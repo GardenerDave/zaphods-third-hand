@@ -1,0 +1,21 @@
+# Generated distiller outputs
+outputs/
+
+# Local/private source intake scratch files
+sources/
+transcripts/
+*.log
+
+# Local user configuration
+.env
+config.env
+*.local.env
+
+# Python/cache artifacts
+__pycache__/
+*.py[cod]
+
+# OS/editor noise
+.DS_Store
+.vscode/
+.idea/
