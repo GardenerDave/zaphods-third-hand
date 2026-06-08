@@ -19,3 +19,9 @@ __pycache__/
 .DS_Store
 .vscode/
 .idea/
+.abacusai/
+.aider.chat.history.md
+.aider.input.history
+.aider.tags.cache.v4/
+_aider-chat/
+conversation.txt
