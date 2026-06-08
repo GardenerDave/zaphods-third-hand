@@ -1,0 +1,282 @@
+{
+  "timestamp_utc": "2026-06-08T03:10:38.314034+00:00",
+  "run_folder": "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context",
+  "profile": "gemma-local",
+  "command": [
+    "/home/owner/Desktop/ICM_Workflow_Optimization_Handoff_SANITIZED/ICM_Workflow_Optimization_Handoff/_aider-chat/bin/python",
+    "-m",
+    "aider",
+    "--model",
+    "openai/gemma4",
+    "--no-show-model-warnings",
+    "--map-tokens",
+    "0",
+    "--no-auto-commits",
+    "--no-dirty-commits",
+    "--yes-always",
+    "--message-file",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/AIDER_MESSAGE.md",
+    "--input-history-file",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/AIDER_INPUT_HISTORY.md",
+    "--chat-history-file",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/AIDER_CHAT_HISTORY.md",
+    "--openai-api-base",
+    "http://localhost:8083/v1",
+    "--timeout",
+    "90",
+    "--no-stream",
+    "--read",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/00_read_snippets/01_REFERENCE.md",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_A.md",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_B.md",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_C.md",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_D.md",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_E.md",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_F.md",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_G.md",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_H.md",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_I.md",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_J.md"
+  ],
+  "model": "openai/gemma4",
+  "openai_api_base": "http://localhost:8083/v1",
+  "map_tokens": 0,
+  "protocol_overhead_tokens": 1400,
+  "context_window": 8192,
+  "completion_reserve": 1536,
+  "compact_request": true,
+  "fit_read_context": true,
+  "bundle_read_inputs": true,
+  "inline_read_digest": false,
+  "minimal_prompt": true,
+  "skip_example_chat": true,
+  "capture_debug_artifacts": true,
+  "edit_format": null,
+  "prewarm": {
+    "attempted": true,
+    "url": "http://localhost:8083/v1/chat/completions",
+    "model": "openai/gemma4",
+    "timeout_seconds": 30,
+    "http_status": 200,
+    "elapsed_seconds": 2.3189769750460982,
+    "success": true,
+    "response_preview": "ok"
+  },
+  "manager_retries": 1,
+  "selected_files": [
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_A.md",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_B.md",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_C.md",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_D.md",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_E.md",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_F.md",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_G.md",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_H.md",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_I.md",
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_J.md"
+  ],
+  "read_only_files": [
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/REFERENCE.md"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 43.9129891480552,
+  "error": "Warning: Input is not a terminal (fd=0).\n",
+  "preflight": {
+    "profile": "gemma-local",
+    "model": "openai/gemma4",
+    "openai_api_base": "http://localhost:8083/v1",
+    "map_tokens": 0,
+    "protocol_overhead_tokens": 1400,
+    "context_window": 8192,
+    "completion_reserve": 1536,
+    "safe_input_budget": 6656,
+    "estimated_total_input_tokens": 465,
+    "estimated_total_with_overhead_tokens": 1865,
+    "within_budget": true,
+    "prompt_mode": "compacted",
+    "editable_file_count": 10,
+    "read_only_file_count": 1,
+    "read_only_estimated_tokens": 135,
+    "validated_shape_match": false,
+    "original_prompt_est_tokens": 175,
+    "effective_prompt_est_tokens": 300,
+    "read_inputs": [
+      {
+        "source": "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/REFERENCE.md",
+        "prepared_path": "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/00_read_snippets/01_REFERENCE.md",
+        "mode": "fit-head",
+        "char_budget": 19704,
+        "read_budget_tokens": 4926,
+        "source_line_count": 12,
+        "kept_line_count": 10,
+        "prepared_char_count": 539,
+        "prepared_estimated_tokens": 135,
+        "truncated": true
+      }
+    ],
+    "largest_inputs": [
+      {
+        "label": "prompt",
+        "path": null,
+        "chars": 1200,
+        "estimated_tokens": 300
+      },
+      {
+        "label": "read_only_file",
+        "path": "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/00_read_snippets/01_REFERENCE.md",
+        "chars": 539,
+        "estimated_tokens": 135
+      },
+      {
+        "label": "editable_file",
+        "path": "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_A.md",
+        "chars": 12,
+        "estimated_tokens": 3
+      },
+      {
+        "label": "editable_file",
+        "path": "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_B.md",
+        "chars": 12,
+        "estimated_tokens": 3
+      },
+      {
+        "label": "editable_file",
+        "path": "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_C.md",
+        "chars": 12,
+        "estimated_tokens": 3
+      }
+    ]
+  },
+  "prepared_read_inputs": [
+    {
+      "source": "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/REFERENCE.md",
+      "prepared_path": "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/00_read_snippets/01_REFERENCE.md",
+      "mode": "fit-head",
+      "char_budget": 19704,
+      "read_budget_tokens": 4926,
+      "source_line_count": 12,
+      "kept_line_count": 10,
+      "prepared_char_count": 539,
+      "prepared_estimated_tokens": 135,
+      "truncated": true
+    }
+  ],
+  "aider_read_inputs": [
+    "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/00_read_snippets/01_REFERENCE.md"
+  ],
+  "read_bundle": null,
+  "read_digest": null,
+  "prewarm_attempts": [
+    {
+      "attempted": true,
+      "url": "http://localhost:8083/v1/chat/completions",
+      "model": "openai/gemma4",
+      "timeout_seconds": 30,
+      "http_status": 200,
+      "elapsed_seconds": 2.3189769750460982,
+      "success": true,
+      "response_preview": "ok"
+    }
+  ],
+  "aider_attempts": [
+    {
+      "attempt_number": 1,
+      "attempt_dir": "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/00_aider_attempts/attempt_01",
+      "output_path": "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/00_aider_attempts/attempt_01/OUTPUT.md",
+      "request_dump_path": "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/00_aider_attempts/attempt_01/AIDER_REQUEST.json",
+      "events_path": "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/00_aider_attempts/attempt_01/AIDER_EVENTS.jsonl",
+      "event_summary": {
+        "event_count": 2,
+        "start_count": 1,
+        "success_count": 1,
+        "error_count": 0,
+        "last_event": "send_completion_success",
+        "last_error": null,
+        "success_previews": [
+          "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_A.md\n```\nalpha ok\n```\n\n10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_B.md\n```\nbeta ok\n```\n\n10_agent_runs/2"
+        ]
+      },
+      "prewarm": {
+        "attempted": true,
+        "url": "http://localhost:8083/v1/chat/completions",
+        "model": "openai/gemma4",
+        "timeout_seconds": 30,
+        "http_status": 200,
+        "elapsed_seconds": 2.3189769750460982,
+        "success": true,
+        "response_preview": "ok"
+      },
+      "exit_code": 0,
+      "elapsed_seconds": 43.9129891480552,
+      "aider_summary": {
+        "thinking_block_present": true,
+        "answer_block_present": true,
+        "applied_edits": [
+          "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_G.md",
+          "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_I.md",
+          "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_J.md",
+          "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_C.md",
+          "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_B.md",
+          "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_H.md",
+          "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_A.md",
+          "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_F.md",
+          "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_E.md",
+          "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_D.md"
+        ],
+        "applied_edit_count": 10,
+        "all_selected_files_edited": true,
+        "unexpected_edit_paths": [],
+        "tokens_sent": 1600,
+        "tokens_received": 1200,
+        "context_error_detected": false,
+        "timeout_hint_detected": false,
+        "connection_error_detected": false,
+        "provider_retry_count": 0,
+        "fatal_error_detected": false
+      }
+    }
+  ],
+  "manager_retry_triggered": false,
+  "final_attempt_number": 1,
+  "aider_summary": {
+    "thinking_block_present": true,
+    "answer_block_present": true,
+    "applied_edits": [
+      "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_G.md",
+      "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_I.md",
+      "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_J.md",
+      "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_C.md",
+      "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_B.md",
+      "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_H.md",
+      "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_A.md",
+      "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_F.md",
+      "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_E.md",
+      "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_D.md"
+    ],
+    "applied_edit_count": 10,
+    "all_selected_files_edited": true,
+    "unexpected_edit_paths": [],
+    "tokens_sent": 1600,
+    "tokens_received": 1200,
+    "context_error_detected": false,
+    "timeout_hint_detected": false,
+    "connection_error_detected": false,
+    "provider_retry_count": 0,
+    "fatal_error_detected": false
+  },
+  "aider_debug": {
+    "request_dump_path": "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/AIDER_REQUEST.json",
+    "events_path": "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/AIDER_EVENTS.jsonl",
+    "event_summary": {
+      "event_count": 2,
+      "start_count": 1,
+      "success_count": 1,
+      "error_count": 0,
+      "last_event": "send_completion_success",
+      "last_error": null,
+      "success_previews": [
+        "10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_A.md\n```\nalpha ok\n```\n\n10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/TARGET_B.md\n```\nbeta ok\n```\n\n10_agent_runs/2"
+      ]
+    }
+  }
+}

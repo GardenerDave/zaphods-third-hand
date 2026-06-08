@@ -1,0 +1,25 @@
+{
+  "triggered": true,
+  "status": "applied",
+  "operation": "excerpt_patch",
+  "operation_count": 1,
+  "operation_types": [
+    "excerpt_patch"
+  ],
+  "file": "local_harness/README.md",
+  "operations": [
+    {
+      "operation": "excerpt_patch",
+      "patches": [
+        {
+          "search": "- Replace block: ``- In `path`, replace the block from `start` through `end` with `new`.`` then ``- Edit only the listed file.``\n- Batch: multiple operation bullets targeting the same file, followed by ``- Edit only the listed file.`` The steps run sequentially, so later steps may rely on text created by earlier ones.",
+          "replace": "- Replace block: ``- In `path`, replace the block from `start` through `end` with `new`.`` then ``- Edit only the listed file.``\n- Excerpt patch: ``- In `path`, apply excerpt patches.`` then a fenced ``SEARCH/REPLACE`` patch set, then ``- Edit only the listed file.``\n- Batch: multiple operation bullets targeting the same file, followed by ``- Edit only the listed file.`` The steps run sequentially, so later steps may rely on text created by earlier ones."
+        },
+        {
+          "search": "- Batched one-file deterministic edits are now manager-routable when each step stays unique.\n- `validated_shape_match` is only a routing hint for Aider-sized work. Run `2026-06-08_033_*` showed a thin real-code file can still stall while matching that heuristic.",
+          "replace": "- Batched one-file deterministic edits are now manager-routable when each step stays unique.\n- Excerpt SEARCH/REPLACE patch sets are now manager-routable when each search stays unique at the step where it is applied.\n- `validated_shape_match` is only a routing hint for Aider-sized work. Run `2026-06-08_033_*` showed a thin real-code file can still stall while matching that heuristic."
+        }
+      ]
+    }
+  ]
+}

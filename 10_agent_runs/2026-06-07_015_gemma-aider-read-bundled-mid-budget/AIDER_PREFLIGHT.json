@@ -1,0 +1,114 @@
+{
+  "profile": "gemma-local",
+  "model": "openai/gemma4",
+  "openai_api_base": "http://localhost:8083/v1",
+  "map_tokens": 0,
+  "protocol_overhead_tokens": 1400,
+  "context_window": 3584,
+  "completion_reserve": 1536,
+  "safe_input_budget": 2048,
+  "estimated_total_input_tokens": 584,
+  "estimated_total_with_overhead_tokens": 1984,
+  "within_budget": true,
+  "prompt_mode": "compacted",
+  "editable_file_count": 1,
+  "read_only_file_count": 6,
+  "read_only_estimated_tokens": 478,
+  "validated_shape_match": false,
+  "original_prompt_est_tokens": 48,
+  "effective_prompt_est_tokens": 103,
+  "read_inputs": [
+    {
+      "source": "local_harness/run_aider_worker.py",
+      "prepared_path": "10_agent_runs/2026-06-07_015_gemma-aider-read-bundled-mid-budget/00_read_snippets/01_run_aider_worker.py",
+      "mode": "fit-head",
+      "char_budget": 361,
+      "read_budget_tokens": 542,
+      "source_line_count": 805,
+      "kept_line_count": 13,
+      "prepared_char_count": 351,
+      "prepared_estimated_tokens": 88,
+      "truncated": true
+    },
+    {
+      "source": "local_harness/run_single_worker.py",
+      "prepared_path": "10_agent_runs/2026-06-07_015_gemma-aider-read-bundled-mid-budget/00_read_snippets/02_run_single_worker.py",
+      "mode": "fit-head",
+      "char_budget": 363,
+      "read_budget_tokens": 542,
+      "source_line_count": 198,
+      "kept_line_count": 12,
+      "prepared_char_count": 336,
+      "prepared_estimated_tokens": 84,
+      "truncated": true
+    },
+    {
+      "source": "local_harness/icm_call.py",
+      "prepared_path": "10_agent_runs/2026-06-07_015_gemma-aider-read-bundled-mid-budget/00_read_snippets/03_icm_call.py",
+      "mode": "fit-head",
+      "char_budget": 370,
+      "read_budget_tokens": 542,
+      "source_line_count": 529,
+      "kept_line_count": 13,
+      "prepared_char_count": 359,
+      "prepared_estimated_tokens": 90,
+      "truncated": true
+    },
+    {
+      "source": "local_harness/README.md",
+      "prepared_path": "10_agent_runs/2026-06-07_015_gemma-aider-read-bundled-mid-budget/00_read_snippets/04_README.md",
+      "mode": "fit-head",
+      "char_budget": 374,
+      "read_budget_tokens": 542,
+      "source_line_count": 111,
+      "kept_line_count": 7,
+      "prepared_char_count": 316,
+      "prepared_estimated_tokens": 79,
+      "truncated": true
+    },
+    {
+      "source": "XX_backend/validate_agent_run.py",
+      "prepared_path": "10_agent_runs/2026-06-07_015_gemma-aider-read-bundled-mid-budget/00_read_snippets/05_validate_agent_run.py",
+      "mode": "fit-head",
+      "char_budget": 403,
+      "read_budget_tokens": 542,
+      "source_line_count": 80,
+      "kept_line_count": 15,
+      "prepared_char_count": 403,
+      "prepared_estimated_tokens": 101,
+      "truncated": true
+    },
+    {
+      "source": "10_agent_runs/README.md",
+      "prepared_path": "10_agent_runs/2026-06-07_015_gemma-aider-read-bundled-mid-budget/00_read_snippets/06_README.md",
+      "mode": "fit-head",
+      "char_budget": 403,
+      "read_budget_tokens": 542,
+      "source_line_count": 77,
+      "kept_line_count": 6,
+      "prepared_char_count": 216,
+      "prepared_estimated_tokens": 54,
+      "truncated": true
+    }
+  ],
+  "largest_inputs": [
+    {
+      "label": "read_only_file",
+      "path": "10_agent_runs/2026-06-07_015_gemma-aider-read-bundled-mid-budget/00_read_snippets/00_READ_BUNDLE.md",
+      "chars": 1912,
+      "estimated_tokens": 478
+    },
+    {
+      "label": "prompt",
+      "path": null,
+      "chars": 410,
+      "estimated_tokens": 103
+    },
+    {
+      "label": "editable_file",
+      "path": "10_agent_runs/2026-06-07_015_gemma-aider-read-bundled-mid-budget/TARGET.md",
+      "chars": 12,
+      "estimated_tokens": 3
+    }
+  ]
+}

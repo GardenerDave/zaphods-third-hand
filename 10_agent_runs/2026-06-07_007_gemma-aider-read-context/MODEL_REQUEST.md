@@ -1,0 +1,7 @@
+Edit only `10_agent_runs/2026-06-07_007_gemma-aider-read-context/TARGET.md`.
+
+Use `10_agent_runs/2026-06-07_007_gemma-aider-read-context/REFERENCE.md` as read-only context.
+
+Set the entire contents of `TARGET.md` to the exact final text described in the reference file.
+
+Do not modify any other file.

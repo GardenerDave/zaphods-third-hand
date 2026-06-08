@@ -1,0 +1,43 @@
+{
+  "profile": "gemma-local",
+  "model": "openai/gemma4",
+  "openai_api_base": "http://localhost:8083/v1",
+  "map_tokens": 0,
+  "context_window": 8192,
+  "completion_reserve": 1536,
+  "safe_input_budget": 6656,
+  "estimated_total_input_tokens": 173,
+  "within_budget": true,
+  "prompt_mode": "compacted",
+  "original_prompt_est_tokens": 76,
+  "effective_prompt_est_tokens": 128,
+  "read_inputs": [
+    {
+      "source": "10_agent_runs/2026-06-07_007_gemma-aider-read-context/REFERENCE.md",
+      "prepared_path": "10_agent_runs/2026-06-07_007_gemma-aider-read-context/00_read_snippets/01_REFERENCE.md",
+      "mode": "head",
+      "source_line_count": 5,
+      "kept_line_count": 5
+    }
+  ],
+  "largest_inputs": [
+    {
+      "label": "prompt",
+      "path": null,
+      "chars": 511,
+      "estimated_tokens": 128
+    },
+    {
+      "label": "read_only_file",
+      "path": "10_agent_runs/2026-06-07_007_gemma-aider-read-context/00_read_snippets/01_REFERENCE.md",
+      "chars": 167,
+      "estimated_tokens": 42
+    },
+    {
+      "label": "editable_file",
+      "path": "10_agent_runs/2026-06-07_007_gemma-aider-read-context/TARGET.md",
+      "chars": 12,
+      "estimated_tokens": 3
+    }
+  ]
+}

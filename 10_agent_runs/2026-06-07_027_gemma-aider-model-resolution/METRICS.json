@@ -1,0 +1,196 @@
+{
+  "timestamp_utc": "2026-06-08T03:22:26.988883+00:00",
+  "run_folder": "10_agent_runs/2026-06-07_027_gemma-aider-model-resolution",
+  "profile": "gemma-local",
+  "command": [
+    "/home/owner/Desktop/ICM_Workflow_Optimization_Handoff_SANITIZED/ICM_Workflow_Optimization_Handoff/_aider-chat/bin/python",
+    "-m",
+    "aider",
+    "--model",
+    "openai/gemma4",
+    "--no-show-model-warnings",
+    "--map-tokens",
+    "0",
+    "--no-auto-commits",
+    "--no-dirty-commits",
+    "--yes-always",
+    "--message-file",
+    "10_agent_runs/2026-06-07_027_gemma-aider-model-resolution/AIDER_MESSAGE.md",
+    "--input-history-file",
+    "10_agent_runs/2026-06-07_027_gemma-aider-model-resolution/AIDER_INPUT_HISTORY.md",
+    "--chat-history-file",
+    "10_agent_runs/2026-06-07_027_gemma-aider-model-resolution/AIDER_CHAT_HISTORY.md",
+    "--openai-api-base",
+    "http://localhost:8083/v1",
+    "--timeout",
+    "90",
+    "--no-stream",
+    "local_harness/icm_call.py",
+    "local_harness/tests/test_icm_call.py"
+  ],
+  "model": "openai/gemma4",
+  "openai_api_base": "http://localhost:8083/v1",
+  "map_tokens": 0,
+  "protocol_overhead_tokens": 1400,
+  "context_window": 8192,
+  "completion_reserve": 1536,
+  "compact_request": true,
+  "fit_read_context": true,
+  "bundle_read_inputs": true,
+  "inline_read_digest": true,
+  "minimal_prompt": true,
+  "skip_example_chat": true,
+  "capture_debug_artifacts": true,
+  "edit_format": null,
+  "prewarm": {
+    "attempted": true,
+    "url": "http://localhost:8083/v1/chat/completions",
+    "model": "openai/gemma4",
+    "timeout_seconds": 30,
+    "http_status": 200,
+    "elapsed_seconds": 2.1892355339368805,
+    "success": true,
+    "response_preview": "ok"
+  },
+  "manager_retries": 1,
+  "selected_files": [
+    "local_harness/icm_call.py",
+    "local_harness/tests/test_icm_call.py"
+  ],
+  "read_only_files": [],
+  "exit_code": 0,
+  "elapsed_seconds": 60.91260413499549,
+  "error": "Warning: Input is not a terminal (fd=0).\n",
+  "preflight": {
+    "profile": "gemma-local",
+    "model": "openai/gemma4",
+    "openai_api_base": "http://localhost:8083/v1",
+    "map_tokens": 0,
+    "protocol_overhead_tokens": 1400,
+    "context_window": 8192,
+    "completion_reserve": 1536,
+    "safe_input_budget": 6656,
+    "estimated_total_input_tokens": 5595,
+    "estimated_total_with_overhead_tokens": 6995,
+    "within_budget": false,
+    "prompt_mode": "compacted",
+    "editable_file_count": 2,
+    "read_only_file_count": 0,
+    "read_only_estimated_tokens": 0,
+    "validated_shape_match": false,
+    "original_prompt_est_tokens": 220,
+    "effective_prompt_est_tokens": 272,
+    "read_inputs": [],
+    "largest_inputs": [
+      {
+        "label": "editable_file",
+        "path": "local_harness/icm_call.py",
+        "chars": 16474,
+        "estimated_tokens": 4119
+      },
+      {
+        "label": "editable_file",
+        "path": "local_harness/tests/test_icm_call.py",
+        "chars": 4814,
+        "estimated_tokens": 1204
+      },
+      {
+        "label": "prompt",
+        "path": null,
+        "chars": 1085,
+        "estimated_tokens": 272
+      }
+    ]
+  },
+  "prepared_read_inputs": [],
+  "aider_read_inputs": [],
+  "read_bundle": null,
+  "read_digest": null,
+  "prewarm_attempts": [
+    {
+      "attempted": true,
+      "url": "http://localhost:8083/v1/chat/completions",
+      "model": "openai/gemma4",
+      "timeout_seconds": 30,
+      "http_status": 200,
+      "elapsed_seconds": 2.1892355339368805,
+      "success": true,
+      "response_preview": "ok"
+    }
+  ],
+  "aider_attempts": [
+    {
+      "attempt_number": 1,
+      "attempt_dir": "10_agent_runs/2026-06-07_027_gemma-aider-model-resolution/00_aider_attempts/attempt_01",
+      "output_path": "10_agent_runs/2026-06-07_027_gemma-aider-model-resolution/00_aider_attempts/attempt_01/OUTPUT.md",
+      "request_dump_path": "10_agent_runs/2026-06-07_027_gemma-aider-model-resolution/00_aider_attempts/attempt_01/AIDER_REQUEST.json",
+      "events_path": "10_agent_runs/2026-06-07_027_gemma-aider-model-resolution/00_aider_attempts/attempt_01/AIDER_EVENTS.jsonl",
+      "event_summary": {
+        "event_count": 2,
+        "start_count": 1,
+        "success_count": 1,
+        "error_count": 0,
+        "last_event": "send_completion_success",
+        "last_error": null,
+        "success_previews": []
+      },
+      "prewarm": {
+        "attempted": true,
+        "url": "http://localhost:8083/v1/chat/completions",
+        "model": "openai/gemma4",
+        "timeout_seconds": 30,
+        "http_status": 200,
+        "elapsed_seconds": 2.1892355339368805,
+        "success": true,
+        "response_preview": "ok"
+      },
+      "exit_code": 0,
+      "elapsed_seconds": 60.91260413499549,
+      "aider_summary": {
+        "thinking_block_present": true,
+        "answer_block_present": true,
+        "applied_edits": [],
+        "applied_edit_count": 0,
+        "all_selected_files_edited": false,
+        "unexpected_edit_paths": [],
+        "tokens_sent": null,
+        "tokens_received": null,
+        "context_error_detected": false,
+        "timeout_hint_detected": false,
+        "connection_error_detected": false,
+        "provider_retry_count": 0,
+        "fatal_error_detected": false
+      }
+    }
+  ],
+  "manager_retry_triggered": false,
+  "final_attempt_number": 1,
+  "aider_summary": {
+    "thinking_block_present": true,
+    "answer_block_present": true,
+    "applied_edits": [],
+    "applied_edit_count": 0,
+    "all_selected_files_edited": false,
+    "unexpected_edit_paths": [],
+    "tokens_sent": null,
+    "tokens_received": null,
+    "context_error_detected": false,
+    "timeout_hint_detected": false,
+    "connection_error_detected": false,
+    "provider_retry_count": 0,
+    "fatal_error_detected": false
+  },
+  "aider_debug": {
+    "request_dump_path": "10_agent_runs/2026-06-07_027_gemma-aider-model-resolution/AIDER_REQUEST.json",
+    "events_path": "10_agent_runs/2026-06-07_027_gemma-aider-model-resolution/AIDER_EVENTS.jsonl",
+    "event_summary": {
+      "event_count": 2,
+      "start_count": 1,
+      "success_count": 1,
+      "error_count": 0,
+      "last_event": "send_completion_success",
+      "last_error": null,
+      "success_previews": []
+    }
+  }
+}

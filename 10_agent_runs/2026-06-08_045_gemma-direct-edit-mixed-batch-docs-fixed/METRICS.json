@@ -1,0 +1,213 @@
+{
+  "timestamp_utc": "2026-06-08T16:24:23.123521+00:00",
+  "run_folder": "10_agent_runs/2026-06-08_045_gemma-direct-edit-mixed-batch-docs-fixed",
+  "profile": "gemma-local",
+  "command": [],
+  "model": "openai/gemma4",
+  "openai_api_base": "http://localhost:8083/v1",
+  "map_tokens": 0,
+  "protocol_overhead_tokens": 1400,
+  "context_window": 8192,
+  "completion_reserve": 1536,
+  "compact_request": true,
+  "fit_read_context": true,
+  "bundle_read_inputs": true,
+  "inline_read_digest": true,
+  "minimal_prompt": true,
+  "skip_example_chat": true,
+  "capture_debug_artifacts": true,
+  "direct_edit_short_circuit": true,
+  "edit_format": null,
+  "prewarm": null,
+  "manager_retries": 1,
+  "selected_files": [
+    "local_harness/README.md",
+    "02_sessions/2026-06-08_abacus-handoff-gemma-aider.md"
+  ],
+  "read_only_files": [],
+  "exit_code": 0,
+  "elapsed_seconds": 0.0,
+  "error": null,
+  "preflight": {
+    "profile": "gemma-local",
+    "model": "openai/gemma4",
+    "openai_api_base": "http://localhost:8083/v1",
+    "map_tokens": 0,
+    "protocol_overhead_tokens": 1400,
+    "context_window": 8192,
+    "completion_reserve": 1536,
+    "safe_input_budget": 6656,
+    "estimated_total_input_tokens": 10455,
+    "estimated_total_with_overhead_tokens": 11855,
+    "within_budget": false,
+    "prompt_mode": "compacted",
+    "editable_file_count": 2,
+    "read_only_file_count": 0,
+    "read_only_estimated_tokens": 0,
+    "validated_shape_match": false,
+    "original_prompt_est_tokens": 619,
+    "effective_prompt_est_tokens": 300,
+    "read_inputs": [],
+    "largest_inputs": [
+      {
+        "label": "editable_file",
+        "path": "02_sessions/2026-06-08_abacus-handoff-gemma-aider.md",
+        "chars": 23155,
+        "estimated_tokens": 5789
+      },
+      {
+        "label": "editable_file",
+        "path": "local_harness/README.md",
+        "chars": 17462,
+        "estimated_tokens": 4366
+      },
+      {
+        "label": "prompt",
+        "path": null,
+        "chars": 1200,
+        "estimated_tokens": 300
+      }
+    ],
+    "direct_edit_candidate": {
+      "eligible": true,
+      "reason": "eligible",
+      "operation": "mixed_batch",
+      "selected_file_count": 2,
+      "selected_file_limit": 4,
+      "prompt_char_count": 2473,
+      "prompt_char_limit": 4096,
+      "file_size_limit_bytes": 24576,
+      "prompt_matches_pattern": true,
+      "target_file": null,
+      "file_exists": null,
+      "file_bytes": null,
+      "within_file_size_limit": null,
+      "unique_match_count": null,
+      "operation_count": 2,
+      "operation_types": [
+        "excerpt_patch",
+        "insert_after"
+      ],
+      "target_files": [
+        "local_harness/README.md",
+        "02_sessions/2026-06-08_abacus-handoff-gemma-aider.md"
+      ],
+      "target_file_count": 2,
+      "contains_excerpt_patch": true,
+      "operations": [
+        {
+          "index": 1,
+          "operation": "excerpt_patch",
+          "file": "local_harness/README.md",
+          "patch_count": 2,
+          "patch_summaries": [
+            {
+              "patch_index": 1,
+              "match_count": 1
+            },
+            {
+              "patch_index": 2,
+              "match_count": 1
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "operation": "insert_after",
+          "file": "02_sessions/2026-06-08_abacus-handoff-gemma-aider.md",
+          "match_count": 1
+        }
+      ],
+      "file_details": [
+        {
+          "file": "local_harness/README.md",
+          "resolved_target_path": "/home/owner/Desktop/ICM_Workflow_Optimization_Handoff_SANITIZED/ICM_Workflow_Optimization_Handoff/local_harness/README.md",
+          "file_exists": true,
+          "file_bytes": 17462,
+          "within_file_size_limit": true
+        },
+        {
+          "file": "02_sessions/2026-06-08_abacus-handoff-gemma-aider.md",
+          "resolved_target_path": "/home/owner/Desktop/ICM_Workflow_Optimization_Handoff_SANITIZED/ICM_Workflow_Optimization_Handoff/02_sessions/2026-06-08_abacus-handoff-gemma-aider.md",
+          "file_exists": true,
+          "file_bytes": 23155,
+          "within_file_size_limit": true
+        }
+      ]
+    },
+    "direct_edit_budget_bypass_available": true
+  },
+  "preflight_blocked": false,
+  "prepared_read_inputs": [],
+  "aider_read_inputs": [],
+  "read_bundle": null,
+  "read_digest": null,
+  "prewarm_attempts": [],
+  "aider_attempts": [],
+  "manager_retry_triggered": false,
+  "final_attempt_number": 0,
+  "aider_summary": {
+    "thinking_block_present": false,
+    "answer_block_present": false,
+    "applied_edits": [],
+    "applied_edit_count": 0,
+    "all_selected_files_edited": false,
+    "unexpected_edit_paths": [],
+    "tokens_sent": null,
+    "tokens_received": null,
+    "context_error_detected": false,
+    "timeout_hint_detected": false,
+    "connection_error_detected": false,
+    "provider_retry_count": 0,
+    "fatal_error_detected": false,
+    "timeout_event_detected": false,
+    "manager_timeout_detected": false,
+    "direct_edit_fallback_triggered": false,
+    "direct_edit_short_circuit_triggered": true
+  },
+  "aider_debug": {
+    "request_dump_path": null,
+    "events_path": null,
+    "event_summary": null,
+    "direct_edit_path": "10_agent_runs/2026-06-08_045_gemma-direct-edit-mixed-batch-docs-fixed/AIDER_DIRECT_EDIT.json"
+  },
+  "direct_edit": {
+    "triggered": true,
+    "eligible": true,
+    "status": "applied",
+    "operation": "mixed_batch",
+    "operation_count": 2,
+    "operation_types": [
+      "excerpt_patch",
+      "insert_after"
+    ],
+    "file": null,
+    "target_files": [
+      "local_harness/README.md",
+      "02_sessions/2026-06-08_abacus-handoff-gemma-aider.md"
+    ],
+    "operations": [
+      {
+        "file": "local_harness/README.md",
+        "operation": "excerpt_patch",
+        "patches": [
+          {
+            "search": "- Excerpt patch: ``- In `path`, apply excerpt patches.`` then a fenced ``SEARCH/REPLACE`` patch set, then ``- Edit only the listed file.``\n- One-file batch: multiple operation bullets targeting the same file, followed by ``- Edit only the listed file.`` The steps run sequentially, so later steps may rely on text created by earlier ones.\n- Multi-file batch: multiple operation bullets targeting up to 4 selected files, followed by ``- Edit only the listed files.`` Each step still has to stay unique at the point where it is applied.",
+            "replace": "- Excerpt patch: ``- In `path`, apply excerpt patches.`` then a fenced ``SEARCH/REPLACE`` patch set, then ``- Edit only the listed file.``\n- One-file batch: multiple operation bullets targeting the same file, followed by ``- Edit only the listed file.`` The steps run sequentially, so later steps may rely on text created by earlier ones.\n- Mixed batch: one excerpt patch plus literal deterministic operations across the selected files, followed by ``- Edit only the listed files.`` Each step still has to stay unique at the point where it is applied.\n- Multi-file batch: multiple operation bullets targeting up to 4 selected files, followed by ``- Edit only the listed files.`` Each step still has to stay unique at the point where it is applied."
+          },
+          {
+            "search": "- Excerpt SEARCH/REPLACE patch sets are now manager-routable when each search stays unique at the step where it is applied.\n- Bounded deterministic multi-file batches are now manager-routable for up to 4 selected files, and run `2026-06-08_043_*` live-proved the path on 2 real repo files.",
+            "replace": "- Excerpt SEARCH/REPLACE patch sets are now manager-routable when each search stays unique at the step where it is applied.\n- Mixed excerpt-plus-literal batches are now manager-routable when the excerpt SEARCH block and every literal step stay unique at the point where each step is applied.\n- Bounded deterministic multi-file batches are now manager-routable for up to 4 selected files, and run `2026-06-08_043_*` live-proved the path on 2 real repo files."
+          }
+        ]
+      },
+      {
+        "file": "02_sessions/2026-06-08_abacus-handoff-gemma-aider.md",
+        "operation": "insert_after",
+        "anchor": "- Over-budget deterministic work no longer has to pay the whole-file Aider path first.\n",
+        "new": "- Mixed excerpt-plus-literal batches across selected files are now live-proven.\n"
+      }
+    ],
+    "output_text": "[direct-edit fallback]\nApplied deterministic mixed batch edit across 2 files\n- operation 1: excerpt_patch in local_harness/README.md\n- operation 2: insert_after in 02_sessions/2026-06-08_abacus-handoff-gemma-aider.md\n"
+  }
+}

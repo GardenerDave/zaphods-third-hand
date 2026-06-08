@@ -1,0 +1,94 @@
+{
+  "profile": "gemma-local",
+  "model": "openai/gemma4",
+  "openai_api_base": "http://localhost:8083/v1",
+  "map_tokens": 0,
+  "context_window": 8192,
+  "completion_reserve": 1536,
+  "safe_input_budget": 6656,
+  "estimated_total_input_tokens": 6558,
+  "within_budget": true,
+  "prompt_mode": "compacted",
+  "editable_file_count": 1,
+  "read_only_file_count": 6,
+  "read_only_estimated_tokens": 6455,
+  "validated_shape_match": false,
+  "original_prompt_est_tokens": 48,
+  "effective_prompt_est_tokens": 100,
+  "read_inputs": [
+    {
+      "source": "local_harness/run_aider_worker.py",
+      "prepared_path": "10_agent_runs/2026-06-07_009_gemma-aider-read-overflow/00_read_snippets/01_run_aider_worker.py",
+      "mode": "head",
+      "source_line_count": 624,
+      "kept_line_count": 160
+    },
+    {
+      "source": "local_harness/run_single_worker.py",
+      "prepared_path": "10_agent_runs/2026-06-07_009_gemma-aider-read-overflow/00_read_snippets/02_run_single_worker.py",
+      "mode": "head",
+      "source_line_count": 198,
+      "kept_line_count": 160
+    },
+    {
+      "source": "local_harness/icm_call.py",
+      "prepared_path": "10_agent_runs/2026-06-07_009_gemma-aider-read-overflow/00_read_snippets/03_icm_call.py",
+      "mode": "head",
+      "source_line_count": 529,
+      "kept_line_count": 160
+    },
+    {
+      "source": "local_harness/README.md",
+      "prepared_path": "10_agent_runs/2026-06-07_009_gemma-aider-read-overflow/00_read_snippets/04_README.md",
+      "mode": "head",
+      "source_line_count": 111,
+      "kept_line_count": 111
+    },
+    {
+      "source": "XX_backend/validate_agent_run.py",
+      "prepared_path": "10_agent_runs/2026-06-07_009_gemma-aider-read-overflow/00_read_snippets/05_validate_agent_run.py",
+      "mode": "head",
+      "source_line_count": 80,
+      "kept_line_count": 80
+    },
+    {
+      "source": "10_agent_runs/README.md",
+      "prepared_path": "10_agent_runs/2026-06-07_009_gemma-aider-read-overflow/00_read_snippets/06_README.md",
+      "mode": "head",
+      "source_line_count": 77,
+      "kept_line_count": 77
+    }
+  ],
+  "largest_inputs": [
+    {
+      "label": "read_only_file",
+      "path": "10_agent_runs/2026-06-07_009_gemma-aider-read-overflow/00_read_snippets/02_run_single_worker.py",
+      "chars": 5471,
+      "estimated_tokens": 1368
+    },
+    {
+      "label": "read_only_file",
+      "path": "10_agent_runs/2026-06-07_009_gemma-aider-read-overflow/00_read_snippets/01_run_aider_worker.py",
+      "chars": 4869,
+      "estimated_tokens": 1218
+    },
+    {
+      "label": "read_only_file",
+      "path": "10_agent_runs/2026-06-07_009_gemma-aider-read-overflow/00_read_snippets/04_README.md",
+      "chars": 4706,
+      "estimated_tokens": 1177
+    },
+    {
+      "label": "read_only_file",
+      "path": "10_agent_runs/2026-06-07_009_gemma-aider-read-overflow/00_read_snippets/03_icm_call.py",
+      "chars": 4594,
+      "estimated_tokens": 1149
+    },
+    {
+      "label": "read_only_file",
+      "path": "10_agent_runs/2026-06-07_009_gemma-aider-read-overflow/00_read_snippets/06_README.md",
+      "chars": 3827,
+      "estimated_tokens": 957
+    }
+  ]
+}

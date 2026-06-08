@@ -1,0 +1,53 @@
+{
+  "profile": "gemma-local",
+  "model": "openai/gemma4",
+  "openai_api_base": "http://localhost:8083/v1",
+  "map_tokens": 0,
+  "protocol_overhead_tokens": 1400,
+  "context_window": 8192,
+  "completion_reserve": 1536,
+  "safe_input_budget": 6656,
+  "estimated_total_input_tokens": 250,
+  "estimated_total_with_overhead_tokens": 1650,
+  "within_budget": true,
+  "prompt_mode": "compacted",
+  "editable_file_count": 6,
+  "read_only_file_count": 0,
+  "read_only_estimated_tokens": 0,
+  "validated_shape_match": false,
+  "original_prompt_est_tokens": 101,
+  "effective_prompt_est_tokens": 232,
+  "read_inputs": [],
+  "largest_inputs": [
+    {
+      "label": "prompt",
+      "path": null,
+      "chars": 926,
+      "estimated_tokens": 232
+    },
+    {
+      "label": "editable_file",
+      "path": "10_agent_runs/2026-06-07_023_gemma-aider-six-file/TARGET_A.md",
+      "chars": 12,
+      "estimated_tokens": 3
+    },
+    {
+      "label": "editable_file",
+      "path": "10_agent_runs/2026-06-07_023_gemma-aider-six-file/TARGET_B.md",
+      "chars": 12,
+      "estimated_tokens": 3
+    },
+    {
+      "label": "editable_file",
+      "path": "10_agent_runs/2026-06-07_023_gemma-aider-six-file/TARGET_C.md",
+      "chars": 12,
+      "estimated_tokens": 3
+    },
+    {
+      "label": "editable_file",
+      "path": "10_agent_runs/2026-06-07_023_gemma-aider-six-file/TARGET_D.md",
+      "chars": 12,
+      "estimated_tokens": 3
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "triggered": true,
+  "status": "applied",
+  "operation": "mixed_batch",
+  "operation_count": 2,
+  "operation_types": [
+    "excerpt_patch",
+    "insert_after"
+  ],
+  "file": null,
+  "target_files": [
+    "local_harness/README.md",
+    "02_sessions/2026-06-08_abacus-handoff-gemma-aider.md"
+  ],
+  "operations": [
+    {
+      "file": "local_harness/README.md",
+      "operation": "excerpt_patch",
+      "patches": [
+        {
+          "search": "- Excerpt patch: ``- In `path`, apply excerpt patches.`` then a fenced ``SEARCH/REPLACE`` patch set, then ``- Edit only the listed file.``\n- One-file batch: multiple operation bullets targeting the same file, followed by ``- Edit only the listed file.`` The steps run sequentially, so later steps may rely on text created by earlier ones.\n- Multi-file batch: multiple operation bullets targeting up to 4 selected files, followed by ``- Edit only the listed files.`` Each step still has to stay unique at the point where it is applied.",
+          "replace": "- Excerpt patch: ``- In `path`, apply excerpt patches.`` then a fenced ``SEARCH/REPLACE`` patch set, then ``- Edit only the listed file.``\n- One-file batch: multiple operation bullets targeting the same file, followed by ``- Edit only the listed file.`` The steps run sequentially, so later steps may rely on text created by earlier ones.\n- Mixed batch: one excerpt patch plus literal deterministic operations across the selected files, followed by ``- Edit only the listed files.`` Each step still has to stay unique at the point where it is applied.\n- Multi-file batch: multiple operation bullets targeting up to 4 selected files, followed by ``- Edit only the listed files.`` Each step still has to stay unique at the point where it is applied."
+        },
+        {
+          "search": "- Excerpt SEARCH/REPLACE patch sets are now manager-routable when each search stays unique at the step where it is applied.\n- Bounded deterministic multi-file batches are now manager-routable for up to 4 selected files, and run `2026-06-08_043_*` live-proved the path on 2 real repo files.",
+          "replace": "- Excerpt SEARCH/REPLACE patch sets are now manager-routable when each search stays unique at the step where it is applied.\n- Mixed excerpt-plus-literal batches are now manager-routable when the excerpt SEARCH block and every literal step stay unique at the point where each step is applied.\n- Bounded deterministic multi-file batches are now manager-routable for up to 4 selected files, and run `2026-06-08_043_*` live-proved the path on 2 real repo files."
+        }
+      ]
+    },
+    {
+      "file": "02_sessions/2026-06-08_abacus-handoff-gemma-aider.md",
+      "operation": "insert_after",
+      "anchor": "- Over-budget deterministic work no longer has to pay the whole-file Aider path first.\n",
+      "new": "- Mixed excerpt-plus-literal batches across selected files are now live-proven.\n"
+    }
+  ]
+}

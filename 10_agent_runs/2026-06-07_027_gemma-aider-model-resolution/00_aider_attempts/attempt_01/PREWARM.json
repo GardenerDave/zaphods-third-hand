@@ -1,0 +1,10 @@
+{
+  "attempted": true,
+  "url": "http://localhost:8083/v1/chat/completions",
+  "model": "openai/gemma4",
+  "timeout_seconds": 30,
+  "http_status": 200,
+  "elapsed_seconds": 2.1892355339368805,
+  "success": true,
+  "response_preview": "ok"
+}

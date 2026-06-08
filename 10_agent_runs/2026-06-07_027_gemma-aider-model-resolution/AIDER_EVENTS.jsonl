@@ -1,0 +1,2 @@
+{"event": "send_completion_start", "model": "openai/gemma4", "message_count": 4, "stream": false}
+{"event": "send_completion_success", "model": "openai/gemma4", "response_preview": ""}

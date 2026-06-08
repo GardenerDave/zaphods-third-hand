@@ -1,0 +1,23 @@
+{
+  "triggered": true,
+  "status": "applied",
+  "operation": "batch",
+  "operation_count": 2,
+  "operation_types": [
+    "replace",
+    "insert_after"
+  ],
+  "file": "local_harness/README.md",
+  "operations": [
+    {
+      "operation": "replace",
+      "old": "- Deterministic insert-after and insert-before edits are now manager-routable when the anchor appears exactly once.",
+      "new": "- Deterministic insert-after and insert-before edits are now manager-routable when each anchor stays unique at the step where it is used."
+    },
+    {
+      "operation": "insert_after",
+      "anchor": "- Deterministic insert-after and insert-before edits are now manager-routable when each anchor stays unique at the step where it is used.",
+      "new": "\n- Batched one-file deterministic edits are now manager-routable when each step stays unique."
+    }
+  ]
+}

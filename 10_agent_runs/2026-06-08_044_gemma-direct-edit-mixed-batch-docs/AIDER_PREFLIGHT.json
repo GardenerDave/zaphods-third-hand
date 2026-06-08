@@ -1,0 +1,111 @@
+{
+  "profile": "gemma-local",
+  "model": "openai/gemma4",
+  "openai_api_base": "http://localhost:8083/v1",
+  "map_tokens": 0,
+  "protocol_overhead_tokens": 1400,
+  "context_window": 8192,
+  "completion_reserve": 1536,
+  "safe_input_budget": 6656,
+  "estimated_total_input_tokens": 10455,
+  "estimated_total_with_overhead_tokens": 11855,
+  "within_budget": false,
+  "prompt_mode": "compacted",
+  "editable_file_count": 2,
+  "read_only_file_count": 0,
+  "read_only_estimated_tokens": 0,
+  "validated_shape_match": false,
+  "original_prompt_est_tokens": 619,
+  "effective_prompt_est_tokens": 300,
+  "read_inputs": [],
+  "largest_inputs": [
+    {
+      "label": "editable_file",
+      "path": "02_sessions/2026-06-08_abacus-handoff-gemma-aider.md",
+      "chars": 23155,
+      "estimated_tokens": 5789
+    },
+    {
+      "label": "editable_file",
+      "path": "local_harness/README.md",
+      "chars": 17462,
+      "estimated_tokens": 4366
+    },
+    {
+      "label": "prompt",
+      "path": null,
+      "chars": 1200,
+      "estimated_tokens": 300
+    }
+  ],
+  "direct_edit_candidate": {
+    "eligible": false,
+    "reason": "no_unique_match",
+    "operation": "mixed_batch",
+    "selected_file_count": 2,
+    "selected_file_limit": 4,
+    "prompt_char_count": 2473,
+    "prompt_char_limit": 4096,
+    "file_size_limit_bytes": 24576,
+    "prompt_matches_pattern": true,
+    "target_file": null,
+    "file_exists": null,
+    "file_bytes": null,
+    "within_file_size_limit": null,
+    "unique_match_count": null,
+    "operation_count": 2,
+    "operation_types": [
+      "excerpt_patch",
+      "insert_after"
+    ],
+    "target_files": [
+      "local_harness/README.md",
+      "02_sessions/2026-06-08_abacus-handoff-gemma-aider.md"
+    ],
+    "target_file_count": 2,
+    "contains_excerpt_patch": true,
+    "operations": [
+      {
+        "index": 1,
+        "operation": "excerpt_patch",
+        "file": "local_harness/README.md",
+        "patch_count": 2,
+        "patch_summaries": [
+          {
+            "patch_index": 1,
+            "match_count": 1
+          },
+          {
+            "patch_index": 2,
+            "match_count": 1
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "operation": "insert_after",
+        "file": "02_sessions/2026-06-08_abacus-handoff-gemma-aider.md",
+        "match_count": 0
+      }
+    ],
+    "file_details": [
+      {
+        "file": "local_harness/README.md",
+        "resolved_target_path": "/home/owner/Desktop/ICM_Workflow_Optimization_Handoff_SANITIZED/ICM_Workflow_Optimization_Handoff/local_harness/README.md",
+        "file_exists": true,
+        "file_bytes": 17462,
+        "within_file_size_limit": true
+      },
+      {
+        "file": "02_sessions/2026-06-08_abacus-handoff-gemma-aider.md",
+        "resolved_target_path": "/home/owner/Desktop/ICM_Workflow_Optimization_Handoff_SANITIZED/ICM_Workflow_Optimization_Handoff/02_sessions/2026-06-08_abacus-handoff-gemma-aider.md",
+        "file_exists": true,
+        "file_bytes": 23155,
+        "within_file_size_limit": true
+      }
+    ],
+    "failing_operation_index": 2,
+    "failing_file": "02_sessions/2026-06-08_abacus-handoff-gemma-aider.md"
+  },
+  "direct_edit_budget_bypass_available": false
+}

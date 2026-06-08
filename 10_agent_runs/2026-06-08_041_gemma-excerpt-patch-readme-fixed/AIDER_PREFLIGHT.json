@@ -1,0 +1,72 @@
+{
+  "profile": "gemma-local",
+  "model": "openai/gemma4",
+  "openai_api_base": "http://localhost:8083/v1",
+  "map_tokens": 0,
+  "protocol_overhead_tokens": 1400,
+  "context_window": 8192,
+  "completion_reserve": 1536,
+  "safe_input_budget": 6656,
+  "estimated_total_input_tokens": 3945,
+  "estimated_total_with_overhead_tokens": 5345,
+  "within_budget": true,
+  "prompt_mode": "compacted",
+  "editable_file_count": 1,
+  "read_only_file_count": 0,
+  "read_only_estimated_tokens": 0,
+  "validated_shape_match": false,
+  "original_prompt_est_tokens": 405,
+  "effective_prompt_est_tokens": 300,
+  "read_inputs": [],
+  "largest_inputs": [
+    {
+      "label": "editable_file",
+      "path": "local_harness/README.md",
+      "chars": 14579,
+      "estimated_tokens": 3645
+    },
+    {
+      "label": "prompt",
+      "path": null,
+      "chars": 1200,
+      "estimated_tokens": 300
+    }
+  ],
+  "direct_edit_candidate": {
+    "eligible": true,
+    "reason": "eligible",
+    "operation": "excerpt_patch",
+    "selected_file_count": 1,
+    "prompt_char_count": 1620,
+    "prompt_char_limit": 4096,
+    "file_size_limit_bytes": 16384,
+    "prompt_matches_pattern": true,
+    "target_file": "local_harness/README.md",
+    "file_exists": true,
+    "file_bytes": 14579,
+    "within_file_size_limit": true,
+    "unique_match_count": null,
+    "operation_count": 1,
+    "operation_types": [
+      "excerpt_patch"
+    ],
+    "operations": [
+      {
+        "index": 1,
+        "operation": "excerpt_patch",
+        "patch_count": 2,
+        "patch_summaries": [
+          {
+            "patch_index": 1,
+            "match_count": 1
+          },
+          {
+            "patch_index": 2,
+            "match_count": 1
+          }
+        ]
+      }
+    ],
+    "resolved_target_path": "/home/owner/Desktop/ICM_Workflow_Optimization_Handoff_SANITIZED/ICM_Workflow_Optimization_Handoff/local_harness/README.md"
+  }
+}

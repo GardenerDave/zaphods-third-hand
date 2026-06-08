@@ -1,0 +1,35 @@
+{
+  "profile": "gemma-local",
+  "model": "openai/gemma4",
+  "openai_api_base": "http://localhost:8083/v1",
+  "map_tokens": 0,
+  "context_window": 8192,
+  "completion_reserve": 1536,
+  "safe_input_budget": 6656,
+  "estimated_total_input_tokens": 145,
+  "within_budget": true,
+  "prompt_mode": "compacted",
+  "original_prompt_est_tokens": 68,
+  "effective_prompt_est_tokens": 135,
+  "read_inputs": [],
+  "largest_inputs": [
+    {
+      "label": "prompt",
+      "path": null,
+      "chars": 537,
+      "estimated_tokens": 135
+    },
+    {
+      "label": "editable_file",
+      "path": "10_agent_runs/2026-06-07_006_gemma-aider-two-file/TARGET_A.md",
+      "chars": 18,
+      "estimated_tokens": 5
+    },
+    {
+      "label": "editable_file",
+      "path": "10_agent_runs/2026-06-07_006_gemma-aider-two-file/TARGET_B.md",
+      "chars": 17,
+      "estimated_tokens": 5
+    }
+  ]
+}
