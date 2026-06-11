@@ -27,6 +27,11 @@ Use this checklist before publishing or handing off Zaphod's Third Hand.
 - [ ] Confirm unattended execution and batched execution are not described as approved.
 - [ ] Confirm generated review patches are described as non-canonical until accepted by human review.
 
+## Attribution
+
+- [ ] If AI assistance is acknowledged, use wording such as "assisted by AI".
+- [ ] Do not use AI co-author commit trailers.
+
 ## License And Contact
 
 - [ ] Confirm `LICENSE.md` and `COMMERCIAL_USE.md` match the intended noncommercial sharing terms.

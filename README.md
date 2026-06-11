@@ -163,3 +163,9 @@ Read:
 ## Contributions
 
 External contributions are not accepted yet.
+
+## Attribution Policy
+
+When using AI assistance for commits or release notes in this repository, use wording such as "assisted by AI".
+
+Do not add AI co-author commit trailers.
