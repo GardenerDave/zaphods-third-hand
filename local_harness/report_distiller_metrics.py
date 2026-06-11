@@ -28,6 +28,7 @@ PROFILE_SETTINGS: dict[str, dict[str, int]] = {
         "ZTH_DISTILLER_TIMEOUT": 900,
     },
 }
+MIN_RECENT_RUNS_FOR_CHUNKED = 3
 
 
 @dataclass
@@ -206,6 +207,11 @@ def recommended_profile(runs: list[RunSummary], completed_only: bool) -> tuple[s
     if avg_elapsed > 600:
         return ("smoke", "Recent runs are very slow.")
     if recent.chunked_mode:
+        if len(runs) < MIN_RECENT_RUNS_FOR_CHUNKED:
+            return (
+                "normal",
+                "Need at least 3 recent runs before recommending chunked as default.",
+            )
         if recent.status == "completed" and recent.chunk_failed == 0 and recent.chunk_row_failures == 0:
             return ("chunked", "Recent chunked runs completed without chunk failures.")
         return ("normal", "Recent chunked runs need stabilization before using chunked as default.")
