@@ -463,10 +463,12 @@ def main() -> int:
     runs_dir = Path(args.runs_dir)
     runs = discover_runs(runs_dir, max(1, args.limit), args.completed_only)
     min_recent_runs_for_chunked = max(1, args.min_recent_runs_for_chunked)
-    if args.json:
-        print(json.dumps(build_report_payload(runs, args.completed_only, min_recent_runs_for_chunked), indent=2))
+    if args.advisor_only and args.json:
+        print(json.dumps(build_advisor_payload(runs, args.completed_only, min_recent_runs_for_chunked), indent=2))
     elif args.advisor_only:
         print_advisor_report(runs, args.completed_only, min_recent_runs_for_chunked)
+    elif args.json:
+        print(json.dumps(build_report_payload(runs, args.completed_only, min_recent_runs_for_chunked), indent=2))
     else:
         print_report(runs, args.completed_only, min_recent_runs_for_chunked)
     return 0

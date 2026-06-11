@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 import sys
+import subprocess
 
 sys.path.insert(0, os.fspath(Path(__file__).resolve().parents[1]))
 
@@ -447,6 +448,85 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual(3, payload["run_count"])
             self.assertEqual("chunked", payload["recommended_profile"])
             self.assertIn("Recent chunked runs completed without chunk failures", payload["recommendation"])
+
+    def test_cli_advisor_only_json_returns_advisor_payload_shape(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runs_dir = Path(temp_dir) / "run_records"
+            run_dir = runs_dir / "run-100"
+            run_dir.mkdir(parents=True)
+            (run_dir / "METRICS.json").write_text(
+                json.dumps(
+                    {
+                        "source_id": "s100",
+                        "short_title": "t100",
+                        "status": "completed",
+                        "compact_mode": "0",
+                        "chunked_mode": "1",
+                        "stages": {"chunk_summary": {"attempted": 1, "succeeded": 1, "failed": 0, "retry_count": 0}},
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            script = Path(report_distiller_metrics.__file__)
+            proc = subprocess.run(
+                [
+                    sys.executable,
+                    os.fspath(script),
+                    "--runs-dir",
+                    os.fspath(runs_dir),
+                    "--advisor-only",
+                    "--json",
+                    "--min-recent-runs-for-chunked",
+                    "1",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertEqual(0, proc.returncode)
+            payload = json.loads(proc.stdout)
+            self.assertIn("recommended_profile", payload)
+            self.assertIn("recent_run", payload)
+            self.assertNotIn("runs", payload)
+
+    def test_cli_json_without_advisor_only_returns_full_payload(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runs_dir = Path(temp_dir) / "run_records"
+            run_dir = runs_dir / "run-101"
+            run_dir.mkdir(parents=True)
+            (run_dir / "METRICS.json").write_text(
+                json.dumps(
+                    {
+                        "source_id": "s101",
+                        "short_title": "t101",
+                        "status": "completed",
+                        "compact_mode": "1",
+                        "chunked_mode": "0",
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            script = Path(report_distiller_metrics.__file__)
+            proc = subprocess.run(
+                [
+                    sys.executable,
+                    os.fspath(script),
+                    "--runs-dir",
+                    os.fspath(runs_dir),
+                    "--json",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertEqual(0, proc.returncode)
+            payload = json.loads(proc.stdout)
+            self.assertIn("runs", payload)
+            self.assertEqual(1, len(payload["runs"]))
 
 
 if __name__ == "__main__":
