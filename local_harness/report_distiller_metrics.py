@@ -381,11 +381,61 @@ def build_calibration_metrics(runs_dir: Path | None, calibration_window: int) ->
     }
 
 
-def interviewer_verdict(readiness: str, calibration_metrics: dict[str, Any]) -> tuple[str, str]:
+def load_role_critiques(role_critiques_file: Path | None) -> list[dict[str, Any]]:
+    if role_critiques_file is None or not role_critiques_file.is_file():
+        return []
+    text = role_critiques_file.read_text(encoding="utf-8").strip()
+    if not text:
+        return []
+    try:
+        parsed = json.loads(text)
+        if isinstance(parsed, list):
+            return [item for item in parsed if isinstance(item, dict)]
+        if isinstance(parsed, dict):
+            critiques = parsed.get("critiques", [])
+            if isinstance(critiques, list):
+                return [item for item in critiques if isinstance(item, dict)]
+            return []
+    except json.JSONDecodeError:
+        pass
+    critiques: list[dict[str, Any]] = []
+    for line in text.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            parsed_line = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(parsed_line, dict):
+            critiques.append(parsed_line)
+    return critiques
+
+
+def summarize_role_critiques(critiques: list[dict[str, Any]]) -> dict[str, Any]:
+    blocking_levels = {"high", "critical", "blocker"}
+    unresolved = [item for item in critiques if str(item.get("status", "open")).lower() not in {"resolved", "closed"}]
+    blocking = [item for item in unresolved if str(item.get("severity", "")).lower() in blocking_levels]
+    focus_areas = sorted({str(item.get("focus_area", "")).strip() for item in unresolved if str(item.get("focus_area", "")).strip()})
+    roles = sorted({str(item.get("role", "")).strip() for item in unresolved if str(item.get("role", "")).strip()})
+    return {
+        "total_count": len(critiques),
+        "unresolved_count": len(unresolved),
+        "blocking_count": len(blocking),
+        "roles": roles,
+        "focus_areas": focus_areas,
+    }
+
+
+def interviewer_verdict(readiness: str, calibration_metrics: dict[str, Any], role_critique_summary: dict[str, Any]) -> tuple[str, str]:
+    if int(role_critique_summary.get("blocking_count", 0)) > 0:
+        return ("hold", "Role critiques include unresolved blocking findings.")
     if readiness == "not_ready":
         return ("hold", "Readiness gate is not_ready.")
     if readiness == "needs_review":
         return ("proceed_with_review", "Readiness gate requires review.")
+    if int(role_critique_summary.get("unresolved_count", 0)) > 0:
+        return ("proceed_with_review", "Role critiques include unresolved non-blocking findings.")
     high_success_rate = calibration_metrics.get("confidence_high_success_rate")
     false_high_count = int(calibration_metrics.get("false_high_count", 0))
     if isinstance(high_success_rate, (int, float)) and high_success_rate < 0.5:
@@ -470,12 +520,14 @@ def build_report_payload(
     min_recent_runs_for_chunked: int,
     runs_dir: Path | None = None,
     calibration_window: int = DEFAULT_CALIBRATION_WINDOW,
+    role_critique_summary: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     profile, reason = recommended_profile(runs, completed_only, min_recent_runs_for_chunked)
     confidence, confidence_reason = recommendation_confidence(runs, completed_only, min_recent_runs_for_chunked)
     readiness, readiness_reason, blocking_signals = readiness_decision(runs, completed_only, min_recent_runs_for_chunked)
     calibration = build_calibration_metrics(runs_dir, calibration_window)
-    verdict, verdict_reason = interviewer_verdict(readiness, calibration)
+    role_summary = role_critique_summary or summarize_role_critiques([])
+    verdict, verdict_reason = interviewer_verdict(readiness, calibration, role_summary)
     return {
         "run_count": len(runs),
         "completed_only": completed_only,
@@ -494,6 +546,7 @@ def build_report_payload(
             "min_recent_runs_for_chunked": min_recent_runs_for_chunked,
         },
         "confidence_signals": build_confidence_signals(runs),
+        "role_critique_summary": role_summary,
         "calibration_metrics": calibration,
         "runs": [serialize_run(run) for run in runs],
     }
@@ -505,12 +558,14 @@ def build_advisor_payload(
     min_recent_runs_for_chunked: int,
     runs_dir: Path | None = None,
     calibration_window: int = DEFAULT_CALIBRATION_WINDOW,
+    role_critique_summary: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     profile, reason = recommended_profile(runs, completed_only, min_recent_runs_for_chunked)
     confidence, confidence_reason = recommendation_confidence(runs, completed_only, min_recent_runs_for_chunked)
     readiness, readiness_reason, blocking_signals = readiness_decision(runs, completed_only, min_recent_runs_for_chunked)
     calibration = build_calibration_metrics(runs_dir, calibration_window)
-    verdict, verdict_reason = interviewer_verdict(readiness, calibration)
+    role_summary = role_critique_summary or summarize_role_critiques([])
+    verdict, verdict_reason = interviewer_verdict(readiness, calibration, role_summary)
     payload: dict[str, Any] = {
         "run_count": len(runs),
         "completed_only": completed_only,
@@ -529,6 +584,7 @@ def build_advisor_payload(
             "min_recent_runs_for_chunked": min_recent_runs_for_chunked,
         },
         "confidence_signals": build_confidence_signals(runs),
+        "role_critique_summary": role_summary,
         "calibration_metrics": calibration,
     }
     if runs:
@@ -596,8 +652,22 @@ def print_report(runs: list[RunSummary], completed_only: bool, min_recent_runs_f
     print(recommendation(runs, completed_only, min_recent_runs_for_chunked))
 
 
-def print_advisor_report(runs: list[RunSummary], completed_only: bool, min_recent_runs_for_chunked: int, runs_dir: Path, calibration_window: int) -> None:
-    payload = build_advisor_payload(runs, completed_only, min_recent_runs_for_chunked, runs_dir=runs_dir, calibration_window=calibration_window)
+def print_advisor_report(
+    runs: list[RunSummary],
+    completed_only: bool,
+    min_recent_runs_for_chunked: int,
+    runs_dir: Path,
+    calibration_window: int,
+    role_critique_summary: dict[str, Any],
+) -> None:
+    payload = build_advisor_payload(
+        runs,
+        completed_only,
+        min_recent_runs_for_chunked,
+        runs_dir=runs_dir,
+        calibration_window=calibration_window,
+        role_critique_summary=role_critique_summary,
+    )
     print("Distiller advisor")
     print()
     print(f"Runs analyzed: {payload['run_count']}")
@@ -623,6 +693,12 @@ def print_advisor_report(runs: list[RunSummary], completed_only: bool, min_recen
         f"window={calibration['window_size']}, entries={calibration['entries_analyzed']}, "
         f"high_success_rate={calibration['confidence_high_success_rate']}, "
         f"false_high={calibration['false_high_count']}, false_low={calibration['false_low_count']}"
+    )
+    role_summary = payload["role_critique_summary"]
+    print(
+        "Role critiques: "
+        f"total={role_summary['total_count']}, unresolved={role_summary['unresolved_count']}, "
+        f"blocking={role_summary['blocking_count']}"
     )
     recent = payload.get("recent_run")
     if isinstance(recent, dict):
@@ -679,6 +755,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_CALIBRATION_WINDOW,
         help="Number of recent ledger entries to use for calibration metrics.",
     )
+    parser.add_argument(
+        "--role-critiques-file",
+        default="",
+        help="Optional JSON/JSONL file containing role critique findings.",
+    )
     return parser
 
 
@@ -689,6 +770,8 @@ def main() -> int:
     runs = discover_runs(runs_dir, max(1, args.limit), args.completed_only)
     min_recent_runs_for_chunked = max(1, args.min_recent_runs_for_chunked)
     calibration_window = max(1, args.calibration_window)
+    role_critiques_file = Path(args.role_critiques_file) if args.role_critiques_file else None
+    role_critique_summary = summarize_role_critiques(load_role_critiques(role_critiques_file))
     profile, _ = recommended_profile(runs, args.completed_only, min_recent_runs_for_chunked)
     confidence, _ = recommendation_confidence(runs, args.completed_only, min_recent_runs_for_chunked)
     readiness, _, _ = readiness_decision(runs, args.completed_only, min_recent_runs_for_chunked)
@@ -703,12 +786,20 @@ def main() -> int:
                     min_recent_runs_for_chunked,
                     runs_dir=runs_dir,
                     calibration_window=calibration_window,
+                    role_critique_summary=role_critique_summary,
                 ),
                 indent=2,
             )
         )
     elif args.advisor_only:
-        print_advisor_report(runs, args.completed_only, min_recent_runs_for_chunked, runs_dir, calibration_window)
+        print_advisor_report(
+            runs,
+            args.completed_only,
+            min_recent_runs_for_chunked,
+            runs_dir,
+            calibration_window,
+            role_critique_summary,
+        )
     elif args.json:
         print(
             json.dumps(
@@ -718,6 +809,7 @@ def main() -> int:
                     min_recent_runs_for_chunked,
                     runs_dir=runs_dir,
                     calibration_window=calibration_window,
+                    role_critique_summary=role_critique_summary,
                 ),
                 indent=2,
             )

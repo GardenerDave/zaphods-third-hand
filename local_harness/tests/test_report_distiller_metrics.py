@@ -534,6 +534,7 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertIn("blocking_signals", payload)
             self.assertIn("interviewer_verdict", payload)
             self.assertIn("interviewer_verdict_reason", payload)
+            self.assertIn("role_critique_summary", payload)
             self.assertIn("recent_run", payload)
             self.assertIn("confidence_signals", payload)
             self.assertIn("calibration_metrics", payload)
@@ -583,6 +584,7 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertIn("blocking_signals", payload)
             self.assertIn("interviewer_verdict", payload)
             self.assertIn("interviewer_verdict_reason", payload)
+            self.assertIn("role_critique_summary", payload)
             self.assertIn("calibration_metrics", payload)
             self.assertEqual(1, len(payload["runs"]))
             self.assertEqual(4, payload["thresholds"]["min_recent_runs_for_chunked"])
@@ -627,6 +629,7 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertIn("Blocking signals:", proc.stdout)
             self.assertIn("Interviewer verdict:", proc.stdout)
             self.assertIn("Calibration:", proc.stdout)
+            self.assertIn("Role critiques:", proc.stdout)
             self.assertIn("completed=0", proc.stdout)
             self.assertIn("failed=1", proc.stdout)
             self.assertIn("chunk_retries=2", proc.stdout)
@@ -726,6 +729,92 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual(1, metrics["false_low_count"])
             self.assertEqual(2, metrics["high_confidence_count"])
             self.assertEqual(0.5, metrics["confidence_high_success_rate"])
+
+    def test_load_role_critiques_supports_json_array_and_summary(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            role_file = Path(temp_dir) / "role_critiques.json"
+            role_file.write_text(
+                json.dumps(
+                    [
+                        {"role": "security", "focus_area": "auth", "severity": "high", "status": "open"},
+                        {"role": "perf", "focus_area": "latency", "severity": "low", "status": "resolved"},
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            critiques = report_distiller_metrics.load_role_critiques(role_file)
+            summary = report_distiller_metrics.summarize_role_critiques(critiques)
+            self.assertEqual(2, summary["total_count"])
+            self.assertEqual(1, summary["unresolved_count"])
+            self.assertEqual(1, summary["blocking_count"])
+            self.assertIn("security", summary["roles"])
+            self.assertIn("auth", summary["focus_areas"])
+
+    def test_interviewer_verdict_hold_on_blocking_role_critique(self):
+        verdict, reason = report_distiller_metrics.interviewer_verdict(
+            "ready",
+            {"confidence_high_success_rate": 1.0, "false_high_count": 0},
+            {"blocking_count": 1, "unresolved_count": 1},
+        )
+        self.assertEqual("hold", verdict)
+        self.assertIn("blocking", reason)
+
+    def test_interviewer_verdict_review_on_unresolved_role_critique(self):
+        verdict, reason = report_distiller_metrics.interviewer_verdict(
+            "ready",
+            {"confidence_high_success_rate": 1.0, "false_high_count": 0},
+            {"blocking_count": 0, "unresolved_count": 2},
+        )
+        self.assertEqual("proceed_with_review", verdict)
+        self.assertIn("unresolved", reason)
+
+    def test_cli_role_critiques_file_influences_verdict(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runs_dir = Path(temp_dir) / "run_records"
+            run_dir = runs_dir / "run-301"
+            run_dir.mkdir(parents=True)
+            (run_dir / "METRICS.json").write_text(
+                json.dumps(
+                    {
+                        "source_id": "s301",
+                        "short_title": "t301",
+                        "status": "completed",
+                        "compact_mode": "0",
+                        "chunked_mode": "1",
+                        "stages": {"chunk_summary": {"attempted": 1, "succeeded": 1, "failed": 0, "retry_count": 0}},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            role_file = Path(temp_dir) / "role_critiques.json"
+            role_file.write_text(
+                json.dumps([{"role": "qa", "focus_area": "tests", "severity": "critical", "status": "open"}]),
+                encoding="utf-8",
+            )
+
+            script = Path(report_distiller_metrics.__file__)
+            proc = subprocess.run(
+                [
+                    sys.executable,
+                    os.fspath(script),
+                    "--runs-dir",
+                    os.fspath(runs_dir),
+                    "--advisor-only",
+                    "--json",
+                    "--min-recent-runs-for-chunked",
+                    "1",
+                    "--role-critiques-file",
+                    os.fspath(role_file),
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(0, proc.returncode)
+            payload = json.loads(proc.stdout)
+            self.assertEqual("hold", payload["interviewer_verdict"])
+            self.assertEqual(1, payload["role_critique_summary"]["blocking_count"])
+
     def test_interviewer_verdict_proceed_when_ready_and_calibration_clean(self):
         verdict, reason = report_distiller_metrics.interviewer_verdict(
             "ready",
@@ -733,6 +822,7 @@ class ReportDistillerMetricsTests(unittest.TestCase):
                 "confidence_high_success_rate": 1.0,
                 "false_high_count": 0,
             },
+            {"blocking_count": 0, "unresolved_count": 0},
         )
         self.assertEqual("proceed", verdict)
         self.assertIn("ready", reason)
@@ -744,6 +834,7 @@ class ReportDistillerMetricsTests(unittest.TestCase):
                 "confidence_high_success_rate": 0.8,
                 "false_high_count": 1,
             },
+            {"blocking_count": 0, "unresolved_count": 0},
         )
         self.assertEqual("proceed_with_review", verdict)
 
@@ -754,12 +845,13 @@ class ReportDistillerMetricsTests(unittest.TestCase):
                 "confidence_high_success_rate": 0.4,
                 "false_high_count": 0,
             },
+            {"blocking_count": 0, "unresolved_count": 0},
         )
         self.assertEqual("hold", verdict)
 
     def test_interviewer_verdict_tracks_readiness_gate(self):
-        verdict_not_ready, _ = report_distiller_metrics.interviewer_verdict("not_ready", {})
-        verdict_needs_review, _ = report_distiller_metrics.interviewer_verdict("needs_review", {})
+        verdict_not_ready, _ = report_distiller_metrics.interviewer_verdict("not_ready", {}, {"blocking_count": 0, "unresolved_count": 0})
+        verdict_needs_review, _ = report_distiller_metrics.interviewer_verdict("needs_review", {}, {"blocking_count": 0, "unresolved_count": 0})
         self.assertEqual("hold", verdict_not_ready)
         self.assertEqual("proceed_with_review", verdict_needs_review)
 

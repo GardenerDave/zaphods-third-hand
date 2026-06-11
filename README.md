@@ -110,9 +110,9 @@ python3 local_harness/report_distiller_metrics.py --runs-dir examples --limit 3
 
 This reads sanitized example data under `examples/sample_metrics_run/`. Real distiller runs write their metrics under `outputs/run_records/`.
 
-Use `--json` if you want advisory profile guidance fields (`recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `calibration_metrics`, `thresholds`) for read-only tuning support.
+Use `--json` if you want advisory profile guidance fields (`recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `calibration_metrics`, `thresholds`) for read-only tuning support.
 
-Advisor JSON also includes `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `calibration_metrics`, and `confidence_signals` (`recent_completed_count`, `recent_failed_count`, `recent_chunk_retry_count`) when you use `--advisor-only --json`.
+Advisor JSON also includes `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `calibration_metrics`, and `confidence_signals` (`recent_completed_count`, `recent_failed_count`, `recent_chunk_retry_count`) when you use `--advisor-only --json`.
 
 Use `--advisor-only` for a concise operator handoff summary:
 
@@ -136,6 +136,12 @@ To append unseen runs to the interviewer ledger and include rolling calibration 
 
 ```bash
 python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --advisor-only --json --write-ledger --calibration-window 20
+```
+
+To include role-based critique findings in verdicting:
+
+```bash
+python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --advisor-only --json --role-critiques-file outputs/role_critiques.jsonl
 ```
 
 ## Basic Setup Assumptions

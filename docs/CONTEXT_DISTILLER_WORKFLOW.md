@@ -125,7 +125,7 @@ python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records
 python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --json
 ```
 
-The JSON output includes `recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `calibration_metrics`, and `thresholds` for read-only guidance.
+The JSON output includes `recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `calibration_metrics`, and `thresholds` for read-only guidance.
 
 You can tune threshold behavior from CLI:
 
@@ -139,6 +139,12 @@ You can append unseen runs to the interviewer ledger and include rolling calibra
 python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --advisor-only --json --write-ledger --calibration-window 20
 ```
 
+You can include role-critique findings in the verdict gate:
+
+```bash
+python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --advisor-only --json --role-critiques-file outputs/role_critiques.jsonl
+```
+
 You can use advisor-only summaries for handoff:
 
 ```bash
@@ -150,7 +156,7 @@ Flag behavior:
 
 - `--json`: full JSON payload with per-run details.
 - `--advisor-only`: concise text advisory summary.
-- `--advisor-only --json`: concise advisor JSON payload without per-run `runs` details; includes `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `calibration_metrics`, and `confidence_signals`.
+- `--advisor-only --json`: concise advisor JSON payload without per-run `runs` details; includes `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `calibration_metrics`, and `confidence_signals`.
 
 Threshold scenarios:
 

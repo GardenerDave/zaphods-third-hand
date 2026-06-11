@@ -145,7 +145,7 @@ For machine-readable output with advisory profile guidance:
 python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --json
 ```
 
-The JSON report includes `recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `calibration_metrics`, and `thresholds`.
+The JSON report includes `recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `calibration_metrics`, and `thresholds`.
 
 For a concise operator handoff view:
 
@@ -157,7 +157,7 @@ Flag behavior:
 
 - `--json`: full JSON payload, including per-run `runs` details.
 - `--advisor-only`: concise text summary.
-- `--advisor-only --json`: concise advisor JSON payload without per-run `runs` details; includes `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `calibration_metrics`, and `confidence_signals`.
+- `--advisor-only --json`: concise advisor JSON payload without per-run `runs` details; includes `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `calibration_metrics`, and `confidence_signals`.
 
 You can override the chunked recommendation threshold:
 
@@ -169,6 +169,12 @@ You can append unseen runs to the interviewer ledger and include rolling calibra
 
 ```bash
 python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --advisor-only --json --write-ledger --calibration-window 20
+```
+
+You can include role-critique findings in the verdict gate:
+
+```bash
+python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --advisor-only --json --role-critiques-file outputs/role_critiques.jsonl
 ```
 
 Practical examples:
