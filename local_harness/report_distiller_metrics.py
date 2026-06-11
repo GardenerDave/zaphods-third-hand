@@ -229,6 +229,34 @@ def recommendation(runs: list[RunSummary], completed_only: bool, min_recent_runs
     return f"Recommend {profile} profile: {reason} Suggested settings: {setting_text}."
 
 
+def build_confidence_signals(runs: list[RunSummary]) -> dict[str, int]:
+    return {
+        "recent_completed_count": sum(1 for run in runs if run.status == "completed"),
+        "recent_failed_count": sum(1 for run in runs if run.status != "completed"),
+        "recent_chunk_retry_count": sum(run.chunk_retry_count for run in runs),
+    }
+
+
+def recommendation_confidence(
+    runs: list[RunSummary],
+    completed_only: bool,
+    min_recent_runs_for_chunked: int,
+) -> tuple[str, str]:
+    if not runs:
+        return ("low", "No recent runs available.")
+    signals = build_confidence_signals(runs)
+    if not completed_only and signals["recent_failed_count"] > 0:
+        return ("low", "Recent failures detected in analyzed runs.")
+    if signals["recent_chunk_retry_count"] > 0:
+        return ("low", "Chunk retries exceed threshold (0).")
+    if len(runs) < min_recent_runs_for_chunked:
+        return ("medium", f"Only {len(runs)} recent runs available; need {min_recent_runs_for_chunked} for high confidence.")
+    recent = runs[0]
+    if recent.status == "completed" and recent.chunk_failed == 0 and recent.chunk_row_failures == 0:
+        return ("high", "Recent window is stable with completed runs and no chunk failures.")
+    return ("medium", "Recent run signals are partially stable.")
+
+
 def format_mode(run: RunSummary) -> str:
     if run.chunked_mode and run.compact_mode:
         return "compact+chunked"
@@ -304,6 +332,7 @@ def build_report_payload(
     min_recent_runs_for_chunked: int,
 ) -> dict[str, Any]:
     profile, reason = recommended_profile(runs, completed_only, min_recent_runs_for_chunked)
+    confidence, confidence_reason = recommendation_confidence(runs, completed_only, min_recent_runs_for_chunked)
     return {
         "run_count": len(runs),
         "completed_only": completed_only,
@@ -311,9 +340,12 @@ def build_report_payload(
         "recommended_profile": profile,
         "recommended_settings": PROFILE_SETTINGS[profile],
         "recommendation_reason": reason,
+        "recommendation_confidence": confidence,
+        "confidence_reason": confidence_reason,
         "thresholds": {
             "min_recent_runs_for_chunked": min_recent_runs_for_chunked,
         },
+        "confidence_signals": build_confidence_signals(runs),
         "runs": [serialize_run(run) for run in runs],
     }
 
@@ -324,6 +356,7 @@ def build_advisor_payload(
     min_recent_runs_for_chunked: int,
 ) -> dict[str, Any]:
     profile, reason = recommended_profile(runs, completed_only, min_recent_runs_for_chunked)
+    confidence, confidence_reason = recommendation_confidence(runs, completed_only, min_recent_runs_for_chunked)
     payload: dict[str, Any] = {
         "run_count": len(runs),
         "completed_only": completed_only,
@@ -331,14 +364,12 @@ def build_advisor_payload(
         "recommended_settings": PROFILE_SETTINGS[profile],
         "recommendation_reason": reason,
         "recommendation": recommendation(runs, completed_only, min_recent_runs_for_chunked),
+        "recommendation_confidence": confidence,
+        "confidence_reason": confidence_reason,
         "thresholds": {
             "min_recent_runs_for_chunked": min_recent_runs_for_chunked,
         },
-        "confidence_signals": {
-            "recent_completed_count": sum(1 for run in runs if run.status == "completed"),
-            "recent_failed_count": sum(1 for run in runs if run.status != "completed"),
-            "recent_chunk_retry_count": sum(run.chunk_retry_count for run in runs),
-        },
+        "confidence_signals": build_confidence_signals(runs),
     }
     if runs:
         recent = runs[0]
@@ -412,6 +443,7 @@ def print_advisor_report(runs: list[RunSummary], completed_only: bool, min_recen
     print(f"Runs analyzed: {payload['run_count']}")
     print(f"Recommended profile: {payload['recommended_profile']}")
     print(f"Reason: {payload['recommendation_reason']}")
+    print(f"Recommendation confidence: {payload['recommendation_confidence']} ({payload['confidence_reason']})")
     print(f"Threshold min recent runs for chunked: {payload['thresholds']['min_recent_runs_for_chunked']}")
     confidence = payload["confidence_signals"]
     print(

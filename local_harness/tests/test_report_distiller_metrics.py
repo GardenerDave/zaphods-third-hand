@@ -188,6 +188,8 @@ class ReportDistillerMetricsTests(unittest.TestCase):
 
             self.assertEqual("smoke", payload["recommended_profile"])
             self.assertIn("Chunk retries detected", payload["recommendation"])
+            self.assertEqual("low", payload["recommendation_confidence"])
+            self.assertIn("Chunk retries", payload["confidence_reason"])
 
     def test_recommendation_prefers_normal_when_chunked_run_count_is_below_threshold(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -231,6 +233,8 @@ class ReportDistillerMetricsTests(unittest.TestCase):
 
             self.assertEqual("normal", payload["recommended_profile"])
             self.assertIn("Need at least 3 recent runs", payload["recommendation"])
+            self.assertEqual("medium", payload["recommendation_confidence"])
+            self.assertIn("need 3", payload["confidence_reason"])
 
     def test_recommendation_threshold_override_allows_chunked_with_two_runs(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -274,6 +278,8 @@ class ReportDistillerMetricsTests(unittest.TestCase):
 
             self.assertEqual("chunked", payload["recommended_profile"])
             self.assertEqual(2, payload["thresholds"]["min_recent_runs_for_chunked"])
+            self.assertEqual("high", payload["recommendation_confidence"])
+            self.assertIn("stable", payload["confidence_reason"])
 
     def test_recommendation_prefers_chunked_when_recent_chunked_runs_are_clean(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -317,6 +323,7 @@ class ReportDistillerMetricsTests(unittest.TestCase):
 
             self.assertEqual("chunked", payload["recommended_profile"])
             self.assertIn("ZTH_DISTILLER_CHUNK_LINES", payload["recommendation"])
+            self.assertEqual("high", payload["recommendation_confidence"])
 
     def test_build_advisor_payload_includes_recent_run_summary(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -355,6 +362,8 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual("chunked", payload["recommended_profile"])
             self.assertEqual("chunked", payload["recent_run"]["mode"])
             self.assertEqual(44, payload["recent_run"]["total_elapsed_seconds"])
+            self.assertEqual("high", payload["recommendation_confidence"])
+            self.assertIn("stable", payload["confidence_reason"])
             self.assertEqual(1, payload["confidence_signals"]["recent_completed_count"])
             self.assertEqual(0, payload["confidence_signals"]["recent_failed_count"])
             self.assertEqual(0, payload["confidence_signals"]["recent_chunk_retry_count"])
@@ -367,6 +376,8 @@ class ReportDistillerMetricsTests(unittest.TestCase):
         )
 
         self.assertEqual("smoke", payload["recommended_profile"])
+        self.assertEqual("low", payload["recommendation_confidence"])
+        self.assertIn("No recent runs", payload["confidence_reason"])
         self.assertNotIn("recent_run", payload)
         self.assertEqual(0, payload["confidence_signals"]["recent_completed_count"])
         self.assertEqual(0, payload["confidence_signals"]["recent_failed_count"])
@@ -409,6 +420,7 @@ class ReportDistillerMetricsTests(unittest.TestCase):
 
             self.assertEqual(3, payload["run_count"])
             self.assertEqual("smoke", payload["recommended_profile"])
+            self.assertEqual("low", payload["recommendation_confidence"])
             self.assertIn("Recent failures detected", payload["recommendation"])
 
     def test_mixed_recent_window_completed_only_can_recommend_chunked(self):
@@ -454,6 +466,7 @@ class ReportDistillerMetricsTests(unittest.TestCase):
 
             self.assertEqual(3, payload["run_count"])
             self.assertEqual("chunked", payload["recommended_profile"])
+            self.assertEqual("high", payload["recommendation_confidence"])
             self.assertIn("Recent chunked runs completed without chunk failures", payload["recommendation"])
 
     def test_cli_advisor_only_json_returns_advisor_payload_shape(self):
@@ -495,6 +508,8 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual(0, proc.returncode)
             payload = json.loads(proc.stdout)
             self.assertIn("recommended_profile", payload)
+            self.assertIn("recommendation_confidence", payload)
+            self.assertIn("confidence_reason", payload)
             self.assertIn("recent_run", payload)
             self.assertIn("confidence_signals", payload)
             self.assertEqual(1, payload["thresholds"]["min_recent_runs_for_chunked"])
@@ -537,6 +552,8 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual(0, proc.returncode)
             payload = json.loads(proc.stdout)
             self.assertIn("runs", payload)
+            self.assertIn("recommendation_confidence", payload)
+            self.assertIn("confidence_reason", payload)
             self.assertEqual(1, len(payload["runs"]))
             self.assertEqual(4, payload["thresholds"]["min_recent_runs_for_chunked"])
 
@@ -575,6 +592,7 @@ class ReportDistillerMetricsTests(unittest.TestCase):
 
             self.assertEqual(0, proc.returncode)
             self.assertIn("Confidence signals:", proc.stdout)
+            self.assertIn("Recommendation confidence:", proc.stdout)
             self.assertIn("completed=0", proc.stdout)
             self.assertIn("failed=1", proc.stdout)
             self.assertIn("chunk_retries=2", proc.stdout)
