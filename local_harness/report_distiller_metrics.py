@@ -334,6 +334,11 @@ def build_advisor_payload(
         "thresholds": {
             "min_recent_runs_for_chunked": min_recent_runs_for_chunked,
         },
+        "confidence_signals": {
+            "recent_completed_count": sum(1 for run in runs if run.status == "completed"),
+            "recent_failed_count": sum(1 for run in runs if run.status != "completed"),
+            "recent_chunk_retry_count": sum(run.chunk_retry_count for run in runs),
+        },
     }
     if runs:
         recent = runs[0]
@@ -408,6 +413,12 @@ def print_advisor_report(runs: list[RunSummary], completed_only: bool, min_recen
     print(f"Recommended profile: {payload['recommended_profile']}")
     print(f"Reason: {payload['recommendation_reason']}")
     print(f"Threshold min recent runs for chunked: {payload['thresholds']['min_recent_runs_for_chunked']}")
+    confidence = payload["confidence_signals"]
+    print(
+        "Confidence signals: "
+        f"completed={confidence['recent_completed_count']}, failed={confidence['recent_failed_count']}, "
+        f"chunk_retries={confidence['recent_chunk_retry_count']}"
+    )
     settings = ", ".join(f"{key}={value}" for key, value in payload["recommended_settings"].items())
     print(f"Recommended settings: {settings}")
     recent = payload.get("recent_run")

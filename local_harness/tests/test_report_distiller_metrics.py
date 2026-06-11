@@ -355,6 +355,9 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual("chunked", payload["recommended_profile"])
             self.assertEqual("chunked", payload["recent_run"]["mode"])
             self.assertEqual(44, payload["recent_run"]["total_elapsed_seconds"])
+            self.assertEqual(1, payload["confidence_signals"]["recent_completed_count"])
+            self.assertEqual(0, payload["confidence_signals"]["recent_failed_count"])
+            self.assertEqual(0, payload["confidence_signals"]["recent_chunk_retry_count"])
 
     def test_build_advisor_payload_omits_recent_run_when_empty(self):
         payload = report_distiller_metrics.build_advisor_payload(
@@ -365,6 +368,10 @@ class ReportDistillerMetricsTests(unittest.TestCase):
 
         self.assertEqual("smoke", payload["recommended_profile"])
         self.assertNotIn("recent_run", payload)
+        self.assertEqual(0, payload["confidence_signals"]["recent_completed_count"])
+        self.assertEqual(0, payload["confidence_signals"]["recent_failed_count"])
+        self.assertEqual(0, payload["confidence_signals"]["recent_chunk_retry_count"])
+
 
     def test_mixed_recent_window_with_failure_recommends_smoke(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -489,6 +496,8 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             payload = json.loads(proc.stdout)
             self.assertIn("recommended_profile", payload)
             self.assertIn("recent_run", payload)
+            self.assertIn("confidence_signals", payload)
+            self.assertEqual(1, payload["thresholds"]["min_recent_runs_for_chunked"])
             self.assertNotIn("runs", payload)
 
     def test_cli_json_without_advisor_only_returns_full_payload(self):
@@ -517,6 +526,8 @@ class ReportDistillerMetricsTests(unittest.TestCase):
                     "--runs-dir",
                     os.fspath(runs_dir),
                     "--json",
+                    "--min-recent-runs-for-chunked",
+                    "4",
                 ],
                 check=False,
                 capture_output=True,
@@ -527,6 +538,46 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             payload = json.loads(proc.stdout)
             self.assertIn("runs", payload)
             self.assertEqual(1, len(payload["runs"]))
+            self.assertEqual(4, payload["thresholds"]["min_recent_runs_for_chunked"])
+
+    def test_cli_advisor_only_text_includes_confidence_signals(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runs_dir = Path(temp_dir) / "run_records"
+            run_dir = runs_dir / "run-102"
+            run_dir.mkdir(parents=True)
+            (run_dir / "METRICS.json").write_text(
+                json.dumps(
+                    {
+                        "source_id": "s102",
+                        "short_title": "t102",
+                        "status": "failed",
+                        "compact_mode": "1",
+                        "chunked_mode": "1",
+                        "stages": {"chunk_summary": {"retry_count": 2}},
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            script = Path(report_distiller_metrics.__file__)
+            proc = subprocess.run(
+                [
+                    sys.executable,
+                    os.fspath(script),
+                    "--runs-dir",
+                    os.fspath(runs_dir),
+                    "--advisor-only",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertEqual(0, proc.returncode)
+            self.assertIn("Confidence signals:", proc.stdout)
+            self.assertIn("completed=0", proc.stdout)
+            self.assertIn("failed=1", proc.stdout)
+            self.assertIn("chunk_retries=2", proc.stdout)
 
 
 if __name__ == "__main__":

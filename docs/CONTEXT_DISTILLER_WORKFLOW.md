@@ -144,7 +144,7 @@ Flag behavior:
 
 - `--json`: full JSON payload with per-run details.
 - `--advisor-only`: concise text advisory summary.
-- `--advisor-only --json`: concise advisor JSON payload without per-run `runs` details.
+- `--advisor-only --json`: concise advisor JSON payload without per-run `runs` details; includes `confidence_signals`.
 
 Threshold scenarios:
 

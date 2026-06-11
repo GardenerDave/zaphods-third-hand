@@ -157,7 +157,7 @@ Flag behavior:
 
 - `--json`: full JSON payload, including per-run `runs` details.
 - `--advisor-only`: concise text summary.
-- `--advisor-only --json`: concise advisor JSON payload without per-run `runs` details.
+- `--advisor-only --json`: concise advisor JSON payload without per-run `runs` details; includes `confidence_signals`.
 
 You can override the chunked recommendation threshold:
 

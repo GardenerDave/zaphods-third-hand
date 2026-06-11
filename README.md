@@ -27,6 +27,13 @@ Long projects accumulate transcripts, logs, decisions, partial plans, stale assu
 - It does not replace human review.
 - It does not decide what private source material is safe to share.
 
+## Recent Updates
+
+- Distiller metrics advisor now supports `--advisor-only` for concise operator handoff output.
+- `--advisor-only --json` now emits a concise advisor JSON contract without per-run `runs` details.
+- Advisor JSON now includes `confidence_signals` (`recent_completed_count`, `recent_failed_count`, `recent_chunk_retry_count`).
+- Chunked recommendation threshold is tunable via `--min-recent-runs-for-chunked`.
+
 ## Why The Workflow Is File-Based
 
 The workflow is file-based because files are inspectable, diffable, and reviewable. Job packets, session summaries, review patches, and role-run evidence are plain Markdown. This keeps the human in control and makes it clear what changed, why it changed, and what still needs review.
@@ -104,6 +111,8 @@ python3 local_harness/report_distiller_metrics.py --runs-dir examples --limit 3
 This reads sanitized example data under `examples/sample_metrics_run/`. Real distiller runs write their metrics under `outputs/run_records/`.
 
 Use `--json` if you want advisory profile guidance fields (`recommended_profile`, `recommended_settings`, `recommendation_reason`, `thresholds`) for read-only tuning support.
+
+Advisor JSON also includes `confidence_signals` (`recent_completed_count`, `recent_failed_count`, `recent_chunk_retry_count`) when you use `--advisor-only --json`.
 
 Use `--advisor-only` for a concise operator handoff summary:
 
