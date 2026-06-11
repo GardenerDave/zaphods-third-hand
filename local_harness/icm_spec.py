@@ -119,7 +119,9 @@ def resolve_worker_spec(
     defaults = DEFAULT_WORKERS[worker_name]
     resolved_api = api or env_override(worker_name, "API") or defaults["api"]
     resolved_base_url = base_url or env_override(worker_name, "BASE_URL") or defaults.get("base_url")
-    resolved_url = url or env_override(worker_name, "URL") or defaults.get("url")
+    resolved_url = url or env_override(worker_name, "URL")
+    if resolved_url is None and resolved_base_url is None:
+        resolved_url = defaults.get("url")
     resolved_model = model or env_override(worker_name, "MODEL") or defaults.get("model")
     append_no_think = final_only or bool(defaults.get("append_no_think"))
 
