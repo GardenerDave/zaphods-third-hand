@@ -118,6 +118,15 @@ outputs/run_records/<SOURCE_ID>_<SHORT_TITLE>/chunk_metrics.tsv
 
 These metrics are evidence only. They do not automatically tune settings or accept generated context.
 
+You can summarize recent runs and get advisory profile suggestions:
+
+```bash
+python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6
+python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --json
+```
+
+The JSON output includes `recommended_profile`, `recommended_settings`, and `recommendation_reason` for read-only guidance.
+
 ## Suggested Profiles
 
 Use these as starting points, then adjust from `METRICS.json` and human review.

@@ -9,6 +9,27 @@ from pathlib import Path
 from typing import Any
 
 
+PROFILE_SETTINGS: dict[str, dict[str, int]] = {
+    "smoke": {
+        "ZTH_DISTILLER_SESSION_MAX_TOKENS": 320,
+        "ZTH_DISTILLER_PATCH_MAX_TOKENS": 240,
+        "ZTH_DISTILLER_TIMEOUT": 240,
+    },
+    "normal": {
+        "ZTH_DISTILLER_SESSION_MAX_TOKENS": 1200,
+        "ZTH_DISTILLER_PATCH_MAX_TOKENS": 900,
+        "ZTH_DISTILLER_TIMEOUT": 600,
+    },
+    "chunked": {
+        "ZTH_DISTILLER_CHUNK_LINES": 200,
+        "ZTH_DISTILLER_CHUNK_MAX_TOKENS": 600,
+        "ZTH_DISTILLER_SESSION_MAX_TOKENS": 1200,
+        "ZTH_DISTILLER_PATCH_MAX_TOKENS": 900,
+        "ZTH_DISTILLER_TIMEOUT": 900,
+    },
+}
+
+
 @dataclass
 class RunSummary:
     run_dir: Path
@@ -170,19 +191,32 @@ def discover_runs(runs_dir: Path, limit: int, completed_only: bool) -> list[RunS
     return summaries[:limit]
 
 
-def recommendation(runs: list[RunSummary], completed_only: bool) -> str:
+def recommended_profile(runs: list[RunSummary], completed_only: bool) -> tuple[str, str]:
     if not runs:
-        return "No runs found. Start with a smoke profile first."
+        return ("smoke", "No runs found yet.")
     failures = sum(1 for run in runs if run.status != "completed")
-    avg_elapsed = sum(run.total_elapsed_seconds for run in runs) / len(runs)
     retry_heavy = sum(1 for run in runs if run.chunk_retry_count > 0)
+    avg_elapsed = sum(run.total_elapsed_seconds for run in runs) / len(runs)
+    recent = runs[0]
+
     if not completed_only and failures > 0:
-        return "Recommend smoke profile: recent failures detected."
+        return ("smoke", "Recent failures detected.")
     if retry_heavy > 0:
-        return "Recommend smoke profile: retries detected in recent runs."
-    if avg_elapsed > 240:
-        return "Recommend smoke profile: recent runs are slow."
-    return "Recommend full-distill profile: recent runs look stable."
+        return ("smoke", "Chunk retries detected in recent runs.")
+    if avg_elapsed > 600:
+        return ("smoke", "Recent runs are very slow.")
+    if recent.chunked_mode:
+        if recent.status == "completed" and recent.chunk_failed == 0 and recent.chunk_row_failures == 0:
+            return ("chunked", "Recent chunked runs completed without chunk failures.")
+        return ("normal", "Recent chunked runs need stabilization before using chunked as default.")
+    return ("normal", "Recent runs look stable for normal compact mode.")
+
+
+def recommendation(runs: list[RunSummary], completed_only: bool) -> str:
+    profile, reason = recommended_profile(runs, completed_only)
+    settings = PROFILE_SETTINGS[profile]
+    setting_text = ", ".join(f"{key}={value}" for key, value in settings.items())
+    return f"Recommend {profile} profile: {reason} Suggested settings: {setting_text}."
 
 
 def format_mode(run: RunSummary) -> str:
@@ -255,10 +289,14 @@ def serialize_run(run: RunSummary) -> dict[str, Any]:
 
 
 def build_report_payload(runs: list[RunSummary], completed_only: bool) -> dict[str, Any]:
+    profile, reason = recommended_profile(runs, completed_only)
     return {
         "run_count": len(runs),
         "completed_only": completed_only,
         "recommendation": recommendation(runs, completed_only),
+        "recommended_profile": profile,
+        "recommended_settings": PROFILE_SETTINGS[profile],
+        "recommendation_reason": reason,
         "runs": [serialize_run(run) for run in runs],
     }
 

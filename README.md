@@ -89,6 +89,8 @@ Default safety posture:
 
 For a step-by-step beginner path, start with `QUICKSTART.md`.
 
+If you only want to validate setup first, run the endpoint smoke check in `QUICKSTART.md` Step 1.5 before any distiller run.
+
 Before tagging or sharing an early release, review `docs/ALPHA_READINESS_CHECKLIST.md`.
 
 ## Try Metrics Without A Model
@@ -100,6 +102,8 @@ python3 local_harness/report_distiller_metrics.py --runs-dir examples --limit 3
 ```
 
 This reads sanitized example data under `examples/sample_metrics_run/`. Real distiller runs write their metrics under `outputs/run_records/`.
+
+Use `--json` if you want advisory profile guidance fields (`recommended_profile`, `recommended_settings`, `recommendation_reason`) for read-only tuning support.
 
 ## Basic Setup Assumptions
 

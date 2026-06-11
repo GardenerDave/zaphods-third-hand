@@ -56,6 +56,25 @@ If your endpoint requires authorization, set your own key in your private shell 
 export ZTH_API_KEY="<YOUR_PRIVATE_KEY>"
 ```
 
+## Step 1.5: Verify Endpoint Connectivity
+
+Before running the distiller, confirm your endpoint and model can answer one tiny request:
+
+```bash
+python3 local_harness/icm_call.py handoff \
+  --api openai-chat \
+  --base-url "$ZTH_BASE_URL" \
+  --model "$ZTH_MODEL" \
+  --max-tokens 16 \
+  --timeout 60 \
+  --final-only \
+  "Reply with exactly: ok"
+```
+
+Expected result: a short response that includes `ok`.
+
+If this fails, fix endpoint/model/auth first before continuing.
+
 ## Step 2: Add A Source Transcript Or Log
 
 Place a source file somewhere in your private working tree. Use a stable source ID and a short title.
@@ -75,10 +94,26 @@ mkdir -p sources
 printf 'Decision: keep role runs supervised. Next action: write a small job packet.\n' > sources/toy_source.txt
 ```
 
-## Step 3: Run The Context Distiller In Compact And Chunked Mode
+## Step 3: Run A First Successful Smoke Distillation
+
+Start with compact mode only and small budgets. This gives you the fastest path to a clean first success.
 
 ```bash
-./scripts/run_context_distiller_head.sh toy-001 sources/toy_source.txt toy-source --compact --chunked
+export ZTH_DISTILLER_SESSION_MAX_TOKENS="320"
+export ZTH_DISTILLER_PATCH_MAX_TOKENS="240"
+export ZTH_DISTILLER_TIMEOUT="240"
+./scripts/run_context_distiller_head.sh toy-001 sources/toy_source.txt toy-source --compact
+```
+
+When this succeeds, try chunked mode for longer files:
+
+```bash
+export ZTH_DISTILLER_CHUNK_LINES="200"
+export ZTH_DISTILLER_CHUNK_MAX_TOKENS="600"
+export ZTH_DISTILLER_SESSION_MAX_TOKENS="1200"
+export ZTH_DISTILLER_PATCH_MAX_TOKENS="900"
+export ZTH_DISTILLER_TIMEOUT="900"
+./scripts/run_context_distiller_head.sh toy-001 sources/toy_source.txt toy-source --chunked
 ```
 
 Compact mode asks the model for a tight durable summary. Chunked mode splits long sources into chunks, summarizes each chunk, and then synthesizes a final session summary.
@@ -103,6 +138,14 @@ You can print a recent summary report:
 ```bash
 python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6
 ```
+
+For machine-readable output with advisory profile guidance:
+
+```bash
+python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --json
+```
+
+The JSON report includes `recommended_profile`, `recommended_settings`, and `recommendation_reason`. These are advisory only and do not modify your environment or files.
 
 ## Step 4: Review The Generated Session And Patch
 
@@ -159,11 +202,13 @@ Any recommended next action requires separate human approval and a separate life
 
 The distiller script is package-relative and writes to `outputs/`, but it still expects an OpenAI-compatible endpoint. If `ZTH_BASE_URL` and `ZTH_MODEL` are placeholders, the script exits before making model calls.
 
-## Common Failure Modes
+## Troubleshooting
 
 - Placeholder endpoint or model: load `config.env` or export `ZTH_BASE_URL` and `ZTH_MODEL`.
+- Endpoint connectivity fails in Step 1.5: verify `ZTH_BASE_URL`, `ZTH_MODEL`, and `ZTH_API_KEY` if required by your endpoint.
+- `icm_call.py` returns HTTP errors: check endpoint URL path, model name, and auth format expected by your provider.
 - Source file not found: run from `zaphods-third-hand/` or pass an absolute path to a private source file.
-- Endpoint rejects the request: confirm the URL, model name, and `ZTH_API_KEY` if your endpoint requires one.
-- Slow backend: test with a tiny source, compact mode, and lower `ZTH_DISTILLER_*_MAX_TOKENS` values before running long chunked jobs.
+- Distiller exits on timeout: lower token budgets for smoke tests or increase `ZTH_DISTILLER_TIMEOUT` for slow backends.
+- Chunked runs are too slow: reduce `ZTH_DISTILLER_CHUNK_LINES` and `ZTH_DISTILLER_CHUNK_MAX_TOKENS`, then compare run metrics.
 - Generated patch looks wrong: do not accept it; record rework or create a narrow follow-up packet.
 - Role output expands scope: stop and return to the active packet boundaries.

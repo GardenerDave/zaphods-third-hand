@@ -143,7 +143,76 @@ class ReportDistillerMetricsTests(unittest.TestCase):
 
             self.assertEqual([], runs)
             self.assertEqual(0, payload["run_count"])
-            self.assertEqual("No runs found. Start with a smoke profile first.", payload["recommendation"])
+            self.assertEqual("smoke", payload["recommended_profile"])
+            self.assertEqual(
+                "Recommend smoke profile: No runs found yet. Suggested settings: "
+                "ZTH_DISTILLER_SESSION_MAX_TOKENS=320, ZTH_DISTILLER_PATCH_MAX_TOKENS=240, "
+                "ZTH_DISTILLER_TIMEOUT=240.",
+                payload["recommendation"],
+            )
+
+    def test_recommendation_prefers_smoke_when_retries_detected(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runs_dir = Path(temp_dir) / "run_records"
+            run_dir = runs_dir / "run-003"
+            run_dir.mkdir(parents=True)
+            (run_dir / "METRICS.json").write_text(
+                json.dumps(
+                    {
+                        "source_id": "s3",
+                        "short_title": "t3",
+                        "status": "completed",
+                        "compact_mode": "1",
+                        "chunked_mode": "1",
+                        "stages": {"chunk_summary": {"retry_count": 2}},
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            runs = report_distiller_metrics.discover_runs(runs_dir, 5, completed_only=False)
+            payload = report_distiller_metrics.build_report_payload(runs, completed_only=False)
+
+            self.assertEqual("smoke", payload["recommended_profile"])
+            self.assertIn("Chunk retries detected", payload["recommendation"])
+
+    def test_recommendation_prefers_chunked_when_recent_chunked_is_clean(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runs_dir = Path(temp_dir) / "run_records"
+            run_dir = runs_dir / "run-004"
+            run_dir.mkdir(parents=True)
+            (run_dir / "chunk_metrics.tsv").write_text(
+                "chunk_prompt\tchunk_summary\tstatus\tattempts\telapsed_seconds\tprompt_estimated_tokens\toutput_estimated_tokens\tprompt_bytes\toutput_bytes\terror_log\n"
+                "a\tb\tcompleted\t1\t1\t10\t8\t40\t32\t\n",
+                encoding="utf-8",
+            )
+            (run_dir / "METRICS.json").write_text(
+                json.dumps(
+                    {
+                        "source_id": "s4",
+                        "short_title": "t4",
+                        "status": "completed",
+                        "compact_mode": "0",
+                        "chunked_mode": "1",
+                        "stages": {
+                            "chunk_summary": {
+                                "attempted": 1,
+                                "succeeded": 1,
+                                "failed": 0,
+                                "retry_count": 0,
+                                "chunk_metrics_file": "chunk_metrics.tsv",
+                            }
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            runs = report_distiller_metrics.discover_runs(runs_dir, 5, completed_only=False)
+            payload = report_distiller_metrics.build_report_payload(runs, completed_only=False)
+
+            self.assertEqual("chunked", payload["recommended_profile"])
+            self.assertIn("ZTH_DISTILLER_CHUNK_LINES", payload["recommendation"])
 
 
 if __name__ == "__main__":
