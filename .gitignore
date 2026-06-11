@@ -1,6 +1,19 @@
 # Generated distiller outputs
 outputs/
 
+# Legacy/local ICM artifacts are not part of the standalone toolkit.
+00_sources/
+02_sessions/
+03_workflows/
+07_review_queue/
+08_import_tools/
+09_indexes/
+10_agent_runs/
+XX_backend/
+README_SANITIZED_HANDOFF.md
+SANITIZATION_REPORT.md
+SHARE_READY_CHECKLIST.md
+
 # Local/private source intake scratch files
 sources/
 transcripts/

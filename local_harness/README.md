@@ -56,22 +56,22 @@ Run a supervised single-worker smoke test folder:
 
 ```text
 python3 local_harness/run_single_worker.py \
-  10_agent_runs/2026-06-07_001_smoke-test \
+  outputs/agent_runs/example-smoke-test \
   handoff \
   --base-url http://localhost:8083/v1 \
-  --model gemma-4-12B-it-qat-UD-Q4_K_XL.gguf \
+  --model <MODEL_NAME> \
   --final-only \
   --init-stubs \
   "Reply with exactly: ok"
 ```
 
-When the worker call succeeds, review `OUTPUT.md`, edit `REVIEW.md`, promote any approved content into `ACCEPTED.md`, and rerun `python3 XX_backend/validate_agent_run.py <run-folder>` before downstream use.
+When the worker call succeeds, review `OUTPUT.md`, edit `REVIEW.md`, promote any approved content into `ACCEPTED.md`, and rerun `python3 local_harness/validate_agent_run.py <run-folder>` before downstream use.
 
 Run a supervised Aider task from the same run-folder shape:
 
 ```text
 python3 local_harness/run_aider_worker.py \
-  10_agent_runs/2026-06-07_004_aider-worker-wrapper \
+  outputs/agent_runs/example-aider-task \
   --init-stubs \
   --read local_harness/run_single_worker.py \
   --read-head-lines 120 \
@@ -107,7 +107,7 @@ Use preflight first when a task looks even slightly large:
 
 ```text
 python3 local_harness/run_aider_worker.py \
-  10_agent_runs/2026-06-07_004_aider-worker-wrapper \
+  outputs/agent_runs/example-aider-task \
   --preflight-only \
   --read local_harness/run_single_worker.py \
   --read-head-lines 120 \
@@ -130,28 +130,7 @@ For Aider specifically, the main failure modes seen so far were:
 
 The `gemma-local` Aider profile is meant to fail early on the sizing problems, and to make the transport story explicit when a run does go out. It now records `fatal_error_detected`, `connection_error_detected`, `timeout_hint_detected`, `manager_timeout_detected`, `direct_edit_fallback_triggered`, `direct_edit_short_circuit_triggered`, retry counts, prewarm results, manager rerun attempts, direct-edit classification artifacts, and Aider request/event summaries in `METRICS.json`. `AIDER_PREFLIGHT.json` now also records explicit `direct_edit_candidate` eligibility metadata plus `direct_edit_budget_bypass_available` so the manager can see when Aider should be bypassed before launch and when a deterministic route can ignore the Aider token budget entirely.
 
-Validated success cases now exist for:
-
-- `10_agent_runs/2026-06-07_005_gemma-aider-smoke/`: one tiny editable file, about 94 estimated input tokens, completed in about 9.2 seconds.
-- `10_agent_runs/2026-06-07_006_gemma-aider-two-file/`: two tiny editable files, about 145 estimated input tokens, completed in about 17.1 seconds.
-- `10_agent_runs/2026-06-07_007_gemma-aider-read-context/`: one tiny editable file plus one trimmed read-only file, about 173 estimated input tokens, completed in about 12.2 seconds.
-- `10_agent_runs/2026-06-07_008_gemma-aider-three-file/`: three tiny editable files, about 195 estimated input tokens, completed in about 15.0 seconds.
-- `10_agent_runs/2026-06-07_020_gemma-aider-clean-smoke/`: one tiny editable file succeeded after eight transient retries and one eventual success, proving the cold-start issue is recoverable.
-- `10_agent_runs/2026-06-07_021_gemma-aider-prewarm-smoke/`: one tiny editable file completed with zero retries after a direct prewarm call.
-- `10_agent_runs/2026-06-07_022_gemma-aider-four-file/`: four tiny editable files completed with one request after prewarm.
-- `10_agent_runs/2026-06-07_023_gemma-aider-six-file/`: six tiny editable files completed with one request after prewarm.
-- `10_agent_runs/2026-06-07_024_gemma-aider-eight-file/`: eight tiny editable files completed with one request after prewarm.
-- `10_agent_runs/2026-06-07_025_gemma-aider-ten-file/`: ten tiny editable files completed with one request after prewarm.
-- `10_agent_runs/2026-06-07_026_gemma-aider-ten-file-read-context/`: ten tiny editable files plus one real trimmed read-only input completed with one request after prewarm.
-- `10_agent_runs/2026-06-08_032_gemma-aider-direct-edit-proof/`: one real one-file code task still timed out on the Aider path, but the manager-side direct-edit fallback applied the requested unique replacement successfully and preserved passing tests.
-- `10_agent_runs/2026-06-08_034_gemma-aider-direct-edit-shortcut/`: one real one-file deterministic change completed entirely through manager-side direct-edit short-circuit, with zero Aider and zero endpoint usage.
-- `10_agent_runs/2026-06-08_035_gemma-direct-edit-large-readme/`: one real 10507-byte file change completed entirely through manager-side direct-edit short-circuit, proving the widened deterministic envelope beyond the old 4096-byte ceiling.
-- `10_agent_runs/2026-06-08_036_gemma-direct-edit-insert-readme/`: one real 11895-byte file change completed entirely through manager-side direct-edit `insert_after` short-circuit, proving the additive edit shape on a large repo file.
-- `10_agent_runs/2026-06-08_038_gemma-direct-edit-block-readme-fixed/`: one real 12967-byte file change completed entirely through manager-side direct-edit `replace_block` short-circuit after widening the deterministic prompt cap to 1200.
-- `10_agent_runs/2026-06-08_039_gemma-direct-edit-batch-readme/`: one real 13805-byte file change completed entirely through manager-side direct-edit batch short-circuit, proving sequential one-file deterministic edits.
-- `10_agent_runs/2026-06-08_041_gemma-excerpt-patch-readme-fixed/`: one real 14579-byte file change completed entirely through manager-side direct-edit `excerpt_patch` short-circuit after widening the excerpt prompt cap to 4096.
-- `10_agent_runs/2026-06-08_043_gemma-direct-edit-multi-file-docs-fixed/`: one over-budget two-file documentation change completed entirely through manager-side multi-file deterministic short-circuit, proving that direct-edit-eligible work can bypass the Aider budget gate.
-- `10_agent_runs/2026-06-08_045_gemma-direct-edit-mixed-batch-docs-fixed/`: one over-budget two-file documentation change completed entirely through manager-side `mixed_batch` short-circuit, proving that one excerpt patch plus one literal deterministic operation can share the same manager batch.
+Historical internal run folders are intentionally not included in this public toolkit. Treat the boundaries below as design notes, not bundled evidence.
 
 The wrapper now reports `validated_shape_match` in `AIDER_PREFLIGHT.json` and `METRICS.json` when a run stays inside the current Gemma-local routing heuristic:
 
@@ -186,24 +165,9 @@ The audited runs now show a more useful boundary story:
 
 The newer read-context experiments are still valuable:
 
-- `2026-06-07_009_*` showed the old preflight undercounted real Aider request footprint.
-- `2026-06-07_010_*` through `2026-06-07_015_*` showed that overhead reservation, read fitting, read bundling, and tiny bundled read budgets were not enough once the Aider transport entered the current failing state.
-- `2026-06-07_016_*` showed that inline read digests alone do not solve the cold-start retry issue.
-- `2026-06-07_020_*` and `2026-06-07_021_*` isolated the real fix for cold starts: direct prewarm before Aider.
-- `2026-06-07_024_*` through `2026-06-07_026_*` moved the validated boundary from six tiny files to ten tiny files plus one trimmed read-only input.
-- `2026-06-07_028_*` showed that a real two-file code task could stay within budget and still stall long enough to require manual intervention.
-- `2026-06-07_029_*` validated the manager-side subprocess timeout guard: the same two-file code shape now exits cleanly with explicit timeout classification instead of hanging indefinitely.
-- `2026-06-08_032_*` validated the direct-edit fallback on a real one-file code task after the Aider path stalled, proving that tiny deterministic changes can now be recovered automatically within the manager wrapper.
-- `2026-06-08_033_*` showed that even a thin one-file real-code task can still stall while reporting `validated_shape_match: true`, so that heuristic must remain only a routing hint.
-- `2026-06-08_034_*` showed that eligible deterministic one-file replacements can bypass Aider entirely through direct-edit short-circuit, with zero prewarm and zero endpoint usage.
-- `2026-06-08_035_*` moved the direct-edit ceiling by proving the widened `16384`-byte file-size guardrail on a real `10507`-byte project file.
-- `2026-06-08_036_*` extended the direct-edit route from replacement-only to additive editing by live-proving `insert_after` on a real `11895`-byte project file.
-- `2026-06-08_037_*` showed that the old deterministic prompt cap of `600` was too low for a practical real-file block-replacement request, even though the edit shape itself was valid.
-- `2026-06-08_038_*` fixed that boundary by widening the cap to `1200` and live-proving `replace_block` on a real `12967`-byte project file.
-- `2026-06-08_039_*` extended the direct-edit route from single-operation edits to sequential one-file batches by live-proving a two-step edit plan on a real `13805`-byte project file.
-- `2026-06-08_040_*` showed that the shared `1200`-character deterministic prompt cap was too low for a real two-hunk excerpt patch request (`prompt_char_count: 1620`), even though the patch grammar itself was valid.
-- `2026-06-08_041_*` fixed that boundary by widening the excerpt patch cap to `4096` and live-proving a two-hunk README patch through manager-only short-circuit.
-- `2026-06-08_042_*` showed that the old manager path still blocked a valid multi-file deterministic plan because one target file exceeded the old `16384`-byte limit and the Aider budget gate ran before the direct-edit short-circuit.
-- `2026-06-08_043_*` fixed that boundary by widening the deterministic file-size ceiling to `24576` bytes and allowing direct-edit-eligible work to bypass the Aider budget gate, then live-proved a two-file over-budget documentation batch with zero Aider and zero endpoint usage.
-- `2026-06-08_044_*` showed that mixed excerpt-plus-literal routing already worked logically, but authored literal prompts using escaped newline text still failed unique matching because the old parser treated `\n` as two characters.
-- `2026-06-08_045_*` fixed that friction by decoding escaped newline/tab/carriage-return sequences in literal direct-edit operations and live-proved a two-file over-budget mixed batch with zero Aider and zero endpoint usage.
+- Preflight must account for the full model request footprint, not only visible user prompt text.
+- Direct endpoint prewarm can reduce cold-start retry noise before Aider-backed work.
+- `validated_shape_match` is only a routing hint. It is not a guarantee that a model-backed edit will finish.
+- Deterministic direct-edit shortcuts are useful for tiny, explicit, uniquely anchored edits.
+- Direct-edit-eligible work can bypass model budget gates only when the manager-side parser can prove the edit is bounded and unique.
+- Escaped newline, tab, and carriage-return sequences in authored prompts should be decoded before unique matching.

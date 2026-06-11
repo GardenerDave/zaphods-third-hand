@@ -1,7 +1,0 @@
-{
-  "triggered": true,
-  "status": "applied",
-  "file": "local_harness/tests/test_aider_runtime.py",
-  "old": "self.assertEqual(\"ok\", result[\"response_preview\"])",
-  "new": "self.assertTrue(result[\"response_preview\"] == \"ok\")"
-}

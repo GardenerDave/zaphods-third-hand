@@ -5,13 +5,9 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Sequence
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(PROJECT_ROOT / "XX_backend"))
 
 from validate_agent_run import validate_run_folder  # type: ignore  # noqa: E402
 from icm_call import DEFAULT_WORKERS, call_worker, resolve_worker_spec  # noqa: E402
@@ -95,7 +91,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Run a single local worker against MODEL_REQUEST.md and write audited artifacts.",
     )
-    parser.add_argument("run_folder", help="Target run folder under 10_agent_runs or another path.")
+    parser.add_argument("run_folder", help="Target run folder under outputs/agent_runs or another path.")
     parser.add_argument(
         "worker",
         choices=sorted(DEFAULT_WORKERS),
