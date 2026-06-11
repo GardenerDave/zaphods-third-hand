@@ -134,6 +134,17 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual(1, len(runs))
             self.assertEqual("completed", runs[0].status)
 
+    def test_missing_runs_dir_is_empty_report(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runs_dir = Path(temp_dir) / "missing"
+
+            runs = report_distiller_metrics.discover_runs(runs_dir, 10, completed_only=False)
+            payload = report_distiller_metrics.build_report_payload(runs, completed_only=False)
+
+            self.assertEqual([], runs)
+            self.assertEqual(0, payload["run_count"])
+            self.assertEqual("No runs found. Start with a smoke profile first.", payload["recommendation"])
+
 
 if __name__ == "__main__":
     unittest.main()

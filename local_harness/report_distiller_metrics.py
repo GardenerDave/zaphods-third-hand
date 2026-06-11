@@ -159,6 +159,8 @@ def parse_run(metrics_path: Path) -> RunSummary:
 
 
 def discover_runs(runs_dir: Path, limit: int, completed_only: bool) -> list[RunSummary]:
+    if not runs_dir.is_dir():
+        return []
     metrics_paths = [p / "METRICS.json" for p in runs_dir.iterdir() if p.is_dir()]
     existing = [p for p in metrics_paths if p.is_file()]
     summaries = [parse_run(p) for p in existing]
@@ -342,9 +344,6 @@ def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
     runs_dir = Path(args.runs_dir)
-    if not runs_dir.is_dir():
-        print(f"Run directory not found: {runs_dir}")
-        return 1
     runs = discover_runs(runs_dir, max(1, args.limit), args.completed_only)
     if args.json:
         print(json.dumps(build_report_payload(runs, args.completed_only), indent=2))
