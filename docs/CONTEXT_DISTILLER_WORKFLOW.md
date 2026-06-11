@@ -125,7 +125,7 @@ python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records
 python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --json
 ```
 
-The JSON output includes `recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `calibration_metrics`, and `thresholds` for read-only guidance.
+The JSON output includes `recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `calibration_metrics`, and `thresholds` for read-only guidance.
 
 You can tune threshold behavior from CLI:
 
@@ -150,7 +150,7 @@ Flag behavior:
 
 - `--json`: full JSON payload with per-run details.
 - `--advisor-only`: concise text advisory summary.
-- `--advisor-only --json`: concise advisor JSON payload without per-run `runs` details; includes `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `calibration_metrics`, and `confidence_signals`.
+- `--advisor-only --json`: concise advisor JSON payload without per-run `runs` details; includes `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `calibration_metrics`, and `confidence_signals`.
 
 Threshold scenarios:
 

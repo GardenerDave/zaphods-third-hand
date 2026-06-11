@@ -532,6 +532,8 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertIn("readiness", payload)
             self.assertIn("readiness_reason", payload)
             self.assertIn("blocking_signals", payload)
+            self.assertIn("interviewer_verdict", payload)
+            self.assertIn("interviewer_verdict_reason", payload)
             self.assertIn("recent_run", payload)
             self.assertIn("confidence_signals", payload)
             self.assertIn("calibration_metrics", payload)
@@ -579,6 +581,8 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertIn("confidence_reason", payload)
             self.assertIn("readiness", payload)
             self.assertIn("blocking_signals", payload)
+            self.assertIn("interviewer_verdict", payload)
+            self.assertIn("interviewer_verdict_reason", payload)
             self.assertIn("calibration_metrics", payload)
             self.assertEqual(1, len(payload["runs"]))
             self.assertEqual(4, payload["thresholds"]["min_recent_runs_for_chunked"])
@@ -621,6 +625,7 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertIn("Recommendation confidence:", proc.stdout)
             self.assertIn("Readiness:", proc.stdout)
             self.assertIn("Blocking signals:", proc.stdout)
+            self.assertIn("Interviewer verdict:", proc.stdout)
             self.assertIn("Calibration:", proc.stdout)
             self.assertIn("completed=0", proc.stdout)
             self.assertIn("failed=1", proc.stdout)
@@ -721,6 +726,42 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual(1, metrics["false_low_count"])
             self.assertEqual(2, metrics["high_confidence_count"])
             self.assertEqual(0.5, metrics["confidence_high_success_rate"])
+    def test_interviewer_verdict_proceed_when_ready_and_calibration_clean(self):
+        verdict, reason = report_distiller_metrics.interviewer_verdict(
+            "ready",
+            {
+                "confidence_high_success_rate": 1.0,
+                "false_high_count": 0,
+            },
+        )
+        self.assertEqual("proceed", verdict)
+        self.assertIn("ready", reason)
+
+    def test_interviewer_verdict_proceed_with_review_on_false_high(self):
+        verdict, _ = report_distiller_metrics.interviewer_verdict(
+            "ready",
+            {
+                "confidence_high_success_rate": 0.8,
+                "false_high_count": 1,
+            },
+        )
+        self.assertEqual("proceed_with_review", verdict)
+
+    def test_interviewer_verdict_hold_on_low_high_success_rate(self):
+        verdict, _ = report_distiller_metrics.interviewer_verdict(
+            "ready",
+            {
+                "confidence_high_success_rate": 0.4,
+                "false_high_count": 0,
+            },
+        )
+        self.assertEqual("hold", verdict)
+
+    def test_interviewer_verdict_tracks_readiness_gate(self):
+        verdict_not_ready, _ = report_distiller_metrics.interviewer_verdict("not_ready", {})
+        verdict_needs_review, _ = report_distiller_metrics.interviewer_verdict("needs_review", {})
+        self.assertEqual("hold", verdict_not_ready)
+        self.assertEqual("proceed_with_review", verdict_needs_review)
 
 
 if __name__ == "__main__":

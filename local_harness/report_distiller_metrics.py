@@ -381,6 +381,20 @@ def build_calibration_metrics(runs_dir: Path | None, calibration_window: int) ->
     }
 
 
+def interviewer_verdict(readiness: str, calibration_metrics: dict[str, Any]) -> tuple[str, str]:
+    if readiness == "not_ready":
+        return ("hold", "Readiness gate is not_ready.")
+    if readiness == "needs_review":
+        return ("proceed_with_review", "Readiness gate requires review.")
+    high_success_rate = calibration_metrics.get("confidence_high_success_rate")
+    false_high_count = int(calibration_metrics.get("false_high_count", 0))
+    if isinstance(high_success_rate, (int, float)) and high_success_rate < 0.5:
+        return ("hold", "Calibration high-confidence success rate is below 0.5.")
+    if false_high_count > 0:
+        return ("proceed_with_review", "Calibration recorded false-high outcomes.")
+    return ("proceed", "Readiness is ready and calibration has no false-high drift.")
+
+
 def format_mode(run: RunSummary) -> str:
     if run.chunked_mode and run.compact_mode:
         return "compact+chunked"
@@ -461,6 +475,7 @@ def build_report_payload(
     confidence, confidence_reason = recommendation_confidence(runs, completed_only, min_recent_runs_for_chunked)
     readiness, readiness_reason, blocking_signals = readiness_decision(runs, completed_only, min_recent_runs_for_chunked)
     calibration = build_calibration_metrics(runs_dir, calibration_window)
+    verdict, verdict_reason = interviewer_verdict(readiness, calibration)
     return {
         "run_count": len(runs),
         "completed_only": completed_only,
@@ -473,6 +488,8 @@ def build_report_payload(
         "readiness": readiness,
         "readiness_reason": readiness_reason,
         "blocking_signals": blocking_signals,
+        "interviewer_verdict": verdict,
+        "interviewer_verdict_reason": verdict_reason,
         "thresholds": {
             "min_recent_runs_for_chunked": min_recent_runs_for_chunked,
         },
@@ -492,6 +509,8 @@ def build_advisor_payload(
     profile, reason = recommended_profile(runs, completed_only, min_recent_runs_for_chunked)
     confidence, confidence_reason = recommendation_confidence(runs, completed_only, min_recent_runs_for_chunked)
     readiness, readiness_reason, blocking_signals = readiness_decision(runs, completed_only, min_recent_runs_for_chunked)
+    calibration = build_calibration_metrics(runs_dir, calibration_window)
+    verdict, verdict_reason = interviewer_verdict(readiness, calibration)
     payload: dict[str, Any] = {
         "run_count": len(runs),
         "completed_only": completed_only,
@@ -504,11 +523,13 @@ def build_advisor_payload(
         "readiness": readiness,
         "readiness_reason": readiness_reason,
         "blocking_signals": blocking_signals,
+        "interviewer_verdict": verdict,
+        "interviewer_verdict_reason": verdict_reason,
         "thresholds": {
             "min_recent_runs_for_chunked": min_recent_runs_for_chunked,
         },
         "confidence_signals": build_confidence_signals(runs),
-        "calibration_metrics": build_calibration_metrics(runs_dir, calibration_window),
+        "calibration_metrics": calibration,
     }
     if runs:
         recent = runs[0]
@@ -586,6 +607,7 @@ def print_advisor_report(runs: list[RunSummary], completed_only: bool, min_recen
     print(f"Readiness: {payload['readiness']} ({payload['readiness_reason']})")
     if payload["blocking_signals"]:
         print("Blocking signals: " + ", ".join(payload["blocking_signals"]))
+    print(f"Interviewer verdict: {payload['interviewer_verdict']} ({payload['interviewer_verdict_reason']})")
     print(f"Threshold min recent runs for chunked: {payload['thresholds']['min_recent_runs_for_chunked']}")
     confidence = payload["confidence_signals"]
     print(
