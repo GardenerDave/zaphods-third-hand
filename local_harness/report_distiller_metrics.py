@@ -392,10 +392,12 @@ def load_role_critiques(role_critiques_file: Path | None) -> list[dict[str, Any]
         if isinstance(parsed, list):
             return [item for item in parsed if isinstance(item, dict)]
         if isinstance(parsed, dict):
-            critiques = parsed.get("critiques", [])
-            if isinstance(critiques, list):
-                return [item for item in critiques if isinstance(item, dict)]
-            return []
+            if "critiques" in parsed:
+                critiques = parsed.get("critiques", [])
+                if isinstance(critiques, list):
+                    return [item for item in critiques if isinstance(item, dict)]
+                return []
+            return [parsed]
     except json.JSONDecodeError:
         pass
     critiques: list[dict[str, Any]] = []
@@ -427,9 +429,16 @@ def summarize_role_critiques(critiques: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def interviewer_verdict(readiness: str, calibration_metrics: dict[str, Any], role_critique_summary: dict[str, Any]) -> tuple[str, str]:
+def interviewer_verdict(
+    readiness: str,
+    calibration_metrics: dict[str, Any],
+    role_critique_summary: dict[str, Any],
+    role_critiques_strict: bool,
+) -> tuple[str, str]:
     if int(role_critique_summary.get("blocking_count", 0)) > 0:
         return ("hold", "Role critiques include unresolved blocking findings.")
+    if role_critiques_strict and int(role_critique_summary.get("unresolved_count", 0)) > 0:
+        return ("hold", "Role critiques strict mode requires all findings to be resolved.")
     if readiness == "not_ready":
         return ("hold", "Readiness gate is not_ready.")
     if readiness == "needs_review":
@@ -521,13 +530,14 @@ def build_report_payload(
     runs_dir: Path | None = None,
     calibration_window: int = DEFAULT_CALIBRATION_WINDOW,
     role_critique_summary: dict[str, Any] | None = None,
+    role_critiques_strict: bool = False,
 ) -> dict[str, Any]:
     profile, reason = recommended_profile(runs, completed_only, min_recent_runs_for_chunked)
     confidence, confidence_reason = recommendation_confidence(runs, completed_only, min_recent_runs_for_chunked)
     readiness, readiness_reason, blocking_signals = readiness_decision(runs, completed_only, min_recent_runs_for_chunked)
     calibration = build_calibration_metrics(runs_dir, calibration_window)
     role_summary = role_critique_summary or summarize_role_critiques([])
-    verdict, verdict_reason = interviewer_verdict(readiness, calibration, role_summary)
+    verdict, verdict_reason = interviewer_verdict(readiness, calibration, role_summary, role_critiques_strict)
     return {
         "run_count": len(runs),
         "completed_only": completed_only,
@@ -547,6 +557,7 @@ def build_report_payload(
         },
         "confidence_signals": build_confidence_signals(runs),
         "role_critique_summary": role_summary,
+        "role_critiques_strict": role_critiques_strict,
         "calibration_metrics": calibration,
         "runs": [serialize_run(run) for run in runs],
     }
@@ -559,13 +570,14 @@ def build_advisor_payload(
     runs_dir: Path | None = None,
     calibration_window: int = DEFAULT_CALIBRATION_WINDOW,
     role_critique_summary: dict[str, Any] | None = None,
+    role_critiques_strict: bool = False,
 ) -> dict[str, Any]:
     profile, reason = recommended_profile(runs, completed_only, min_recent_runs_for_chunked)
     confidence, confidence_reason = recommendation_confidence(runs, completed_only, min_recent_runs_for_chunked)
     readiness, readiness_reason, blocking_signals = readiness_decision(runs, completed_only, min_recent_runs_for_chunked)
     calibration = build_calibration_metrics(runs_dir, calibration_window)
     role_summary = role_critique_summary or summarize_role_critiques([])
-    verdict, verdict_reason = interviewer_verdict(readiness, calibration, role_summary)
+    verdict, verdict_reason = interviewer_verdict(readiness, calibration, role_summary, role_critiques_strict)
     payload: dict[str, Any] = {
         "run_count": len(runs),
         "completed_only": completed_only,
@@ -585,6 +597,7 @@ def build_advisor_payload(
         },
         "confidence_signals": build_confidence_signals(runs),
         "role_critique_summary": role_summary,
+        "role_critiques_strict": role_critiques_strict,
         "calibration_metrics": calibration,
     }
     if runs:
@@ -659,6 +672,7 @@ def print_advisor_report(
     runs_dir: Path,
     calibration_window: int,
     role_critique_summary: dict[str, Any],
+    role_critiques_strict: bool,
 ) -> None:
     payload = build_advisor_payload(
         runs,
@@ -667,6 +681,7 @@ def print_advisor_report(
         runs_dir=runs_dir,
         calibration_window=calibration_window,
         role_critique_summary=role_critique_summary,
+        role_critiques_strict=role_critiques_strict,
     )
     print("Distiller advisor")
     print()
@@ -698,7 +713,7 @@ def print_advisor_report(
     print(
         "Role critiques: "
         f"total={role_summary['total_count']}, unresolved={role_summary['unresolved_count']}, "
-        f"blocking={role_summary['blocking_count']}"
+        f"blocking={role_summary['blocking_count']}, strict={payload['role_critiques_strict']}"
     )
     recent = payload.get("recent_run")
     if isinstance(recent, dict):
@@ -760,6 +775,11 @@ def build_parser() -> argparse.ArgumentParser:
         default="",
         help="Optional JSON/JSONL file containing role critique findings.",
     )
+    parser.add_argument(
+        "--role-critiques-strict",
+        action="store_true",
+        help="Treat any unresolved role critique finding as hold.",
+    )
     return parser
 
 
@@ -787,6 +807,7 @@ def main() -> int:
                     runs_dir=runs_dir,
                     calibration_window=calibration_window,
                     role_critique_summary=role_critique_summary,
+                    role_critiques_strict=args.role_critiques_strict,
                 ),
                 indent=2,
             )
@@ -799,6 +820,7 @@ def main() -> int:
             runs_dir,
             calibration_window,
             role_critique_summary,
+            args.role_critiques_strict,
         )
     elif args.json:
         print(
@@ -810,6 +832,7 @@ def main() -> int:
                     runs_dir=runs_dir,
                     calibration_window=calibration_window,
                     role_critique_summary=role_critique_summary,
+                    role_critiques_strict=args.role_critiques_strict,
                 ),
                 indent=2,
             )
