@@ -45,7 +45,7 @@ Call a live worker and force final-answer output:
 ```text
 python3 local_harness/icm_call.py handoff \
   --base-url http://localhost:8083/v1 \
-  --model gemma-4-12B-it-qat-UD-Q4_K_XL.gguf \
+  --model <MODEL_NAME> \
   --final-only \
   "Reply with exactly: ok"
 ```
@@ -118,7 +118,7 @@ This wrapper reads the Aider prompt from `MODEL_REQUEST.md`, writes the effectiv
 
 ## Endpoint Note
 
-On the current `gemma-4-12B-it-qat-UD-Q4_K_XL.gguf` runtime, short prompts on `chat/completions` can return clean final content when `--final-only` is used. Broader prompts may still spend the token budget inside `reasoning_content`. Treat the short smoke test as connection validation first, then tune prompt shape and token budget before relying on richer outputs.
+Some OpenAI-compatible local runtimes can return cleaner final content when `--final-only` is used. Broader prompts may still spend the token budget inside hidden reasoning fields or long internal planning. Treat the short smoke test as connection validation first, then tune prompt shape and token budget before relying on richer outputs.
 
 For Aider specifically, the main failure modes seen so far were:
 

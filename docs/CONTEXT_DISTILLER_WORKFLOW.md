@@ -24,11 +24,11 @@ Compact mode asks the model for a concise summary using a fixed structure:
 
 Use compact mode for most sources.
 
-For smoke tests or slower model servers, use a tiny source and lower the optional output budgets:
+For smoke tests, use a tiny source and lower the optional output budgets:
 
 ```bash
-export ZTH_DISTILLER_SESSION_MAX_TOKENS="900"
-export ZTH_DISTILLER_PATCH_MAX_TOKENS="700"
+export ZTH_DISTILLER_SESSION_MAX_TOKENS="320"
+export ZTH_DISTILLER_PATCH_MAX_TOKENS="240"
 ```
 
 Some model endpoints need an explicit final-answer-only hint to avoid spending the response budget on hidden reasoning. Enable this when short direct harness tests work with `--final-only` but distiller calls time out or return reasoning-only content:
