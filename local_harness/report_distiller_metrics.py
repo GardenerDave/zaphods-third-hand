@@ -29,6 +29,7 @@ PROFILE_SETTINGS: dict[str, dict[str, int]] = {
     },
 }
 DEFAULT_MIN_RECENT_RUNS_FOR_CHUNKED = 3
+DEFAULT_CALIBRATION_WINDOW = 20
 
 
 @dataclass
@@ -257,6 +258,129 @@ def recommendation_confidence(
     return ("medium", "Recent run signals are partially stable.")
 
 
+def readiness_decision(
+    runs: list[RunSummary],
+    completed_only: bool,
+    min_recent_runs_for_chunked: int,
+) -> tuple[str, str, list[str]]:
+    if not runs:
+        return ("not_ready", "No recent runs available.", ["no_recent_runs"])
+    signals = build_confidence_signals(runs)
+    blockers: list[str] = []
+    if not completed_only and signals["recent_failed_count"] > 0:
+        blockers.append("recent_failures")
+    if signals["recent_chunk_retry_count"] > 0:
+        blockers.append("chunk_retries")
+    confidence, confidence_reason = recommendation_confidence(runs, completed_only, min_recent_runs_for_chunked)
+    if blockers:
+        return ("not_ready", "Blocking run instability signals detected.", blockers)
+    if confidence == "high":
+        return ("ready", "Recent runs are stable and confidence is high.", blockers)
+    blockers.append("insufficient_recent_window")
+    return ("needs_review", confidence_reason, blockers)
+
+
+def lesson_tag_for_run(run: RunSummary) -> str:
+    if run.status != "completed":
+        return "run_failed"
+    if run.chunk_retry_count > 0:
+        return "retry_spike"
+    if run.total_elapsed_seconds > 600:
+        return "slow_backend"
+    if run.chunked_mode and run.chunk_failed == 0 and run.chunk_row_failures == 0:
+        return "chunk_stable"
+    return "run_stable"
+
+
+def build_ledger_entry(
+    run: RunSummary,
+    recommended_profile_name: str,
+    confidence_level: str,
+    readiness: str,
+) -> dict[str, Any]:
+    observed_profile = "chunked" if run.chunked_mode else "normal"
+    return {
+        "timestamp": datetime.utcnow().isoformat(timespec="seconds") + "Z",
+        "run_dir": str(run.run_dir),
+        "source_id": run.source_id,
+        "short_title": run.short_title,
+        "recommended_profile": recommended_profile_name,
+        "recommendation_confidence": confidence_level,
+        "readiness": readiness,
+        "actual_status": run.status,
+        "observed_profile": observed_profile,
+        "delta": "match" if observed_profile == recommended_profile_name else "profile_mismatch",
+        "lesson_tag": lesson_tag_for_run(run),
+    }
+
+
+def append_ledger_entries(
+    runs_dir: Path,
+    runs: list[RunSummary],
+    recommended_profile_name: str,
+    confidence_level: str,
+    readiness: str,
+) -> Path:
+    ledger_path = runs_dir / "interviewer_ledger.jsonl"
+    seen: set[str] = set()
+    if ledger_path.is_file():
+        for line in ledger_path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                entry = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            run_dir = str(entry.get("run_dir", ""))
+            if run_dir:
+                seen.add(run_dir)
+    additions = [run for run in runs if str(run.run_dir) not in seen]
+    if not additions:
+        return ledger_path
+    with ledger_path.open("a", encoding="utf-8") as handle:
+        for run in additions:
+            handle.write(json.dumps(build_ledger_entry(run, recommended_profile_name, confidence_level, readiness), sort_keys=True))
+            handle.write("\n")
+    return ledger_path
+
+
+def read_ledger_entries(runs_dir: Path, calibration_window: int) -> list[dict[str, Any]]:
+    ledger_path = runs_dir / "interviewer_ledger.jsonl"
+    if not ledger_path.is_file():
+        return []
+    entries: list[dict[str, Any]] = []
+    for line in ledger_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            payload = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(payload, dict):
+            entries.append(payload)
+    return entries[-max(1, calibration_window) :]
+
+
+def build_calibration_metrics(runs_dir: Path | None, calibration_window: int) -> dict[str, Any]:
+    entries = read_ledger_entries(runs_dir, calibration_window) if runs_dir else []
+    high_entries = [e for e in entries if e.get("recommendation_confidence") == "high"]
+    high_successes = sum(1 for e in high_entries if e.get("actual_status") == "completed")
+    low_entries = [e for e in entries if e.get("recommendation_confidence") == "low"]
+    false_high_count = sum(1 for e in high_entries if e.get("actual_status") != "completed")
+    false_low_count = sum(1 for e in low_entries if e.get("actual_status") == "completed")
+    return {
+        "window_size": max(1, calibration_window),
+        "entries_analyzed": len(entries),
+        "confidence_high_success_rate": round((high_successes / len(high_entries)), 4) if high_entries else None,
+        "false_high_count": false_high_count,
+        "false_low_count": false_low_count,
+        "high_confidence_count": len(high_entries),
+        "low_confidence_count": len(low_entries),
+    }
+
+
 def format_mode(run: RunSummary) -> str:
     if run.chunked_mode and run.compact_mode:
         return "compact+chunked"
@@ -330,9 +454,13 @@ def build_report_payload(
     runs: list[RunSummary],
     completed_only: bool,
     min_recent_runs_for_chunked: int,
+    runs_dir: Path | None = None,
+    calibration_window: int = DEFAULT_CALIBRATION_WINDOW,
 ) -> dict[str, Any]:
     profile, reason = recommended_profile(runs, completed_only, min_recent_runs_for_chunked)
     confidence, confidence_reason = recommendation_confidence(runs, completed_only, min_recent_runs_for_chunked)
+    readiness, readiness_reason, blocking_signals = readiness_decision(runs, completed_only, min_recent_runs_for_chunked)
+    calibration = build_calibration_metrics(runs_dir, calibration_window)
     return {
         "run_count": len(runs),
         "completed_only": completed_only,
@@ -342,10 +470,14 @@ def build_report_payload(
         "recommendation_reason": reason,
         "recommendation_confidence": confidence,
         "confidence_reason": confidence_reason,
+        "readiness": readiness,
+        "readiness_reason": readiness_reason,
+        "blocking_signals": blocking_signals,
         "thresholds": {
             "min_recent_runs_for_chunked": min_recent_runs_for_chunked,
         },
         "confidence_signals": build_confidence_signals(runs),
+        "calibration_metrics": calibration,
         "runs": [serialize_run(run) for run in runs],
     }
 
@@ -354,9 +486,12 @@ def build_advisor_payload(
     runs: list[RunSummary],
     completed_only: bool,
     min_recent_runs_for_chunked: int,
+    runs_dir: Path | None = None,
+    calibration_window: int = DEFAULT_CALIBRATION_WINDOW,
 ) -> dict[str, Any]:
     profile, reason = recommended_profile(runs, completed_only, min_recent_runs_for_chunked)
     confidence, confidence_reason = recommendation_confidence(runs, completed_only, min_recent_runs_for_chunked)
+    readiness, readiness_reason, blocking_signals = readiness_decision(runs, completed_only, min_recent_runs_for_chunked)
     payload: dict[str, Any] = {
         "run_count": len(runs),
         "completed_only": completed_only,
@@ -366,10 +501,14 @@ def build_advisor_payload(
         "recommendation": recommendation(runs, completed_only, min_recent_runs_for_chunked),
         "recommendation_confidence": confidence,
         "confidence_reason": confidence_reason,
+        "readiness": readiness,
+        "readiness_reason": readiness_reason,
+        "blocking_signals": blocking_signals,
         "thresholds": {
             "min_recent_runs_for_chunked": min_recent_runs_for_chunked,
         },
         "confidence_signals": build_confidence_signals(runs),
+        "calibration_metrics": build_calibration_metrics(runs_dir, calibration_window),
     }
     if runs:
         recent = runs[0]
@@ -436,14 +575,17 @@ def print_report(runs: list[RunSummary], completed_only: bool, min_recent_runs_f
     print(recommendation(runs, completed_only, min_recent_runs_for_chunked))
 
 
-def print_advisor_report(runs: list[RunSummary], completed_only: bool, min_recent_runs_for_chunked: int) -> None:
-    payload = build_advisor_payload(runs, completed_only, min_recent_runs_for_chunked)
+def print_advisor_report(runs: list[RunSummary], completed_only: bool, min_recent_runs_for_chunked: int, runs_dir: Path, calibration_window: int) -> None:
+    payload = build_advisor_payload(runs, completed_only, min_recent_runs_for_chunked, runs_dir=runs_dir, calibration_window=calibration_window)
     print("Distiller advisor")
     print()
     print(f"Runs analyzed: {payload['run_count']}")
     print(f"Recommended profile: {payload['recommended_profile']}")
     print(f"Reason: {payload['recommendation_reason']}")
     print(f"Recommendation confidence: {payload['recommendation_confidence']} ({payload['confidence_reason']})")
+    print(f"Readiness: {payload['readiness']} ({payload['readiness_reason']})")
+    if payload["blocking_signals"]:
+        print("Blocking signals: " + ", ".join(payload["blocking_signals"]))
     print(f"Threshold min recent runs for chunked: {payload['thresholds']['min_recent_runs_for_chunked']}")
     confidence = payload["confidence_signals"]
     print(
@@ -453,6 +595,13 @@ def print_advisor_report(runs: list[RunSummary], completed_only: bool, min_recen
     )
     settings = ", ".join(f"{key}={value}" for key, value in payload["recommended_settings"].items())
     print(f"Recommended settings: {settings}")
+    calibration = payload["calibration_metrics"]
+    print(
+        "Calibration: "
+        f"window={calibration['window_size']}, entries={calibration['entries_analyzed']}, "
+        f"high_success_rate={calibration['confidence_high_success_rate']}, "
+        f"false_high={calibration['false_high_count']}, false_low={calibration['false_low_count']}"
+    )
     recent = payload.get("recent_run")
     if isinstance(recent, dict):
         print(
@@ -497,6 +646,17 @@ def build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_MIN_RECENT_RUNS_FOR_CHUNKED,
         help="Minimum recent runs required before recommending chunked as default.",
     )
+    parser.add_argument(
+        "--write-ledger",
+        action="store_true",
+        help="Append unseen run outcomes to interviewer_ledger.jsonl.",
+    )
+    parser.add_argument(
+        "--calibration-window",
+        type=int,
+        default=DEFAULT_CALIBRATION_WINDOW,
+        help="Number of recent ledger entries to use for calibration metrics.",
+    )
     return parser
 
 
@@ -506,12 +666,40 @@ def main() -> int:
     runs_dir = Path(args.runs_dir)
     runs = discover_runs(runs_dir, max(1, args.limit), args.completed_only)
     min_recent_runs_for_chunked = max(1, args.min_recent_runs_for_chunked)
+    calibration_window = max(1, args.calibration_window)
+    profile, _ = recommended_profile(runs, args.completed_only, min_recent_runs_for_chunked)
+    confidence, _ = recommendation_confidence(runs, args.completed_only, min_recent_runs_for_chunked)
+    readiness, _, _ = readiness_decision(runs, args.completed_only, min_recent_runs_for_chunked)
+    if args.write_ledger:
+        append_ledger_entries(runs_dir, runs, profile, confidence, readiness)
     if args.advisor_only and args.json:
-        print(json.dumps(build_advisor_payload(runs, args.completed_only, min_recent_runs_for_chunked), indent=2))
+        print(
+            json.dumps(
+                build_advisor_payload(
+                    runs,
+                    args.completed_only,
+                    min_recent_runs_for_chunked,
+                    runs_dir=runs_dir,
+                    calibration_window=calibration_window,
+                ),
+                indent=2,
+            )
+        )
     elif args.advisor_only:
-        print_advisor_report(runs, args.completed_only, min_recent_runs_for_chunked)
+        print_advisor_report(runs, args.completed_only, min_recent_runs_for_chunked, runs_dir, calibration_window)
     elif args.json:
-        print(json.dumps(build_report_payload(runs, args.completed_only, min_recent_runs_for_chunked), indent=2))
+        print(
+            json.dumps(
+                build_report_payload(
+                    runs,
+                    args.completed_only,
+                    min_recent_runs_for_chunked,
+                    runs_dir=runs_dir,
+                    calibration_window=calibration_window,
+                ),
+                indent=2,
+            )
+        )
     else:
         print_report(runs, args.completed_only, min_recent_runs_for_chunked)
     return 0

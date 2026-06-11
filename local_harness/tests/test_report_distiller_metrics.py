@@ -153,6 +153,10 @@ class ReportDistillerMetricsTests(unittest.TestCase):
                 report_distiller_metrics.DEFAULT_MIN_RECENT_RUNS_FOR_CHUNKED,
                 payload["thresholds"]["min_recent_runs_for_chunked"],
             )
+            self.assertEqual("low", payload["recommendation_confidence"])
+            self.assertEqual("not_ready", payload["readiness"])
+            self.assertIn("no_recent_runs", payload["blocking_signals"])
+            self.assertEqual(0, payload["calibration_metrics"]["entries_analyzed"])
             self.assertEqual(
                 "Recommend smoke profile: No runs found yet. Suggested settings: "
                 "ZTH_DISTILLER_SESSION_MAX_TOKENS=320, ZTH_DISTILLER_PATCH_MAX_TOKENS=240, "
@@ -189,6 +193,8 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual("smoke", payload["recommended_profile"])
             self.assertIn("Chunk retries detected", payload["recommendation"])
             self.assertEqual("low", payload["recommendation_confidence"])
+            self.assertEqual("not_ready", payload["readiness"])
+            self.assertIn("chunk_retries", payload["blocking_signals"])
             self.assertIn("Chunk retries", payload["confidence_reason"])
 
     def test_recommendation_prefers_normal_when_chunked_run_count_is_below_threshold(self):
@@ -234,6 +240,8 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual("normal", payload["recommended_profile"])
             self.assertIn("Need at least 3 recent runs", payload["recommendation"])
             self.assertEqual("medium", payload["recommendation_confidence"])
+            self.assertEqual("needs_review", payload["readiness"])
+            self.assertIn("insufficient_recent_window", payload["blocking_signals"])
             self.assertIn("need 3", payload["confidence_reason"])
 
     def test_recommendation_threshold_override_allows_chunked_with_two_runs(self):
@@ -279,6 +287,8 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual("chunked", payload["recommended_profile"])
             self.assertEqual(2, payload["thresholds"]["min_recent_runs_for_chunked"])
             self.assertEqual("high", payload["recommendation_confidence"])
+            self.assertEqual("ready", payload["readiness"])
+            self.assertEqual([], payload["blocking_signals"])
             self.assertIn("stable", payload["confidence_reason"])
 
     def test_recommendation_prefers_chunked_when_recent_chunked_runs_are_clean(self):
@@ -324,6 +334,7 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual("chunked", payload["recommended_profile"])
             self.assertIn("ZTH_DISTILLER_CHUNK_LINES", payload["recommendation"])
             self.assertEqual("high", payload["recommendation_confidence"])
+            self.assertEqual("ready", payload["readiness"])
 
     def test_build_advisor_payload_includes_recent_run_summary(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -363,6 +374,8 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual("chunked", payload["recent_run"]["mode"])
             self.assertEqual(44, payload["recent_run"]["total_elapsed_seconds"])
             self.assertEqual("high", payload["recommendation_confidence"])
+            self.assertEqual("ready", payload["readiness"])
+            self.assertEqual([], payload["blocking_signals"])
             self.assertIn("stable", payload["confidence_reason"])
             self.assertEqual(1, payload["confidence_signals"]["recent_completed_count"])
             self.assertEqual(0, payload["confidence_signals"]["recent_failed_count"])
@@ -377,6 +390,8 @@ class ReportDistillerMetricsTests(unittest.TestCase):
 
         self.assertEqual("smoke", payload["recommended_profile"])
         self.assertEqual("low", payload["recommendation_confidence"])
+        self.assertEqual("not_ready", payload["readiness"])
+        self.assertIn("no_recent_runs", payload["blocking_signals"])
         self.assertIn("No recent runs", payload["confidence_reason"])
         self.assertNotIn("recent_run", payload)
         self.assertEqual(0, payload["confidence_signals"]["recent_completed_count"])
@@ -421,6 +436,8 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual(3, payload["run_count"])
             self.assertEqual("smoke", payload["recommended_profile"])
             self.assertEqual("low", payload["recommendation_confidence"])
+            self.assertEqual("not_ready", payload["readiness"])
+            self.assertIn("recent_failures", payload["blocking_signals"])
             self.assertIn("Recent failures detected", payload["recommendation"])
 
     def test_mixed_recent_window_completed_only_can_recommend_chunked(self):
@@ -467,6 +484,8 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual(3, payload["run_count"])
             self.assertEqual("chunked", payload["recommended_profile"])
             self.assertEqual("high", payload["recommendation_confidence"])
+            self.assertEqual("ready", payload["readiness"])
+            self.assertEqual([], payload["blocking_signals"])
             self.assertIn("Recent chunked runs completed without chunk failures", payload["recommendation"])
 
     def test_cli_advisor_only_json_returns_advisor_payload_shape(self):
@@ -510,8 +529,12 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertIn("recommended_profile", payload)
             self.assertIn("recommendation_confidence", payload)
             self.assertIn("confidence_reason", payload)
+            self.assertIn("readiness", payload)
+            self.assertIn("readiness_reason", payload)
+            self.assertIn("blocking_signals", payload)
             self.assertIn("recent_run", payload)
             self.assertIn("confidence_signals", payload)
+            self.assertIn("calibration_metrics", payload)
             self.assertEqual(1, payload["thresholds"]["min_recent_runs_for_chunked"])
             self.assertNotIn("runs", payload)
 
@@ -554,6 +577,9 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertIn("runs", payload)
             self.assertIn("recommendation_confidence", payload)
             self.assertIn("confidence_reason", payload)
+            self.assertIn("readiness", payload)
+            self.assertIn("blocking_signals", payload)
+            self.assertIn("calibration_metrics", payload)
             self.assertEqual(1, len(payload["runs"]))
             self.assertEqual(4, payload["thresholds"]["min_recent_runs_for_chunked"])
 
@@ -593,9 +619,108 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual(0, proc.returncode)
             self.assertIn("Confidence signals:", proc.stdout)
             self.assertIn("Recommendation confidence:", proc.stdout)
+            self.assertIn("Readiness:", proc.stdout)
+            self.assertIn("Blocking signals:", proc.stdout)
+            self.assertIn("Calibration:", proc.stdout)
             self.assertIn("completed=0", proc.stdout)
             self.assertIn("failed=1", proc.stdout)
             self.assertIn("chunk_retries=2", proc.stdout)
+    def test_write_ledger_appends_unseen_runs_and_emits_calibration(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runs_dir = Path(temp_dir) / "run_records"
+            for run_name, status, compact_mode, chunked_mode in [
+                ("run-201", "completed", "0", "1"),
+                ("run-202", "failed", "1", "0"),
+            ]:
+                run_dir = runs_dir / run_name
+                run_dir.mkdir(parents=True)
+                (run_dir / "METRICS.json").write_text(
+                    json.dumps(
+                        {
+                            "source_id": run_name,
+                            "short_title": run_name,
+                            "status": status,
+                            "compact_mode": compact_mode,
+                            "chunked_mode": chunked_mode,
+                            "stages": {"chunk_summary": {"retry_count": 0, "failed": 0}},
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+
+            script = Path(report_distiller_metrics.__file__)
+            proc = subprocess.run(
+                [
+                    sys.executable,
+                    os.fspath(script),
+                    "--runs-dir",
+                    os.fspath(runs_dir),
+                    "--json",
+                    "--write-ledger",
+                    "--calibration-window",
+                    "10",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertEqual(0, proc.returncode)
+            payload = json.loads(proc.stdout)
+            self.assertIn("calibration_metrics", payload)
+            ledger_path = runs_dir / "interviewer_ledger.jsonl"
+            self.assertTrue(ledger_path.is_file())
+            lines = [line for line in ledger_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+            self.assertEqual(2, len(lines))
+
+            proc_second = subprocess.run(
+                [
+                    sys.executable,
+                    os.fspath(script),
+                    "--runs-dir",
+                    os.fspath(runs_dir),
+                    "--json",
+                    "--write-ledger",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(0, proc_second.returncode)
+            lines_second = [line for line in ledger_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+            self.assertEqual(2, len(lines_second))
+
+    def test_calibration_metrics_from_seeded_ledger(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runs_dir = Path(temp_dir) / "run_records"
+            runs_dir.mkdir(parents=True)
+            ledger_path = runs_dir / "interviewer_ledger.jsonl"
+            seeded = [
+                {
+                    "run_dir": "a",
+                    "recommendation_confidence": "high",
+                    "actual_status": "completed",
+                },
+                {
+                    "run_dir": "b",
+                    "recommendation_confidence": "high",
+                    "actual_status": "failed",
+                },
+                {
+                    "run_dir": "c",
+                    "recommendation_confidence": "low",
+                    "actual_status": "completed",
+                },
+            ]
+            ledger_path.write_text("\n".join(json.dumps(x) for x in seeded) + "\n", encoding="utf-8")
+
+            metrics = report_distiller_metrics.build_calibration_metrics(runs_dir, calibration_window=10)
+
+            self.assertEqual(3, metrics["entries_analyzed"])
+            self.assertEqual(1, metrics["false_high_count"])
+            self.assertEqual(1, metrics["false_low_count"])
+            self.assertEqual(2, metrics["high_confidence_count"])
+            self.assertEqual(0.5, metrics["confidence_high_success_rate"])
 
 
 if __name__ == "__main__":
