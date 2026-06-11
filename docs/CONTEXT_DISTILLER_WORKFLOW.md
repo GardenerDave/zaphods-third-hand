@@ -102,6 +102,22 @@ Chunked runs also include chunk prompts, summaries, and error logs when retries 
 
 `MODEL_REQUEST.md` and `METRICS.json` record the chunk line size, token budgets, timeout, endpoint, and model used for the run.
 
+`METRICS.json` also records passive telemetry for later human review and tuning:
+
+- Source, prompt, session, and review-patch byte counts.
+- Approximate token estimates based on file size.
+- Elapsed seconds for chunk splitting, chunk summaries, session generation, and review-patch generation.
+- Chunk summary attempt, retry, success, and failure counts.
+- Failure stage when a run exits before completion.
+
+Chunked runs write per-chunk telemetry to:
+
+```text
+outputs/run_records/<SOURCE_ID>_<SHORT_TITLE>/chunk_metrics.tsv
+```
+
+These metrics are evidence only. They do not automatically tune settings or accept generated context.
+
 ## Expected Output Paths
 
 ```text

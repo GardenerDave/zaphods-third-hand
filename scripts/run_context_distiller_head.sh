@@ -36,6 +36,24 @@ if [ "$MODE_ARG" = "--chunked" ] || [ "$MODE_ARG_2" = "--chunked" ] || [ "${ZTH_
   CHUNKED_MODE="1"
 fi
 CHUNK_COUNT="0"
+RUN_STARTED_AT="$(date -u +%FT%TZ)"
+RUN_START_EPOCH="$(date +%s)"
+RUN_STATUS="running"
+FAILURE_STAGE=""
+CHUNK_SPLIT_STATUS="skipped"
+CHUNK_SUMMARY_STATUS="skipped"
+CHUNK_SPLIT_SECONDS="0"
+CHUNK_SUMMARY_SECONDS="0"
+CHUNK_ATTEMPTED="0"
+CHUNK_SUCCEEDED="0"
+CHUNK_FAILED="0"
+CHUNK_RETRY_COUNT="0"
+CHUNK_METRICS_FILE=""
+SESSION_STATUS="pending"
+SESSION_SECONDS="0"
+SESSION_INPUT_PROMPT_FILE=""
+PATCH_STATUS="pending"
+PATCH_SECONDS="0"
 
 if [ -z "$SOURCE_ID" ] || [ -z "$SOURCE_FILE" ] || [ -z "$SHORT_TITLE" ]; then
   echo "Usage: ./scripts/run_context_distiller_head.sh <SOURCE_ID> <SOURCE_FILE> <SHORT_TITLE> [--compact] [--chunked]"
@@ -62,12 +80,151 @@ PATCH_FILE="${PATCH_DIR}/context_patch_${SOURCE_ID}.md"
 RUN_DIR="${RUNS_DIR}/${SOURCE_ID}_${SHORT_TITLE}"
 
 mkdir -p "$RUN_DIR"
+METRICS_FILE="${RUN_DIR}/METRICS.json"
+
+now_epoch() {
+  date +%s
+}
+
+elapsed_since() {
+  local started_at="$1"
+  echo "$(( $(now_epoch) - started_at ))"
+}
+
+file_bytes() {
+  if [ -f "$1" ]; then
+    wc -c < "$1" | tr -d ' '
+  else
+    echo "0"
+  fi
+}
+
+file_lines() {
+  if [ -f "$1" ]; then
+    wc -l < "$1" | tr -d ' '
+  else
+    echo "0"
+  fi
+}
+
+file_est_tokens() {
+  local bytes
+  bytes="$(file_bytes "$1")"
+  echo "$(( (bytes + 3) / 4 ))"
+}
+
+write_metrics() {
+  local status="${1:-$RUN_STATUS}"
+  local completed_at
+  local total_seconds
+  local prompt_file
+
+  completed_at="$(date -u +%FT%TZ)"
+  total_seconds="$(elapsed_since "$RUN_START_EPOCH")"
+
+  if [ -n "$SESSION_INPUT_PROMPT_FILE" ]; then
+    prompt_file="$SESSION_INPUT_PROMPT_FILE"
+  elif [ "$CHUNKED_MODE" = "1" ]; then
+    prompt_file="${RUN_DIR}/synthesis_prompt.md"
+  else
+    prompt_file="${RUN_DIR}/session_prompt.md"
+  fi
+
+  cat > "$METRICS_FILE" <<EOF
+{
+  "source_id": "${SOURCE_ID}",
+  "source_file": "${SOURCE_FILE}",
+  "short_title": "${SHORT_TITLE}",
+  "compact_mode": "${COMPACT_MODE}",
+  "chunked_mode": "${CHUNKED_MODE}",
+  "chunk_line_size": "${CHUNK_LINES}",
+  "chunk_count": "${CHUNK_COUNT}",
+  "chunk_max_tokens": "${CHUNK_MAX_TOKENS}",
+  "session_max_tokens": "${SESSION_MAX_TOKENS}",
+  "patch_max_tokens": "${PATCH_MAX_TOKENS}",
+  "call_timeout_seconds": "${CALL_TIMEOUT}",
+  "source": {
+    "bytes": $(file_bytes "$SOURCE_FILE"),
+    "lines": $(file_lines "$SOURCE_FILE"),
+    "estimated_tokens": $(file_est_tokens "$SOURCE_FILE")
+  },
+  "prompts": {
+    "session_prompt_file": "${prompt_file}",
+    "session_prompt_bytes": $(file_bytes "$prompt_file"),
+    "session_prompt_lines": $(file_lines "$prompt_file"),
+    "session_prompt_estimated_tokens": $(file_est_tokens "$prompt_file"),
+    "patch_prompt_file": "${RUN_DIR}/patch_prompt.md",
+    "patch_prompt_bytes": $(file_bytes "${RUN_DIR}/patch_prompt.md"),
+    "patch_prompt_lines": $(file_lines "${RUN_DIR}/patch_prompt.md"),
+    "patch_prompt_estimated_tokens": $(file_est_tokens "${RUN_DIR}/patch_prompt.md")
+  },
+  "outputs": {
+    "session_bytes": $(file_bytes "$SESSION_FILE"),
+    "session_lines": $(file_lines "$SESSION_FILE"),
+    "session_estimated_tokens": $(file_est_tokens "$SESSION_FILE"),
+    "patch_bytes": $(file_bytes "$PATCH_FILE"),
+    "patch_lines": $(file_lines "$PATCH_FILE"),
+    "patch_estimated_tokens": $(file_est_tokens "$PATCH_FILE")
+  },
+  "stages": {
+    "chunk_split": {
+      "status": "${CHUNK_SPLIT_STATUS}",
+      "elapsed_seconds": ${CHUNK_SPLIT_SECONDS}
+    },
+    "chunk_summary": {
+      "status": "${CHUNK_SUMMARY_STATUS}",
+      "elapsed_seconds": ${CHUNK_SUMMARY_SECONDS},
+      "attempted": ${CHUNK_ATTEMPTED},
+      "succeeded": ${CHUNK_SUCCEEDED},
+      "failed": ${CHUNK_FAILED},
+      "retry_count": ${CHUNK_RETRY_COUNT},
+      "chunk_metrics_file": "${CHUNK_METRICS_FILE}"
+    },
+    "session": {
+      "status": "${SESSION_STATUS}",
+      "elapsed_seconds": ${SESSION_SECONDS}
+    },
+    "review_patch": {
+      "status": "${PATCH_STATUS}",
+      "elapsed_seconds": ${PATCH_SECONDS}
+    }
+  },
+  "run_started_at": "${RUN_STARTED_AT}",
+  "run_completed_at": "${completed_at}",
+  "total_elapsed_seconds": ${total_seconds},
+  "failure_stage": "${FAILURE_STAGE}",
+  "session_file": "${SESSION_FILE}",
+  "patch_file": "${PATCH_FILE}",
+  "worker": "openai-compatible-model-endpoint",
+  "base_url": "${BASE_URL}",
+  "model": "${MODEL}",
+  "status": "${status}"
+}
+EOF
+}
+
+on_exit() {
+  local exit_code="$?"
+  if [ "$exit_code" -ne 0 ] && [ -z "$FAILURE_STAGE" ]; then
+    FAILURE_STAGE="script"
+  fi
+  if [ "$RUN_STATUS" != "completed" ]; then
+    if [ "$exit_code" -ne 0 ]; then
+      RUN_STATUS="failed"
+    fi
+    write_metrics "$RUN_STATUS"
+  fi
+}
+
+trap on_exit EXIT
 
 call_model() {
   python3 "${PACKAGE_ROOT}/local_harness/icm_call.py" handoff --api openai-chat --base-url "$BASE_URL" --model "$MODEL" --timeout "$CALL_TIMEOUT" "$@"
 }
 
 if [ "$CHUNKED_MODE" = "1" ]; then
+  CHUNK_SPLIT_STATUS="running"
+  CHUNK_SPLIT_START="$(now_epoch)"
   mkdir -p "$RUN_DIR/chunks"
 
   awk \
@@ -153,11 +310,22 @@ EOF
     cat "$CHUNK_FILE" >> "$CHUNK_PROMPT"
   done
 
+  CHUNK_SPLIT_SECONDS="$(elapsed_since "$CHUNK_SPLIT_START")"
+  CHUNK_SPLIT_STATUS="completed"
+  CHUNK_SUMMARY_STATUS="running"
+  CHUNK_SUMMARY_START="$(now_epoch)"
+  CHUNK_METRICS_FILE="${RUN_DIR}/chunk_metrics.tsv"
+  printf 'chunk_prompt\tchunk_summary\tstatus\tattempts\telapsed_seconds\tprompt_estimated_tokens\toutput_estimated_tokens\tprompt_bytes\toutput_bytes\terror_log\n' > "$CHUNK_METRICS_FILE"
+
   for CHUNK_PROMPT in "$RUN_DIR"/chunks/chunk_[0-9][0-9][0-9]_prompt.md; do
     [ -f "$CHUNK_PROMPT" ] || continue
     CHUNK_SUMMARY="${CHUNK_PROMPT%_prompt.md}_summary.md"
     CHUNK_ERROR="${CHUNK_PROMPT%_prompt.md}_error.log"
     CHUNK_OK="0"
+    CHUNK_STATUS="failed"
+    CHUNK_ATTEMPTS="1"
+    CHUNK_STAGE_START="$(now_epoch)"
+    CHUNK_ATTEMPTED="$((CHUNK_ATTEMPTED + 1))"
     : > "$CHUNK_ERROR"
 
     if call_model --max-tokens "$CHUNK_MAX_TOKENS" < "$CHUNK_PROMPT" > "$CHUNK_SUMMARY" 2>> "$CHUNK_ERROR"; then
@@ -167,6 +335,8 @@ EOF
         echo
         echo "--- retry 1 ---"
       } >> "$CHUNK_ERROR"
+      CHUNK_ATTEMPTS="2"
+      CHUNK_RETRY_COUNT="$((CHUNK_RETRY_COUNT + 1))"
 
       if call_model --max-tokens "$CHUNK_MAX_TOKENS" < "$CHUNK_PROMPT" > "$CHUNK_SUMMARY" 2>> "$CHUNK_ERROR"; then
         CHUNK_OK="1"
@@ -174,10 +344,13 @@ EOF
     fi
 
     if [ "$CHUNK_OK" = "1" ]; then
+      CHUNK_STATUS="completed"
+      CHUNK_SUCCEEDED="$((CHUNK_SUCCEEDED + 1))"
       if [ ! -s "$CHUNK_ERROR" ]; then
         rm -f "$CHUNK_ERROR"
       fi
     else
+      CHUNK_FAILED="$((CHUNK_FAILED + 1))"
       cat > "$CHUNK_SUMMARY" <<EOF
 # Chunk Context Summary
 
@@ -192,7 +365,35 @@ See: ${CHUNK_ERROR}
 Chunk distillation failed; human review required.
 EOF
     fi
+
+    if [ -f "$CHUNK_ERROR" ]; then
+      CHUNK_ERROR_PATH="$CHUNK_ERROR"
+    else
+      CHUNK_ERROR_PATH=""
+    fi
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+      "$CHUNK_PROMPT" \
+      "$CHUNK_SUMMARY" \
+      "$CHUNK_STATUS" \
+      "$CHUNK_ATTEMPTS" \
+      "$(elapsed_since "$CHUNK_STAGE_START")" \
+      "$(file_est_tokens "$CHUNK_PROMPT")" \
+      "$(file_est_tokens "$CHUNK_SUMMARY")" \
+      "$(file_bytes "$CHUNK_PROMPT")" \
+      "$(file_bytes "$CHUNK_SUMMARY")" \
+      "$CHUNK_ERROR_PATH" >> "$CHUNK_METRICS_FILE"
   done
+
+  CHUNK_SUMMARY_SECONDS="$(elapsed_since "$CHUNK_SUMMARY_START")"
+  if [ "$CHUNK_ATTEMPTED" -eq 0 ]; then
+    CHUNK_SUMMARY_STATUS="skipped"
+  elif [ "$CHUNK_FAILED" -eq 0 ]; then
+    CHUNK_SUMMARY_STATUS="completed"
+  elif [ "$CHUNK_SUCCEEDED" -eq 0 ]; then
+    CHUNK_SUMMARY_STATUS="failed"
+  else
+    CHUNK_SUMMARY_STATUS="partial"
+  fi
 
   CHUNK_SUMMARIES=( "$RUN_DIR"/chunks/chunk_[0-9][0-9][0-9]_summary.md )
   if [ ! -f "${CHUNK_SUMMARIES[0]}" ]; then
@@ -381,9 +582,22 @@ EOF
 fi
 
 if [ "$CHUNKED_MODE" = "1" ]; then
-  call_model --max-tokens "$SESSION_MAX_TOKENS" < "$RUN_DIR/synthesis_prompt.md" > "$SESSION_FILE"
+  SESSION_INPUT_PROMPT_FILE="${RUN_DIR}/synthesis_prompt.md"
 else
-  call_model --max-tokens "$SESSION_MAX_TOKENS" < "$RUN_DIR/session_prompt.md" > "$SESSION_FILE"
+  SESSION_INPUT_PROMPT_FILE="${RUN_DIR}/session_prompt.md"
+fi
+
+SESSION_STATUS="running"
+SESSION_STAGE_START="$(now_epoch)"
+if call_model --max-tokens "$SESSION_MAX_TOKENS" < "$SESSION_INPUT_PROMPT_FILE" > "$SESSION_FILE"; then
+  SESSION_SECONDS="$(elapsed_since "$SESSION_STAGE_START")"
+  SESSION_STATUS="completed"
+else
+  SESSION_SECONDS="$(elapsed_since "$SESSION_STAGE_START")"
+  SESSION_STATUS="failed"
+  FAILURE_STAGE="session"
+  RUN_STATUS="failed"
+  exit 1
 fi
 
 cat > "$RUN_DIR/patch_prompt.md" <<EOF
@@ -415,7 +629,18 @@ EOF
 
 cat "$SESSION_FILE" >> "$RUN_DIR/patch_prompt.md"
 
-call_model --max-tokens "$PATCH_MAX_TOKENS" < "$RUN_DIR/patch_prompt.md" > "$PATCH_FILE"
+PATCH_STATUS="running"
+PATCH_STAGE_START="$(now_epoch)"
+if call_model --max-tokens "$PATCH_MAX_TOKENS" < "$RUN_DIR/patch_prompt.md" > "$PATCH_FILE"; then
+  PATCH_SECONDS="$(elapsed_since "$PATCH_STAGE_START")"
+  PATCH_STATUS="completed"
+else
+  PATCH_SECONDS="$(elapsed_since "$PATCH_STAGE_START")"
+  PATCH_STATUS="failed"
+  FAILURE_STAGE="review_patch"
+  RUN_STATUS="failed"
+  exit 1
+fi
 
 cp "$SESSION_FILE" "$RUN_DIR/OUTPUT.md"
 
@@ -431,27 +656,8 @@ Context review patch:
 - ${PATCH_FILE}
 EOF
 
-cat > "$RUN_DIR/METRICS.json" <<EOF
-{
-  "source_id": "${SOURCE_ID}",
-  "source_file": "${SOURCE_FILE}",
-  "short_title": "${SHORT_TITLE}",
-  "compact_mode": "${COMPACT_MODE}",
-  "chunked_mode": "${CHUNKED_MODE}",
-  "chunk_line_size": "${CHUNK_LINES}",
-  "chunk_count": "${CHUNK_COUNT}",
-  "chunk_max_tokens": "${CHUNK_MAX_TOKENS}",
-  "session_max_tokens": "${SESSION_MAX_TOKENS}",
-  "patch_max_tokens": "${PATCH_MAX_TOKENS}",
-  "call_timeout_seconds": "${CALL_TIMEOUT}",
-  "session_file": "${SESSION_FILE}",
-  "patch_file": "${PATCH_FILE}",
-  "worker": "openai-compatible-model-endpoint",
-  "base_url": "${BASE_URL}",
-  "model": "${MODEL}",
-  "status": "completed"
-}
-EOF
+RUN_STATUS="completed"
+write_metrics "$RUN_STATUS"
 
 cat > "$RUN_DIR/ACCEPTED.md" <<EOF
 # Accepted
