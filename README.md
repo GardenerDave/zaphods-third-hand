@@ -89,6 +89,16 @@ Default safety posture:
 
 For a step-by-step beginner path, start with `QUICKSTART.md`.
 
+## Try Metrics Without A Model
+
+You can inspect a sample telemetry report before configuring a model endpoint:
+
+```bash
+python3 local_harness/report_distiller_metrics.py --runs-dir examples --limit 3
+```
+
+This reads sanitized example data under `examples/sample_metrics_run/`. Real distiller runs write their metrics under `outputs/run_records/`.
+
 ## Basic Setup Assumptions
 
 - You have Python 3 available.

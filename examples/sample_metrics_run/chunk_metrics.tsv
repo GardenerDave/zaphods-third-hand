@@ -1,0 +1,3 @@
+chunk_prompt	chunk_summary	status	attempts	elapsed_seconds	prompt_estimated_tokens	output_estimated_tokens	prompt_bytes	output_bytes	error_log
+chunks/chunk_001_prompt.md	chunks/chunk_001_summary.md	completed	1	47	320	180	1280	720	
+chunks/chunk_002_prompt.md	chunks/chunk_002_summary.md	completed	1	48	300	170	1200	680	

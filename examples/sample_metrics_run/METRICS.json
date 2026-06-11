@@ -1,0 +1,69 @@
+{
+  "source_id": "sample-source-001",
+  "source_file": "<SOURCE_FILE>",
+  "short_title": "sample-metrics-run",
+  "compact_mode": "0",
+  "chunked_mode": "1",
+  "chunk_line_size": "200",
+  "chunk_count": "2",
+  "chunk_max_tokens": "600",
+  "session_max_tokens": "1200",
+  "patch_max_tokens": "900",
+  "call_timeout_seconds": "900",
+  "source": {
+    "bytes": 2400,
+    "lines": 80,
+    "estimated_tokens": 600
+  },
+  "prompts": {
+    "session_prompt_file": "examples/sample_metrics_run/synthesis_prompt.md",
+    "session_prompt_bytes": 1800,
+    "session_prompt_lines": 60,
+    "session_prompt_estimated_tokens": 450,
+    "patch_prompt_file": "examples/sample_metrics_run/patch_prompt.md",
+    "patch_prompt_bytes": 1500,
+    "patch_prompt_lines": 48,
+    "patch_prompt_estimated_tokens": 375
+  },
+  "outputs": {
+    "session_bytes": 1200,
+    "session_lines": 42,
+    "session_estimated_tokens": 300,
+    "patch_bytes": 700,
+    "patch_lines": 24,
+    "patch_estimated_tokens": 175
+  },
+  "stages": {
+    "chunk_split": {
+      "status": "completed",
+      "elapsed_seconds": 1
+    },
+    "chunk_summary": {
+      "status": "completed",
+      "elapsed_seconds": 95,
+      "attempted": 2,
+      "succeeded": 2,
+      "failed": 0,
+      "retry_count": 0,
+      "chunk_metrics_file": "chunk_metrics.tsv"
+    },
+    "session": {
+      "status": "completed",
+      "elapsed_seconds": 70
+    },
+    "review_patch": {
+      "status": "completed",
+      "elapsed_seconds": 45
+    }
+  },
+  "run_started_at": "2026-06-11T00:00:00Z",
+  "run_completed_at": "2026-06-11T00:03:31Z",
+  "total_elapsed_seconds": 211,
+  "failure_stage": "",
+  "session_file": "outputs/sessions/<DATE>_sample-metrics-run.md",
+  "patch_file": "outputs/review_patches/context_patch_sample-source-001.md",
+  "worker": "openai-compatible-model-endpoint",
+  "base_url": "http://<LLAMA_CPP_BASE_URL>/v1",
+  "model": "<MODEL_NAME>",
+  "status": "completed"
+}

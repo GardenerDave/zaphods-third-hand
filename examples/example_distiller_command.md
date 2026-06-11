@@ -1,5 +1,11 @@
 # Example Distiller Command
 
+Try the sample metrics report without a model:
+
+```bash
+python3 local_harness/report_distiller_metrics.py --runs-dir examples --limit 3
+```
+
 Configure the model endpoint:
 
 ```bash

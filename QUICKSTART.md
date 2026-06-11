@@ -24,6 +24,12 @@ Put `zaphods-third-hand/` inside the repository or workspace where you want to k
 cd <REPO_ROOT>/zaphods-third-hand
 ```
 
+You can verify the metrics reporter without a model server:
+
+```bash
+python3 local_harness/report_distiller_metrics.py --runs-dir examples --limit 3
+```
+
 ## Step 1: Configure Local Or Remote Model Endpoint
 
 Use an OpenAI-compatible chat-completions endpoint.
