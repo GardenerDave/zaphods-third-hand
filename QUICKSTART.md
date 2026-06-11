@@ -77,6 +77,17 @@ printf 'Decision: keep role runs supervised. Next action: write a small job pack
 
 Compact mode asks the model for a tight durable summary. Chunked mode splits long sources into chunks, summarizes each chunk, and then synthesizes a final session summary.
 
+For a slow model server or a smoke test, lower the output budgets before running:
+
+```bash
+export ZTH_DISTILLER_CHUNK_MAX_TOKENS="600"
+export ZTH_DISTILLER_SESSION_MAX_TOKENS="900"
+export ZTH_DISTILLER_PATCH_MAX_TOKENS="700"
+export ZTH_DISTILLER_TIMEOUT="600"
+```
+
+Use higher values again for real source distillation when you need more complete summaries.
+
 ## Step 4: Review The Generated Session And Patch
 
 Inspect:
@@ -137,5 +148,6 @@ The distiller script is package-relative and writes to `outputs/`, but it still 
 - Placeholder endpoint or model: load `config.env` or export `ZTH_BASE_URL` and `ZTH_MODEL`.
 - Source file not found: run from `zaphods-third-hand/` or pass an absolute path to a private source file.
 - Endpoint rejects the request: confirm the URL, model name, and `ZTH_API_KEY` if your endpoint requires one.
+- Slow backend: test with a tiny source, compact mode, and lower `ZTH_DISTILLER_*_MAX_TOKENS` values before running long chunked jobs.
 - Generated patch looks wrong: do not accept it; record rework or create a narrow follow-up packet.
 - Role output expands scope: stop and return to the active packet boundaries.

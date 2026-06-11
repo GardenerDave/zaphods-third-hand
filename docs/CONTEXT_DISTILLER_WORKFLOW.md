@@ -24,11 +24,20 @@ Compact mode asks the model for a concise summary using a fixed structure:
 
 Use compact mode for most sources.
 
+For smoke tests or slower model servers, use a tiny source and lower the optional output budgets:
+
+```bash
+export ZTH_DISTILLER_SESSION_MAX_TOKENS="900"
+export ZTH_DISTILLER_PATCH_MAX_TOKENS="700"
+```
+
 ## Chunked Mode
 
 Chunked mode splits long sources into fixed-size chunks. Each chunk gets its own summary before a final synthesis step.
 
 Use chunked mode when a source is too long for one reliable model call.
+
+Chunked mode makes multiple model calls, so it can be much slower than compact mode on CPU-bound or small model servers. For smoke tests, lower `ZTH_DISTILLER_CHUNK_LINES`, `ZTH_DISTILLER_CHUNK_MAX_TOKENS`, `ZTH_DISTILLER_SESSION_MAX_TOKENS`, and `ZTH_DISTILLER_PATCH_MAX_TOKENS`.
 
 ## Chunk Summaries
 
@@ -90,6 +99,8 @@ Typical audit files include:
 - `ACCEPTED.md`
 
 Chunked runs also include chunk prompts, summaries, and error logs when retries fail.
+
+`MODEL_REQUEST.md` and `METRICS.json` record the chunk line size, token budgets, timeout, endpoint, and model used for the run.
 
 ## Expected Output Paths
 

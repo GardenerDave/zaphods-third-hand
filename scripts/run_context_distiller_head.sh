@@ -16,6 +16,10 @@ MODE_ARG_2="${5:-}"
 BASE_URL="${ZTH_BASE_URL:-http://<LLAMA_CPP_BASE_URL>/v1}"
 MODEL="${ZTH_MODEL:-<MODEL_NAME>}"
 CHUNK_LINES="${ZTH_DISTILLER_CHUNK_LINES:-350}"
+CHUNK_MAX_TOKENS="${ZTH_DISTILLER_CHUNK_MAX_TOKENS:-1200}"
+SESSION_MAX_TOKENS="${ZTH_DISTILLER_SESSION_MAX_TOKENS:-2200}"
+PATCH_MAX_TOKENS="${ZTH_DISTILLER_PATCH_MAX_TOKENS:-1800}"
+CALL_TIMEOUT="${ZTH_DISTILLER_TIMEOUT:-900}"
 
 if [[ "$BASE_URL" == *"<LLAMA_CPP_BASE_URL>"* ]] || [[ "$MODEL" == "<MODEL_NAME>" ]]; then
   echo "Configure ZTH_BASE_URL and ZTH_MODEL before running. See config.example.env."
@@ -60,7 +64,7 @@ RUN_DIR="${RUNS_DIR}/${SOURCE_ID}_${SHORT_TITLE}"
 mkdir -p "$RUN_DIR"
 
 call_model() {
-  python3 "${PACKAGE_ROOT}/local_harness/icm_call.py" handoff --api openai-chat --base-url "$BASE_URL" --model "$MODEL" "$@"
+  python3 "${PACKAGE_ROOT}/local_harness/icm_call.py" handoff --api openai-chat --base-url "$BASE_URL" --model "$MODEL" --timeout "$CALL_TIMEOUT" "$@"
 }
 
 if [ "$CHUNKED_MODE" = "1" ]; then
@@ -156,7 +160,7 @@ EOF
     CHUNK_OK="0"
     : > "$CHUNK_ERROR"
 
-    if call_model --max-tokens 1200 < "$CHUNK_PROMPT" > "$CHUNK_SUMMARY" 2>> "$CHUNK_ERROR"; then
+    if call_model --max-tokens "$CHUNK_MAX_TOKENS" < "$CHUNK_PROMPT" > "$CHUNK_SUMMARY" 2>> "$CHUNK_ERROR"; then
       CHUNK_OK="1"
     else
       {
@@ -164,7 +168,7 @@ EOF
         echo "--- retry 1 ---"
       } >> "$CHUNK_ERROR"
 
-      if call_model --max-tokens 1200 < "$CHUNK_PROMPT" > "$CHUNK_SUMMARY" 2>> "$CHUNK_ERROR"; then
+      if call_model --max-tokens "$CHUNK_MAX_TOKENS" < "$CHUNK_PROMPT" > "$CHUNK_SUMMARY" 2>> "$CHUNK_ERROR"; then
         CHUNK_OK="1"
       fi
     fi
@@ -274,6 +278,10 @@ Short title: ${SHORT_TITLE}
 Compact mode: ${COMPACT_MODE}
 Chunked mode: ${CHUNKED_MODE}
 Chunk line size: ${CHUNK_LINES}
+Chunk max tokens: ${CHUNK_MAX_TOKENS}
+Session max tokens: ${SESSION_MAX_TOKENS}
+Patch max tokens: ${PATCH_MAX_TOKENS}
+Call timeout seconds: ${CALL_TIMEOUT}
 EOF
 
 if [ "$COMPACT_MODE" = "1" ]; then
@@ -373,9 +381,9 @@ EOF
 fi
 
 if [ "$CHUNKED_MODE" = "1" ]; then
-  call_model --max-tokens 2200 < "$RUN_DIR/synthesis_prompt.md" > "$SESSION_FILE"
+  call_model --max-tokens "$SESSION_MAX_TOKENS" < "$RUN_DIR/synthesis_prompt.md" > "$SESSION_FILE"
 else
-  call_model --max-tokens 2200 < "$RUN_DIR/session_prompt.md" > "$SESSION_FILE"
+  call_model --max-tokens "$SESSION_MAX_TOKENS" < "$RUN_DIR/session_prompt.md" > "$SESSION_FILE"
 fi
 
 cat > "$RUN_DIR/patch_prompt.md" <<EOF
@@ -407,7 +415,7 @@ EOF
 
 cat "$SESSION_FILE" >> "$RUN_DIR/patch_prompt.md"
 
-call_model --max-tokens 1800 < "$RUN_DIR/patch_prompt.md" > "$PATCH_FILE"
+call_model --max-tokens "$PATCH_MAX_TOKENS" < "$RUN_DIR/patch_prompt.md" > "$PATCH_FILE"
 
 cp "$SESSION_FILE" "$RUN_DIR/OUTPUT.md"
 
@@ -432,6 +440,10 @@ cat > "$RUN_DIR/METRICS.json" <<EOF
   "chunked_mode": "${CHUNKED_MODE}",
   "chunk_line_size": "${CHUNK_LINES}",
   "chunk_count": "${CHUNK_COUNT}",
+  "chunk_max_tokens": "${CHUNK_MAX_TOKENS}",
+  "session_max_tokens": "${SESSION_MAX_TOKENS}",
+  "patch_max_tokens": "${PATCH_MAX_TOKENS}",
+  "call_timeout_seconds": "${CALL_TIMEOUT}",
   "session_file": "${SESSION_FILE}",
   "patch_file": "${PATCH_FILE}",
   "worker": "openai-compatible-model-endpoint",
