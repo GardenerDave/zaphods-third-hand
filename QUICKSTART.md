@@ -162,7 +162,14 @@ python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records
 
 The JSON report includes `recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, and `thresholds`.
 
-When token usage is available, the advisor also reports recent-run prompt/completion/total tokens plus completion cap utilization. Use that to tune budgets for efficiency before optimizing for speed.
+When token usage is available, the advisor also reports recent-run prompt/completion/total tokens, finish reasons, completion cap utilization, and a `budget_tuning` action. Use that to tune budgets for efficiency before optimizing for speed.
+
+Budget tuning actions mean:
+
+- `raise_session_budget`: the session summary likely clipped at the completion cap.
+- `raise_patch_budget`: the review patch likely clipped at the completion cap.
+- `consider_lowering_budget`: both calls stopped naturally with substantial headroom.
+- `profile_looks_good`: both calls stopped naturally and used a healthy share of the completion budget.
 
 For a concise operator handoff view:
 

@@ -110,14 +110,17 @@ Chunked runs also include chunk prompts, summaries, per-chunk metadata files, an
 
 `MODEL_REQUEST.md` and `METRICS.json` record the chunk line size, token budgets, timeout, endpoint, and model used for the run.
 They also record whether final-only/no-think mode was enabled through `ZTH_DISTILLER_FINAL_ONLY`.
-When the model endpoint returns OpenAI-style `usage`, `METRICS.json` records actual prompt, completion, and total tokens for the session and review-patch calls. If the endpoint does not return usage, the distiller still records estimated tokens from file size.
+When the model endpoint returns OpenAI-style metadata, `METRICS.json` records actual prompt, completion, and total tokens, finish reasons, and timing fields for the session and review-patch calls. If the endpoint does not return usage, the distiller still records estimated tokens from file size.
 
 `METRICS.json` also records passive telemetry for later human review and tuning:
 
 - Source, prompt, session, and review-patch byte counts.
 - Approximate token estimates based on file size.
 - Actual model usage tokens when the endpoint reports them.
+- Finish reasons such as `stop` or `length` when the endpoint reports them.
+- Prompt and generation timing fields when the endpoint reports them.
 - Completion cap utilization and completion-to-output-estimate ratios in the metrics advisor.
+- Budget tuning advice such as `raise_session_budget`, `raise_patch_budget`, `consider_lowering_budget`, or `profile_looks_good`.
 - Elapsed seconds for chunk splitting, chunk summaries, session generation, and review-patch generation.
 - Chunk summary attempt, retry, success, and failure counts.
 - Failure stage when a run exits before completion.

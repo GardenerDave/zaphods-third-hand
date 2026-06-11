@@ -63,12 +63,22 @@ class RunSummary:
     patch_lines: int
     patch_estimated_tokens: int
     usage_available: bool
+    session_finish_reason: str
     session_prompt_tokens_actual: int
     session_completion_tokens_actual: int
     session_total_tokens_actual: int
+    session_prompt_ms: float
+    session_predicted_ms: float
+    session_prompt_per_second: float
+    session_predicted_per_second: float
+    patch_finish_reason: str
     patch_prompt_tokens_actual: int
     patch_completion_tokens_actual: int
     patch_total_tokens_actual: int
+    patch_prompt_ms: float
+    patch_predicted_ms: float
+    patch_prompt_per_second: float
+    patch_predicted_per_second: float
     total_prompt_tokens_actual: int
     total_completion_tokens_actual: int
     total_tokens_actual: int
@@ -89,6 +99,13 @@ class RunSummary:
 def to_int(value: Any, default: int = 0) -> int:
     try:
         return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def to_float(value: Any, default: float = 0.0) -> float:
+    try:
+        return float(value)
     except (TypeError, ValueError):
         return default
 
@@ -156,6 +173,39 @@ def parse_sort_epoch(completed_at: str) -> float:
         return 0.0
 
 
+def load_json_sidecar(path: str, run_dir: Path) -> dict[str, Any]:
+    if not path:
+        return {}
+    sidecar = Path(path)
+    if not sidecar.is_absolute():
+        sidecar = run_dir / sidecar
+    if not sidecar.is_file():
+        sidecar = run_dir / Path(path).name
+    if not sidecar.is_file():
+        return {}
+    try:
+        payload = json.loads(sidecar.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return payload if isinstance(payload, dict) else {}
+
+
+def model_call_section(model_usage: dict[str, Any], key: str, metadata: dict[str, Any]) -> dict[str, Any]:
+    section = model_usage.get(key, {}) if isinstance(model_usage, dict) else {}
+    if not isinstance(section, dict):
+        section = {}
+    usage = section
+    metadata_usage = metadata.get("usage", {})
+    if not usage_has_tokens(usage) and isinstance(metadata_usage, dict):
+        usage = {**metadata_usage, **section}
+    finish_reason = section.get("finish_reason") or metadata.get("finish_reason")
+    timings = section.get("timings")
+    if not isinstance(timings, dict):
+        metadata_timings = metadata.get("timings", {})
+        timings = metadata_timings if isinstance(metadata_timings, dict) else {}
+    return {**usage, "finish_reason": finish_reason, "timings": timings}
+
+
 def parse_run(metrics_path: Path) -> RunSummary:
     data = json.loads(metrics_path.read_text(encoding="utf-8"))
     stages = data.get("stages", {})
@@ -167,8 +217,22 @@ def parse_run(metrics_path: Path) -> RunSummary:
     outputs = data.get("outputs", {})
     source = data.get("source", {})
     model_usage = data.get("model_usage", {})
-    session_usage = model_usage.get("session", {}) if isinstance(model_usage, dict) else {}
-    patch_usage = model_usage.get("review_patch", {}) if isinstance(model_usage, dict) else {}
+    session_metadata = (
+        load_json_sidecar(str(model_usage.get("session_metadata_file", "")), metrics_path.parent)
+        if isinstance(model_usage, dict)
+        else {}
+    )
+    patch_metadata = (
+        load_json_sidecar(str(model_usage.get("patch_metadata_file", "")), metrics_path.parent)
+        if isinstance(model_usage, dict)
+        else {}
+    )
+    session_usage = model_call_section(model_usage, "session", session_metadata) if isinstance(model_usage, dict) else {}
+    patch_usage = model_call_section(model_usage, "review_patch", patch_metadata) if isinstance(model_usage, dict) else {}
+    session_timings = session_usage.get("timings", {}) if isinstance(session_usage, dict) else {}
+    patch_timings = patch_usage.get("timings", {}) if isinstance(patch_usage, dict) else {}
+    session_finish_reason = str(session_usage.get("finish_reason") or "") if isinstance(session_usage, dict) else ""
+    patch_finish_reason = str(patch_usage.get("finish_reason") or "") if isinstance(patch_usage, dict) else ""
     session_prompt_tokens_actual = to_int(session_usage.get("prompt_tokens", 0)) if isinstance(session_usage, dict) else 0
     session_completion_tokens_actual = to_int(session_usage.get("completion_tokens", 0)) if isinstance(session_usage, dict) else 0
     session_total_tokens_actual = (
@@ -230,12 +294,34 @@ def parse_run(metrics_path: Path) -> RunSummary:
         patch_lines=to_int(outputs.get("patch_lines", 0)),
         patch_estimated_tokens=to_int(outputs.get("patch_estimated_tokens", 0)),
         usage_available=usage_available,
+        session_finish_reason=session_finish_reason,
         session_prompt_tokens_actual=session_prompt_tokens_actual,
         session_completion_tokens_actual=session_completion_tokens_actual,
         session_total_tokens_actual=session_total_tokens_actual,
+        session_prompt_ms=to_float(session_timings.get("prompt_ms", 0)) if isinstance(session_timings, dict) else 0.0,
+        session_predicted_ms=(
+            to_float(session_timings.get("predicted_ms", 0)) if isinstance(session_timings, dict) else 0.0
+        ),
+        session_prompt_per_second=(
+            to_float(session_timings.get("prompt_per_second", 0)) if isinstance(session_timings, dict) else 0.0
+        ),
+        session_predicted_per_second=(
+            to_float(session_timings.get("predicted_per_second", 0)) if isinstance(session_timings, dict) else 0.0
+        ),
+        patch_finish_reason=patch_finish_reason,
         patch_prompt_tokens_actual=patch_prompt_tokens_actual,
         patch_completion_tokens_actual=patch_completion_tokens_actual,
         patch_total_tokens_actual=patch_total_tokens_actual,
+        patch_prompt_ms=to_float(patch_timings.get("prompt_ms", 0)) if isinstance(patch_timings, dict) else 0.0,
+        patch_predicted_ms=(
+            to_float(patch_timings.get("predicted_ms", 0)) if isinstance(patch_timings, dict) else 0.0
+        ),
+        patch_prompt_per_second=(
+            to_float(patch_timings.get("prompt_per_second", 0)) if isinstance(patch_timings, dict) else 0.0
+        ),
+        patch_predicted_per_second=(
+            to_float(patch_timings.get("predicted_per_second", 0)) if isinstance(patch_timings, dict) else 0.0
+        ),
         total_prompt_tokens_actual=session_prompt_tokens_actual + patch_prompt_tokens_actual,
         total_completion_tokens_actual=session_completion_tokens_actual + patch_completion_tokens_actual,
         total_tokens_actual=session_total_tokens_actual + patch_total_tokens_actual,
@@ -557,6 +643,57 @@ def completion_to_output_estimate_ratio(run: RunSummary) -> float | None:
     return safe_ratio(run.total_completion_tokens_actual, total_output_estimated_tokens(run))
 
 
+def format_finish_reasons(run: RunSummary) -> str:
+    session_reason = run.session_finish_reason or "unknown"
+    patch_reason = run.patch_finish_reason or "unknown"
+    return f"session={session_reason}, review_patch={patch_reason}"
+
+
+def budget_tuning_advice(run: RunSummary) -> dict[str, str]:
+    if run.status != "completed":
+        return {
+            "action": "fix_run_stability",
+            "reason": "Run did not complete; tune reliability before token budgets.",
+        }
+    if run.session_finish_reason == "length":
+        return {
+            "action": "raise_session_budget",
+            "reason": "Session generation reached the completion cap and may be clipped.",
+        }
+    if run.patch_finish_reason == "length":
+        return {
+            "action": "raise_patch_budget",
+            "reason": "Review-patch generation reached the completion cap and may be clipped.",
+        }
+    if not run.usage_available:
+        return {
+            "action": "review_finish_reasons",
+            "reason": "Finish reasons are available, but model token usage is unavailable.",
+        }
+
+    cap_used = completion_cap_utilization(run)
+    if run.session_finish_reason == "stop" and run.patch_finish_reason == "stop":
+        if cap_used is not None and cap_used < 0.5:
+            return {
+                "action": "consider_lowering_budget",
+                "reason": "Both calls stopped naturally with substantial completion-token headroom.",
+            }
+        if cap_used is not None and cap_used <= 0.9:
+            return {
+                "action": "profile_looks_good",
+                "reason": "Both calls stopped naturally and used a healthy share of the completion budget.",
+            }
+        return {
+            "action": "monitor_budget_headroom",
+            "reason": "Both calls stopped naturally, but completion budget headroom is narrow.",
+        }
+
+    return {
+        "action": "review_finish_reasons",
+        "reason": f"Finish reasons need review: {format_finish_reasons(run)}.",
+    }
+
+
 def serialize_run(run: RunSummary) -> dict[str, Any]:
     return {
         "run_dir": str(run.run_dir),
@@ -601,14 +738,28 @@ def serialize_run(run: RunSummary) -> dict[str, Any]:
         "model_usage": {
             "available": run.usage_available,
             "session": {
+                "finish_reason": run.session_finish_reason,
                 "prompt_tokens": run.session_prompt_tokens_actual,
                 "completion_tokens": run.session_completion_tokens_actual,
                 "total_tokens": run.session_total_tokens_actual,
+                "timings": {
+                    "prompt_ms": run.session_prompt_ms,
+                    "predicted_ms": run.session_predicted_ms,
+                    "prompt_per_second": run.session_prompt_per_second,
+                    "predicted_per_second": run.session_predicted_per_second,
+                },
             },
             "review_patch": {
+                "finish_reason": run.patch_finish_reason,
                 "prompt_tokens": run.patch_prompt_tokens_actual,
                 "completion_tokens": run.patch_completion_tokens_actual,
                 "total_tokens": run.patch_total_tokens_actual,
+                "timings": {
+                    "prompt_ms": run.patch_prompt_ms,
+                    "predicted_ms": run.patch_predicted_ms,
+                    "prompt_per_second": run.patch_prompt_per_second,
+                    "predicted_per_second": run.patch_predicted_per_second,
+                },
             },
             "total": {
                 "prompt_tokens": run.total_prompt_tokens_actual,
@@ -619,6 +770,11 @@ def serialize_run(run: RunSummary) -> dict[str, Any]:
             "completion_cap_utilization": completion_cap_utilization(run),
             "estimated_output_tokens": total_output_estimated_tokens(run),
             "completion_to_output_estimate_ratio": completion_to_output_estimate_ratio(run),
+            "finish_reasons": {
+                "session": run.session_finish_reason,
+                "review_patch": run.patch_finish_reason,
+            },
+            "budget_tuning": budget_tuning_advice(run),
         },
         "stages": {
             "chunk_split_elapsed_seconds": run.chunk_split_seconds,
@@ -725,6 +881,10 @@ def build_advisor_payload(
             "chunk_retry_count": recent.chunk_retry_count,
             "chunk_failed": recent.chunk_failed,
             "chunk_row_failures": recent.chunk_row_failures,
+            "finish_reasons": {
+                "session": recent.session_finish_reason,
+                "review_patch": recent.patch_finish_reason,
+            },
             "model_usage_available": recent.usage_available,
             "prompt_tokens": recent.total_prompt_tokens_actual,
             "completion_tokens": recent.total_completion_tokens_actual,
@@ -732,6 +892,7 @@ def build_advisor_payload(
             "tracked_completion_cap_tokens": tracked_completion_token_cap(recent),
             "completion_cap_utilization": completion_cap_utilization(recent),
             "completion_to_output_estimate_ratio": completion_to_output_estimate_ratio(recent),
+            "budget_tuning": budget_tuning_advice(recent),
         }
     return payload
 
@@ -777,11 +938,14 @@ def print_report(runs: list[RunSummary], completed_only: bool, min_recent_runs_f
                 "  Model usage actual (prompt/completion/total): "
                 f"{run.total_prompt_tokens_actual}/{run.total_completion_tokens_actual}/{run.total_tokens_actual}"
             )
+            print(f"  Finish reasons: {format_finish_reasons(run)}")
             print(
                 "  Completion efficiency (cap used/completion-output-est ratio): "
                 f"{format_optional_ratio(completion_cap_utilization(run))}/"
                 f"{format_optional_ratio(completion_to_output_estimate_ratio(run))}"
             )
+            advice = budget_tuning_advice(run)
+            print(f"  Budget tuning: {advice['action']} ({advice['reason']})")
         else:
             print("  Model usage actual: unavailable")
         print(
@@ -858,10 +1022,15 @@ def print_advisor_report(
             f"chunk_tsv_failures={recent['chunk_row_failures']}"
         )
         if recent.get("model_usage_available"):
+            finish_reasons = recent.get("finish_reasons", {})
+            budget_tuning = recent.get("budget_tuning", {})
             summary += (
                 f", tokens={recent['prompt_tokens']}/{recent['completion_tokens']}/{recent['total_tokens']}, "
+                f"finish=session:{finish_reasons.get('session') or 'unknown'}/"
+                f"patch:{finish_reasons.get('review_patch') or 'unknown'}, "
                 f"cap_used={format_optional_ratio(recent['completion_cap_utilization'])}, "
-                f"completion_output_ratio={format_optional_ratio(recent['completion_to_output_estimate_ratio'])}"
+                f"completion_output_ratio={format_optional_ratio(recent['completion_to_output_estimate_ratio'])}, "
+                f"budget_tuning={budget_tuning.get('action', 'unknown')}"
             )
         else:
             summary += ", tokens=unavailable"

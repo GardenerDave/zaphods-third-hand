@@ -56,8 +56,30 @@ class ReportDistillerMetricsTests(unittest.TestCase):
                     "patch_estimated_tokens": 10,
                 },
                 "model_usage": {
-                    "session": {"prompt_tokens": 55, "completion_tokens": 18, "total_tokens": 73},
-                    "review_patch": {"prompt_tokens": 31, "completion_tokens": 9, "total_tokens": 40},
+                    "session": {
+                        "finish_reason": "stop",
+                        "prompt_tokens": 55,
+                        "completion_tokens": 18,
+                        "total_tokens": 73,
+                        "timings": {
+                            "prompt_ms": 100.5,
+                            "predicted_ms": 200.25,
+                            "prompt_per_second": 10.0,
+                            "predicted_per_second": 5.0,
+                        },
+                    },
+                    "review_patch": {
+                        "finish_reason": "stop",
+                        "prompt_tokens": 31,
+                        "completion_tokens": 9,
+                        "total_tokens": 40,
+                        "timings": {
+                            "prompt_ms": 50.0,
+                            "predicted_ms": 75.0,
+                            "prompt_per_second": 12.0,
+                            "predicted_per_second": 6.0,
+                        },
+                    },
                 },
                 "stages": {
                     "chunk_split": {"elapsed_seconds": 1},
@@ -88,9 +110,13 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual(700, run.patch_max_tokens)
             self.assertEqual(300, run.call_timeout_seconds)
             self.assertTrue(run.usage_available)
+            self.assertEqual("stop", run.session_finish_reason)
+            self.assertEqual("stop", run.patch_finish_reason)
             self.assertEqual(86, run.total_prompt_tokens_actual)
             self.assertEqual(27, run.total_completion_tokens_actual)
             self.assertEqual(113, run.total_tokens_actual)
+            self.assertEqual(100.5, run.session_prompt_ms)
+            self.assertEqual(6.0, run.patch_predicted_per_second)
             self.assertEqual(1, run.chunk_split_seconds)
             self.assertEqual(2, run.chunk_summary_seconds)
             self.assertEqual("compact+chunked", report_distiller_metrics.format_mode(run))
@@ -103,6 +129,9 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual(1600, payload["model_usage"]["tracked_completion_cap_tokens"])
             self.assertEqual(0.0169, payload["model_usage"]["completion_cap_utilization"])
             self.assertEqual(0.9, payload["model_usage"]["completion_to_output_estimate_ratio"])
+            self.assertEqual("stop", payload["model_usage"]["finish_reasons"]["session"])
+            self.assertEqual("consider_lowering_budget", payload["model_usage"]["budget_tuning"]["action"])
+            self.assertEqual(100.5, payload["model_usage"]["session"]["timings"]["prompt_ms"])
 
     def test_discover_runs_parses_partial_metrics(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -127,6 +156,59 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual(0, run.session_prompt_estimated_tokens)
             self.assertEqual(0, run.patch_estimated_tokens)
             self.assertFalse(run.usage_available)
+
+    def test_discover_runs_reads_metadata_sidecars_for_finish_and_timings(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runs_dir = Path(temp_dir) / "run_records"
+            run_dir = runs_dir / "run-sidecar"
+            run_dir.mkdir(parents=True)
+            (run_dir / "session_metadata.json").write_text(
+                json.dumps(
+                    {
+                        "finish_reason": "stop",
+                        "usage": {"prompt_tokens": 100, "completion_tokens": 70, "total_tokens": 170},
+                        "timings": {"prompt_ms": 10.5, "predicted_ms": 20.5, "predicted_per_second": 3.5},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (run_dir / "patch_metadata.json").write_text(
+                json.dumps(
+                    {
+                        "finish_reason": "length",
+                        "usage": {"prompt_tokens": 80, "completion_tokens": 50, "total_tokens": 130},
+                        "timings": {"prompt_ms": 11.5, "predicted_ms": 21.5, "predicted_per_second": 4.5},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (run_dir / "METRICS.json").write_text(
+                json.dumps(
+                    {
+                        "source_id": "sidecar",
+                        "short_title": "sidecar",
+                        "status": "completed",
+                        "session_max_tokens": "100",
+                        "patch_max_tokens": "50",
+                        "model_usage": {
+                            "session_metadata_file": "session_metadata.json",
+                            "patch_metadata_file": "patch_metadata.json",
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            run = report_distiller_metrics.discover_runs(runs_dir, 1, completed_only=False)[0]
+
+            self.assertTrue(run.usage_available)
+            self.assertEqual("stop", run.session_finish_reason)
+            self.assertEqual("length", run.patch_finish_reason)
+            self.assertEqual(180, run.total_prompt_tokens_actual)
+            self.assertEqual(120, run.total_completion_tokens_actual)
+            self.assertEqual(300, run.total_tokens_actual)
+            self.assertEqual(20.5, run.session_predicted_ms)
+            self.assertEqual(4.5, run.patch_predicted_per_second)
 
     def test_completed_only_filters_failed_runs(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -374,8 +456,8 @@ class ReportDistillerMetricsTests(unittest.TestCase):
                             "patch_estimated_tokens": 10,
                         },
                         "model_usage": {
-                            "session": {"prompt_tokens": 80, "completion_tokens": 20},
-                            "review_patch": {"prompt_tokens": 30, "completion_tokens": 10},
+                            "session": {"finish_reason": "stop", "prompt_tokens": 80, "completion_tokens": 20},
+                            "review_patch": {"finish_reason": "stop", "prompt_tokens": 30, "completion_tokens": 10},
                         },
                         "stages": {
                             "chunk_summary": {
@@ -414,6 +496,8 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual(150, payload["recent_run"]["tracked_completion_cap_tokens"])
             self.assertEqual(0.2, payload["recent_run"]["completion_cap_utilization"])
             self.assertEqual(1.0, payload["recent_run"]["completion_to_output_estimate_ratio"])
+            self.assertEqual("stop", payload["recent_run"]["finish_reasons"]["session"])
+            self.assertEqual("consider_lowering_budget", payload["recent_run"]["budget_tuning"]["action"])
 
     def test_build_advisor_payload_omits_recent_run_when_empty(self):
         payload = report_distiller_metrics.build_advisor_payload(
@@ -431,6 +515,80 @@ class ReportDistillerMetricsTests(unittest.TestCase):
         self.assertEqual(0, payload["confidence_signals"]["recent_completed_count"])
         self.assertEqual(0, payload["confidence_signals"]["recent_failed_count"])
         self.assertEqual(0, payload["confidence_signals"]["recent_chunk_retry_count"])
+
+    def test_budget_tuning_flags_length_finish_reason(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runs_dir = Path(temp_dir) / "run_records"
+            run_dir = runs_dir / "run-length"
+            run_dir.mkdir(parents=True)
+            (run_dir / "METRICS.json").write_text(
+                json.dumps(
+                    {
+                        "source_id": "length",
+                        "short_title": "length",
+                        "status": "completed",
+                        "compact_mode": "1",
+                        "session_max_tokens": "600",
+                        "patch_max_tokens": "280",
+                        "model_usage": {
+                            "session": {
+                                "finish_reason": "length",
+                                "prompt_tokens": 900,
+                                "completion_tokens": 600,
+                            },
+                            "review_patch": {
+                                "finish_reason": "stop",
+                                "prompt_tokens": 700,
+                                "completion_tokens": 180,
+                            },
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            run = report_distiller_metrics.discover_runs(runs_dir, 1, completed_only=False)[0]
+            advice = report_distiller_metrics.budget_tuning_advice(run)
+
+            self.assertEqual("raise_session_budget", advice["action"])
+            self.assertIn("completion cap", advice["reason"])
+
+    def test_budget_tuning_marks_good_profile(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runs_dir = Path(temp_dir) / "run_records"
+            run_dir = runs_dir / "run-good"
+            run_dir.mkdir(parents=True)
+            (run_dir / "METRICS.json").write_text(
+                json.dumps(
+                    {
+                        "source_id": "good",
+                        "short_title": "good",
+                        "status": "completed",
+                        "compact_mode": "1",
+                        "session_max_tokens": "700",
+                        "patch_max_tokens": "280",
+                        "model_usage": {
+                            "session": {
+                                "finish_reason": "stop",
+                                "prompt_tokens": 900,
+                                "completion_tokens": 559,
+                            },
+                            "review_patch": {
+                                "finish_reason": "stop",
+                                "prompt_tokens": 718,
+                                "completion_tokens": 222,
+                            },
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            run = report_distiller_metrics.discover_runs(runs_dir, 1, completed_only=False)[0]
+            advice = report_distiller_metrics.budget_tuning_advice(run)
+
+            self.assertEqual("profile_looks_good", advice["action"])
+            self.assertIn("stopped naturally", advice["reason"])
 
 
     def test_mixed_recent_window_with_failure_recommends_smoke(self):

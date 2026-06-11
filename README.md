@@ -31,6 +31,7 @@ Long projects accumulate transcripts, logs, decisions, partial plans, stale assu
 
 - Distiller runs can enable final-answer-only mode with `ZTH_DISTILLER_FINAL_ONLY=1` for endpoints that otherwise spend output budget on hidden reasoning.
 - Distiller run records now capture `session_metadata.json`, `patch_metadata.json`, and actual model token usage when the endpoint reports OpenAI-style `usage`.
+- Metrics advisor now reports finish reasons, timing telemetry, and budget-tuning advice for recent distiller runs.
 - The normal compact profile is tuned for token efficiency with `ZTH_DISTILLER_SESSION_MAX_TOKENS=700`, `ZTH_DISTILLER_PATCH_MAX_TOKENS=280`, and `ZTH_DISTILLER_TIMEOUT=900`.
 - Distiller metrics advisor now supports `--advisor-only` for concise operator handoff output.
 - `--advisor-only --json` now emits a concise advisor JSON contract without per-run `runs` details.
@@ -113,9 +114,9 @@ python3 local_harness/report_distiller_metrics.py --runs-dir examples --limit 3
 
 This reads sanitized example data under `examples/sample_metrics_run/`. Real distiller runs write their metrics under `outputs/run_records/`.
 
-Use `--json` if you want advisory profile guidance fields (`recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, token-usage summaries, `thresholds`) for read-only tuning support.
+Use `--json` if you want advisory profile guidance fields (`recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, token-usage summaries, finish reasons, budget-tuning advice, `thresholds`) for read-only tuning support.
 
-Advisor JSON also includes `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, token-usage summaries, and `confidence_signals` (`recent_completed_count`, `recent_failed_count`, `recent_chunk_retry_count`) when you use `--advisor-only --json`.
+Advisor JSON also includes `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, token-usage summaries, finish reasons, budget-tuning advice, and `confidence_signals` (`recent_completed_count`, `recent_failed_count`, `recent_chunk_retry_count`) when you use `--advisor-only --json`.
 
 Use `--advisor-only` for a concise operator handoff summary:
 

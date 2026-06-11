@@ -161,6 +161,38 @@ except Exception:
 PY
 }
 
+json_string() {
+  local file="$1"
+  shift
+  if [ ! -s "$file" ]; then
+    echo "null"
+    return
+  fi
+
+  python3 - "$file" "$@" <<'PY'
+import json
+import sys
+
+path = sys.argv[1]
+keys = sys.argv[2:]
+
+try:
+    with open(path, encoding="utf-8") as handle:
+        value = json.load(handle)
+    for key in keys:
+        if not isinstance(value, dict):
+            value = None
+            break
+        value = value.get(key)
+    if isinstance(value, str):
+        print(json.dumps(value))
+    else:
+        print("null")
+except Exception:
+    print("null")
+PY
+}
+
 write_metrics() {
   local status="${1:-$RUN_STATUS}"
   local completed_at
@@ -219,14 +251,28 @@ write_metrics() {
     "session_metadata_file": "${SESSION_METADATA_FILE}",
     "patch_metadata_file": "${PATCH_METADATA_FILE}",
     "session": {
+      "finish_reason": $(json_string "$SESSION_METADATA_FILE" finish_reason),
       "prompt_tokens": $(json_number "$SESSION_METADATA_FILE" usage prompt_tokens),
       "completion_tokens": $(json_number "$SESSION_METADATA_FILE" usage completion_tokens),
-      "total_tokens": $(json_number "$SESSION_METADATA_FILE" usage total_tokens)
+      "total_tokens": $(json_number "$SESSION_METADATA_FILE" usage total_tokens),
+      "timings": {
+        "prompt_ms": $(json_number "$SESSION_METADATA_FILE" timings prompt_ms),
+        "predicted_ms": $(json_number "$SESSION_METADATA_FILE" timings predicted_ms),
+        "prompt_per_second": $(json_number "$SESSION_METADATA_FILE" timings prompt_per_second),
+        "predicted_per_second": $(json_number "$SESSION_METADATA_FILE" timings predicted_per_second)
+      }
     },
     "review_patch": {
+      "finish_reason": $(json_string "$PATCH_METADATA_FILE" finish_reason),
       "prompt_tokens": $(json_number "$PATCH_METADATA_FILE" usage prompt_tokens),
       "completion_tokens": $(json_number "$PATCH_METADATA_FILE" usage completion_tokens),
-      "total_tokens": $(json_number "$PATCH_METADATA_FILE" usage total_tokens)
+      "total_tokens": $(json_number "$PATCH_METADATA_FILE" usage total_tokens),
+      "timings": {
+        "prompt_ms": $(json_number "$PATCH_METADATA_FILE" timings prompt_ms),
+        "predicted_ms": $(json_number "$PATCH_METADATA_FILE" timings predicted_ms),
+        "prompt_per_second": $(json_number "$PATCH_METADATA_FILE" timings prompt_per_second),
+        "predicted_per_second": $(json_number "$PATCH_METADATA_FILE" timings predicted_per_second)
+      }
     }
   },
   "stages": {
