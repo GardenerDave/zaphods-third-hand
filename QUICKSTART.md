@@ -147,6 +147,18 @@ python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records
 
 The JSON report includes `recommended_profile`, `recommended_settings`, `recommendation_reason`, and `thresholds`.
 
+For a concise operator handoff view:
+
+```bash
+python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --advisor-only
+```
+
+Flag behavior:
+
+- `--json`: full JSON payload, including per-run `runs` details.
+- `--advisor-only`: concise text summary.
+- `--advisor-only --json`: concise advisor JSON payload without per-run `runs` details.
+
 You can override the chunked recommendation threshold:
 
 ```bash
@@ -158,6 +170,13 @@ Practical examples:
 - 1 clean chunked run with default threshold 3: recommendation stays `normal`.
 - 3 clean chunked runs with default threshold 3: recommendation can move to `chunked`.
 - 2 clean chunked runs with override threshold 2: recommendation can move to `chunked`.
+
+Mode selection quick guide:
+
+- Use default text output for human review of all run details.
+- Use `--json` for automation that needs full per-run telemetry.
+- Use `--advisor-only` for concise operator handoff.
+- Use `--advisor-only --json` for automation that only needs recommendation-level fields.
 
 Recommendations are advisory only and do not modify your environment or files.
 

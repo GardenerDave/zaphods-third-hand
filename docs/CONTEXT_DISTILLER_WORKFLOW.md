@@ -133,6 +133,19 @@ You can tune threshold behavior from CLI:
 python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --json --min-recent-runs-for-chunked 2
 ```
 
+You can use advisor-only summaries for handoff:
+
+```bash
+python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --advisor-only
+python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --advisor-only --json
+```
+
+Flag behavior:
+
+- `--json`: full JSON payload with per-run details.
+- `--advisor-only`: concise text advisory summary.
+- `--advisor-only --json`: concise advisor JSON payload without per-run `runs` details.
+
 Threshold scenarios:
 
 - Default threshold 3 and only 1-2 recent clean chunked runs: stays on `normal`.

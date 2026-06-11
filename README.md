@@ -105,6 +105,18 @@ This reads sanitized example data under `examples/sample_metrics_run/`. Real dis
 
 Use `--json` if you want advisory profile guidance fields (`recommended_profile`, `recommended_settings`, `recommendation_reason`, `thresholds`) for read-only tuning support.
 
+Use `--advisor-only` for a concise operator handoff summary:
+
+```bash
+python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --advisor-only
+```
+
+Flag behavior:
+
+- `--json`: full JSON payload, including per-run details.
+- `--advisor-only`: concise text summary for handoff.
+- `--advisor-only --json`: concise advisor JSON payload without per-run `runs` list.
+
 Example threshold override:
 
 ```bash
