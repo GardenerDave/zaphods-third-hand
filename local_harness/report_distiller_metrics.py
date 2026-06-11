@@ -28,7 +28,7 @@ PROFILE_SETTINGS: dict[str, dict[str, int]] = {
         "ZTH_DISTILLER_TIMEOUT": 900,
     },
 }
-MIN_RECENT_RUNS_FOR_CHUNKED = 3
+DEFAULT_MIN_RECENT_RUNS_FOR_CHUNKED = 3
 
 
 @dataclass
@@ -192,7 +192,11 @@ def discover_runs(runs_dir: Path, limit: int, completed_only: bool) -> list[RunS
     return summaries[:limit]
 
 
-def recommended_profile(runs: list[RunSummary], completed_only: bool) -> tuple[str, str]:
+def recommended_profile(
+    runs: list[RunSummary],
+    completed_only: bool,
+    min_recent_runs_for_chunked: int,
+) -> tuple[str, str]:
     if not runs:
         return ("smoke", "No runs found yet.")
     failures = sum(1 for run in runs if run.status != "completed")
@@ -207,10 +211,10 @@ def recommended_profile(runs: list[RunSummary], completed_only: bool) -> tuple[s
     if avg_elapsed > 600:
         return ("smoke", "Recent runs are very slow.")
     if recent.chunked_mode:
-        if len(runs) < MIN_RECENT_RUNS_FOR_CHUNKED:
+        if len(runs) < min_recent_runs_for_chunked:
             return (
                 "normal",
-                "Need at least 3 recent runs before recommending chunked as default.",
+                f"Need at least {min_recent_runs_for_chunked} recent runs before recommending chunked as default.",
             )
         if recent.status == "completed" and recent.chunk_failed == 0 and recent.chunk_row_failures == 0:
             return ("chunked", "Recent chunked runs completed without chunk failures.")
@@ -218,8 +222,8 @@ def recommended_profile(runs: list[RunSummary], completed_only: bool) -> tuple[s
     return ("normal", "Recent runs look stable for normal compact mode.")
 
 
-def recommendation(runs: list[RunSummary], completed_only: bool) -> str:
-    profile, reason = recommended_profile(runs, completed_only)
+def recommendation(runs: list[RunSummary], completed_only: bool, min_recent_runs_for_chunked: int) -> str:
+    profile, reason = recommended_profile(runs, completed_only, min_recent_runs_for_chunked)
     settings = PROFILE_SETTINGS[profile]
     setting_text = ", ".join(f"{key}={value}" for key, value in settings.items())
     return f"Recommend {profile} profile: {reason} Suggested settings: {setting_text}."
@@ -294,20 +298,58 @@ def serialize_run(run: RunSummary) -> dict[str, Any]:
     }
 
 
-def build_report_payload(runs: list[RunSummary], completed_only: bool) -> dict[str, Any]:
-    profile, reason = recommended_profile(runs, completed_only)
+def build_report_payload(
+    runs: list[RunSummary],
+    completed_only: bool,
+    min_recent_runs_for_chunked: int,
+) -> dict[str, Any]:
+    profile, reason = recommended_profile(runs, completed_only, min_recent_runs_for_chunked)
     return {
         "run_count": len(runs),
         "completed_only": completed_only,
-        "recommendation": recommendation(runs, completed_only),
+        "recommendation": recommendation(runs, completed_only, min_recent_runs_for_chunked),
         "recommended_profile": profile,
         "recommended_settings": PROFILE_SETTINGS[profile],
         "recommendation_reason": reason,
+        "thresholds": {
+            "min_recent_runs_for_chunked": min_recent_runs_for_chunked,
+        },
         "runs": [serialize_run(run) for run in runs],
     }
 
 
-def print_report(runs: list[RunSummary], completed_only: bool) -> None:
+def build_advisor_payload(
+    runs: list[RunSummary],
+    completed_only: bool,
+    min_recent_runs_for_chunked: int,
+) -> dict[str, Any]:
+    profile, reason = recommended_profile(runs, completed_only, min_recent_runs_for_chunked)
+    payload: dict[str, Any] = {
+        "run_count": len(runs),
+        "completed_only": completed_only,
+        "recommended_profile": profile,
+        "recommended_settings": PROFILE_SETTINGS[profile],
+        "recommendation_reason": reason,
+        "recommendation": recommendation(runs, completed_only, min_recent_runs_for_chunked),
+        "thresholds": {
+            "min_recent_runs_for_chunked": min_recent_runs_for_chunked,
+        },
+    }
+    if runs:
+        recent = runs[0]
+        payload["recent_run"] = {
+            "run_dir": str(recent.run_dir),
+            "status": recent.status,
+            "mode": format_mode(recent),
+            "total_elapsed_seconds": recent.total_elapsed_seconds,
+            "chunk_retry_count": recent.chunk_retry_count,
+            "chunk_failed": recent.chunk_failed,
+            "chunk_row_failures": recent.chunk_row_failures,
+        }
+    return payload
+
+
+def print_report(runs: list[RunSummary], completed_only: bool, min_recent_runs_for_chunked: int) -> None:
     print("Distiller metrics report")
     print()
     for run in runs:
@@ -355,7 +397,27 @@ def print_report(runs: list[RunSummary], completed_only: bool) -> None:
         if run.chunk_rows > 0:
             print(f"  Chunk TSV rows/failures: {run.chunk_rows}/{run.chunk_row_failures}")
         print()
-    print(recommendation(runs, completed_only))
+    print(recommendation(runs, completed_only, min_recent_runs_for_chunked))
+
+
+def print_advisor_report(runs: list[RunSummary], completed_only: bool, min_recent_runs_for_chunked: int) -> None:
+    payload = build_advisor_payload(runs, completed_only, min_recent_runs_for_chunked)
+    print("Distiller advisor")
+    print()
+    print(f"Runs analyzed: {payload['run_count']}")
+    print(f"Recommended profile: {payload['recommended_profile']}")
+    print(f"Reason: {payload['recommendation_reason']}")
+    print(f"Threshold min recent runs for chunked: {payload['thresholds']['min_recent_runs_for_chunked']}")
+    settings = ", ".join(f"{key}={value}" for key, value in payload["recommended_settings"].items())
+    print(f"Recommended settings: {settings}")
+    recent = payload.get("recent_run")
+    if isinstance(recent, dict):
+        print(
+            "Recent run summary: "
+            f"mode={recent['mode']}, status={recent['status']}, elapsed={recent['total_elapsed_seconds']}s, "
+            f"chunk_retries={recent['chunk_retry_count']}, chunk_failed={recent['chunk_failed']}, "
+            f"chunk_tsv_failures={recent['chunk_row_failures']}"
+        )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -381,6 +443,17 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Print report as JSON.",
     )
+    parser.add_argument(
+        "--advisor-only",
+        action="store_true",
+        help="Print concise operator advisory summary.",
+    )
+    parser.add_argument(
+        "--min-recent-runs-for-chunked",
+        type=int,
+        default=DEFAULT_MIN_RECENT_RUNS_FOR_CHUNKED,
+        help="Minimum recent runs required before recommending chunked as default.",
+    )
     return parser
 
 
@@ -389,10 +462,13 @@ def main() -> int:
     args = parser.parse_args()
     runs_dir = Path(args.runs_dir)
     runs = discover_runs(runs_dir, max(1, args.limit), args.completed_only)
+    min_recent_runs_for_chunked = max(1, args.min_recent_runs_for_chunked)
     if args.json:
-        print(json.dumps(build_report_payload(runs, args.completed_only), indent=2))
+        print(json.dumps(build_report_payload(runs, args.completed_only, min_recent_runs_for_chunked), indent=2))
+    elif args.advisor_only:
+        print_advisor_report(runs, args.completed_only, min_recent_runs_for_chunked)
     else:
-        print_report(runs, args.completed_only)
+        print_report(runs, args.completed_only, min_recent_runs_for_chunked)
     return 0
 
 

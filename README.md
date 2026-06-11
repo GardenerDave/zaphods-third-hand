@@ -103,7 +103,13 @@ python3 local_harness/report_distiller_metrics.py --runs-dir examples --limit 3
 
 This reads sanitized example data under `examples/sample_metrics_run/`. Real distiller runs write their metrics under `outputs/run_records/`.
 
-Use `--json` if you want advisory profile guidance fields (`recommended_profile`, `recommended_settings`, `recommendation_reason`) for read-only tuning support.
+Use `--json` if you want advisory profile guidance fields (`recommended_profile`, `recommended_settings`, `recommendation_reason`, `thresholds`) for read-only tuning support.
+
+Example threshold override:
+
+```bash
+python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --json --min-recent-runs-for-chunked 2
+```
 
 ## Basic Setup Assumptions
 

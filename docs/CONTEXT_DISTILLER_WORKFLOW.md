@@ -125,7 +125,19 @@ python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records
 python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --json
 ```
 
-The JSON output includes `recommended_profile`, `recommended_settings`, and `recommendation_reason` for read-only guidance.
+The JSON output includes `recommended_profile`, `recommended_settings`, `recommendation_reason`, and `thresholds` for read-only guidance.
+
+You can tune threshold behavior from CLI:
+
+```bash
+python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --json --min-recent-runs-for-chunked 2
+```
+
+Threshold scenarios:
+
+- Default threshold 3 and only 1-2 recent clean chunked runs: stays on `normal`.
+- Default threshold 3 and at least 3 recent clean chunked runs: can recommend `chunked`.
+- Override threshold 2 and 2 recent clean chunked runs: can recommend `chunked`.
 
 ## Suggested Profiles
 

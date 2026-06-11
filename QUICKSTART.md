@@ -145,7 +145,21 @@ For machine-readable output with advisory profile guidance:
 python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --json
 ```
 
-The JSON report includes `recommended_profile`, `recommended_settings`, and `recommendation_reason`. These are advisory only and do not modify your environment or files.
+The JSON report includes `recommended_profile`, `recommended_settings`, `recommendation_reason`, and `thresholds`.
+
+You can override the chunked recommendation threshold:
+
+```bash
+python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --json --min-recent-runs-for-chunked 2
+```
+
+Practical examples:
+
+- 1 clean chunked run with default threshold 3: recommendation stays `normal`.
+- 3 clean chunked runs with default threshold 3: recommendation can move to `chunked`.
+- 2 clean chunked runs with override threshold 2: recommendation can move to `chunked`.
+
+Recommendations are advisory only and do not modify your environment or files.
 
 ## Step 4: Review The Generated Session And Patch
 

@@ -139,11 +139,19 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             runs_dir = Path(temp_dir) / "missing"
 
             runs = report_distiller_metrics.discover_runs(runs_dir, 10, completed_only=False)
-            payload = report_distiller_metrics.build_report_payload(runs, completed_only=False)
+            payload = report_distiller_metrics.build_report_payload(
+                runs,
+                completed_only=False,
+                min_recent_runs_for_chunked=report_distiller_metrics.DEFAULT_MIN_RECENT_RUNS_FOR_CHUNKED,
+            )
 
             self.assertEqual([], runs)
             self.assertEqual(0, payload["run_count"])
             self.assertEqual("smoke", payload["recommended_profile"])
+            self.assertEqual(
+                report_distiller_metrics.DEFAULT_MIN_RECENT_RUNS_FOR_CHUNKED,
+                payload["thresholds"]["min_recent_runs_for_chunked"],
+            )
             self.assertEqual(
                 "Recommend smoke profile: No runs found yet. Suggested settings: "
                 "ZTH_DISTILLER_SESSION_MAX_TOKENS=320, ZTH_DISTILLER_PATCH_MAX_TOKENS=240, "
@@ -171,7 +179,11 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             )
 
             runs = report_distiller_metrics.discover_runs(runs_dir, 5, completed_only=False)
-            payload = report_distiller_metrics.build_report_payload(runs, completed_only=False)
+            payload = report_distiller_metrics.build_report_payload(
+                runs,
+                completed_only=False,
+                min_recent_runs_for_chunked=report_distiller_metrics.DEFAULT_MIN_RECENT_RUNS_FOR_CHUNKED,
+            )
 
             self.assertEqual("smoke", payload["recommended_profile"])
             self.assertIn("Chunk retries detected", payload["recommendation"])
@@ -210,10 +222,57 @@ class ReportDistillerMetricsTests(unittest.TestCase):
                 )
 
             runs = report_distiller_metrics.discover_runs(runs_dir, 5, completed_only=False)
-            payload = report_distiller_metrics.build_report_payload(runs, completed_only=False)
+            payload = report_distiller_metrics.build_report_payload(
+                runs,
+                completed_only=False,
+                min_recent_runs_for_chunked=report_distiller_metrics.DEFAULT_MIN_RECENT_RUNS_FOR_CHUNKED,
+            )
 
             self.assertEqual("normal", payload["recommended_profile"])
             self.assertIn("Need at least 3 recent runs", payload["recommendation"])
+
+    def test_recommendation_threshold_override_allows_chunked_with_two_runs(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runs_dir = Path(temp_dir) / "run_records"
+            for idx in [9, 10]:
+                run_dir = runs_dir / f"run-0{idx}"
+                run_dir.mkdir(parents=True)
+                (run_dir / "chunk_metrics.tsv").write_text(
+                    "chunk_prompt\tchunk_summary\tstatus\tattempts\telapsed_seconds\tprompt_estimated_tokens\toutput_estimated_tokens\tprompt_bytes\toutput_bytes\terror_log\n"
+                    "a\tb\tcompleted\t1\t1\t10\t8\t40\t32\t\n",
+                    encoding="utf-8",
+                )
+                (run_dir / "METRICS.json").write_text(
+                    json.dumps(
+                        {
+                            "source_id": f"s{idx}",
+                            "short_title": f"t{idx}",
+                            "status": "completed",
+                            "compact_mode": "0",
+                            "chunked_mode": "1",
+                            "stages": {
+                                "chunk_summary": {
+                                    "attempted": 1,
+                                    "succeeded": 1,
+                                    "failed": 0,
+                                    "retry_count": 0,
+                                    "chunk_metrics_file": "chunk_metrics.tsv",
+                                }
+                            },
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+
+            runs = report_distiller_metrics.discover_runs(runs_dir, 5, completed_only=False)
+            payload = report_distiller_metrics.build_report_payload(
+                runs,
+                completed_only=False,
+                min_recent_runs_for_chunked=2,
+            )
+
+            self.assertEqual("chunked", payload["recommended_profile"])
+            self.assertEqual(2, payload["thresholds"]["min_recent_runs_for_chunked"])
 
     def test_recommendation_prefers_chunked_when_recent_chunked_runs_are_clean(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -249,10 +308,145 @@ class ReportDistillerMetricsTests(unittest.TestCase):
                 )
 
             runs = report_distiller_metrics.discover_runs(runs_dir, 5, completed_only=False)
-            payload = report_distiller_metrics.build_report_payload(runs, completed_only=False)
+            payload = report_distiller_metrics.build_report_payload(
+                runs,
+                completed_only=False,
+                min_recent_runs_for_chunked=report_distiller_metrics.DEFAULT_MIN_RECENT_RUNS_FOR_CHUNKED,
+            )
 
             self.assertEqual("chunked", payload["recommended_profile"])
             self.assertIn("ZTH_DISTILLER_CHUNK_LINES", payload["recommendation"])
+
+    def test_build_advisor_payload_includes_recent_run_summary(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runs_dir = Path(temp_dir) / "run_records"
+            run_dir = runs_dir / "run-011"
+            run_dir.mkdir(parents=True)
+            (run_dir / "METRICS.json").write_text(
+                json.dumps(
+                    {
+                        "source_id": "s11",
+                        "short_title": "t11",
+                        "status": "completed",
+                        "compact_mode": "0",
+                        "chunked_mode": "1",
+                        "total_elapsed_seconds": 44,
+                        "stages": {
+                            "chunk_summary": {
+                                "attempted": 1,
+                                "succeeded": 1,
+                                "failed": 0,
+                                "retry_count": 0,
+                            }
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            runs = report_distiller_metrics.discover_runs(runs_dir, 5, completed_only=False)
+            payload = report_distiller_metrics.build_advisor_payload(
+                runs,
+                completed_only=False,
+                min_recent_runs_for_chunked=1,
+            )
+
+            self.assertEqual("chunked", payload["recommended_profile"])
+            self.assertEqual("chunked", payload["recent_run"]["mode"])
+            self.assertEqual(44, payload["recent_run"]["total_elapsed_seconds"])
+
+    def test_build_advisor_payload_omits_recent_run_when_empty(self):
+        payload = report_distiller_metrics.build_advisor_payload(
+            [],
+            completed_only=False,
+            min_recent_runs_for_chunked=3,
+        )
+
+        self.assertEqual("smoke", payload["recommended_profile"])
+        self.assertNotIn("recent_run", payload)
+
+    def test_mixed_recent_window_with_failure_recommends_smoke(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runs_dir = Path(temp_dir) / "run_records"
+
+            def write_run(run_name: str, status: str, completed_at: str) -> None:
+                run_dir = runs_dir / run_name
+                run_dir.mkdir(parents=True)
+                (run_dir / "METRICS.json").write_text(
+                    json.dumps(
+                        {
+                            "source_id": run_name,
+                            "short_title": run_name,
+                            "status": status,
+                            "compact_mode": "1",
+                            "chunked_mode": "1",
+                            "run_completed_at": completed_at,
+                            "stages": {"chunk_summary": {"retry_count": 0, "failed": 0}},
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+
+            write_run("run-older-ok", "completed", "2026-06-10T00:00:00Z")
+            write_run("run-mid-ok", "completed", "2026-06-11T00:00:00Z")
+            write_run("run-recent-fail", "failed", "2026-06-12T00:00:00Z")
+            write_run("run-newest-ok", "completed", "2026-06-13T00:00:00Z")
+
+            runs = report_distiller_metrics.discover_runs(runs_dir, 3, completed_only=False)
+            payload = report_distiller_metrics.build_report_payload(
+                runs,
+                completed_only=False,
+                min_recent_runs_for_chunked=report_distiller_metrics.DEFAULT_MIN_RECENT_RUNS_FOR_CHUNKED,
+            )
+
+            self.assertEqual(3, payload["run_count"])
+            self.assertEqual("smoke", payload["recommended_profile"])
+            self.assertIn("Recent failures detected", payload["recommendation"])
+
+    def test_mixed_recent_window_completed_only_can_recommend_chunked(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runs_dir = Path(temp_dir) / "run_records"
+
+            def write_run(run_name: str, status: str, completed_at: str) -> None:
+                run_dir = runs_dir / run_name
+                run_dir.mkdir(parents=True)
+                (run_dir / "METRICS.json").write_text(
+                    json.dumps(
+                        {
+                            "source_id": run_name,
+                            "short_title": run_name,
+                            "status": status,
+                            "compact_mode": "1",
+                            "chunked_mode": "1",
+                            "run_completed_at": completed_at,
+                            "stages": {
+                                "chunk_summary": {
+                                    "attempted": 1,
+                                    "succeeded": 1,
+                                    "failed": 0,
+                                    "retry_count": 0,
+                                }
+                            },
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+
+            write_run("run-old-ok", "completed", "2026-06-10T00:00:00Z")
+            write_run("run-mid-ok", "completed", "2026-06-11T00:00:00Z")
+            write_run("run-recent-fail", "failed", "2026-06-12T00:00:00Z")
+            write_run("run-newest-ok", "completed", "2026-06-13T00:00:00Z")
+
+            runs = report_distiller_metrics.discover_runs(runs_dir, 3, completed_only=True)
+            payload = report_distiller_metrics.build_report_payload(
+                runs,
+                completed_only=True,
+                min_recent_runs_for_chunked=report_distiller_metrics.DEFAULT_MIN_RECENT_RUNS_FOR_CHUNKED,
+            )
+
+            self.assertEqual(3, payload["run_count"])
+            self.assertEqual("chunked", payload["recommended_profile"])
+            self.assertIn("Recent chunked runs completed without chunk failures", payload["recommendation"])
 
 
 if __name__ == "__main__":
