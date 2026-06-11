@@ -89,6 +89,8 @@ Default safety posture:
 
 For a step-by-step beginner path, start with `QUICKSTART.md`.
 
+Before tagging or sharing an early release, review `docs/ALPHA_READINESS_CHECKLIST.md`.
+
 ## Try Metrics Without A Model
 
 You can inspect a sample telemetry report before configuring a model endpoint:
