@@ -31,6 +31,12 @@ export ZTH_DISTILLER_SESSION_MAX_TOKENS="900"
 export ZTH_DISTILLER_PATCH_MAX_TOKENS="700"
 ```
 
+Some model endpoints need an explicit final-answer-only hint to avoid spending the response budget on hidden reasoning. Enable this when short direct harness tests work with `--final-only` but distiller calls time out or return reasoning-only content:
+
+```bash
+export ZTH_DISTILLER_FINAL_ONLY="1"
+```
+
 ## Chunked Mode
 
 Chunked mode splits long sources into fixed-size chunks. Each chunk gets its own summary before a final synthesis step.
@@ -92,20 +98,26 @@ Typical audit files include:
 - `INPUT.md`
 - `MODEL_REQUEST.md`
 - `session_prompt.md`
+- `session_metadata.json`
 - `patch_prompt.md`
+- `patch_metadata.json`
 - `OUTPUT.md`
 - `REVIEW.md`
 - `METRICS.json`
 - `ACCEPTED.md`
 
-Chunked runs also include chunk prompts, summaries, and error logs when retries fail.
+Chunked runs also include chunk prompts, summaries, per-chunk metadata files, and error logs when retries fail.
 
 `MODEL_REQUEST.md` and `METRICS.json` record the chunk line size, token budgets, timeout, endpoint, and model used for the run.
+They also record whether final-only/no-think mode was enabled through `ZTH_DISTILLER_FINAL_ONLY`.
+When the model endpoint returns OpenAI-style `usage`, `METRICS.json` records actual prompt, completion, and total tokens for the session and review-patch calls. If the endpoint does not return usage, the distiller still records estimated tokens from file size.
 
 `METRICS.json` also records passive telemetry for later human review and tuning:
 
 - Source, prompt, session, and review-patch byte counts.
 - Approximate token estimates based on file size.
+- Actual model usage tokens when the endpoint reports them.
+- Completion cap utilization and completion-to-output-estimate ratios in the metrics advisor.
 - Elapsed seconds for chunk splitting, chunk summaries, session generation, and review-patch generation.
 - Chunk summary attempt, retry, success, and failure counts.
 - Failure stage when a run exits before completion.
@@ -125,7 +137,7 @@ python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records
 python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --json
 ```
 
-The JSON output includes `recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, and `thresholds` for read-only guidance.
+The JSON output includes `recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, token-usage summaries, and `thresholds` for read-only guidance.
 
 You can tune threshold behavior from CLI:
 

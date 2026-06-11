@@ -62,6 +62,16 @@ class RunSummary:
     patch_bytes: int
     patch_lines: int
     patch_estimated_tokens: int
+    usage_available: bool
+    session_prompt_tokens_actual: int
+    session_completion_tokens_actual: int
+    session_total_tokens_actual: int
+    patch_prompt_tokens_actual: int
+    patch_completion_tokens_actual: int
+    patch_total_tokens_actual: int
+    total_prompt_tokens_actual: int
+    total_completion_tokens_actual: int
+    total_tokens_actual: int
     chunk_attempted: int
     chunk_succeeded: int
     chunk_failed: int
@@ -87,6 +97,32 @@ def to_bool(value: Any) -> bool:
     if isinstance(value, bool):
         return value
     return str(value).strip() == "1"
+
+
+def is_number(value: Any) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def usage_has_tokens(usage: dict[str, Any]) -> bool:
+    return any(is_number(usage.get(key)) for key in ("prompt_tokens", "completion_tokens", "total_tokens"))
+
+
+def usage_total(prompt_tokens: int, completion_tokens: int, total_tokens: int) -> int:
+    if total_tokens > 0:
+        return total_tokens
+    if prompt_tokens > 0 or completion_tokens > 0:
+        return prompt_tokens + completion_tokens
+    return 0
+
+
+def safe_ratio(numerator: int, denominator: int) -> float | None:
+    if denominator <= 0:
+        return None
+    return round(numerator / denominator, 4)
+
+
+def format_optional_ratio(value: float | None) -> str:
+    return "n/a" if value is None else f"{value:.2f}"
 
 
 def parse_chunk_metrics(path: str, run_dir: Path) -> tuple[int, int]:
@@ -130,6 +166,33 @@ def parse_run(metrics_path: Path) -> RunSummary:
     prompts = data.get("prompts", {})
     outputs = data.get("outputs", {})
     source = data.get("source", {})
+    model_usage = data.get("model_usage", {})
+    session_usage = model_usage.get("session", {}) if isinstance(model_usage, dict) else {}
+    patch_usage = model_usage.get("review_patch", {}) if isinstance(model_usage, dict) else {}
+    session_prompt_tokens_actual = to_int(session_usage.get("prompt_tokens", 0)) if isinstance(session_usage, dict) else 0
+    session_completion_tokens_actual = to_int(session_usage.get("completion_tokens", 0)) if isinstance(session_usage, dict) else 0
+    session_total_tokens_actual = (
+        to_int(session_usage.get("total_tokens", 0)) if isinstance(session_usage, dict) else 0
+    )
+    session_total_tokens_actual = usage_total(
+        session_prompt_tokens_actual,
+        session_completion_tokens_actual,
+        session_total_tokens_actual,
+    )
+    patch_prompt_tokens_actual = to_int(patch_usage.get("prompt_tokens", 0)) if isinstance(patch_usage, dict) else 0
+    patch_completion_tokens_actual = (
+        to_int(patch_usage.get("completion_tokens", 0)) if isinstance(patch_usage, dict) else 0
+    )
+    patch_total_tokens_actual = to_int(patch_usage.get("total_tokens", 0)) if isinstance(patch_usage, dict) else 0
+    patch_total_tokens_actual = usage_total(
+        patch_prompt_tokens_actual,
+        patch_completion_tokens_actual,
+        patch_total_tokens_actual,
+    )
+    usage_available = (
+        (isinstance(session_usage, dict) and usage_has_tokens(session_usage))
+        or (isinstance(patch_usage, dict) and usage_has_tokens(patch_usage))
+    )
     completed_at = str(data.get("run_completed_at", ""))
     sort_epoch = parse_sort_epoch(completed_at)
     if sort_epoch == 0.0:
@@ -166,6 +229,16 @@ def parse_run(metrics_path: Path) -> RunSummary:
         patch_bytes=to_int(outputs.get("patch_bytes", 0)),
         patch_lines=to_int(outputs.get("patch_lines", 0)),
         patch_estimated_tokens=to_int(outputs.get("patch_estimated_tokens", 0)),
+        usage_available=usage_available,
+        session_prompt_tokens_actual=session_prompt_tokens_actual,
+        session_completion_tokens_actual=session_completion_tokens_actual,
+        session_total_tokens_actual=session_total_tokens_actual,
+        patch_prompt_tokens_actual=patch_prompt_tokens_actual,
+        patch_completion_tokens_actual=patch_completion_tokens_actual,
+        patch_total_tokens_actual=patch_total_tokens_actual,
+        total_prompt_tokens_actual=session_prompt_tokens_actual + patch_prompt_tokens_actual,
+        total_completion_tokens_actual=session_completion_tokens_actual + patch_completion_tokens_actual,
+        total_tokens_actual=session_total_tokens_actual + patch_total_tokens_actual,
         chunk_attempted=to_int(chunk_summary.get("attempted", 0)),
         chunk_succeeded=to_int(chunk_summary.get("succeeded", 0)),
         chunk_failed=to_int(chunk_summary.get("failed", 0)),
@@ -464,6 +537,26 @@ def format_mode(run: RunSummary) -> str:
     return "standard"
 
 
+def tracked_completion_token_cap(run: RunSummary) -> int:
+    return max(run.session_max_tokens, 0) + max(run.patch_max_tokens, 0)
+
+
+def total_output_estimated_tokens(run: RunSummary) -> int:
+    return run.session_estimated_tokens + run.patch_estimated_tokens
+
+
+def completion_cap_utilization(run: RunSummary) -> float | None:
+    if not run.usage_available:
+        return None
+    return safe_ratio(run.total_completion_tokens_actual, tracked_completion_token_cap(run))
+
+
+def completion_to_output_estimate_ratio(run: RunSummary) -> float | None:
+    if not run.usage_available:
+        return None
+    return safe_ratio(run.total_completion_tokens_actual, total_output_estimated_tokens(run))
+
+
 def serialize_run(run: RunSummary) -> dict[str, Any]:
     return {
         "run_dir": str(run.run_dir),
@@ -504,6 +597,28 @@ def serialize_run(run: RunSummary) -> dict[str, Any]:
             "bytes": run.patch_bytes,
             "lines": run.patch_lines,
             "estimated_tokens": run.patch_estimated_tokens,
+        },
+        "model_usage": {
+            "available": run.usage_available,
+            "session": {
+                "prompt_tokens": run.session_prompt_tokens_actual,
+                "completion_tokens": run.session_completion_tokens_actual,
+                "total_tokens": run.session_total_tokens_actual,
+            },
+            "review_patch": {
+                "prompt_tokens": run.patch_prompt_tokens_actual,
+                "completion_tokens": run.patch_completion_tokens_actual,
+                "total_tokens": run.patch_total_tokens_actual,
+            },
+            "total": {
+                "prompt_tokens": run.total_prompt_tokens_actual,
+                "completion_tokens": run.total_completion_tokens_actual,
+                "total_tokens": run.total_tokens_actual,
+            },
+            "tracked_completion_cap_tokens": tracked_completion_token_cap(run),
+            "completion_cap_utilization": completion_cap_utilization(run),
+            "estimated_output_tokens": total_output_estimated_tokens(run),
+            "completion_to_output_estimate_ratio": completion_to_output_estimate_ratio(run),
         },
         "stages": {
             "chunk_split_elapsed_seconds": run.chunk_split_seconds,
@@ -610,6 +725,13 @@ def build_advisor_payload(
             "chunk_retry_count": recent.chunk_retry_count,
             "chunk_failed": recent.chunk_failed,
             "chunk_row_failures": recent.chunk_row_failures,
+            "model_usage_available": recent.usage_available,
+            "prompt_tokens": recent.total_prompt_tokens_actual,
+            "completion_tokens": recent.total_completion_tokens_actual,
+            "total_tokens": recent.total_tokens_actual,
+            "tracked_completion_cap_tokens": tracked_completion_token_cap(recent),
+            "completion_cap_utilization": completion_cap_utilization(recent),
+            "completion_to_output_estimate_ratio": completion_to_output_estimate_ratio(recent),
         }
     return payload
 
@@ -650,6 +772,18 @@ def print_report(runs: list[RunSummary], completed_only: bool, min_recent_runs_f
             "  Patch output (bytes/lines/tokens est): "
             f"{run.patch_bytes}/{run.patch_lines}/{run.patch_estimated_tokens}"
         )
+        if run.usage_available:
+            print(
+                "  Model usage actual (prompt/completion/total): "
+                f"{run.total_prompt_tokens_actual}/{run.total_completion_tokens_actual}/{run.total_tokens_actual}"
+            )
+            print(
+                "  Completion efficiency (cap used/completion-output-est ratio): "
+                f"{format_optional_ratio(completion_cap_utilization(run))}/"
+                f"{format_optional_ratio(completion_to_output_estimate_ratio(run))}"
+            )
+        else:
+            print("  Model usage actual: unavailable")
         print(
             "  Stage seconds (chunk_split/chunk_summary/session/review_patch): "
             f"{run.chunk_split_seconds}/{run.chunk_summary_seconds}/"
@@ -717,12 +851,21 @@ def print_advisor_report(
     )
     recent = payload.get("recent_run")
     if isinstance(recent, dict):
-        print(
+        summary = (
             "Recent run summary: "
             f"mode={recent['mode']}, status={recent['status']}, elapsed={recent['total_elapsed_seconds']}s, "
             f"chunk_retries={recent['chunk_retry_count']}, chunk_failed={recent['chunk_failed']}, "
             f"chunk_tsv_failures={recent['chunk_row_failures']}"
         )
+        if recent.get("model_usage_available"):
+            summary += (
+                f", tokens={recent['prompt_tokens']}/{recent['completion_tokens']}/{recent['total_tokens']}, "
+                f"cap_used={format_optional_ratio(recent['completion_cap_utilization'])}, "
+                f"completion_output_ratio={format_optional_ratio(recent['completion_to_output_estimate_ratio'])}"
+            )
+        else:
+            summary += ", tokens=unavailable"
+        print(summary)
 
 
 def build_parser() -> argparse.ArgumentParser:

@@ -55,6 +55,10 @@ class ReportDistillerMetricsTests(unittest.TestCase):
                     "patch_lines": 2,
                     "patch_estimated_tokens": 10,
                 },
+                "model_usage": {
+                    "session": {"prompt_tokens": 55, "completion_tokens": 18, "total_tokens": 73},
+                    "review_patch": {"prompt_tokens": 31, "completion_tokens": 9, "total_tokens": 40},
+                },
                 "stages": {
                     "chunk_split": {"elapsed_seconds": 1},
                     "chunk_summary": {
@@ -83,6 +87,10 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual(900, run.session_max_tokens)
             self.assertEqual(700, run.patch_max_tokens)
             self.assertEqual(300, run.call_timeout_seconds)
+            self.assertTrue(run.usage_available)
+            self.assertEqual(86, run.total_prompt_tokens_actual)
+            self.assertEqual(27, run.total_completion_tokens_actual)
+            self.assertEqual(113, run.total_tokens_actual)
             self.assertEqual(1, run.chunk_split_seconds)
             self.assertEqual(2, run.chunk_summary_seconds)
             self.assertEqual("compact+chunked", report_distiller_metrics.format_mode(run))
@@ -90,6 +98,11 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             payload = report_distiller_metrics.serialize_run(run)
             self.assertEqual(900, payload["settings"]["session_max_tokens"])
             self.assertEqual(2, payload["stages"]["chunk_summary_elapsed_seconds"])
+            self.assertEqual(86, payload["model_usage"]["total"]["prompt_tokens"])
+            self.assertEqual(27, payload["model_usage"]["total"]["completion_tokens"])
+            self.assertEqual(1600, payload["model_usage"]["tracked_completion_cap_tokens"])
+            self.assertEqual(0.0169, payload["model_usage"]["completion_cap_utilization"])
+            self.assertEqual(0.9, payload["model_usage"]["completion_to_output_estimate_ratio"])
 
     def test_discover_runs_parses_partial_metrics(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -113,6 +126,7 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual(0, run.source_bytes)
             self.assertEqual(0, run.session_prompt_estimated_tokens)
             self.assertEqual(0, run.patch_estimated_tokens)
+            self.assertFalse(run.usage_available)
 
     def test_completed_only_filters_failed_runs(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -349,7 +363,17 @@ class ReportDistillerMetricsTests(unittest.TestCase):
                         "status": "completed",
                         "compact_mode": "0",
                         "chunked_mode": "1",
+                        "session_max_tokens": "100",
+                        "patch_max_tokens": "50",
                         "total_elapsed_seconds": 44,
+                        "outputs": {
+                            "session_estimated_tokens": 20,
+                            "patch_estimated_tokens": 10,
+                        },
+                        "model_usage": {
+                            "session": {"prompt_tokens": 80, "completion_tokens": 20},
+                            "review_patch": {"prompt_tokens": 30, "completion_tokens": 10},
+                        },
                         "stages": {
                             "chunk_summary": {
                                 "attempted": 1,
@@ -380,6 +404,13 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual(1, payload["confidence_signals"]["recent_completed_count"])
             self.assertEqual(0, payload["confidence_signals"]["recent_failed_count"])
             self.assertEqual(0, payload["confidence_signals"]["recent_chunk_retry_count"])
+            self.assertTrue(payload["recent_run"]["model_usage_available"])
+            self.assertEqual(110, payload["recent_run"]["prompt_tokens"])
+            self.assertEqual(30, payload["recent_run"]["completion_tokens"])
+            self.assertEqual(140, payload["recent_run"]["total_tokens"])
+            self.assertEqual(150, payload["recent_run"]["tracked_completion_cap_tokens"])
+            self.assertEqual(0.2, payload["recent_run"]["completion_cap_utilization"])
+            self.assertEqual(1.0, payload["recent_run"]["completion_to_output_estimate_ratio"])
 
     def test_build_advisor_payload_omits_recent_run_when_empty(self):
         payload = report_distiller_metrics.build_advisor_payload(

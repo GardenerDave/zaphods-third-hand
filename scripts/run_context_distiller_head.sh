@@ -20,6 +20,16 @@ CHUNK_MAX_TOKENS="${ZTH_DISTILLER_CHUNK_MAX_TOKENS:-1200}"
 SESSION_MAX_TOKENS="${ZTH_DISTILLER_SESSION_MAX_TOKENS:-2200}"
 PATCH_MAX_TOKENS="${ZTH_DISTILLER_PATCH_MAX_TOKENS:-1800}"
 CALL_TIMEOUT="${ZTH_DISTILLER_TIMEOUT:-900}"
+FINAL_ONLY="${ZTH_DISTILLER_FINAL_ONLY:-0}"
+
+case "$FINAL_ONLY" in
+  1|true|TRUE|yes|YES)
+    FINAL_ONLY="1"
+    ;;
+  *)
+    FINAL_ONLY="0"
+    ;;
+esac
 
 if [[ "$BASE_URL" == *"<LLAMA_CPP_BASE_URL>"* ]] || [[ "$MODEL" == "<MODEL_NAME>" ]]; then
   echo "Configure ZTH_BASE_URL and ZTH_MODEL before running. See config.example.env."
@@ -81,6 +91,8 @@ RUN_DIR="${RUNS_DIR}/${SOURCE_ID}_${SHORT_TITLE}"
 
 mkdir -p "$RUN_DIR"
 METRICS_FILE="${RUN_DIR}/METRICS.json"
+SESSION_METADATA_FILE="${RUN_DIR}/session_metadata.json"
+PATCH_METADATA_FILE="${RUN_DIR}/patch_metadata.json"
 
 now_epoch() {
   date +%s
@@ -113,6 +125,42 @@ file_est_tokens() {
   echo "$(( (bytes + 3) / 4 ))"
 }
 
+json_number() {
+  local file="$1"
+  shift
+  if [ ! -s "$file" ]; then
+    echo "null"
+    return
+  fi
+
+  python3 - "$file" "$@" <<'PY'
+import json
+import sys
+
+path = sys.argv[1]
+keys = sys.argv[2:]
+
+try:
+    with open(path, encoding="utf-8") as handle:
+        value = json.load(handle)
+    for key in keys:
+        if not isinstance(value, dict):
+            value = None
+            break
+        value = value.get(key)
+    if isinstance(value, bool):
+        value = None
+    if isinstance(value, int):
+        print(value)
+    elif isinstance(value, float):
+        print(int(value) if value.is_integer() else value)
+    else:
+        print("null")
+except Exception:
+    print("null")
+PY
+}
+
 write_metrics() {
   local status="${1:-$RUN_STATUS}"
   local completed_at
@@ -143,6 +191,7 @@ write_metrics() {
   "session_max_tokens": "${SESSION_MAX_TOKENS}",
   "patch_max_tokens": "${PATCH_MAX_TOKENS}",
   "call_timeout_seconds": "${CALL_TIMEOUT}",
+  "final_only": "${FINAL_ONLY}",
   "source": {
     "bytes": $(file_bytes "$SOURCE_FILE"),
     "lines": $(file_lines "$SOURCE_FILE"),
@@ -165,6 +214,20 @@ write_metrics() {
     "patch_bytes": $(file_bytes "$PATCH_FILE"),
     "patch_lines": $(file_lines "$PATCH_FILE"),
     "patch_estimated_tokens": $(file_est_tokens "$PATCH_FILE")
+  },
+  "model_usage": {
+    "session_metadata_file": "${SESSION_METADATA_FILE}",
+    "patch_metadata_file": "${PATCH_METADATA_FILE}",
+    "session": {
+      "prompt_tokens": $(json_number "$SESSION_METADATA_FILE" usage prompt_tokens),
+      "completion_tokens": $(json_number "$SESSION_METADATA_FILE" usage completion_tokens),
+      "total_tokens": $(json_number "$SESSION_METADATA_FILE" usage total_tokens)
+    },
+    "review_patch": {
+      "prompt_tokens": $(json_number "$PATCH_METADATA_FILE" usage prompt_tokens),
+      "completion_tokens": $(json_number "$PATCH_METADATA_FILE" usage completion_tokens),
+      "total_tokens": $(json_number "$PATCH_METADATA_FILE" usage total_tokens)
+    }
   },
   "stages": {
     "chunk_split": {
@@ -219,7 +282,11 @@ on_exit() {
 trap on_exit EXIT
 
 call_model() {
-  python3 "${PACKAGE_ROOT}/local_harness/icm_call.py" handoff --api openai-chat --base-url "$BASE_URL" --model "$MODEL" --timeout "$CALL_TIMEOUT" "$@"
+  if [ "$FINAL_ONLY" = "1" ]; then
+    python3 "${PACKAGE_ROOT}/local_harness/icm_call.py" handoff --api openai-chat --base-url "$BASE_URL" --model "$MODEL" --timeout "$CALL_TIMEOUT" --final-only "$@"
+  else
+    python3 "${PACKAGE_ROOT}/local_harness/icm_call.py" handoff --api openai-chat --base-url "$BASE_URL" --model "$MODEL" --timeout "$CALL_TIMEOUT" "$@"
+  fi
 }
 
 if [ "$CHUNKED_MODE" = "1" ]; then
@@ -315,12 +382,14 @@ EOF
   CHUNK_SUMMARY_STATUS="running"
   CHUNK_SUMMARY_START="$(now_epoch)"
   CHUNK_METRICS_FILE="${RUN_DIR}/chunk_metrics.tsv"
-  printf 'chunk_prompt\tchunk_summary\tstatus\tattempts\telapsed_seconds\tprompt_estimated_tokens\toutput_estimated_tokens\tprompt_bytes\toutput_bytes\terror_log\n' > "$CHUNK_METRICS_FILE"
+  printf 'chunk_prompt\tchunk_summary\tstatus\tattempts\telapsed_seconds\tprompt_estimated_tokens\toutput_estimated_tokens\tprompt_bytes\toutput_bytes\terror_log\tmetadata_file\n' > "$CHUNK_METRICS_FILE"
 
   for CHUNK_PROMPT in "$RUN_DIR"/chunks/chunk_[0-9][0-9][0-9]_prompt.md; do
     [ -f "$CHUNK_PROMPT" ] || continue
     CHUNK_SUMMARY="${CHUNK_PROMPT%_prompt.md}_summary.md"
     CHUNK_ERROR="${CHUNK_PROMPT%_prompt.md}_error.log"
+    CHUNK_METADATA="${CHUNK_PROMPT%_prompt.md}_metadata.json"
+    CHUNK_METADATA_PATH="$CHUNK_METADATA"
     CHUNK_OK="0"
     CHUNK_STATUS="failed"
     CHUNK_ATTEMPTS="1"
@@ -328,7 +397,7 @@ EOF
     CHUNK_ATTEMPTED="$((CHUNK_ATTEMPTED + 1))"
     : > "$CHUNK_ERROR"
 
-    if call_model --max-tokens "$CHUNK_MAX_TOKENS" < "$CHUNK_PROMPT" > "$CHUNK_SUMMARY" 2>> "$CHUNK_ERROR"; then
+    if call_model --metadata-out "$CHUNK_METADATA" --max-tokens "$CHUNK_MAX_TOKENS" < "$CHUNK_PROMPT" > "$CHUNK_SUMMARY" 2>> "$CHUNK_ERROR"; then
       CHUNK_OK="1"
     else
       {
@@ -337,8 +406,10 @@ EOF
       } >> "$CHUNK_ERROR"
       CHUNK_ATTEMPTS="2"
       CHUNK_RETRY_COUNT="$((CHUNK_RETRY_COUNT + 1))"
+      CHUNK_METADATA="${CHUNK_PROMPT%_prompt.md}_retry1_metadata.json"
+      CHUNK_METADATA_PATH="$CHUNK_METADATA"
 
-      if call_model --max-tokens "$CHUNK_MAX_TOKENS" < "$CHUNK_PROMPT" > "$CHUNK_SUMMARY" 2>> "$CHUNK_ERROR"; then
+      if call_model --metadata-out "$CHUNK_METADATA" --max-tokens "$CHUNK_MAX_TOKENS" < "$CHUNK_PROMPT" > "$CHUNK_SUMMARY" 2>> "$CHUNK_ERROR"; then
         CHUNK_OK="1"
       fi
     fi
@@ -371,7 +442,7 @@ EOF
     else
       CHUNK_ERROR_PATH=""
     fi
-    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
       "$CHUNK_PROMPT" \
       "$CHUNK_SUMMARY" \
       "$CHUNK_STATUS" \
@@ -381,7 +452,8 @@ EOF
       "$(file_est_tokens "$CHUNK_SUMMARY")" \
       "$(file_bytes "$CHUNK_PROMPT")" \
       "$(file_bytes "$CHUNK_SUMMARY")" \
-      "$CHUNK_ERROR_PATH" >> "$CHUNK_METRICS_FILE"
+      "$CHUNK_ERROR_PATH" \
+      "$CHUNK_METADATA_PATH" >> "$CHUNK_METRICS_FILE"
   done
 
   CHUNK_SUMMARY_SECONDS="$(elapsed_since "$CHUNK_SUMMARY_START")"
@@ -483,6 +555,9 @@ Chunk max tokens: ${CHUNK_MAX_TOKENS}
 Session max tokens: ${SESSION_MAX_TOKENS}
 Patch max tokens: ${PATCH_MAX_TOKENS}
 Call timeout seconds: ${CALL_TIMEOUT}
+Final-only/no-think mode: ${FINAL_ONLY}
+Session metadata file: ${SESSION_METADATA_FILE}
+Patch metadata file: ${PATCH_METADATA_FILE}
 EOF
 
 if [ "$COMPACT_MODE" = "1" ]; then
@@ -589,7 +664,7 @@ fi
 
 SESSION_STATUS="running"
 SESSION_STAGE_START="$(now_epoch)"
-if call_model --max-tokens "$SESSION_MAX_TOKENS" < "$SESSION_INPUT_PROMPT_FILE" > "$SESSION_FILE"; then
+if call_model --metadata-out "$SESSION_METADATA_FILE" --max-tokens "$SESSION_MAX_TOKENS" < "$SESSION_INPUT_PROMPT_FILE" > "$SESSION_FILE"; then
   SESSION_SECONDS="$(elapsed_since "$SESSION_STAGE_START")"
   SESSION_STATUS="completed"
 else
@@ -631,7 +706,7 @@ cat "$SESSION_FILE" >> "$RUN_DIR/patch_prompt.md"
 
 PATCH_STATUS="running"
 PATCH_STAGE_START="$(now_epoch)"
-if call_model --max-tokens "$PATCH_MAX_TOKENS" < "$RUN_DIR/patch_prompt.md" > "$PATCH_FILE"; then
+if call_model --metadata-out "$PATCH_METADATA_FILE" --max-tokens "$PATCH_MAX_TOKENS" < "$RUN_DIR/patch_prompt.md" > "$PATCH_FILE"; then
   PATCH_SECONDS="$(elapsed_since "$PATCH_STAGE_START")"
   PATCH_STATUS="completed"
 else

@@ -127,9 +127,15 @@ export ZTH_DISTILLER_PATCH_MAX_TOKENS="700"
 export ZTH_DISTILLER_TIMEOUT="600"
 ```
 
+If your model server tends to spend the response on hidden reasoning or returns empty final content, enable final-only mode for distiller calls:
+
+```bash
+export ZTH_DISTILLER_FINAL_ONLY="1"
+```
+
 Use higher values again for real source distillation when you need more complete summaries.
 
-After a run, compare `outputs/run_records/<SOURCE_ID>_<SHORT_TITLE>/METRICS.json` across different settings. It records stage timing, prompt/output sizes, token estimates, retries, and failure stage if the run does not complete.
+After a run, compare `outputs/run_records/<SOURCE_ID>_<SHORT_TITLE>/METRICS.json` across different settings. It records stage timing, prompt/output sizes, token estimates, actual model usage when the endpoint reports it, retries, and failure stage if the run does not complete.
 
 See `docs/CONTEXT_DISTILLER_WORKFLOW.md` for suggested smoke, normal compact, and chunked profiles.
 
@@ -146,6 +152,8 @@ python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records
 ```
 
 The JSON report includes `recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, and `thresholds`.
+
+When token usage is available, the advisor also reports recent-run prompt/completion/total tokens plus completion cap utilization. Use that to tune budgets for efficiency before optimizing for speed.
 
 For a concise operator handoff view:
 
