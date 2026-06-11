@@ -90,6 +90,12 @@ Use higher values again for real source distillation when you need more complete
 
 After a run, compare `outputs/run_records/<SOURCE_ID>_<SHORT_TITLE>/METRICS.json` across different settings. It records stage timing, prompt/output sizes, token estimates, retries, and failure stage if the run does not complete.
 
+You can print a recent summary report:
+
+```bash
+python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6
+```
+
 ## Step 4: Review The Generated Session And Patch
 
 Inspect:
