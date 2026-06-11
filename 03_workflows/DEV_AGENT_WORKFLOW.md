@@ -65,6 +65,22 @@ For repeatable work, use stage-specific folders and markdown context files rathe
 
 For local-model delegation, use `ICM/03_workflows/LOCAL_AGENT_ORCHESTRATION_WORKFLOW.md`. Local agents should produce draft reports or candidate outputs first; Codex/Nav or [REDACTED_AUTHOR] should review before canonical docs, app source, release records, or commits change.
 
+## Manager-Side Deterministic Edit Route
+
+For tiny, unambiguous edits, the manager may use the deterministic direct-edit route documented in `ICM/03_workflows/LOCAL_AGENT_ORCHESTRATION_WORKFLOW.md` instead of asking a local model to reason about code. This route is not autonomous agent editing. It is a manager-controlled mechanical edit with explicit selected files, prompt grammar, uniqueness checks, file-size limits, and verification.
+
+Use this route only when the requested edit fits a proven shape such as:
+
+- Unique literal replacement.
+- Unique anchor insertion.
+- Unique block replacement.
+- One-file sequential deterministic batch.
+- One-file excerpt SEARCH/REPLACE patch.
+- Bounded multi-file deterministic batch.
+- Mixed excerpt-plus-literal deterministic batch.
+
+If the edit does not fit the deterministic envelope, fall back to the normal staged workflow: inspect, plan, implement narrowly, verify, and report. Do not treat deterministic routing as permission for broad refactors, unclear code changes, dependency changes, generated output edits, or autonomous lifecycle movement.
+
 ## Important Project Preferences
 
 - Minimize copy/paste friction.

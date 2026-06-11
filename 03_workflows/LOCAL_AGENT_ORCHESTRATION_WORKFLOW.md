@@ -267,6 +267,52 @@ Manager review remains required for exact file paths, next-test wording, context
 
 Use small contrast sets when validating routing boundaries. For compact `router3` contrast prompts, `max_tokens` around 128 and a timeout around 150 seconds are reasonable pilot defaults. The stronger rule is to keep prompts compact; increasing the timeout alone did not solve the broad nine-case shape.
 
+## Manager-Side Deterministic Direct-Edit Boundary
+
+The Aider wrapper now includes a manager-side deterministic direct-edit path. This path is for narrow, mechanical edits that can be parsed, checked, applied, and audited without asking a model to reason about the change. It may short-circuit before Aider starts or recover after an Aider timeout when the request fits the deterministic envelope.
+
+This is not permission for autonomous source editing. Codex/Nav or the human manager still owns file selection, prompt authoring, review, verification, and commit decisions.
+
+Current supported prompt shapes:
+
+- Literal replacement: ``- In `path`, replace `old` with `new`.`` followed by ``- Edit only the listed file.``
+- Insert after or before a unique anchor.
+- Replace a unique block from a start anchor through an end anchor.
+- Apply one-file excerpt SEARCH/REPLACE patches.
+- Apply sequential one-file deterministic batches.
+- Apply bounded multi-file deterministic batches.
+- Apply mixed excerpt-plus-literal batches across selected files.
+
+Current guardrails:
+
+- Replacement, insertion, block replacement, excerpt patch, and one-file batch routes target exactly one selected file.
+- Multi-file deterministic batches target up to 4 selected files.
+- One-file literal/block/batch prompts must stay at or below 1200 characters.
+- Multi-file deterministic batch prompts must stay at or below 2400 characters.
+- Excerpt SEARCH/REPLACE patch prompts must stay at or below 4096 characters.
+- Each targeted file must stay at or below 24576 bytes.
+- Every target string, anchor, block boundary, or SEARCH excerpt must be unique at the step where it is applied.
+- Literal deterministic routes decode escaped `\n`, `\r`, and `\t` sequences in authored prompts.
+- Direct-edit-eligible work may bypass the Aider budget gate even when `within_budget: false`.
+
+Validated evidence:
+
+- Runs `2026-06-08_032_*` and `2026-06-08_034_*` proved one-file deterministic replacement as both fallback and pre-Aider short-circuit.
+- Runs `2026-06-08_036_*` and `2026-06-08_038_*` proved insertion and block replacement.
+- Run `2026-06-08_039_*` proved sequential one-file deterministic batches.
+- Runs `2026-06-08_040_*` and `2026-06-08_041_*` proved the excerpt patch grammar and the need for the larger excerpt prompt cap.
+- Runs `2026-06-08_042_*` and `2026-06-08_043_*` proved the current bounded multi-file batch route and the 24576-byte file-size ceiling.
+- Runs `2026-06-08_044_*` and `2026-06-08_045_*` proved mixed excerpt-plus-literal routing and the escaped-newline decoding fix.
+
+Stop and use the normal manager-reviewed implementation path when:
+
+- The prompt does not match a supported deterministic grammar.
+- Any selected file is missing or exceeds the size limit.
+- Any target, anchor, block boundary, or SEARCH excerpt is not unique.
+- The requested edit is semantic, architectural, generated-output related, dependency-related, or security-sensitive.
+- More than 4 files are selected.
+- The manager cannot verify the result cheaply.
+
 ## Required Output Report
 
 Every local-agent output should include:
@@ -338,4 +384,4 @@ Start with low-risk, high-volume support work:
 - Documentation cleanup.
 - Release-note draft bullets from verified commits.
 
-Avoid local-agent source edits until the report/review loop proves reliable. Also avoid multi-file edits, dependency changes, database/schema edits, security decisions, unreviewed task decomposition, private raw-data cross-agent chaining, and autonomous agent chaining.
+Avoid model-authored local-agent source edits unless a separate supervised pilot explicitly validates the route. Manager-side deterministic direct-edit is allowed only inside the envelope above and must remain mechanical, selected-file bounded, auditable, and verified. Avoid dependency changes, database/schema edits, security decisions, unreviewed task decomposition, private raw-data cross-agent chaining, and autonomous agent chaining.
