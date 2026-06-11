@@ -60,7 +60,7 @@ RUN_DIR="${RUNS_DIR}/${SOURCE_ID}_${SHORT_TITLE}"
 mkdir -p "$RUN_DIR"
 
 call_model() {
-  python3 "${PACKAGE_ROOT}/local_harness/icm_call.py" deep "$@"
+  python3 "${PACKAGE_ROOT}/local_harness/icm_call.py" deep --api openai-chat --base-url "$BASE_URL" --model "$MODEL" "$@"
 }
 
 if [ "$CHUNKED_MODE" = "1" ]; then
