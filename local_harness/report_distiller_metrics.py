@@ -16,9 +16,9 @@ PROFILE_SETTINGS: dict[str, dict[str, int]] = {
         "ZTH_DISTILLER_TIMEOUT": 240,
     },
     "normal": {
-        "ZTH_DISTILLER_SESSION_MAX_TOKENS": 1200,
-        "ZTH_DISTILLER_PATCH_MAX_TOKENS": 900,
-        "ZTH_DISTILLER_TIMEOUT": 600,
+        "ZTH_DISTILLER_SESSION_MAX_TOKENS": 700,
+        "ZTH_DISTILLER_PATCH_MAX_TOKENS": 280,
+        "ZTH_DISTILLER_TIMEOUT": 900,
     },
     "chunked": {
         "ZTH_DISTILLER_CHUNK_LINES": 200,

@@ -205,19 +205,19 @@ Expected use:
 
 ### Normal Compact Profile
 
-Use this for ordinary notes, short transcripts, or small docs after the smoke profile works.
+Use this for ordinary notes, short transcripts, or small docs after the smoke profile works. This profile favors token efficiency over maximum completeness and was tuned from actual usage telemetry on a slower local model server.
 
 ```bash
-export ZTH_DISTILLER_SESSION_MAX_TOKENS="1200"
-export ZTH_DISTILLER_PATCH_MAX_TOKENS="900"
-export ZTH_DISTILLER_TIMEOUT="600"
+export ZTH_DISTILLER_SESSION_MAX_TOKENS="700"
+export ZTH_DISTILLER_PATCH_MAX_TOKENS="280"
+export ZTH_DISTILLER_TIMEOUT="900"
 ./scripts/run_context_distiller_head.sh source-001 <SOURCE_FILE> short-title --compact
 ```
 
 Expected use:
 
 - Single source that fits one model call reliably.
-- More complete session summaries than the smoke profile.
+- More complete session summaries than the smoke profile without the broad `1200/900` completion-token budget.
 - Good default for CPU-bound or slower backends before trying chunked mode.
 
 ### Chunked Profile

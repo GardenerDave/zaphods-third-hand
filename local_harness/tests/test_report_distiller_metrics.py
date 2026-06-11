@@ -253,6 +253,9 @@ class ReportDistillerMetricsTests(unittest.TestCase):
 
             self.assertEqual("normal", payload["recommended_profile"])
             self.assertIn("Need at least 3 recent runs", payload["recommendation"])
+            self.assertEqual(700, payload["recommended_settings"]["ZTH_DISTILLER_SESSION_MAX_TOKENS"])
+            self.assertEqual(280, payload["recommended_settings"]["ZTH_DISTILLER_PATCH_MAX_TOKENS"])
+            self.assertEqual(900, payload["recommended_settings"]["ZTH_DISTILLER_TIMEOUT"])
             self.assertEqual("medium", payload["recommendation_confidence"])
             self.assertEqual("needs_review", payload["readiness"])
             self.assertIn("insufficient_recent_window", payload["blocking_signals"])

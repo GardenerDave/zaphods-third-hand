@@ -105,7 +105,16 @@ export ZTH_DISTILLER_TIMEOUT="240"
 ./scripts/run_context_distiller_head.sh toy-001 sources/toy_source.txt toy-source --compact
 ```
 
-When this succeeds, try chunked mode for longer files:
+When this succeeds, try the normal compact profile on a slightly larger source:
+
+```bash
+export ZTH_DISTILLER_SESSION_MAX_TOKENS="700"
+export ZTH_DISTILLER_PATCH_MAX_TOKENS="280"
+export ZTH_DISTILLER_TIMEOUT="900"
+./scripts/run_context_distiller_head.sh toy-002 sources/toy_source.txt toy-source-normal --compact
+```
+
+For longer files, try chunked mode:
 
 ```bash
 export ZTH_DISTILLER_CHUNK_LINES="200"
@@ -122,8 +131,8 @@ For a slow model server or a smoke test, lower the output budgets before running
 
 ```bash
 export ZTH_DISTILLER_CHUNK_MAX_TOKENS="600"
-export ZTH_DISTILLER_SESSION_MAX_TOKENS="900"
-export ZTH_DISTILLER_PATCH_MAX_TOKENS="700"
+export ZTH_DISTILLER_SESSION_MAX_TOKENS="700"
+export ZTH_DISTILLER_PATCH_MAX_TOKENS="280"
 export ZTH_DISTILLER_TIMEOUT="600"
 ```
 
