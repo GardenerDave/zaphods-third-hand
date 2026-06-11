@@ -32,6 +32,7 @@ Long projects accumulate transcripts, logs, decisions, partial plans, stale assu
 - Distiller runs can enable final-answer-only mode with `ZTH_DISTILLER_FINAL_ONLY=1` for endpoints that otherwise spend output budget on hidden reasoning.
 - Distiller run records now capture `session_metadata.json`, `patch_metadata.json`, and actual model token usage when the endpoint reports OpenAI-style `usage`.
 - Metrics advisor now reports finish reasons, timing telemetry, and budget-tuning advice for recent distiller runs.
+- Distiller run records now include `run_profile` and `run_purpose` labels so smoke, tuning, handoff, and production runs can be analyzed separately.
 - The normal compact profile is tuned for token efficiency with `ZTH_DISTILLER_SESSION_MAX_TOKENS=700`, `ZTH_DISTILLER_PATCH_MAX_TOKENS=280`, and `ZTH_DISTILLER_TIMEOUT=900`.
 - Distiller metrics advisor now supports `--advisor-only` for concise operator handoff output.
 - `--advisor-only --json` now emits a concise advisor JSON contract without per-run `runs` details.
@@ -129,6 +130,13 @@ Flag behavior:
 - `--json`: full JSON payload, including per-run details.
 - `--advisor-only`: concise text summary for handoff.
 - `--advisor-only --json`: concise advisor JSON payload without per-run `runs` list.
+- `--profile`, `--purpose`, and `--exclude-purpose`: filter advisory windows by run labels, for example to keep connectivity smoke tests out of handoff tuning decisions.
+
+Example handoff advisor view that excludes endpoint-connectivity smoke runs:
+
+```bash
+python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --advisor-only --exclude-purpose connectivity
+```
 
 Example threshold override:
 

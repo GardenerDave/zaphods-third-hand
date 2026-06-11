@@ -41,6 +41,8 @@ class RunSummary:
     failure_stage: str
     compact_mode: bool
     chunked_mode: bool
+    run_profile: str
+    run_purpose: str
     chunk_line_size: int
     chunk_max_tokens: int
     session_max_tokens: int
@@ -140,6 +142,63 @@ def safe_ratio(numerator: int, denominator: int) -> float | None:
 
 def format_optional_ratio(value: float | None) -> str:
     return "n/a" if value is None else f"{value:.2f}"
+
+
+def normalize_label(value: Any, default: str = "") -> str:
+    normalized = str(value or "").strip().lower().replace(" ", "_")
+    return normalized or default
+
+
+def infer_run_profile(chunked_mode: bool, session_max_tokens: int, patch_max_tokens: int) -> str:
+    if chunked_mode:
+        return "chunked"
+    if session_max_tokens > 0 and patch_max_tokens > 0:
+        if session_max_tokens <= 320 and patch_max_tokens <= 240:
+            return "smoke"
+        if session_max_tokens <= 900 and patch_max_tokens <= 700:
+            return "normal"
+    return "custom"
+
+
+def infer_run_purpose(run_profile: str, source_id: str, short_title: str) -> str:
+    combined = f"{source_id} {short_title}".lower()
+    if run_profile == "smoke":
+        return "connectivity"
+    if "connectivity" in combined or "smoke" in combined:
+        return "connectivity"
+    if "tuning" in combined or "budget" in combined or "finish-reason" in combined:
+        return "tuning"
+    if "test" in combined:
+        return "test"
+    return "handoff"
+
+
+def parse_filter_values(values: list[str]) -> set[str]:
+    labels: set[str] = set()
+    for value in values:
+        for item in value.split(","):
+            label = normalize_label(item)
+            if label:
+                labels.add(label)
+    return labels
+
+
+def filter_runs(
+    runs: list[RunSummary],
+    profiles: set[str],
+    purposes: set[str],
+    excluded_purposes: set[str],
+) -> list[RunSummary]:
+    filtered: list[RunSummary] = []
+    for run in runs:
+        if profiles and run.run_profile not in profiles:
+            continue
+        if purposes and run.run_purpose not in purposes:
+            continue
+        if excluded_purposes and run.run_purpose in excluded_purposes:
+            continue
+        filtered.append(run)
+    return filtered
 
 
 def parse_chunk_metrics(path: str, run_dir: Path) -> tuple[int, int]:
@@ -263,19 +322,35 @@ def parse_run(metrics_path: Path) -> RunSummary:
         sort_epoch = metrics_path.stat().st_mtime
     chunk_metrics_file = str(chunk_summary.get("chunk_metrics_file", ""))
     chunk_rows, chunk_row_failures = parse_chunk_metrics(chunk_metrics_file, metrics_path.parent)
+    compact_mode = to_bool(data.get("compact_mode", "0"))
+    chunked_mode = to_bool(data.get("chunked_mode", "0"))
+    session_max_tokens = to_int(data.get("session_max_tokens", 0))
+    patch_max_tokens = to_int(data.get("patch_max_tokens", 0))
+    source_id = str(data.get("source_id", ""))
+    short_title = str(data.get("short_title", ""))
+    run_profile = normalize_label(
+        data.get("run_profile"),
+        infer_run_profile(chunked_mode, session_max_tokens, patch_max_tokens),
+    )
+    run_purpose = normalize_label(
+        data.get("run_purpose"),
+        infer_run_purpose(run_profile, source_id, short_title),
+    )
 
     return RunSummary(
         run_dir=metrics_path.parent,
-        source_id=str(data.get("source_id", "")),
-        short_title=str(data.get("short_title", "")),
+        source_id=source_id,
+        short_title=short_title,
         status=str(data.get("status", "unknown")),
         failure_stage=str(data.get("failure_stage", "")),
-        compact_mode=to_bool(data.get("compact_mode", "0")),
-        chunked_mode=to_bool(data.get("chunked_mode", "0")),
+        compact_mode=compact_mode,
+        chunked_mode=chunked_mode,
+        run_profile=run_profile,
+        run_purpose=run_purpose,
         chunk_line_size=to_int(data.get("chunk_line_size", 0)),
         chunk_max_tokens=to_int(data.get("chunk_max_tokens", 0)),
-        session_max_tokens=to_int(data.get("session_max_tokens", 0)),
-        patch_max_tokens=to_int(data.get("patch_max_tokens", 0)),
+        session_max_tokens=session_max_tokens,
+        patch_max_tokens=patch_max_tokens,
         call_timeout_seconds=to_int(data.get("call_timeout_seconds", 0)),
         total_elapsed_seconds=to_int(data.get("total_elapsed_seconds", 0)),
         source_bytes=to_int(source.get("bytes", 0)),
@@ -349,6 +424,8 @@ def discover_runs(runs_dir: Path, limit: int, completed_only: bool) -> list[RunS
     if completed_only:
         summaries = [summary for summary in summaries if summary.status == "completed"]
     summaries.sort(key=lambda s: (s.sort_epoch, s.run_dir.name), reverse=True)
+    if limit <= 0:
+        return summaries
     return summaries[:limit]
 
 
@@ -457,12 +534,14 @@ def build_ledger_entry(
     confidence_level: str,
     readiness: str,
 ) -> dict[str, Any]:
-    observed_profile = "chunked" if run.chunked_mode else "normal"
+    observed_profile = run.run_profile
     return {
         "timestamp": datetime.utcnow().isoformat(timespec="seconds") + "Z",
         "run_dir": str(run.run_dir),
         "source_id": run.source_id,
         "short_title": run.short_title,
+        "run_profile": run.run_profile,
+        "run_purpose": run.run_purpose,
         "recommended_profile": recommended_profile_name,
         "recommendation_confidence": confidence_level,
         "readiness": readiness,
@@ -702,6 +781,8 @@ def serialize_run(run: RunSummary) -> dict[str, Any]:
         "status": run.status,
         "failure_stage": run.failure_stage,
         "mode": format_mode(run),
+        "run_profile": run.run_profile,
+        "run_purpose": run.run_purpose,
         "settings": {
             "chunk_line_size": run.chunk_line_size,
             "chunk_max_tokens": run.chunk_max_tokens,
@@ -802,6 +883,7 @@ def build_report_payload(
     calibration_window: int = DEFAULT_CALIBRATION_WINDOW,
     role_critique_summary: dict[str, Any] | None = None,
     role_critiques_strict: bool = False,
+    filters: dict[str, list[str]] | None = None,
 ) -> dict[str, Any]:
     profile, reason = recommended_profile(runs, completed_only, min_recent_runs_for_chunked)
     confidence, confidence_reason = recommendation_confidence(runs, completed_only, min_recent_runs_for_chunked)
@@ -812,6 +894,7 @@ def build_report_payload(
     return {
         "run_count": len(runs),
         "completed_only": completed_only,
+        "filters": filters or {"profiles": [], "purposes": [], "excluded_purposes": []},
         "recommendation": recommendation(runs, completed_only, min_recent_runs_for_chunked),
         "recommended_profile": profile,
         "recommended_settings": PROFILE_SETTINGS[profile],
@@ -842,6 +925,7 @@ def build_advisor_payload(
     calibration_window: int = DEFAULT_CALIBRATION_WINDOW,
     role_critique_summary: dict[str, Any] | None = None,
     role_critiques_strict: bool = False,
+    filters: dict[str, list[str]] | None = None,
 ) -> dict[str, Any]:
     profile, reason = recommended_profile(runs, completed_only, min_recent_runs_for_chunked)
     confidence, confidence_reason = recommendation_confidence(runs, completed_only, min_recent_runs_for_chunked)
@@ -852,6 +936,7 @@ def build_advisor_payload(
     payload: dict[str, Any] = {
         "run_count": len(runs),
         "completed_only": completed_only,
+        "filters": filters or {"profiles": [], "purposes": [], "excluded_purposes": []},
         "recommended_profile": profile,
         "recommended_settings": PROFILE_SETTINGS[profile],
         "recommendation_reason": reason,
@@ -875,8 +960,12 @@ def build_advisor_payload(
         recent = runs[0]
         payload["recent_run"] = {
             "run_dir": str(recent.run_dir),
+            "source_id": recent.source_id,
+            "short_title": recent.short_title,
             "status": recent.status,
             "mode": format_mode(recent),
+            "run_profile": recent.run_profile,
+            "run_purpose": recent.run_purpose,
             "total_elapsed_seconds": recent.total_elapsed_seconds,
             "chunk_retry_count": recent.chunk_retry_count,
             "chunk_failed": recent.chunk_failed,
@@ -904,6 +993,7 @@ def print_report(runs: list[RunSummary], completed_only: bool, min_recent_runs_f
         print(f"Run: {run.run_dir.name}")
         print(f"  Source: {run.source_id} ({run.short_title})")
         print(f"  Mode: {format_mode(run)}")
+        print(f"  Profile/purpose: {run.run_profile}/{run.run_purpose}")
         print(f"  Status: {run.status}")
         if run.failure_stage:
             print(f"  Failure stage: {run.failure_stage}")
@@ -971,6 +1061,7 @@ def print_advisor_report(
     calibration_window: int,
     role_critique_summary: dict[str, Any],
     role_critiques_strict: bool,
+    filters: dict[str, list[str]] | None = None,
 ) -> None:
     payload = build_advisor_payload(
         runs,
@@ -980,10 +1071,19 @@ def print_advisor_report(
         calibration_window=calibration_window,
         role_critique_summary=role_critique_summary,
         role_critiques_strict=role_critiques_strict,
+        filters=filters,
     )
     print("Distiller advisor")
     print()
     print(f"Runs analyzed: {payload['run_count']}")
+    applied_filters = payload.get("filters", {})
+    if isinstance(applied_filters, dict) and any(applied_filters.values()):
+        print(
+            "Filters: "
+            f"profiles={applied_filters.get('profiles', [])}, "
+            f"purposes={applied_filters.get('purposes', [])}, "
+            f"excluded_purposes={applied_filters.get('excluded_purposes', [])}"
+        )
     print(f"Recommended profile: {payload['recommended_profile']}")
     print(f"Reason: {payload['recommendation_reason']}")
     print(f"Recommendation confidence: {payload['recommendation_confidence']} ({payload['confidence_reason']})")
@@ -1017,6 +1117,7 @@ def print_advisor_report(
     if isinstance(recent, dict):
         summary = (
             "Recent run summary: "
+            f"profile={recent['run_profile']}, purpose={recent['run_purpose']}, "
             f"mode={recent['mode']}, status={recent['status']}, elapsed={recent['total_elapsed_seconds']}s, "
             f"chunk_retries={recent['chunk_retry_count']}, chunk_failed={recent['chunk_failed']}, "
             f"chunk_tsv_failures={recent['chunk_row_failures']}"
@@ -1066,6 +1167,24 @@ def build_parser() -> argparse.ArgumentParser:
         help="Print concise operator advisory summary.",
     )
     parser.add_argument(
+        "--profile",
+        action="append",
+        default=[],
+        help="Only include runs with these run_profile labels; repeat or use comma-separated values.",
+    )
+    parser.add_argument(
+        "--purpose",
+        action="append",
+        default=[],
+        help="Only include runs with these run_purpose labels; repeat or use comma-separated values.",
+    )
+    parser.add_argument(
+        "--exclude-purpose",
+        action="append",
+        default=[],
+        help="Exclude runs with these run_purpose labels; repeat or use comma-separated values.",
+    )
+    parser.add_argument(
         "--min-recent-runs-for-chunked",
         type=int,
         default=DEFAULT_MIN_RECENT_RUNS_FOR_CHUNKED,
@@ -1099,7 +1218,18 @@ def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
     runs_dir = Path(args.runs_dir)
-    runs = discover_runs(runs_dir, max(1, args.limit), args.completed_only)
+    profile_filters = parse_filter_values(args.profile)
+    purpose_filters = parse_filter_values(args.purpose)
+    excluded_purpose_filters = parse_filter_values(args.exclude_purpose)
+    has_filters = bool(profile_filters or purpose_filters or excluded_purpose_filters)
+    runs = discover_runs(runs_dir, 0 if has_filters else max(1, args.limit), args.completed_only)
+    if has_filters:
+        runs = filter_runs(runs, profile_filters, purpose_filters, excluded_purpose_filters)[: max(1, args.limit)]
+    filter_payload = {
+        "profiles": sorted(profile_filters),
+        "purposes": sorted(purpose_filters),
+        "excluded_purposes": sorted(excluded_purpose_filters),
+    }
     min_recent_runs_for_chunked = max(1, args.min_recent_runs_for_chunked)
     calibration_window = max(1, args.calibration_window)
     role_critiques_file = Path(args.role_critiques_file) if args.role_critiques_file else None
@@ -1120,6 +1250,7 @@ def main() -> int:
                     calibration_window=calibration_window,
                     role_critique_summary=role_critique_summary,
                     role_critiques_strict=args.role_critiques_strict,
+                    filters=filter_payload,
                 ),
                 indent=2,
             )
@@ -1133,6 +1264,7 @@ def main() -> int:
             calibration_window,
             role_critique_summary,
             args.role_critiques_strict,
+            filters=filter_payload,
         )
     elif args.json:
         print(
@@ -1145,6 +1277,7 @@ def main() -> int:
                     calibration_window=calibration_window,
                     role_critique_summary=role_critique_summary,
                     role_critiques_strict=args.role_critiques_strict,
+                    filters=filter_payload,
                 ),
                 indent=2,
             )

@@ -102,6 +102,8 @@ Start with compact mode only and small budgets. This gives you the fastest path 
 export ZTH_DISTILLER_SESSION_MAX_TOKENS="320"
 export ZTH_DISTILLER_PATCH_MAX_TOKENS="240"
 export ZTH_DISTILLER_TIMEOUT="240"
+export ZTH_DISTILLER_RUN_PROFILE="smoke"
+export ZTH_DISTILLER_RUN_PURPOSE="connectivity"
 ./scripts/run_context_distiller_head.sh toy-001 sources/toy_source.txt toy-source --compact
 ```
 
@@ -111,6 +113,8 @@ When this succeeds, try the normal compact profile on a slightly larger source:
 export ZTH_DISTILLER_SESSION_MAX_TOKENS="700"
 export ZTH_DISTILLER_PATCH_MAX_TOKENS="280"
 export ZTH_DISTILLER_TIMEOUT="900"
+export ZTH_DISTILLER_RUN_PROFILE="normal"
+export ZTH_DISTILLER_RUN_PURPOSE="handoff"
 ./scripts/run_context_distiller_head.sh toy-002 sources/toy_source.txt toy-source-normal --compact
 ```
 
@@ -145,6 +149,7 @@ export ZTH_DISTILLER_FINAL_ONLY="1"
 Use higher values again for real source distillation when you need more complete summaries.
 
 After a run, compare `outputs/run_records/<SOURCE_ID>_<SHORT_TITLE>/METRICS.json` across different settings. It records stage timing, prompt/output sizes, token estimates, actual model usage when the endpoint reports it, retries, and failure stage if the run does not complete.
+It also records `run_profile` and `run_purpose` labels so you can keep connectivity smoke tests, budget tuning runs, and real handoff runs separate during later analysis.
 
 See `docs/CONTEXT_DISTILLER_WORKFLOW.md` for suggested smoke, normal compact, and chunked profiles.
 
@@ -177,11 +182,18 @@ For a concise operator handoff view:
 python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --advisor-only
 ```
 
+To keep smoke/connectivity tests from skewing handoff tuning advice:
+
+```bash
+python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --advisor-only --exclude-purpose connectivity
+```
+
 Flag behavior:
 
 - `--json`: full JSON payload, including per-run `runs` details.
 - `--advisor-only`: concise text summary.
 - `--advisor-only --json`: concise advisor JSON payload without per-run `runs` details; includes `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, and `confidence_signals`.
+- `--profile`, `--purpose`, and `--exclude-purpose`: include or exclude runs by `run_profile` and `run_purpose` labels.
 
 You can override the chunked recommendation threshold:
 

@@ -120,8 +120,12 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertEqual(1, run.chunk_split_seconds)
             self.assertEqual(2, run.chunk_summary_seconds)
             self.assertEqual("compact+chunked", report_distiller_metrics.format_mode(run))
+            self.assertEqual("chunked", run.run_profile)
+            self.assertEqual("handoff", run.run_purpose)
 
             payload = report_distiller_metrics.serialize_run(run)
+            self.assertEqual("chunked", payload["run_profile"])
+            self.assertEqual("handoff", payload["run_purpose"])
             self.assertEqual(900, payload["settings"]["session_max_tokens"])
             self.assertEqual(2, payload["stages"]["chunk_summary_elapsed_seconds"])
             self.assertEqual(86, payload["model_usage"]["total"]["prompt_tokens"])
@@ -481,6 +485,9 @@ class ReportDistillerMetricsTests(unittest.TestCase):
 
             self.assertEqual("chunked", payload["recommended_profile"])
             self.assertEqual("chunked", payload["recent_run"]["mode"])
+            self.assertEqual("s11", payload["recent_run"]["source_id"])
+            self.assertEqual("chunked", payload["recent_run"]["run_profile"])
+            self.assertEqual("handoff", payload["recent_run"]["run_purpose"])
             self.assertEqual(44, payload["recent_run"]["total_elapsed_seconds"])
             self.assertEqual("high", payload["recommendation_confidence"])
             self.assertEqual("ready", payload["readiness"])
@@ -828,6 +835,103 @@ class ReportDistillerMetricsTests(unittest.TestCase):
             self.assertIn("completed=0", proc.stdout)
             self.assertIn("failed=1", proc.stdout)
             self.assertIn("chunk_retries=2", proc.stdout)
+
+    def test_cli_filters_exclude_connectivity_smoke_from_advisor_window(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runs_dir = Path(temp_dir) / "run_records"
+
+            def write_run(
+                run_name: str,
+                source_id: str,
+                completed_at: str,
+                session_max: str,
+                patch_max: str,
+                session_finish: str,
+                patch_finish: str,
+                session_completion: int,
+                patch_completion: int,
+            ) -> None:
+                run_dir = runs_dir / run_name
+                run_dir.mkdir(parents=True)
+                (run_dir / "METRICS.json").write_text(
+                    json.dumps(
+                        {
+                            "source_id": source_id,
+                            "short_title": source_id,
+                            "status": "completed",
+                            "compact_mode": "1",
+                            "chunked_mode": "0",
+                            "session_max_tokens": session_max,
+                            "patch_max_tokens": patch_max,
+                            "run_completed_at": completed_at,
+                            "model_usage": {
+                                "session": {
+                                    "finish_reason": session_finish,
+                                    "prompt_tokens": 100,
+                                    "completion_tokens": session_completion,
+                                },
+                                "review_patch": {
+                                    "finish_reason": patch_finish,
+                                    "prompt_tokens": 80,
+                                    "completion_tokens": patch_completion,
+                                },
+                            },
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+
+            write_run(
+                "run-normal-handoff",
+                "conversation-handoff",
+                "2026-06-11T00:00:00Z",
+                "700",
+                "280",
+                "stop",
+                "stop",
+                500,
+                130,
+            )
+            write_run(
+                "run-newer-smoke",
+                "connectivity-smoke",
+                "2026-06-12T00:00:00Z",
+                "80",
+                "60",
+                "length",
+                "length",
+                80,
+                60,
+            )
+
+            script = Path(report_distiller_metrics.__file__)
+            proc = subprocess.run(
+                [
+                    sys.executable,
+                    os.fspath(script),
+                    "--runs-dir",
+                    os.fspath(runs_dir),
+                    "--advisor-only",
+                    "--json",
+                    "--limit",
+                    "1",
+                    "--exclude-purpose",
+                    "connectivity",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertEqual(0, proc.returncode)
+            payload = json.loads(proc.stdout)
+            self.assertEqual(1, payload["run_count"])
+            self.assertEqual(["connectivity"], payload["filters"]["excluded_purposes"])
+            self.assertEqual("conversation-handoff", payload["recent_run"]["source_id"])
+            self.assertEqual("normal", payload["recent_run"]["run_profile"])
+            self.assertEqual("handoff", payload["recent_run"]["run_purpose"])
+            self.assertEqual("profile_looks_good", payload["recent_run"]["budget_tuning"]["action"])
+
     def test_write_ledger_appends_unseen_runs_and_emits_calibration(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             runs_dir = Path(temp_dir) / "run_records"

@@ -110,6 +110,7 @@ Chunked runs also include chunk prompts, summaries, per-chunk metadata files, an
 
 `MODEL_REQUEST.md` and `METRICS.json` record the chunk line size, token budgets, timeout, endpoint, and model used for the run.
 They also record whether final-only/no-think mode was enabled through `ZTH_DISTILLER_FINAL_ONLY`.
+They record `run_profile` and `run_purpose` labels for separating setup checks from real work. The script infers defaults from mode and token budgets, or you can set them explicitly with `ZTH_DISTILLER_RUN_PROFILE` and `ZTH_DISTILLER_RUN_PURPOSE`.
 When the model endpoint returns OpenAI-style metadata, `METRICS.json` records actual prompt, completion, and total tokens, finish reasons, and timing fields for the session and review-patch calls. If the endpoint does not return usage, the distiller still records estimated tokens from file size.
 
 `METRICS.json` also records passive telemetry for later human review and tuning:
@@ -121,6 +122,7 @@ When the model endpoint returns OpenAI-style metadata, `METRICS.json` records ac
 - Prompt and generation timing fields when the endpoint reports them.
 - Completion cap utilization and completion-to-output-estimate ratios in the metrics advisor.
 - Budget tuning advice such as `raise_session_budget`, `raise_patch_budget`, `consider_lowering_budget`, or `profile_looks_good`.
+- Run labels such as `smoke/connectivity`, `normal/handoff`, `chunked/handoff`, or `custom/tuning`.
 - Elapsed seconds for chunk splitting, chunk summaries, session generation, and review-patch generation.
 - Chunk summary attempt, retry, success, and failure counts.
 - Failure stage when a run exits before completion.
@@ -173,11 +175,18 @@ python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records
 python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --advisor-only --json
 ```
 
+If the latest run was only a connectivity or clipping test, exclude it from normal handoff advice:
+
+```bash
+python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --advisor-only --exclude-purpose connectivity
+```
+
 Flag behavior:
 
 - `--json`: full JSON payload with per-run details.
 - `--advisor-only`: concise text advisory summary.
 - `--advisor-only --json`: concise advisor JSON payload without per-run `runs` details; includes `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, and `confidence_signals`.
+- `--profile`, `--purpose`, and `--exclude-purpose`: filter advisory windows by run labels.
 
 Threshold scenarios:
 
@@ -197,6 +206,8 @@ Use this first on a new machine, new endpoint, or slow model server.
 export ZTH_DISTILLER_SESSION_MAX_TOKENS="320"
 export ZTH_DISTILLER_PATCH_MAX_TOKENS="240"
 export ZTH_DISTILLER_TIMEOUT="240"
+export ZTH_DISTILLER_RUN_PROFILE="smoke"
+export ZTH_DISTILLER_RUN_PURPOSE="connectivity"
 ./scripts/run_context_distiller_head.sh smoke-001 sources/toy_source.txt smoke --compact
 ```
 
@@ -214,6 +225,8 @@ Use this for ordinary notes, short transcripts, or small docs after the smoke pr
 export ZTH_DISTILLER_SESSION_MAX_TOKENS="700"
 export ZTH_DISTILLER_PATCH_MAX_TOKENS="280"
 export ZTH_DISTILLER_TIMEOUT="900"
+export ZTH_DISTILLER_RUN_PROFILE="normal"
+export ZTH_DISTILLER_RUN_PURPOSE="handoff"
 ./scripts/run_context_distiller_head.sh source-001 <SOURCE_FILE> short-title --compact
 ```
 

@@ -21,6 +21,8 @@ SESSION_MAX_TOKENS="${ZTH_DISTILLER_SESSION_MAX_TOKENS:-2200}"
 PATCH_MAX_TOKENS="${ZTH_DISTILLER_PATCH_MAX_TOKENS:-1800}"
 CALL_TIMEOUT="${ZTH_DISTILLER_TIMEOUT:-900}"
 FINAL_ONLY="${ZTH_DISTILLER_FINAL_ONLY:-0}"
+RUN_PROFILE="${ZTH_DISTILLER_RUN_PROFILE:-}"
+RUN_PURPOSE="${ZTH_DISTILLER_RUN_PURPOSE:-}"
 
 case "$FINAL_ONLY" in
   1|true|TRUE|yes|YES)
@@ -45,6 +47,27 @@ CHUNKED_MODE="0"
 if [ "$MODE_ARG" = "--chunked" ] || [ "$MODE_ARG_2" = "--chunked" ] || [ "${ZTH_DISTILLER_CHUNKED:-}" = "1" ]; then
   CHUNKED_MODE="1"
 fi
+
+if [ -z "$RUN_PROFILE" ]; then
+  if [ "$CHUNKED_MODE" = "1" ]; then
+    RUN_PROFILE="chunked"
+  elif [ "$SESSION_MAX_TOKENS" -le 320 ] && [ "$PATCH_MAX_TOKENS" -le 240 ]; then
+    RUN_PROFILE="smoke"
+  elif [ "$SESSION_MAX_TOKENS" -le 900 ] && [ "$PATCH_MAX_TOKENS" -le 700 ]; then
+    RUN_PROFILE="normal"
+  else
+    RUN_PROFILE="custom"
+  fi
+fi
+
+if [ -z "$RUN_PURPOSE" ]; then
+  if [ "$RUN_PROFILE" = "smoke" ]; then
+    RUN_PURPOSE="connectivity"
+  else
+    RUN_PURPOSE="handoff"
+  fi
+fi
+
 CHUNK_COUNT="0"
 RUN_STARTED_AT="$(date -u +%FT%TZ)"
 RUN_START_EPOCH="$(date +%s)"
@@ -217,6 +240,8 @@ write_metrics() {
   "short_title": "${SHORT_TITLE}",
   "compact_mode": "${COMPACT_MODE}",
   "chunked_mode": "${CHUNKED_MODE}",
+  "run_profile": "${RUN_PROFILE}",
+  "run_purpose": "${RUN_PURPOSE}",
   "chunk_line_size": "${CHUNK_LINES}",
   "chunk_count": "${CHUNK_COUNT}",
   "chunk_max_tokens": "${CHUNK_MAX_TOKENS}",
@@ -596,6 +621,8 @@ Source file: ${SOURCE_FILE}
 Short title: ${SHORT_TITLE}
 Compact mode: ${COMPACT_MODE}
 Chunked mode: ${CHUNKED_MODE}
+Run profile: ${RUN_PROFILE}
+Run purpose: ${RUN_PURPOSE}
 Chunk line size: ${CHUNK_LINES}
 Chunk max tokens: ${CHUNK_MAX_TOKENS}
 Session max tokens: ${SESSION_MAX_TOKENS}
