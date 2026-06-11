@@ -115,9 +115,9 @@ python3 local_harness/report_distiller_metrics.py --runs-dir examples --limit 3
 
 This reads sanitized example data under `examples/sample_metrics_run/`. Real distiller runs write their metrics under `outputs/run_records/`.
 
-Use `--json` if you want advisory profile guidance fields (`recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, token-usage summaries, finish reasons, budget-tuning advice, `thresholds`) for read-only tuning support.
+Use `--json` if you want advisory profile guidance fields (`recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, `filters`, token-usage summaries, finish reasons, budget-tuning advice, `thresholds`) for read-only tuning support.
 
-Advisor JSON also includes `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, token-usage summaries, finish reasons, budget-tuning advice, and `confidence_signals` (`recent_completed_count`, `recent_failed_count`, `recent_chunk_retry_count`) when you use `--advisor-only --json`.
+Advisor JSON also includes `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, `filters`, token-usage summaries, finish reasons, budget-tuning advice, and `confidence_signals` (`recent_completed_count`, `recent_failed_count`, `recent_chunk_retry_count`) when you use `--advisor-only --json`.
 
 Use `--advisor-only` for a concise operator handoff summary:
 
@@ -130,7 +130,7 @@ Flag behavior:
 - `--json`: full JSON payload, including per-run details.
 - `--advisor-only`: concise text summary for handoff.
 - `--advisor-only --json`: concise advisor JSON payload without per-run `runs` list.
-- `--profile`, `--purpose`, and `--exclude-purpose`: filter advisory windows by run labels, for example to keep connectivity smoke tests out of handoff tuning decisions.
+- `--profile`, `--purpose`, and `--exclude-purpose`: filter advisory windows by run labels, for example to keep connectivity smoke tests out of handoff tuning decisions. You can repeat these flags or pass comma-separated values.
 
 Example handoff advisor view that excludes endpoint-connectivity smoke runs:
 

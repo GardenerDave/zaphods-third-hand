@@ -142,7 +142,7 @@ python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records
 python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --json
 ```
 
-The JSON output includes `recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, token-usage summaries, and `thresholds` for read-only guidance.
+The JSON output includes `recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, `filters`, token-usage summaries, and `thresholds` for read-only guidance.
 
 You can tune threshold behavior from CLI:
 
@@ -185,8 +185,8 @@ Flag behavior:
 
 - `--json`: full JSON payload with per-run details.
 - `--advisor-only`: concise text advisory summary.
-- `--advisor-only --json`: concise advisor JSON payload without per-run `runs` details; includes `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, and `confidence_signals`.
-- `--profile`, `--purpose`, and `--exclude-purpose`: filter advisory windows by run labels.
+- `--advisor-only --json`: concise advisor JSON payload without per-run `runs` details; includes `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, `filters`, and `confidence_signals`.
+- `--profile`, `--purpose`, and `--exclude-purpose`: filter advisory windows by run labels; flags can be repeated or passed as comma-separated values.
 
 Threshold scenarios:
 

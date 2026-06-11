@@ -165,7 +165,7 @@ For machine-readable output with advisory profile guidance:
 python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --json
 ```
 
-The JSON report includes `recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, and `thresholds`.
+The JSON report includes `recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, `filters`, and `thresholds`.
 
 When token usage is available, the advisor also reports recent-run prompt/completion/total tokens, finish reasons, completion cap utilization, and a `budget_tuning` action. Use that to tune budgets for efficiency before optimizing for speed.
 
@@ -192,8 +192,8 @@ Flag behavior:
 
 - `--json`: full JSON payload, including per-run `runs` details.
 - `--advisor-only`: concise text summary.
-- `--advisor-only --json`: concise advisor JSON payload without per-run `runs` details; includes `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, and `confidence_signals`.
-- `--profile`, `--purpose`, and `--exclude-purpose`: include or exclude runs by `run_profile` and `run_purpose` labels.
+- `--advisor-only --json`: concise advisor JSON payload without per-run `runs` details; includes `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, `filters`, and `confidence_signals`.
+- `--profile`, `--purpose`, and `--exclude-purpose`: include or exclude runs by `run_profile` and `run_purpose` labels; flags can be repeated or passed as comma-separated values.
 
 You can override the chunked recommendation threshold:
 
