@@ -23,6 +23,8 @@ export ZTH_DISTILLER_PATCH_MAX_TOKENS="700"
 export ZTH_DISTILLER_TIMEOUT="600"
 ```
 
+See `docs/CONTEXT_DISTILLER_WORKFLOW.md` for smoke, normal compact, and chunked profile guidance.
+
 Review the generated files under:
 
 ```text

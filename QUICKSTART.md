@@ -90,6 +90,8 @@ Use higher values again for real source distillation when you need more complete
 
 After a run, compare `outputs/run_records/<SOURCE_ID>_<SHORT_TITLE>/METRICS.json` across different settings. It records stage timing, prompt/output sizes, token estimates, retries, and failure stage if the run does not complete.
 
+See `docs/CONTEXT_DISTILLER_WORKFLOW.md` for suggested smoke, normal compact, and chunked profiles.
+
 You can print a recent summary report:
 
 ```bash

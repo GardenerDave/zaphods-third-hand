@@ -118,6 +118,63 @@ outputs/run_records/<SOURCE_ID>_<SHORT_TITLE>/chunk_metrics.tsv
 
 These metrics are evidence only. They do not automatically tune settings or accept generated context.
 
+## Suggested Profiles
+
+Use these as starting points, then adjust from `METRICS.json` and human review.
+
+### Smoke Profile
+
+Use this first on a new machine, new endpoint, or slow model server.
+
+```bash
+export ZTH_DISTILLER_SESSION_MAX_TOKENS="320"
+export ZTH_DISTILLER_PATCH_MAX_TOKENS="240"
+export ZTH_DISTILLER_TIMEOUT="240"
+./scripts/run_context_distiller_head.sh smoke-001 sources/toy_source.txt smoke --compact
+```
+
+Expected use:
+
+- Tiny source file.
+- Compact mode only.
+- Confirms endpoint, model routing, output paths, telemetry, and review-patch generation.
+
+### Normal Compact Profile
+
+Use this for ordinary notes, short transcripts, or small docs after the smoke profile works.
+
+```bash
+export ZTH_DISTILLER_SESSION_MAX_TOKENS="1200"
+export ZTH_DISTILLER_PATCH_MAX_TOKENS="900"
+export ZTH_DISTILLER_TIMEOUT="600"
+./scripts/run_context_distiller_head.sh source-001 <SOURCE_FILE> short-title --compact
+```
+
+Expected use:
+
+- Single source that fits one model call reliably.
+- More complete session summaries than the smoke profile.
+- Good default for CPU-bound or slower backends before trying chunked mode.
+
+### Chunked Profile
+
+Use this only when a source is too long for one reliable compact call.
+
+```bash
+export ZTH_DISTILLER_CHUNK_LINES="200"
+export ZTH_DISTILLER_CHUNK_MAX_TOKENS="600"
+export ZTH_DISTILLER_SESSION_MAX_TOKENS="1200"
+export ZTH_DISTILLER_PATCH_MAX_TOKENS="900"
+export ZTH_DISTILLER_TIMEOUT="900"
+./scripts/run_context_distiller_head.sh source-002 <SOURCE_FILE> long-source --chunked
+```
+
+Expected use:
+
+- Longer transcripts or logs.
+- Multiple model calls: chunk summaries, synthesis, and review patch.
+- Slower than compact mode; watch `chunk_metrics.tsv` and stage timings.
+
 ## Expected Output Paths
 
 ```text
