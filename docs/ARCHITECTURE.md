@@ -16,6 +16,9 @@ The head unit owns:
 
 The model worker only serves inference through an OpenAI-compatible endpoint.
 
+For endpoint setup patterns, see `docs/OPENAI_COMPATIBLE_ENDPOINTS.md`.
+For first-run onboarding, see `docs/FIRST_SUCCESS.md`.
+
 ## Head Unit
 
 The head unit is the machine or environment where you run the repository. It is responsible for:

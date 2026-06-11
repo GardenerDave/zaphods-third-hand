@@ -1,5 +1,9 @@
 # Quickstart
 
+For the shortest onboarding path, use `docs/FIRST_SUCCESS.md` first.
+
+Use this quickstart after that first smoke pass.
+
 ## License Note
 
 Before using this toolkit, confirm your use is noncommercial or obtain written permission for commercial use. See `LICENSE.md` and `COMMERCIAL_USE.md`.
@@ -14,7 +18,7 @@ You need:
 - An OpenAI-compatible chat-completions endpoint.
 - A source transcript or log that is safe for your local environment.
 
-The model endpoint can be local or remote. Zaphod's Third Hand does not include a model server.
+The model endpoint can be local or remote. Zaphod's Third Hand does not include a model server. For endpoint patterns and examples, see `docs/OPENAI_COMPATIBLE_ENDPOINTS.md`.
 
 ## Step 0: Copy Or Clone The Toolkit
 

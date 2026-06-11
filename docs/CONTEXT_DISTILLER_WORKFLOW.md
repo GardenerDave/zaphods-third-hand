@@ -4,6 +4,9 @@
 
 The context distiller turns source transcripts or logs into durable, reviewable project context without treating raw source text as canonical memory.
 
+If you are new, run `docs/FIRST_SUCCESS.md` first.
+For endpoint assumptions and examples, see `docs/OPENAI_COMPATIBLE_ENDPOINTS.md`.
+
 ## Compact Mode
 
 Compact mode asks the model for a concise summary using a fixed structure:

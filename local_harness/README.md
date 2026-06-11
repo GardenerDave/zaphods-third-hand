@@ -130,6 +130,8 @@ For Aider specifically, the main failure modes seen so far were:
 
 The `gemma-local` Aider profile is meant to fail early on the sizing problems, and to make the transport story explicit when a run does go out. It now records `fatal_error_detected`, `connection_error_detected`, `timeout_hint_detected`, `manager_timeout_detected`, `direct_edit_fallback_triggered`, `direct_edit_short_circuit_triggered`, retry counts, prewarm results, manager rerun attempts, direct-edit classification artifacts, and Aider request/event summaries in `METRICS.json`. `AIDER_PREFLIGHT.json` now also records explicit `direct_edit_candidate` eligibility metadata plus `direct_edit_budget_bypass_available` so the manager can see when Aider should be bypassed before launch and when a deterministic route can ignore the Aider token budget entirely.
 
+## Operator Notes
+
 Historical internal run folders are intentionally not included in this public toolkit. Treat the boundaries below as design notes, not bundled evidence.
 
 The wrapper now reports `validated_shape_match` in `AIDER_PREFLIGHT.json` and `METRICS.json` when a run stays inside the current Gemma-local routing heuristic:
@@ -143,6 +145,8 @@ The wrapper now reports `validated_shape_match` in `AIDER_PREFLIGHT.json` and `M
 Treat that as a routing hint, not a guarantee or proven upper bound.
 
 ## Current Boundary
+
+## Historical Notes
 
 The audited runs now show a more useful boundary story:
 

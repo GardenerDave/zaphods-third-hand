@@ -4,6 +4,8 @@
 
 The management-team layer gives a human a structured way to ask different roles for scoped help without letting any role take autonomous control.
 
+Use this layer after you are comfortable with the Context Distiller path, or when you already run packet-based supervised execution and need role-specific decomposition, implementation, and review support.
+
 ## Manager
 
 For:
