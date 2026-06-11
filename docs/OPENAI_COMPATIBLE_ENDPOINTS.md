@@ -1,5 +1,7 @@
 # OpenAI-Compatible Endpoints
 
+Start here: [`README.md`](../README.md) -> [`docs/FIRST_SUCCESS.md`](FIRST_SUCCESS.md).
+
 This repository expects an OpenAI-compatible endpoint for model-backed operations.
 
 It does not install, host, or manage model servers.
@@ -105,6 +107,28 @@ Notes:
 
 - Ensure provider supports compatible chat-completions semantics.
 - Keep secrets out of git-tracked files.
+
+## Known-good local examples
+
+These are practical local patterns used by many setups. Treat them as starting points, not guarantees for every install.
+
+### llama.cpp-style local server
+
+```bash
+./llama-server -m /path/to/model.gguf --host 127.0.0.1 --port 8080
+export ZTH_BASE_URL="http://127.0.0.1:8080/v1"
+export ZTH_MODEL="your-model-name"
+```
+
+### LM Studio local server
+
+Enable Local Server in LM Studio first, then set:
+
+```bash
+export ZTH_BASE_URL="http://127.0.0.1:1234/v1"
+export ZTH_MODEL="your-loaded-model-name"
+```
+
 
 ## Troubleshooting
 

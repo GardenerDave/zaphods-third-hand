@@ -1,5 +1,7 @@
 # Architecture
 
+Start here: [`README.md`](../README.md) -> [`docs/FIRST_SUCCESS.md`](FIRST_SUCCESS.md).
+
 ## Overview
 
 Zaphod's Third Hand separates repository ownership from model inference.
@@ -16,8 +18,8 @@ The head unit owns:
 
 The model worker only serves inference through an OpenAI-compatible endpoint.
 
-For endpoint setup patterns, see `docs/OPENAI_COMPATIBLE_ENDPOINTS.md`.
-For first-run onboarding, see `docs/FIRST_SUCCESS.md`.
+For endpoint setup patterns, see [`docs/OPENAI_COMPATIBLE_ENDPOINTS.md`](OPENAI_COMPATIBLE_ENDPOINTS.md).
+For first-run onboarding, see [`docs/FIRST_SUCCESS.md`](FIRST_SUCCESS.md).
 
 ## Head Unit
 

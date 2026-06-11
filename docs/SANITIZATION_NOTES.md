@@ -1,5 +1,7 @@
 # Sanitization Notes
 
+Start here: [`README.md`](../README.md) -> [`docs/FIRST_SUCCESS.md`](FIRST_SUCCESS.md).
+
 ## What Was Intentionally Excluded
 
 The public package should not include:
@@ -83,7 +85,7 @@ Also inspect:
 - Prompt files.
 - Any generated files.
 
-Use `docs/SHARING_CHECKLIST.md` for a short publication checklist before copying the toolkit into a public repository.
+Use [`docs/SHARING_CHECKLIST.md`](SHARING_CHECKLIST.md) for a short publication checklist before copying the toolkit into a public repository.
 
 ## Review Checklist
 

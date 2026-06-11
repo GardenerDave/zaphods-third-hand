@@ -1,5 +1,7 @@
 # Management-Team Overview
 
+Start here: [`README.md`](../README.md) -> [`docs/FIRST_SUCCESS.md`](FIRST_SUCCESS.md).
+
 ## Purpose
 
 The management-team layer gives a human a structured way to ask different roles for scoped help without letting any role take autonomous control.

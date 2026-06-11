@@ -1,5 +1,7 @@
 # Sharing Checklist
 
+Start here: [`README.md`](../README.md) -> [`docs/FIRST_SUCCESS.md`](FIRST_SUCCESS.md).
+
 Use this checklist before publishing or handing off Zaphod's Third Hand.
 
 ## Private Information

@@ -1,5 +1,7 @@
 # Job Lifecycle
 
+Start here: [`README.md`](../README.md) -> [`docs/FIRST_SUCCESS.md`](FIRST_SUCCESS.md).
+
 ## Purpose
 
 The job lifecycle turns vague work into small, reviewable, auditable steps.

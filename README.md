@@ -18,16 +18,24 @@ Zaphod's Third Hand is a file-based, supervised workflow kit for turning messy s
 
 ## Fastest First Success
 
+| User type | Usable now? |
+|---|---|
+| Has Python/Bash only | Partial: metrics smoke test |
+| Has local OpenAI-compatible endpoint | Yes: Context Distiller |
+| Wants autonomous agent | No |
+| Wants polished app | No |
+| Wants supervised file workflow | Yes |
+
 Start here:
 
-1. `docs/FIRST_SUCCESS.md` for the smallest successful run.
+1. [`docs/FIRST_SUCCESS.md`](docs/FIRST_SUCCESS.md) for the smallest successful run.
 2. Model-free smoke test:
 
 ```bash
 python3 local_harness/report_distiller_metrics.py --runs-dir examples --limit 3
 ```
 
-3. Optional endpoint smoke test and toy distiller run from `docs/FIRST_SUCCESS.md`.
+3. Optional endpoint smoke test and toy distiller run from [`docs/FIRST_SUCCESS.md`](docs/FIRST_SUCCESS.md).
 
 If you are new to this repo, begin with Context Distiller before the management-team layer.
 
@@ -37,7 +45,7 @@ This repo assumes an OpenAI-compatible endpoint for model-backed runs and does n
 
 Supported patterns are documented in:
 
-- `docs/OPENAI_COMPATIBLE_ENDPOINTS.md`
+- [`docs/OPENAI_COMPATIBLE_ENDPOINTS.md`](docs/OPENAI_COMPATIBLE_ENDPOINTS.md)
 
 Common local options include llama.cpp server and LM Studio local server. Generic OpenAI-compatible APIs also work when they expose compatible chat-completions behavior.
 
@@ -55,8 +63,8 @@ Purpose:
 
 Start with:
 
-- `docs/FIRST_SUCCESS.md`
-- `docs/CONTEXT_DISTILLER_WORKFLOW.md`
+- [`docs/FIRST_SUCCESS.md`](docs/FIRST_SUCCESS.md)
+- [`docs/CONTEXT_DISTILLER_WORKFLOW.md`](docs/CONTEXT_DISTILLER_WORKFLOW.md)
 
 ### Layer 2: Supervised Management-Team Workflow
 
@@ -69,9 +77,9 @@ Purpose:
 
 Start with:
 
-- `docs/MANAGEMENT_TEAM_OVERVIEW.md`
-- `workflows/SUPERVISED_MANAGEMENT_TEAM_USAGE_RULES.md`
-- `workflows/MANUAL_JOB_ROUTING_WORKFLOW.md`
+- [`docs/MANAGEMENT_TEAM_OVERVIEW.md`](docs/MANAGEMENT_TEAM_OVERVIEW.md)
+- [`workflows/SUPERVISED_MANAGEMENT_TEAM_USAGE_RULES.md`](workflows/SUPERVISED_MANAGEMENT_TEAM_USAGE_RULES.md)
+- [`workflows/MANUAL_JOB_ROUTING_WORKFLOW.md`](workflows/MANUAL_JOB_ROUTING_WORKFLOW.md)
 
 ## Safety Model
 
@@ -105,7 +113,7 @@ Required for model-backed runs:
 Optional:
 
 - `ZTH_API_KEY`
-- Distiller budget/time/profile variables in `config.example.env`
+- Distiller budget/time/profile variables in [`config.example.env`](config.example.env)
 
 ## Dependency and Installation Notes
 
@@ -128,9 +136,9 @@ These outputs are intentionally file-based and reviewable.
 
 Before sharing or tagging:
 
-- `docs/REPO_HEALTH.md`
-- `docs/ALPHA_READINESS_CHECKLIST.md`
-- `docs/SHARING_CHECKLIST.md`
+- [`docs/REPO_HEALTH.md`](docs/REPO_HEALTH.md)
+- [`docs/ALPHA_READINESS_CHECKLIST.md`](docs/ALPHA_READINESS_CHECKLIST.md)
+- [`docs/SHARING_CHECKLIST.md`](docs/SHARING_CHECKLIST.md)
 
 ## License
 
@@ -140,8 +148,8 @@ Commercial or for-profit use requires explicit written permission.
 
 See:
 
-- `LICENSE.md`
-- `COMMERCIAL_USE.md`
+- [`LICENSE.md`](LICENSE.md)
+- [`COMMERCIAL_USE.md`](COMMERCIAL_USE.md)
 
 ## Contributions
 

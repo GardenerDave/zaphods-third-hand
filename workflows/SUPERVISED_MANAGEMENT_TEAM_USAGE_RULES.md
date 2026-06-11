@@ -1,5 +1,7 @@
 # Supervised Management-Team Usage Rules
 
+Start here: [`README.md`](../README.md) -> [`docs/FIRST_SUCCESS.md`](../docs/FIRST_SUCCESS.md).
+
 ## Purpose
 
 Define how management-team role prompts may be used safely in supervised routed development without approving unattended execution, batching, automation, or broad scaffold creation.

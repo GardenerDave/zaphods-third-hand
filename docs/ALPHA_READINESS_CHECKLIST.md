@@ -1,5 +1,7 @@
 # Alpha Readiness Checklist
 
+Start here: [`README.md`](../README.md) -> [`docs/FIRST_SUCCESS.md`](FIRST_SUCCESS.md).
+
 Use this checklist before tagging or announcing an early Zaphod's Third Hand release.
 
 This is not a promise that the toolkit is production-ready. It is a checkpoint for a supervised, source-available, noncommercial alpha.
@@ -35,8 +37,8 @@ This is not a promise that the toolkit is production-ready. It is a checkpoint f
 - [ ] No private transcripts, source exports, generated runs, review queues, local logs, or cache files are included.
 - [ ] No private LAN IPs, local usernames, private repo paths, API keys, tokens, emails, phone numbers, or private machine names are included.
 - [ ] Any endpoint, model, source, and path examples use placeholders or clearly marked local examples.
-- [ ] `docs/SHARING_CHECKLIST.md` has been reviewed.
-- [ ] `docs/SANITIZATION_NOTES.md` reflects the current extracted package.
+- [ ] [`docs/SHARING_CHECKLIST.md`](SHARING_CHECKLIST.md) has been reviewed.
+- [ ] [`docs/SANITIZATION_NOTES.md`](SANITIZATION_NOTES.md) reflects the current extracted package.
 
 ## Suggested Verification
 

@@ -1,11 +1,13 @@
 # Context Distiller Workflow
 
+Start here: [`README.md`](../README.md) -> [`docs/FIRST_SUCCESS.md`](FIRST_SUCCESS.md).
+
 ## Purpose
 
 The context distiller turns source transcripts or logs into durable, reviewable project context without treating raw source text as canonical memory.
 
-If you are new, run `docs/FIRST_SUCCESS.md` first.
-For endpoint assumptions and examples, see `docs/OPENAI_COMPATIBLE_ENDPOINTS.md`.
+If you are new, run [`docs/FIRST_SUCCESS.md`](FIRST_SUCCESS.md) first.
+For endpoint assumptions and examples, see [`docs/OPENAI_COMPATIBLE_ENDPOINTS.md`](OPENAI_COMPATIBLE_ENDPOINTS.md).
 
 ## Compact Mode
 

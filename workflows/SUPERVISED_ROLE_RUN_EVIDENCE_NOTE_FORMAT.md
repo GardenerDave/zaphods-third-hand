@@ -1,5 +1,7 @@
 # Supervised Role-Run Evidence Note Format
 
+Start here: [`README.md`](../README.md) -> [`docs/FIRST_SUCCESS.md`](../docs/FIRST_SUCCESS.md).
+
 ## Purpose
 
 Define the standard evidence note format for supervised management-team role runs. Role runs remain supervised only, and role output is advisory unless a human accepts it through the job lifecycle.

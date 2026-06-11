@@ -1,5 +1,7 @@
 # Manual Job Routing Workflow
 
+Start here: [`README.md`](../README.md) -> [`docs/FIRST_SUCCESS.md`](../docs/FIRST_SUCCESS.md).
+
 Routing happens before moving a packet from `job_queue/` to `active_jobs/`.
 
 Use the job packet objective, file allowlist, off-limits list, verification commands, and stop conditions to decide who or what should handle the work.

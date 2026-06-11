@@ -1,5 +1,7 @@
 # First Success Guide
 
+Start here: [`README.md`](../README.md).
+
 This guide is the shortest path to a successful first run for a new technical user.
 
 ## Safety Model First
@@ -52,14 +54,19 @@ This confirms your local Python environment can run the distiller reporting tool
 
 Only do this if you have a running OpenAI-compatible endpoint.
 
-Create and load environment config:
+Create a private config file, edit it, then load it:
 
 ```bash
 cp config.example.env config.env
+# Edit config.env now: set real ZTH_BASE_URL and ZTH_MODEL for your endpoint.
 set -a
 source config.env
 set +a
 ```
+
+Do not source `config.example.env` unchanged unless those values already match your real endpoint and model.
+
+If `ZTH_BASE_URL` or `ZTH_MODEL` are blank, placeholder, or incorrect, endpoint smoke tests will fail.
 
 Run a tiny connectivity call:
 
@@ -145,7 +152,8 @@ Minimum success criteria:
 
 If this first run worked, continue with:
 
-- `README.md` for primary workflows.
-- `docs/OPENAI_COMPATIBLE_ENDPOINTS.md` for endpoint patterns.
-- `docs/CONTEXT_DISTILLER_WORKFLOW.md` for profile tuning and advisor usage.
-- `docs/MANAGEMENT_TEAM_OVERVIEW.md` when you are ready for supervised role workflow.
+- [`README.md`](../README.md) for primary workflows.
+- [`config.example.env`](../config.example.env) for environment variable reference.
+- [`docs/OPENAI_COMPATIBLE_ENDPOINTS.md`](OPENAI_COMPATIBLE_ENDPOINTS.md) for endpoint patterns.
+- [`docs/CONTEXT_DISTILLER_WORKFLOW.md`](CONTEXT_DISTILLER_WORKFLOW.md) for profile tuning and advisor usage.
+- [`docs/MANAGEMENT_TEAM_OVERVIEW.md`](MANAGEMENT_TEAM_OVERVIEW.md) when you are ready for supervised role workflow.

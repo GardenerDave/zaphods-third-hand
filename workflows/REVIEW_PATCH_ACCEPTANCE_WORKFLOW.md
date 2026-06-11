@@ -1,5 +1,7 @@
 # Review Patch Acceptance Workflow
 
+Start here: [`README.md`](../README.md) -> [`docs/FIRST_SUCCESS.md`](../docs/FIRST_SUCCESS.md).
+
 ## Purpose
 
 Review context patches, decide whether proposed updates should influence canonical context, and record outcomes manually.

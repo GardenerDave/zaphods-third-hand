@@ -1,5 +1,7 @@
 # Management-Team Status Index
 
+Start here: [`README.md`](../README.md) -> [`docs/FIRST_SUCCESS.md`](../docs/FIRST_SUCCESS.md).
+
 ## Purpose
 
 Provide a concise reference for the management-team system state. This index is descriptive only; it does not automate routing, lifecycle movement, role execution, unattended execution, or batched execution.

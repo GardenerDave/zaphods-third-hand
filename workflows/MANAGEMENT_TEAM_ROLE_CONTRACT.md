@@ -1,5 +1,7 @@
 # Management Team Role Contract
 
+Start here: [`README.md`](../README.md) -> [`docs/FIRST_SUCCESS.md`](../docs/FIRST_SUCCESS.md).
+
 ## Introduction
 
 This document defines the minimal role contract for the management-team layer. It outlines the purpose, allowed outputs, handoff expectations, and must-not-do rules for each role. This contract is not automation, and routing still happens through job packets.
