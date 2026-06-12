@@ -13,7 +13,9 @@ import zth_agent_packet
 import zth_compare_agent_outputs
 
 
-SAMPLE_OUTPUT_ONE = """# Agent One
+SAMPLE_OUTPUT_ONE = """output_contract_version: zth.agent_output.v0.2
+
+# Agent One
 
 ## Decision
 
@@ -58,7 +60,9 @@ Add one focused timeout note.
 """
 
 
-SAMPLE_OUTPUT_TWO = """# Agent Two
+SAMPLE_OUTPUT_TWO = """output_contract_version: zth.agent_output.v0.2
+
+# Agent Two
 
 ## Decision
 
@@ -103,6 +107,52 @@ Add one focused timeout note.
 """
 
 
+SAMPLE_OUTPUT_MISMATCHED_VERSION = """output_contract_version: zth.agent_output.v0.1
+
+# Agent Three
+
+## Decision
+
+Accepted for follow-up
+
+## Summary
+
+Older contract output.
+
+## Files Inspected
+
+- README.md
+
+## Files Changed
+
+- None
+
+## Commands Run
+
+- None
+
+## Evidence
+
+- Legacy format still mostly parseable.
+
+## Assumptions
+
+- None
+
+## Risks
+
+- Contract drift can hide missing fields.
+
+## Confidence
+
+low
+
+## Suggested Next Step
+
+Require v0.2 output.
+"""
+
+
 class ZthAgentPacketTests(unittest.TestCase):
     def test_packet_generation_validates_modes(self):
         with self.assertRaises(ValueError):
@@ -125,6 +175,8 @@ class ZthAgentPacketTests(unittest.TestCase):
             commands=["python3 -m pytest local_harness/tests"],
             risks=["Parser behavior drift"],
             do_not_touch=["outputs/"],
+            token_budget_scope="broad",
+            checkpoint_required=True,
         )
 
         for heading in (
@@ -140,6 +192,10 @@ class ZthAgentPacketTests(unittest.TestCase):
         self.assertIn("one independent external agent", packet)
         self.assertIn("Do not include, rely on, or react to another", packet)
         self.assertIn("agent's conclusions before synthesis/comparison", packet)
+        self.assertIn("## Token Budget / Checkpoint Guidance", packet)
+        self.assertIn("scope: broad", packet)
+        self.assertIn("checkpoint_required: true", packet)
+        self.assertIn("output_contract_version: zth.agent_output.v0.2", packet)
         self.assertIn("- README.md", packet)
 
     def test_packet_cli_stdout_and_output_paths_work(self):
@@ -184,6 +240,25 @@ class ZthAgentPacketTests(unittest.TestCase):
 
 
 class ZthCompareAgentOutputsTests(unittest.TestCase):
+    def test_compare_reports_valid_matching_contract_versions(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            first = Path(temp_dir) / "agent1.md"
+            second = Path(temp_dir) / "agent2.md"
+            first.write_text(SAMPLE_OUTPUT_ONE, encoding="utf-8")
+            second.write_text(SAMPLE_OUTPUT_TWO, encoding="utf-8")
+
+            outputs = [
+                zth_compare_agent_outputs.load_agent_output(first),
+                zth_compare_agent_outputs.load_agent_output(second),
+            ]
+            report = zth_compare_agent_outputs.render_comparison(outputs)
+
+        self.assertIn("output_contract_version: zth.agent_comparison.v0.2", report)
+        self.assertIn("agent1.md: zth.agent_output.v0.2", report)
+        self.assertIn("agent2.md: zth.agent_output.v0.2", report)
+        self.assertIn("## Contract Warnings", report)
+        self.assertIn("- None reported.", report)
+
     def test_compare_detects_missing_required_sections(self):
         output = zth_compare_agent_outputs.AgentOutput(
             path=Path("agent.md"),
@@ -194,6 +269,34 @@ class ZthCompareAgentOutputsTests(unittest.TestCase):
 
         self.assertIn("Summary", missing)
         self.assertIn("Files inspected", missing)
+
+    def test_compare_reports_missing_contract_version(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            first = Path(temp_dir) / "agent1.md"
+            first.write_text("# Agent\n\n## Decision\n\nAccepted\n", encoding="utf-8")
+
+            report = zth_compare_agent_outputs.render_comparison(
+                [zth_compare_agent_outputs.load_agent_output(first)]
+            )
+
+        self.assertIn("agent1.md: missing output_contract_version", report)
+
+    def test_compare_reports_mismatched_contract_versions(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            first = Path(temp_dir) / "agent1.md"
+            second = Path(temp_dir) / "agent3.md"
+            first.write_text(SAMPLE_OUTPUT_ONE, encoding="utf-8")
+            second.write_text(SAMPLE_OUTPUT_MISMATCHED_VERSION, encoding="utf-8")
+
+            report = zth_compare_agent_outputs.render_comparison(
+                [
+                    zth_compare_agent_outputs.load_agent_output(first),
+                    zth_compare_agent_outputs.load_agent_output(second),
+                ]
+            )
+
+        self.assertIn("expected zth.agent_output.v0.2, got zth.agent_output.v0.1", report)
+        self.assertIn("Mismatched output contract versions across agent outputs", report)
 
     def test_compare_reports_files_commands_and_risks_from_two_outputs(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -213,7 +316,26 @@ class ZthCompareAgentOutputsTests(unittest.TestCase):
         self.assertIn("python3 -m pytest local_harness/tests", report)
         self.assertIn("Timeout behavior remains model-dependent.", report)
         self.assertIn("Model aliases can be mismatched.", report)
-        self.assertIn("All agents reported decision: Needs rework", report)
+        self.assertIn("## Cross-Agent Agreement Map", report)
+        self.assertIn("Finding/topic: Decision convergence", report)
+
+    def test_compare_reports_disagreements_for_conflicting_outputs(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            first = Path(temp_dir) / "agent1.md"
+            second = Path(temp_dir) / "agent3.md"
+            first.write_text(SAMPLE_OUTPUT_ONE, encoding="utf-8")
+            second.write_text(SAMPLE_OUTPUT_MISMATCHED_VERSION, encoding="utf-8")
+
+            report = zth_compare_agent_outputs.render_comparison(
+                [
+                    zth_compare_agent_outputs.load_agent_output(first),
+                    zth_compare_agent_outputs.load_agent_output(second),
+                ]
+            )
+
+        self.assertIn("## Disagreements", report)
+        self.assertIn("Conflict topic: Decision", report)
+        self.assertIn("Synthesis resolution: human synthesis required.", report)
 
     def test_compare_cli_stdout_and_output_paths_work(self):
         with tempfile.TemporaryDirectory() as temp_dir:

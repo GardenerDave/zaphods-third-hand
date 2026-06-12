@@ -4,12 +4,15 @@
 from __future__ import annotations
 
 import argparse
+import json
 import textwrap
 from pathlib import Path
 from typing import Iterable, Sequence
 
 
 MODES = ("quick", "standard", "rig")
+TOKEN_BUDGET_SCOPES = ("narrow", "normal", "broad")
+DEFAULT_CHECKPOINT_RULE = "Write findings incrementally after each major finding or every N findings."
 INTRO_TEXT = (
     "This packet is for one independent external agent. ZTH prepares context and evidence; it does "
     "not orchestrate panels or run permanent agents."
@@ -20,6 +23,7 @@ INDEPENDENCE_RULE = (
     "cross-agent conclusions are not."
 )
 OUTPUT_CONTRACT_SECTIONS = (
+    "output_contract_version: zth.agent_output.v0.2",
     "Decision",
     "Summary",
     "Files inspected",
@@ -55,7 +59,7 @@ def bullet_list(values: Sequence[str]) -> str:
 
 
 def paragraph(value: str) -> str:
-    return textwrap.fill(clean_value(value), width=100) + "\n"
+    return textwrap.fill(clean_value(value), width=100, break_on_hyphens=False) + "\n"
 
 
 def render_packet(
@@ -70,11 +74,17 @@ def render_packet(
     commands: Sequence[str] = (),
     risks: Sequence[str] = (),
     do_not_touch: Sequence[str] = (),
+    token_budget_scope: str = "normal",
+    checkpoint_required: bool = False,
+    checkpoint_rule: str = DEFAULT_CHECKPOINT_RULE,
+    max_findings_before_checkpoint: int = 5,
 ) -> str:
     """Return deterministic Markdown for one independent agent role packet."""
 
     if mode not in MODES:
         raise ValueError(f"mode must be one of: {', '.join(MODES)}")
+    if token_budget_scope not in TOKEN_BUDGET_SCOPES:
+        raise ValueError(f"token_budget_scope must be one of: {', '.join(TOKEN_BUDGET_SCOPES)}")
 
     files = clean_values(files)
     constraints = clean_values(constraints)
@@ -106,6 +116,14 @@ def render_packet(
         f"{bullet_list(commands)}\n"
         "## Do-Not-Touch Areas\n\n"
         f"{bullet_list(do_not_touch)}\n"
+        "## Token Budget / Checkpoint Guidance\n\n"
+        "```yaml\n"
+        "token_budget_guidance:\n"
+        f"  scope: {token_budget_scope}\n"
+        f"  checkpoint_required: {str(checkpoint_required).lower()}\n"
+        f"  checkpoint_rule: {json.dumps(clean_value(checkpoint_rule))}\n"
+        f"  max_findings_before_checkpoint: {max_findings_before_checkpoint}\n"
+        "```\n\n"
         "## Independence Rule\n\n"
         f"{paragraph(INDEPENDENCE_RULE)}\n"
         "## Required Output Contract\n\n"
@@ -141,6 +159,28 @@ def build_parser() -> argparse.ArgumentParser:
         default=[],
         help="Areas the agent must not touch.",
     )
+    parser.add_argument(
+        "--token-budget-scope",
+        choices=TOKEN_BUDGET_SCOPES,
+        default="normal",
+        help="Expected context/output scope for this agent.",
+    )
+    parser.add_argument(
+        "--checkpoint-required",
+        action="store_true",
+        help="Require incremental checkpoint writing for this agent.",
+    )
+    parser.add_argument(
+        "--checkpoint-rule",
+        default=DEFAULT_CHECKPOINT_RULE,
+        help="Rule the agent should follow when checkpointing broad findings.",
+    )
+    parser.add_argument(
+        "--max-findings-before-checkpoint",
+        type=int,
+        default=5,
+        help="Maximum findings before the agent writes an intermediate checkpoint.",
+    )
     parser.add_argument("--output", help="Optional output path. Omit to print to stdout.")
     return parser
 
@@ -158,6 +198,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         commands=flatten(args.commands),
         risks=flatten(args.risks),
         do_not_touch=flatten(args.do_not_touch),
+        token_budget_scope=args.token_budget_scope,
+        checkpoint_required=args.checkpoint_required,
+        checkpoint_rule=args.checkpoint_rule,
+        max_findings_before_checkpoint=args.max_findings_before_checkpoint,
     )
 
     if args.output:

@@ -50,9 +50,28 @@ red-team reviewer, synthesis agent.>
 - <path or area>
 - <path or area>
 
+## Token Budget / Checkpoint Guidance
+
+```yaml
+token_budget_guidance:
+  scope: narrow|normal|broad
+  checkpoint_required: true|false
+  checkpoint_rule: "Write findings incrementally after each major finding or every N findings."
+  max_findings_before_checkpoint: 5
+```
+
+For broad roles, require checkpoints so useful findings are written before a model runs out of
+budget or spends too long planning.
+
 ## Required Output Contract
 
 Return your final response using `docs/prompts/AGENT_OUTPUT_CONTRACT.md`.
+
+Required metadata:
+
+```yaml
+output_contract_version: zth.agent_output.v0.2
+```
 
 ## Independence Rule
 

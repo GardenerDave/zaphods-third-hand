@@ -10,6 +10,7 @@ This folder contains the manager-side helper scripts for supervised local-worker
   preflight safeguards, can prewarm the endpoint, and records command output plus debug artifacts.
 - `zth_agent_packet.py`: generates one independent role/context packet for an external agent.
 - `zth_compare_agent_outputs.py`: compares completed external-agent outputs that follow the ZTH contract.
+- `zth_coverage_auditor.py`: reports obvious pre-synthesis coverage areas and blind spots.
 
 ## Internal Modules
 

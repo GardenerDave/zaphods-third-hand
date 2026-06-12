@@ -3,6 +3,14 @@
 Use this format when returning work from one independent external agent. Keep the headings intact so
 `local_harness/zth_compare_agent_outputs.py` can compare multiple outputs.
 
+Every agent output must declare the contract version before the first heading. The version lets
+comparison and synthesis tools detect format drift across agents. Missing or mismatched versions
+should be treated as contract warnings until a human decides compatibility.
+
+Template starts here:
+
+output_contract_version: zth.agent_output.v0.2
+
 ## Decision
 
 <Accepted for follow-up | Needs rework | Blocked | No action recommended>
@@ -48,6 +56,8 @@ Use this format when returning work from one independent external agent. Keep th
 <Anything useful for a later synthesis or human review step.>
 
 ## Example
+
+output_contract_version: zth.agent_output.v0.2
 
 ## Decision
 

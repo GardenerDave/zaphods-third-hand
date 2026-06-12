@@ -41,8 +41,9 @@ This keeps parallel reviewers from anchoring on each other and makes disagreemen
 3. The packet is handed to one external agent.
 4. The agent works independently and returns output using `docs/prompts/AGENT_OUTPUT_CONTRACT.md`.
 5. Repeat for other independent agents, using only shared source-of-truth context.
-6. ZTH compares completed outputs with `local_harness/zth_compare_agent_outputs.py`.
-7. A human or external orchestrator decides what follow-up work, if any, should happen.
+6. Optionally run `local_harness/zth_coverage_auditor.py` before synthesis to expose blind spots.
+7. ZTH compares completed outputs with `local_harness/zth_compare_agent_outputs.py`.
+8. A human or external orchestrator decides what follow-up work, if any, should happen.
 
 ## Suggested Modes
 
@@ -51,6 +52,33 @@ This keeps parallel reviewers from anchoring on each other and makes disagreemen
 - `rig`: high-risk architecture, refactor, safety, security, or release decisions.
 
 The mode is a communication contract. It does not grant autonomy or bypass human review.
+
+## Contract Versioning
+
+Every completed agent output should declare:
+
+```yaml
+output_contract_version: zth.agent_output.v0.2
+```
+
+The comparison utility reports missing or mismatched versions as contract warnings. This keeps
+format drift visible before synthesis relies on incompatible outputs.
+
+## Token Budget And Checkpoints
+
+Role packets can include checkpoint guidance:
+
+```yaml
+token_budget_guidance:
+  scope: narrow|normal|broad
+  checkpoint_required: true|false
+  checkpoint_rule: "Write findings incrementally after each major finding or every N findings."
+  max_findings_before_checkpoint: 5
+```
+
+Use `broad` and `checkpoint_required: true` for roles such as functional/UX testing, red-team review,
+large documentation audits, or any task likely to produce many findings. The goal is to get durable
+intermediate findings written before the model runs out of budget or spends too long planning.
 
 ## Example Roles
 
@@ -83,6 +111,15 @@ Compare completed outputs:
 ```bash
 python3 local_harness/zth_compare_agent_outputs.py agent1.md agent2.md agent3.md
 ```
+
+Audit planned packets or completed outputs for obvious coverage blind spots:
+
+```bash
+python3 local_harness/zth_coverage_auditor.py packet1.md packet2.md agent-output.md
+```
+
+Use `docs/prompts/SYNTHESIS_OUTPUT_TEMPLATE.md` and `docs/prompts/AGREEMENT_MAP_TEMPLATE.md` when
+turning independent outputs into a human-reviewed synthesis.
 
 ## Non-Goals
 
