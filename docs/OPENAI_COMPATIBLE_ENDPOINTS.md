@@ -8,7 +8,8 @@ It does not install, host, or manage model servers.
 
 ## What "OpenAI-compatible endpoint" means here
 
-For this toolkit, an endpoint is considered compatible when it accepts a chat-completions style request at a URL under your configured base, typically:
+For this toolkit, an endpoint is considered compatible when it accepts a chat-completions style request
+at a URL under your configured base, typically:
 
 - `<BASE_URL>/chat/completions` when base includes `/v1`
 
@@ -99,9 +100,9 @@ Notes:
 - Confirm the loaded model id in LM Studio server UI/API.
 - Run the same `icm_call.py` smoke test before distiller runs.
 
-## Example: PowerEdge multi-port local stack
+## Advanced operator example: PowerEdge multi-port local stack
 
-Example mapping pattern for a single host exposing multiple models:
+This is an operator pattern for a single host exposing multiple models. It is not the main beginner path.
 
 ```bash
 export POWEREDGE_IP="192.168.1.13"
@@ -148,28 +149,6 @@ Notes:
 
 - Ensure provider supports compatible chat-completions semantics.
 - Keep secrets out of git-tracked files.
-
-## Known-good local examples
-
-These are practical local patterns used by many setups. Treat them as starting points, not guarantees for every install.
-
-### llama.cpp-style local server
-
-```bash
-./llama-server -m /path/to/model.gguf --host 127.0.0.1 --port 8080
-export ZTH_BASE_URL="http://127.0.0.1:8080/v1"
-export ZTH_MODEL="your-model-name"
-```
-
-### LM Studio local server
-
-Enable Local Server in LM Studio first, then set:
-
-```bash
-export ZTH_BASE_URL="http://127.0.0.1:1234/v1"
-export ZTH_MODEL="your-loaded-model-name"
-```
-
 
 ## Troubleshooting
 

@@ -1,6 +1,7 @@
 # Zaphod's Third Hand
 
-Zaphod's Third Hand is a file-based, supervised workflow kit for turning messy source material into reviewable context and running scoped AI role workflows without giving models direct control of your repository.
+Zaphod's Third Hand is a file-based, supervised workflow kit for turning messy source material into
+reviewable context and running scoped AI role workflows without giving models direct control of your repository.
 
 ## What It Is
 
@@ -47,7 +48,8 @@ Supported patterns are documented in:
 
 - [`docs/OPENAI_COMPATIBLE_ENDPOINTS.md`](docs/OPENAI_COMPATIBLE_ENDPOINTS.md)
 
-Common local options include llama.cpp server and LM Studio local server. Generic OpenAI-compatible APIs also work when they expose compatible chat-completions behavior.
+Common local options include llama.cpp server and LM Studio local server.
+Generic OpenAI-compatible APIs also work when they expose compatible chat-completions behavior.
 
 ## Two Product Layers
 
@@ -144,6 +146,9 @@ Before sharing or tagging:
 - [`docs/REPO_HEALTH.md`](docs/REPO_HEALTH.md)
 - [`docs/ALPHA_READINESS_CHECKLIST.md`](docs/ALPHA_READINESS_CHECKLIST.md)
 - [`docs/SHARING_CHECKLIST.md`](docs/SHARING_CHECKLIST.md)
+
+Advanced supervised Aider runs are documented in [`docs/AIDER_FIRST_SUCCESS.md`](docs/AIDER_FIRST_SUCCESS.md).
+Complete the Context Distiller first-success path before using that workflow.
 
 ## License
 
