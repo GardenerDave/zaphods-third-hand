@@ -54,19 +54,19 @@ This confirms your local Python environment can run the distiller reporting tool
 
 Only do this if you have a running OpenAI-compatible endpoint.
 
-Create a private config file, edit it, then load it:
+Create a private config file, edit it first, then load it:
 
 ```bash
 cp config.example.env config.env
-# Edit config.env now: set real ZTH_BASE_URL and ZTH_MODEL for your endpoint.
+# Edit config.env first: set real ZTH_BASE_URL and ZTH_MODEL for your endpoint.
 set -a
 source config.env
 set +a
 ```
 
-Do not source `config.example.env` unchanged unless those values already match your real endpoint and model.
+`ZTH_BASE_URL` and `ZTH_MODEL` must match your actual running endpoint and accepted model id.
 
-If `ZTH_BASE_URL` or `ZTH_MODEL` are blank, placeholder, or incorrect, endpoint smoke tests will fail.
+If you source placeholder values unchanged, endpoint smoke tests will fail.
 
 Run a tiny connectivity call:
 
@@ -86,6 +86,35 @@ Expected result:
 - Response contains `ok`.
 
 If this fails, fix endpoint URL/model/auth before running the context distiller.
+
+### Optional: First full model-backed run
+
+Use this short path after you have edited and sourced `config.env`:
+
+```bash
+set -a
+source config.env
+set +a
+python3 local_harness/icm_call.py handoff \
+  --api openai-chat \
+  --base-url "$ZTH_BASE_URL" \
+  --model "$ZTH_MODEL" \
+  --max-tokens 16 \
+  --timeout 60 \
+  --final-only \
+  "Reply with exactly: ok"
+mkdir -p sources
+printf 'Decision: keep role runs supervised. Next action: write a small job packet.\n' > sources/toy_source.txt
+export ZTH_DISTILLER_SESSION_MAX_TOKENS="320"
+export ZTH_DISTILLER_PATCH_MAX_TOKENS="240"
+export ZTH_DISTILLER_TIMEOUT="240"
+export ZTH_DISTILLER_RUN_PROFILE="smoke"
+export ZTH_DISTILLER_RUN_PURPOSE="connectivity"
+./scripts/run_context_distiller_head.sh toy-001 sources/toy_source.txt toy-source --compact
+ls -1 outputs/sessions outputs/review_patches outputs/run_records
+```
+
+Success here means files are generated under `outputs/` for human review. Generated outputs are not automatically accepted.
 
 ## 4) Context Distiller toy input
 

@@ -96,14 +96,19 @@ All generated files remain review material until a human accepts follow-up work.
 
 ## Setup and Config
 
-Copy and load config:
+Copy config, edit it first, then load it:
 
 ```bash
 cp config.example.env config.env
+# Edit config.env first: set real ZTH_BASE_URL and ZTH_MODEL for your endpoint.
 set -a
 source config.env
 set +a
 ```
+
+`ZTH_BASE_URL` and `ZTH_MODEL` must match your actual running endpoint and accepted model id.
+
+If you source placeholder values unchanged, endpoint smoke tests will fail.
 
 Required for model-backed runs:
 

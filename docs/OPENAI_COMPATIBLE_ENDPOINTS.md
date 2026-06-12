@@ -63,16 +63,18 @@ python3 local_harness/icm_call.py handoff \
 
 ## Example: llama.cpp server
 
-Typical local pattern:
+Example pattern (may vary by build and launch options):
 
 ```bash
+./llama-server -m /path/to/model.gguf --host 127.0.0.1 --port 8080
 export ZTH_BASE_URL="http://127.0.0.1:8080/v1"
-export ZTH_MODEL="<LLAMA_CPP_MODEL_ID>"
+export ZTH_MODEL="your-model-name"
 ```
 
 Notes:
 
 - Keep `/v1` in base URL for OpenAI-style paths.
+- Model id must match what your server exposes.
 - If endpoint/model tends to return reasoning-heavy outputs, distiller runs can use:
 
 ```bash
@@ -81,11 +83,13 @@ export ZTH_DISTILLER_FINAL_ONLY="1"
 
 ## Example: LM Studio local server
 
+You must start or enable the LM Studio Local Server first. This repo does not launch LM Studio or start its server.
+
 Typical local pattern:
 
 ```bash
 export ZTH_BASE_URL="http://127.0.0.1:1234/v1"
-export ZTH_MODEL="<LM_STUDIO_MODEL_ID>"
+export ZTH_MODEL="your-loaded-model-name"
 ```
 
 Notes:
