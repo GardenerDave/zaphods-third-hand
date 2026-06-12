@@ -91,6 +91,7 @@ Purpose:
 
 - Prepare role-specific packets for external multi-agent or panel systems.
 - Keep agents independent until synthesis/comparison.
+- Surface contract drift, agreement maps, disagreements, and coverage blind spots before synthesis.
 - Compare completed agent outputs without turning ZTH into an orchestrator.
 
 Start with:
@@ -98,6 +99,8 @@ Start with:
 - [`docs/AGENT_ADAPTER.md`](docs/AGENT_ADAPTER.md)
 - [`docs/prompts/ROLE_PACKET_TEMPLATE.md`](docs/prompts/ROLE_PACKET_TEMPLATE.md)
 - [`docs/prompts/AGENT_OUTPUT_CONTRACT.md`](docs/prompts/AGENT_OUTPUT_CONTRACT.md)
+- [`docs/prompts/SYNTHESIS_OUTPUT_TEMPLATE.md`](docs/prompts/SYNTHESIS_OUTPUT_TEMPLATE.md)
+- [`docs/prompts/AGREEMENT_MAP_TEMPLATE.md`](docs/prompts/AGREEMENT_MAP_TEMPLATE.md)
 
 ## Safety Model
 

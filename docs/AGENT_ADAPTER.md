@@ -121,6 +121,13 @@ python3 local_harness/zth_coverage_auditor.py packet1.md packet2.md agent-output
 Use `docs/prompts/SYNTHESIS_OUTPUT_TEMPLATE.md` and `docs/prompts/AGREEMENT_MAP_TEMPLATE.md` when
 turning independent outputs into a human-reviewed synthesis.
 
+Recommended v0.2 sequence:
+
+1. Generate independent role packets.
+2. Run the coverage auditor before synthesis.
+3. Compare completed outputs for contract drift, agreement maps, and disagreements.
+4. Write synthesis with explicit disagreement resolution and human follow-up.
+
 ## Non-Goals
 
 - No built-in multi-agent scheduler.

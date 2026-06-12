@@ -132,7 +132,8 @@ Treat the short smoke test as connection validation first, then tune prompt shap
 relying on richer outputs.
 
 For a tiny supervised Aider smoke path, see [`docs/AIDER_FIRST_SUCCESS.md`](../docs/AIDER_FIRST_SUCCESS.md).
-For external agent packet/comparison tools, see [`docs/AGENT_ADAPTER.md`](../docs/AGENT_ADAPTER.md).
+For external agent packet, comparison, and coverage tools, see
+[`docs/AGENT_ADAPTER.md`](../docs/AGENT_ADAPTER.md).
 
 If Aider runs time out, reduce read payload and prompt size first:
 
