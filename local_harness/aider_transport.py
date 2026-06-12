@@ -24,6 +24,7 @@ def build_aider_command(args: Any, prompt_path: Path, read_paths: Sequence[str])
         str(args.map_tokens),
         "--no-auto-commits",
         "--no-dirty-commits",
+        "--no-gitignore",
         "--yes-always",
         "--message-file",
         str(prompt_path),

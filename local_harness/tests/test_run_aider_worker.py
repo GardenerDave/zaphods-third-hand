@@ -65,6 +65,7 @@ class RunAiderWorkerTests(unittest.TestCase):
             self.assertIn("--message-file", called_command)
             self.assertIn("--no-auto-commits", called_command)
             self.assertIn("--no-dirty-commits", called_command)
+            self.assertIn("--no-gitignore", called_command)
             self.assertIn("--no-stream", called_command)
             self.assertIn("--openai-api-base", called_command)
             self.assertIn("http://localhost:8083/v1", called_command)

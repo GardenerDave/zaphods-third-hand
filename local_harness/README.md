@@ -8,6 +8,8 @@ This folder contains the manager-side helper scripts for supervised local-worker
 - `run_single_worker.py`: executes one audited single-worker run folder and writes `OUTPUT.md` plus `METRICS.json`.
 - `run_aider_worker.py`: executes one audited Aider task from `MODEL_REQUEST.md`, adds Gemma-local
   preflight safeguards, can prewarm the endpoint, and records command output plus debug artifacts.
+- `zth_agent_packet.py`: generates one independent role/context packet for an external agent.
+- `zth_compare_agent_outputs.py`: compares completed external-agent outputs that follow the ZTH contract.
 
 ## Internal Modules
 
@@ -119,6 +121,7 @@ writes `AIDER_PREWARM.json` when prewarm is enabled, captures `AIDER_REQUEST.jso
 `AIDER_EVENTS.jsonl`, archives per-attempt artifacts under `00_aider_attempts/`, writes combined
 stdout/stderr to `OUTPUT.md`, records run metadata in `METRICS.json`, and preserves the usual
 `REVIEW.md` plus `ACCEPTED.md` manager checkpoints.
+It also passes `--no-gitignore` so Aider does not modify `.gitignore` during supervised smoke runs.
 
 ## Endpoint Note
 
@@ -128,6 +131,7 @@ Treat the short smoke test as connection validation first, then tune prompt shap
 relying on richer outputs.
 
 For a tiny supervised Aider smoke path, see [`docs/AIDER_FIRST_SUCCESS.md`](../docs/AIDER_FIRST_SUCCESS.md).
+For external agent packet/comparison tools, see [`docs/AGENT_ADAPTER.md`](../docs/AGENT_ADAPTER.md).
 
 If Aider runs time out, reduce read payload and prompt size first:
 
@@ -137,5 +141,6 @@ If Aider runs time out, reduce read payload and prompt size first:
 ```
 
 When using remote OpenAI-compatible backends with Aider, prefer `--model openai/<MODEL_ID>` so provider resolution remains explicit.
+Treat endpoint prewarm as connectivity evidence only; slower local backends can still time out on the full Aider edit request.
 
 For operator notes and historical boundary details, see [`docs/OPERATOR_NOTES.md`](../docs/OPERATOR_NOTES.md).

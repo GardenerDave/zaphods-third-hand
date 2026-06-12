@@ -44,7 +44,8 @@ For Aider specifically, the main failure modes seen so far were:
 - Long silent runs that ended in timeout.
 - Cold-endpoint retry loops that surface as `OpenAIException - Connection error` from the Aider/LiteLLM path before a later success.
 - False connection failures when the run is executed inside the Codex sandbox, because the sandbox cannot reliably reach the local endpoint.
-- Editable target paths under gitignored locations (for example `sources/`) can be skipped by Aider unless `--no-gitignore` is used.
+- The wrapper passes `--no-gitignore` so editable target paths under ignored scratch locations are not
+  skipped and Aider does not add `.aider*` to `.gitignore`.
 - Some runtimes respond better to plain smoke prompts than `--final-only` hints; retrying without `--final-only` can recover fast connectivity checks.
 
 The `gemma-local` Aider profile is meant to fail early on the sizing problems, and to make the transport story explicit when a run does go out. It now records `fatal_error_detected`, `connection_error_detected`, `timeout_hint_detected`, `manager_timeout_detected`, `direct_edit_fallback_triggered`, `direct_edit_short_circuit_triggered`, retry counts, prewarm results, manager rerun attempts, direct-edit classification artifacts, and Aider request/event summaries in `METRICS.json`. `AIDER_PREFLIGHT.json` now also records explicit `direct_edit_candidate` eligibility metadata plus `direct_edit_budget_bypass_available` so the manager can see when Aider should be bypassed before launch and when a deterministic route can ignore the Aider token budget entirely.

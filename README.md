@@ -83,6 +83,22 @@ Start with:
 - [`workflows/SUPERVISED_MANAGEMENT_TEAM_USAGE_RULES.md`](workflows/SUPERVISED_MANAGEMENT_TEAM_USAGE_RULES.md)
 - [`workflows/MANUAL_JOB_ROUTING_WORKFLOW.md`](workflows/MANUAL_JOB_ROUTING_WORKFLOW.md)
 
+### Advanced: External Agent Adapter
+
+Use this only after the Context Distiller path is clear.
+
+Purpose:
+
+- Prepare role-specific packets for external multi-agent or panel systems.
+- Keep agents independent until synthesis/comparison.
+- Compare completed agent outputs without turning ZTH into an orchestrator.
+
+Start with:
+
+- [`docs/AGENT_ADAPTER.md`](docs/AGENT_ADAPTER.md)
+- [`docs/prompts/ROLE_PACKET_TEMPLATE.md`](docs/prompts/ROLE_PACKET_TEMPLATE.md)
+- [`docs/prompts/AGENT_OUTPUT_CONTRACT.md`](docs/prompts/AGENT_OUTPUT_CONTRACT.md)
+
 ## Safety Model
 
 Default safety posture:

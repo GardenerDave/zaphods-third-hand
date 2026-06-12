@@ -95,6 +95,8 @@ If preflight says the prompt or read payload is too large, stop and reduce scope
 
 Use your actual endpoint and model values. For Aider/litellm, the model usually needs an explicit
 provider prefix such as `openai/<MODEL_ID>`.
+Endpoint prewarm proves connectivity only. On slower local backends, Aider can still time out during
+the real edit request even when prewarm returns `ok`.
 
 ```bash
 python3 local_harness/run_aider_worker.py \
@@ -137,6 +139,7 @@ Do not promote or commit the result until a human decides the edit is acceptable
 ## What Success Looks Like
 
 - Preflight completes and shows a small prompt/read payload.
+- Endpoint prewarm succeeds, if enabled.
 - Aider edits only `scratch/aider_smoke_note.txt`.
 - The diff is one harmless sentence or similarly tiny wording change.
 - The run folder contains reviewable request, output, metrics, review, and acceptance artifacts.
@@ -147,6 +150,7 @@ Do not promote or commit the result until a human decides the edit is acceptable
 
 - Endpoint timeout:
   - Confirm the server is running, increase `--timeout`, or reduce the prompt/read payload.
+  - Treat successful prewarm as a connectivity check, not a guarantee the full Aider edit will finish.
 - Model alias mismatch:
   - Use the exact model id from the endpoint and include the provider prefix, for example `openai/<MODEL_ID>`.
 - Prompt/read payload too large:
@@ -155,6 +159,9 @@ Do not promote or commit the result until a human decides the edit is acceptable
   - Install Aider or pass the correct `--aider-python /path/to/aider/python`.
 - Generated edit is low quality:
   - Reject it in review notes and keep the output as evidence. Do not broaden the task to compensate.
+- `.gitignore` changes appear:
+  - The wrapper passes `--no-gitignore` to Aider. If you run Aider manually, include that flag or review
+    and revert any unintended `.gitignore` edits.
 
 This guide is not a recommendation for broad autonomous coding. Use Aider only for tiny, supervised,
 explicitly scoped edits until you have stronger local evidence.
