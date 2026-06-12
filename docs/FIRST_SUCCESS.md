@@ -81,6 +81,8 @@ python3 local_harness/icm_call.py handoff \
   "Reply with exactly: ok"
 ```
 
+If this times out on your endpoint, retry once without `--final-only`.
+
 Expected result:
 
 - Response contains `ok`.

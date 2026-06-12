@@ -61,6 +61,8 @@ python3 local_harness/icm_call.py handoff \
   "Reply with exactly: ok"
 ```
 
+If this times out on your endpoint, retry without `--final-only` before deeper debugging.
+
 ## Example: llama.cpp server
 
 Example pattern (may vary by build and launch options):
@@ -96,6 +98,41 @@ Notes:
 
 - Confirm the loaded model id in LM Studio server UI/API.
 - Run the same `icm_call.py` smoke test before distiller runs.
+
+## Example: PowerEdge multi-port local stack
+
+Example mapping pattern for a single host exposing multiple models:
+
+```bash
+export POWEREDGE_IP="192.168.1.13"
+# Deep 32B
+export ZTH_DEEP_BASE_URL="http://${POWEREDGE_IP}:8080/v1"
+# Coder 7B
+export ZTH_CODER_BASE_URL="http://${POWEREDGE_IP}:8081/v1"
+# Router 3B
+export ZTH_ROUTER_BASE_URL="http://${POWEREDGE_IP}:8082/v1"
+# Handoff 7B
+export ZTH_HANDOFF_BASE_URL="http://${POWEREDGE_IP}:8083/v1"
+# Gemma 12B
+export ZTH_GEMMA12_BASE_URL="http://${POWEREDGE_IP}:8084/v1"
+# Gemma E4B
+export ZTH_GEMMAE4B_BASE_URL="http://${POWEREDGE_IP}:8085/v1"
+```
+
+For this repo's primary single-endpoint path, set one active pair:
+
+```bash
+export ZTH_BASE_URL="http://${POWEREDGE_IP}:8081/v1"
+export ZTH_MODEL="Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M"
+```
+
+Validate model listing first:
+
+```bash
+python3 local_harness/icm_call.py handoff \
+  --base-url "$ZTH_BASE_URL" \
+  --list-models
+```
 
 ## Example: Generic OpenAI-compatible API
 
@@ -142,5 +179,7 @@ export ZTH_MODEL="your-loaded-model-name"
   - Missing/invalid API key or auth policy mismatch.
 - Empty/low-value content on smoke call:
   - Try `--final-only` and smaller requests first.
+- Smoke call timeout with `--final-only`:
+  - Retry without `--final-only`; some runtimes respond faster to plain prompts.
 - Distiller fails but smoke call works:
   - Lower distiller token budgets and verify timeout settings in `config.example.env`.

@@ -78,6 +78,21 @@ python3 local_harness/run_aider_worker.py \
   local_harness/run_aider_worker.py
 ```
 
+Run a supervised Aider task against a remote OpenAI-compatible endpoint:
+
+```text
+python3 local_harness/run_aider_worker.py \
+  outputs/agent_runs/example-aider-remote \
+  --aider-python /home/<USER>/.local/share/uv/tools/aider-chat/bin/python \
+  --openai-api-base http://<SERVER-IP>:8081/v1 \
+  --model openai/<MODEL_ID> \
+  --timeout 360 \
+  --read README.md \
+  --read-head-lines 20 \
+  --compact-request-max-chars 700 \
+  smoke_aider_note.txt
+```
+
 Use preflight first when a task looks even slightly large:
 
 ```text
@@ -94,5 +109,14 @@ This wrapper reads the Aider prompt from `MODEL_REQUEST.md`, writes the effectiv
 ## Endpoint Note
 
 Some OpenAI-compatible local runtimes can return cleaner final content when `--final-only` is used. Broader prompts may still spend the token budget inside hidden reasoning fields or long internal planning. Treat the short smoke test as connection validation first, then tune prompt shape and token budget before relying on richer outputs.
+
+If Aider runs time out, reduce read payload and prompt size first:
+
+```text
+--read-head-lines 20
+--compact-request-max-chars 700
+```
+
+When using remote OpenAI-compatible backends with Aider, prefer `--model openai/<MODEL_ID>` so provider resolution remains explicit.
 
 For operator notes and historical boundary details, see [`docs/OPERATOR_NOTES.md`](../docs/OPERATOR_NOTES.md).
