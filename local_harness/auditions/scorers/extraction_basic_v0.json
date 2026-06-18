@@ -1,0 +1,32 @@
+{
+  "profile_id": "extraction_basic_v0",
+  "metrics": [
+    {
+      "id": "completed",
+      "type": "completion",
+      "weight": 0.10
+    },
+    {
+      "id": "json_parse",
+      "type": "json_parse",
+      "weight": 0.20
+    },
+    {
+      "id": "required_keys",
+      "type": "required_keys",
+      "weight": 0.20,
+      "keys": ["signals"]
+    },
+    {
+      "id": "expected_contains",
+      "type": "expected_contains",
+      "weight": 0.35
+    },
+    {
+      "id": "runtime",
+      "type": "runtime",
+      "weight": 0.15,
+      "target_seconds": 60
+    }
+  ]
+}
