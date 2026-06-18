@@ -1,0 +1,67 @@
+# ZTH Reports
+
+Reports are durable evidence snapshots.
+
+They preserve selected results from local runs, model auditions, comparisons, audits, and review passes so they can be inspected later without rerunning the original workflow.
+
+## In Plain English
+
+A report is the part of a run that was worth keeping.
+
+Most ZTH run output is local evidence. It may live under `.work/` or another generated-output directory while you inspect it. If a result is useful for future comparison, review, or project history, copy or summarize it here.
+
+Reports should help answer:
+
+- What was tested?
+- What inputs or configs were used?
+- What did the system produce?
+- What failed?
+- What looked promising?
+- What should a human inspect next?
+
+## What Belongs Here
+
+Good report candidates include:
+
+- model audition comparison reports;
+- capability cards selected for long-term comparison;
+- review summaries;
+- audit findings;
+- regression snapshots;
+- notable failure analyses;
+- human-readable summaries of important local runs.
+
+## What Does Not Belong Here
+
+Do not use `docs/reports/` for:
+
+- raw scratch output from every run;
+- large temporary logs;
+- secrets, API keys, or private credentials;
+- unreviewed model output that should stay local;
+- production role assignments.
+
+A report can describe generated output, but it should not pretend generated output is accepted truth.
+
+## Report Rules
+
+Reports should be:
+
+- human-readable;
+- file-based;
+- dated or otherwise traceable;
+- honest about failure modes;
+- clear about what was measured;
+- clear about what was not measured.
+
+Reports should not claim that a model, prompt, workflow, or agent role is production-ready unless a separate human review process has accepted that conclusion.
+
+## Current Report Areas
+
+- `model_auditions/` — model audition cards and comparison reports.
+
+## Safety Reminder
+
+Reports are evidence.
+
+They support human review, comparison, and future decision-making. They do not automatically move generated context into canonical project memory, assign model roles, or approve code changes.
