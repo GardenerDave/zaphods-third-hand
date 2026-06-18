@@ -324,3 +324,129 @@ def test_limit_and_case_id_filter(tmp_path: Path) -> None:
 
     assert len(rows) == 1
     assert rows[0]["case_id"] == "route_002"
+
+
+def test_model_registry_loads_model_id_base_url_and_default_api_key(tmp_path: Path) -> None:
+    files = make_audition_files(tmp_path)
+    model_file = tmp_path / "models" / "fake_model.json"
+    write_json(
+        model_file,
+        {
+            "model_ref": "fake_local",
+            "model_id": "fake-model-from-registry",
+            "base_url": "http://127.0.0.1:9999/v1",
+            "api_key_default": "registry-default-key",
+        },
+    )
+
+    parser = build_arg_parser()
+    args = parser.parse_args(
+        [
+            "--model",
+            str(model_file),
+            "--suite",
+            str(files["suite"]),
+            "--out-dir",
+            str(tmp_path / "out"),
+        ]
+    )
+
+    config = build_config_from_args(args)
+
+    assert config.model_id == "fake-model-from-registry"
+    assert config.base_url == "http://127.0.0.1:9999/v1"
+    assert config.api_key == "registry-default-key"
+
+
+def test_explicit_model_args_override_registry(tmp_path: Path) -> None:
+    files = make_audition_files(tmp_path)
+    model_file = tmp_path / "models" / "fake_model.json"
+    write_json(
+        model_file,
+        {
+            "model_ref": "fake_local",
+            "model_id": "registry-model",
+            "base_url": "http://127.0.0.1:9999/v1",
+            "api_key_default": "registry-default-key",
+        },
+    )
+
+    parser = build_arg_parser()
+    args = parser.parse_args(
+        [
+            "--model",
+            str(model_file),
+            "--model-id",
+            "explicit-model",
+            "--base-url",
+            "http://127.0.0.1:1111/v1",
+            "--api-key",
+            "explicit-key",
+            "--suite",
+            str(files["suite"]),
+            "--out-dir",
+            str(tmp_path / "out"),
+        ]
+    )
+
+    config = build_config_from_args(args)
+
+    assert config.model_id == "explicit-model"
+    assert config.base_url == "http://127.0.0.1:1111/v1"
+    assert config.api_key == "explicit-key"
+
+
+def test_model_registry_api_key_env_beats_default(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    files = make_audition_files(tmp_path)
+    monkeypatch.setenv("ZTH_TEST_AUDITION_KEY", "env-key")
+
+    model_file = tmp_path / "models" / "fake_model.json"
+    write_json(
+        model_file,
+        {
+            "model_ref": "fake_local",
+            "model_id": "registry-model",
+            "base_url": "http://127.0.0.1:9999/v1",
+            "api_key_env": "ZTH_TEST_AUDITION_KEY",
+            "api_key_default": "registry-default-key",
+        },
+    )
+
+    parser = build_arg_parser()
+    args = parser.parse_args(
+        [
+            "--model",
+            str(model_file),
+            "--suite",
+            str(files["suite"]),
+            "--out-dir",
+            str(tmp_path / "out"),
+        ]
+    )
+
+    config = build_config_from_args(args)
+
+    assert config.api_key == "env-key"
+
+
+def test_metadata_json_prompt_replacement(tmp_path: Path) -> None:
+    files = make_audition_files(tmp_path)
+    files["prompt"].write_text(
+        "Metadata:\n{{metadata_json}}\nInput:\n{{input}}\n",
+        encoding="utf-8",
+    )
+
+    config = config_for(tmp_path, files)
+
+    run_audition(config, client=fake_client)
+
+    rendered = (
+        config.out_dir / "rendered_prompts" / "route_001.md"
+    ).read_text(encoding="utf-8")
+
+    assert '"case_id"' not in rendered
+    assert "Metadata:" in rendered
+    assert "{}" in rendered

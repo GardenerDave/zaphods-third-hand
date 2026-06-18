@@ -144,6 +144,67 @@ def _expected_field_match_metric(
     )
 
 
+
+def _flatten_json_strings(value: Any) -> list[str]:
+    """Collect searchable string values from nested JSON-like data."""
+
+    strings: list[str] = []
+
+    if isinstance(value, str):
+        strings.append(value)
+    elif isinstance(value, dict):
+        for key, nested in value.items():
+            strings.append(str(key))
+            strings.extend(_flatten_json_strings(nested))
+    elif isinstance(value, list):
+        for nested in value:
+            strings.extend(_flatten_json_strings(nested))
+    elif value is not None:
+        strings.append(str(value))
+
+    return strings
+
+
+def _expected_contains_metric(
+    *,
+    fixture: dict[str, Any],
+    model_text: str,
+) -> tuple[float, dict[str, Any], list[str]]:
+    expected = fixture.get("expected") or {}
+    required_terms = []
+
+    if isinstance(expected, dict):
+        raw_terms = expected.get("required_terms", [])
+        if isinstance(raw_terms, list):
+            required_terms = [str(term) for term in raw_terms]
+        elif raw_terms:
+            required_terms = [str(raw_terms)]
+
+    if not required_terms:
+        return 1.0, {"required_terms": [], "note": "no required terms"}, []
+
+    parsed, _error = _parse_json_from_text(model_text)
+    searchable_parts = [model_text]
+
+    if parsed is not None:
+        searchable_parts.extend(_flatten_json_strings(parsed))
+
+    haystack = "\n".join(searchable_parts).lower()
+
+    found = [term for term in required_terms if term.lower() in haystack]
+    missing = [term for term in required_terms if term.lower() not in haystack]
+    score = len(found) / len(required_terms)
+
+    return (
+        score,
+        {
+            "required_terms": required_terms,
+            "found_terms": found,
+            "missing_terms": missing,
+        },
+        [] if score == 1.0 else ["expected_contains_missing"],
+    )
+
 def _runtime_metric(
     *,
     runtime: dict[str, Any],
@@ -218,6 +279,11 @@ def score_case(
             score, details, failures = _runtime_metric(
                 runtime=runtime,
                 target_seconds=float(metric.get("target_seconds", 60)),
+            )
+        elif metric_type == "expected_contains":
+            score, details, failures = _expected_contains_metric(
+                fixture=fixture,
+                model_text=model_text,
             )
         else:
             score = 0.0

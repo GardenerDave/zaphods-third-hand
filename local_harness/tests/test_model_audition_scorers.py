@@ -174,3 +174,34 @@ def test_score_case_weighted_overall() -> None:
 
     assert result["overall"] == 1.0
     assert result["failure_modes"] == []
+
+
+def test_expected_contains_scorer() -> None:
+    result = score_case(
+        fixture={
+            "case_id": "code_001",
+            "task_type": "code_patch_plan",
+            "expected": {
+                "required_terms": ["empty", "return"],
+            },
+        },
+        model_text='{"diagnosis": "empty input path", "patch_summary": "return early"}',
+        scorer_profile={
+            "profile_id": "test",
+            "metrics": [
+                {
+                    "id": "expected_contains",
+                    "type": "expected_contains",
+                    "weight": 1.0,
+                },
+            ],
+        },
+        runtime={"wall_time_seconds": 1.0},
+    )
+
+    assert result["overall"] == 1.0
+    assert result["metrics"]["expected_contains"]["details"]["found_terms"] == [
+        "empty",
+        "return",
+    ]
+    assert result["failure_modes"] == []

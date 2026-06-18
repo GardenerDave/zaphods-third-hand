@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import statistics
 import sys
 import time
@@ -13,6 +14,9 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
+
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from local_harness.model_audition_scorers import score_case
 
@@ -116,6 +120,11 @@ def render_prompt(template: str, fixture: dict[str, Any]) -> str:
             indent=2,
             sort_keys=True,
         ),
+        "{{metadata_json}}": json.dumps(
+            fixture.get("metadata", {}),
+            indent=2,
+            sort_keys=True,
+        ),
     }
 
     rendered = template
@@ -168,10 +177,39 @@ def default_chat_completion_client(
     return json.loads(payload)
 
 
+def resolve_api_key(
+    *,
+    explicit_api_key: str | None,
+    model_config: dict[str, Any],
+) -> str:
+    if explicit_api_key:
+        return explicit_api_key
+
+    api_key_env = model_config.get("api_key_env")
+    if api_key_env:
+        env_value = os.environ.get(str(api_key_env))
+        if env_value:
+            return env_value
+
+    return str(model_config.get("api_key_default", ""))
+
+
 def build_config_from_args(args: argparse.Namespace) -> AuditionConfig:
     suite_file = resolve_cli_path(args.suite)
     suite_config = load_json(suite_file)
     defaults = suite_config.get("defaults", {})
+
+    model_config: dict[str, Any] = {}
+    if args.model:
+        model_config = load_json(resolve_cli_path(args.model))
+
+    model_id = args.model_id or model_config.get("model_id")
+    base_url = args.base_url or model_config.get("base_url")
+
+    if not model_id:
+        raise ValueError("--model-id is required unless provided by --model")
+    if not base_url:
+        raise ValueError("--base-url is required unless provided by --model")
 
     prompt_file = (
         resolve_cli_path(args.prompt_file)
@@ -193,9 +231,12 @@ def build_config_from_args(args: argparse.Namespace) -> AuditionConfig:
 
     return AuditionConfig(
         run_id=run_id,
-        model_id=args.model_id,
-        base_url=args.base_url,
-        api_key=args.api_key or "",
+        model_id=str(model_id),
+        base_url=str(base_url),
+        api_key=resolve_api_key(
+            explicit_api_key=args.api_key,
+            model_config=model_config,
+        ),
         suite_id=suite_config["suite_id"],
         suite_file=suite_file,
         prompt_file=prompt_file,
@@ -566,12 +607,13 @@ def run_audition(
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
 
-    parser.add_argument("--model-id", required=True)
-    parser.add_argument("--base-url", required=True)
+    parser.add_argument("--model")
+    parser.add_argument("--model-id")
+    parser.add_argument("--base-url")
     parser.add_argument("--suite", required=True)
     parser.add_argument("--out-dir", required=True)
 
-    parser.add_argument("--api-key", default="")
+    parser.add_argument("--api-key")
     parser.add_argument("--prompt-file")
     parser.add_argument("--fixtures-file")
     parser.add_argument("--scorer-profile")
