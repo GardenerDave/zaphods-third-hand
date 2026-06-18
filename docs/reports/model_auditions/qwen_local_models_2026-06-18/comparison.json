@@ -1,0 +1,112 @@
+{
+  "card_count": 3,
+  "created_at": "2026-06-18T05:14:09+00:00",
+  "failure_mode_summary": {
+    "expected_contains_missing": [
+      "Qwen/Qwen2.5-3B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M"
+    ]
+  },
+  "input_cards": [
+    "/home/navigator/agent-workspace/zaphods-third-hand/.work/model_auditions/qwen25_3b_full_board_smoke/board_capability_card.json",
+    "/home/navigator/agent-workspace/zaphods-third-hand/.work/model_auditions/qwen25_coder7b_full_board_smoke/board_capability_card.json",
+    "/home/navigator/agent-workspace/zaphods-third-hand/.work/model_auditions/qwen25_7b_instruct_full_board_smoke/board_capability_card.json"
+  ],
+  "metric_rankings": {
+    "completed": [
+      "Qwen/Qwen2.5-3B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M"
+    ],
+    "expected_contains": [
+      "Qwen/Qwen2.5-3B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M"
+    ],
+    "expected_field_match": [
+      "Qwen/Qwen2.5-3B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M"
+    ],
+    "json_parse": [
+      "Qwen/Qwen2.5-3B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M"
+    ],
+    "required_keys": [
+      "Qwen/Qwen2.5-3B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M"
+    ],
+    "runtime": [
+      "Qwen/Qwen2.5-3B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M"
+    ]
+  },
+  "models": [
+    {
+      "board_id": "local_baseline_board_v0",
+      "model_id": "Qwen/Qwen2.5-3B-Instruct-GGUF:Q4_K_M",
+      "overall": 0.990625,
+      "run_id": "qwen25_3b_full_board_smoke"
+    },
+    {
+      "board_id": "local_baseline_board_v0",
+      "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M",
+      "overall": 0.98125,
+      "run_id": "qwen25_coder7b_full_board_smoke"
+    },
+    {
+      "board_id": "local_baseline_board_v0",
+      "model_id": "Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M",
+      "overall": 0.9715277777777778,
+      "run_id": "qwen25_7b_instruct_full_board_smoke"
+    }
+  ],
+  "rankings": {
+    "baseline_micro_v0": [
+      "Qwen/Qwen2.5-3B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M"
+    ],
+    "coding_micro_v0": [
+      "Qwen/Qwen2.5-3B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M"
+    ],
+    "extraction_micro_v0": [
+      "Qwen/Qwen2.5-3B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M"
+    ],
+    "overall": [
+      "Qwen/Qwen2.5-3B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M"
+    ],
+    "routing_micro_v0": [
+      "Qwen/Qwen2.5-3B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M",
+      "Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M"
+    ]
+  },
+  "runtime": [
+    {
+      "median_case_wall_time_seconds": 22.356950249999997,
+      "model_id": "Qwen/Qwen2.5-3B-Instruct-GGUF:Q4_K_M",
+      "total_wall_time_seconds": 359.724827
+    },
+    {
+      "median_case_wall_time_seconds": 23.9488785,
+      "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M",
+      "total_wall_time_seconds": 367.39968799999997
+    },
+    {
+      "median_case_wall_time_seconds": 26.8718515,
+      "model_id": "Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M",
+      "total_wall_time_seconds": 403.221242
+    }
+  ]
+}

@@ -38,3 +38,7 @@ __pycache__/
 .aider.tags.cache.v4/
 _aider-chat/
 conversation.txt
+
+# Local run outputs and operator-specific model configs
+.work/
+local_harness/auditions/models/qwen25_coder7b_q4_local.json

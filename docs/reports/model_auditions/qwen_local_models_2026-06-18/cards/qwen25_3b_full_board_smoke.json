@@ -1,0 +1,31 @@
+{
+  "board_id": "local_baseline_board_v0",
+  "failure_modes": [
+    "expected_contains_missing"
+  ],
+  "metric_averages": {
+    "completed": 1.0,
+    "expected_contains": 0.9722222222222222,
+    "expected_field_match": 1.0,
+    "json_parse": 1.0,
+    "required_keys": 1.0,
+    "runtime": 1.0
+  },
+  "model_id": "Qwen/Qwen2.5-3B-Instruct-GGUF:Q4_K_M",
+  "overall": 0.990625,
+  "role_fit": {
+    "note": "Role eligibility is derived by later MTNG/ZTH policy layers.",
+    "status": "not_evaluated"
+  },
+  "run_id": "qwen25_3b_full_board_smoke",
+  "runtime": {
+    "median_case_wall_time_seconds": 22.356950249999997,
+    "total_wall_time_seconds": 359.724827
+  },
+  "suite_scores": {
+    "baseline_micro_v0": 0.9625,
+    "coding_micro_v0": 1.0,
+    "extraction_micro_v0": 1.0,
+    "routing_micro_v0": 1.0
+  }
+}
