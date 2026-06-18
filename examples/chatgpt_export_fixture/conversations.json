@@ -1,0 +1,77 @@
+[
+  {
+    "id": "conv_synthetic_001",
+    "title": "Synthetic Export Fixture",
+    "create_time": 1710000000.0,
+    "update_time": 1710000060.0,
+    "current_node": "node-assistant-1",
+    "mapping": {
+      "node-root": {
+        "id": "node-root",
+        "parent": null,
+        "children": [
+          "node-system-1"
+        ],
+        "message": null
+      },
+      "node-system-1": {
+        "id": "node-system-1",
+        "parent": "node-root",
+        "children": [
+          "node-user-1"
+        ],
+        "message": {
+          "id": "msg-system-1",
+          "author": {
+            "role": "system"
+          },
+          "create_time": 1710000001.0,
+          "content": {
+            "content_type": "text",
+            "parts": [
+              "Synthetic system setup that should be skipped."
+            ]
+          }
+        }
+      },
+      "node-user-1": {
+        "id": "node-user-1",
+        "parent": "node-system-1",
+        "children": [
+          "node-assistant-1"
+        ],
+        "message": {
+          "id": "msg-user-1",
+          "author": {
+            "role": "user"
+          },
+          "create_time": 1710000005.0,
+          "content": {
+            "content_type": "text",
+            "parts": [
+              "Please summarize the synthetic project note."
+            ]
+          }
+        }
+      },
+      "node-assistant-1": {
+        "id": "node-assistant-1",
+        "parent": "node-user-1",
+        "children": [],
+        "message": {
+          "id": "msg-assistant-1",
+          "author": {
+            "role": "assistant"
+          },
+          "create_time": 1710000060.0,
+          "content": {
+            "content_type": "text",
+            "parts": [
+              "The synthetic note says to keep generated files reviewable."
+            ]
+          }
+        }
+      }
+    }
+  }
+]
