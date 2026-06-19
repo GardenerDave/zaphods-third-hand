@@ -95,12 +95,20 @@ what gets committed.
 
 ## OpenAI-Compatible Endpoint Requirement
 
-This repo assumes an OpenAI-compatible endpoint for model-backed runs. It does
-not install or manage a model server.
+Core ZTH workflows expect an existing OpenAI-compatible endpoint for
+model-backed runs. They connect to an endpoint supplied by the operator and do
+not manage its production lifecycle.
+
+The optional small-model audition harness can download candidate GGUFs and
+start or stop temporary local llama.cpp servers for exploratory evaluation.
+That lifecycle support is evidence-gathering tooling, not a hosted service,
+production model-server manager, promotion mechanism, or production-readiness
+claim.
 
 Supported patterns are documented in:
 
 - [`docs/OPENAI_COMPATIBLE_ENDPOINTS.md`](docs/OPENAI_COMPATIBLE_ENDPOINTS.md)
+- [`local_harness/model_auditions/README.md`](local_harness/model_auditions/README.md) for optional exploratory GGUF and temporary llama.cpp lifecycle support
 
 Common local options include llama.cpp server and LM Studio local server.
 Generic OpenAI-compatible APIs also work when they expose compatible
@@ -138,6 +146,7 @@ Purpose:
 Start with:
 
 - [`local_harness/auditions/README.md`](local_harness/auditions/README.md)
+- [`local_harness/model_auditions/README.md`](local_harness/model_auditions/README.md) for optional small-model download and temporary local-server support
 - [`docs/reports/model_auditions/qwen_local_models_2026-06-18/comparison.md`](docs/reports/model_auditions/qwen_local_models_2026-06-18/comparison.md)
 
 ### Layer 3: Supervised Management-Team Workflow
