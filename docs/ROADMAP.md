@@ -17,13 +17,13 @@ The metaphor does not imply autonomous control. ZTH is meant to add external wor
 - Source preservation and SHA-256 evidence for imported preflight data.
 - `preflight_capability_manifest.json` as a conservative ZTH-owned preflight summary.
 - Optional OKF-style markdown export for preflight evidence.
+- Preflight regression comparison from canonical capability manifests.
 - Direct audition preflight gate through `run_model_audition.py`.
 - Board audition preflight gate through `run_model_audition_board.py`.
 - Human-review boundary: a preflight pass permits an audition to run; it does not promote, approve, rank, or assign a model.
 
 ## Next
 
-- Preflight regression comparison.
 - Operator convenience flow for the full import → manifest → gated audition chain.
 - Real local endpoint smoke run using actual LLM-probe output.
 - Public-facing docs polish after the flow stabilizes.

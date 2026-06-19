@@ -272,6 +272,72 @@ audition fields, conservative capability-manifest status rules, fail-closed
 input handling, unchanged JSON import behavior, YAML adaptation, and the CLI
 paths.
 
+## Preflight Regression Comparison
+
+`local_harness/llm_probe_preflight_compare.py` compares two canonical
+`preflight_capability_manifest.json` files and writes plain-file evidence for
+human review. The manifests are the only source of truth for this comparison;
+the tool does not read OKF exports, hardware reports, audition outputs, or model
+endpoints.
+
+Run a comparison:
+
+```bash
+python3 local_harness/llm_probe_preflight_compare.py \
+  --previous-manifest /path/to/previous/preflight_capability_manifest.json \
+  --latest-manifest /path/to/latest/preflight_capability_manifest.json \
+  --out-dir /path/to/preflight-comparison
+```
+
+The output is:
+
+```text
+<out-dir>/
+  source/
+    previous_preflight_capability_manifest.json
+    latest_preflight_capability_manifest.json
+  preflight_comparison.json
+  preflight_comparison.md
+```
+
+Both input manifests are validated before the output directory is created and
+are then preserved byte-for-byte under `source/`. The JSON and Markdown reports
+record their manifest SHA-256 values, source run identities, source SHA-256
+values, formats, schemas, aggregate status-count changes, observed model/probe
+ID set changes, and valid/invalid record-count changes.
+
+Overall status transitions are classified conservatively:
+
+- `unchanged` when both overall statuses are equal;
+- `regression` for `pass → intermittent`, `pass → fail`,
+  `intermittent → fail`, or any known status changing to `unknown`;
+- `improvement` for `fail → intermittent`, `fail → pass`, or
+  `intermittent → pass`;
+- `resolved_unknown` for `unknown` changing to `pass`, `intermittent`, or
+  `fail`.
+
+`resolved_unknown` means that the evidence became more definite. It does not
+necessarily mean that model capability improved.
+
+The capability manifest is aggregate-only. It has no per-model/per-probe status
+map, so this comparison cannot claim that a specific model/probe pair regressed
+or improved. Aggregate `status_counts` retain the importer observation statuses
+`pass`, `warn`, `fail`, `error`, and `skipped`; overall `intermittent` and
+`unknown` are not invented as observation-count categories.
+
+Comparison output uses
+`output_contract_version: zth.llm_probe_preflight_comparison.v0.1`,
+`scope: preflight_comparison_only`, `promotion_performed: false`, and
+`requires_human_review: true`. It performs no ranking, audition, promotion,
+role assignment, lifecycle authorization, or production-readiness assessment.
+
+Run its focused tests:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -p no:cacheprovider \
+  local_harness/tests/test_llm_probe_preflight_compare.py
+```
+
 ## Optional OKF-Style Export
 
 `local_harness/llm_probe_preflight_okf_export.py` can convert one completed

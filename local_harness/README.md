@@ -9,6 +9,7 @@ This folder contains the manager-side helper scripts for supervised local-worker
 - `run_aider_worker.py`: executes one audited Aider task from `MODEL_REQUEST.md`, adds Gemma-local
   preflight safeguards, can prewarm the endpoint, and records command output plus debug artifacts.
 - `llm_probe_preflight_ingest.py`: imports versioned LLM-probe JSON as preflight-only plain-file evidence; see [`docs/LLM_PROBE_PREFLIGHT.md`](../docs/LLM_PROBE_PREFLIGHT.md).
+- `llm_probe_preflight_compare.py`: compares two canonical preflight capability manifests and writes aggregate, human-reviewable regression evidence; see [`docs/LLM_PROBE_PREFLIGHT.md`](../docs/LLM_PROBE_PREFLIGHT.md).
 - `model_auditions/`: optional exploratory small-model harness that can download candidate GGUFs, manage temporary local llama.cpp tmux sessions, or call existing local/LAN OpenAI-compatible endpoints; see [`model_auditions/README.md`](model_auditions/README.md).
 - `zth_agent_packet.py`: generates one independent role/context packet for an external agent.
 - `zth_compare_agent_outputs.py`: compares completed external-agent outputs that follow the ZTH contract.
