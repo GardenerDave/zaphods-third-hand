@@ -35,7 +35,7 @@ The preflight importer does not:
 - assign role fit or gate roles;
 - create model-registry entries or audition commands;
 - promote, approve, or select a model;
-- export OKF data;
+- require OKF export for internal operation;
 - execute LLM-probe or contact a provider.
 
 Preflight observations are evidence to inspect, not authorization for later
@@ -271,6 +271,52 @@ invalid-record capture, factual summary counts, contract fields, forbidden
 audition fields, conservative capability-manifest status rules, fail-closed
 input handling, unchanged JSON import behavior, YAML adaptation, and the CLI
 paths.
+
+## Optional OKF-Style Export
+
+`local_harness/llm_probe_preflight_okf_export.py` can convert one completed
+preflight import directory into an optional linked Markdown bundle with YAML
+frontmatter.
+
+The export:
+
+- reads the existing preflight files without modifying them;
+- verifies required files, contract fields, source SHA-256, and record counts;
+- writes provider, model, run, bundle-index, and export-log concepts;
+- remains plain-file evidence for human review;
+- is not required for importer or ZTH internal operation;
+- does not become the source of truth;
+- does not run LLM-probe;
+- does not promote, rank, gate, or audition models.
+
+Export a completed preflight directory:
+
+```bash
+python3 local_harness/llm_probe_preflight_okf_export.py \
+  --preflight-dir "$tmpdir/preflight" \
+  --out-dir "$tmpdir/okf/model-preflight"
+```
+
+The output shape is:
+
+```text
+<out-dir>/
+  index.md
+  log.md
+  providers/
+    index.md
+    <provider-slug>.md
+  models/
+    index.md
+    <model-slug>.md
+  runs/
+    index.md
+    <run-slug>.md
+```
+
+Every Markdown file carries the preflight contract boundary in a namespaced
+`zth` frontmatter object, including `scope: preflight_only` and
+`promotion_performed: false`. Links inside the bundle are relative.
 
 ## Separation From Model Auditions
 
