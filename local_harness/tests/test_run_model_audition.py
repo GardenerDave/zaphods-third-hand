@@ -27,6 +27,28 @@ def write_jsonl(path: Path, rows: list[dict]) -> None:
     )
 
 
+def write_preflight_manifest(path: Path, status: str) -> None:
+    write_json(
+        path,
+        {
+            "output_contract_version": "zth.llm_probe_preflight.v0.1",
+            "scope": "preflight_only",
+            "promotion_performed": False,
+            "requires_human_review": True,
+            "source_sha256": "synthetic-source-sha256",
+            "source_run_id": "synthetic-preflight-run",
+            "input_format": "llm_probe_verified_yaml",
+            "input_schema_version": "llm_probe.verified_yaml.v1",
+            "model_ids_observed": ["fake-model"],
+            "probe_ids_observed": ["synthetic-probe"],
+            "status_counts": {status: 1},
+            "valid_record_count": 1,
+            "invalid_record_count": 0,
+            "preflight_status": status,
+        },
+    )
+
+
 def make_audition_files(tmp_path: Path) -> dict[str, Path]:
     root = tmp_path / "auditions"
 
@@ -214,6 +236,7 @@ def test_runner_writes_metadata(tmp_path: Path) -> None:
     assert metadata["model_id"] == "fake-model"
     assert metadata["suite_id"] == "baseline_suite_v0"
     assert metadata["runner"] == "local_harness/run_model_audition.py"
+    assert "preflight_gate" not in metadata
 
 
 def test_runner_writes_case_manifest(tmp_path: Path) -> None:
@@ -450,3 +473,257 @@ def test_metadata_json_prompt_replacement(tmp_path: Path) -> None:
     assert '"case_id"' not in rendered
     assert "Metadata:" in rendered
     assert "{}" in rendered
+
+
+def test_pass_preflight_manifest_allows_audition_and_records_gate(
+    tmp_path: Path,
+) -> None:
+    files = make_audition_files(tmp_path)
+    manifest_path = tmp_path / "preflight_capability_manifest.json"
+    write_preflight_manifest(manifest_path, "pass")
+    base = config_for(tmp_path, files)
+    config = AuditionConfig(
+        **{
+            **base.__dict__,
+            "preflight_manifest": manifest_path,
+        }
+    )
+
+    run_audition(config, client=fake_client)
+    metadata = load_json(config.out_dir / "run_metadata.json")
+
+    assert metadata["preflight_gate"]["decision"] == "allowed"
+    assert metadata["preflight_gate"]["basis"] == "preflight_pass"
+    assert metadata["preflight_gate"]["preflight_status"] == "pass"
+    assert "promotion_performed" not in metadata
+
+
+def test_intermittent_preflight_blocks_by_default(tmp_path: Path) -> None:
+    files = make_audition_files(tmp_path)
+    manifest_path = tmp_path / "preflight_capability_manifest.json"
+    write_preflight_manifest(manifest_path, "intermittent")
+    base = config_for(tmp_path, files)
+    config = AuditionConfig(
+        **{
+            **base.__dict__,
+            "preflight_manifest": manifest_path,
+        }
+    )
+
+    with pytest.raises(ValueError, match="status=intermittent"):
+        run_audition(config, client=fake_client)
+
+    assert not config.out_dir.exists()
+
+
+def test_intermittent_preflight_allows_explicit_override(
+    tmp_path: Path,
+) -> None:
+    files = make_audition_files(tmp_path)
+    manifest_path = tmp_path / "preflight_capability_manifest.json"
+    write_preflight_manifest(manifest_path, "intermittent")
+    base = config_for(tmp_path, files)
+    config = AuditionConfig(
+        **{
+            **base.__dict__,
+            "preflight_manifest": manifest_path,
+            "allow_intermittent_preflight": True,
+        }
+    )
+
+    run_audition(config, client=fake_client)
+    gate = load_json(config.out_dir / "run_metadata.json")["preflight_gate"]
+
+    assert gate["basis"] == "allow_intermittent_preflight"
+    assert gate["overrides"]["allow_intermittent_preflight"] is True
+
+
+def test_unknown_preflight_blocks_by_default(tmp_path: Path) -> None:
+    files = make_audition_files(tmp_path)
+    manifest_path = tmp_path / "preflight_capability_manifest.json"
+    write_preflight_manifest(manifest_path, "unknown")
+    base = config_for(tmp_path, files)
+    config = AuditionConfig(
+        **{
+            **base.__dict__,
+            "preflight_manifest": manifest_path,
+        }
+    )
+
+    with pytest.raises(ValueError, match="status=unknown"):
+        run_audition(config, client=fake_client)
+
+    assert not config.out_dir.exists()
+
+
+def test_unknown_preflight_allows_explicit_override(tmp_path: Path) -> None:
+    files = make_audition_files(tmp_path)
+    manifest_path = tmp_path / "preflight_capability_manifest.json"
+    write_preflight_manifest(manifest_path, "unknown")
+    base = config_for(tmp_path, files)
+    config = AuditionConfig(
+        **{
+            **base.__dict__,
+            "preflight_manifest": manifest_path,
+            "allow_unknown_preflight": True,
+        }
+    )
+
+    run_audition(config, client=fake_client)
+    gate = load_json(config.out_dir / "run_metadata.json")["preflight_gate"]
+
+    assert gate["basis"] == "allow_unknown_preflight"
+    assert gate["overrides"]["allow_unknown_preflight"] is True
+
+
+def test_failed_preflight_only_allows_human_waiver(tmp_path: Path) -> None:
+    files = make_audition_files(tmp_path)
+    manifest_path = tmp_path / "preflight_capability_manifest.json"
+    write_preflight_manifest(manifest_path, "fail")
+    base = config_for(tmp_path, files)
+    blocked_config = AuditionConfig(
+        **{
+            **base.__dict__,
+            "preflight_manifest": manifest_path,
+            "allow_intermittent_preflight": True,
+            "allow_unknown_preflight": True,
+        }
+    )
+
+    with pytest.raises(ValueError, match="status=fail"):
+        run_audition(blocked_config, client=fake_client)
+    assert not blocked_config.out_dir.exists()
+
+    waiver_reason = "Human approved a constrained diagnostic audition."
+    waived_config = AuditionConfig(
+        **{
+            **base.__dict__,
+            "preflight_manifest": manifest_path,
+            "waive_preflight": waiver_reason,
+        }
+    )
+    run_audition(waived_config, client=fake_client)
+    gate = load_json(
+        waived_config.out_dir / "run_metadata.json"
+    )["preflight_gate"]
+
+    assert gate["basis"] == "waiver"
+    assert gate["overrides"]["waiver_reason"] == waiver_reason
+    assert "promotion_performed" not in gate
+
+
+@pytest.mark.parametrize(
+    "manifest",
+    [
+        {"scope": "preflight_only"},
+        {
+            "scope": "wrong_scope",
+            "promotion_performed": False,
+            "requires_human_review": True,
+            "preflight_status": "pass",
+        },
+        {
+            "scope": "preflight_only",
+            "promotion_performed": True,
+            "requires_human_review": True,
+            "preflight_status": "pass",
+        },
+        {
+            "scope": "preflight_only",
+            "promotion_performed": False,
+            "requires_human_review": False,
+            "preflight_status": "pass",
+        },
+        {
+            "scope": "preflight_only",
+            "promotion_performed": False,
+            "requires_human_review": True,
+            "preflight_status": "unexpected",
+        },
+    ],
+)
+def test_malformed_preflight_manifest_fails_closed(
+    tmp_path: Path,
+    manifest: dict,
+) -> None:
+    files = make_audition_files(tmp_path)
+    manifest_path = tmp_path / "preflight_capability_manifest.json"
+    write_json(manifest_path, manifest)
+    base = config_for(tmp_path, files)
+    config = AuditionConfig(
+        **{
+            **base.__dict__,
+            "preflight_manifest": manifest_path,
+        }
+    )
+
+    with pytest.raises(ValueError, match="preflight manifest"):
+        run_audition(config, client=fake_client)
+
+    assert not config.out_dir.exists()
+
+
+def test_invalid_json_preflight_manifest_fails_closed(tmp_path: Path) -> None:
+    files = make_audition_files(tmp_path)
+    manifest_path = tmp_path / "preflight_capability_manifest.json"
+    manifest_path.write_text("{not valid json\n", encoding="utf-8")
+    base = config_for(tmp_path, files)
+    config = AuditionConfig(
+        **{
+            **base.__dict__,
+            "preflight_manifest": manifest_path,
+        }
+    )
+
+    with pytest.raises(ValueError, match="not valid JSON"):
+        run_audition(config, client=fake_client)
+
+    assert not config.out_dir.exists()
+
+
+def test_missing_preflight_manifest_fails_closed(tmp_path: Path) -> None:
+    files = make_audition_files(tmp_path)
+    base = config_for(tmp_path, files)
+    config = AuditionConfig(
+        **{
+            **base.__dict__,
+            "preflight_manifest": tmp_path / "missing.json",
+        }
+    )
+
+    with pytest.raises(ValueError, match="not a file"):
+        run_audition(config, client=fake_client)
+
+    assert not config.out_dir.exists()
+
+
+def test_preflight_cli_flags_are_loaded_into_config(tmp_path: Path) -> None:
+    files = make_audition_files(tmp_path)
+    manifest_path = tmp_path / "preflight_capability_manifest.json"
+    write_preflight_manifest(manifest_path, "fail")
+    parser = build_arg_parser()
+    args = parser.parse_args(
+        [
+            "--model-id",
+            "fake-model",
+            "--base-url",
+            "http://127.0.0.1:8080/v1",
+            "--suite",
+            str(files["suite"]),
+            "--out-dir",
+            str(tmp_path / "out"),
+            "--preflight-manifest",
+            str(manifest_path),
+            "--allow-intermittent-preflight",
+            "--allow-unknown-preflight",
+            "--waive-preflight",
+            "Synthetic human waiver.",
+        ]
+    )
+
+    config = build_config_from_args(args)
+
+    assert config.preflight_manifest == manifest_path.resolve()
+    assert config.allow_intermittent_preflight is True
+    assert config.allow_unknown_preflight is True
+    assert config.waive_preflight == "Synthetic human waiver."

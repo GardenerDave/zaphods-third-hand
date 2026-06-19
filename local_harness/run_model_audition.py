@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import statistics
@@ -21,6 +22,7 @@ if __package__ in {None, ""}:
 from local_harness.model_audition_scorers import score_case
 
 ApiClient = Callable[[dict[str, Any], dict[str, Any]], dict[str, Any]]
+PREFLIGHT_STATUSES = {"pass", "intermittent", "fail", "unknown"}
 
 
 @dataclass(frozen=True)
@@ -42,6 +44,10 @@ class AuditionConfig:
     limit: int | None = None
     case_id: str | None = None
     resume: bool = False
+    preflight_manifest: Path | None = None
+    allow_intermittent_preflight: bool = False
+    allow_unknown_preflight: bool = False
+    waive_preflight: str | None = None
 
 
 def utc_now_iso() -> str:
@@ -194,6 +200,110 @@ def resolve_api_key(
     return str(model_config.get("api_key_default", ""))
 
 
+def evaluate_preflight_gate(config: AuditionConfig) -> dict[str, Any] | None:
+    override_requested = bool(
+        config.allow_intermittent_preflight
+        or config.allow_unknown_preflight
+        or config.waive_preflight is not None
+    )
+    if config.preflight_manifest is None:
+        if override_requested:
+            raise ValueError(
+                "preflight override flags require --preflight-manifest"
+            )
+        return None
+
+    manifest_path = config.preflight_manifest
+    if not manifest_path.is_file():
+        raise ValueError(
+            f"preflight manifest is not a file: {manifest_path}"
+        )
+
+    manifest_bytes = manifest_path.read_bytes()
+    try:
+        manifest = json.loads(manifest_bytes.decode("utf-8"))
+    except UnicodeDecodeError as exc:
+        raise ValueError("preflight manifest is not valid UTF-8") from exc
+    except json.JSONDecodeError as exc:
+        raise ValueError(
+            "preflight manifest is not valid JSON: "
+            f"line {exc.lineno} column {exc.colno}"
+        ) from exc
+
+    if not isinstance(manifest, dict):
+        raise ValueError("preflight manifest must contain a JSON object")
+    if manifest.get("scope") != "preflight_only":
+        raise ValueError(
+            "preflight manifest must have scope 'preflight_only'"
+        )
+    if manifest.get("promotion_performed") is not False:
+        raise ValueError(
+            "preflight manifest must record promotion_performed as false"
+        )
+    if manifest.get("requires_human_review") is not True:
+        raise ValueError(
+            "preflight manifest must record requires_human_review as true"
+        )
+
+    status = manifest.get("preflight_status")
+    if status not in PREFLIGHT_STATUSES:
+        raise ValueError(
+            "preflight manifest preflight_status must be one of: "
+            + ", ".join(sorted(PREFLIGHT_STATUSES))
+        )
+
+    waiver_reason: str | None = None
+    if config.waive_preflight is not None:
+        waiver_reason = config.waive_preflight.strip()
+        if not waiver_reason:
+            raise ValueError("--waive-preflight requires a non-empty reason")
+
+    allowed = False
+    basis = ""
+    if waiver_reason is not None:
+        allowed = True
+        basis = "waiver"
+    elif status == "pass":
+        allowed = True
+        basis = "preflight_pass"
+    elif status == "intermittent" and config.allow_intermittent_preflight:
+        allowed = True
+        basis = "allow_intermittent_preflight"
+    elif status == "unknown" and config.allow_unknown_preflight:
+        allowed = True
+        basis = "allow_unknown_preflight"
+
+    if not allowed:
+        if status == "fail":
+            guidance = "use --waive-preflight with a human-readable reason"
+        elif status == "intermittent":
+            guidance = (
+                "use --allow-intermittent-preflight or --waive-preflight"
+            )
+        else:
+            guidance = "use --allow-unknown-preflight or --waive-preflight"
+        raise ValueError(
+            f"preflight gate blocked audition: status={status}; {guidance}"
+        )
+
+    return {
+        "enabled": True,
+        "decision": "allowed",
+        "basis": basis,
+        "preflight_status": status,
+        "manifest_path": display_path(manifest_path),
+        "manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
+        "source_run_id": str(manifest.get("source_run_id", "")),
+        "overrides": {
+            "allow_intermittent_preflight": (
+                config.allow_intermittent_preflight
+            ),
+            "allow_unknown_preflight": config.allow_unknown_preflight,
+            "waiver_reason": waiver_reason or "",
+        },
+    }
+
+
 def build_config_from_args(args: argparse.Namespace) -> AuditionConfig:
     suite_file = resolve_cli_path(args.suite)
     suite_config = load_json(suite_file)
@@ -262,6 +372,16 @@ def build_config_from_args(args: argparse.Namespace) -> AuditionConfig:
         limit=args.limit,
         case_id=args.case_id,
         resume=bool(args.resume),
+        preflight_manifest=(
+            resolve_cli_path(args.preflight_manifest)
+            if args.preflight_manifest
+            else None
+        ),
+        allow_intermittent_preflight=bool(
+            args.allow_intermittent_preflight
+        ),
+        allow_unknown_preflight=bool(args.allow_unknown_preflight),
+        waive_preflight=args.waive_preflight,
     )
 
 
@@ -277,7 +397,11 @@ def prepare_output_dir(out_dir: Path, *, resume: bool) -> None:
     (out_dir / "scores").mkdir(parents=True, exist_ok=True)
 
 
-def write_run_metadata(config: AuditionConfig) -> None:
+def write_run_metadata(
+    config: AuditionConfig,
+    *,
+    preflight_gate: dict[str, Any] | None = None,
+) -> None:
     metadata = {
         "run_id": config.run_id,
         "created_at": utc_now_iso(),
@@ -293,6 +417,8 @@ def write_run_metadata(config: AuditionConfig) -> None:
         "timeout_seconds": config.timeout_seconds,
         "runner": "local_harness/run_model_audition.py",
     }
+    if preflight_gate is not None:
+        metadata["preflight_gate"] = preflight_gate
 
     write_json(config.out_dir / "run_metadata.json", metadata)
 
@@ -568,8 +694,9 @@ def run_audition(
     *,
     client: ApiClient | None = None,
 ) -> dict[str, Any]:
+    preflight_gate = evaluate_preflight_gate(config)
     prepare_output_dir(config.out_dir, resume=config.resume)
-    write_run_metadata(config)
+    write_run_metadata(config, preflight_gate=preflight_gate)
 
     prompt_template = config.prompt_file.read_text(encoding="utf-8")
     scorer_profile = load_json(config.scorer_profile)
@@ -625,6 +752,30 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--limit", type=int)
     parser.add_argument("--case-id")
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument(
+        "--preflight-manifest",
+        help=(
+            "Optional preflight_capability_manifest.json used to gate this "
+            "audition."
+        ),
+    )
+    parser.add_argument(
+        "--allow-intermittent-preflight",
+        action="store_true",
+        help="Allow an intermittent preflight status and record the override.",
+    )
+    parser.add_argument(
+        "--allow-unknown-preflight",
+        action="store_true",
+        help="Allow an unknown preflight status and record the override.",
+    )
+    parser.add_argument(
+        "--waive-preflight",
+        help=(
+            "Human-readable waiver reason. Required to override a failed "
+            "preflight."
+        ),
+    )
 
     return parser
 

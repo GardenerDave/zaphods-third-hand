@@ -94,6 +94,35 @@ The model file may provide:
 
 Explicit CLI arguments override the model registry file.
 
+## Optional Preflight Gate
+
+`run_model_audition.py` can optionally check a completed LLM-probe preflight
+capability manifest before creating audition output or calling a model:
+
+    python3 local_harness/run_model_audition.py \
+      --model local_harness/auditions/models/qwen25_3b_q4_local.json \
+      --suite local_harness/auditions/suites/baseline_micro_v0.json \
+      --preflight-manifest .work/llm_probe_preflight/example/preflight_capability_manifest.json \
+      --out-dir .work/model_auditions/qwen25_3b_baseline_micro
+
+Preflight gating is optional. Without `--preflight-manifest`, existing audition
+behavior is unchanged.
+
+The gate reads `preflight_capability_manifest.json` directly. It does not read
+the optional OKF export and does not run LLM-probe.
+
+Gate rules:
+
+- `pass`: the model may enter the audition;
+- `intermittent`: blocked unless `--allow-intermittent-preflight` or a waiver is provided;
+- `unknown`: blocked unless `--allow-unknown-preflight` or a waiver is provided;
+- `fail`: blocked unless `--waive-preflight "human-readable reason"` is provided;
+- missing or malformed manifests: fail closed.
+
+Any override is recorded under `preflight_gate` in `run_metadata.json`.
+A preflight pass means only that the audition may run. It does not promote,
+approve, assign, or rank the model. A waiver also does not promote the model.
+
 ## Run a Board
 
 Use a board when you want to test one model across several suites.
