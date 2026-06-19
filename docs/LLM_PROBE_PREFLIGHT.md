@@ -16,6 +16,7 @@ role suitability, or make deployment decisions.
 - records the source SHA-256 and byte count;
 - normalizes valid observations into JSONL;
 - records malformed observations and explicit reasons in separate JSONL;
+- writes a conservative ZTH-owned preflight capability manifest;
 - writes factual counts and diagnostics in JSON and Markdown.
 
 The importer makes no network calls and no model calls. The output directory
@@ -98,6 +99,7 @@ One successful import writes exactly:
   import_metadata.json
   probe_manifest.jsonl
   invalid_records.jsonl
+  preflight_capability_manifest.json
   preflight_summary.json
   preflight_summary.md
 ```
@@ -108,6 +110,9 @@ One successful import writes exactly:
 - `probe_manifest.jsonl` contains one normalized row per valid observation.
 - `invalid_records.jsonl` contains malformed observations, source indexes, raw
   records, and explicit validation reasons.
+- `preflight_capability_manifest.json` summarizes source identity, observed
+  model and probe IDs, status counts, record counts, and a conservative
+  preflight status. It requires human review and is not a capability card.
 - `preflight_summary.json` contains factual record, model, probe, status, and
   diagnostic counts.
 - `preflight_summary.md` presents the same boundary and counts for human review.
@@ -132,6 +137,27 @@ These fields are explicit invariants:
   audition or deployment decision.
 - `promotion_performed: false` records that importing evidence did not promote
   a model.
+
+The capability manifest also records:
+
+```json
+{
+  "requires_human_review": true,
+  "preflight_status": "fail"
+}
+```
+
+`preflight_status` is intentionally conservative:
+
+- `unknown` when there are no valid records;
+- `fail` when any valid record has `fail` or `error`;
+- `intermittent` when at least one valid record has `warn` or `skipped` and
+  none has `fail` or `error`;
+- `pass` only when at least one valid record exists and every valid record has
+  `pass`.
+
+This status summarizes imported preflight evidence. It does not rank, promote,
+approve, or assign a model to a role.
 
 ## Run Manually
 
@@ -162,7 +188,8 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -p no:cacheprovider \
 
 The tests cover source preservation, SHA-256 recording, JSONL validity,
 invalid-record capture, factual summary counts, contract fields, forbidden
-audition fields, fail-closed input handling, and the CLI path.
+audition fields, conservative capability-manifest status rules, fail-closed
+input handling, and the CLI path.
 
 ## Separation From Model Auditions
 

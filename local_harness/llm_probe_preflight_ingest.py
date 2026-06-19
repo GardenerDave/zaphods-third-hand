@@ -231,6 +231,44 @@ def build_summary(
     }
 
 
+def determine_preflight_status(valid_rows: list[dict[str, Any]]) -> str:
+    statuses = {row["status"] for row in valid_rows}
+    if not statuses:
+        return "unknown"
+    if statuses & {"fail", "error"}:
+        return "fail"
+    if statuses & {"warn", "skipped"}:
+        return "intermittent"
+    return "pass"
+
+
+def build_preflight_capability_manifest(
+    *,
+    document: dict[str, Any],
+    source_sha256: str,
+    valid_rows: list[dict[str, Any]],
+    invalid_rows: list[dict[str, Any]],
+) -> dict[str, Any]:
+    status_counts = Counter(row["status"] for row in valid_rows)
+    return {
+        **contract_fields(),
+        "requires_human_review": True,
+        "source_sha256": source_sha256,
+        "source_run_id": document["run_id"].strip(),
+        "input_schema_version": document["schema_version"],
+        "model_ids_observed": sorted(
+            {row["model_id"] for row in valid_rows}
+        ),
+        "probe_ids_observed": sorted(
+            {row["probe_id"] for row in valid_rows}
+        ),
+        "status_counts": dict(sorted(status_counts.items())),
+        "valid_record_count": len(valid_rows),
+        "invalid_record_count": len(invalid_rows),
+        "preflight_status": determine_preflight_status(valid_rows),
+    }
+
+
 def render_summary_markdown(summary: dict[str, Any]) -> str:
     lines = [
         f"output_contract_version: {summary['output_contract_version']}",
@@ -323,11 +361,21 @@ def ingest_probe_output(probe_output: Path, out_dir: Path) -> dict[str, Any]:
         valid_rows=valid_rows,
         invalid_rows=invalid_rows,
     )
+    capability_manifest = build_preflight_capability_manifest(
+        document=document,
+        source_sha256=source_sha256,
+        valid_rows=valid_rows,
+        invalid_rows=invalid_rows,
+    )
 
     write_json(out_dir / "import_metadata.json", metadata)
     write_jsonl(out_dir / "probe_manifest.jsonl", valid_rows)
     write_jsonl(out_dir / "invalid_records.jsonl", invalid_rows)
     write_json(out_dir / "preflight_summary.json", summary)
+    write_json(
+        out_dir / "preflight_capability_manifest.json",
+        capability_manifest,
+    )
     (out_dir / "preflight_summary.md").write_text(
         render_summary_markdown(summary),
         encoding="utf-8",
