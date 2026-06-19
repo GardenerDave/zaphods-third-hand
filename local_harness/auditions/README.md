@@ -132,6 +132,39 @@ Use a board when you want to test one model across several suites.
       --board local_harness/auditions/boards/local_baseline_board_v0.json \
       --out-dir .work/model_auditions/qwen25_3b_board
 
+Board runs can optionally select the model's preflight manifest from a JSON map:
+
+    python3 local_harness/run_model_audition_board.py \
+      --model local_harness/auditions/models/qwen25_3b_q4_local.json \
+      --board local_harness/auditions/boards/local_baseline_board_v0.json \
+      --preflight-manifest-map .work/llm_probe_preflight/preflight_manifest_map.json \
+      --out-dir .work/model_auditions/qwen25_3b_board
+
+Manifest-map shape:
+
+```json
+{
+  "schema_version": "zth.preflight_manifest_map.v0.1",
+  "models": {
+    "Qwen/Qwen2.5-3B-Instruct-GGUF:Q4_K_M": "qwen25_3b/preflight_capability_manifest.json"
+  }
+}
+```
+
+Map paths are resolved relative to the map file. The board matches the current
+model by model ID, model registry `model_ref`, or model-config filename stem.
+The selected manifest and the same direct-audition overrides are passed to
+every suite. Each suite records the decision in its own `run_metadata.json`.
+
+When a map is supplied, a missing model entry fails closed unless
+`--allow-missing-preflight-manifest` is explicit. Intermittent, unknown, and
+failed statuses follow the same override and waiver rules as direct auditions.
+
+The board gate uses `preflight_capability_manifest.json`, not OKF output.
+Gating decides whether the board audition may run; preflight status is not
+included in suite scores, board scores, comparisons, or rankings. Passing or
+waiving the gate never promotes the model.
+
 The board writes one board-level capability card:
 
     .work/model_auditions/qwen25_3b_board/board_capability_card.json

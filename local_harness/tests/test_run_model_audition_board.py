@@ -27,6 +27,43 @@ def write_jsonl(path: Path, rows: list[dict]) -> None:
     )
 
 
+def write_preflight_manifest(path: Path, status: str) -> None:
+    write_json(
+        path,
+        {
+            "output_contract_version": "zth.llm_probe_preflight.v0.1",
+            "scope": "preflight_only",
+            "promotion_performed": False,
+            "requires_human_review": True,
+            "source_sha256": "synthetic-source-sha256",
+            "source_run_id": "synthetic-preflight-run",
+            "input_format": "llm_probe_verified_yaml",
+            "input_schema_version": "llm_probe.verified_yaml.v1",
+            "model_ids_observed": ["fake-model"],
+            "probe_ids_observed": ["synthetic-probe"],
+            "status_counts": {status: 1},
+            "valid_record_count": 1,
+            "invalid_record_count": 0,
+            "preflight_status": status,
+        },
+    )
+
+
+def write_preflight_map(
+    path: Path,
+    models: dict[str, str],
+    *,
+    schema_version: str = "zth.preflight_manifest_map.v0.1",
+) -> None:
+    write_json(
+        path,
+        {
+            "schema_version": schema_version,
+            "models": models,
+        },
+    )
+
+
 def make_suite(root: Path, suite_id: str, case_id: str) -> Path:
     prompt = root / "prompts" / f"{suite_id}.md"
     fixtures = root / "fixtures" / f"{suite_id}.jsonl"
@@ -142,6 +179,39 @@ def config_for(tmp_path: Path, files: dict[str, Path]) -> BoardRunConfig:
     )
 
 
+def config_from_map(
+    tmp_path: Path,
+    files: dict[str, Path],
+    *,
+    status: str,
+    extra_args: list[str] | None = None,
+) -> tuple[BoardRunConfig, Path, Path]:
+    manifest_path = tmp_path / "preflight" / "preflight_capability_manifest.json"
+    map_path = tmp_path / "preflight_manifest_map.json"
+    write_preflight_manifest(manifest_path, status)
+    write_preflight_map(
+        map_path,
+        {"fake-model": "preflight/preflight_capability_manifest.json"},
+    )
+    parser = build_arg_parser()
+    args = parser.parse_args(
+        [
+            "--model-id",
+            "fake-model",
+            "--base-url",
+            "http://127.0.0.1:8080/v1",
+            "--board",
+            str(files["board"]),
+            "--out-dir",
+            str(tmp_path / "out"),
+            "--preflight-manifest-map",
+            str(map_path),
+            *(extra_args or []),
+        ]
+    )
+    return build_board_config_from_args(args), manifest_path, map_path
+
+
 def test_board_loads_suites(tmp_path: Path) -> None:
     files = make_board_files(tmp_path)
     parser = build_arg_parser()
@@ -213,6 +283,7 @@ def test_board_writes_metadata(tmp_path: Path) -> None:
     assert metadata["board_id"] == "local_test_board_v0"
     assert metadata["model_id"] == "fake-model"
     assert metadata["suite_count"] == 2
+    assert "preflight_manifest_map" not in metadata
 
 
 def test_board_writes_manifest(tmp_path: Path) -> None:
@@ -272,3 +343,307 @@ def test_board_refuses_non_empty_out_dir_without_resume(tmp_path: Path) -> None:
 
     with pytest.raises(FileExistsError):
         run_board(config, client=fake_client)
+
+
+def test_board_with_pass_manifest_runs_and_passes_gate_to_every_suite(
+    tmp_path: Path,
+) -> None:
+    files = make_board_files(tmp_path)
+    config, manifest_path, map_path = config_from_map(
+        tmp_path,
+        files,
+        status="pass",
+    )
+
+    card = run_board(config, client=fake_client)
+
+    assert card["overall"] == 1.0
+    assert "preflight_status" not in card
+    assert "preflight_gate" not in card
+    board_metadata = load_json(config.out_dir / "board_metadata.json")
+    assert board_metadata["preflight_manifest_map"]["path"] == str(
+        map_path.resolve()
+    )
+    assert board_metadata["preflight_manifest_map"]["selected_manifest"] == str(
+        manifest_path.resolve()
+    )
+    for suite_id in ("suite_a_v0", "suite_b_v0"):
+        metadata = load_json(
+            config.out_dir / "suites" / suite_id / "run_metadata.json"
+        )
+        assert metadata["preflight_gate"]["preflight_status"] == "pass"
+        assert metadata["preflight_gate"]["basis"] == "preflight_pass"
+
+
+def test_board_with_intermittent_manifest_blocks_by_default(
+    tmp_path: Path,
+) -> None:
+    files = make_board_files(tmp_path)
+    config, _, _ = config_from_map(tmp_path, files, status="intermittent")
+
+    with pytest.raises(ValueError, match="status=intermittent"):
+        run_board(config, client=fake_client)
+
+    assert not config.out_dir.exists()
+
+
+def test_board_with_intermittent_manifest_allows_explicit_override(
+    tmp_path: Path,
+) -> None:
+    files = make_board_files(tmp_path)
+    config, _, _ = config_from_map(
+        tmp_path,
+        files,
+        status="intermittent",
+        extra_args=["--allow-intermittent-preflight"],
+    )
+
+    run_board(config, client=fake_client)
+
+    for suite_id in ("suite_a_v0", "suite_b_v0"):
+        gate = load_json(
+            config.out_dir / "suites" / suite_id / "run_metadata.json"
+        )["preflight_gate"]
+        assert gate["basis"] == "allow_intermittent_preflight"
+        assert gate["overrides"]["allow_intermittent_preflight"] is True
+
+
+def test_board_with_unknown_manifest_allows_explicit_override(
+    tmp_path: Path,
+) -> None:
+    files = make_board_files(tmp_path)
+    config, _, _ = config_from_map(
+        tmp_path,
+        files,
+        status="unknown",
+        extra_args=["--allow-unknown-preflight"],
+    )
+
+    run_board(config, client=fake_client)
+
+    for suite_id in ("suite_a_v0", "suite_b_v0"):
+        gate = load_json(
+            config.out_dir / "suites" / suite_id / "run_metadata.json"
+        )["preflight_gate"]
+        assert gate["basis"] == "allow_unknown_preflight"
+        assert gate["overrides"]["allow_unknown_preflight"] is True
+
+
+def test_board_with_failed_manifest_blocks_without_waiver(
+    tmp_path: Path,
+) -> None:
+    files = make_board_files(tmp_path)
+    config, _, _ = config_from_map(
+        tmp_path,
+        files,
+        status="fail",
+        extra_args=[
+            "--allow-intermittent-preflight",
+            "--allow-unknown-preflight",
+        ],
+    )
+
+    with pytest.raises(ValueError, match="status=fail"):
+        run_board(config, client=fake_client)
+
+    assert not config.out_dir.exists()
+
+
+def test_board_with_failed_manifest_allows_recorded_waiver(
+    tmp_path: Path,
+) -> None:
+    files = make_board_files(tmp_path)
+    reason = "Human approved a constrained board audition."
+    config, _, _ = config_from_map(
+        tmp_path,
+        files,
+        status="fail",
+        extra_args=["--waive-preflight", reason],
+    )
+
+    card = run_board(config, client=fake_client)
+
+    assert card["overall"] == 1.0
+    assert "preflight_status" not in card
+    for suite_id in ("suite_a_v0", "suite_b_v0"):
+        gate = load_json(
+            config.out_dir / "suites" / suite_id / "run_metadata.json"
+        )["preflight_gate"]
+        assert gate["basis"] == "waiver"
+        assert gate["overrides"]["waiver_reason"] == reason
+
+
+def test_manifest_map_missing_model_fails_closed(tmp_path: Path) -> None:
+    files = make_board_files(tmp_path)
+    manifest_path = tmp_path / "preflight_capability_manifest.json"
+    map_path = tmp_path / "preflight_manifest_map.json"
+    write_preflight_manifest(manifest_path, "pass")
+    write_preflight_map(map_path, {"another-model": str(manifest_path)})
+    parser = build_arg_parser()
+    args = parser.parse_args(
+        [
+            "--model-id",
+            "fake-model",
+            "--base-url",
+            "http://127.0.0.1:8080/v1",
+            "--board",
+            str(files["board"]),
+            "--out-dir",
+            str(tmp_path / "out"),
+            "--preflight-manifest-map",
+            str(map_path),
+        ]
+    )
+
+    with pytest.raises(ValueError, match="no entry for model"):
+        build_board_config_from_args(args)
+
+    assert not (tmp_path / "out").exists()
+
+
+def test_manifest_map_can_explicitly_allow_missing_model(
+    tmp_path: Path,
+) -> None:
+    files = make_board_files(tmp_path)
+    map_path = tmp_path / "preflight_manifest_map.json"
+    write_preflight_map(map_path, {})
+    parser = build_arg_parser()
+    args = parser.parse_args(
+        [
+            "--model-id",
+            "fake-model",
+            "--base-url",
+            "http://127.0.0.1:8080/v1",
+            "--board",
+            str(files["board"]),
+            "--out-dir",
+            str(tmp_path / "out"),
+            "--preflight-manifest-map",
+            str(map_path),
+            "--allow-missing-preflight-manifest",
+        ]
+    )
+    config = build_board_config_from_args(args)
+
+    run_board(config, client=fake_client)
+
+    assert config.preflight_manifest is None
+    for suite_id in ("suite_a_v0", "suite_b_v0"):
+        metadata = load_json(
+            config.out_dir / "suites" / suite_id / "run_metadata.json"
+        )
+        assert "preflight_gate" not in metadata
+
+
+@pytest.mark.parametrize(
+    "map_payload",
+    [
+        {},
+        {
+            "schema_version": "wrong-version",
+            "models": {},
+        },
+        {
+            "schema_version": "zth.preflight_manifest_map.v0.1",
+            "models": [],
+        },
+        {
+            "schema_version": "zth.preflight_manifest_map.v0.1",
+            "models": {"fake-model": ""},
+        },
+        {
+            "schema_version": "zth.preflight_manifest_map.v0.1",
+            "models": {},
+            "unexpected": True,
+        },
+    ],
+)
+def test_malformed_manifest_map_fails_closed(
+    tmp_path: Path,
+    map_payload: dict,
+) -> None:
+    files = make_board_files(tmp_path)
+    map_path = tmp_path / "preflight_manifest_map.json"
+    write_json(map_path, map_payload)
+    parser = build_arg_parser()
+    args = parser.parse_args(
+        [
+            "--model-id",
+            "fake-model",
+            "--base-url",
+            "http://127.0.0.1:8080/v1",
+            "--board",
+            str(files["board"]),
+            "--out-dir",
+            str(tmp_path / "out"),
+            "--preflight-manifest-map",
+            str(map_path),
+        ]
+    )
+
+    with pytest.raises((KeyError, ValueError), match="preflight manifest map|unsupported"):
+        build_board_config_from_args(args)
+
+    assert not (tmp_path / "out").exists()
+
+
+def test_manifest_map_can_match_model_config_name(tmp_path: Path) -> None:
+    files = make_board_files(tmp_path)
+    model_file = tmp_path / "models" / "fake_board_model.json"
+    manifest_path = tmp_path / "preflight_capability_manifest.json"
+    map_path = tmp_path / "preflight_manifest_map.json"
+    write_json(
+        model_file,
+        {
+            "model_ref": "fake-board-model-ref",
+            "model_id": "fake-model",
+            "base_url": "http://127.0.0.1:8080/v1",
+            "api_key_default": "not-needed",
+        },
+    )
+    write_preflight_manifest(manifest_path, "pass")
+    write_preflight_map(
+        map_path,
+        {"fake-board-model-ref": str(manifest_path)},
+    )
+    parser = build_arg_parser()
+    args = parser.parse_args(
+        [
+            "--model",
+            str(model_file),
+            "--board",
+            str(files["board"]),
+            "--out-dir",
+            str(tmp_path / "out"),
+            "--preflight-manifest-map",
+            str(map_path),
+        ]
+    )
+
+    config = build_board_config_from_args(args)
+
+    assert config.preflight_manifest == manifest_path.resolve()
+    assert config.preflight_lookup_key == "fake-board-model-ref"
+
+
+def test_board_preflight_override_flags_require_manifest_map(
+    tmp_path: Path,
+) -> None:
+    files = make_board_files(tmp_path)
+    parser = build_arg_parser()
+    args = parser.parse_args(
+        [
+            "--model-id",
+            "fake-model",
+            "--base-url",
+            "http://127.0.0.1:8080/v1",
+            "--board",
+            str(files["board"]),
+            "--out-dir",
+            str(tmp_path / "out"),
+            "--allow-unknown-preflight",
+        ]
+    )
+
+    with pytest.raises(ValueError, match="require --preflight-manifest-map"):
+        build_board_config_from_args(args)
