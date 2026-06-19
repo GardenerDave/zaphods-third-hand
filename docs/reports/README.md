@@ -54,6 +54,12 @@ Reports should be:
 - clear about what was measured;
 - clear about what was not measured.
 
+Before committing a report, normalize operator-specific usernames, absolute
+home/workspace paths, and real endpoint hosts. Prefer package-relative paths,
+`<MODEL_ROOT>`, and `<LAN_HOST>`. Preserve observed behavior, scores, failure
+modes, and human-review boundaries; sanitizing provenance metadata must not
+turn evidence into an approval or promotion claim.
+
 Reports should not claim that a model, prompt, workflow, or agent role is production-ready unless a separate human review process has accepted that conclusion.
 
 ## Current Report Areas

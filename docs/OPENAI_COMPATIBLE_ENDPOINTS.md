@@ -100,30 +100,33 @@ Notes:
 - Confirm the loaded model id in LM Studio server UI/API.
 - Run the same `icm_call.py` smoke test before distiller runs.
 
-## Advanced operator example: PowerEdge multi-port local stack
+## Advanced operator example: multi-port LAN stack
 
 This is an operator pattern for a single host exposing multiple models. It is not the main beginner path.
 
 ```bash
-export POWEREDGE_IP="192.168.1.13"
+export LAN_HOST="<LAN_HOST>"
 # Deep 32B
-export ZTH_DEEP_BASE_URL="http://${POWEREDGE_IP}:8080/v1"
+export ZTH_DEEP_BASE_URL="http://${LAN_HOST}:8080/v1"
 # Coder 7B
-export ZTH_CODER_BASE_URL="http://${POWEREDGE_IP}:8081/v1"
+export ZTH_CODER_BASE_URL="http://${LAN_HOST}:8081/v1"
 # Router 3B
-export ZTH_ROUTER_BASE_URL="http://${POWEREDGE_IP}:8082/v1"
+export ZTH_ROUTER_BASE_URL="http://${LAN_HOST}:8082/v1"
 # Handoff 7B
-export ZTH_HANDOFF_BASE_URL="http://${POWEREDGE_IP}:8083/v1"
+export ZTH_HANDOFF_BASE_URL="http://${LAN_HOST}:8083/v1"
 # Gemma 12B
-export ZTH_GEMMA12_BASE_URL="http://${POWEREDGE_IP}:8084/v1"
+export ZTH_GEMMA12_BASE_URL="http://${LAN_HOST}:8084/v1"
 # Gemma E4B
-export ZTH_GEMMAE4B_BASE_URL="http://${POWEREDGE_IP}:8085/v1"
+export ZTH_GEMMAE4B_BASE_URL="http://${LAN_HOST}:8085/v1"
 ```
+
+Replace `<LAN_HOST>` with an authorized hostname or address from your private
+configuration. Do not commit a real internal address.
 
 For this repo's primary single-endpoint path, set one active pair:
 
 ```bash
-export ZTH_BASE_URL="http://${POWEREDGE_IP}:8081/v1"
+export ZTH_BASE_URL="http://${LAN_HOST}:8081/v1"
 export ZTH_MODEL="Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M"
 ```
 

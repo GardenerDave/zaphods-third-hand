@@ -1,7 +1,7 @@
 {
   "model_ref": "qwen25_coder7b_q4_local",
   "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M",
-  "base_url": "http://192.168.1.13:8083/v1",
+  "base_url": "http://<LAN_HOST>:8083/v1",
   "api_key_env": "ZTH_SIGNAL_EXTRACT_API_KEY",
   "api_key_default": "not-needed-for-local",
   "notes": "Example local 7B coder candidate. Copy to .json and edit base_url before use."

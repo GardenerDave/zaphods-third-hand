@@ -79,7 +79,7 @@ request URL defaults to `http://127.0.0.1:<port>/v1/chat/completions`.
   "models": {
     "local_qwen": {
       "label": "Local Qwen",
-      "path": "/home/<USER>/ai/models/qwen/model-Q4_K_M.gguf",
+      "path": "~/ai/models/qwen/model-Q4_K_M.gguf",
       "host": "127.0.0.1",
       "port": 8112,
       "server_host": "0.0.0.0",
@@ -102,7 +102,7 @@ existing behavior: connect through `127.0.0.1`, bind the local server to
 {
   "models": {
     "local_qwen": {
-      "path": "/home/<USER>/ai/models/qwen/model-Q4_K_M.gguf",
+      "path": "~/ai/models/qwen/model-Q4_K_M.gguf",
       "base_url": "http://127.0.0.1:8112/v1",
       "port": 8112
     }
@@ -120,7 +120,7 @@ audition client.
   "models": {
     "lan_qwen": {
       "label": "Qwen on LAN worker",
-      "base_url": "http://192.168.1.13:8112/v1",
+      "base_url": "http://<LAN_HOST>:8112/v1",
       "api_model": "Qwen/Qwen3-4B-GGUF",
       "expected_role": "router_candidate"
     }
@@ -142,7 +142,7 @@ The equivalent host-and-port form is:
 {
   "models": {
     "lan_qwen": {
-      "host": "192.168.1.13",
+      "host": "<LAN_HOST>",
       "port": 8112
     }
   }
@@ -151,6 +151,8 @@ The equivalent host-and-port form is:
 
 Only use LAN endpoints you are authorized to access. The harness does not add
 authentication headers.
+Replace `<LAN_HOST>` in a private config before use; do not commit a real
+internal address.
 
 ## 3. Inspect Configuration Without Network Calls
 

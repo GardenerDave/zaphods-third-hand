@@ -9,9 +9,9 @@
     ]
   },
   "input_cards": [
-    "/home/navigator/agent-workspace/zaphods-third-hand/.work/model_auditions/qwen25_3b_full_board_smoke/board_capability_card.json",
-    "/home/navigator/agent-workspace/zaphods-third-hand/.work/model_auditions/qwen25_coder7b_full_board_smoke/board_capability_card.json",
-    "/home/navigator/agent-workspace/zaphods-third-hand/.work/model_auditions/qwen25_7b_instruct_full_board_smoke/board_capability_card.json"
+    "cards/qwen25_3b_full_board_smoke.json",
+    "cards/qwen25_coder7b_full_board_smoke.json",
+    "cards/qwen25_7b_instruct_full_board_smoke.json"
   ],
   "metric_rankings": {
     "completed": [

@@ -96,7 +96,7 @@ Run a supervised Aider task against a remote OpenAI-compatible endpoint:
 ```text
 python3 local_harness/run_aider_worker.py \
   outputs/agent_runs/example-aider-remote \
-  --aider-python /home/<USER>/.local/share/uv/tools/aider-chat/bin/python \
+  --aider-python ~/.local/share/uv/tools/aider-chat/bin/python \
   --openai-api-base http://<SERVER-IP>:8081/v1 \
   --model openai/<MODEL_ID> \
   --timeout 360 \

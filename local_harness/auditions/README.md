@@ -71,10 +71,13 @@ Use this when you know the model id and endpoint URL.
 
     python3 local_harness/run_model_audition.py \
       --model-id "Qwen/Qwen2.5-3B-Instruct-GGUF:Q4_K_M" \
-      --base-url "http://192.168.1.13:8082/v1" \
+      --base-url "http://<LAN_HOST>:8082/v1" \
       --api-key "not-needed-for-local" \
       --suite "local_harness/auditions/suites/baseline_micro_v0.json" \
       --out-dir ".work/model_auditions/qwen25_3b_baseline_micro"
+
+Replace `<LAN_HOST>` with an authorized host from private configuration. Do not
+commit a real internal address.
 
 ## Run a Model Registry File
 
@@ -93,6 +96,8 @@ The model file may provide:
 - `api_key_default`
 
 Explicit CLI arguments override the model registry file.
+Bundled LAN-oriented model files use `<LAN_HOST>` and must be edited privately
+before use.
 
 ## Optional Preflight Gate
 

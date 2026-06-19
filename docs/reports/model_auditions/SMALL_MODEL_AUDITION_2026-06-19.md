@@ -15,12 +15,16 @@ The reusable harness and current local/LAN operator workflow are documented in
 
 ## Files that landed on the server
 
+The publication copy normalizes the operator-specific model root as
+`<MODEL_ROOT>`. This changes path provenance only, not the observed model
+behavior.
+
 ```text
-/home/navigator/ai/models/small-auditions/granite-3.3-2b/ibm-granite_granite-3.3-2b-instruct-Q4_K_M.gguf
-/home/navigator/ai/models/small-auditions/ministral-3b/mistralai_Ministral-3-3B-Instruct-2512-Q4_K_M.gguf
-/home/navigator/ai/models/small-auditions/qwen3-1.7b/Qwen_Qwen3-1.7B-Q4_K_M.gguf
-/home/navigator/ai/models/small-auditions/qwen3-4b/Qwen_Qwen3-4B-Q4_K_M.gguf
-/home/navigator/ai/models/small-auditions/smollm3-3b/SmolLM3-Q4_K_M.gguf
+<MODEL_ROOT>/granite-3.3-2b/ibm-granite_granite-3.3-2b-instruct-Q4_K_M.gguf
+<MODEL_ROOT>/ministral-3b/mistralai_Ministral-3-3B-Instruct-2512-Q4_K_M.gguf
+<MODEL_ROOT>/qwen3-1.7b/Qwen_Qwen3-1.7B-Q4_K_M.gguf
+<MODEL_ROOT>/qwen3-4b/Qwen_Qwen3-4B-Q4_K_M.gguf
+<MODEL_ROOT>/smollm3-3b/SmolLM3-Q4_K_M.gguf
 ```
 
 ## First concept prompt
