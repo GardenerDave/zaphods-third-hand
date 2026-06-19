@@ -1,0 +1,90 @@
+{
+  "prompts": {
+    "zth_context_explain": {
+      "label": "ZTH context distiller concept check",
+      "kind": "prose",
+      "temperature": 0.2,
+      "max_tokens": 384,
+      "system": "You are auditioning for Zaphod's Third Hand. Return only the requested answer. Do not explain reasoning. /no_think",
+      "user": "In exactly 5 bullets, describe what a context distiller does in Zaphod's Third Hand. Include: token reduction, agent handoff, decision trace preservation, failure handling, and reuse. /no_think",
+      "expected": {
+        "exact_bullets": 5,
+        "must_include": [
+          "token reduction",
+          "agent handoff",
+          "decision trace",
+          "failure",
+          "reuse"
+        ]
+      }
+    },
+    "router_docs_update": {
+      "label": "Router classification: docs update",
+      "kind": "json_route",
+      "temperature": 0.0,
+      "max_tokens": 256,
+      "system": "Return only a single JSON object. No markdown. No code fence. No prose. Schema: {\"route\": string, \"confidence\": number, \"reason\": string, \"next_action\": string}. confidence must be a number from 0.0 to 1.0. /no_think",
+      "user": "Allowed routes: bug_report, build_spec, context_distill, docs_update, model_audition, cleanup, unknown.\n\nClassify: \"Codex patched the local endpoint docs, tests pass, but I still need to verify whether the README now sends first-time users to the distiller before Aider.\"\n\nReturn the JSON object now. /no_think",
+      "expected": {
+        "route": "docs_update",
+        "schema": {
+          "route": "string",
+          "confidence": "number",
+          "reason": "string",
+          "next_action": "string"
+        }
+      }
+    },
+    "router_model_audition": {
+      "label": "Router classification: model audition",
+      "kind": "json_route",
+      "temperature": 0.0,
+      "max_tokens": 256,
+      "system": "Return only a single JSON object. No markdown. No code fence. No prose. Schema: {\"route\": string, \"confidence\": number, \"reason\": string, \"next_action\": string}. confidence must be a number from 0.0 to 1.0. /no_think",
+      "user": "Allowed routes: bug_report, build_spec, context_distill, docs_update, model_audition, cleanup, unknown.\n\nClassify: \"The model loaded and answered, but it put the answer inside reasoning_content until I added /no_think. Now I need to record which models obey JSON, which ones use markdown fences, and which are fast enough for router work.\"\n\nReturn the JSON object now. /no_think",
+      "expected": {
+        "route": "model_audition",
+        "schema": {
+          "route": "string",
+          "confidence": "number",
+          "reason": "string",
+          "next_action": "string"
+        }
+      }
+    },
+    "messy_bug_report": {
+      "label": "Messy operator note to dev report",
+      "kind": "structured_report",
+      "temperature": 0.1,
+      "max_tokens": 512,
+      "system": "You convert messy operator notes into concise dev handoff reports. Return only the requested sections. Do not invent file paths. /no_think",
+      "user": "Messy note: \"I clicked the Living Archive button and it opened a side thing, then after some patches the home screen went chat-only and I thought tools vanished. The right side had this weird blank gutter. Augmentor answered on the local endpoint but Engineer did not. Some settings knobs exist but do not seem wired. Make this useful for a developer.\"\n\nReturn exactly these sections:\nObserved:\nExpected:\nLikely affected area:\nRepro steps:\nOpen questions:\nDo not invent file paths. /no_think",
+      "expected": {
+        "sections": [
+          "Observed",
+          "Expected",
+          "Likely affected area",
+          "Repro steps",
+          "Open questions"
+        ]
+      }
+    },
+    "router_model_audition_defined_routes": {
+      "label": "Router classification: model audition with route definitions",
+      "kind": "json_route",
+      "temperature": 0.0,
+      "max_tokens": 256,
+      "system": "Return only one JSON object. No markdown. No code fence. No prose. Schema: {\"route\": string, \"confidence\": number, \"reason\": string, \"next_action\": string}. confidence must be a number from 0.0 to 1.0. /no_think",
+      "user": "Routes:\n- bug_report: messy behavior report that should become a developer issue\n- build_spec: implementation plan for a new feature or tool\n- context_distill: compressing conversation/history into reusable context\n- docs_update: README, guide, docs, or user instruction changes\n- model_audition: testing, comparing, scoring, or ranking models\n- cleanup: removing temp files, dead branches, stale sessions, or artifacts\n- unknown: use only when none of the above fit\n\nClassify: \"The model loaded and answered, but it put the answer inside reasoning_content until I added /no_think. Now I need to record which models obey JSON, which ones use markdown fences, and which are fast enough for router work.\"\n\nReturn the JSON object now. /no_think",
+      "expected": {
+        "route": "model_audition",
+        "schema": {
+          "route": "string",
+          "confidence": "number",
+          "reason": "string",
+          "next_action": "string"
+        }
+      }
+    }
+  }
+}
