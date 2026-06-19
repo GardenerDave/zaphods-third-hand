@@ -1,15 +1,19 @@
 # Small-Model Audition Harness
 
-This directory contains a repeatable, plain-file harness for testing small
-models against Zaphod's Third Hand prompts. It can call:
+This directory contains optional exploratory tooling for testing small models
+against Zaphod's Third Hand prompts. Core ZTH workflows normally connect to an
+existing OpenAI-compatible endpoint; this harness additionally can:
 
-- llama.cpp servers started locally by this harness;
-- an already-running local OpenAI-compatible endpoint;
-- an already-running OpenAI-compatible endpoint on another LAN host.
+- download configured candidate GGUFs;
+- start and stop temporary local llama.cpp servers in tmux;
+- call an already-running local OpenAI-compatible endpoint;
+- call an already-running OpenAI-compatible endpoint on another LAN host.
 
 The harness preserves raw responses and scores observable behavior. It does not
-promote models, assign production roles, or change ZTH routing configuration.
-Every result remains evidence for human review.
+provide production service management, hardening, monitoring, or availability.
+It does not promote models, assign production roles, or change ZTH routing
+configuration. Server lifecycle actions and audition results remain evidence
+for human review.
 
 ## What It Measures
 
@@ -74,6 +78,8 @@ request URL defaults to `http://127.0.0.1:<port>/v1/chat/completions`.
 
 ### Local llama.cpp model
 
+The primary local example binds llama.cpp to loopback only:
+
 ```json
 {
   "models": {
@@ -82,7 +88,7 @@ request URL defaults to `http://127.0.0.1:<port>/v1/chat/completions`.
       "path": "~/ai/models/qwen/model-Q4_K_M.gguf",
       "host": "127.0.0.1",
       "port": 8112,
-      "server_host": "0.0.0.0",
+      "server_host": "127.0.0.1",
       "threads": 6,
       "ctx": 4096,
       "session": "small_qwen"
@@ -92,9 +98,41 @@ request URL defaults to `http://127.0.0.1:<port>/v1/chat/completions`.
 ```
 
 `host` controls where the audition client connects. `server_host` controls the
-bind address used when this harness starts llama.cpp. The defaults preserve the
-existing behavior: connect through `127.0.0.1`, bind the local server to
-`0.0.0.0`.
+bind address used when this harness starts llama.cpp. Set `server_host`
+explicitly to `127.0.0.1` for loopback-only evaluation. Public or reusable
+configs should not omit this field.
+
+### Intentional LAN exposure
+
+Use `0.0.0.0` only when the temporary llama.cpp endpoint is intentionally
+meant to accept traffic through network interfaces:
+
+```json
+{
+  "models": {
+    "lan_exposed_qwen": {
+      "path": "~/ai/models/qwen/model-Q4_K_M.gguf",
+      "host": "127.0.0.1",
+      "port": 8112,
+      "server_host": "0.0.0.0",
+      "session": "small_qwen_lan"
+    }
+  }
+}
+```
+
+The implementation retains `0.0.0.0` as a backward-compatible fallback when
+`server_host` is omitted. Omitting the field therefore does not produce a
+loopback-only server.
+
+`0.0.0.0` binds the server on all available interfaces; it does not restrict
+access to the local machine. Before using it, review firewall rules, interface
+exposure, host access controls, and the llama.cpp server's authentication
+capabilities. The audition harness does not add authentication headers.
+
+Use only networks and endpoints you are authorized to expose or access. Keep
+the client-facing LAN address in private configuration using `<LAN_HOST>` in
+committed examples.
 
 ### Explicit local endpoint
 
@@ -208,6 +246,9 @@ Endpoint-only models without a local `path` are skipped.
 
 ## 5. Start Local llama.cpp Endpoints
 
+This optional step starts temporary evaluation servers. Skip it when using an
+already-running local or LAN endpoint.
+
 The default llama.cpp server path is:
 
 ```text
@@ -250,6 +291,10 @@ tmux attach -t small_qwen4
 Detach from tmux with `Ctrl-b`, then `d`.
 
 For already-running local or LAN endpoints, skip this entire step.
+
+Starting a server establishes only a test endpoint for evidence gathering. It
+does not establish production readiness, service ownership, model approval, or
+promotion.
 
 ## 6. Run an Audition
 
@@ -367,6 +412,8 @@ python3 local_harness/model_auditions/stop_models.py \
 ```
 
 Endpoint-only LAN models are skipped. The harness never stops remote services.
+It stops only the configured local tmux sessions used for exploratory
+evaluation.
 
 ## Audition Is Not Promotion
 
