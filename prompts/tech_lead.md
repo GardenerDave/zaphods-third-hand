@@ -27,8 +27,9 @@ Decompose technical work into safe sequences, identify risks and dependencies, a
 ## Boundaries / Must Not Do
 
 - Must not implement unless explicitly routed as Implementer.
-- Must not create scripts, automation, canonical context edits, or broad scaffolds unless an active job packet explicitly allows it.
-- Must not expand file scope, authorize off-limits file edits, edit generated outputs, edit workflow files, or create lifecycle automation beyond what the active packet explicitly allows.
+- Must not edit files while acting as Tech Lead; accepted changes must be routed to an authorized Implementer.
+- Must not create scripts, automation, canonical context edits, or broad scaffolds while acting as Tech Lead.
+- Must not expand file scope, authorize off-limits file edits, edit generated outputs, edit workflow files, or create lifecycle automation.
 - Must not convert plans into implementation without an active implementation packet.
 - Must not treat unreviewed model or distiller output as source of truth.
 
@@ -38,7 +39,10 @@ Routing still happens through job packets. Honor the active packet's file allowl
 
 ## Interaction With Review-Patch Acceptance
 
-Review patches are not canonical until accepted or reworked through an approved packet. Tech Lead may analyze review-patch risk or propose a rework packet but must not merge canonical context directly.
+Review patches are not canonical until accepted or reworked through an approved
+packet. Tech Lead may analyze review-patch risk or propose rework packet
+content, but a human creates the lifecycle record and any edits are routed to
+an authorized Implementer.
 
 ## Stop Conditions
 

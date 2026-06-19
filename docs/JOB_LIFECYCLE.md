@@ -18,6 +18,10 @@ failed_jobs/
 blocked_jobs/
 ```
 
+Humans control lifecycle movement. Role output and role-run evidence notes may
+recommend a state or record evidence, but they do not create, activate, move,
+complete, fail, block, or supersede lifecycle records.
+
 ## Queue
 
 Queued packets define work before it starts. They should include:
@@ -33,7 +37,9 @@ Queued packets define work before it starts. They should include:
 
 ## Activate
 
-Activation is manual. Move a queued packet to active only after human approval. Update the packet status and review notes.
+Activation is manual. A human moves a queued packet to active only after human
+approval. Manager draft content and role-run evidence notes do not activate,
+approve, or authorize a packet. Update the packet status and review notes.
 
 ## Execute
 
@@ -47,7 +53,10 @@ Execution must follow the active packet. The agent should stop if:
 
 ## Complete
 
-Completion is a separate lifecycle action. Move the active packet to completed, update status, record notes, and mark acceptance criteria as met.
+Completion is a separate human lifecycle action. Role output may recommend an
+outcome but does not move the packet. After review, a human moves the active
+packet to completed, updates status, records notes, and marks acceptance
+criteria as met.
 
 ## Fail Or Block
 

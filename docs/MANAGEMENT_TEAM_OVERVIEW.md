@@ -8,20 +8,31 @@ The management-team layer gives a human a structured way to ask different roles 
 
 Use this layer after you are comfortable with the Context Distiller path, or when you already run packet-based supervised execution and need role-specific decomposition, implementation, and review support.
 
+## Authority Model
+
+- Role output is advisory unless an active packet explicitly grants execution authority.
+- A role-run evidence note records authority already granted by the active packet; the note grants no new authority.
+- Only an explicitly authorized Implementer may edit files, and only files named in the active packet allowlist.
+- Manager, Tech Lead, Reviewer, and Integrator outputs remain advisory and do not edit files.
+- Humans approve activation, lifecycle movement, acceptance, and follow-up work.
+
 ## Manager
 
 For:
 
 - Scoping.
 - Decomposition.
+- Draft packet content for human review.
 - Routing recommendations.
 - Status summaries.
 
 Must not:
 
 - Authorize execution.
+- Approve or activate packet content.
 - Move lifecycle packets.
-- Edit files unless explicitly allowed.
+- Represent draft packet content as queued or active work.
+- Edit files.
 - Trigger other agents.
 
 ## Tech Lead
@@ -39,18 +50,20 @@ Must not:
 - Implement changes.
 - Broaden scope.
 - Authorize off-limits edits.
+- Edit files.
 - Convert plans into execution without an active implementation packet.
 
 ## Implementer
 
 For:
 
-- Narrow edits to explicitly allowlisted files.
+- Narrow edits explicitly authorized by the active packet.
 - Verification results.
 - Blocked reports.
 
 Must not:
 
+- Edit unless the active packet explicitly grants implementation authority.
 - Edit outside the active allowlist.
 - Invent work.
 - Create scripts or automation unless explicitly allowed.
@@ -68,7 +81,7 @@ Must not:
 
 - Silently fix issues.
 - Treat review patches as canonical automatically.
-- Edit files unless explicitly allowed.
+- Edit files; accepted fixes must be routed to an authorized Implementer.
 
 ## Integrator
 
@@ -81,9 +94,10 @@ For:
 Must not:
 
 - Commit.
-- Canonicalize context without approval.
+- Canonicalize context directly; accepted work must be routed to an authorized Implementer.
 - Combine unrelated changes.
-- Move lifecycle packets without approval.
+- Edit files; accepted integration work must be routed to an authorized Implementer.
+- Move lifecycle packets.
 
 ## Human Authority
 
@@ -92,8 +106,9 @@ Humans remain the authority for:
 - Choosing the active packet.
 - Choosing the role.
 - Approving prompts.
+- Granting execution authority through an active packet.
 - Reviewing outputs.
 - Accepting or rejecting evidence.
 - Moving lifecycle state.
-- Creating follow-up packets.
+- Reviewing and creating lifecycle packet records from draft content.
 - Approving file edits.

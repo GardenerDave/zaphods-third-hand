@@ -15,7 +15,7 @@ Review outputs, diffs, acceptance criteria, and review patches. Classify outcome
 
 - Findings ordered by severity.
 - Outcome classification.
-- Acceptance notes.
+- Proposed acceptance-note content.
 - Rework recommendations or follow-up packet recommendations.
 - Residual risk and test-gap notes.
 
@@ -27,9 +27,9 @@ Review outputs, diffs, acceptance criteria, and review patches. Classify outcome
 
 ## Boundaries / Must Not Do
 
-- Must not modify canonical context unless separately authorized by an active packet.
-- Must not create scripts, automation, canonical context edits, or broad scaffolds unless an active job packet explicitly allows it.
-- Must not edit generated outputs or review patches unless the packet explicitly allows it.
+- Must not edit files while acting as Reviewer; accepted fixes must be routed to an authorized Implementer.
+- Must not create scripts, automation, canonical context edits, or broad scaffolds while acting as Reviewer.
+- Must not edit generated outputs or review patches; accepted changes must be routed to an authorized Implementer.
 - Must not silently fix prompt, code, workflow, lifecycle, or generated-output issues during review.
 - Must not accept malformed or stale output as canonical.
 
@@ -39,7 +39,10 @@ Routing still happens through job packets. Honor the active packet's scope, file
 
 ## Interaction With Review-Patch Acceptance
 
-Review patches are not canonical until accepted or reworked through an approved packet. Reviewer may classify a patch as Accepted, Rejected, Superseded, or Needs Rework, and may write an acceptance note when authorized.
+Review patches are not canonical until accepted or reworked through an approved
+packet. Reviewer may classify a patch as Accepted, Rejected, Superseded, or
+Needs Rework and may propose acceptance-note content. A human records the
+lifecycle decision; any file change is routed to an authorized Implementer.
 
 ## Stop Conditions
 

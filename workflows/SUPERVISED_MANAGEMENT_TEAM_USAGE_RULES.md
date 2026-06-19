@@ -9,6 +9,9 @@ Define how management-team role prompts may be used safely in supervised routed 
 ## Current Approval Level
 
 - Management-team role prompts are accepted for supervised routed use.
+- Role output is advisory unless an active packet explicitly grants authority.
+- A role-run evidence note records authority already granted and grants no new authority.
+- Only an explicitly authorized Implementer may edit allowlisted files.
 - They are not approved for unattended execution.
 - They are not approved for batched execution.
 - Human approval is required before each routed role use.
@@ -30,31 +33,35 @@ Define how management-team role prompts may be used safely in supervised routed 
 - No automatic review-patch acceptance.
 - No broad scaffold creation.
 - No role-prompt self-modification.
-- No scripts or automation unless a separate approved packet allows them.
+- No scripts or automation unless a separate active packet explicitly routes the work to an authorized Implementer.
 
 ## Required Human Supervision
 
 - Human selects the active packet.
 - Human selects the role.
 - Human submits or approves the role prompt.
-- Human reviews role output before any file changes.
+- Human grants any implementation authority through the active packet before file changes.
+- Human reviews role output and any resulting Implementer changes.
 - Human decides whether outputs become job notes, follow-up packets, or rejected material.
+- Human approves activation and performs lifecycle movement.
 
 ## Packet Routing Requirements
 
 - Every role use must reference an active job packet.
 - The packet must name route, objective, allowed files, off-limits files, verification commands, and stop conditions.
+- Any Implementer edit authority must be explicit in the active packet.
 - Role output cannot expand scope.
 - Role output cannot override packet restrictions.
-- Any new work must become a separate queued packet.
+- Manager output may draft packet content, but a human must create or update the lifecycle record.
+- Any new work must become a separate human-reviewed packet.
 
 ## Role Invocation Rules
 
-- Manager: may triage, scope, and decompose work; must not authorize execution or edit files.
+- Manager: may triage, scope, decompose work, and draft packet content; must not edit files, authorize execution, approve or activate packets, or move lifecycle state.
 - Tech Lead: may plan architecture and implementation strategy; must not edit files or broaden scope.
-- Implementer: may propose or apply changes only inside the active packet allowlist and only when explicitly routed to do so.
-- Reviewer: may review evidence, diffs, and outputs; must not modify files unless a packet explicitly allows it.
-- Integrator: may propose merge sequencing and handoff notes; must not merge canonical context or lifecycle packets without approval.
+- Implementer: may apply changes only when the active packet explicitly grants implementation authority and only inside its allowlist.
+- Reviewer: may review evidence, diffs, and outputs; must not modify files.
+- Integrator: may propose merge sequencing, canonical updates, and handoff notes; must not modify files or lifecycle packets.
 
 ## Evidence To Record
 
@@ -70,6 +77,8 @@ Define how management-team role prompts may be used safely in supervised routed 
 ## Stop Conditions
 
 - Role output asks to edit off-limits files.
+- A non-Implementer role attempts to edit files.
+- An Implementer attempts edits without explicit active-packet authority.
 - Role output expands scope beyond packet.
 - Role output suggests automation or batching.
 - Role output attempts canonical context changes without an approved packet.
@@ -86,10 +95,8 @@ Define how management-team role prompts may be used safely in supervised routed 
 
 ## Do Not
 
-- Do not edit role prompts without a packet that explicitly allows it.
-- Do not create scripts.
-- Do not create automation.
-- Do not edit canonical context.
-- Do not edit generated outputs or review patches.
-- Do not move lifecycle packets unless the active packet allows it.
+- Do not edit role prompts except through an explicitly authorized Implementer and active-packet allowlist.
+- Do not create scripts or automation through advisory role output.
+- Do not edit canonical context, generated outputs, or review patches except through an explicitly authorized Implementer and active-packet allowlist.
+- Do not move lifecycle packets through role output.
 - Do not create broad scaffold.
