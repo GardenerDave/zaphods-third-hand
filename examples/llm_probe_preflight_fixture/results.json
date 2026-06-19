@@ -1,0 +1,46 @@
+{
+  "schema_version": "llm_probe.results.v1",
+  "run_id": "synthetic-preflight-001",
+  "generated_at": "2026-06-19T12:00:00Z",
+  "observations": [
+    {
+      "model_id": "synthetic-model-a",
+      "probe_id": "endpoint_response",
+      "status": "pass",
+      "observed_value": true,
+      "latency_ms": 125,
+      "diagnostics": [],
+      "metadata": {
+        "fixture": "synthetic"
+      }
+    },
+    {
+      "model_id": "synthetic-model-a",
+      "probe_id": "json_shape",
+      "status": "warn",
+      "observed_value": {
+        "parsed": false
+      },
+      "latency_ms": 250,
+      "diagnostics": [
+        "Synthetic response required cleanup."
+      ]
+    },
+    {
+      "model_id": "synthetic-model-b",
+      "probe_id": "endpoint_response",
+      "status": "fail",
+      "observed_value": false,
+      "latency_ms": null,
+      "diagnostics": [
+        "Synthetic timeout."
+      ]
+    },
+    {
+      "model_id": "synthetic-model-b",
+      "status": "pass",
+      "observed_value": true
+    },
+    "synthetic malformed observation"
+  ]
+}
