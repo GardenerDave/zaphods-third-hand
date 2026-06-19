@@ -1,18 +1,20 @@
 # LLM-Probe Preflight Import
 
-The LLM-probe preflight importer turns one supported JSON result file into
-plain-file evidence for human review.
+The LLM-probe preflight importer turns one supported JSON result file or one
+upstream-shaped LLM-probe `verified/<provider>.yaml` file into plain-file
+evidence for human review.
 
 It is an import and normalization layer only. It does not run a model, evaluate
-role suitability, or make deployment decisions.
+role suitability, run LLM-probe, or make deployment decisions.
 
 ## What the Importer Does
 
 `local_harness/llm_probe_preflight_ingest.py`:
 
-- reads one `llm_probe.results.v1` JSON file;
-- rejects unsupported or unknown top-level input shapes;
-- preserves the source bytes as `source/results.json`;
+- reads one `llm_probe.results.v1` JSON file or LLM-probe verified YAML file;
+- adapts YAML model test results into the existing normalized observation shape;
+- rejects unsupported JSON shapes and malformed core YAML shapes;
+- preserves the source bytes as `source/results.json` or `source/results.yaml`;
 - records the source SHA-256 and byte count;
 - normalizes valid observations into JSONL;
 - records malformed observations and explicit reasons in separate JSONL;
@@ -34,14 +36,15 @@ The preflight importer does not:
 - create model-registry entries or audition commands;
 - promote, approve, or select a model;
 - export OKF data;
-- accept YAML input.
+- execute LLM-probe or contact a provider.
 
 Preflight observations are evidence to inspect, not authorization for later
 actions.
 
-## Supported Input Shape
+## Supported JSON Input Shape
 
-The importer currently accepts JSON with this exact top-level shape:
+The existing normalized JSON contract remains supported with this exact
+top-level shape:
 
 ```json
 {
@@ -82,15 +85,55 @@ invalid JSON, and non-array `observations` fail closed before an output
 directory is created. Malformed individual observations are retained in
 `invalid_records.jsonl` instead of being silently discarded.
 
-The bundled sanitized fixture is:
+The bundled sanitized JSON fixture is:
 
 ```text
 examples/llm_probe_preflight_fixture/results.json
 ```
 
+## Supported LLM-Probe YAML Shape
+
+The YAML adapter accepts an upstream-shaped LLM-probe
+`verified/<provider>.yaml` document:
+
+```yaml
+provider: synthetic-provider
+last_run: "2026-03-31"
+models:
+  - id: synthetic-model
+    tool_call: pass
+    think_blocks: none
+    avg_response_ms: 120
+    tests:
+      tool_call_basic: {passed: true, pass_rate: "3/3"}
+      tool_call_large: {passed: true, pass_rate: "3/3"}
+    last_tested: "2026-03-31"
+```
+
+Each entry under a model's `tests` mapping becomes one normalized observation.
+`passed: true` maps to `status: "pass"` and `passed: false` maps to
+`status: "fail"`. Provider, model-level probe facts, pass rate, last-tested
+date, and source format remain visible in the observation.
+
+Malformed individual models or tests are written to `invalid_records.jsonl`.
+Malformed YAML, a missing top-level `models` field, or a non-list `models`
+field fails closed before an output directory is created. Unknown top-level
+YAML fields are ignored safely because real verified files may contain
+additional upstream metadata.
+
+The YAML path uses `yaml.safe_load`. PyYAML must already be available in the
+environment; the importer does not install dependencies automatically. JSON
+imports do not require PyYAML.
+
+The bundled sanitized YAML fixture is:
+
+```text
+examples/llm_probe_preflight_fixture/verified-provider.yaml
+```
+
 ## Generated Files
 
-One successful import writes exactly:
+One successful JSON import writes:
 
 ```text
 <out-dir>/
@@ -104,9 +147,16 @@ One successful import writes exactly:
   preflight_summary.md
 ```
 
-- `source/results.json` preserves the input bytes exactly.
+A YAML import uses the same output shape except that the preserved source is:
+
+```text
+source/results.yaml
+```
+
+- `source/results.json` or `source/results.yaml` preserves the input bytes
+  exactly.
 - `import_metadata.json` records the importer, source paths, source SHA-256,
-  source byte count, input schema, and run ID.
+  source byte count, input format, input schema, and run ID.
 - `probe_manifest.jsonl` contains one normalized row per valid observation.
 - `invalid_records.jsonl` contains malformed observations, source indexes, raw
   records, and explicit validation reasons.
@@ -159,6 +209,25 @@ The capability manifest also records:
 This status summarizes imported preflight evidence. It does not rank, promote,
 approve, or assign a model to a role.
 
+## Input Format Selection
+
+The CLI accepts:
+
+```text
+--input-format auto|json|llm-probe-yaml
+```
+
+The default is `auto`:
+
+- `.json` selects the existing normalized JSON loader;
+- `.yaml` or `.yml` selects the LLM-probe verified YAML adapter;
+- other extensions fail closed with a format-selection error.
+
+The recorded input formats are:
+
+- `zth_normalized_json`;
+- `llm_probe_verified_yaml`.
+
 ## Run Manually
 
 From the repository root:
@@ -168,6 +237,17 @@ tmpdir=$(mktemp -d)
 
 python3 local_harness/llm_probe_preflight_ingest.py \
   --probe-output examples/llm_probe_preflight_fixture/results.json \
+  --out-dir "$tmpdir/preflight"
+```
+
+Import an LLM-probe verified YAML file:
+
+```bash
+tmpdir=$(mktemp -d)
+
+python3 local_harness/llm_probe_preflight_ingest.py \
+  --probe-output examples/llm_probe_preflight_fixture/verified-provider.yaml \
+  --input-format llm-probe-yaml \
   --out-dir "$tmpdir/preflight"
 ```
 
@@ -189,7 +269,8 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -p no:cacheprovider \
 The tests cover source preservation, SHA-256 recording, JSONL validity,
 invalid-record capture, factual summary counts, contract fields, forbidden
 audition fields, conservative capability-manifest status rules, fail-closed
-input handling, and the CLI path.
+input handling, unchanged JSON import behavior, YAML adaptation, and the CLI
+paths.
 
 ## Separation From Model Auditions
 
@@ -208,5 +289,7 @@ ZTH model auditions ask:
 Combining these layers would let imported external observations look like ZTH
 audition results or model-selection decisions. Keeping them separate preserves
 provenance and prevents a preflight pass from becoming an implicit promotion.
+Importing verified YAML does not run LLM-probe and does not convert an upstream
+test pass into a ZTH audition result.
 If a human wants to audition a model after reviewing preflight evidence, that
 is a separate, explicit workflow.

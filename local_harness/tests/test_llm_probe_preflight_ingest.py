@@ -15,6 +15,12 @@ from local_harness.llm_probe_preflight_ingest import (
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = REPO_ROOT / "examples" / "llm_probe_preflight_fixture" / "results.json"
+YAML_FIXTURE = (
+    REPO_ROOT
+    / "examples"
+    / "llm_probe_preflight_fixture"
+    / "verified-provider.yaml"
+)
 EXPECTED_FILES = {
     "source/results.json",
     "import_metadata.json",
@@ -23,6 +29,10 @@ EXPECTED_FILES = {
     "preflight_capability_manifest.json",
     "preflight_summary.json",
     "preflight_summary.md",
+}
+YAML_EXPECTED_FILES = {
+    *EXPECTED_FILES - {"source/results.json"},
+    "source/results.yaml",
 }
 FORBIDDEN_FIELDS = {
     "audition",
@@ -47,6 +57,7 @@ CAPABILITY_MANIFEST_FIELDS = {
     "requires_human_review",
     "source_sha256",
     "source_run_id",
+    "input_format",
     "input_schema_version",
     "model_ids_observed",
     "probe_ids_observed",
@@ -113,6 +124,14 @@ def observation(status: str, index: int) -> dict:
     }
 
 
+def write_yaml_fixture(path: Path, payload: object) -> None:
+    yaml = pytest.importorskip("yaml")
+    path.write_text(
+        yaml.safe_dump(payload, sort_keys=False),
+        encoding="utf-8",
+    )
+
+
 def test_import_writes_expected_plain_files_and_preserves_source(tmp_path: Path) -> None:
     out_dir = tmp_path / "preflight"
 
@@ -125,6 +144,9 @@ def test_import_writes_expected_plain_files_and_preserves_source(tmp_path: Path)
     }
     assert written_files == EXPECTED_FILES
     assert (out_dir / "source" / "results.json").read_bytes() == FIXTURE.read_bytes()
+    assert read_json(out_dir / "import_metadata.json")["input_format"] == (
+        "zth_normalized_json"
+    )
 
 
 def test_source_sha256_and_contract_boundary_are_recorded(tmp_path: Path) -> None:
@@ -222,6 +244,7 @@ def test_fixture_capability_manifest_records_fail_status_and_observed_ids(
 
     assert set(manifest) == CAPABILITY_MANIFEST_FIELDS
     assert manifest["source_run_id"] == "synthetic-preflight-001"
+    assert manifest["input_format"] == "zth_normalized_json"
     assert manifest["input_schema_version"] == "llm_probe.results.v1"
     assert manifest["model_ids_observed"] == [
         "synthetic-model-a",
@@ -281,6 +304,200 @@ def test_capability_manifest_uses_unknown_when_there_are_no_valid_records(
     assert manifest["status_counts"] == {}
 
 
+def test_yaml_fixture_writes_expected_files_and_preserves_source(
+    tmp_path: Path,
+) -> None:
+    pytest.importorskip("yaml")
+    out_dir = tmp_path / "preflight"
+
+    ingest_probe_output(YAML_FIXTURE, out_dir)
+
+    written_files = {
+        path.relative_to(out_dir).as_posix()
+        for path in out_dir.rglob("*")
+        if path.is_file()
+    }
+    assert written_files == YAML_EXPECTED_FILES
+    assert (out_dir / "source" / "results.yaml").read_bytes() == (
+        YAML_FIXTURE.read_bytes()
+    )
+    assert not (out_dir / "source" / "results.json").exists()
+
+
+def test_yaml_fixture_records_source_identity_and_normalized_observations(
+    tmp_path: Path,
+) -> None:
+    pytest.importorskip("yaml")
+    out_dir = tmp_path / "preflight"
+    expected_sha256 = hashlib.sha256(YAML_FIXTURE.read_bytes()).hexdigest()
+
+    ingest_probe_output(YAML_FIXTURE, out_dir)
+    metadata = read_json(out_dir / "import_metadata.json")
+    summary = read_json(out_dir / "preflight_summary.json")
+    capability_manifest = read_json(
+        out_dir / "preflight_capability_manifest.json"
+    )
+    rows = read_jsonl(out_dir / "probe_manifest.jsonl")
+
+    for payload in (metadata, summary, capability_manifest):
+        assert payload["input_format"] == "llm_probe_verified_yaml"
+        assert payload["input_schema_version"] == "llm_probe.verified_yaml.v1"
+        assert payload["source_sha256"] == expected_sha256
+        assert payload["scope"] == "preflight_only"
+        assert payload["promotion_performed"] is False
+
+    assert metadata["preserved_source_path"] == "source/results.yaml"
+    assert capability_manifest["source_run_id"] == (
+        "synthetic-provider-2026-03-31"
+    )
+    assert capability_manifest["preflight_status"] == "fail"
+    assert capability_manifest["requires_human_review"] is True
+    assert len(rows) == 7
+    assert {row["model_id"] for row in rows} == {
+        "synthetic-all-pass-model",
+        "synthetic-mixed-model",
+    }
+    failed = next(row for row in rows if row["probe_id"] == "system_prompt")
+    assert failed["status"] == "fail"
+    assert failed["observed_value"]["passed"] is False
+    assert failed["observed_value"]["provider"] == "synthetic-provider"
+    assert failed["metadata"] == {
+        "source_format": "llm_probe_verified_yaml",
+        "provider": "synthetic-provider",
+        "last_run": "2026-03-31",
+    }
+
+
+def test_all_pass_yaml_yields_pass_preflight_status(tmp_path: Path) -> None:
+    source = tmp_path / "verified.yaml"
+    write_yaml_fixture(
+        source,
+        {
+            "provider": "synthetic-pass-provider",
+            "last_run": "2026-04-01",
+            "models": [
+                {
+                    "id": "synthetic-pass-model",
+                    "tool_call": "pass",
+                    "think_blocks": "none",
+                    "avg_response_ms": 100,
+                    "tests": {
+                        "tool_call_basic": {
+                            "passed": True,
+                            "pass_rate": "3/3",
+                        },
+                        "tool_call_large": {
+                            "passed": True,
+                            "pass_rate": "3/3",
+                        },
+                    },
+                    "last_tested": "2026-04-01",
+                }
+            ],
+        },
+    )
+    out_dir = tmp_path / "preflight"
+
+    ingest_probe_output(source, out_dir)
+    manifest = read_json(out_dir / "preflight_capability_manifest.json")
+
+    assert manifest["preflight_status"] == "pass"
+    assert manifest["status_counts"] == {"pass": 2}
+
+
+@pytest.mark.parametrize(
+    ("source_text", "expected_error"),
+    [
+        ("provider: broken\nmodels: [unterminated\n", "not valid YAML"),
+        ("provider: missing-models\nlast_run: '2026-04-01'\n", "missing required"),
+    ],
+)
+def test_invalid_yaml_shapes_fail_closed_without_outputs(
+    tmp_path: Path,
+    source_text: str,
+    expected_error: str,
+) -> None:
+    pytest.importorskip("yaml")
+    source = tmp_path / "verified.yaml"
+    source.write_text(source_text, encoding="utf-8")
+    out_dir = tmp_path / "preflight"
+
+    with pytest.raises(ValueError, match=expected_error):
+        ingest_probe_output(source, out_dir)
+
+    assert not out_dir.exists()
+
+
+def test_malformed_yaml_model_and_test_entries_are_invalid_records(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "verified.yaml"
+    write_yaml_fixture(
+        source,
+        {
+            "provider": "synthetic-invalid-provider",
+            "last_run": "2026-04-01",
+            "models": [
+                {
+                    "id": "synthetic-model",
+                    "tests": {
+                        "not_an_object": "broken",
+                        "missing_passed": {"pass_rate": "0/3"},
+                    },
+                },
+                {
+                    "tests": {
+                        "missing_model_id": {
+                            "passed": True,
+                            "pass_rate": "3/3",
+                        }
+                    }
+                },
+                "not-a-model-object",
+            ],
+        },
+    )
+    out_dir = tmp_path / "preflight"
+
+    ingest_probe_output(source, out_dir)
+    invalid_rows = read_jsonl(out_dir / "invalid_records.jsonl")
+    manifest = read_json(out_dir / "preflight_capability_manifest.json")
+
+    assert len(invalid_rows) == 4
+    reasons = {
+        reason
+        for row in invalid_rows
+        for reason in row["reasons"]
+    }
+    assert "test_result_is_not_object" in reasons
+    assert "missing_field(s): passed" in reasons
+    assert "model_id_missing_or_empty" in reasons
+    assert "model_is_not_object" in reasons
+    assert manifest["valid_record_count"] == 0
+    assert manifest["invalid_record_count"] == 4
+    assert manifest["preflight_status"] == "unknown"
+
+
+def test_yaml_outputs_do_not_emit_audition_or_selection_fields(
+    tmp_path: Path,
+) -> None:
+    pytest.importorskip("yaml")
+    out_dir = tmp_path / "preflight"
+
+    ingest_probe_output(YAML_FIXTURE, out_dir)
+    payloads: list[object] = [
+        read_json(out_dir / "import_metadata.json"),
+        read_json(out_dir / "preflight_summary.json"),
+        read_json(out_dir / "preflight_capability_manifest.json"),
+        *read_jsonl(out_dir / "probe_manifest.jsonl"),
+        *read_jsonl(out_dir / "invalid_records.jsonl"),
+    ]
+
+    emitted_keys = set().union(*(collect_keys(payload) for payload in payloads))
+    assert emitted_keys.isdisjoint(FORBIDDEN_FIELDS)
+    assert not any("capability_card" in path.name for path in out_dir.rglob("*"))
+
+
 def test_unknown_top_level_shape_fails_closed_without_outputs(
     tmp_path: Path,
 ) -> None:
@@ -318,3 +535,22 @@ def test_cli_writes_preflight_output(tmp_path: Path) -> None:
 
     assert exit_code == 0
     assert (out_dir / "preflight_summary.json").is_file()
+
+
+def test_cli_accepts_explicit_yaml_input_format(tmp_path: Path) -> None:
+    pytest.importorskip("yaml")
+    out_dir = tmp_path / "preflight"
+
+    exit_code = main(
+        [
+            "--probe-output",
+            str(YAML_FIXTURE),
+            "--input-format",
+            "llm-probe-yaml",
+            "--out-dir",
+            str(out_dir),
+        ]
+    )
+
+    assert exit_code == 0
+    assert (out_dir / "source" / "results.yaml").is_file()

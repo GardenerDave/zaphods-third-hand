@@ -1,0 +1,23 @@
+provider: synthetic-provider
+last_run: "2026-03-31"
+verification_notes: "Synthetic upstream-shaped fixture."
+models:
+  - id: synthetic-all-pass-model
+    tool_call: pass
+    think_blocks: none
+    avg_response_ms: 120
+    tests:
+      tool_call_basic: {passed: true, pass_rate: "3/3"}
+      empty_response: {passed: true, pass_rate: "3/3"}
+      tool_call_large: {passed: true, pass_rate: "3/3"}
+    last_tested: "2026-03-31"
+  - id: synthetic-mixed-model
+    tool_call: partial
+    think_blocks: none
+    avg_response_ms: 240
+    tests:
+      tool_call_basic: {passed: true, pass_rate: "3/3"}
+      system_prompt: {passed: false, pass_rate: "0/3"}
+      response_time: {passed: true, pass_rate: "3/3"}
+      tool_call_large: {passed: true, pass_rate: "3/3"}
+    last_tested: "2026-03-31"

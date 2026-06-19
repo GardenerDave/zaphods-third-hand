@@ -8,12 +8,17 @@ import hashlib
 import json
 import sys
 from collections import Counter
+from dataclasses import dataclass
+from datetime import date
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Sequence
 
 
 INPUT_SCHEMA_VERSION = "llm_probe.results.v1"
+YAML_INPUT_SCHEMA_VERSION = "llm_probe.verified_yaml.v1"
+JSON_INPUT_FORMAT = "zth_normalized_json"
+YAML_INPUT_FORMAT = "llm_probe_verified_yaml"
 OUTPUT_CONTRACT_VERSION = "zth.llm_probe_preflight.v0.1"
 SCOPE = "preflight_only"
 PROMOTION_PERFORMED = False
@@ -39,6 +44,16 @@ REQUIRED_OBSERVATION_FIELDS = {
     "status",
     "observed_value",
 }
+
+
+@dataclass(frozen=True)
+class LoadedProbeInput:
+    document: dict[str, Any]
+    input_format: str
+    input_schema_version: str
+    preserved_source_name: str
+    observation_records: list[tuple[int, Any]]
+    adapter_invalid_rows: list[dict[str, Any]]
 
 
 def utc_now_iso() -> str:
@@ -70,7 +85,24 @@ def contract_fields() -> dict[str, Any]:
     }
 
 
+def json_safe(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {str(key): json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [json_safe(item) for item in value]
+    if isinstance(value, (date, datetime)):
+        return value.isoformat()
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    return str(value)
+
+
+def nonempty_text(value: Any) -> str:
+    return value.strip() if isinstance(value, str) else ""
+
+
 def load_probe_document(source_bytes: bytes, source_path: Path) -> dict[str, Any]:
+    """Load the existing strict ZTH-normalized JSON input contract."""
     try:
         document = json.loads(source_bytes.decode("utf-8"))
     except UnicodeDecodeError as exc:
@@ -111,6 +143,194 @@ def load_probe_document(source_bytes: bytes, source_path: Path) -> dict[str, Any
         raise ValueError("observations must be a JSON array")
 
     return document
+
+
+def load_json_probe_input(source_bytes: bytes, source_path: Path) -> LoadedProbeInput:
+    document = load_probe_document(source_bytes, source_path)
+    return LoadedProbeInput(
+        document=document,
+        input_format=JSON_INPUT_FORMAT,
+        input_schema_version=document["schema_version"],
+        preserved_source_name="results.json",
+        observation_records=list(enumerate(document["observations"], start=1)),
+        adapter_invalid_rows=[],
+    )
+
+
+def yaml_run_id(provider: str, last_run: str) -> str:
+    return f"{provider or 'unknown-provider'}-{last_run or 'unknown-run'}"
+
+
+def yaml_latency(value: Any) -> int | float | None:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, (int, float)) and value >= 0:
+        return value
+    return None
+
+
+def load_yaml_probe_input(source_bytes: bytes, source_path: Path) -> LoadedProbeInput:
+    try:
+        import yaml
+    except ImportError as exc:
+        raise ValueError(
+            "LLM-probe YAML input requires PyYAML; install or declare PyYAML "
+            "before using --input-format llm-probe-yaml"
+        ) from exc
+
+    try:
+        source_text = source_bytes.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise ValueError(f"{source_path} is not valid UTF-8") from exc
+
+    try:
+        loaded = yaml.safe_load(source_text)
+    except yaml.YAMLError as exc:
+        raise ValueError(f"{source_path} is not valid YAML: {exc}") from exc
+
+    payload = json_safe(loaded)
+    if not isinstance(payload, dict):
+        raise ValueError(f"{source_path} must contain a top-level YAML mapping")
+    if "models" not in payload:
+        raise ValueError(f"{source_path} is missing required top-level field 'models'")
+    if not isinstance(payload["models"], list):
+        raise ValueError(f"{source_path} top-level field 'models' must be a list")
+
+    provider = nonempty_text(payload.get("provider"))
+    last_run = nonempty_text(payload.get("last_run"))
+    observations: list[tuple[int, Any]] = []
+    adapter_invalid_rows: list[dict[str, Any]] = []
+    source_index = 0
+
+    for model_index, model in enumerate(payload["models"], start=1):
+        if not isinstance(model, dict):
+            source_index += 1
+            adapter_invalid_rows.append(
+                invalid_record(
+                    {
+                        "model_index": model_index,
+                        "model": model,
+                    },
+                    source_index,
+                    ["model_is_not_object"],
+                )
+            )
+            continue
+
+        model_id = nonempty_text(model.get("id"))
+        tests = model.get("tests")
+        if not isinstance(tests, dict) or not tests:
+            source_index += 1
+            reasons = ["tests_missing_or_not_object"]
+            if not model_id:
+                reasons.insert(0, "model_id_missing_or_empty")
+            adapter_invalid_rows.append(
+                invalid_record(
+                    {
+                        "model_index": model_index,
+                        "model": model,
+                    },
+                    source_index,
+                    reasons,
+                )
+            )
+            continue
+
+        for test_name, test_result in tests.items():
+            source_index += 1
+            raw_test = {
+                "model_index": model_index,
+                "model_id": model.get("id"),
+                "test_name": test_name,
+                "test_result": test_result,
+            }
+            reasons: list[str] = []
+            if not model_id:
+                reasons.append("model_id_missing_or_empty")
+            if not isinstance(test_name, str) or not test_name.strip():
+                reasons.append("test_name_must_be_non_empty_string")
+            if not isinstance(test_result, dict):
+                reasons.append("test_result_is_not_object")
+            elif "passed" not in test_result:
+                reasons.append("missing_field(s): passed")
+            elif not isinstance(test_result["passed"], bool):
+                reasons.append("passed_must_be_boolean")
+
+            if reasons:
+                adapter_invalid_rows.append(
+                    invalid_record(raw_test, source_index, reasons)
+                )
+                continue
+
+            passed = test_result["passed"]
+            observations.append(
+                (
+                    source_index,
+                    {
+                        "model_id": model_id,
+                        "probe_id": test_name.strip(),
+                        "status": "pass" if passed else "fail",
+                        "observed_value": {
+                            "passed": passed,
+                            "pass_rate": test_result.get("pass_rate"),
+                            "provider": provider,
+                            "tool_call": model.get("tool_call"),
+                            "think_blocks": model.get("think_blocks"),
+                            "avg_response_ms": model.get("avg_response_ms"),
+                            "last_tested": model.get("last_tested"),
+                        },
+                        "latency_ms": yaml_latency(model.get("avg_response_ms")),
+                        "diagnostics": [],
+                        "metadata": {
+                            "source_format": YAML_INPUT_FORMAT,
+                            "provider": provider,
+                            "last_run": last_run,
+                        },
+                    },
+                )
+            )
+
+    document = {
+        "schema_version": YAML_INPUT_SCHEMA_VERSION,
+        "run_id": yaml_run_id(provider, last_run),
+        "generated_at": last_run,
+        "observations": [record for _, record in observations],
+    }
+    return LoadedProbeInput(
+        document=document,
+        input_format=YAML_INPUT_FORMAT,
+        input_schema_version=YAML_INPUT_SCHEMA_VERSION,
+        preserved_source_name="results.yaml",
+        observation_records=observations,
+        adapter_invalid_rows=adapter_invalid_rows,
+    )
+
+
+def resolve_input_format(probe_output: Path, requested_format: str) -> str:
+    if requested_format != "auto":
+        return requested_format
+    suffix = probe_output.suffix.lower()
+    if suffix == ".json":
+        return "json"
+    if suffix in {".yaml", ".yml"}:
+        return "llm-probe-yaml"
+    raise ValueError(
+        "cannot infer input format from extension "
+        f"{probe_output.suffix!r}; use --input-format json or llm-probe-yaml"
+    )
+
+
+def load_probe_input(
+    source_bytes: bytes,
+    source_path: Path,
+    requested_format: str,
+) -> LoadedProbeInput:
+    resolved_format = resolve_input_format(source_path, requested_format)
+    if resolved_format == "json":
+        return load_json_probe_input(source_bytes, source_path)
+    if resolved_format == "llm-probe-yaml":
+        return load_yaml_probe_input(source_bytes, source_path)
+    raise ValueError(f"unsupported input format: {resolved_format}")
 
 
 def observation_errors(record: Any) -> list[str]:
@@ -199,6 +419,8 @@ def prepare_output_dir(out_dir: Path) -> None:
 def build_summary(
     *,
     document: dict[str, Any],
+    input_format: str,
+    input_schema_version: str,
     source_sha256: str,
     source_byte_count: int,
     valid_rows: list[dict[str, Any]],
@@ -211,12 +433,13 @@ def build_summary(
 
     return {
         **contract_fields(),
-        "input_schema_version": document["schema_version"],
+        "input_format": input_format,
+        "input_schema_version": input_schema_version,
         "run_id": document["run_id"].strip(),
         "source_generated_at": document["generated_at"].strip(),
         "source_sha256": source_sha256,
         "source_byte_count": source_byte_count,
-        "input_record_count": len(document["observations"]),
+        "input_record_count": len(valid_rows) + len(invalid_rows),
         "valid_record_count": len(valid_rows),
         "invalid_record_count": len(invalid_rows),
         "model_count": len({row["model_id"] for row in valid_rows}),
@@ -245,6 +468,8 @@ def determine_preflight_status(valid_rows: list[dict[str, Any]]) -> str:
 def build_preflight_capability_manifest(
     *,
     document: dict[str, Any],
+    input_format: str,
+    input_schema_version: str,
     source_sha256: str,
     valid_rows: list[dict[str, Any]],
     invalid_rows: list[dict[str, Any]],
@@ -255,7 +480,8 @@ def build_preflight_capability_manifest(
         "requires_human_review": True,
         "source_sha256": source_sha256,
         "source_run_id": document["run_id"].strip(),
-        "input_schema_version": document["schema_version"],
+        "input_format": input_format,
+        "input_schema_version": input_schema_version,
         "model_ids_observed": sorted(
             {row["model_id"] for row in valid_rows}
         ),
@@ -278,6 +504,7 @@ def render_summary_markdown(summary: dict[str, Any]) -> str:
         f"- Scope: `{summary['scope']}`",
         f"- Promotion performed: `{str(summary['promotion_performed']).lower()}`",
         f"- Run ID: `{summary['run_id']}`",
+        f"- Input format: `{summary['input_format']}`",
         f"- Input schema: `{summary['input_schema_version']}`",
         f"- Source SHA-256: `{summary['source_sha256']}`",
         f"- Source bytes: {summary['source_byte_count']}",
@@ -322,21 +549,27 @@ def render_summary_markdown(summary: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def ingest_probe_output(probe_output: Path, out_dir: Path) -> dict[str, Any]:
+def ingest_probe_output(
+    probe_output: Path,
+    out_dir: Path,
+    *,
+    input_format: str = "auto",
+) -> dict[str, Any]:
     if not probe_output.is_file():
         raise ValueError(f"probe output is not a file: {probe_output}")
 
     source_bytes = probe_output.read_bytes()
-    document = load_probe_document(source_bytes, probe_output)
+    loaded_input = load_probe_input(source_bytes, probe_output, input_format)
+    document = loaded_input.document
     prepare_output_dir(out_dir)
 
     source_sha256 = hashlib.sha256(source_bytes).hexdigest()
-    preserved_source = out_dir / "source" / "results.json"
+    preserved_source = out_dir / "source" / loaded_input.preserved_source_name
     preserved_source.write_bytes(source_bytes)
 
     valid_rows: list[dict[str, Any]] = []
-    invalid_rows: list[dict[str, Any]] = []
-    for source_index, record in enumerate(document["observations"], start=1):
+    invalid_rows = list(loaded_input.adapter_invalid_rows)
+    for source_index, record in loaded_input.observation_records:
         reasons = observation_errors(record)
         if reasons:
             invalid_rows.append(invalid_record(record, source_index, reasons))
@@ -347,15 +580,20 @@ def ingest_probe_output(probe_output: Path, out_dir: Path) -> dict[str, Any]:
         **contract_fields(),
         "imported_at": utc_now_iso(),
         "importer": "local_harness/llm_probe_preflight_ingest.py",
-        "input_schema_version": document["schema_version"],
+        "input_format": loaded_input.input_format,
+        "input_schema_version": loaded_input.input_schema_version,
         "run_id": document["run_id"].strip(),
         "source_input_path": str(probe_output.resolve()),
-        "preserved_source_path": "source/results.json",
+        "preserved_source_path": (
+            f"source/{loaded_input.preserved_source_name}"
+        ),
         "source_sha256": source_sha256,
         "source_byte_count": len(source_bytes),
     }
     summary = build_summary(
         document=document,
+        input_format=loaded_input.input_format,
+        input_schema_version=loaded_input.input_schema_version,
         source_sha256=source_sha256,
         source_byte_count=len(source_bytes),
         valid_rows=valid_rows,
@@ -363,6 +601,8 @@ def ingest_probe_output(probe_output: Path, out_dir: Path) -> dict[str, Any]:
     )
     capability_manifest = build_preflight_capability_manifest(
         document=document,
+        input_format=loaded_input.input_format,
+        input_schema_version=loaded_input.input_schema_version,
         source_sha256=source_sha256,
         valid_rows=valid_rows,
         invalid_rows=invalid_rows,
@@ -390,7 +630,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--probe-output",
         required=True,
-        help="Path to an LLM-probe results.json file.",
+        help="Path to a normalized JSON or LLM-probe verified YAML file.",
+    )
+    parser.add_argument(
+        "--input-format",
+        choices=("auto", "json", "llm-probe-yaml"),
+        default="auto",
+        help="Input format. Auto infers JSON or YAML from the file extension.",
     )
     parser.add_argument(
         "--out-dir",
@@ -406,6 +652,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         summary = ingest_probe_output(
             Path(args.probe_output),
             Path(args.out_dir),
+            input_format=args.input_format,
         )
     except (FileExistsError, ValueError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
