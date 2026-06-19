@@ -60,10 +60,14 @@ Model auditions do not:
 - decide that a model is "the router" or "the coder";
 - call a judge model;
 - modify your repository;
-- manage your model server;
+- start, stop, or download models for this board/capability-card workflow;
 - automatically accept generated outputs.
 
 A human reviews the evidence and decides what to do next.
+For optional exploratory GGUF download and temporary local llama.cpp lifecycle
+support, use the separate
+[`local_harness/model_auditions/`](../model_auditions/README.md) harness. That
+support is not production model-server management or model promotion.
 
 ## Run an Explicit Endpoint
 

@@ -18,7 +18,12 @@ You need:
 - An OpenAI-compatible chat-completions endpoint.
 - A source transcript or log that is safe for your local environment.
 
-The model endpoint can be local or remote. Zaphod's Third Hand does not include a model server. For endpoint patterns and examples, see `docs/OPENAI_COMPATIBLE_ENDPOINTS.md`.
+The model endpoint can be local or remote. Core ZTH workflows expect an
+already-running OpenAI-compatible endpoint. The optional small-model audition
+harness can download candidate GGUFs and manage temporary local llama.cpp
+servers for exploratory evaluation, but it is not a production model-server
+manager. For endpoint patterns and boundaries, see
+`docs/OPENAI_COMPATIBLE_ENDPOINTS.md`.
 
 ## Step 0: Copy Or Clone The Toolkit
 

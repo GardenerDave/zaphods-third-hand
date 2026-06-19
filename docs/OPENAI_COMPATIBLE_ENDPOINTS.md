@@ -2,9 +2,14 @@
 
 Start here: [`README.md`](../README.md) -> [`docs/FIRST_SUCCESS.md`](FIRST_SUCCESS.md).
 
-This repository expects an OpenAI-compatible endpoint for model-backed operations.
+Core ZTH workflows expect an existing OpenAI-compatible endpoint for
+model-backed operations. Endpoint-backed tools can use a local server, a LAN
+server, or another compatible service supplied by the operator.
 
-It does not install, host, or manage model servers.
+The optional small-model audition harness can download candidate GGUFs and
+start or stop temporary local llama.cpp servers for exploratory evaluation.
+It is not a hosted service or production model-server manager, and its
+lifecycle commands do not imply model promotion or production readiness.
 
 ## What "OpenAI-compatible endpoint" means here
 
@@ -25,18 +30,27 @@ Optional capabilities used by some helper flows:
 
 - `GET <BASE_URL>/models` for model listing/alias resolution
 
-## What this repo assumes
+## What core endpoint-backed tools assume
 
 - You provide a reachable endpoint URL.
 - You provide a model name that your endpoint accepts.
 - You provide auth through environment variables if required.
 
-## What this repo does not do
+## Core workflow boundary
 
-- It does not start model servers.
-- It does not download models.
-- It does not configure GPU/CPU runtime settings.
-- It does not manage provider accounts.
+Core Context Distiller, worker, Aider, signal-extraction, and board-audition
+flows connect to existing endpoints. They do not start or stop those servers,
+download their models, configure their GPU/CPU runtime, or manage provider
+accounts.
+
+The separate
+[`local_harness/model_auditions/`](../local_harness/model_auditions/README.md)
+harness is optional exploratory tooling. It may download configured GGUF
+candidates and manage temporary local llama.cpp processes in tmux so their
+behavior can be measured. Operators still control the machine, network
+exposure, and final lifecycle decisions. Unlike core clients that support
+configured credentials, this small-model audition harness does not add
+authentication headers.
 
 ## Configuration pattern
 
@@ -66,7 +80,7 @@ If this times out on your endpoint, retry without `--final-only` before deeper d
 
 ## Example: llama.cpp server
 
-Example pattern (may vary by build and launch options):
+Example loopback-only pattern (may vary by build and launch options):
 
 ```bash
 ./llama-server -m /path/to/model.gguf --host 127.0.0.1 --port 8080
@@ -76,6 +90,7 @@ export ZTH_MODEL="your-model-name"
 
 Notes:
 
+- Prefer `127.0.0.1` when only local clients need the endpoint.
 - Keep `/v1` in base URL for OpenAI-style paths.
 - Model id must match what your server exposes.
 - If endpoint/model tends to return reasoning-heavy outputs, distiller runs can use:
@@ -86,7 +101,8 @@ export ZTH_DISTILLER_FINAL_ONLY="1"
 
 ## Example: LM Studio local server
 
-You must start or enable the LM Studio Local Server first. This repo does not launch LM Studio or start its server.
+You must start or enable the LM Studio Local Server first. Core ZTH tools do
+not launch LM Studio or start its server.
 
 Typical local pattern:
 
@@ -123,6 +139,11 @@ export ZTH_GEMMAE4B_BASE_URL="http://${LAN_HOST}:8085/v1"
 Replace `<LAN_HOST>` with an authorized hostname or address from your private
 configuration. Do not commit a real internal address.
 
+Before exposing any endpoint to a LAN, review the server's bind address,
+firewall rules, host access controls, and authentication behavior. Binding a
+server to `0.0.0.0` can make it reachable through every configured network
+interface; it is not equivalent to a loopback-only bind.
+
 For this repo's primary single-endpoint path, set one active pair:
 
 ```bash
@@ -152,6 +173,14 @@ Notes:
 
 - Ensure provider supports compatible chat-completions semantics.
 - Keep secrets out of git-tracked files.
+
+## Production Boundary
+
+Endpoint connectivity proves only that a configured tool can reach and call a
+server. Temporary llama.cpp lifecycle support and successful audition results
+are evidence for human review. They do not establish service hardening,
+availability, access control, production readiness, model promotion, or a
+production role assignment.
 
 ## Troubleshooting
 

@@ -4,6 +4,11 @@ This directory contains durable snapshots from ZTH model audition runs.
 
 Model audition reports compare models on repeatable prompts, fixtures, scorer profiles, suites, and boards. They are useful for tracking model behavior over time, but they are not production role assignments.
 
+Some reports use the optional small-model harness, which can download candidate
+GGUFs and manage temporary local llama.cpp servers for exploratory evaluation.
+That server lifecycle is evidence-gathering support only; it is not production
+model-server management or evidence of production readiness.
+
 ## In Plain English
 
 A model audition report says:
@@ -79,6 +84,7 @@ When reviewing a report, ask:
 ## Current Reports
 
 - `qwen_local_models_2026-06-18/` — comparison of local Qwen model candidates across the baseline audition board.
+- `SMALL_MODEL_AUDITION_2026-06-19.md` — exploratory small-model GGUF, endpoint, and prompt observations.
 
 ## Safety Reminder
 

@@ -5,6 +5,11 @@ This note records the observed setup issues and model behavior from the first sm
 The reusable harness and current local/LAN operator workflow are documented in
 [`local_harness/model_auditions/README.md`](../../../local_harness/model_auditions/README.md).
 
+The local llama.cpp processes used for this work were temporary exploratory
+test endpoints. Starting or stopping them gathered evidence only; it did not
+establish production service management, production readiness, or model
+promotion.
+
 ## Setup findings
 
 - Ubuntu/Debian Python rejected a global `pip install` with `externally-managed-environment` / PEP 668. The safe path was a dedicated venv under `~/ai/tools/hf-venv`.
