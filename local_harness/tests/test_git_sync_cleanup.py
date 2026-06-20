@@ -184,9 +184,38 @@ class GitSyncCleanupTests(unittest.TestCase):
 
         self.assertIn("git log --oneline origin/main..squashed-feature", text)
         self.assertIn("git diff --stat origin/main...squashed-feature", text)
+        self.assertIn("git diff --stat origin/main squashed-feature", text)
         self.assertIn("Only after a human confirms", text)
         self.assertIn("git branch -D squashed-feature", text)
         self.assertNotIn("safe to force-delete", text.lower())
+
+    def test_focused_remote_branch_includes_merge_base_and_tip_diffs(self):
+        branch = "squashed-feature"
+        remote_name = f"origin/{branch}"
+        state = sample_state(
+            remote_branches={"origin/main": "a" * 40, remote_name: "b" * 40},
+        )
+
+        recommendations = git_sync_cleanup.build_recommendations(
+            state,
+            after_merge_branch=branch,
+        )
+        text = "\n".join(recommendations)
+
+        self.assertIn(
+            "git log --oneline --decorate origin/squashed-feature -3",
+            text,
+        )
+        self.assertIn(
+            "git diff --stat origin/main...origin/squashed-feature",
+            text,
+        )
+        self.assertIn(
+            "git diff --stat origin/main origin/squashed-feature",
+            text,
+        )
+        self.assertIn("Only after human confirmation", text)
+        self.assertIn("git push origin --delete squashed-feature", text)
 
     def test_remote_revert_branch_requires_inspection_before_deletion(self):
         branch = "origin/revert-7-example"

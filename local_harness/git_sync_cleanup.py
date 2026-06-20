@@ -394,12 +394,20 @@ def build_recommendations(
                             "--oneline",
                             f"origin/main..{after_merge_branch}",
                         ),
-                        "Compare the focused branch before cleanup: "
+                        "Compare the focused branch patch from its merge base: "
                         + command_text(
                             "git",
                             "diff",
                             "--stat",
                             f"origin/main...{after_merge_branch}",
+                        ),
+                        "Compare final focused branch tree content before cleanup: "
+                        + command_text(
+                            "git",
+                            "diff",
+                            "--stat",
+                            "origin/main",
+                            after_merge_branch,
                         ),
                         "Only after a human confirms the PR was merged may they choose: "
                         + command_text("git", "branch", "-D", after_merge_branch),
@@ -417,8 +425,10 @@ def build_recommendations(
                 [
                     "Inspect the focused remote branch: "
                     + command_text("git", "log", "--oneline", "--decorate", remote_name, "-3"),
-                    "Compare the focused remote branch: "
+                    "Compare the focused remote branch patch from its merge base: "
                     + command_text("git", "diff", "--stat", f"origin/main...{remote_name}"),
+                    "Compare final focused remote branch tree content: "
+                    + command_text("git", "diff", "--stat", "origin/main", remote_name),
                     "Only after human confirmation may the remote branch be deleted: "
                     + command_text("git", "push", "origin", "--delete", after_merge_branch),
                 ]
