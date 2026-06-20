@@ -255,6 +255,9 @@ Model audition runs usually write to:
 - `.work/model_auditions/`
 - `.work/model_audition_comparisons/`
 
+Keep board/capability-card and exploratory small-model evidence in separate
+subdirectories under `.work/model_auditions/` so their schemas are not mixed.
+
 `.work` is local run evidence. Inspect useful failures before deleting it.
 Commit durable summaries under `docs/reports/` when a result is worth preserving.
 

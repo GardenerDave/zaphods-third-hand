@@ -9,7 +9,8 @@ This is not a promise that the toolkit is production-ready. It is a checkpoint f
 ## Core Toolkit
 
 - [ ] README explains what the toolkit is, who it is for, and what it does not do yet.
-- [ ] QUICKSTART gives a new user a short path from configuration to a toy run.
+- [ ] `docs/FIRST_SUCCESS.md` gives a new user a model-free smoke test and an optional endpoint connectivity smoke.
+- [ ] QUICKSTART gives an operator the normal private-source Context Distiller workflow.
 - [ ] `config.example.env` uses placeholders or safe local defaults only.
 - [ ] `.gitignore` excludes private config, generated outputs, caches, logs, and local source material.
 - [ ] License docs state that noncommercial use is allowed and commercial use requires explicit written permission.

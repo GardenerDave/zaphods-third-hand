@@ -60,7 +60,8 @@ home/workspace paths, and real endpoint hosts. Prefer package-relative paths,
 modes, and human-review boundaries; sanitizing provenance metadata must not
 turn evidence into an approval or promotion claim.
 
-Reports should not claim that a model, prompt, workflow, or agent role is production-ready unless a separate human review process has accepted that conclusion.
+Reports may record reviewed evidence and human decisions, but the report itself
+does not establish production readiness.
 
 ## Current Report Areas
 
@@ -70,4 +71,7 @@ Reports should not claim that a model, prompt, workflow, or agent role is produc
 
 Reports are evidence.
 
-They support human review, comparison, and future decision-making. They do not automatically move generated context into canonical project memory, assign model roles, or approve code changes.
+They support human review, comparison, and future decision-making. They do not
+accept generated context, promote or rank models into roles, assign model
+roles, move lifecycle state, or approve code changes. Humans make acceptance,
+publication, lifecycle, and follow-up decisions.
