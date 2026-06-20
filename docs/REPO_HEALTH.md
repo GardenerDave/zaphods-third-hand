@@ -20,6 +20,15 @@ git diff --check
 Confirm that every changed and untracked file is intentional, generated or
 private files are not staged, and unrelated user changes remain untouched.
 
+After a squash merge or PR cleanup, the read-only Git sync advisor can summarize
+current local and remote-tracking refs and print inspection commands:
+
+```bash
+python3 local_harness/git_sync_cleanup.py
+```
+
+It does not fetch, pull, prune, switch, reset, push, or delete branches.
+
 ## 2. Check Tracked Files for Private Material
 
 Use tracked-file-safe checks:

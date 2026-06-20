@@ -15,6 +15,7 @@ This folder contains the manager-side helper scripts for supervised local-worker
 - `tool_maker.py`: prepares a bounded, model-free workflow evidence packet and Markdown lifecycle draft scaffold; see [`docs/TOOL_MAKER.md`](../docs/TOOL_MAKER.md).
 - `validate_scaffold.py`: validates Tool Maker and Change Closeout scaffold shape and metadata consistency without reading original sources or judging truth, safety, completeness, or promotion readiness.
 - `repo_health_check.py`: reports Markdown-link, public-surface privacy, boundary-language, scaffold, diff-hygiene, and optional test health without changing files.
+- `git_sync_cleanup.py`: reports local post-merge Git sync and branch-cleanup evidence and prints human-reviewable commands without executing cleanup.
 - `zth_agent_packet.py`: generates one independent role/context packet for an external agent.
 - `zth_compare_agent_outputs.py`: compares completed external-agent outputs that follow the ZTH contract.
 - `zth_coverage_auditor.py`: reports obvious pre-synthesis coverage areas and blind spots.
@@ -58,6 +59,27 @@ delete files, validate semantic truth or safety, or grant merge, acceptance,
 promotion, or lifecycle authority. Full pytest is optional and is not part of
 the default check. The privacy scan excludes durable historical material under
 `docs/reports/`; review reports separately before publication.
+
+## Git Sync and Cleanup Advice
+
+Inspect local Git and remote-tracking refs after a merge:
+
+```text
+python3 local_harness/git_sync_cleanup.py
+python3 local_harness/git_sync_cleanup.py \
+  --after-merge-branch roadmap-mutual-supervision-clarity
+python3 local_harness/git_sync_cleanup.py --run-health
+python3 local_harness/git_sync_cleanup.py --json
+```
+
+The advisor is read-only. It does not fetch, pull, prune, switch, merge, reset,
+push, or delete branches. Remote findings reflect the currently available
+local remote-tracking refs and may be stale. It prints inspection commands
+before destructive cleanup suggestions, especially after squash merges, and
+requires a human to confirm branch deletion. Use `--include-fetch-advice` to
+print `git fetch --prune` as an optional command; it is never run by the
+advisor. Passing repo health remains evidence, not cleanup or acceptance
+authority.
 
 ## Configuration
 
