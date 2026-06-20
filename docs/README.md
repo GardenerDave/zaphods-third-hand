@@ -47,6 +47,25 @@ outputs remain evidence until a human reviews the next action.
   and review-bundle steps, plus optional supervised endpoint-backed
   extraction.
 
+## Tool Maker
+
+- [`TOOL_MAKER.md`](TOOL_MAKER.md) — supervised workflow-to-lifecycle
+  extraction process with a model-free scaffold builder.
+- [`templates/TOOL_LIFECYCLE_TEMPLATE.md`](templates/TOOL_LIFECYCLE_TEMPLATE.md)
+  — blank reusable lifecycle draft.
+- [`prompts/TOOL_MAKER_PROMPT.md`](../prompts/TOOL_MAKER_PROMPT.md) — compact
+  extraction contract for supervised agents.
+
+## Change Closeout
+
+- [`CHANGE_CLOSEOUT.md`](CHANGE_CLOSEOUT.md) — supervised final review process
+  with a model-free scaffold builder for behavior, validation, documentation,
+  safety boundaries, and lifecycle knowledge.
+- [`templates/CHANGE_CLOSEOUT_TEMPLATE.md`](templates/CHANGE_CLOSEOUT_TEMPLATE.md)
+  — blank human-copyable closeout report.
+- [`prompts/CHANGE_CLOSEOUT_PROMPT.md`](../prompts/CHANGE_CLOSEOUT_PROMPT.md) —
+  compact supervised closeout contract.
+
 ## LLM-Probe Preflight and Comparison
 
 - [`LLM_PROBE_PREFLIGHT.md`](LLM_PROBE_PREFLIGHT.md) — model-free import,

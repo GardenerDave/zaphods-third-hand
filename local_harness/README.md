@@ -11,6 +11,8 @@ This folder contains the manager-side helper scripts for supervised local-worker
 - `llm_probe_preflight_ingest.py`: imports versioned LLM-probe JSON as preflight-only plain-file evidence; see [`docs/LLM_PROBE_PREFLIGHT.md`](../docs/LLM_PROBE_PREFLIGHT.md).
 - `llm_probe_preflight_compare.py`: compares two canonical preflight capability manifests and writes aggregate, human-reviewable regression evidence; see [`docs/LLM_PROBE_PREFLIGHT.md`](../docs/LLM_PROBE_PREFLIGHT.md).
 - `model_auditions/`: optional exploratory small-model harness that can download candidate GGUFs, manage temporary local llama.cpp tmux sessions, or call existing local/LAN OpenAI-compatible endpoints; see [`model_auditions/README.md`](model_auditions/README.md).
+- `change_closeout.py`: prepares a bounded, model-free final-review evidence packet and Markdown closeout scaffold; see [`docs/CHANGE_CLOSEOUT.md`](../docs/CHANGE_CLOSEOUT.md).
+- `tool_maker.py`: prepares a bounded, model-free workflow evidence packet and Markdown lifecycle draft scaffold; see [`docs/TOOL_MAKER.md`](../docs/TOOL_MAKER.md).
 - `zth_agent_packet.py`: generates one independent role/context packet for an external agent.
 - `zth_compare_agent_outputs.py`: compares completed external-agent outputs that follow the ZTH contract.
 - `zth_coverage_auditor.py`: reports obvious pre-synthesis coverage areas and blind spots.

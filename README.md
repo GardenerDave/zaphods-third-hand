@@ -32,6 +32,7 @@ audit trail and human control.
 
 - Run a model-free smoke test to confirm the repo works.
 - Distill transcripts or logs into reviewable summaries and patch files.
+- Turn messy workflow evidence into reviewable tool lifecycle drafts.
 - Audition local or remote OpenAI-compatible models against repeatable test boards.
 - Compare model capability cards without assigning production roles.
 - Prepare supervised role packets for external agent or panel workflows.
