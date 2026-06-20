@@ -57,7 +57,7 @@ authentication headers.
 Set environment variables in your private shell or `config.env`:
 
 ```bash
-export ZTH_BASE_URL="http://localhost:8080/v1"
+export ZTH_BASE_URL="http://127.0.0.1:8080/v1"
 export ZTH_MODEL="your-model-id"
 # Optional if endpoint requires bearer auth:
 # export ZTH_API_KEY="your-secret-key"
@@ -116,9 +116,10 @@ Notes:
 - Confirm the loaded model id in LM Studio server UI/API.
 - Run the same `icm_call.py` smoke test before distiller runs.
 
-## Advanced operator example: multi-port LAN stack
+## Intentional LAN exposure
 
-This is an operator pattern for a single host exposing multiple models. It is not the main beginner path.
+The following advanced operator pattern uses a single host to expose multiple
+models. It is not the main beginner path.
 
 ```bash
 export LAN_HOST="<LAN_HOST>"

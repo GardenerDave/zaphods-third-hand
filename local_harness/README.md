@@ -45,7 +45,7 @@ List models on a live OpenAI-compatible worker:
 
 ```text
 python3 local_harness/icm_call.py handoff \
-  --base-url http://localhost:8083/v1 \
+  --base-url http://127.0.0.1:8083/v1 \
   --list-models
 ```
 
@@ -53,7 +53,7 @@ Call a live worker and force final-answer output:
 
 ```text
 python3 local_harness/icm_call.py handoff \
-  --base-url http://localhost:8083/v1 \
+  --base-url http://127.0.0.1:8083/v1 \
   --model <MODEL_NAME> \
   --final-only \
   "Reply with exactly: ok"
@@ -70,7 +70,7 @@ Run a supervised single-worker smoke test folder:
 python3 local_harness/run_single_worker.py \
   outputs/agent_runs/example-smoke-test \
   handoff \
-  --base-url http://localhost:8083/v1 \
+  --base-url http://127.0.0.1:8083/v1 \
   --model <MODEL_NAME> \
   --final-only \
   --init-stubs \
@@ -98,7 +98,7 @@ Run a supervised Aider task against a remote OpenAI-compatible endpoint:
 python3 local_harness/run_aider_worker.py \
   outputs/agent_runs/example-aider-remote \
   --aider-python ~/.local/share/uv/tools/aider-chat/bin/python \
-  --openai-api-base http://<SERVER-IP>:8081/v1 \
+  --openai-api-base http://<LAN_HOST>:8081/v1 \
   --model openai/<MODEL_ID> \
   --timeout 360 \
   --read README.md \
@@ -129,11 +129,14 @@ It also passes `--no-gitignore` so Aider does not modify `.gitignore` during sup
 
 ## Endpoint Note
 
-Most endpoint-backed local-harness tools expect an existing OpenAI-compatible
+Core endpoint-backed ZTH workflows expect an existing OpenAI-compatible
 server. The `model_auditions/` download/start/stop scripts are a separate,
 optional exception for exploratory evidence gathering. They are not a
 production model-server manager, and starting or stopping a candidate server
-does not promote or approve its model.
+does not promote or approve its model or establish production readiness. The
+small-model audition harness does not add authentication headers; review
+firewall and access controls before intentionally exposing a temporary server
+to a LAN.
 
 Some OpenAI-compatible local runtimes can return cleaner final content when `--final-only` is used.
 Broader prompts may still spend the token budget inside hidden reasoning fields or long internal planning.
