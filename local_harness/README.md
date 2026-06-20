@@ -14,6 +14,7 @@ This folder contains the manager-side helper scripts for supervised local-worker
 - `change_closeout.py`: prepares a bounded, model-free final-review evidence packet and Markdown closeout scaffold; see [`docs/CHANGE_CLOSEOUT.md`](../docs/CHANGE_CLOSEOUT.md).
 - `tool_maker.py`: prepares a bounded, model-free workflow evidence packet and Markdown lifecycle draft scaffold; see [`docs/TOOL_MAKER.md`](../docs/TOOL_MAKER.md).
 - `validate_scaffold.py`: validates Tool Maker and Change Closeout scaffold shape and metadata consistency without reading original sources or judging truth, safety, completeness, or promotion readiness.
+- `repo_health_check.py`: reports Markdown-link, public-surface privacy, boundary-language, scaffold, diff-hygiene, and optional test health without changing files.
 - `zth_agent_packet.py`: generates one independent role/context packet for an external agent.
 - `zth_compare_agent_outputs.py`: compares completed external-agent outputs that follow the ZTH contract.
 - `zth_coverage_auditor.py`: reports obvious pre-synthesis coverage areas and blind spots.
@@ -27,6 +28,36 @@ This folder contains the manager-side helper scripts for supervised local-worker
 - `aider_metrics.py`: run metadata assembly helpers for Aider runs.
 - `tests/test_run_aider_worker.py`, `tests/test_aider_prep.py`, and `tests/test_aider_runtime.py`:
   split test surfaces so local Aider tasks can target smaller real-code files.
+
+## Repository Health
+
+Run the fast default checks for tracked Markdown links, public setup surfaces,
+and authority-expanding wording:
+
+```text
+python3 local_harness/repo_health_check.py
+```
+
+Run every supported check, including `git diff --check` and the full
+`local_harness/tests` suite:
+
+```text
+python3 local_harness/repo_health_check.py --all
+```
+
+Validate a private scaffold explicitly without scanning `.work/` generally:
+
+```text
+python3 local_harness/repo_health_check.py \
+  --scaffolds \
+  --scaffold .work/change_closeouts/example.md
+```
+
+The helper reports health and exits nonzero on failures. It does not fix or
+delete files, validate semantic truth or safety, or grant merge, acceptance,
+promotion, or lifecycle authority. Full pytest is optional and is not part of
+the default check. The privacy scan excludes durable historical material under
+`docs/reports/`; review reports separately before publication.
 
 ## Configuration
 
