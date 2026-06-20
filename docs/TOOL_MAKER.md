@@ -88,16 +88,31 @@ The script:
 Use `--max-source-chars` to lower or raise the total embedded character limit.
 Truncation is recorded per source so missing evidence remains visible.
 
-Files inside the repository use repository-relative source paths. Relative
-external inputs retain a normalized relative label; absolute external inputs
-use an `external/<path-marker>/<filename>` label so home paths are not copied
-into the scaffold. The SHA-256 value identifies the complete source bytes at
-scaffold time, including bytes omitted by truncation.
+Generated scaffolds declare
+`scaffold_contract_version: "tool-lifecycle-v1"`. Files inside the repository
+use repository-relative source paths. Relative external inputs retain a
+normalized relative label; absolute external inputs use an
+`external/<path-marker>/<filename>` label so absolute home paths are not copied
+into the scaffold. SHA-256 identifies the complete source bytes at scaffold
+time, including bytes omitted by truncation.
 
-Source labels, sanitized paths, and hashes improve provenance and help
-distinguish duplicate basenames. They do not remove secrets from source text or
-make private evidence safe to publish. A human must still review and sanitize
-any scaffold selected for sharing.
+Validate a generated scaffold with:
+
+```bash
+python3 local_harness/validate_scaffold.py \
+  --kind tool-lifecycle \
+  .work/tool_lifecycles/local-provider-smoke.md
+```
+
+Validation checks the declared contract, required headings, enum-like fields,
+source metadata shape, source counts, hashes, labels, totals, and truncation
+consistency. It reads only the scaffold; original source files are not
+required.
+
+Validation does not prove that source evidence or lifecycle claims are true,
+safe, complete, sanitized, or promotion-ready. Source labels and hashes improve
+provenance but do not remove secrets or make private evidence safe to publish.
+A human must still review the draft and sanitize anything selected for sharing.
 
 ## Fill and Review the Draft
 

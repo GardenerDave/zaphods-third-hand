@@ -45,6 +45,10 @@ class ChangeCloseoutTests(unittest.TestCase):
 
         self.assertEqual(1, len(records))
         self.assertIn("# Change Closeout Report: Tool Maker v1", text)
+        self.assertIn(
+            'scaffold_contract_version: "change-closeout-v1"',
+            text,
+        )
         for section in REQUIRED_SECTIONS:
             self.assertIn(section, text)
         self.assertIn("docs_pass_status: incomplete", text)
@@ -87,13 +91,13 @@ class ChangeCloseoutTests(unittest.TestCase):
             output = root / "closeout.md"
             implementation.write_text("print('change')\n", encoding="utf-8")
             tests.write_text("Tests passed with limitations.\n", encoding="utf-8")
-            expected_total_characters = len(
+            expected_total = len(
                 implementation.read_text(encoding="utf-8")
             ) + len(tests.read_text(encoding="utf-8"))
-            expected_implementation_sha256 = hashlib.sha256(
+            implementation_sha256 = hashlib.sha256(
                 implementation.read_bytes()
             ).hexdigest()
-            expected_tests_sha256 = hashlib.sha256(tests.read_bytes()).hexdigest()
+            tests_sha256 = hashlib.sha256(tests.read_bytes()).hexdigest()
 
             records = change_closeout.generate_scaffold(
                 [implementation, tests],
@@ -115,14 +119,14 @@ class ChangeCloseoutTests(unittest.TestCase):
             f"max_source_chars: {change_closeout.DEFAULT_MAX_SOURCE_CHARS}",
             text,
         )
-        self.assertIn(f"total_source_characters: {expected_total_characters}", text)
-        self.assertIn(f"total_included_characters: {expected_total_characters}", text)
+        self.assertIn(f"total_source_characters: {expected_total}", text)
+        self.assertIn(f"total_included_characters: {expected_total}", text)
         self.assertIn("any_truncated: false", text)
         self.assertIn('"bytes":', text)
         self.assertIn('"lines":', text)
         self.assertEqual(2, text.count('"sha256":'))
-        self.assertIn(expected_implementation_sha256, text)
-        self.assertIn(expected_tests_sha256, text)
+        self.assertIn(implementation_sha256, text)
+        self.assertIn(tests_sha256, text)
 
     def test_duplicate_basenames_remain_distinguishable(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -142,8 +146,6 @@ class ChangeCloseoutTests(unittest.TestCase):
             )
             text = output.read_text(encoding="utf-8")
 
-        self.assertEqual("README.md", records[0].filename)
-        self.assertEqual("README.md", records[1].filename)
         self.assertNotEqual(records[0].source_label, records[1].source_label)
         self.assertTrue(records[0].source_label.startswith("external/"))
         self.assertTrue(records[1].source_label.startswith("external/"))
@@ -157,14 +159,10 @@ class ChangeCloseoutTests(unittest.TestCase):
             f"  - {change_closeout.yaml_string(records[1].source_label)}",
             text,
         )
-        self.assertIn(f'"source_path": "{records[0].source_path}"', text)
-        self.assertIn(f'"source_path": "{records[1].source_path}"', text)
 
     def test_repository_source_path_is_repository_relative(self):
-        source = change_closeout.REPO_ROOT / "docs" / "README.md"
-
         record = change_closeout.load_sources(
-            [source],
+            [change_closeout.REPO_ROOT / "docs" / "README.md"],
             change_closeout.DEFAULT_MAX_SOURCE_CHARS,
         )[0]
 

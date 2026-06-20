@@ -63,6 +63,7 @@ Return Markdown with these sections in this order:
 Immediately after the title, include:
 
 ```yaml
+scaffold_contract_version: "change-closeout-v1"
 change_name: "<change name>"
 status: draft
 requires_human_review: true
@@ -78,6 +79,7 @@ Keep `status: draft` and `requires_human_review: true`. Even
 
 ## Evidence Rules
 
+- Preserve `scaffold_contract_version: "change-closeout-v1"`.
 - Cite reviewed source labels or sanitized paths and use the recorded SHA-256
   when source identity matters. Do not collapse duplicate basenames into one
   source.

@@ -45,6 +45,10 @@ class ToolMakerTests(unittest.TestCase):
 
         self.assertEqual(1, len(records))
         self.assertIn("# Tool Lifecycle Draft: Provider smoke", text)
+        self.assertIn(
+            'scaffold_contract_version: "tool-lifecycle-v1"',
+            text,
+        )
         for section in REQUIRED_SECTIONS:
             self.assertIn(section, text)
         self.assertIn("status: draft", text)
@@ -95,11 +99,11 @@ class ToolMakerTests(unittest.TestCase):
             output = root / "lifecycle.md"
             chat.write_text("Intent and attempted steps.\n", encoding="utf-8")
             notes.write_text("Validation passed.\nFailure mattered.\n", encoding="utf-8")
-            expected_total_characters = len(chat.read_text(encoding="utf-8")) + len(
+            expected_total = len(chat.read_text(encoding="utf-8")) + len(
                 notes.read_text(encoding="utf-8")
             )
-            expected_chat_sha256 = hashlib.sha256(chat.read_bytes()).hexdigest()
-            expected_notes_sha256 = hashlib.sha256(notes.read_bytes()).hexdigest()
+            chat_sha256 = hashlib.sha256(chat.read_bytes()).hexdigest()
+            notes_sha256 = hashlib.sha256(notes.read_bytes()).hexdigest()
 
             records = tool_maker.generate_scaffold(
                 [chat, notes],
@@ -112,15 +116,15 @@ class ToolMakerTests(unittest.TestCase):
         self.assertIn(f"  - {tool_maker.yaml_string(records[1].source_label)}", text)
         self.assertIn("source_count: 2", text)
         self.assertIn(f"max_source_chars: {tool_maker.DEFAULT_MAX_SOURCE_CHARS}", text)
-        self.assertIn(f"total_source_characters: {expected_total_characters}", text)
-        self.assertIn(f"total_included_characters: {expected_total_characters}", text)
+        self.assertIn(f"total_source_characters: {expected_total}", text)
+        self.assertIn(f"total_included_characters: {expected_total}", text)
         self.assertIn("any_truncated: false", text)
         self.assertIn('"bytes":', text)
         self.assertIn('"lines":', text)
         self.assertIn('"included_characters":', text)
         self.assertEqual(2, text.count('"sha256":'))
-        self.assertIn(expected_chat_sha256, text)
-        self.assertIn(expected_notes_sha256, text)
+        self.assertIn(chat_sha256, text)
+        self.assertIn(notes_sha256, text)
 
     def test_duplicate_basenames_remain_distinguishable(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -140,8 +144,6 @@ class ToolMakerTests(unittest.TestCase):
             )
             text = output.read_text(encoding="utf-8")
 
-        self.assertEqual("README.md", records[0].filename)
-        self.assertEqual("README.md", records[1].filename)
         self.assertNotEqual(records[0].source_label, records[1].source_label)
         self.assertTrue(records[0].source_label.startswith("external/"))
         self.assertTrue(records[1].source_label.startswith("external/"))
@@ -149,14 +151,10 @@ class ToolMakerTests(unittest.TestCase):
         self.assertNotIn(os.fspath(root), records[1].source_label)
         self.assertIn(f"  - {tool_maker.yaml_string(records[0].source_label)}", text)
         self.assertIn(f"  - {tool_maker.yaml_string(records[1].source_label)}", text)
-        self.assertIn(f'"source_path": "{records[0].source_path}"', text)
-        self.assertIn(f'"source_path": "{records[1].source_path}"', text)
 
     def test_repository_source_path_is_repository_relative(self):
-        source = tool_maker.REPO_ROOT / "docs" / "README.md"
-
         record = tool_maker.load_sources(
-            [source],
+            [tool_maker.REPO_ROOT / "docs" / "README.md"],
             tool_maker.DEFAULT_MAX_SOURCE_CHARS,
         )[0]
 

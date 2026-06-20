@@ -118,15 +118,31 @@ existing report. It does not call a model or execute source commands.
 Use `--max-source-chars` to control the total embedded character limit.
 Truncation remains visible in each source record.
 
-Files inside the repository use repository-relative source paths. Relative
-external inputs retain a normalized relative label; absolute external inputs
-use an `external/<path-marker>/<filename>` label so home paths are not copied
-into the report. SHA-256 identifies the complete source bytes at scaffold
-time, including bytes omitted from a truncated packet.
+Generated scaffolds declare
+`scaffold_contract_version: "change-closeout-v1"`. Files inside the repository
+use repository-relative source paths. Relative external inputs retain a
+normalized relative label; absolute external inputs use an
+`external/<path-marker>/<filename>` label so absolute home paths are not copied
+into the report. SHA-256 identifies the complete source bytes at scaffold time,
+including bytes omitted by truncation.
 
-Paths and hashes improve provenance and distinguish duplicate basenames. They
-do not remove secrets, classify sensitivity, or make private evidence safe to
-publish. Sanitization and publication decisions remain human responsibilities.
+Validate a generated scaffold with:
+
+```bash
+python3 local_harness/validate_scaffold.py \
+  --kind change-closeout \
+  .work/change_closeouts/tool-maker-v1.md
+```
+
+Validation checks the declared contract, required headings, enum-like fields,
+source metadata shape, source counts, hashes, labels, totals, and truncation
+consistency. It reads only the scaffold; original source files are not
+required.
+
+Validation does not prove that evidence or closeout findings are true, safe,
+complete, sanitized, or promotion-ready. Paths and hashes improve provenance
+but do not remove secrets or make private evidence safe to publish.
+Sanitization, acceptance, and promotion remain human decisions.
 
 ## Review Honestly
 
