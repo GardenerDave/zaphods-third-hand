@@ -14,6 +14,7 @@ from typing import Sequence
 
 
 DEFAULT_MAX_SOURCE_CHARS = 100_000
+SCAFFOLD_CONTRACT_VERSION = "tool-lifecycle-v1"
 REPO_ROOT = Path(__file__).absolute().parent.parent
 
 
@@ -175,6 +176,7 @@ def render_scaffold(
     return (
         f"# Tool Lifecycle Draft: {clean_name(name)}\n\n"
         "```yaml\n"
+        f"scaffold_contract_version: {yaml_string(SCAFFOLD_CONTRACT_VERSION)}\n"
         f"lifecycle_name: {yaml_string(clean_name(name))}\n"
         "status: draft\n"
         "source_material:\n"

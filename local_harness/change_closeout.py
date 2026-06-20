@@ -14,6 +14,7 @@ from typing import Sequence
 
 
 DEFAULT_MAX_SOURCE_CHARS = 100_000
+SCAFFOLD_CONTRACT_VERSION = "change-closeout-v1"
 REPO_ROOT = Path(__file__).absolute().parent.parent
 
 
@@ -166,6 +167,7 @@ def render_scaffold(
     return (
         f"# Change Closeout Report: {change_name}\n\n"
         "```yaml\n"
+        f"scaffold_contract_version: {yaml_string(SCAFFOLD_CONTRACT_VERSION)}\n"
         f"change_name: {yaml_string(change_name)}\n"
         "status: draft\n"
         "requires_human_review: true\n"
