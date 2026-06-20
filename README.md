@@ -63,8 +63,9 @@ Start here:
 
         python3 local_harness/report_distiller_metrics.py --runs-dir examples --limit 3
 
-3. If you have an OpenAI-compatible endpoint, continue with the optional endpoint
-   smoke test and toy Context Distiller run in [`docs/FIRST_SUCCESS.md`](docs/FIRST_SUCCESS.md).
+3. If you have an OpenAI-compatible endpoint, run the optional connectivity
+   smoke in [`docs/FIRST_SUCCESS.md`](docs/FIRST_SUCCESS.md), then continue with
+   the normal workflow in [`QUICKSTART.md`](QUICKSTART.md).
 
 If you are new to this repo, begin with Context Distiller before using the
 management-team or external-agent layers.
@@ -225,13 +226,21 @@ Optional:
 - `ZTH_API_KEY`
 - Distiller budget, time, and profile variables in [`config.example.env`](config.example.env)
 
-## Dependency and Installation Notes
+## Dependency Matrix
 
-For core smoke tests and local harness usage, this repo uses Python standard
-library modules and Bash scripts.
+| Workflow | Required dependencies | Notes |
+|---|---|---|
+| Model-free smoke | Bash and Python 3 standard library | No endpoint or third-party Python package required. |
+| Core HTTP endpoint calls | Python 3 standard library | Requires an external OpenAI-compatible endpoint and any operator-supplied credentials. |
+| Test suite | `pytest` | Development and verification dependency; not needed for normal runtime commands. |
+| YAML preflight import | PyYAML | Required only for LLM-probe YAML input. Normalized JSON import does not require it. |
+| GGUF download | `huggingface_hub`; optional `hf_xet` | Install in a dedicated virtual environment. |
+| Temporary llama.cpp lifecycle | llama.cpp `llama-server` binary and `tmux` | Optional exploratory small-model harness only. |
+| Aider adapter | Separate Aider installation | Use the supervised wrapper and review every edit. |
+| Endpoint serving | External OpenAI-compatible server | Core workflows do not manage the server. The optional exploratory small-model harness can manage temporary local llama.cpp sessions. |
 
-- No mandatory third-party Python packages are required for the model-free metrics smoke test.
-- If your endpoint requires auth, provide credentials through environment variables only.
+If an endpoint requires authentication, provide credentials through private
+environment variables or `config.env`, never tracked examples.
 
 ## Generated Outputs
 

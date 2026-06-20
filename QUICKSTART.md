@@ -1,73 +1,53 @@
 # Quickstart
 
-For the shortest onboarding path, use `docs/FIRST_SUCCESS.md` first.
+Run [`docs/FIRST_SUCCESS.md`](docs/FIRST_SUCCESS.md) first. This guide covers
+the normal operator workflow after the model-free and optional endpoint smoke
+checks succeed.
 
-Use this quickstart after that first smoke pass.
+## Boundaries
 
-## License Note
+- ZTH is human-supervised and file-based.
+- Generated summaries, patches, scores, and role outputs remain evidence until
+  reviewed.
+- No workflow automatically promotes a model, accepts generated context, moves
+  lifecycle state, or establishes production readiness.
+- Core model-backed workflows use an existing OpenAI-compatible endpoint. The
+  optional small-model exploratory harness is the only workflow that can
+  manage temporary local llama.cpp servers.
 
-Before using this toolkit, confirm your use is noncommercial or obtain written permission for commercial use. See `LICENSE.md` and `COMMERCIAL_USE.md`.
+Before use, confirm that your activity complies with [`LICENSE.md`](LICENSE.md)
+and [`COMMERCIAL_USE.md`](COMMERCIAL_USE.md).
 
 ## Prerequisites
 
-You need:
+For the Context Distiller path below:
 
-- Bash.
-- Python 3.
-- A git working tree or another folder where you can review file changes.
-- An OpenAI-compatible chat-completions endpoint.
-- A source transcript or log that is safe for your local environment.
+- Bash
+- Python 3
+- a working directory where generated files can be reviewed
+- an existing OpenAI-compatible endpoint
+- a model ID accepted by that endpoint
+- a source transcript or log safe for your environment
 
-The model endpoint can be local or remote. Core ZTH workflows expect an
-already-running OpenAI-compatible endpoint. The optional small-model audition
-harness can download candidate GGUFs and manage temporary local llama.cpp
-servers for exploratory evaluation, but it is not a production model-server
-manager. For endpoint patterns and boundaries, see
-`docs/OPENAI_COMPATIBLE_ENDPOINTS.md`.
+See the dependency matrix in [`README.md`](README.md#dependency-matrix) for
+optional workflows and test dependencies.
 
-## Step 0: Copy Or Clone The Toolkit
+## 1. Configure and Verify the Endpoint
 
-Put `zaphods-third-hand/` inside the repository or workspace where you want to keep generated outputs and job evidence.
+From the repository root:
 
 ```bash
-cd <REPO_ROOT>/zaphods-third-hand
-```
-
-You can verify the metrics reporter without a model server:
-
-```bash
-python3 local_harness/report_distiller_metrics.py --runs-dir examples --limit 3
-```
-
-## Step 1: Configure Local Or Remote Model Endpoint
-
-Use an OpenAI-compatible chat-completions endpoint.
-
-```bash
-cd <REPO_ROOT>/zaphods-third-hand
 cp config.example.env config.env
-# Edit config.env with your endpoint and model, then load it.
+# Edit config.env with the real endpoint and model before loading it.
 set -a
 source config.env
 set +a
 ```
 
-You can also export values directly:
+If required by the endpoint, set `ZTH_API_KEY` in your private shell or
+`config.env`.
 
-```bash
-export ZTH_BASE_URL="http://<LLAMA_CPP_BASE_URL>/v1"
-export ZTH_MODEL="<MODEL_NAME>"
-```
-
-If your endpoint requires authorization, set your own key in your private shell or `config.env`:
-
-```bash
-export ZTH_API_KEY="<YOUR_PRIVATE_KEY>"
-```
-
-## Step 1.5: Verify Endpoint Connectivity
-
-Before running the distiller, confirm your endpoint and model can answer one tiny request:
+Verify connectivity:
 
 ```bash
 python3 local_harness/icm_call.py handoff \
@@ -80,43 +60,27 @@ python3 local_harness/icm_call.py handoff \
   "Reply with exactly: ok"
 ```
 
-Expected result: a short response that includes `ok`.
+Do not continue until the endpoint, model ID, and authentication are correct.
+See [`docs/OPENAI_COMPATIBLE_ENDPOINTS.md`](docs/OPENAI_COMPATIBLE_ENDPOINTS.md)
+for local, LAN, and remote patterns.
 
-If this fails, fix endpoint/model/auth first before continuing.
+## 2. Choose a Private Source
 
-## Step 2: Add A Source Transcript Or Log
-
-Place a source file somewhere in your private working tree. Use a stable source ID and a short title.
-
-```text
-SOURCE_ID=<SOURCE_ID>
-SOURCE_FILE=<SOURCE_FILE>
-SHORT_TITLE=<SHORT_TITLE>
-```
-
-Do not commit private transcripts unless you have reviewed and approved them for sharing.
-
-For a tiny first test, create a short toy source in a private scratch folder:
+Keep private transcripts and logs outside tracked documentation. Record a
+stable source ID and short title:
 
 ```bash
-mkdir -p sources
-printf 'Decision: keep role runs supervised. Next action: write a small job packet.\n' > sources/toy_source.txt
+export SOURCE_ID="<SOURCE_ID>"
+export SOURCE_FILE="<SOURCE_FILE>"
+export SHORT_TITLE="<SHORT_TITLE>"
 ```
 
-## Step 3: Run A First Successful Smoke Distillation
+Do not commit source material unless it has been explicitly reviewed for
+sharing.
 
-Start with compact mode only and small budgets. This gives you the fastest path to a clean first success.
+## 3. Run Context Distiller
 
-```bash
-export ZTH_DISTILLER_SESSION_MAX_TOKENS="320"
-export ZTH_DISTILLER_PATCH_MAX_TOKENS="240"
-export ZTH_DISTILLER_TIMEOUT="240"
-export ZTH_DISTILLER_RUN_PROFILE="smoke"
-export ZTH_DISTILLER_RUN_PURPOSE="connectivity"
-./scripts/run_context_distiller_head.sh toy-001 sources/toy_source.txt toy-source --compact
-```
-
-When this succeeds, try the normal compact profile on a slightly larger source:
+Start with compact mode:
 
 ```bash
 export ZTH_DISTILLER_SESSION_MAX_TOKENS="700"
@@ -124,126 +88,38 @@ export ZTH_DISTILLER_PATCH_MAX_TOKENS="280"
 export ZTH_DISTILLER_TIMEOUT="900"
 export ZTH_DISTILLER_RUN_PROFILE="normal"
 export ZTH_DISTILLER_RUN_PURPOSE="handoff"
-./scripts/run_context_distiller_head.sh toy-002 sources/toy_source.txt toy-source-normal --compact
+
+./scripts/run_context_distiller_head.sh \
+  "$SOURCE_ID" \
+  "$SOURCE_FILE" \
+  "$SHORT_TITLE" \
+  --compact
 ```
 
-For longer files, try chunked mode:
+Use chunked mode for a source that is too long for one reliable request:
 
 ```bash
 export ZTH_DISTILLER_CHUNK_LINES="200"
 export ZTH_DISTILLER_CHUNK_MAX_TOKENS="600"
-export ZTH_DISTILLER_SESSION_MAX_TOKENS="1200"
-export ZTH_DISTILLER_PATCH_MAX_TOKENS="900"
-export ZTH_DISTILLER_TIMEOUT="900"
-./scripts/run_context_distiller_head.sh toy-001 sources/toy_source.txt toy-source --chunked
+
+./scripts/run_context_distiller_head.sh \
+  "$SOURCE_ID" \
+  "$SOURCE_FILE" \
+  "$SHORT_TITLE" \
+  --chunked
 ```
 
-Compact mode asks the model for a tight durable summary. Chunked mode splits long sources into chunks, summarizes each chunk, and then synthesizes a final session summary.
-
-For a slow model server or a smoke test, lower the output budgets before running:
-
-```bash
-export ZTH_DISTILLER_CHUNK_MAX_TOKENS="600"
-export ZTH_DISTILLER_SESSION_MAX_TOKENS="700"
-export ZTH_DISTILLER_PATCH_MAX_TOKENS="280"
-export ZTH_DISTILLER_TIMEOUT="600"
-```
-
-If your model server tends to spend the response on hidden reasoning or returns empty final content, enable final-only mode for distiller calls:
+If a reasoning-capable endpoint returns empty final content, try:
 
 ```bash
 export ZTH_DISTILLER_FINAL_ONLY="1"
 ```
 
-Use higher values again for real source distillation when you need more complete summaries.
+Detailed smoke, compact, chunked, timeout, advisor, threshold, ledger,
+calibration, and role-critique options are maintained in
+[`docs/CONTEXT_DISTILLER_WORKFLOW.md`](docs/CONTEXT_DISTILLER_WORKFLOW.md).
 
-After a run, compare `outputs/run_records/<SOURCE_ID>_<SHORT_TITLE>/METRICS.json` across different settings. It records stage timing, prompt/output sizes, token estimates, actual model usage when the endpoint reports it, retries, and failure stage if the run does not complete.
-It also records `run_profile` and `run_purpose` labels so you can keep connectivity smoke tests, budget tuning runs, and real handoff runs separate during later analysis.
-
-See `docs/CONTEXT_DISTILLER_WORKFLOW.md` for suggested smoke, normal compact, and chunked profiles.
-
-You can print a recent summary report:
-
-```bash
-python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6
-```
-
-For machine-readable output with advisory profile guidance:
-
-```bash
-python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --json
-```
-
-The JSON report includes `recommended_profile`, `recommended_settings`, `recommendation_reason`, `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, `filters`, and `thresholds`.
-
-When token usage is available, the advisor also reports recent-run prompt/completion/total tokens, finish reasons, completion cap utilization, and a `budget_tuning` action. Use that to tune budgets for efficiency before optimizing for speed.
-
-Budget tuning actions mean:
-
-- `raise_session_budget`: the session summary likely clipped at the completion cap.
-- `raise_patch_budget`: the review patch likely clipped at the completion cap.
-- `consider_lowering_budget`: both calls stopped naturally with substantial headroom.
-- `profile_looks_good`: both calls stopped naturally and used a healthy share of the completion budget.
-
-For a concise operator handoff view:
-
-```bash
-python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --advisor-only
-```
-
-To keep smoke/connectivity tests from skewing handoff tuning advice:
-
-```bash
-python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --advisor-only --exclude-purpose connectivity
-```
-
-Flag behavior:
-
-- `--json`: full JSON payload, including per-run `runs` details.
-- `--advisor-only`: concise text summary.
-- `--advisor-only --json`: concise advisor JSON payload without per-run `runs` details; includes `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, `filters`, and `confidence_signals`.
-- `--profile`, `--purpose`, and `--exclude-purpose`: include or exclude runs by `run_profile` and `run_purpose` labels; flags can be repeated or passed as comma-separated values.
-
-You can override the chunked recommendation threshold:
-
-```bash
-python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --json --min-recent-runs-for-chunked 2
-```
-
-You can append unseen runs to the interviewer ledger and include rolling calibration metrics:
-
-```bash
-python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --limit 6 --advisor-only --json --write-ledger --calibration-window 20
-```
-
-You can include role-critique findings in the verdict gate:
-
-```bash
-python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --advisor-only --json --role-critiques-file outputs/role_critiques.jsonl
-```
-
-You can force unresolved role critiques to block handoff:
-
-```bash
-python3 local_harness/report_distiller_metrics.py --runs-dir outputs/run_records --advisor-only --json --role-critiques-file outputs/role_critiques.jsonl --role-critiques-strict
-```
-
-Practical examples:
-
-- 1 clean chunked run with default threshold 3: recommendation stays `normal`.
-- 3 clean chunked runs with default threshold 3: recommendation can move to `chunked`.
-- 2 clean chunked runs with override threshold 2: recommendation can move to `chunked`.
-
-Mode selection quick guide:
-
-- Use default text output for human review of all run details.
-- Use `--json` for automation that needs full per-run telemetry.
-- Use `--advisor-only` for concise operator handoff.
-- Use `--advisor-only --json` for automation that only needs recommendation-level fields.
-
-Recommendations are advisory only and do not modify your environment or files.
-
-## Step 4: Review The Generated Session And Patch
+## 4. Review the Evidence
 
 Inspect:
 
@@ -253,58 +129,57 @@ outputs/review_patches/
 outputs/run_records/
 ```
 
-Generated review patches are not canonical. Review them against the source and session summary before accepting anything.
-
-Generated outputs can include source paths, endpoint names, and model names from your environment. Keep `outputs/` private unless you have reviewed it for sharing.
-
-## Step 5: Create Or Activate A Job Packet
-
-Use `templates/job_packet_template.md` to create a narrow packet. The packet should name:
-
-- Route.
-- Objective.
-- Files allowed to edit.
-- Files off limits.
-- Verification commands.
-- Stop conditions.
-- Human approval requirement.
-
-Move a packet to active only after human review.
-
-Example manual lifecycle:
+Print a concise recent-run summary:
 
 ```bash
-mkdir -p job_queue active_jobs completed_jobs
-cp templates/job_packet_template.md job_queue/example-job.md
-# Edit job_queue/example-job.md by hand.
-mv job_queue/example-job.md active_jobs/example-job.md
-# After execution and review:
-mv active_jobs/example-job.md completed_jobs/example-job.md
+python3 local_harness/report_distiller_metrics.py \
+  --runs-dir outputs/run_records \
+  --limit 6
 ```
 
-Each move should be paired with a status update inside the packet.
+Check the generated session against the source. Review the proposed patch and
+run metrics. Keep source paths, endpoint names, and model names private unless
+they have been sanitized for sharing.
 
-## Step 6: Use Role Prompts Only Under Human Supervision
+The review patch is not canonical and must not be applied automatically.
 
-Use prompts from `prompts/` only through an active packet. Keep role outputs advisory unless the human accepts them through lifecycle review.
+## 5. Route Any Follow-Up Work
 
-## Step 7: Record Acceptance Or Rework Decisions
+If review identifies an accepted follow-up:
 
-Use `workflows/REVIEW_PATCH_ACCEPTANCE_WORKFLOW.md` and `workflows/SUPERVISED_ROLE_RUN_EVIDENCE_NOTE_FORMAT.md` to record decisions.
+1. Create a narrow packet from `templates/job_packet_template.md`.
+2. Record the objective, allowed files, off-limits files, verification, and
+   stop conditions.
+3. Have a human review and activate the packet.
+4. Use one supervised route, such as an authorized Implementer, Aider, or a
+   human terminal session.
+5. Record the result and human acceptance, rework, or rejection decision.
 
-Any recommended next action requires separate human approval and a separate lifecycle packet.
+Use:
 
-## Portable Script Limitation
+- [`docs/MANAGEMENT_TEAM_OVERVIEW.md`](docs/MANAGEMENT_TEAM_OVERVIEW.md)
+- [`workflows/MANUAL_JOB_ROUTING_WORKFLOW.md`](workflows/MANUAL_JOB_ROUTING_WORKFLOW.md)
+- [`workflows/REVIEW_PATCH_ACCEPTANCE_WORKFLOW.md`](workflows/REVIEW_PATCH_ACCEPTANCE_WORKFLOW.md)
+- [`workflows/SUPERVISED_ROLE_RUN_EVIDENCE_NOTE_FORMAT.md`](workflows/SUPERVISED_ROLE_RUN_EVIDENCE_NOTE_FORMAT.md)
 
-The distiller script is package-relative and writes to `outputs/`, but it still expects an OpenAI-compatible endpoint. If `ZTH_BASE_URL` and `ZTH_MODEL` are placeholders, the script exits before making model calls.
+Role output does not activate packets, authorize lifecycle movement, or expand
+an active packet’s file allowlist.
 
 ## Troubleshooting
 
-- Placeholder endpoint or model: load `config.env` or export `ZTH_BASE_URL` and `ZTH_MODEL`.
-- Endpoint connectivity fails in Step 1.5: verify `ZTH_BASE_URL`, `ZTH_MODEL`, and `ZTH_API_KEY` if required by your endpoint.
-- `icm_call.py` returns HTTP errors: check endpoint URL path, model name, and auth format expected by your provider.
-- Source file not found: run from `zaphods-third-hand/` or pass an absolute path to a private source file.
-- Distiller exits on timeout: lower token budgets for smoke tests or increase `ZTH_DISTILLER_TIMEOUT` for slow backends.
-- Chunked runs are too slow: reduce `ZTH_DISTILLER_CHUNK_LINES` and `ZTH_DISTILLER_CHUNK_MAX_TOKENS`, then compare run metrics.
-- Generated patch looks wrong: do not accept it; record rework or create a narrow follow-up packet.
-- Role output expands scope: stop and return to the active packet boundaries.
+- Placeholder endpoint or model:
+  - Edit and reload `config.env`.
+- Endpoint connectivity failure:
+  - Verify `ZTH_BASE_URL`, `ZTH_MODEL`, and `ZTH_API_KEY` if required.
+- Source file not found:
+  - Run from the repository root or use an absolute private source path.
+- Distiller timeout:
+  - Reduce source size or output budgets, or increase
+    `ZTH_DISTILLER_TIMEOUT`.
+- Chunked run is too slow:
+  - Reduce `ZTH_DISTILLER_CHUNK_LINES` and
+    `ZTH_DISTILLER_CHUNK_MAX_TOKENS`.
+- Generated evidence is weak or incorrect:
+  - Do not accept it. Record rework or create a narrower follow-up packet.
+
+For the complete documentation map, see [`docs/README.md`](docs/README.md).
