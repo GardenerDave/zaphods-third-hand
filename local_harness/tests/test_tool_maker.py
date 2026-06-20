@@ -1,3 +1,4 @@
+import hashlib
 import os
 import sys
 import tempfile
@@ -94,16 +95,73 @@ class ToolMakerTests(unittest.TestCase):
             output = root / "lifecycle.md"
             chat.write_text("Intent and attempted steps.\n", encoding="utf-8")
             notes.write_text("Validation passed.\nFailure mattered.\n", encoding="utf-8")
+            expected_total_characters = len(chat.read_text(encoding="utf-8")) + len(
+                notes.read_text(encoding="utf-8")
+            )
+            expected_chat_sha256 = hashlib.sha256(chat.read_bytes()).hexdigest()
+            expected_notes_sha256 = hashlib.sha256(notes.read_bytes()).hexdigest()
 
-            tool_maker.generate_scaffold([chat, notes], output, name="Evidence workflow")
+            records = tool_maker.generate_scaffold(
+                [chat, notes],
+                output,
+                name="Evidence workflow",
+            )
             text = output.read_text(encoding="utf-8")
 
-        self.assertIn('  - "chat.md"', text)
-        self.assertIn('  - "operator-notes.md"', text)
+        self.assertIn(f"  - {tool_maker.yaml_string(records[0].source_label)}", text)
+        self.assertIn(f"  - {tool_maker.yaml_string(records[1].source_label)}", text)
         self.assertIn("source_count: 2", text)
+        self.assertIn(f"max_source_chars: {tool_maker.DEFAULT_MAX_SOURCE_CHARS}", text)
+        self.assertIn(f"total_source_characters: {expected_total_characters}", text)
+        self.assertIn(f"total_included_characters: {expected_total_characters}", text)
+        self.assertIn("any_truncated: false", text)
         self.assertIn('"bytes":', text)
         self.assertIn('"lines":', text)
         self.assertIn('"included_characters":', text)
+        self.assertEqual(2, text.count('"sha256":'))
+        self.assertIn(expected_chat_sha256, text)
+        self.assertIn(expected_notes_sha256, text)
+
+    def test_duplicate_basenames_remain_distinguishable(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            first = root / "first" / "README.md"
+            second = root / "second" / "README.md"
+            output = root / "lifecycle.md"
+            first.parent.mkdir()
+            second.parent.mkdir()
+            first.write_text("First source.\n", encoding="utf-8")
+            second.write_text("Second source.\n", encoding="utf-8")
+
+            records = tool_maker.generate_scaffold(
+                [first, second],
+                output,
+                name="Duplicate basenames",
+            )
+            text = output.read_text(encoding="utf-8")
+
+        self.assertEqual("README.md", records[0].filename)
+        self.assertEqual("README.md", records[1].filename)
+        self.assertNotEqual(records[0].source_label, records[1].source_label)
+        self.assertTrue(records[0].source_label.startswith("external/"))
+        self.assertTrue(records[1].source_label.startswith("external/"))
+        self.assertNotIn(os.fspath(root), records[0].source_label)
+        self.assertNotIn(os.fspath(root), records[1].source_label)
+        self.assertIn(f"  - {tool_maker.yaml_string(records[0].source_label)}", text)
+        self.assertIn(f"  - {tool_maker.yaml_string(records[1].source_label)}", text)
+        self.assertIn(f'"source_path": "{records[0].source_path}"', text)
+        self.assertIn(f'"source_path": "{records[1].source_path}"', text)
+
+    def test_repository_source_path_is_repository_relative(self):
+        source = tool_maker.REPO_ROOT / "docs" / "README.md"
+
+        record = tool_maker.load_sources(
+            [source],
+            tool_maker.DEFAULT_MAX_SOURCE_CHARS,
+        )[0]
+
+        self.assertEqual("docs/README.md", record.source_path)
+        self.assertEqual("docs/README.md", record.source_label)
 
     def test_lifecycle_name_is_preserved_and_normalized_to_one_line(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -142,6 +200,10 @@ class ToolMakerTests(unittest.TestCase):
         self.assertTrue(records[0].truncated)
         self.assertIn('"included_characters": 4', text)
         self.assertIn('"truncated": true', text)
+        self.assertIn("max_source_chars: 4", text)
+        self.assertIn("total_source_characters: 10", text)
+        self.assertIn("total_included_characters: 4", text)
+        self.assertIn("any_truncated: true", text)
         self.assertNotIn("abcdefghij", text)
 
     def test_cli_writes_scaffold(self):

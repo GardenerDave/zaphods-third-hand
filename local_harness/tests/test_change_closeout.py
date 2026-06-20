@@ -1,3 +1,4 @@
+import hashlib
 import os
 import sys
 import tempfile
@@ -86,19 +87,89 @@ class ChangeCloseoutTests(unittest.TestCase):
             output = root / "closeout.md"
             implementation.write_text("print('change')\n", encoding="utf-8")
             tests.write_text("Tests passed with limitations.\n", encoding="utf-8")
+            expected_total_characters = len(
+                implementation.read_text(encoding="utf-8")
+            ) + len(tests.read_text(encoding="utf-8"))
+            expected_implementation_sha256 = hashlib.sha256(
+                implementation.read_bytes()
+            ).hexdigest()
+            expected_tests_sha256 = hashlib.sha256(tests.read_bytes()).hexdigest()
 
-            change_closeout.generate_scaffold(
+            records = change_closeout.generate_scaffold(
                 [implementation, tests],
                 output,
                 name="Evidence closeout",
             )
             text = output.read_text(encoding="utf-8")
 
-        self.assertIn('  - "implementation.py"', text)
-        self.assertIn('  - "tests.md"', text)
+        self.assertIn(
+            f"  - {change_closeout.yaml_string(records[0].source_label)}",
+            text,
+        )
+        self.assertIn(
+            f"  - {change_closeout.yaml_string(records[1].source_label)}",
+            text,
+        )
         self.assertIn("source_count: 2", text)
+        self.assertIn(
+            f"max_source_chars: {change_closeout.DEFAULT_MAX_SOURCE_CHARS}",
+            text,
+        )
+        self.assertIn(f"total_source_characters: {expected_total_characters}", text)
+        self.assertIn(f"total_included_characters: {expected_total_characters}", text)
+        self.assertIn("any_truncated: false", text)
         self.assertIn('"bytes":', text)
         self.assertIn('"lines":', text)
+        self.assertEqual(2, text.count('"sha256":'))
+        self.assertIn(expected_implementation_sha256, text)
+        self.assertIn(expected_tests_sha256, text)
+
+    def test_duplicate_basenames_remain_distinguishable(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            first = root / "first" / "README.md"
+            second = root / "second" / "README.md"
+            output = root / "closeout.md"
+            first.parent.mkdir()
+            second.parent.mkdir()
+            first.write_text("First source.\n", encoding="utf-8")
+            second.write_text("Second source.\n", encoding="utf-8")
+
+            records = change_closeout.generate_scaffold(
+                [first, second],
+                output,
+                name="Duplicate basenames",
+            )
+            text = output.read_text(encoding="utf-8")
+
+        self.assertEqual("README.md", records[0].filename)
+        self.assertEqual("README.md", records[1].filename)
+        self.assertNotEqual(records[0].source_label, records[1].source_label)
+        self.assertTrue(records[0].source_label.startswith("external/"))
+        self.assertTrue(records[1].source_label.startswith("external/"))
+        self.assertNotIn(os.fspath(root), records[0].source_label)
+        self.assertNotIn(os.fspath(root), records[1].source_label)
+        self.assertIn(
+            f"  - {change_closeout.yaml_string(records[0].source_label)}",
+            text,
+        )
+        self.assertIn(
+            f"  - {change_closeout.yaml_string(records[1].source_label)}",
+            text,
+        )
+        self.assertIn(f'"source_path": "{records[0].source_path}"', text)
+        self.assertIn(f'"source_path": "{records[1].source_path}"', text)
+
+    def test_repository_source_path_is_repository_relative(self):
+        source = change_closeout.REPO_ROOT / "docs" / "README.md"
+
+        record = change_closeout.load_sources(
+            [source],
+            change_closeout.DEFAULT_MAX_SOURCE_CHARS,
+        )[0]
+
+        self.assertEqual("docs/README.md", record.source_path)
+        self.assertEqual("docs/README.md", record.source_label)
 
     def test_change_name_is_preserved_and_normalized_to_one_line(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -137,6 +208,10 @@ class ChangeCloseoutTests(unittest.TestCase):
         self.assertTrue(records[0].truncated)
         self.assertIn('"included_characters": 4', text)
         self.assertIn('"truncated": true', text)
+        self.assertIn("max_source_chars: 4", text)
+        self.assertIn("total_source_characters: 10", text)
+        self.assertIn("total_included_characters: 4", text)
+        self.assertIn("any_truncated: true", text)
         self.assertNotIn("abcdefghij", text)
 
     def test_cli_writes_scaffold(self):

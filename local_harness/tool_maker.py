@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -12,11 +14,15 @@ from typing import Sequence
 
 
 DEFAULT_MAX_SOURCE_CHARS = 100_000
+REPO_ROOT = Path(__file__).absolute().parent.parent
 
 
 @dataclass(frozen=True)
 class SourceRecord:
+    source_label: str
+    source_path: str
     filename: str
+    sha256: str
     byte_count: int
     character_count: int
     line_count: int
@@ -40,6 +46,21 @@ def clean_name(value: str) -> str:
 def default_name(output_path: Path) -> str:
     candidate = output_path.stem.replace("_", " ").replace("-", " ")
     return clean_name(candidate or "Untitled Tool Lifecycle")
+
+
+def source_path_for(path: Path) -> str:
+    """Return a deterministic review label without exposing absolute external paths."""
+
+    absolute_path = Path(os.path.abspath(os.fspath(path)))
+    try:
+        return absolute_path.relative_to(REPO_ROOT).as_posix()
+    except ValueError:
+        if not path.is_absolute():
+            return Path(os.path.normpath(os.fspath(path))).as_posix()
+        path_marker = hashlib.sha256(
+            os.path.normcase(os.fspath(absolute_path)).encode("utf-8")
+        ).hexdigest()[:12]
+        return f"external/{path_marker}/{path.name}"
 
 
 def load_sources(paths: Sequence[Path], max_source_chars: int) -> list[SourceRecord]:
@@ -69,9 +90,13 @@ def load_sources(paths: Sequence[Path], max_source_chars: int) -> list[SourceRec
 
         included_text = text[:remaining]
         remaining -= len(included_text)
+        source_path = source_path_for(path)
         records.append(
             SourceRecord(
+                source_label=source_path,
+                source_path=source_path,
                 filename=path.name,
+                sha256=hashlib.sha256(raw).hexdigest(),
                 byte_count=len(raw),
                 character_count=len(text),
                 line_count=len(text.splitlines()),
@@ -99,7 +124,10 @@ def yaml_string(value: str) -> str:
 def render_source(record: SourceRecord, index: int) -> str:
     metadata = {
         "source_index": index,
+        "source_label": record.source_label,
+        "source_path": record.source_path,
         "filename": record.filename,
+        "sha256": record.sha256,
         "bytes": record.byte_count,
         "characters": record.character_count,
         "lines": record.line_count,
@@ -124,13 +152,25 @@ def render_source(record: SourceRecord, index: int) -> str:
     )
 
 
-def render_scaffold(name: str, sources: Sequence[SourceRecord]) -> str:
+def render_scaffold(
+    name: str,
+    sources: Sequence[SourceRecord],
+    *,
+    max_source_chars: int = DEFAULT_MAX_SOURCE_CHARS,
+) -> str:
     """Return the deterministic Markdown lifecycle draft scaffold."""
 
-    source_names = "\n".join(f"  - {yaml_string(source.filename)}" for source in sources)
+    source_names = "\n".join(
+        f"  - {yaml_string(source.source_label)}" for source in sources
+    )
     source_sections = "\n".join(
         render_source(source, index) for index, source in enumerate(sources, start=1)
     )
+    total_source_characters = sum(source.character_count for source in sources)
+    total_included_characters = sum(
+        source.included_character_count for source in sources
+    )
+    any_truncated = any(source.truncated for source in sources)
 
     return (
         f"# Tool Lifecycle Draft: {clean_name(name)}\n\n"
@@ -147,6 +187,10 @@ def render_scaffold(name: str, sources: Sequence[SourceRecord]) -> str:
         "known_failure_modes: []\n"
         "promotion_recommendation: not_ready\n"
         f"source_count: {len(sources)}\n"
+        f"max_source_chars: {max_source_chars}\n"
+        f"total_source_characters: {total_source_characters}\n"
+        f"total_included_characters: {total_included_characters}\n"
+        f"any_truncated: {str(any_truncated).lower()}\n"
         "```\n\n"
         "This scaffold is draft evidence only. It does not execute commands,\n"
         "authorize lifecycle movement, delete evidence, or promote this lifecycle.\n\n"
@@ -212,7 +256,14 @@ def generate_scaffold(
     records = load_sources(input_paths, max_source_chars)
     lifecycle_name = clean_name(name) if name is not None else default_name(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(render_scaffold(lifecycle_name, records), encoding="utf-8")
+    output_path.write_text(
+        render_scaffold(
+            lifecycle_name,
+            records,
+            max_source_chars=max_source_chars,
+        ),
+        encoding="utf-8",
+    )
     return records
 
 

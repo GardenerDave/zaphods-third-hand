@@ -4,7 +4,12 @@
 lifecycle_name: "<name>"
 status: draft
 source_material:
-  - "<source file, transcript, log, or evidence note>"
+  - "<sanitized source label or path>"
+source_count: 1
+max_source_chars: 100000
+total_source_characters: 0
+total_included_characters: 0
+any_truncated: false
 intended_operator: "<human or supervised agent>"
 risk_level: "<low|medium|high|unknown>"
 requires_human_review: true
@@ -16,6 +21,11 @@ promotion_recommendation: "not_ready"
 
 This is a draft evidence artifact. It does not authorize execution, lifecycle
 movement, cleanup, or promotion.
+
+Generated source packets include sanitized source labels/paths and SHA-256
+hashes of the full source bytes at scaffold time. Paths and hashes support
+human provenance review; they do not make private evidence safe to publish.
+Sanitization remains a human responsibility.
 
 ## Purpose
 

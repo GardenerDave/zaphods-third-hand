@@ -87,7 +87,8 @@ promotion.
 
 ## Evidence Rules
 
-- Cite source filenames or source labels where practical.
+- Cite source labels or sanitized paths and use the recorded SHA-256 when
+  source identity matters. Do not collapse duplicate basenames into one source.
 - Preserve exact commands only when they appear in the evidence.
 - Do not infer that a command succeeded merely because it was attempted.
 - Treat claims without output or validation as unverified.
