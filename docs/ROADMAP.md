@@ -10,6 +10,14 @@ For this project, that is the metaphor: do not force one model, one chat, or one
 
 The metaphor does not imply autonomous control. ZTH is meant to add external working memory and extra supervised execution capacity while keeping lifecycle movement human-reviewed.
 
+## Mutual Supervision and Human-Attention Throughput
+
+The operating objective is to **maximize trusted work per unit of human attention**. ZTH provides procedural constraint and verification through scoped task packets, provenance, validators, repo health checks, scaffold contracts, closeout reports, and reviewable handoff evidence. Codex provides semantic critique and implementation through high-reasoning work, abstraction review, test design, and challenges to weak assumptions.
+
+Humans retain decision authority over priority, taste, architecture, merge, release, promotion, policy exceptions, and lifecycle movement. This operating model should reduce repetitive review work without converting evidence or recommendations into unattended decisions.
+
+The next likely build from this model is a structured Agent Task Session harness: a reviewable wrapper around scoped Codex work, validation, provenance, and closeout evidence. It may produce a PR-candidate artifact for human review, but it must not merge, release, promote, or move lifecycle state on its own.
+
 ## Implemented
 
 - LLM-probe preflight import scaffold.
@@ -24,6 +32,7 @@ The metaphor does not imply autonomous control. ZTH is meant to add external wor
 
 ## Next
 
+- Structured Agent Task Session harness for scoped, provenance-backed, reviewable Codex work.
 - Operator convenience flow for the full import → manifest → gated audition chain.
 - Real local endpoint smoke run using actual LLM-probe output.
 
