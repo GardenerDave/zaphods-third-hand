@@ -9,6 +9,13 @@ validation_status: "not_run"
 promotion_recommendation: "not_ready"
 safety_boundary_changed: "unknown"
 lifecycle_candidate: "unknown"
+source_material:
+  - "<sanitized source label or path>"
+source_count: 1
+max_source_chars: 100000
+total_source_characters: 0
+total_included_characters: 0
+any_truncated: false
 ```
 
 This report is draft review evidence. It does not merge, promote, accept,
@@ -17,6 +24,11 @@ delete, execute, clean up, or authorize lifecycle movement.
 A change can pass tests and still be incomplete when documentation, prompt or
 template contracts, safety boundaries, limitations, or human-review guidance
 are missing.
+
+Generated source packets include sanitized source labels/paths and SHA-256
+hashes of the full source bytes at scaffold time. Paths and hashes support
+human provenance review; they do not make private evidence safe to publish.
+Sanitization remains a human responsibility.
 
 ## Summary
 

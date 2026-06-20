@@ -110,12 +110,23 @@ python3 local_harness/change_closeout.py \
   local_harness/tests/test_tool_maker.py
 ```
 
-The scaffold builder reads UTF-8 text files, records source filenames and
-basic statistics, embeds bounded source evidence, and refuses to overwrite an
+The scaffold builder reads UTF-8 text files, records distinguishing source
+labels and sanitized paths, full-byte SHA-256 hashes, and source/inclusion
+statistics, embeds bounded source evidence, and refuses to overwrite an
 existing report. It does not call a model or execute source commands.
 
 Use `--max-source-chars` to control the total embedded character limit.
 Truncation remains visible in each source record.
+
+Files inside the repository use repository-relative source paths. Relative
+external inputs retain a normalized relative label; absolute external inputs
+use an `external/<path-marker>/<filename>` label so home paths are not copied
+into the report. SHA-256 identifies the complete source bytes at scaffold
+time, including bytes omitted from a truncated packet.
+
+Paths and hashes improve provenance and distinguish duplicate basenames. They
+do not remove secrets, classify sensitivity, or make private evidence safe to
+publish. Sanitization and publication decisions remain human responsibilities.
 
 ## Review Honestly
 

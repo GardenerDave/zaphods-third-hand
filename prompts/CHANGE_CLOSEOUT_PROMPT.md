@@ -78,7 +78,9 @@ Keep `status: draft` and `requires_human_review: true`. Even
 
 ## Evidence Rules
 
-- Cite reviewed files, diffs, tests, logs, prompts, templates, and reports.
+- Cite reviewed source labels or sanitized paths and use the recorded SHA-256
+  when source identity matters. Do not collapse duplicate basenames into one
+  source.
 - Distinguish observed behavior from intended behavior and inference.
 - Do not claim a Docs Pass from test results alone.
 - Do not claim validation passed if relevant checks were skipped.

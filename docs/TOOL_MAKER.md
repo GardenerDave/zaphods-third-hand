@@ -78,7 +78,8 @@ python3 local_harness/tool_maker.py \
 The script:
 
 - validates and reads one or more UTF-8 text or Markdown files;
-- records source filenames and basic byte, character, and line counts;
+- records distinguishing source labels and sanitized paths, full-byte SHA-256
+  hashes, and byte, character, line, inclusion, and truncation counts;
 - embeds a bounded source packet;
 - writes the required lifecycle headings and draft metadata;
 - refuses to overwrite an existing output file;
@@ -86,6 +87,17 @@ The script:
 
 Use `--max-source-chars` to lower or raise the total embedded character limit.
 Truncation is recorded per source so missing evidence remains visible.
+
+Files inside the repository use repository-relative source paths. Relative
+external inputs retain a normalized relative label; absolute external inputs
+use an `external/<path-marker>/<filename>` label so home paths are not copied
+into the scaffold. The SHA-256 value identifies the complete source bytes at
+scaffold time, including bytes omitted by truncation.
+
+Source labels, sanitized paths, and hashes improve provenance and help
+distinguish duplicate basenames. They do not remove secrets from source text or
+make private evidence safe to publish. A human must still review and sanitize
+any scaffold selected for sharing.
 
 ## Fill and Review the Draft
 
