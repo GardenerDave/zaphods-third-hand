@@ -69,6 +69,12 @@ existing OpenAI-compatible endpoint.
 Session summaries and review patches are evidence. A human-reviewed, separately
 authorized action is required before any proposed context becomes canonical.
 
+The current head script writes active artifacts under `outputs/sessions/`,
+`outputs/review_patches/`, and `outputs/run_records/`. It also creates
+`outputs/context/` and `outputs/indexes/` as reserved context-artifact and
+index/manifest locations; those two directories may remain empty in the
+current workflow.
+
 See [`CONTEXT_DISTILLER_WORKFLOW.md`](CONTEXT_DISTILLER_WORKFLOW.md).
 
 ## ChatGPT Export Ingestion and Signal Review

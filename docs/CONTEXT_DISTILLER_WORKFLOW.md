@@ -140,6 +140,8 @@ outputs/run_records/<SOURCE_ID>_<SHORT_TITLE>/chunk_metrics.tsv
 
 These metrics are evidence only. They do not automatically tune settings or accept generated context.
 
+### Metrics Advisor and Filters
+
 You can summarize recent runs and get advisory profile suggestions:
 
 ```bash
@@ -193,11 +195,33 @@ Flag behavior:
 - `--advisor-only --json`: concise advisor JSON payload without per-run `runs` details; includes `recommendation_confidence`, `confidence_reason`, `readiness`, `readiness_reason`, `blocking_signals`, `interviewer_verdict`, `interviewer_verdict_reason`, `role_critique_summary`, `role_critiques_strict`, `calibration_metrics`, `filters`, and `confidence_signals`.
 - `--profile`, `--purpose`, and `--exclude-purpose`: filter advisory windows by run labels; flags can be repeated or passed as comma-separated values.
 
+A displayed run label is formed as `<profile>/<purpose>`, such as
+`smoke/connectivity` or `normal/handoff`. The two values are stored and
+filtered separately:
+
+- `--profile smoke` matches the exact `run_profile` value `smoke`.
+- `--purpose connectivity` matches the exact `run_purpose` value
+  `connectivity`.
+- Use both flags to select the compound combination.
+- `--profile smoke/connectivity` does not match the displayed compound label;
+  the current implementation has no single compound-label filter.
+
 Threshold scenarios:
 
-- Default threshold 3 and only 1-2 recent clean chunked runs: stays on `normal`.
-- Default threshold 3 and at least 3 recent clean chunked runs: can recommend `chunked`.
-- Override threshold 2 and 2 recent clean chunked runs: can recommend `chunked`.
+- Default threshold 3 and fewer than 3 analyzed runs: a most-recent chunked run
+  stays on `normal`.
+- Default threshold 3 and at least 3 analyzed runs: can recommend `chunked`
+  when the analyzed window has no failures, no chunk retries, average elapsed
+  time at most 600 seconds, and the most-recent run is chunked, completed, and
+  records zero chunk failures in both aggregate metrics and `chunk_metrics.tsv`.
+- Override threshold 2 lowers only the minimum analyzed-run count to 2.
+
+“Clean chunked run” is informal shorthand, not a separate stored field. The
+current advisor checks the window and most-recent run as described above; it
+does not require every analyzed run to be chunked, and it does not use semantic
+output quality, finish reason, or length truncation in the profile
+recommendation. Finish reasons still inform separate budget-tuning advice.
+Using `--completed-only` excludes failed runs before this analysis.
 
 ## Suggested Profiles
 
@@ -213,12 +237,13 @@ export ZTH_DISTILLER_PATCH_MAX_TOKENS="240"
 export ZTH_DISTILLER_TIMEOUT="240"
 export ZTH_DISTILLER_RUN_PROFILE="smoke"
 export ZTH_DISTILLER_RUN_PURPOSE="connectivity"
-./scripts/run_context_distiller_head.sh smoke-001 sources/toy_source.txt smoke --compact
+./scripts/run_context_distiller_head.sh smoke-001 examples/toy_source.txt smoke --compact
 ```
 
 Expected use:
 
-- Tiny source file.
+- `examples/toy_source.txt` is a harmless checked-in smoke fixture; replace it
+  with any plain UTF-8 text file for your own test.
 - Compact mode only.
 - Confirms endpoint, model routing, output paths, telemetry, and review-patch generation.
 
@@ -269,6 +294,16 @@ outputs/sessions/
 outputs/review_patches/
 outputs/run_records/
 ```
+
+- `outputs/context/`: reserved for generated context artifacts. The current
+  `run_context_distiller_head.sh` creates this directory but does not write an
+  artifact there.
+- `outputs/indexes/`: reserved for generated indexes or manifests. The current
+  head script creates this directory but does not write an artifact there.
+- `outputs/sessions/`: final generated session summaries.
+- `outputs/review_patches/`: proposed context review patches.
+- `outputs/run_records/`: prompts, copied input, metadata, metrics, stage
+  evidence, and review placeholders for each run.
 
 ## Human Review
 

@@ -60,7 +60,7 @@ Set environment variables in your private shell or `config.env`:
 export ZTH_BASE_URL="http://127.0.0.1:8080/v1"
 export ZTH_MODEL="your-model-id"
 # Optional if endpoint requires bearer auth:
-# export ZTH_API_KEY="your-secret-key"
+# export OPENAI_API_KEY="your-secret-key"
 ```
 
 Then run endpoint smoke test:
@@ -118,27 +118,28 @@ Notes:
 
 ## Intentional LAN exposure
 
-The following advanced operator pattern uses a single host to expose multiple
-models. It is not the main beginner path.
+The following advanced local-harness pattern uses a single host to expose
+multiple OpenAI-compatible workers. It is not the main beginner path.
 
 ```bash
 export LAN_HOST="<LAN_HOST>"
-# Deep 32B
-export ZTH_DEEP_BASE_URL="http://${LAN_HOST}:8080/v1"
-# Coder 7B
-export ZTH_CODER_BASE_URL="http://${LAN_HOST}:8081/v1"
-# Router 3B
-export ZTH_ROUTER_BASE_URL="http://${LAN_HOST}:8082/v1"
-# Handoff 7B
-export ZTH_HANDOFF_BASE_URL="http://${LAN_HOST}:8083/v1"
-# Gemma 12B
-export ZTH_GEMMA12_BASE_URL="http://${LAN_HOST}:8084/v1"
-# Gemma E4B
-export ZTH_GEMMAE4B_BASE_URL="http://${LAN_HOST}:8085/v1"
+export ICM_DEEP_API="openai-chat"
+export ICM_DEEP_BASE_URL="http://${LAN_HOST}:8080/v1"
+export ICM_DEEP_MODEL="your-deep-model-id"
+export ICM_CODER_BASE_URL="http://${LAN_HOST}:8081/v1"
+export ICM_CODER_MODEL="your-coder-model-id"
+export ICM_ROUTER_BASE_URL="http://${LAN_HOST}:8082/v1"
+export ICM_ROUTER_MODEL="your-router-model-id"
 ```
 
 Replace `<LAN_HOST>` with an authorized hostname or address from your private
 configuration. Do not commit a real internal address.
+
+These `ICM_*` variables configure the named workers used by
+`local_harness/icm_call.py`; they do not replace the primary
+`ZTH_BASE_URL` / `ZTH_MODEL` pair used by Context Distiller. The `deep` worker
+defaults to a native completion API, so `ICM_DEEP_API="openai-chat"` is
+required when its configured endpoint is OpenAI-compatible.
 
 Before exposing any endpoint to a LAN, review the server's bind address,
 firewall rules, host access controls, and authentication behavior. Binding a
@@ -149,7 +150,7 @@ For this repo's primary single-endpoint path, set one active pair:
 
 ```bash
 export ZTH_BASE_URL="http://${LAN_HOST}:8081/v1"
-export ZTH_MODEL="Qwen/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M"
+export ZTH_MODEL="your-model-id"
 ```
 
 Validate model listing first:
@@ -167,7 +168,7 @@ Typical remote pattern:
 ```bash
 export ZTH_BASE_URL="https://api.example.com/v1"
 export ZTH_MODEL="provider-model-name"
-export ZTH_API_KEY="<PRIVATE_KEY>"
+export OPENAI_API_KEY="<PRIVATE_KEY>"
 ```
 
 Notes:

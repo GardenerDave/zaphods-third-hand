@@ -63,6 +63,18 @@ source config.env
 set +a
 ```
 
+If you are unsure which model ID the endpoint exposes, try:
+
+```bash
+python3 local_harness/icm_call.py handoff \
+  --base-url "$ZTH_BASE_URL" \
+  --list-models
+```
+
+Use a returned model ID for `ZTH_MODEL`. Not every compatible provider exposes
+model listing; if this check fails, use the model ID configured by your
+provider or server.
+
 Run one small connectivity request:
 
 ```bash
