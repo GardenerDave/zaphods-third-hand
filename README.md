@@ -135,6 +135,23 @@ Start with:
 
 Use this when you want to compare models with the same tests.
 
+#### Choose an audition workflow
+
+ZTH has two separate model-audition systems:
+
+| Workflow | Use it for | Preflight manifests | Primary outputs |
+|---|---|---|---|
+| [`local_harness/auditions/`](local_harness/auditions/README.md) | Board/capability-card auditions using suites, fixtures, scorer profiles, boards, and card comparisons. | Optional direct or board-level preflight gates. | Case evidence, scores, capability cards, board capability cards, and comparison reports. |
+| [`local_harness/model_auditions/`](local_harness/model_auditions/README.md) | Exploratory small-model work using GGUF downloads, temporary llama.cpp/tmux servers, existing local/LAN endpoints, raw prompt responses, and mechanical scoring. | Not currently supported. | Raw responses, per-response scores, rollups, and exploratory summaries. |
+
+The workflows have different output schemas and are not interchangeable.
+Prefer `.work/model_auditions/board_runs/` for board/capability-card evidence
+and `.work/model_auditions/exploratory_runs/` for small-model exploratory
+evidence.
+
+Neither workflow promotes, approves, assigns, or production-certifies a model.
+All outputs remain evidence for human review.
+
 Purpose:
 
 - Run repeatable probes against local or remote OpenAI-compatible models.
@@ -239,9 +256,10 @@ Normal distiller runs write to:
 - `outputs/review_patches/`
 - `outputs/run_records/`
 
-Model audition runs usually write to:
+Recommended model-audition output roots are:
 
-- `.work/model_auditions/`
+- `.work/model_auditions/board_runs/`
+- `.work/model_auditions/exploratory_runs/`
 - `.work/model_audition_comparisons/`
 
 `.work` is local run evidence. Inspect useful failures before deleting it.

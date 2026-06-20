@@ -8,6 +8,26 @@ A model audition asks:
 
 The answer is saved as plain files so a human can inspect the evidence.
 
+## Choose an Audition Workflow
+
+This directory is the board/capability-card audition workflow. Use it for
+suites, fixtures, scorer profiles, multi-suite boards, capability cards,
+capability-card comparisons, and optional preflight gates.
+
+For exploratory small-model work that downloads GGUFs, manages temporary local
+llama.cpp servers in tmux, calls existing local/LAN endpoints, preserves raw
+prompt responses, and applies mechanical exploratory scoring, use
+[`local_harness/model_auditions/`](../model_auditions/README.md).
+
+Of the two audition workflows, only this board/capability-card workflow
+consumes preflight manifests. The small-model exploratory harness does not
+currently consume preflight gates. The two workflows write different schemas;
+prefer
+`.work/model_auditions/board_runs/` here and
+`.work/model_auditions/exploratory_runs/` for the small-model harness.
+
+Neither workflow promotes, approves, assigns, or production-certifies a model.
+
 ## In Plain English
 
 A model audition is a structured interview for an AI model.
@@ -78,7 +98,7 @@ Use this when you know the model id and endpoint URL.
       --base-url "http://<LAN_HOST>:8082/v1" \
       --api-key "not-needed-for-local" \
       --suite "local_harness/auditions/suites/baseline_micro_v0.json" \
-      --out-dir ".work/model_auditions/qwen25_3b_baseline_micro"
+      --out-dir ".work/model_auditions/board_runs/qwen25_3b_baseline_micro"
 
 Replace `<LAN_HOST>` with an authorized host from private configuration. Do not
 commit a real internal address.
@@ -90,7 +110,7 @@ Use this when a model config file already records the model id, endpoint, and AP
     python3 local_harness/run_model_audition.py \
       --model local_harness/auditions/models/qwen25_3b_q4_local.json \
       --suite local_harness/auditions/suites/baseline_micro_v0.json \
-      --out-dir .work/model_auditions/qwen25_3b_baseline_micro
+      --out-dir .work/model_auditions/board_runs/qwen25_3b_baseline_micro
 
 The model file may provide:
 
@@ -112,7 +132,7 @@ capability manifest before creating audition output or calling a model:
       --model local_harness/auditions/models/qwen25_3b_q4_local.json \
       --suite local_harness/auditions/suites/baseline_micro_v0.json \
       --preflight-manifest .work/llm_probe_preflight/example/preflight_capability_manifest.json \
-      --out-dir .work/model_auditions/qwen25_3b_baseline_micro
+      --out-dir .work/model_auditions/board_runs/qwen25_3b_baseline_micro
 
 Preflight gating is optional. Without `--preflight-manifest`, existing audition
 behavior is unchanged.
@@ -139,7 +159,7 @@ Use a board when you want to test one model across several suites.
     python3 local_harness/run_model_audition_board.py \
       --model local_harness/auditions/models/qwen25_3b_q4_local.json \
       --board local_harness/auditions/boards/local_baseline_board_v0.json \
-      --out-dir .work/model_auditions/qwen25_3b_board
+      --out-dir .work/model_auditions/board_runs/qwen25_3b_board
 
 Board runs can optionally select the model's preflight manifest from a JSON map:
 
@@ -147,7 +167,7 @@ Board runs can optionally select the model's preflight manifest from a JSON map:
       --model local_harness/auditions/models/qwen25_3b_q4_local.json \
       --board local_harness/auditions/boards/local_baseline_board_v0.json \
       --preflight-manifest-map .work/llm_probe_preflight/preflight_manifest_map.json \
-      --out-dir .work/model_auditions/qwen25_3b_board
+      --out-dir .work/model_auditions/board_runs/qwen25_3b_board
 
 Manifest-map shape:
 
@@ -176,7 +196,7 @@ waiving the gate never promotes the model.
 
 The board writes one board-level capability card:
 
-    .work/model_auditions/qwen25_3b_board/board_capability_card.json
+    .work/model_auditions/board_runs/qwen25_3b_board/board_capability_card.json
 
 ## Compare Existing Board Cards
 
@@ -184,8 +204,8 @@ Use comparison reporting after you have two or more board capability cards.
 
     python3 local_harness/compare_model_auditions.py \
       --cards \
-        .work/model_auditions/qwen25_3b_board/board_capability_card.json \
-        .work/model_auditions/qwen25_coder7b_board/board_capability_card.json \
+        .work/model_auditions/board_runs/qwen25_3b_board/board_capability_card.json \
+        .work/model_auditions/board_runs/qwen25_coder7b_board/board_capability_card.json \
       --out-dir .work/model_audition_comparisons/qwen3b_vs_coder7b
 
 The comparison script does not rerun models. It only reads existing cards and writes:
@@ -203,7 +223,7 @@ Use overrides when you want to test a different prompt, fixture set, or scoring 
       --prompt-file local_harness/auditions/prompts/routing_v0.md \
       --fixtures-file local_harness/auditions/fixtures/routing_micro_v0.jsonl \
       --scorer-profile local_harness/auditions/scorers/routing_basic_v0.json \
-      --out-dir .work/model_auditions/qwen25_3b_override_probe
+      --out-dir .work/model_auditions/board_runs/qwen25_3b_override_probe
 
 Path rules:
 
@@ -286,7 +306,7 @@ Use `--dry-run` to test file resolution and output layout without calling a live
     python3 local_harness/run_model_audition.py \
       --model local_harness/auditions/models/qwen25_3b_q4_local.json \
       --suite local_harness/auditions/suites/baseline_micro_v0.json \
-      --out-dir .work/model_auditions/dry_run_baseline_micro \
+      --out-dir .work/model_auditions/board_runs/dry_run_baseline_micro \
       --dry-run
 
 ## Available Micro Suites

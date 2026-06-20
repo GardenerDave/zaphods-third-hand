@@ -9,6 +9,22 @@ GGUFs and manage temporary local llama.cpp servers for exploratory evaluation.
 That server lifecycle is evidence-gathering support only; it is not production
 model-server management or evidence of production readiness.
 
+## Two Audition Evidence Sources
+
+- [`local_harness/auditions/`](../../../local_harness/auditions/README.md) is
+  the board/capability-card workflow. Its durable evidence includes capability
+  cards and board comparison reports, and it can optionally consume preflight
+  manifests.
+- [`local_harness/model_auditions/`](../../../local_harness/model_auditions/README.md)
+  is the exploratory small-model harness. Its evidence includes raw prompt
+  responses, mechanical scores, rollups, and summaries; it does not currently
+  consume preflight gates.
+
+The output schemas differ. Keep their disposable run evidence in separate
+directories before selecting sanitized reports for this shared report area.
+Neither source workflow promotes, approves, assigns, or production-certifies a
+model.
+
 ## In Plain English
 
 A model audition report says:
@@ -25,13 +41,23 @@ That decision belongs to later human review and policy layers.
 
 When saving audition results, prefer preserving:
 
-- `comparison.md`
-- `comparison.json`
-- selected `board_capability_card.json` files
-- selected `board_capability_card.md` files
-- short notes explaining why the result mattered
+- from the board/capability-card workflow:
+  - `comparison.md`
+  - `comparison.json`
+  - selected `board_capability_card.json` files
+  - selected `board_capability_card.md` files
+- from the exploratory small-model workflow:
+  - a sanitized `summary.md`
+  - a sanitized `rollup.json` when machine-readable evidence matters
+  - short notes explaining the setup and observed failure modes
+- for either workflow:
+  - short notes explaining why the result mattered
 
-Avoid preserving every raw scratch run. Keep `.work/` disposable unless a result has review value.
+Do not mix files from the two schemas into one run folder. Avoid preserving
+every raw scratch run. Keep `.work/` disposable unless a result has review
+value, and do not publish raw responses without explicit sanitization.
+
+The folder example below uses the board/capability-card schema.
 
 ## Suggested Report Folder Shape
 

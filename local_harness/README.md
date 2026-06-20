@@ -10,10 +10,28 @@ This folder contains the manager-side helper scripts for supervised local-worker
   preflight safeguards, can prewarm the endpoint, and records command output plus debug artifacts.
 - `llm_probe_preflight_ingest.py`: imports versioned LLM-probe JSON as preflight-only plain-file evidence; see [`docs/LLM_PROBE_PREFLIGHT.md`](../docs/LLM_PROBE_PREFLIGHT.md).
 - `llm_probe_preflight_compare.py`: compares two canonical preflight capability manifests and writes aggregate, human-reviewable regression evidence; see [`docs/LLM_PROBE_PREFLIGHT.md`](../docs/LLM_PROBE_PREFLIGHT.md).
+- `auditions/`: board/capability-card workflow using suites, fixtures, scorer profiles, board comparisons, capability cards, and optional preflight gates; see [`auditions/README.md`](auditions/README.md).
 - `model_auditions/`: optional exploratory small-model harness that can download candidate GGUFs, manage temporary local llama.cpp tmux sessions, or call existing local/LAN OpenAI-compatible endpoints; see [`model_auditions/README.md`](model_auditions/README.md).
 - `zth_agent_packet.py`: generates one independent role/context packet for an external agent.
 - `zth_compare_agent_outputs.py`: compares completed external-agent outputs that follow the ZTH contract.
 - `zth_coverage_auditor.py`: reports obvious pre-synthesis coverage areas and blind spots.
+
+## Choose an Audition Workflow
+
+- Use [`auditions/`](auditions/README.md) when you need the structured
+  suite/board workflow, capability cards, comparisons, or optional preflight
+  gating.
+- Use [`model_auditions/`](model_auditions/README.md) when you need exploratory
+  GGUF download, temporary llama.cpp/tmux lifecycle support, existing
+  local/LAN endpoints, raw prompt responses, and mechanical scoring.
+
+Of the two audition workflows, only the board/capability-card workflow consumes
+preflight manifests. The small-model exploratory harness does not currently
+consume preflight gates. Their output files and schemas differ, so keep
+evidence under separate roots such as `.work/model_auditions/board_runs/` and
+`.work/model_auditions/exploratory_runs/`.
+
+Neither workflow promotes, approves, assigns, or production-certifies a model.
 
 ## Internal Modules
 

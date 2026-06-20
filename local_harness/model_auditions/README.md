@@ -15,6 +15,25 @@ It does not promote models, assign production roles, or change ZTH routing
 configuration. Server lifecycle actions and audition results remain evidence
 for human review.
 
+## Choose an Audition Workflow
+
+This directory is the exploratory small-model harness. Use it for GGUF
+downloads, temporary local llama.cpp/tmux lifecycle support, existing
+local/LAN endpoints, raw prompt responses, and mechanical exploratory scoring.
+
+For structured suites, fixtures, scorer profiles, multi-suite boards,
+capability cards, capability-card comparisons, and optional preflight gates,
+use the separate
+[`local_harness/auditions/`](../auditions/README.md) workflow.
+
+Of the two audition workflows, only the board/capability-card workflow consumes
+preflight manifests. This small-model exploratory harness does not currently
+consume preflight gates. The two workflows write different schemas; prefer
+`.work/model_auditions/exploratory_runs/` here and
+`.work/model_auditions/board_runs/` for board/capability-card evidence.
+
+Neither workflow promotes, approves, assigns, or production-certifies a model.
+
 ## What It Measures
 
 The included scorers distinguish several failure modes that look similar at a
@@ -304,7 +323,7 @@ Run all configured models and prompts:
 python3 local_harness/model_auditions/run_audition.py \
   --models local_harness/model_auditions/models.example.json \
   --prompts local_harness/model_auditions/prompts.example.json \
-  --out .work/model_auditions/run_$(date -u +%Y%m%dT%H%M%SZ)
+  --out .work/model_auditions/exploratory_runs/run_$(date -u +%Y%m%dT%H%M%SZ)
 ```
 
 Run a selected endpoint and prompt subset:
@@ -316,7 +335,7 @@ python3 local_harness/model_auditions/run_audition.py \
   --only-models lan_qwen \
   --only-prompts router_docs_update,router_model_audition \
   --timeout 180 \
-  --out .work/model_auditions/lan_qwen_$(date -u +%Y%m%dT%H%M%SZ)
+  --out .work/model_auditions/exploratory_runs/lan_qwen_$(date -u +%Y%m%dT%H%M%SZ)
 ```
 
 Thinking-capable Qwen-style models may put output in `reasoning_content` and
@@ -330,7 +349,7 @@ later endpoint is slow or unavailable.
 
 ```bash
 python3 local_harness/model_auditions/score_results.py \
-  --run .work/model_auditions/<run_id>
+  --run .work/model_auditions/exploratory_runs/<run_id>
 ```
 
 The scorer reads `responses.jsonl` and writes:
@@ -344,15 +363,16 @@ summary.md     human-readable aggregate and prompt-level table
 Review raw responses before relying on aggregate scores:
 
 ```bash
-python3 -m json.tool .work/model_auditions/<run_id>/run_metadata.json
-sed -n '1,20p' .work/model_auditions/<run_id>/responses.jsonl
-sed -n '1,240p' .work/model_auditions/<run_id>/summary.md
+python3 -m json.tool .work/model_auditions/exploratory_runs/<run_id>/run_metadata.json
+sed -n '1,20p' .work/model_auditions/exploratory_runs/<run_id>/responses.jsonl
+sed -n '1,240p' .work/model_auditions/exploratory_runs/<run_id>/summary.md
 ```
 
 ## Output Locations
 
-Normal runs live under `.work/model_auditions/` unless `--out` specifies
-another directory:
+To keep its schema separate from board/capability-card evidence, pass `--out`
+and place exploratory runs under
+`.work/model_auditions/exploratory_runs/`:
 
 ```text
 <run-dir>/
@@ -362,6 +382,10 @@ another directory:
 ├── rollup.json        aggregate metrics
 └── summary.md         human-readable review report
 ```
+
+If `--out` is omitted, the current runner default is
+`.work/model_auditions/<generated-run-id>`. Prefer the explicit separated path
+shown above.
 
 `.work/` is disposable local evidence. Preserve selected reviewed findings
 under `docs/reports/model_auditions/`, while keeping raw private or

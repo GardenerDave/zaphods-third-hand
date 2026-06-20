@@ -405,3 +405,11 @@ Importing verified YAML does not run LLM-probe and does not convert an upstream
 test pass into a ZTH audition result.
 If a human wants to audition a model after reviewing preflight evidence, that
 is a separate, explicit workflow.
+
+Only the board/capability-card audition path under
+[`local_harness/auditions/`](../local_harness/auditions/README.md) consumes
+`preflight_capability_manifest.json`, through optional direct or board-level
+gates. The exploratory
+[`local_harness/model_auditions/`](../local_harness/model_auditions/README.md)
+harness does not currently consume preflight gates. Their output files and
+schemas remain separate.
