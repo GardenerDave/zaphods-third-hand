@@ -100,6 +100,8 @@ Report review and sanitization are model-free.
 
 - [`reports/README.md`](reports/README.md) — durable evidence rules and report
   hygiene.
+- [`reports/REPORT_TEMPLATE.md`](reports/REPORT_TEMPLATE.md) — reusable
+  evidence-report structure and sanitization checklist.
 - [`reports/model_auditions/README.md`](reports/model_auditions/README.md) —
   board/capability-card and exploratory small-model report guidance.
 
