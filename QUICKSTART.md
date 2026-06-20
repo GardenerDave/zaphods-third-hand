@@ -44,7 +44,7 @@ source config.env
 set +a
 ```
 
-If required by the endpoint, set `ZTH_API_KEY` in your private shell or
+If required by the endpoint, set `OPENAI_API_KEY` in your private shell or
 `config.env`.
 
 Verify connectivity:
@@ -63,6 +63,11 @@ python3 local_harness/icm_call.py handoff \
 Do not continue until the endpoint, model ID, and authentication are correct.
 See [`docs/OPENAI_COMPATIBLE_ENDPOINTS.md`](docs/OPENAI_COMPATIBLE_ENDPOINTS.md)
 for local, LAN, and remote patterns.
+
+Advanced role-specific endpoint routing uses the `ICM_DEEP_*`, `ICM_CODER_*`,
+and `ICM_ROUTER_*` variables documented there and in
+[`config.example.env`](config.example.env). The normal Context Distiller path
+uses the single `ZTH_BASE_URL` / `ZTH_MODEL` pair.
 
 ## 2. Choose a Private Source
 
@@ -132,10 +137,16 @@ calibration, and role-critique options are maintained in
 Inspect:
 
 ```text
+outputs/context/
+outputs/indexes/
 outputs/sessions/
 outputs/review_patches/
 outputs/run_records/
 ```
+
+The current head script creates `outputs/context/` and `outputs/indexes/` as
+reserved locations but does not populate them. Review the session, review
+patch, and run-record directories for the active outputs from this workflow.
 
 Print a concise recent-run summary:
 
@@ -144,6 +155,18 @@ python3 local_harness/report_distiller_metrics.py \
   --runs-dir outputs/run_records \
   --limit 6
 ```
+
+For compact mode, verify the session follows the documented structure,
+including `Executive Summary`, `Durable Facts`, `Decisions Made`, `Open
+Questions`, and `Next Actions`; see
+[`Compact Mode`](docs/CONTEXT_DISTILLER_WORKFLOW.md#compact-mode).
+
+For advisory filters, ledger/calibration options, role critiques, and the
+chunked recommendation threshold—including `--advisor-only`, `--write-ledger`,
+`--calibration-window`, `--role-critiques-file`,
+`--role-critiques-strict`, `--profile`, `--purpose`, `--exclude-purpose`, and
+`--min-recent-runs-for-chunked`—see
+[`Metrics Advisor and Filters`](docs/CONTEXT_DISTILLER_WORKFLOW.md#metrics-advisor-and-filters).
 
 Check the generated session against the source. Review the proposed patch and
 run metrics. Keep source paths, endpoint names, and model names private unless
@@ -178,7 +201,10 @@ an active packet’s file allowlist.
 - Placeholder endpoint or model:
   - Edit and reload `config.env`.
 - Endpoint connectivity failure:
-  - Verify `ZTH_BASE_URL`, `ZTH_MODEL`, and `ZTH_API_KEY` if required.
+  - Verify `ZTH_BASE_URL`, `ZTH_MODEL`, and `OPENAI_API_KEY` if required.
+  - For HTTP error codes, authentication failures, and endpoint diagnostics,
+    see
+    [`OpenAI-Compatible Endpoint Troubleshooting`](docs/OPENAI_COMPATIBLE_ENDPOINTS.md#troubleshooting).
 - Source file not found:
   - Run from the repository root or use an absolute private source path.
 - Distiller timeout:

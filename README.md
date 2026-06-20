@@ -230,7 +230,7 @@ Required for model-backed runs:
 
 Optional:
 
-- `ZTH_API_KEY`
+- `OPENAI_API_KEY`
 - Distiller budget, time, and profile variables in [`config.example.env`](config.example.env)
 
 ## Dependency Matrix
@@ -253,6 +253,10 @@ environment variables or `config.env`, never tracked examples.
 
 Normal distiller runs write to:
 
+- `outputs/context/` — reserved context-artifact directory; the current head
+  script creates it but does not populate it.
+- `outputs/indexes/` — reserved index/manifest directory; the current head
+  script creates it but does not populate it.
 - `outputs/sessions/`
 - `outputs/review_patches/`
 - `outputs/run_records/`

@@ -1,0 +1,5 @@
+Project smoke note:
+
+- The operator is testing Context Distiller with harmless sample text.
+- Generated summaries and review patches remain evidence for human review.
+- No canonical context update or lifecycle movement is authorized by this run.
