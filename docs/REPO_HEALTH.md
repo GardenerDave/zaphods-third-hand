@@ -45,50 +45,28 @@ See [`SANITIZATION_NOTES.md`](SANITIZATION_NOTES.md) for the full policy.
 
 ## 3. Check Relative Markdown Links
 
-No dedicated Markdown link-check script is currently tracked. Use this
-standard-library check for local relative targets:
+Run the standard-library repository-health helper:
 
 ```bash
-python3 - <<'PY'
-import re
-import subprocess
-from pathlib import Path
-
-files = [
-    Path(path)
-    for path in subprocess.check_output(
-        ["git", "ls-files", "*.md"],
-        text=True,
-    ).splitlines()
-]
-link_re = re.compile(r"(?<!!)\[[^\]\n]+\]\(([^)\n]+)\)")
-fence_re = re.compile(r"^\s*```")
-missing = []
-
-for source in files:
-    in_fence = False
-    for line in source.read_text(encoding="utf-8").splitlines():
-        if fence_re.match(line):
-            in_fence = not in_fence
-            continue
-        if in_fence:
-            continue
-        for raw_target in link_re.findall(line):
-            target = raw_target.split("#", 1)[0]
-            if not target or "://" in target or target.startswith("mailto:"):
-                continue
-            if not (source.parent / target).resolve().exists():
-                missing.append((source, raw_target))
-
-for source, target in missing:
-    print(f"MISSING {source}: {target}")
-raise SystemExit(1 if missing else 0)
-PY
+python3 local_harness/repo_health_check.py --docs
 ```
 
-This checks local file targets, not external URLs or Markdown anchors.
+This checks tracked local file targets and configured boundary-language
+patterns. It ignores fenced code, external URLs, and pure fragment links; it
+checks the file portion of `file.md#anchor` but does not validate the anchor.
 Untracked Markdown files must be checked separately or staged before relying
-on `git ls-files`.
+on the tracked-file check.
+
+The default helper command runs the docs checks plus a focused privacy scan of
+beginner/public docs, configuration, and examples:
+
+```bash
+python3 local_harness/repo_health_check.py
+```
+
+The privacy scan excludes `docs/reports/` because durable historical evidence
+can intentionally name evaluated models. Reports still require separate human
+sanitization review before publication.
 
 ## 4. Run Relevant Verification
 
@@ -108,6 +86,15 @@ For Python changes, run focused tests and the relevant regression subset:
 PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -p no:cacheprovider \
   local_harness/tests/<focused_test_file>.py
 ```
+
+The complete helper mode also runs `git diff --check` and the full harness
+suite:
+
+```bash
+python3 local_harness/repo_health_check.py --all
+```
+
+Full pytest is intentionally not part of the default fast check.
 
 For docs-only changes, run `git diff --check`, the relative-link check, the
 tracked-file sanitization checks, and any smoke command whose documented
