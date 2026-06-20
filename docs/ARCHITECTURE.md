@@ -1,91 +1,244 @@
 # Architecture
 
-Start here: [`README.md`](../README.md) -> [`docs/FIRST_SUCCESS.md`](FIRST_SUCCESS.md).
+Start here: [`README.md`](../README.md) ->
+[`docs/README.md`](README.md) -> [`docs/FIRST_SUCCESS.md`](FIRST_SUCCESS.md).
 
-## Overview
+## Operating Model
 
-Zaphod's Third Hand separates repository ownership from model inference.
+Zaphod's Third Hand is a plain-file, human-supervised workflow kit. Tools
+prepare, transform, execute, and compare evidence. Humans retain authority over
+acceptance, model assignment, repository changes, and lifecycle movement.
 
-The head unit owns:
+The repository or operator environment owns:
 
-- Repository files.
-- Source files.
-- Audit trail.
-- Job packets.
-- Generated session summaries.
-- Generated review patches.
-- Role-run evidence.
+- source material and private configuration;
+- job and role packets;
+- generated evidence and audit files;
+- review, acceptance, and lifecycle decisions.
 
-The model worker only serves inference through an OpenAI-compatible endpoint.
+Endpoint-backed model workers receive bounded requests and return output. They
+do not own repository files, source archives, job state, acceptance state, or
+canonical project memory.
 
-For endpoint setup patterns, see [`docs/OPENAI_COMPATIBLE_ENDPOINTS.md`](OPENAI_COMPATIBLE_ENDPOINTS.md).
-For first-run onboarding, see [`docs/FIRST_SUCCESS.md`](FIRST_SUCCESS.md).
+## Runtime Classes
 
-## Head Unit
+| Runtime class | Meaning | Examples |
+|---|---|---|
+| Model-free | No model endpoint is required. | Export ingestion, chunk planning, packet generation, validation, dedupe, review bundles, preflight import/comparison, report generation, packet preparation, and output comparison. |
+| Endpoint-backed | The live operation uses an existing OpenAI-compatible endpoint supplied by the operator. | Context Distiller generation, selected ChatGPT signal-extraction packets, board auditions, exploratory prompt runs, and model-backed Aider execution. |
+| Optional local lifecycle | Exploratory tooling may download a GGUF and start or stop a temporary local llama.cpp server. | `local_harness/model_auditions/` only. |
 
-The head unit is the machine or environment where you run the repository. It is responsible for:
+Core endpoint-backed workflows expect an existing endpoint. The optional
+small-model exploratory harness is the exception that can manage temporary
+local llama.cpp/tmux sessions. It is not a production model-server manager.
 
-- Reading source files.
-- Writing outputs.
-- Preserving audit evidence.
-- Running verification commands.
-- Keeping lifecycle movement manual.
+## Common Evidence Boundary
 
-## Model Worker
-
-The model worker receives prompts and returns text. It should not own repo files, job records, lifecycle state, source transcripts, or output folders.
-
-## Job Lifecycle Folders
-
-Recommended lifecycle folders:
+Every workflow follows the same control pattern:
 
 ```text
-job_queue/
-active_jobs/
-completed_jobs/
-failed_jobs/
-blocked_jobs/
+source or packet
+    -> bounded tool or supervised model call
+    -> plain-file evidence
+    -> human review
+    -> explicit human decision, if any
 ```
 
-The folder names can be adapted, but the lifecycle principle should remain:
+Evidence creation does not itself:
 
-- Queue work first.
-- Activate manually.
-- Execute inside a narrow allowlist.
-- Complete or fail with evidence.
+- accept generated context as canonical;
+- authorize repository edits or lifecycle movement;
+- promote, approve, rank into a role, or assign a model;
+- certify a model or endpoint as production-ready;
+- approve unattended execution.
 
-## Context Distiller Pipeline
+## Context Distiller
 
-The context distiller is optional infrastructure included with the toolkit. Use it when source transcripts or logs need to become reviewable summaries; skip it when a project only needs the job lifecycle or role prompt layer.
+```text
+source transcript or log
+    -> compact or chunked endpoint-backed distillation
+    -> session summary + review patch + run metrics
+    -> human review
+    -> accept, rework, reject, or route a separate update packet
+```
 
-The distiller pipeline:
+The model-free metrics reporter can inspect bundled or completed run records
+without an endpoint. Actual summary and review-patch generation requires an
+existing OpenAI-compatible endpoint.
 
-1. Reads a source file.
-2. Optionally splits it into chunks.
-3. Summarizes each chunk.
-4. Synthesizes a final session summary.
-5. Generates a review patch.
-6. Records run audit files.
-7. Leaves canonical acceptance to a human-reviewed packet.
+Session summaries and review patches are evidence. A human-reviewed, separately
+authorized action is required before any proposed context becomes canonical.
 
-## Role Prompt Layer
+See [`CONTEXT_DISTILLER_WORKFLOW.md`](CONTEXT_DISTILLER_WORKFLOW.md).
 
-The role prompt layer provides reusable role definitions for:
+## ChatGPT Export Ingestion and Signal Review
 
-- Manager.
-- Tech Lead.
-- Implementer.
-- Reviewer.
-- Integrator.
+```text
+private ChatGPT export
+    -> normalize conversations                    [model-free]
+    -> plan deterministic chunks                  [model-free]
+    -> generate extraction packets                [model-free]
+    -> run selected packets                       [endpoint-backed, optional]
+    -> normalize and validate raw signals         [model-free]
+    -> dedupe + identify conflict candidates      [model-free]
+    -> build review bundle and candidate files    [model-free]
+    -> human review and separate acceptance
+```
 
-Roles are advisory by default. Active packets define what a role may read, edit, verify, and hand off.
+Raw exports remain private source evidence. Normalized conversations, chunks,
+packets, extracted signals, deduped signals, conflict candidates, and review
+bundles are not canonical memory. Dedupe does not resolve conflicts, and review
+bundle generation does not accept candidates.
 
-Unattended and batched role execution are not approved by default. They require separate design, validation, and human approval before use.
+See [`CHATGPT_EXPORT_DISTILLER.md`](CHATGPT_EXPORT_DISTILLER.md).
 
-## Review And Acceptance Layer
+## LLM-Probe Preflight, Comparison, and Audition Gate
 
-Review patches and role outputs are not canonical automatically. They become durable project memory only after:
+```text
+existing LLM-probe JSON or verified YAML output
+    -> ZTH preflight importer                     [model-free]
+    -> preserved source + capability manifest
+    -> optional manifest comparison               [model-free]
+    -> optional board/capability-card gate
+    -> board audition, if allowed                 [endpoint-backed]
+    -> human review
+```
 
-1. Human review.
-2. Recorded acceptance/rework/rejection decision.
-3. Separate packet for any canonical update.
+The importer does not run LLM-probe or call a model. The capability manifest is
+aggregate preflight evidence. Comparison is manifest-only and cannot claim
+per-model/per-probe status transitions.
+
+Only the board/capability-card audition workflow consumes preflight manifests.
+A preflight pass means that an audition may run; it does not promote, approve,
+assign, rank, or production-certify a model. Optional OKF-style export remains
+an export view, not an internal source of truth.
+
+See [`LLM_PROBE_PREFLIGHT.md`](LLM_PROBE_PREFLIGHT.md).
+
+## Board / Capability-Card Auditions
+
+```text
+existing endpoint + model configuration
+    + suites + fixtures + scorer profiles
+    + optional preflight manifest
+    -> single-suite or board audition
+    -> case evidence + capability cards
+    -> optional board-card comparison
+    -> human review
+```
+
+This workflow uses
+[`local_harness/auditions/`](../local_harness/auditions/README.md). It produces
+suite and board capability-card schemas and can apply optional direct or
+board-level preflight gates.
+
+Scores and comparisons are evidence about the tested configuration. They do
+not assign production roles or establish production readiness.
+
+## Small-Model Exploratory Harness
+
+```text
+small-model configuration
+    -> optional GGUF download
+    -> optional temporary llama.cpp/tmux start
+    -> raw prompt responses from local/LAN endpoint
+    -> mechanical scores + rollup + summary
+    -> exploratory evidence for human review
+    -> optional temporary server stop
+```
+
+This workflow uses
+[`local_harness/model_auditions/`](../local_harness/model_auditions/README.md).
+It can use an already-running endpoint without managing a local process.
+
+Its files and schemas differ from board/capability-card outputs. It does not
+currently consume preflight gates. Temporary server lifecycle actions gather
+evidence only; they do not promote a model or create a production service.
+
+Keep board and exploratory run evidence in separate output directories.
+
+## Management-Team Role Workflow
+
+```text
+human-created and human-activated packet
+    -> one supervised role execution
+    -> role output + role-run evidence note
+    -> human review
+    -> human lifecycle decision
+```
+
+Role output is advisory unless the active packet explicitly grants authority.
+An evidence note records authority already granted and grants no new authority.
+Only an explicitly authorized Implementer may edit files, and only files in the
+active packet allowlist.
+
+Managers may draft packet content but may not activate, approve, authorize, or
+move lifecycle state. No role output moves a packet or accepts generated
+evidence.
+
+Lifecycle records remain plain files under human-controlled states such as
+`job_queue/`, `active_jobs/`, `completed_jobs/`, `failed_jobs/`, and
+`blocked_jobs/`.
+
+See [`MANAGEMENT_TEAM_OVERVIEW.md`](MANAGEMENT_TEAM_OVERVIEW.md) and
+[`SUPERVISED_MANAGEMENT_TEAM_USAGE_RULES.md`](../workflows/SUPERVISED_MANAGEMENT_TEAM_USAGE_RULES.md).
+
+## External-Agent and Aider Integration
+
+### External-Agent Adapter
+
+```text
+bounded task + source-of-truth context
+    -> ZTH role packet                            [model-free]
+    -> independently executed external agent
+    -> contracted agent output
+    -> ZTH comparison / coverage audit            [model-free]
+    -> human-reviewed follow-up decision
+```
+
+ZTH supplies a workbench, not an agent scheduler. External agent output does
+not authorize edits, commits, future packets, canonicalization, or lifecycle
+movement.
+
+See [`AGENT_ADAPTER.md`](AGENT_ADAPTER.md).
+
+### Aider
+
+```text
+human-scoped editable files + read-only context
+    -> local preflight and request artifacts
+    -> supervised endpoint-backed Aider run
+    -> diff + output + metrics + review artifacts
+    -> human acceptance or rejection
+```
+
+Aider is an optional integration path for tightly scoped edits. It is not
+approved for broad autonomous coding, automatic commits, or lifecycle
+movement.
+
+See [`AIDER_FIRST_SUCCESS.md`](AIDER_FIRST_SUCCESS.md).
+
+## Human Decision Points
+
+Humans decide:
+
+- whether a model-backed step should run;
+- whether a role packet is active and what authority it grants;
+- whether generated evidence is accepted, rejected, or reworked;
+- whether a canonical update or repository edit receives a separate packet;
+- whether a model receives any later assignment;
+- whether temporary LAN exposure or local server lifecycle is appropriate;
+- whether reviewed evidence is suitable for a durable report.
+
+No passing smoke test, preflight status, capability card, score, comparison,
+role output, evidence note, or successful endpoint call replaces these
+decisions.
+
+## Output and Reporting Boundary
+
+Normal run outputs remain local evidence under `outputs/`, `.work/`, `/tmp`, or
+another operator-selected directory. Reviewed snapshots may be sanitized and
+copied under [`docs/reports/`](reports/README.md).
+
+Reports preserve observations. They do not change acceptance state, move
+lifecycle records, assign model roles, or establish production readiness.

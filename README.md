@@ -69,6 +69,8 @@ Start here:
 If you are new to this repo, begin with Context Distiller before using the
 management-team or external-agent layers.
 
+For the full documentation map, see [`docs/README.md`](docs/README.md).
+
 ## How ChatGPT Fits
 
 You can use ChatGPT as an operator assistant while working with ZTH.
