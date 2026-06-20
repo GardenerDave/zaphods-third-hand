@@ -16,6 +16,7 @@ This folder contains the manager-side helper scripts for supervised local-worker
 - `validate_scaffold.py`: validates Tool Maker and Change Closeout scaffold shape and metadata consistency without reading original sources or judging truth, safety, completeness, or promotion readiness.
 - `repo_health_check.py`: reports Markdown-link, public-surface privacy, boundary-language, scaffold, diff-hygiene, and optional test health without changing files.
 - `git_sync_cleanup.py`: reports local post-merge Git sync and branch-cleanup evidence and prints human-reviewable commands without executing cleanup.
+- `agent_task_session.py`: creates a scoped, model-free Agent Task Session review packet under `.work/agent_tasks/` without running agents, checks, or Git commands.
 - `zth_agent_packet.py`: generates one independent role/context packet for an external agent.
 - `zth_compare_agent_outputs.py`: compares completed external-agent outputs that follow the ZTH contract.
 - `zth_coverage_auditor.py`: reports obvious pre-synthesis coverage areas and blind spots.
@@ -80,6 +81,29 @@ requires a human to confirm branch deletion. Use `--include-fetch-advice` to
 print `git fetch --prune` as an optional command; it is never run by the
 advisor. Passing repo health remains evidence, not cleanup or acceptance
 authority.
+
+## Agent Task Sessions
+
+Create a draft work packet for a supervised Codex or external-agent task:
+
+```text
+python3 local_harness/agent_task_session.py new \
+  --name "Add focused parser validation" \
+  --goal "Add parser checks without changing unrelated behavior" \
+  --branch agent-task-parser-validation \
+  --allow local_harness/example.py \
+  --allow local_harness/tests/test_example.py \
+  --check "python3 -m pytest local_harness/tests/test_example.py" \
+  --check "python3 local_harness/repo_health_check.py"
+```
+
+The command writes `task.yaml`, `codex_prompt.md`, `allowed_paths.txt`,
+`required_checks.txt`, and `status.md` under
+`.work/agent_tasks/<task-id>/`. It records scope and verification
+instructions but does not execute the task, run checks, invoke an agent, or
+perform Git operations. The packet remains draft review evidence: passing
+checks are evidence, not authority, and humans retain acceptance, commit,
+merge, release, promotion, cleanup, and lifecycle decisions.
 
 ## Configuration
 
