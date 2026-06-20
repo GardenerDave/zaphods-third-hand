@@ -1,6 +1,7 @@
 # Change Closeout Report: <change name>
 
 ```yaml
+scaffold_contract_version: "change-closeout-v1"
 change_name: "<change name>"
 status: draft
 requires_human_review: true
@@ -25,10 +26,11 @@ A change can pass tests and still be incomplete when documentation, prompt or
 template contracts, safety boundaries, limitations, or human-review guidance
 are missing.
 
+The contract version supports lightweight shape and metadata validation.
 Generated source packets include sanitized source labels/paths and SHA-256
-hashes of the full source bytes at scaffold time. Paths and hashes support
-human provenance review; they do not make private evidence safe to publish.
-Sanitization remains a human responsibility.
+hashes of the full source bytes at scaffold time. Validation and provenance
+metadata do not prove that evidence is true, safe, complete, sanitized, or
+promotion-ready. Human review remains required.
 
 ## Summary
 

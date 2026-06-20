@@ -65,6 +65,7 @@ Return Markdown with these sections in this order:
 Immediately after the title, include this machine-readable summary block:
 
 ```yaml
+scaffold_contract_version: "tool-lifecycle-v1"
 lifecycle_name: "<name>"
 status: draft
 source_material:
@@ -87,6 +88,7 @@ promotion.
 
 ## Evidence Rules
 
+- Preserve `scaffold_contract_version: "tool-lifecycle-v1"`.
 - Cite source labels or sanitized paths and use the recorded SHA-256 when
   source identity matters. Do not collapse duplicate basenames into one source.
 - Preserve exact commands only when they appear in the evidence.

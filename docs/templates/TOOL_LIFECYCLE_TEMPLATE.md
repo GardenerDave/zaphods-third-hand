@@ -1,6 +1,7 @@
 # Tool Lifecycle Draft: <name>
 
 ```yaml
+scaffold_contract_version: "tool-lifecycle-v1"
 lifecycle_name: "<name>"
 status: draft
 source_material:
@@ -22,10 +23,11 @@ promotion_recommendation: "not_ready"
 This is a draft evidence artifact. It does not authorize execution, lifecycle
 movement, cleanup, or promotion.
 
+The contract version supports lightweight shape and metadata validation.
 Generated source packets include sanitized source labels/paths and SHA-256
-hashes of the full source bytes at scaffold time. Paths and hashes support
-human provenance review; they do not make private evidence safe to publish.
-Sanitization remains a human responsibility.
+hashes of the full source bytes at scaffold time. Validation and provenance
+metadata do not prove that evidence is true, safe, complete, sanitized, or
+promotion-ready. Human review remains required.
 
 ## Purpose
 
