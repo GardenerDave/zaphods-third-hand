@@ -26,7 +26,6 @@ The metaphor does not imply autonomous control. ZTH is meant to add external wor
 
 - Operator convenience flow for the full import → manifest → gated audition chain.
 - Real local endpoint smoke run using actual LLM-probe output.
-- Public-facing docs polish after the flow stabilizes.
 
 ## Planned Branches
 

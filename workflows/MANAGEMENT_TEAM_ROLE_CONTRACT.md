@@ -1,4 +1,4 @@
-# Management Team Role Contract
+# Management-Team Role Contract
 
 Start here: [`README.md`](../README.md) -> [`docs/FIRST_SUCCESS.md`](../docs/FIRST_SUCCESS.md).
 

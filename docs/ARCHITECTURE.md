@@ -172,6 +172,10 @@ An evidence note records authority already granted and grants no new authority.
 Only an explicitly authorized Implementer may edit files, and only files in the
 active packet allowlist.
 
+Record role-run evidence inside the active packet by default. Use a separate
+operator-selected evidence-note path only when the active packet explicitly
+allows that path.
+
 Managers may draft packet content but may not activate, approve, authorize, or
 move lifecycle state. No role output moves a packet or accepts generated
 evidence.

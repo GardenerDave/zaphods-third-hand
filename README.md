@@ -6,6 +6,12 @@ using AI helpers without giving them direct control of your repository.
 It helps turn chats, logs, model outputs, and role-work packets into reviewable
 files that a human can inspect, compare, accept, reject, or refine.
 
+## Why “Third Hand”?
+
+The name borrows from Zaphod carving out hidden space in his own head and
+gaining a third arm. For this project, that means externalized cognition,
+supervised delegation, and extra working capacity—not autonomous control.
+
 ## In Plain English
 
 ZTH helps you use AI without handing it the steering wheel.

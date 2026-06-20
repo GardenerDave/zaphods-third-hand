@@ -75,6 +75,14 @@ export SOURCE_FILE="<SOURCE_FILE>"
 export SHORT_TITLE="<SHORT_TITLE>"
 ```
 
+For example, if the private source is `/tmp/zth-team-handoff.txt`:
+
+```bash
+export SOURCE_ID="team-handoff-2026-06-20"
+export SOURCE_FILE="/tmp/zth-team-handoff.txt"
+export SHORT_TITLE="team-handoff"
+```
+
 Do not commit source material unless it has been explicitly reviewed for
 sharing.
 
@@ -174,8 +182,10 @@ an active packet’s file allowlist.
 - Source file not found:
   - Run from the repository root or use an absolute private source path.
 - Distiller timeout:
-  - Reduce source size or output budgets, or increase
-    `ZTH_DISTILLER_TIMEOUT`.
+  - This guide uses 900 seconds as the normal compact-run starting point; the
+    detailed workflow uses 240 seconds only for a tiny smoke profile.
+  - If 900 seconds still expires, reduce source size or output budgets before
+    increasing `ZTH_DISTILLER_TIMEOUT`, then inspect endpoint latency.
 - Chunked run is too slow:
   - Reduce `ZTH_DISTILLER_CHUNK_LINES` and
     `ZTH_DISTILLER_CHUNK_MAX_TOKENS`.
