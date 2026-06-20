@@ -24,10 +24,35 @@ GENERATED_FILES = (
     "required_checks.txt",
     "status.md",
 )
+PROMPT_BOUNDARY_PHRASES = (
+    "Human review is required",
+    "Passing checks are evidence, not authority",
+    "Do not mark the task complete automatically",
+    "Do not merge, release, promote, clean up, delete",
+)
+STATUS_BOUNDARY_PHRASES = (
+    "- Status: `draft`",
+    "- Human review required: `true`",
+    "- Authority granted by this packet: `false`",
+    "does not mark the task complete",
+)
+
+
+class SessionValidationError(ValueError):
+    """Raised when an Agent Task Session packet is malformed or inconsistent."""
 
 
 @dataclass(frozen=True)
 class TaskSession:
+    task_id: str
+    output_dir: Path
+    generated_files: tuple[str, ...]
+    allowed_paths: tuple[str, ...]
+    required_checks: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class SessionValidation:
     task_id: str
     output_dir: Path
     generated_files: tuple[str, ...]
@@ -278,6 +303,137 @@ def create_task_session(
     )
 
 
+def read_required_text(path: Path) -> str:
+    try:
+        return path.read_text(encoding="utf-8")
+    except FileNotFoundError as exc:
+        raise SessionValidationError(f"missing required file: {path.name}") from exc
+    except UnicodeDecodeError as exc:
+        raise SessionValidationError(
+            f"required file is not valid UTF-8: {path.name}"
+        ) from exc
+    except OSError as exc:
+        raise SessionValidationError(f"could not read {path.name}: {exc}") from exc
+
+
+def require_metadata_string(metadata: dict[str, object], key: str) -> str:
+    value = metadata.get(key)
+    if not isinstance(value, str):
+        raise SessionValidationError(f"task.yaml field {key!r} must be a string")
+    try:
+        return clean_text(value, f"task.yaml field {key!r}")
+    except ValueError as exc:
+        raise SessionValidationError(str(exc)) from exc
+
+
+def require_metadata_list(metadata: dict[str, object], key: str) -> list[str]:
+    value = metadata.get(key)
+    if not isinstance(value, list) or not value:
+        raise SessionValidationError(
+            f"task.yaml field {key!r} must be a non-empty list"
+        )
+    if not all(isinstance(item, str) for item in value):
+        raise SessionValidationError(
+            f"task.yaml field {key!r} must contain only strings"
+        )
+    return value
+
+
+def validate_task_session(session_dir: Path) -> SessionValidation:
+    if not session_dir.exists():
+        raise SessionValidationError(f"task session directory does not exist: {session_dir}")
+    if not session_dir.is_dir():
+        raise SessionValidationError(f"task session path is not a directory: {session_dir}")
+
+    texts = {
+        filename: read_required_text(session_dir / filename)
+        for filename in GENERATED_FILES
+    }
+    try:
+        metadata = json.loads(texts["task.yaml"])
+    except json.JSONDecodeError as exc:
+        raise SessionValidationError(
+            "task.yaml must contain the JSON-compatible YAML object emitted by the builder"
+        ) from exc
+    if not isinstance(metadata, dict):
+        raise SessionValidationError("task.yaml must contain a top-level object")
+
+    if metadata.get("task_session_contract_version") != CONTRACT_VERSION:
+        raise SessionValidationError(
+            f"unsupported task session contract: "
+            f"{metadata.get('task_session_contract_version')!r}"
+        )
+    if metadata.get("status") != "draft":
+        raise SessionValidationError("task.yaml status must remain 'draft'")
+    if metadata.get("requires_human_review") is not True:
+        raise SessionValidationError("task.yaml requires_human_review must be true")
+    if metadata.get("authority_granted") is not False:
+        raise SessionValidationError("task.yaml authority_granted must be false")
+    if metadata.get("agent_execution_performed") is not False:
+        raise SessionValidationError(
+            "task.yaml agent_execution_performed must be false"
+        )
+
+    task_id = require_metadata_string(metadata, "task_id")
+    try:
+        validate_task_id(task_id)
+    except ValueError as exc:
+        raise SessionValidationError(str(exc)) from exc
+    if session_dir.name != task_id:
+        raise SessionValidationError(
+            "task directory name must match task.yaml task_id"
+        )
+    require_metadata_string(metadata, "name")
+    require_metadata_string(metadata, "goal")
+    require_metadata_string(metadata, "branch")
+
+    raw_paths = require_metadata_list(metadata, "allowed_paths")
+    try:
+        allowed_paths = tuple(normalize_allowed_path(value) for value in raw_paths)
+    except ValueError as exc:
+        raise SessionValidationError(str(exc)) from exc
+    if len(allowed_paths) != len(set(allowed_paths)):
+        raise SessionValidationError("task.yaml allowed_paths must be unique")
+
+    raw_checks = require_metadata_list(metadata, "required_checks")
+    try:
+        required_checks = tuple(clean_check(value) for value in raw_checks)
+    except ValueError as exc:
+        raise SessionValidationError(str(exc)) from exc
+    if len(required_checks) != len(set(required_checks)):
+        raise SessionValidationError("task.yaml required_checks must be unique")
+
+    path_lines = tuple(texts["allowed_paths.txt"].splitlines())
+    if path_lines != allowed_paths:
+        raise SessionValidationError(
+            "allowed_paths.txt must match task.yaml allowed_paths in order"
+        )
+    check_lines = tuple(texts["required_checks.txt"].splitlines())
+    if check_lines != required_checks:
+        raise SessionValidationError(
+            "required_checks.txt must match task.yaml required_checks in order"
+        )
+
+    for phrase in PROMPT_BOUNDARY_PHRASES:
+        if phrase not in texts["codex_prompt.md"]:
+            raise SessionValidationError(
+                f"codex_prompt.md is missing required boundary language: {phrase!r}"
+            )
+    for phrase in STATUS_BOUNDARY_PHRASES:
+        if phrase not in texts["status.md"]:
+            raise SessionValidationError(
+                f"status.md is missing required boundary language: {phrase!r}"
+            )
+
+    return SessionValidation(
+        task_id=task_id,
+        output_dir=session_dir,
+        generated_files=GENERATED_FILES,
+        allowed_paths=allowed_paths,
+        required_checks=required_checks,
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
@@ -306,6 +462,11 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         help="Required check to record; repeat as needed. Checks are not executed.",
     )
+    validate_parser = subparsers.add_parser(
+        "validate",
+        help="Validate packet shape and boundaries without executing checks.",
+    )
+    validate_parser.add_argument("session", type=Path, help="Task session directory.")
     return parser
 
 
@@ -315,6 +476,19 @@ def main(
     session_root: Path = DEFAULT_SESSION_ROOT,
 ) -> int:
     args = build_parser().parse_args(argv)
+    if args.command == "validate":
+        try:
+            validation = validate_task_session(args.session)
+        except SessionValidationError as exc:
+            print(f"INVALID {args.session}: {exc}", file=sys.stderr)
+            return 1
+        print(
+            f"VALID {validation.output_dir}: "
+            f"{validation.task_id} ({CONTRACT_VERSION})"
+        )
+        print("No required checks, agents, shell commands, or Git operations were executed.")
+        return 0
+
     try:
         session = create_task_session(
             name=args.name,

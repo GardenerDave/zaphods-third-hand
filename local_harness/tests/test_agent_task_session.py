@@ -174,6 +174,115 @@ class AgentTaskSessionTests(unittest.TestCase):
             self.assertEqual(0, exit_code)
             self.assertIn("No agent, check, shell command, or Git operation was executed", output.getvalue())
 
+    def rewrite_json(self, path: Path, update) -> None:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        update(payload)
+        path.write_text(
+            json.dumps(payload, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+
+    def test_generated_session_validates_without_executing_checks(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            session = self.create_session(Path(temp_dir))
+            with mock.patch.object(subprocess, "run") as run:
+                validation = agent_task_session.validate_task_session(
+                    session.output_dir
+                )
+
+        run.assert_not_called()
+        self.assertEqual(session.task_id, validation.task_id)
+        self.assertEqual(session.required_checks, validation.required_checks)
+
+    def test_validation_fails_when_required_file_is_missing(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            session = self.create_session(Path(temp_dir))
+            (session.output_dir / "status.md").unlink()
+
+            with self.assertRaisesRegex(
+                agent_task_session.SessionValidationError,
+                "missing required file: status.md",
+            ):
+                agent_task_session.validate_task_session(session.output_dir)
+
+    def test_validation_rejects_unsafe_metadata_path(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            session = self.create_session(Path(temp_dir))
+            self.rewrite_json(
+                session.output_dir / "task.yaml",
+                lambda payload: payload.__setitem__("allowed_paths", ["../outside.py"]),
+            )
+
+            with self.assertRaisesRegex(
+                agent_task_session.SessionValidationError,
+                "unsafe segment",
+            ):
+                agent_task_session.validate_task_session(session.output_dir)
+
+    def test_validation_rejects_empty_goal_or_checks(self):
+        for key, value, message in (
+            ("goal", "", "goal"),
+            ("required_checks", [], "non-empty list"),
+        ):
+            with self.subTest(key=key), tempfile.TemporaryDirectory() as temp_dir:
+                session = self.create_session(Path(temp_dir))
+                self.rewrite_json(
+                    session.output_dir / "task.yaml",
+                    lambda payload, key=key, value=value: payload.__setitem__(key, value),
+                )
+
+                with self.assertRaisesRegex(
+                    agent_task_session.SessionValidationError,
+                    message,
+                ):
+                    agent_task_session.validate_task_session(session.output_dir)
+
+    def test_validation_rejects_missing_authority_boundary_language(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            session = self.create_session(Path(temp_dir))
+            prompt_path = session.output_dir / "codex_prompt.md"
+            prompt_path.write_text(
+                prompt_path.read_text(encoding="utf-8").replace(
+                    "Passing checks are evidence, not authority",
+                    "Checks passed",
+                ),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(
+                agent_task_session.SessionValidationError,
+                "missing required boundary language",
+            ):
+                agent_task_session.validate_task_session(session.output_dir)
+
+    def test_validation_rejects_metadata_and_text_file_mismatch(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            session = self.create_session(Path(temp_dir))
+            (session.output_dir / "required_checks.txt").write_text(
+                "python3 -m pytest different.py\n",
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(
+                agent_task_session.SessionValidationError,
+                "must match task.yaml required_checks",
+            ):
+                agent_task_session.validate_task_session(session.output_dir)
+
+    def test_validate_cli_reports_success_without_subprocess_execution(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            session = self.create_session(Path(temp_dir))
+            output = io.StringIO()
+            with mock.patch.object(subprocess, "run") as run, contextlib.redirect_stdout(output):
+                exit_code = agent_task_session.main(
+                    ["validate", os.fspath(session.output_dir)]
+                )
+
+        run.assert_not_called()
+        self.assertEqual(0, exit_code)
+        self.assertIn("VALID", output.getvalue())
+        self.assertIn("No required checks", output.getvalue())
+
 
 if __name__ == "__main__":
     unittest.main()
