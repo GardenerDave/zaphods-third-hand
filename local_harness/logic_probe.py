@@ -8,13 +8,24 @@ import hashlib
 import json
 import re
 import sys
+import time
+import urllib.error
+import urllib.request
 from collections import Counter
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
+
+if __package__ in {None, ""}:
+    from model_auditions.common import AuditionError, filter_by_keys, load_models
+else:
+    from .model_auditions.common import AuditionError, filter_by_keys, load_models
 
 
 FIXTURE_SCHEMA_VERSION = "zth.logic_probes.v0.1"
+RUN_SCHEMA_VERSION = "zth.logic_probe_run.v0.1"
+RAW_RESPONSE_SCHEMA_VERSION = "zth.logic_probe_raw_response.v0.1"
 SCORE_SCHEMA_VERSION = "zth.logic_probe_scores.v0.1"
+DEFAULT_RUN_OUTPUT_ROOT = ".work/model_auditions/logic_probe_runs"
 ALLOWED_CATEGORIES = {
     "authority_boundary",
     "contradiction_handling",
@@ -37,6 +48,7 @@ BOUNDARY_NOTE = (
     "execute, commit, merge, delete, clean up, promote, release, or mark work complete."
 )
 PROBE_ID_RE = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
+SAFE_PATH_COMPONENT_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
 
 class LogicProbeError(ValueError):
@@ -189,6 +201,221 @@ def load_fixtures(path: str | Path) -> dict[str, Any]:
     except json.JSONDecodeError as exc:
         raise LogicProbeError(f"fixture file is not valid JSON: {exc}") from exc
     return validate_fixture_document(document)
+
+
+def utc_now() -> str:
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
+
+def build_probe_payload(
+    probe: dict[str, Any],
+    *,
+    api_model: str,
+    max_tokens: int,
+) -> dict[str, Any]:
+    return {
+        "model": api_model,
+        "messages": [
+            {
+                "role": "system",
+                "content": (
+                    "You are responding to a ZTH diagnostic logic probe. "
+                    "Follow the requested output shape exactly. This produces "
+                    "evidence only and grants no authority to take actions."
+                ),
+            },
+            {"role": "user", "content": probe["prompt"]},
+        ],
+        "temperature": 0,
+        "max_tokens": max_tokens,
+    }
+
+
+def post_chat_completion(
+    url: str,
+    payload: dict[str, Any],
+    timeout: int,
+) -> dict[str, Any]:
+    """Call an OpenAI-compatible chat-completions endpoint."""
+
+    request = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    started = time.monotonic()
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            body = response.read().decode("utf-8")
+        try:
+            parsed = json.loads(body)
+        except json.JSONDecodeError as exc:
+            return {
+                "error": "invalid_json_response",
+                "message": str(exc),
+                "body": body,
+                "client_elapsed_seconds": round(time.monotonic() - started, 3),
+            }
+        if not isinstance(parsed, dict):
+            return {
+                "error": "invalid_response_shape",
+                "message": "Endpoint JSON response root is not an object",
+                "response": parsed,
+                "client_elapsed_seconds": round(time.monotonic() - started, 3),
+            }
+        parsed.setdefault(
+            "client_elapsed_seconds",
+            round(time.monotonic() - started, 3),
+        )
+        return parsed
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="replace")
+        return {
+            "error": "http_error",
+            "status": exc.code,
+            "body": body,
+            "client_elapsed_seconds": round(time.monotonic() - started, 3),
+        }
+    except Exception as exc:  # noqa: BLE001 - preserve per-probe evidence.
+        return {
+            "error": type(exc).__name__,
+            "message": str(exc),
+            "client_elapsed_seconds": round(time.monotonic() - started, 3),
+        }
+
+
+def extract_response_text(response: dict[str, Any]) -> tuple[str | None, str | None]:
+    if response.get("error"):
+        error = str(response["error"])
+        if response.get("status") is not None:
+            error += f" (HTTP {response['status']})"
+        if response.get("message"):
+            error += f": {response['message']}"
+        return None, error
+    try:
+        content = response["choices"][0]["message"]["content"]
+    except (KeyError, IndexError, TypeError):
+        return None, "Endpoint response is missing choices[0].message.content"
+    if not isinstance(content, str):
+        return None, "Endpoint response content is not a string"
+    return content, None
+
+
+def _validate_run_component(value: str, field: str) -> str:
+    _nonempty_string(value, field)
+    if value in {".", ".."} or not SAFE_PATH_COMPONENT_RE.fullmatch(value):
+        raise LogicProbeError(
+            f"{field} must be a filesystem-safe name using letters, numbers, "
+            "dots, underscores, or hyphens"
+        )
+    return value
+
+
+def run_probe_session(
+    fixture_document: dict[str, Any],
+    *,
+    fixtures_path: str | Path,
+    models_path: str | Path,
+    output_root: str | Path,
+    run_id: str,
+    only_models: str | None = None,
+    timeout: int = 180,
+    max_tokens: int = 512,
+    request_fn: Callable[[str, dict[str, Any], int], dict[str, Any]] | None = None,
+    created_at_utc: str | None = None,
+) -> Path:
+    """Call configured endpoints, preserve raw evidence, and score the run."""
+
+    _validate_run_component(run_id, "run_id")
+    if isinstance(timeout, bool) or timeout <= 0:
+        raise LogicProbeError("timeout must be a positive integer")
+    if isinstance(max_tokens, bool) or max_tokens <= 0:
+        raise LogicProbeError("max_tokens must be a positive integer")
+
+    try:
+        models = filter_by_keys(load_models(models_path), only_models)
+    except AuditionError as exc:
+        raise LogicProbeError(str(exc)) from exc
+    if not models:
+        raise LogicProbeError("model config selected no models")
+    for model in models:
+        _validate_run_component(model.key, f"model key {model.key!r}")
+
+    run_dir = Path(output_root).expanduser() / run_id
+    if run_dir.exists():
+        raise LogicProbeError(f"refusing to overwrite existing run directory: {run_dir}")
+
+    created = created_at_utc or utc_now()
+    raw_dir = run_dir / "raw"
+    raw_dir.mkdir(parents=True)
+    manifest = {
+        "schema_version": RUN_SCHEMA_VERSION,
+        "run_id": run_id,
+        "fixtures_path": str(fixtures_path),
+        "models_path": str(models_path),
+        "created_at_utc": created,
+        "probe_count": len(fixture_document["probes"]),
+        "model_count": len(models),
+        "model_ids": [model.key for model in models],
+        "requires_human_review": True,
+        "authority_granted": False,
+    }
+    (run_dir / "run_manifest.json").write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    caller = request_fn or post_chat_completion
+    for model in models:
+        model_raw_dir = raw_dir / model.key
+        model_raw_dir.mkdir()
+        for probe in fixture_document["probes"]:
+            payload = build_probe_payload(
+                probe,
+                api_model=model.api_model,
+                max_tokens=max_tokens,
+            )
+            started = time.monotonic()
+            try:
+                response = caller(model.url, payload, timeout)
+                if not isinstance(response, dict):
+                    response = {
+                        "error": "invalid_caller_result",
+                        "message": "Endpoint caller did not return a JSON object",
+                    }
+            except Exception as exc:  # noqa: BLE001 - preserve and continue.
+                response = {
+                    "error": type(exc).__name__,
+                    "message": str(exc),
+                }
+            duration = response.get("client_elapsed_seconds")
+            if not isinstance(duration, (int, float)) or isinstance(duration, bool):
+                duration = round(time.monotonic() - started, 3)
+            response_text, response_error = extract_response_text(response)
+            raw_record = {
+                "schema_version": RAW_RESPONSE_SCHEMA_VERSION,
+                "run_id": run_id,
+                "model_id": model.key,
+                "api_model": model.api_model,
+                "probe_id": probe["id"],
+                "category": probe["category"],
+                "prompt": probe["prompt"],
+                "endpoint": model.endpoint_base_url,
+                "chat_completions_url": model.url,
+                "duration_seconds": duration,
+                "response_text": response_text,
+                "error": response_error,
+                "request": payload,
+                "response": response,
+            }
+            (model_raw_dir / f"{probe['id']}.json").write_text(
+                json.dumps(raw_record, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+
+    score_response_directory(fixture_document, raw_dir, run_dir)
+    return run_dir
 
 
 def _contains(text: str, phrase: str) -> bool:
@@ -608,6 +835,21 @@ def build_parser() -> argparse.ArgumentParser:
     score_parser.add_argument("--fixtures", required=True)
     score_parser.add_argument("--responses", required=True)
     score_parser.add_argument("--out-dir", required=True)
+
+    run_parser = subparsers.add_parser(
+        "run", help="Run probes against configured OpenAI-compatible endpoints."
+    )
+    run_parser.add_argument("--fixtures", required=True)
+    run_parser.add_argument("--models", required=True)
+    run_parser.add_argument("--out-dir", default=DEFAULT_RUN_OUTPUT_ROOT)
+    run_parser.add_argument("--run-id", required=True)
+    run_parser.add_argument(
+        "--only-models",
+        default=None,
+        help="Comma-separated model keys to include.",
+    )
+    run_parser.add_argument("--timeout", type=int, default=180)
+    run_parser.add_argument("--max-tokens", type=int, default=512)
     return parser
 
 
@@ -621,12 +863,25 @@ def main(argv: list[str] | None = None) -> int:
                 f"{FIXTURE_SCHEMA_VERSION}"
             )
             return 0
-        scored = score_response_directory(fixtures, args.responses, args.out_dir)
-        print(
-            f"PASS: scored {len(scored)} model response set(s); "
-            f"wrote {Path(args.out_dir) / 'scored'} and "
-            f"{Path(args.out_dir) / 'LOGIC_PROBE_SUMMARY.md'}"
+        if args.command == "score":
+            scored = score_response_directory(fixtures, args.responses, args.out_dir)
+            print(
+                f"PASS: scored {len(scored)} model response set(s); "
+                f"wrote {Path(args.out_dir) / 'scored'} and "
+                f"{Path(args.out_dir) / 'LOGIC_PROBE_SUMMARY.md'}"
+            )
+            return 0
+        run_dir = run_probe_session(
+            fixtures,
+            fixtures_path=args.fixtures,
+            models_path=args.models,
+            output_root=args.out_dir,
+            run_id=args.run_id,
+            only_models=args.only_models,
+            timeout=args.timeout,
+            max_tokens=args.max_tokens,
         )
+        print(f"PASS: wrote logic probe run evidence to {run_dir}")
         return 0
     except LogicProbeError as exc:
         print(f"FAIL: {exc}", file=sys.stderr)

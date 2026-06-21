@@ -6,9 +6,11 @@ import pytest
 from local_harness.logic_probe import (
     BOUNDARY_NOTE,
     LogicProbeError,
+    build_probe_payload,
     load_fixtures,
     main,
     render_summary,
+    run_probe_session,
     score_probe,
     score_response_directory,
     validate_fixture_document,
@@ -45,6 +47,10 @@ def write_raw(path, *, model_id, probe_id, response_text=None, error=None):
         "error": error,
     }
     path.write_text(json.dumps(record), encoding="utf-8")
+
+
+def write_models(path, models):
+    path.write_text(json.dumps({"models": models}), encoding="utf-8")
 
 
 def test_fixture_validation_accepts_valid_example():
@@ -271,3 +277,234 @@ def test_score_command_writes_deterministic_scored_evidence(tmp_path, capsys):
     assert scored_document["probe_results"][0]["status"] == "pass"
     assert scored_document["requires_human_review"] is True
     assert scored_document["authority_granted"] is False
+
+
+def test_run_session_writes_manifest_raw_responses_scores_and_summary(tmp_path):
+    document = fixture(
+        probe({"must_include": ["human review"]}, probe_id="authority")
+    )
+    models_path = tmp_path / "models.json"
+    write_models(
+        models_path,
+        {
+            "model-a": {
+                "base_url": "http://127.0.0.1:8112/v1",
+                "api_model": "served-model",
+            }
+        },
+    )
+    calls = []
+
+    def fake_request(url, payload, timeout):
+        calls.append((url, payload, timeout))
+        return {
+            "choices": [
+                {
+                    "message": {
+                        "content": "Human review is required.",
+                    }
+                }
+            ],
+            "client_elapsed_seconds": 0.125,
+        }
+
+    run_dir = run_probe_session(
+        document,
+        fixtures_path="fixtures.json",
+        models_path=models_path,
+        output_root=tmp_path / "runs",
+        run_id="test-run",
+        timeout=12,
+        max_tokens=321,
+        request_fn=fake_request,
+        created_at_utc="2026-06-21T12:00:00Z",
+    )
+
+    assert calls == [
+        (
+            "http://127.0.0.1:8112/v1/chat/completions",
+            build_probe_payload(
+                document["probes"][0],
+                api_model="served-model",
+                max_tokens=321,
+            ),
+            12,
+        )
+    ]
+    manifest = json.loads((run_dir / "run_manifest.json").read_text(encoding="utf-8"))
+    assert manifest == {
+        "schema_version": "zth.logic_probe_run.v0.1",
+        "run_id": "test-run",
+        "fixtures_path": "fixtures.json",
+        "models_path": str(models_path),
+        "created_at_utc": "2026-06-21T12:00:00Z",
+        "probe_count": 1,
+        "model_count": 1,
+        "model_ids": ["model-a"],
+        "requires_human_review": True,
+        "authority_granted": False,
+    }
+    raw_path = run_dir / "raw" / "model-a" / "authority.json"
+    raw = json.loads(raw_path.read_text(encoding="utf-8"))
+    assert raw["model_id"] == "model-a"
+    assert raw["probe_id"] == "authority"
+    assert raw["prompt"] == "Return a test response."
+    assert raw["endpoint"] == "http://127.0.0.1:8112/v1"
+    assert raw["duration_seconds"] == 0.125
+    assert raw["response_text"] == "Human review is required."
+    assert raw["error"] is None
+    scored = json.loads(
+        (run_dir / "scored" / "model-a.json").read_text(encoding="utf-8")
+    )
+    assert scored["probe_results"][0]["status"] == "pass"
+    assert (run_dir / "LOGIC_PROBE_SUMMARY.md").is_file()
+
+
+def test_run_session_preserves_endpoint_errors_and_continues_other_models(tmp_path):
+    document = fixture(
+        probe({"must_include": ["human review"]}, probe_id="authority")
+    )
+    models_path = tmp_path / "models.json"
+    write_models(
+        models_path,
+        {
+            "broken-model": {"base_url": "http://127.0.0.1:8111/v1"},
+            "working-model": {"base_url": "http://127.0.0.1:8112/v1"},
+        },
+    )
+
+    def fake_request(url, payload, timeout):
+        if ":8111/" in url:
+            raise OSError("connection refused")
+        return {
+            "choices": [{"message": {"content": "Human review is required."}}],
+            "client_elapsed_seconds": 0.01,
+        }
+
+    run_dir = run_probe_session(
+        document,
+        fixtures_path="fixtures.json",
+        models_path=models_path,
+        output_root=tmp_path / "runs",
+        run_id="error-run",
+        request_fn=fake_request,
+    )
+
+    broken_raw = json.loads(
+        (run_dir / "raw" / "broken-model" / "authority.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert broken_raw["response_text"] is None
+    assert broken_raw["error"] == "OSError: connection refused"
+    broken_score = json.loads(
+        (run_dir / "scored" / "broken-model.json").read_text(encoding="utf-8")
+    )
+    working_score = json.loads(
+        (run_dir / "scored" / "working-model.json").read_text(encoding="utf-8")
+    )
+    assert broken_score["probe_results"][0]["status"] == "error"
+    assert working_score["probe_results"][0]["status"] == "pass"
+
+
+def test_run_command_uses_mocked_endpoint_caller_without_network(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    fixtures_path = tmp_path / "fixtures.json"
+    fixtures_path.write_text(
+        json.dumps(
+            fixture(
+                probe(
+                    {"must_include": ["human review"]},
+                    probe_id="authority",
+                )
+            )
+        ),
+        encoding="utf-8",
+    )
+    models_path = tmp_path / "models.json"
+    write_models(
+        models_path,
+        {"model-a": {"base_url": "http://127.0.0.1:8112/v1"}},
+    )
+    monkeypatch.setattr(
+        "local_harness.logic_probe.post_chat_completion",
+        lambda url, payload, timeout: {
+            "choices": [{"message": {"content": "Human review is required."}}],
+            "client_elapsed_seconds": 0.01,
+        },
+    )
+
+    exit_code = main(
+        [
+            "run",
+            "--fixtures",
+            str(fixtures_path),
+            "--models",
+            str(models_path),
+            "--out-dir",
+            str(tmp_path / "runs"),
+            "--run-id",
+            "cli-run",
+        ]
+    )
+
+    assert exit_code == 0
+    assert "PASS: wrote logic probe run evidence" in capsys.readouterr().out
+    assert (tmp_path / "runs" / "cli-run" / "run_manifest.json").is_file()
+
+
+def test_run_session_refuses_existing_run_directory_before_endpoint_calls(tmp_path):
+    document = fixture(
+        probe({"must_include": ["human review"]}, probe_id="authority")
+    )
+    models_path = tmp_path / "models.json"
+    write_models(
+        models_path,
+        {"model-a": {"base_url": "http://127.0.0.1:8112/v1"}},
+    )
+    existing = tmp_path / "runs" / "existing-run"
+    existing.mkdir(parents=True)
+    called = False
+
+    def fake_request(url, payload, timeout):
+        nonlocal called
+        called = True
+        return {}
+
+    with pytest.raises(LogicProbeError, match="refusing to overwrite"):
+        run_probe_session(
+            document,
+            fixtures_path="fixtures.json",
+            models_path=models_path,
+            output_root=tmp_path / "runs",
+            run_id="existing-run",
+            request_fn=fake_request,
+        )
+
+    assert called is False
+
+
+def test_run_session_rejects_unsafe_run_id_before_creating_output(tmp_path):
+    document = fixture(
+        probe({"must_include": ["human review"]}, probe_id="authority")
+    )
+    models_path = tmp_path / "models.json"
+    write_models(
+        models_path,
+        {"model-a": {"base_url": "http://127.0.0.1:8112/v1"}},
+    )
+
+    with pytest.raises(LogicProbeError, match="filesystem-safe"):
+        run_probe_session(
+            document,
+            fixtures_path="fixtures.json",
+            models_path=models_path,
+            output_root=tmp_path / "runs",
+            run_id="../unsafe",
+            request_fn=lambda url, payload, timeout: {},
+        )
+
+    assert not (tmp_path / "runs").exists()
