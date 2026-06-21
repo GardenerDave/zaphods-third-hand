@@ -211,6 +211,20 @@ Path rules:
 - Board-relative suite paths are resolved relative to the board file.
 - CLI-provided paths are resolved relative to the current working directory.
 
+## Writing Your Own Audition
+
+To author a custom suite rather than only running the bundled examples, see
+[`docs/MODEL_AUDITION_AUTHORING.md`](../../docs/MODEL_AUDITION_AUTHORING.md).
+
+The guide documents suite, fixture JSONL, prompt-template, scorer-profile, and
+optional board schemas; all current deterministic metric types and failure
+modes; path resolution; and a complete micro routing example with dry-run and
+placeholder endpoint commands.
+
+Start with three to six cases and inspect rendered prompts, raw outputs, and
+per-case scores before relying on capability cards. Custom audition evidence
+does not promote a model, assign a production role, or replace human review.
+
 ## Outputs
 
 A single-suite audition writes:
