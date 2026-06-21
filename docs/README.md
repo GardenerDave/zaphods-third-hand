@@ -83,6 +83,9 @@ outputs remain evidence until a human reviews the next action.
 - [`local_harness/auditions/README.md`](../local_harness/auditions/README.md) —
   endpoint-backed suites, fixtures, scorer profiles, boards, capability cards,
   comparisons, and optional preflight gates.
+- [`MODEL_AUDITION_AUTHORING.md`](MODEL_AUDITION_AUTHORING.md) — maker/reference
+  guide for custom suites, fixture JSONL, prompt templates, scorer profiles,
+  boards, dry runs, and deterministic failure modes.
 
 ## Small-Model Exploratory Harness
 
