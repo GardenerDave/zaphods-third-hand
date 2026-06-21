@@ -434,6 +434,46 @@ def validate_task_session(session_dir: Path) -> SessionValidation:
     )
 
 
+def display_path(path: Path) -> str:
+    absolute = path.resolve()
+    try:
+        return absolute.relative_to(REPO_ROOT).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
+def session_json_payload(session: TaskSession) -> dict[str, object]:
+    return {
+        "allowed_paths": list(session.allowed_paths),
+        "generated_files": list(session.generated_files),
+        "output_dir": display_path(session.output_dir),
+        "required_checks": list(session.required_checks),
+        "status": "draft",
+        "task_id": session.task_id,
+        "task_session_contract_version": CONTRACT_VERSION,
+        "warnings": [
+            "No agent, required check, shell command, or Git operation was executed.",
+            "Human review is required; passing checks are evidence, not authority.",
+        ],
+    }
+
+
+def validation_json_payload(validation: SessionValidation) -> dict[str, object]:
+    return {
+        "allowed_paths": list(validation.allowed_paths),
+        "generated_files": list(validation.generated_files),
+        "output_dir": display_path(validation.output_dir),
+        "required_checks": list(validation.required_checks),
+        "task_id": validation.task_id,
+        "task_session_contract_version": CONTRACT_VERSION,
+        "valid": True,
+        "warnings": [
+            "Validation checked packet shape and authority boundaries only.",
+            "No required checks, agents, shell commands, or Git operations were executed.",
+        ],
+    }
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
@@ -462,11 +502,21 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         help="Required check to record; repeat as needed. Checks are not executed.",
     )
+    new_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Print a machine-readable creation summary.",
+    )
     validate_parser = subparsers.add_parser(
         "validate",
         help="Validate packet shape and boundaries without executing checks.",
     )
     validate_parser.add_argument("session", type=Path, help="Task session directory.")
+    validate_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Print a machine-readable validation summary.",
+    )
     return parser
 
 
@@ -480,8 +530,24 @@ def main(
         try:
             validation = validate_task_session(args.session)
         except SessionValidationError as exc:
-            print(f"INVALID {args.session}: {exc}", file=sys.stderr)
+            if args.json:
+                print(
+                    json.dumps(
+                        {
+                            "error": str(exc),
+                            "output_dir": display_path(args.session),
+                            "valid": False,
+                        },
+                        indent=2,
+                        sort_keys=True,
+                    )
+                )
+            else:
+                print(f"INVALID {args.session}: {exc}", file=sys.stderr)
             return 1
+        if args.json:
+            print(json.dumps(validation_json_payload(validation), indent=2, sort_keys=True))
+            return 0
         print(
             f"VALID {validation.output_dir}: "
             f"{validation.task_id} ({CONTRACT_VERSION})"
@@ -500,9 +566,15 @@ def main(
             session_root=session_root,
         )
     except ValueError as exc:
-        print(f"agent-task-session: error: {exc}", file=sys.stderr)
+        if args.json:
+            print(json.dumps({"error": str(exc)}, indent=2, sort_keys=True))
+        else:
+            print(f"agent-task-session: error: {exc}", file=sys.stderr)
         return 1
 
+    if args.json:
+        print(json.dumps(session_json_payload(session), indent=2, sort_keys=True))
+        return 0
     print(f"Created draft Agent Task Session: {session.output_dir}")
     print(f"Task ID: {session.task_id}")
     print("No agent, check, shell command, or Git operation was executed.")

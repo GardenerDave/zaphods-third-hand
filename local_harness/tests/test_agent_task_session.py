@@ -283,6 +283,54 @@ class AgentTaskSessionTests(unittest.TestCase):
         self.assertIn("VALID", output.getvalue())
         self.assertIn("No required checks", output.getvalue())
 
+    def test_new_json_output_contains_machine_readable_handoff(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                exit_code = agent_task_session.main(
+                    [
+                        "new",
+                        "--name",
+                        "JSON task",
+                        "--goal",
+                        "Create a machine-readable packet summary.",
+                        "--branch",
+                        "json-task",
+                        "--allow",
+                        "README.md",
+                        "--check",
+                        "git diff --check",
+                        "--json",
+                    ],
+                    session_root=Path(temp_dir),
+                )
+
+            payload = json.loads(output.getvalue())
+
+        self.assertEqual(0, exit_code)
+        self.assertEqual("draft", payload["status"])
+        self.assertEqual(["README.md"], payload["allowed_paths"])
+        self.assertEqual(["git diff --check"], payload["required_checks"])
+        self.assertEqual(list(agent_task_session.GENERATED_FILES), payload["generated_files"])
+        self.assertIn("Human review is required", " ".join(payload["warnings"]))
+
+    def test_validate_json_output_contains_expected_fields(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            session = self.create_session(Path(temp_dir))
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                exit_code = agent_task_session.main(
+                    ["validate", os.fspath(session.output_dir), "--json"]
+                )
+
+            payload = json.loads(output.getvalue())
+
+        self.assertEqual(0, exit_code)
+        self.assertTrue(payload["valid"])
+        self.assertEqual(session.task_id, payload["task_id"])
+        self.assertEqual(list(session.generated_files), payload["generated_files"])
+        self.assertIn("No required checks", " ".join(payload["warnings"]))
+
 
 if __name__ == "__main__":
     unittest.main()
