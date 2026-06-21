@@ -80,6 +80,14 @@ implementation quality, or establish task completion.
 Add `--json` to `new` or `validate` for a machine-readable handoff. Repository
 paths are emitted relative to the checkout when practical.
 
+Repo health can validate an explicitly named private packet without scanning
+`.work/` generally:
+
+```bash
+python3 local_harness/repo_health_check.py \
+  --task-session .work/agent_tasks/<task-id>
+```
+
 ## Human Review Boundary
 
 An Agent Task Session is a review packet, not an active worker or authority

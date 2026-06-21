@@ -116,6 +116,14 @@ Add `--json` to `new` or `validate` for a machine-readable handoff. See
 [`docs/AGENT_TASK_SESSION.md`](../docs/AGENT_TASK_SESSION.md) for the output
 contract, path rules, and human-review boundary.
 
+To include a specific private packet in repo health without scanning `.work/`
+generally:
+
+```text
+python3 local_harness/repo_health_check.py \
+  --task-session .work/agent_tasks/<task-id>
+```
+
 ## Configuration
 
 The defaults preserve the sanitized placeholder hosts from the handoff bundle.

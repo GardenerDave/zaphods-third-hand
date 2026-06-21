@@ -13,6 +13,7 @@ from typing import Callable, Sequence
 from urllib.parse import unquote
 
 import validate_scaffold
+import agent_task_session
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -394,6 +395,48 @@ def check_scaffolds(
     )
 
 
+def check_task_sessions(
+    repo_root: Path,
+    task_session_paths: Sequence[Path] | None = None,
+) -> CheckResult:
+    explicit = list(task_session_paths or ())
+    if not explicit:
+        return CheckResult(
+            "task_sessions",
+            "task sessions",
+            STATUS_SKIP,
+            "no explicit task sessions supplied; .work was not scanned",
+        )
+
+    paths = [path if path.is_absolute() else repo_root / path for path in explicit]
+    invalid: list[str] = []
+    valid: list[str] = []
+    for path in paths:
+        try:
+            validation = agent_task_session.validate_task_session(path)
+        except agent_task_session.SessionValidationError as exc:
+            invalid.append(f"{relative_display(path, repo_root)}: {exc}")
+        else:
+            valid.append(
+                f"{relative_display(path, repo_root)}: {validation.task_id}"
+            )
+    if invalid:
+        return CheckResult(
+            "task_sessions",
+            "task sessions",
+            STATUS_FAIL,
+            f"validated {len(paths)} task session(s); {len(invalid)} invalid",
+            tuple(invalid),
+        )
+    return CheckResult(
+        "task_sessions",
+        "task sessions",
+        STATUS_PASS,
+        f"validated {len(valid)} task session(s)",
+        tuple(valid),
+    )
+
+
 def run_subprocess_check(
     *,
     key: str,
@@ -491,6 +534,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="Explicit Tool Maker or Change Closeout scaffold; repeat as needed.",
     )
     parser.add_argument(
+        "--task-session",
+        action="append",
+        default=[],
+        type=Path,
+        metavar="PATH",
+        help="Explicit Agent Task Session directory; repeat as needed.",
+    )
+    parser.add_argument(
         "--diff-check",
         action="store_true",
         help="Run git diff --check.",
@@ -521,6 +572,7 @@ def main(
             args.privacy,
             args.scaffolds,
             bool(args.scaffold),
+            bool(args.task_session),
             args.diff_check,
             args.pytest,
             args.all,
@@ -529,6 +581,7 @@ def main(
     run_docs = args.all or args.docs or not any_selection
     run_privacy = args.all or args.privacy or not any_selection
     run_scaffold_validation = args.all or args.scaffolds or bool(args.scaffold)
+    run_task_session_validation = bool(args.task_session)
     run_diff = args.all or args.diff_check
     run_tests = args.all or args.pytest
 
@@ -556,6 +609,12 @@ def main(
             "scaffolds",
             run_scaffold_validation,
             lambda: check_scaffolds(root, args.scaffold),
+        ),
+        (
+            "task_sessions",
+            "task sessions",
+            run_task_session_validation,
+            lambda: check_task_sessions(root, args.task_session),
         ),
         (
             "diff_check",
