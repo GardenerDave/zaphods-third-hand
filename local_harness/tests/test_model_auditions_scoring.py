@@ -170,7 +170,7 @@ def test_host_and_port_config_resolves_lan_endpoint(tmp_path):
         config_path,
         {
             "lan_model": {
-                "host": "192.168.1.13",
+                "host": "lan-model-server.local",
                 "port": 8112,
             }
         },
@@ -178,7 +178,7 @@ def test_host_and_port_config_resolves_lan_endpoint(tmp_path):
 
     model = load_models(config_path)[0]
 
-    assert model.endpoint_base_url == "http://192.168.1.13:8112/v1"
+    assert model.endpoint_base_url == "http://lan-model-server.local:8112/v1"
     assert model.managed_locally is False
 
 
@@ -188,7 +188,7 @@ def test_full_base_url_config_resolves_lan_endpoint(tmp_path):
         config_path,
         {
             "lan_model": {
-                "base_url": "http://192.168.1.13:8112/v1",
+                "base_url": "http://lan-model-server.local:8112/v1",
                 "api_model": "served-model-id",
             }
         },
@@ -196,7 +196,7 @@ def test_full_base_url_config_resolves_lan_endpoint(tmp_path):
 
     model = load_models(config_path)[0]
 
-    assert model.url == "http://192.168.1.13:8112/v1/chat/completions"
+    assert model.url == "http://lan-model-server.local:8112/v1/chat/completions"
     assert model.api_model == "served-model-id"
     assert model.managed_locally is False
 
@@ -256,7 +256,7 @@ def test_audition_dry_run_validates_configs_without_creating_output(
         models_path,
         {
             "lan_model": {
-                "base_url": "http://192.168.1.13:8112/v1",
+                "base_url": "http://lan-model-server.local:8112/v1",
             }
         },
     )
@@ -277,6 +277,9 @@ def test_audition_dry_run_validates_configs_without_creating_output(
     inspection = json.loads(capsys.readouterr().out)
     assert exit_code == 0
     assert inspection["network_calls_performed"] is False
-    assert inspection["models"][0]["endpoint"] == "http://192.168.1.13:8112/v1"
+    assert (
+        inspection["models"][0]["endpoint"]
+        == "http://lan-model-server.local:8112/v1"
+    )
     assert inspection["models"][0]["managed_locally"] is False
     assert not out_dir.exists()
