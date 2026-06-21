@@ -92,6 +92,8 @@ Each entry under `models` supports either:
 
 Existing local configs that only specify `path` and `port` remain valid. The
 request URL defaults to `http://127.0.0.1:<port>/v1/chat/completions`.
+That loopback address means the same machine that runs the harness. It cannot
+reach a model server running on another workstation.
 
 ### Local llama.cpp model
 
@@ -147,9 +149,7 @@ access to the local machine. Before using it, review firewall rules, interface
 exposure, host access controls, and the llama.cpp server's authentication
 capabilities. The audition harness does not add authentication headers.
 
-Use only networks and endpoints you are authorized to expose or access. Keep
-the client-facing LAN address in private configuration using `<LAN_HOST>` in
-committed examples.
+Use only networks and endpoints you are authorized to expose or access.
 
 ### Explicit local endpoint
 
@@ -170,12 +170,16 @@ audition client.
 
 ### Already-running LAN endpoint
 
+This repository uses `192.168.1.13` as an intentional LAN model-server
+example. It is not loopback: the harness runner and model server may be
+different machines on the same private network.
+
 ```json
 {
   "models": {
     "lan_qwen": {
       "label": "Qwen on LAN worker",
-      "base_url": "http://<LAN_HOST>:8112/v1",
+      "base_url": "http://192.168.1.13:8112/v1",
       "api_model": "Qwen/Qwen3-4B-GGUF",
       "expected_role": "router_candidate"
     }
@@ -197,7 +201,7 @@ The equivalent host-and-port form is:
 {
   "models": {
     "lan_qwen": {
-      "host": "<LAN_HOST>",
+      "host": "192.168.1.13",
       "port": 8112
     }
   }
@@ -206,8 +210,9 @@ The equivalent host-and-port form is:
 
 Only use LAN endpoints you are authorized to access. The harness does not add
 authentication headers.
-Replace `<LAN_HOST>` in a private config before use; do not commit a real
-internal address.
+Replace `192.168.1.13` in private configuration when your model server uses a
+different address. Review firewall, routing, and endpoint access controls
+before sending prompts over the LAN.
 
 ## 3. Inspect Configuration Without Network Calls
 

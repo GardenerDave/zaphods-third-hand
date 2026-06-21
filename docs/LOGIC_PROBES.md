@@ -77,11 +77,14 @@ the raw evidence, and invoke the same mechanical scorer:
 python3 local_harness/logic_probe.py run \
   --fixtures local_harness/logic_probes.example.json \
   --models local_harness/model_auditions/models.example.json \
+  --only-models lan_qwen3_4b \
   --out-dir .work/model_auditions/logic_probe_runs \
   --run-id <run-id>
 ```
 
-Use `--only-models` for a comma-separated subset. `--timeout` and
+The selected example is the checked-in endpoint-only LAN entry. Use
+`--only-models` with another key or a comma-separated subset for a different
+topology; omit it to probe every configured model. `--timeout` and
 `--max-tokens` set per-request limits.
 
 The command uses the existing exploratory small-model configuration shape.
@@ -90,6 +93,13 @@ set `api_model` for the request's model value. See
 [`local_harness/model_auditions/README.md`](../local_harness/model_auditions/README.md)
 for local/LAN endpoint configuration and optional temporary llama.cpp server
 lifecycle guidance.
+
+`127.0.0.1` always means the same machine that is running
+`logic_probe.py`. It does not reach a model server on another workstation.
+When the model server is on the LAN, select or create an endpoint-only model
+entry whose `base_url` uses that server's LAN address. The checked-in model
+configuration includes an intentional LAN example; review and replace its
+address for a different network.
 
 The logic-probe runner does not start or stop servers and does not add
 authentication headers. The endpoint must already be running and accessible.
