@@ -7,12 +7,14 @@ Review every diff and generated artifact before accepting anything.
 
 The workflow remains file-based:
 
-- Human-supervised operation only.
+- Supervised operation only; the acting agent remains inside explicit file and
+  task scope.
 - No unattended execution.
 - No automatic lifecycle movement.
 - No automatic canonicalization.
 - No automatic review-patch acceptance.
-- Generated outputs remain review material until a human accepts follow-up work.
+- Generated outputs remain review material until an authorized reviewer
+  accepts follow-up work.
 
 ## Prerequisites
 

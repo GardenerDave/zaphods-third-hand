@@ -36,14 +36,17 @@ This keeps parallel reviewers from anchoring on each other and makes disagreemen
 
 ## Recommended Flow
 
-1. An external orchestrator or human operator chooses role, task, repo scope, and context budget.
+1. An authorized operator or external orchestrator chooses role, task, repo
+   scope, and context budget.
 2. ZTH generates a role-specific packet with `local_harness/zth_agent_packet.py`.
 3. The packet is handed to one external agent.
 4. The agent works independently and returns output using `docs/prompts/AGENT_OUTPUT_CONTRACT.md`.
 5. Repeat for other independent agents, using only shared source-of-truth context.
 6. Optionally run `local_harness/zth_coverage_auditor.py` before synthesis to expose blind spots.
 7. ZTH compares completed outputs with `local_harness/zth_compare_agent_outputs.py`.
-8. A human or external orchestrator decides what follow-up work, if any, should happen.
+8. An authorized reviewer or an external orchestrator operating within
+   explicitly granted authority decides what follow-up work, if any, should
+   happen.
 
 ## Suggested Modes
 
@@ -51,7 +54,8 @@ This keeps parallel reviewers from anchoring on each other and makes disagreemen
 - `standard`: normal repo changes where tests and review evidence are expected.
 - `rig`: high-risk architecture, refactor, safety, security, or release decisions.
 
-The mode is a communication contract. It does not grant autonomy or bypass human review.
+The mode is a communication contract. It does not grant autonomy or bypass
+authorized review.
 
 ## Contract Versioning
 
@@ -144,8 +148,10 @@ Recommended v0.2 sequence:
 
 The existing ZTH safety model still applies:
 
-- Human-supervised operation only.
+- Supervised operation only; humans and agents may perform explicitly scoped
+  steps.
 - No unattended execution.
 - No batched execution by default.
-- Generated outputs are review material until a human accepts follow-up work.
+- Generated outputs are review material until an authorized reviewer accepts
+  follow-up work.
 - External agent output does not authorize file edits, commits, lifecycle movement, or future packets.

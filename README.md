@@ -1,10 +1,16 @@
 # Zaphod's Third Hand
 
-Zaphod's Third Hand, or ZTH, is a plain-file, human-supervised workflow kit for
+Zaphod's Third Hand, or ZTH, is a plain-file, supervised workflow kit for
 using AI helpers without giving them direct control of your repository.
 
 It helps turn chats, logs, model outputs, and role-work packets into reviewable
-files that a human can inspect, compare, accept, reject, or refine.
+files that an operator or authorized reviewer can inspect, compare, accept,
+reject, or refine.
+
+ZTH workflows are supervised, not autonomous. Humans and agents may both
+operate inside the workflow, but authority boundaries are explicit.
+Destructive actions, publication, promotion, disclosure, cleanup, and
+lifecycle movement require authorized approval.
 
 ## Why “Third Hand”?
 
@@ -42,7 +48,8 @@ audit trail and human control.
 - A local-first toolkit for context distillation and supervised AI workflows.
 - A set of scripts, prompts, fixtures, scorer profiles, and workflow docs.
 - A way to preserve evidence from AI-assisted work.
-- A human-controlled process for accepting, rejecting, or reworking outputs.
+- A supervised, operator-controlled process for accepting, rejecting, or
+  reworking outputs.
 
 ## What It Is Not
 
@@ -51,7 +58,7 @@ audit trail and human control.
 - Not automatic canonicalization of generated context.
 - Not a hosted model service.
 - Not a production model router.
-- Not a replacement for human review.
+- Not a replacement for authorized review and approval.
 
 ## Fastest First Success
 
@@ -104,8 +111,9 @@ Good questions to ask:
 - Should this result be committed as a durable report or treated as disposable run evidence?
 - What is the smallest safe next commit?
 
-ZTH works best when ChatGPT helps interpret evidence, but a human still decides
-what gets committed.
+ZTH works best when ChatGPT helps interpret evidence, but the acting agent's
+output does not approve itself. An authorized operator still decides what gets
+committed.
 
 ## OpenAI-Compatible Endpoint Requirement
 
@@ -172,7 +180,7 @@ packet-based work.
 
 Purpose:
 
-- Route scoped work through role prompts under explicit human supervision.
+- Route scoped work through role prompts under explicit supervision.
 - Preserve packet boundaries, allowlists, stop conditions, and manual lifecycle control.
 
 Start with:
@@ -204,15 +212,19 @@ Start with:
 
 Default safety posture:
 
-- Human-supervised operation only.
+- Supervised operation only; humans and agents may perform scoped workflow
+  steps.
 - No unattended execution.
 - No batched execution by default.
 - No automatic lifecycle movement.
 - No automatic review-patch acceptance.
 - No automatic canonical context updates.
 - No production role assignment from audition scores alone.
+- Destructive actions, publication, promotion, disclosure, cleanup, and
+  lifecycle movement require authorized approval.
 
-All generated files remain review material until a human accepts follow-up work.
+All generated files remain review material until an authorized reviewer
+accepts follow-up work. An acting agent cannot approve its own output.
 
 ## Setup and Config
 

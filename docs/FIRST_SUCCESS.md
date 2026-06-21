@@ -6,9 +6,10 @@ This is the smallest practical check that ZTH can run in your environment.
 
 ## Safety Boundary
 
-- Human-supervised operation only.
+- Supervised operation only; humans and agents may perform scoped steps.
 - No unattended execution or automatic lifecycle movement.
-- Generated output remains evidence until a human reviews it.
+- Generated output remains evidence until authorized review. An acting agent
+  cannot approve its own output.
 - A successful smoke test does not promote a model or establish production
   readiness.
 
