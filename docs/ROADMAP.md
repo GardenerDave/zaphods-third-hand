@@ -16,7 +16,7 @@ The operating objective is to **maximize trusted work per unit of human attentio
 
 Humans retain decision authority over priority, taste, architecture, merge, release, promotion, policy exceptions, and lifecycle movement. This operating model should reduce repetitive review work without converting evidence or recommendations into unattended decisions.
 
-The next likely build from this model is a structured Agent Task Session harness: a reviewable wrapper around scoped Codex work, validation, provenance, and closeout evidence. It may produce a PR-candidate artifact for human review, but it must not merge, release, promote, or move lifecycle state on its own.
+This model is implemented first through the structured Agent Task Session harness: a reviewable wrapper around scoped Codex work, validation, plain-file handoff, and closeout guidance. It produces draft evidence for human review but does not merge, release, promote, or move lifecycle state on its own.
 
 ## Implemented
 
@@ -29,10 +29,10 @@ The next likely build from this model is a structured Agent Task Session harness
 - Direct audition preflight gate through `run_model_audition.py`.
 - Board audition preflight gate through `run_model_audition_board.py`.
 - Human-review boundary: a preflight pass permits an audition to run; it does not promote, approve, rank, or assign a model.
+- Agent Task Session packets with deterministic IDs, path allowlists, required checks, validation, JSON handoff, and optional closeout guidance.
 
 ## Next
 
-- Structured Agent Task Session harness for scoped, provenance-backed, reviewable Codex work.
 - Operator convenience flow for the full import → manifest → gated audition chain.
 - Real local endpoint smoke run using actual LLM-probe output.
 

@@ -98,12 +98,23 @@ python3 local_harness/agent_task_session.py new \
 ```
 
 The command writes `task.yaml`, `codex_prompt.md`, `allowed_paths.txt`,
-`required_checks.txt`, and `status.md` under
+`required_checks.txt`, `status.md`, and `closeout_request.md` under
 `.work/agent_tasks/<task-id>/`. It records scope and verification
 instructions but does not execute the task, run checks, invoke an agent, or
 perform Git operations. The packet remains draft review evidence: passing
 checks are evidence, not authority, and humans retain acceptance, commit,
 merge, release, promotion, cleanup, and lifecycle decisions.
+
+Validate packet shape and authority boundaries without executing its checks:
+
+```text
+python3 local_harness/agent_task_session.py validate \
+  .work/agent_tasks/<task-id>
+```
+
+Add `--json` to `new` or `validate` for a machine-readable handoff. See
+[`docs/AGENT_TASK_SESSION.md`](../docs/AGENT_TASK_SESSION.md) for the output
+contract, path rules, and human-review boundary.
 
 ## Configuration
 
