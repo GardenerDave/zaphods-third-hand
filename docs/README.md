@@ -89,9 +89,13 @@ outputs remain evidence until a human reviews the next action.
 - [`local_harness/model_auditions/README.md`](../local_harness/model_auditions/README.md)
   — GGUF download, optional temporary llama.cpp/tmux lifecycle, existing
   local/LAN endpoints, raw responses, and mechanical exploratory scoring.
+- [`LOGIC_PROBES.md`](LOGIC_PROBES.md) — ZTH-specific logic and safety probes,
+  model-free fixture validation/scoring, and optional endpoint-backed probe
+  runs.
 
-This harness has different outputs from the board/capability-card workflow and
-does not currently consume preflight gates.
+The exploratory small-model and logic-probe harnesses have outputs different
+from the board/capability-card workflow. Neither currently consumes preflight
+gates.
 
 ## Management-Team Workflows
 

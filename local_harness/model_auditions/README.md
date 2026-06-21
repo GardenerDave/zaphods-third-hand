@@ -32,6 +32,23 @@ glance:
 
 Scoring is mechanical evidence, not a promotion decision.
 
+## ZTH Logic Probes
+
+[`logic_probe.py`](../logic_probe.py) is an adjacent diagnostic harness that
+uses this directory's model configuration shape but a separate fixture and
+output contract. It tests ZTH-specific authority, evidence, scope,
+destructive-action, contradiction, and structured-output behavior.
+
+It can call the same already-running local or LAN OpenAI-compatible endpoints.
+It does not download models or start/stop llama.cpp itself; use this
+small-model harness separately when temporary local server lifecycle support
+is needed.
+
+Logic-probe runs belong under a distinct directory such as
+`.work/model_auditions/logic_probe_runs/` so their evidence is not mixed with
+the exploratory prompt-audition outputs documented below. See
+[`docs/LOGIC_PROBES.md`](../../docs/LOGIC_PROBES.md).
+
 ## Files
 
 ```text
