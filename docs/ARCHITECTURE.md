@@ -226,6 +226,11 @@ Aider is an optional integration path for tightly scoped edits. It is not
 approved for broad autonomous coding, automatic commits, or lifecycle
 movement.
 
+Supervised single-worker and Aider wrappers use
+`outputs/agent_runs/<run-id>/` for one run's task/request inputs, captured
+output, metrics, and review/acceptance files. The folder is evidence for human
+review; creating or populating it does not accept the result.
+
 See [`AIDER_FIRST_SUCCESS.md`](AIDER_FIRST_SUCCESS.md).
 
 ## Human Decision Points

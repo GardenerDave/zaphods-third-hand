@@ -261,6 +261,12 @@ Normal distiller runs write to:
 - `outputs/review_patches/`
 - `outputs/run_records/`
 
+Supervised single-worker and Aider runs write review folders under:
+
+- `outputs/agent_runs/<run-id>/` — task/request inputs, captured output,
+  metrics, and human review/acceptance files for one scoped run. These are
+  local evidence, not automatic acceptance or lifecycle state.
+
 Model audition runs usually write to:
 
 - `.work/model_auditions/`
