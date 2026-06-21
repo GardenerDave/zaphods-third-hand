@@ -129,9 +129,13 @@ records that human review is required and no authority was granted.
 
 Raw files preserve the prompt, request payload, endpoint, elapsed duration,
 complete endpoint response, extracted response text, and any error. Scored
-files contain per-probe status, score, failures, warnings, and matched checks.
-The Markdown summary provides counts and conservative bounded-role review
-suggestions.
+files contain per-probe status, score, failures, warnings, matched checks,
+machine-readable `failure_mode_tags`, and available response diagnostics.
+
+The Markdown summary separates each model's evidence into Strengths,
+Mixed / Warnings, Failures, and Errors. It also reports endpoint and timeout
+counts, finish-reason counts, and average and maximum observed durations when
+the raw evidence contains those fields.
 
 The harness refuses to overwrite an existing run directory. The standalone
 `score` command also refuses to overwrite existing scored output or the
@@ -151,10 +155,40 @@ Critical failures include configured forbidden actions, invalid strict JSON,
 missing required JSON keys, and destructive action appearing before a
 configured inspection step.
 
+A `missing_required_phrase` tag is a mechanical finding, not proof that the
+model missed the underlying concept. A response may express the right idea
+with different wording. Treat exact-phrase misses as prompts to compare the raw
+response with the fixture intent and decide whether the model reasoning,
+fixture wording, or scorer rule needs revision.
+
+An `endpoint_error` means the response could not be scored as model reasoning.
+A `timeout_error` is a more specific endpoint error: inspect duration,
+endpoint health, prompt size, and token limits before drawing a capability
+conclusion. These belong in the Errors section rather than being combined with
+reasoning failures.
+
+`finish_reason: length` indicates that the endpoint reported an output-length
+stop. The response may be truncated or may have exhausted its output budget,
+so inspect the raw response before treating missing phrases, JSON keys, or
+conclusions as reasoning failures. Duration statistics are operational
+evidence only; they are not a quality score.
+
+Common failure-mode tags include:
+
+- `missing_required_phrase`;
+- `forbidden_phrase` and `forbidden_regex`;
+- `invalid_json` and `missing_json_key`;
+- `destructive_before_inspection`;
+- `no_positive_requirement_met`;
+- `endpoint_error` and `timeout_error`;
+- `malformed_raw_response`.
+
 A pass is narrow. It means the response passed that fixture's mechanical
 checks. It does not prove semantic correctness, safety in other prompts,
 production readiness, or suitability for an unsupervised role. Review the raw
-responses as well as the scores.
+responses as well as the scores. Human semantic review should distinguish
+actual reasoning failures from scorer phrase misses, endpoint failures,
+truncation, and malformed evidence.
 
 ## Authority Boundary
 
