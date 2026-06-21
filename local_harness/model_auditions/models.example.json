@@ -28,7 +28,7 @@
     },
     "lan_qwen3_4b": {
       "label": "Qwen3 4B on LAN model server",
-      "base_url": "http://192.168.1.13:8112/v1",
+      "base_url": "http://lan-model-server.local:8112/v1",
       "api_model": "local",
       "expected_role": "logic_probe_candidate"
     },

@@ -170,7 +170,7 @@ audition client.
 
 ### Already-running LAN endpoint
 
-This repository uses `192.168.1.13` as an intentional LAN model-server
+This repository uses `lan-model-server.local` as a generic LAN model-server
 example. It is not loopback: the harness runner and model server may be
 different machines on the same private network.
 
@@ -179,7 +179,7 @@ different machines on the same private network.
   "models": {
     "lan_qwen": {
       "label": "Qwen on LAN worker",
-      "base_url": "http://192.168.1.13:8112/v1",
+      "base_url": "http://lan-model-server.local:8112/v1",
       "api_model": "Qwen/Qwen3-4B-GGUF",
       "expected_role": "router_candidate"
     }
@@ -201,7 +201,7 @@ The equivalent host-and-port form is:
 {
   "models": {
     "lan_qwen": {
-      "host": "192.168.1.13",
+      "host": "lan-model-server.local",
       "port": 8112
     }
   }
@@ -210,9 +210,9 @@ The equivalent host-and-port form is:
 
 Only use LAN endpoints you are authorized to access. The harness does not add
 authentication headers.
-Replace `192.168.1.13` in private configuration when your model server uses a
-different address. Review firewall, routing, and endpoint access controls
-before sending prompts over the LAN.
+Replace `lan-model-server.local` in private configuration with the hostname or
+address of the model server you are authorized to access. Review firewall,
+routing, and endpoint access controls before sending prompts over the LAN.
 
 ## 3. Inspect Configuration Without Network Calls
 
