@@ -113,6 +113,10 @@ python3 local_harness/run_aider_worker.py \
 ```
 
 If your Aider install is already the default for this repo, you may omit `--aider-python`.
+Otherwise, activate the environment where Aider is installed and run
+`which python3`; pass that interpreter path to `--aider-python`. If
+`which aider` returns a wrapper script, inspect its first line with
+`head -1 "$(which aider)"` to identify the environment's Python interpreter.
 
 ## Expected Review Artifacts
 
