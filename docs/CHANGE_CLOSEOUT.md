@@ -9,6 +9,10 @@ completed change. It produces a draft Markdown report so a human can check
 behavior, validation, documentation, authority boundaries, reusable knowledge,
 and follow-up work before deciding what happens next.
 
+Change Closeout is part of the informal
+[`Vogon Printer`](VOGON_PRINTER.md) family. The family name is navigation
+only; a closeout report remains draft evidence and grants no authority.
+
 The first version includes:
 
 - [`prompts/CHANGE_CLOSEOUT_PROMPT.md`](../prompts/CHANGE_CLOSEOUT_PROMPT.md),

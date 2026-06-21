@@ -52,6 +52,25 @@ Evidence creation does not itself:
 - certify a model or endpoint as production-ready;
 - approve unattended execution.
 
+## Vogon Printer Family
+
+Vogon Printer is the informal documentation umbrella for ZTH's model-free
+packet/scaffold printers and their read-only validators or advisors:
+
+```text
+Agent Task Session + Tool Maker + Change Closeout
+    -> plain-file packets and review scaffolds
+
+validate_scaffold + repo_health_check + git_sync_cleanup
+    -> contract, repository-health, and Git-state evidence
+```
+
+This is not a new runtime or orchestration layer. The tools remain independent,
+no tool automatically invokes the next, and humans retain execution,
+acceptance, lifecycle, merge, release, promotion, and cleanup decisions.
+
+See [`VOGON_PRINTER.md`](VOGON_PRINTER.md).
+
 ## Context Distiller
 
 ```text

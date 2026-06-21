@@ -10,6 +10,11 @@ or external-agent tasks. They implement the ZTH operating model directly:
 The objective is to maximize trusted work per unit of human attention without
 turning a packet into unattended execution authority.
 
+Agent Task Session is part of the informal
+[`Vogon Printer`](VOGON_PRINTER.md) family of model-free packet, scaffold,
+validation, and advisory tools. The family name does not change this tool's
+contract or grant execution authority.
+
 ## What the Builder Does
 
 `local_harness/agent_task_session.py new` records:

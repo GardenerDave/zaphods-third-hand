@@ -79,6 +79,10 @@ management-team or external-agent layers.
 
 For the full documentation map, see [`docs/README.md`](docs/README.md).
 
+For the model-free packet, scaffold, validation, repo-health, and Git-advice
+tools, see the informal [`Vogon Printer`](docs/VOGON_PRINTER.md) family
+overview. It is a documentation umbrella, not an autonomous runner.
+
 ## How ChatGPT Fits
 
 You can use ChatGPT as an operator assistant while working with ZTH.

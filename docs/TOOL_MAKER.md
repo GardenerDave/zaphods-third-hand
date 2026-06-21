@@ -9,6 +9,10 @@ model-free scaffold builder. It helps turn a messy successful or partially
 successful workflow into a reusable lifecycle draft made from plain Markdown
 evidence.
 
+Tool Maker is part of the informal [`Vogon Printer`](VOGON_PRINTER.md) family.
+The family name is navigation only; Tool Maker remains a distinct lifecycle
+draft workflow with its own contract.
+
 The first version has three parts:
 
 - [`prompts/TOOL_MAKER_PROMPT.md`](../prompts/TOOL_MAKER_PROMPT.md), the compact
