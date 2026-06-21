@@ -89,6 +89,23 @@ class AgentTaskSessionTests(unittest.TestCase):
         self.assertIn("- Authority granted by this packet: `false`", status)
         self.assertIn("does not mark the task complete", status)
 
+    def test_closeout_request_is_optional_draft_guidance(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            session = self.create_session(Path(temp_dir))
+            request = (session.output_dir / "closeout_request.md").read_text(
+                encoding="utf-8"
+            )
+
+        self.assertIn("does not create a closeout", request)
+        self.assertIn("A human may choose", request)
+        self.assertIn("local_harness/change_closeout.py", request)
+        self.assertIn("local_harness/example.py", request)
+        self.assertIn("Do not execute this command automatically", request)
+        self.assertIn(
+            "grants no merge, release, promotion, cleanup, or lifecycle authority",
+            request,
+        )
+
     def test_duplicate_paths_and_checks_are_deduplicated_in_order(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             session = self.create_session(
@@ -252,6 +269,24 @@ class AgentTaskSessionTests(unittest.TestCase):
             with self.assertRaisesRegex(
                 agent_task_session.SessionValidationError,
                 "missing required boundary language",
+            ):
+                agent_task_session.validate_task_session(session.output_dir)
+
+    def test_validation_rejects_closeout_authority_drift(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            session = self.create_session(Path(temp_dir))
+            request_path = session.output_dir / "closeout_request.md"
+            request_path.write_text(
+                request_path.read_text(encoding="utf-8").replace(
+                    "does not create a closeout",
+                    "creates a closeout",
+                ),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(
+                agent_task_session.SessionValidationError,
+                "closeout_request.md is missing required boundary language",
             ):
                 agent_task_session.validate_task_session(session.output_dir)
 

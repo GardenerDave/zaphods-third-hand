@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import re
+import shlex
 import sys
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
@@ -23,6 +24,7 @@ GENERATED_FILES = (
     "allowed_paths.txt",
     "required_checks.txt",
     "status.md",
+    "closeout_request.md",
 )
 PROMPT_BOUNDARY_PHRASES = (
     "Human review is required",
@@ -35,6 +37,11 @@ STATUS_BOUNDARY_PHRASES = (
     "- Human review required: `true`",
     "- Authority granted by this packet: `false`",
     "does not mark the task complete",
+)
+CLOSEOUT_BOUNDARY_PHRASES = (
+    "does not create a closeout",
+    "A human may choose",
+    "grants no merge, release, promotion, cleanup, or lifecycle authority",
 )
 
 
@@ -230,6 +237,40 @@ def render_status(task_id: str, name: str) -> str:
     )
 
 
+def render_closeout_request(
+    *,
+    task_id: str,
+    name: str,
+    allowed_paths: Sequence[str],
+) -> str:
+    command = shlex.join(
+        (
+            "python3",
+            "local_harness/change_closeout.py",
+            "--name",
+            name,
+            "--out",
+            f".work/change_closeouts/{task_id}.md",
+            *allowed_paths,
+        )
+    )
+    return (
+        f"# Change Closeout Request: {name}\n\n"
+        "This task-session builder does not create a closeout or claim that work has "
+        "been performed. A human may choose to create a draft Change Closeout after "
+        "implementation and validation evidence exist.\n\n"
+        "## Suggested Command\n\n"
+        "```text\n"
+        f"{command}\n"
+        "```\n\n"
+        "Review the source paths before running the command. The resulting closeout "
+        "must remain private draft evidence unless a human separately reviews and "
+        "selects it for publication.\n\n"
+        "A closeout recommendation grants no merge, release, promotion, cleanup, or "
+        "lifecycle authority. Do not execute this command automatically.\n"
+    )
+
+
 def create_task_session(
     *,
     name: str,
@@ -288,6 +329,11 @@ def create_task_session(
         "allowed_paths.txt": "".join(f"{path}\n" for path in normalized_paths),
         "required_checks.txt": "".join(f"{check}\n" for check in normalized_checks),
         "status.md": render_status(resolved_task_id, clean_name),
+        "closeout_request.md": render_closeout_request(
+            task_id=resolved_task_id,
+            name=clean_name,
+            allowed_paths=normalized_paths,
+        ),
     }
 
     output_dir.mkdir(parents=True)
@@ -423,6 +469,12 @@ def validate_task_session(session_dir: Path) -> SessionValidation:
         if phrase not in texts["status.md"]:
             raise SessionValidationError(
                 f"status.md is missing required boundary language: {phrase!r}"
+            )
+    for phrase in CLOSEOUT_BOUNDARY_PHRASES:
+        if phrase not in texts["closeout_request.md"]:
+            raise SessionValidationError(
+                "closeout_request.md is missing required boundary language: "
+                f"{phrase!r}"
             )
 
     return SessionValidation(
