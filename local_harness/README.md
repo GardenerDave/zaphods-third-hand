@@ -11,6 +11,7 @@ This folder contains the manager-side helper scripts for supervised local-worker
 - `llm_probe_preflight_ingest.py`: imports versioned LLM-probe JSON as preflight-only plain-file evidence; see [`docs/LLM_PROBE_PREFLIGHT.md`](../docs/LLM_PROBE_PREFLIGHT.md).
 - `llm_probe_preflight_compare.py`: compares two canonical preflight capability manifests and writes aggregate, human-reviewable regression evidence; see [`docs/LLM_PROBE_PREFLIGHT.md`](../docs/LLM_PROBE_PREFLIGHT.md).
 - `model_auditions/`: optional exploratory small-model harness that can download candidate GGUFs, manage temporary local llama.cpp tmux sessions, or call existing local/LAN OpenAI-compatible endpoints; see [`model_auditions/README.md`](model_auditions/README.md).
+- `logic_probe.py`: validates and mechanically scores ZTH-specific model logic probes, and can preserve raw evidence from existing OpenAI-compatible endpoints; see [`docs/LOGIC_PROBES.md`](../docs/LOGIC_PROBES.md).
 - `change_closeout.py`: prepares a bounded, model-free final-review evidence packet and Markdown closeout scaffold; see [`docs/CHANGE_CLOSEOUT.md`](../docs/CHANGE_CLOSEOUT.md).
 - `tool_maker.py`: prepares a bounded, model-free workflow evidence packet and Markdown lifecycle draft scaffold; see [`docs/TOOL_MAKER.md`](../docs/TOOL_MAKER.md).
 - `validate_scaffold.py`: validates Tool Maker and Change Closeout scaffold shape and metadata consistency without reading original sources or judging truth, safety, completeness, or promotion readiness.
@@ -45,6 +46,37 @@ grants merge, release, promotion, cleanup, or lifecycle authority.
 - `aider_metrics.py`: run metadata assembly helpers for Aider runs.
 - `tests/test_run_aider_worker.py`, `tests/test_aider_prep.py`, and `tests/test_aider_runtime.py`:
   split test surfaces so local Aider tasks can target smaller real-code files.
+
+## Local Model Logic Probes
+
+Validate the checked-in fixture set without a model call:
+
+```text
+python3 local_harness/logic_probe.py validate \
+  --fixtures local_harness/logic_probes.example.json
+```
+
+Run the probes against configured, already-running OpenAI-compatible
+endpoints:
+
+```text
+python3 local_harness/logic_probe.py run \
+  --fixtures local_harness/logic_probes.example.json \
+  --models local_harness/model_auditions/models.example.json \
+  --out-dir .work/model_auditions/logic_probe_runs \
+  --run-id <run-id>
+```
+
+The command preserves raw per-model/per-probe responses, writes mechanically
+scored JSON, and produces `LOGIC_PROBE_SUMMARY.md`. Endpoint errors become
+reviewable error evidence instead of stopping the full run. The runner does
+not start model servers or add authentication headers.
+
+Probe results diagnose bounded ZTH behaviors; they do not rank models
+generally or grant implementation, cleanup, role-assignment, promotion,
+release, or lifecycle authority. See
+[`docs/LOGIC_PROBES.md`](../docs/LOGIC_PROBES.md) for score mode, output
+contracts, and interpretation.
 
 ## Repository Health
 

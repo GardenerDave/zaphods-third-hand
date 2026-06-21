@@ -45,6 +45,17 @@ post-merge branch state after the human-controlled Git action has occurred.
 
 No step automatically invokes the next one.
 
+## Adjacent Model Evidence
+
+[Local Model Logic Probes](LOGIC_PROBES.md) are adjacent to this family but
+are not another packet printer. Their `validate` and `score` modes inspect
+fixture or response files, while `run` calls already-running
+OpenAI-compatible model endpoints and preserves diagnostic evidence.
+
+Logic probes can help a human assess whether a model is a plausible candidate
+for bounded packet-review or drafting work. They do not activate a packet,
+assign a role, or change the authority held by any Vogon Printer artifact.
+
 ## Boundaries
 
 Vogon Printer tools do not collectively or individually:

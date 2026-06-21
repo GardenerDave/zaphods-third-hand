@@ -26,6 +26,12 @@
       "session": "small_qwen4",
       "expected_role": "router"
     },
+    "lan_qwen3_4b": {
+      "label": "Qwen3 4B on LAN model server",
+      "base_url": "http://192.168.1.13:8112/v1",
+      "api_model": "local",
+      "expected_role": "logic_probe_candidate"
+    },
     "smollm3_3b": {
       "label": "SmolLM3 3B Q4_K_M",
       "repo": "ggml-org/SmolLM3-3B-GGUF",

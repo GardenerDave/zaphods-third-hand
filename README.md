@@ -161,6 +161,8 @@ Start with:
 
 - [`local_harness/auditions/README.md`](local_harness/auditions/README.md)
 - [`local_harness/model_auditions/README.md`](local_harness/model_auditions/README.md) for optional small-model download and temporary local-server support
+- [`docs/LOGIC_PROBES.md`](docs/LOGIC_PROBES.md) for ZTH-specific authority,
+  evidence, scope, cleanup, contradiction, and structured-output diagnostics
 - [`docs/reports/model_auditions/qwen_local_models_2026-06-18/comparison.md`](docs/reports/model_auditions/qwen_local_models_2026-06-18/comparison.md)
 
 ### Layer 3: Supervised Management-Team Workflow
