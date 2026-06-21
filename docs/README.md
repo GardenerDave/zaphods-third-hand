@@ -47,6 +47,12 @@ outputs remain evidence until a human reviews the next action.
   and review-bundle steps, plus optional supervised endpoint-backed
   extraction.
 
+## Vogon Printer
+
+- [`VOGON_PRINTER.md`](VOGON_PRINTER.md) — navigation for the model-free
+  Agent Task Session, Tool Maker, Change Closeout, scaffold validation, repo
+  health, and Git sync/cleanup advisor family.
+
 ## Tool Maker
 
 - [`TOOL_MAKER.md`](TOOL_MAKER.md) — supervised workflow-to-lifecycle

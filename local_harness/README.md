@@ -21,6 +21,21 @@ This folder contains the manager-side helper scripts for supervised local-worker
 - `zth_compare_agent_outputs.py`: compares completed external-agent outputs that follow the ZTH contract.
 - `zth_coverage_auditor.py`: reports obvious pre-synthesis coverage areas and blind spots.
 
+## Vogon Printer Family
+
+[`docs/VOGON_PRINTER.md`](../docs/VOGON_PRINTER.md) groups these existing
+model-free tools for operator navigation:
+
+- packet/scaffold printers: `agent_task_session.py`, `tool_maker.py`, and
+  `change_closeout.py`;
+- validators/advisors: `validate_scaffold.py`, `repo_health_check.py`, and
+  `git_sync_cleanup.py`.
+
+Vogon Printer is an informal family name, not a wrapper command or autonomous
+workflow. Each script keeps its existing CLI and contract. No family member
+automatically runs another, executes a task packet, accepts evidence, or
+grants merge, release, promotion, cleanup, or lifecycle authority.
+
 ## Internal Modules
 
 - `aider_prep.py`: prompt compaction, read-context shaping, and preflight budgeting helpers used by `run_aider_worker.py`.
