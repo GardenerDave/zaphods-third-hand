@@ -13,6 +13,7 @@ sys.path.insert(0, os.fspath(Path(__file__).resolve().parents[1]))
 
 import repo_health_check
 import tool_maker
+import agent_task_session
 
 
 class RepoHealthCheckTests(unittest.TestCase):
@@ -174,6 +175,40 @@ class RepoHealthCheckTests(unittest.TestCase):
 
         self.assertEqual(repo_health_check.STATUS_PASS, result.status)
         self.assertIn("tool-lifecycle", result.details[0])
+
+    def test_task_session_check_validates_explicit_generated_packet(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            session = agent_task_session.create_task_session(
+                name="Health-check task session",
+                goal="Validate an explicit ignored task packet.",
+                branch="health-check-task-session",
+                allowed_paths=["README.md"],
+                required_checks=["git diff --check"],
+                session_root=root / ".work" / "agent_tasks",
+            )
+
+            result = repo_health_check.check_task_sessions(
+                root,
+                [session.output_dir],
+            )
+
+        self.assertEqual(repo_health_check.STATUS_PASS, result.status)
+        self.assertIn(session.task_id, result.details[0])
+
+    def test_default_cli_does_not_scan_task_sessions(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.initialize_repo(root, "# Healthy repository\n")
+            with mock.patch.object(
+                repo_health_check,
+                "check_task_sessions",
+            ) as task_session_check:
+                with contextlib.redirect_stdout(io.StringIO()):
+                    exit_code = repo_health_check.main([], repo_root=root)
+
+        self.assertEqual(0, exit_code)
+        task_session_check.assert_not_called()
 
 
 if __name__ == "__main__":

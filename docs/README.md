@@ -106,6 +106,9 @@ Actual role execution depends on the supervised executor chosen by the human.
 
 ## External-Agent / Aider Adapter
 
+- [`AGENT_TASK_SESSION.md`](AGENT_TASK_SESSION.md) — model-free scoped work
+  packets, validation, JSON handoff, and optional closeout guidance for
+  supervised Codex or external-agent tasks.
 - [`AGENT_ADAPTER.md`](AGENT_ADAPTER.md) — model-free packet preparation,
   output comparison, and coverage auditing around externally executed agents.
 - [`AIDER_FIRST_SUCCESS.md`](AIDER_FIRST_SUCCESS.md) — optional,
