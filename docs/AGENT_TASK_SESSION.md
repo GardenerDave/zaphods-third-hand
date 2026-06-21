@@ -72,6 +72,7 @@ Validation checks:
 - safe, unique allowed paths;
 - non-empty required checks;
 - consistency between metadata and plain-text lists;
+- consistency between metadata, the agent prompt, and closeout guidance;
 - required no-authority language in the prompt, status, and closeout request.
 
 Validation does not execute checks, read the allowlisted source files, judge

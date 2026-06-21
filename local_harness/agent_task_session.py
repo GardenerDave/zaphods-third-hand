@@ -429,10 +429,6 @@ def validate_task_session(session_dir: Path) -> SessionValidation:
         raise SessionValidationError(
             "task directory name must match task.yaml task_id"
         )
-    require_metadata_string(metadata, "name")
-    require_metadata_string(metadata, "goal")
-    require_metadata_string(metadata, "branch")
-
     raw_paths = require_metadata_list(metadata, "allowed_paths")
     try:
         allowed_paths = tuple(normalize_allowed_path(value) for value in raw_paths)
@@ -460,11 +456,27 @@ def validate_task_session(session_dir: Path) -> SessionValidation:
             "required_checks.txt must match task.yaml required_checks in order"
         )
 
+    name = require_metadata_string(metadata, "name")
+    goal = require_metadata_string(metadata, "goal")
+    branch = require_metadata_string(metadata, "branch")
+
     for phrase in PROMPT_BOUNDARY_PHRASES:
         if phrase not in texts["codex_prompt.md"]:
             raise SessionValidationError(
                 f"codex_prompt.md is missing required boundary language: {phrase!r}"
             )
+    expected_prompt = render_prompt(
+        task_id=task_id,
+        name=name,
+        goal=goal,
+        branch=branch,
+        allowed_paths=allowed_paths,
+        required_checks=required_checks,
+    )
+    if texts["codex_prompt.md"] != expected_prompt:
+        raise SessionValidationError(
+            "codex_prompt.md must match task.yaml scope and required checks"
+        )
     for phrase in STATUS_BOUNDARY_PHRASES:
         if phrase not in texts["status.md"]:
             raise SessionValidationError(
@@ -476,6 +488,15 @@ def validate_task_session(session_dir: Path) -> SessionValidation:
                 "closeout_request.md is missing required boundary language: "
                 f"{phrase!r}"
             )
+    expected_closeout_request = render_closeout_request(
+        task_id=task_id,
+        name=name,
+        allowed_paths=allowed_paths,
+    )
+    if texts["closeout_request.md"] != expected_closeout_request:
+        raise SessionValidationError(
+            "closeout_request.md must match task.yaml name and allowed_paths"
+        )
 
     return SessionValidation(
         task_id=task_id,

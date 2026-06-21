@@ -272,6 +272,24 @@ class AgentTaskSessionTests(unittest.TestCase):
             ):
                 agent_task_session.validate_task_session(session.output_dir)
 
+    def test_validation_rejects_prompt_scope_drift(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            session = self.create_session(Path(temp_dir))
+            prompt_path = session.output_dir / "codex_prompt.md"
+            prompt_path.write_text(
+                prompt_path.read_text(encoding="utf-8").replace(
+                    "- `local_harness/example.py`",
+                    "- `local_harness/unapproved.py`",
+                ),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(
+                agent_task_session.SessionValidationError,
+                "must match task.yaml scope and required checks",
+            ):
+                agent_task_session.validate_task_session(session.output_dir)
+
     def test_validation_rejects_closeout_authority_drift(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             session = self.create_session(Path(temp_dir))
@@ -287,6 +305,24 @@ class AgentTaskSessionTests(unittest.TestCase):
             with self.assertRaisesRegex(
                 agent_task_session.SessionValidationError,
                 "closeout_request.md is missing required boundary language",
+            ):
+                agent_task_session.validate_task_session(session.output_dir)
+
+    def test_validation_rejects_closeout_source_drift(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            session = self.create_session(Path(temp_dir))
+            request_path = session.output_dir / "closeout_request.md"
+            request_path.write_text(
+                request_path.read_text(encoding="utf-8").replace(
+                    "local_harness/example.py",
+                    "local_harness/unapproved.py",
+                ),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(
+                agent_task_session.SessionValidationError,
+                "must match task.yaml name and allowed_paths",
             ):
                 agent_task_session.validate_task_session(session.output_dir)
 
