@@ -42,17 +42,9 @@ This model is implemented first through the structured Agent Task Session harnes
 - Agent Task Session packets with deterministic IDs, path allowlists, required checks, validation, JSON handoff, and optional closeout guidance.
 - Model-free operator planner for reviewable import → manifest → gated suite or
   board audition commands. The planner does not execute the chain.
-
-## Next
-
-- Real local endpoint smoke run using newly generated verified preflight
-  output. A partial
-  upstream-shaped-fixture run reached the endpoint and verified fail-closed
-  gating. The missing producer contract is now addressed by the ZTH-owned
-  smoke probe; keep this item open until that producer is exercised against
-  the real endpoint and its generated manifest reaches an honest unwaived
-  gate result. See
-  [`REAL_LLM_PROBE_PREFLIGHT_SMOKE_2026-06-21.md`](reports/preflight_smoke/REAL_LLM_PROBE_PREFLIGHT_SMOKE_2026-06-21.md).
+- Live local endpoint smoke through the ZTH producer → verified YAML →
+  capability manifest → operator plan → unwaived gated audition chain. See
+  [`LIVE_ZTH_SMOKE_PROBE_PREFLIGHT_2026-06-22.md`](reports/preflight_smoke/LIVE_ZTH_SMOKE_PROBE_PREFLIGHT_2026-06-22.md).
 
 ## Conversation-Derived Backlog
 
