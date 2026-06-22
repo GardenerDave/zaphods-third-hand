@@ -81,6 +81,39 @@ When reviewing a report, ask:
 - Should this become a regression fixture?
 - Should the model be retested with a different prompt, timeout, or output budget?
 
+## Evidence Types
+
+- Board/capability-card auditions use suites, fixtures, scorer profiles, board
+  comparisons, capability cards, and optional preflight gates.
+- Exploratory small-model auditions preserve raw prompt responses and
+  mechanical scores from GGUF-backed or existing local/LAN endpoints.
+- Direct supervised patch probes test whether a model can produce one bounded
+  artifact from a constrained packet. They are not board auditions and do not
+  produce capability cards.
+
+Keep these evidence types in separate output directories. Their schemas and
+review purposes differ, and none of them promotes, assigns, or
+production-certifies a model.
+
+## Direct Supervised Patch-Probe Milestone
+
+The `qwen3-1.7b-gpu-40k` run reached `ACCEPT`: the 1.7B model produced an
+accepted constrained human patch checklist from a corrected supervised patch
+packet.
+
+This is evidence that small models can perform bounded complex work when tasks
+are decomposed, supervised, and validated. It is not evidence that this model
+has broad autonomous project understanding. The demonstrated value is in the
+packet design, constrained output, validation, provenance, and operator
+acceptance gates.
+
+The accepted artifact retains review caveats:
+
+- some generated `stop_conditions` were weak or provenance-like rather than
+  true operational stop rules;
+- one acceptance check used broad “All board names” wording that may need
+  operator tightening.
+
 ## Current Reports
 
 - `qwen_local_models_2026-06-18/` — comparison of local Qwen model candidates across the baseline audition board.
