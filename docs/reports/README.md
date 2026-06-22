@@ -66,6 +66,8 @@ does not establish production readiness.
 ## Current Report Areas
 
 - `model_auditions/` — model audition cards and comparison reports.
+- `preflight_smoke/` — supervised preflight → manifest → planner → gated
+  audition smoke evidence, including honest blockers and retry conditions.
 
 ## Safety Reminder
 
