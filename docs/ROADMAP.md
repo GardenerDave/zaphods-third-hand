@@ -43,7 +43,10 @@ This model is implemented first through the structured Agent Task Session harnes
 
 ## Next
 
-- Real local endpoint smoke run using actual LLM-probe output.
+- Real local endpoint smoke run using actual LLM-probe output. A partial
+  upstream-shaped-fixture run reached the endpoint and verified fail-closed
+  gating; repeat with genuine LLM-probe output before marking complete. See
+  [`REAL_PREFLIGHT_SMOKE_2026-06-21.md`](reports/preflight_smoke/REAL_PREFLIGHT_SMOKE_2026-06-21.md).
 
 ## Conversation-Derived Backlog
 
