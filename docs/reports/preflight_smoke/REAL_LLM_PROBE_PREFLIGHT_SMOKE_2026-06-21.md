@@ -222,9 +222,22 @@ permits it.
 - No waiver was used.
 - Passing endpoint discovery is evidence, not authority.
 
-## Follow-up
+## Historical Follow-up
 
-1. Add or privately provide the authoritative LLM-probe source and exact local
+1. Add or privately provide an authoritative producer source and exact local
    endpoint invocation contract.
 2. Re-run this packet from genuine verified output without changing the ZTH
    importer, planner, or gate semantics.
+
+## Resolution Note
+
+The implementation blocker described above was addressed later by the
+ZTH-owned `local_harness/llm_probe_smoke_probe.py` producer and
+[`LLM_PROBE_PRODUCER_CONTRACT.md`](../../LLM_PROBE_PRODUCER_CONTRACT.md).
+
+That producer is not the missing external upstream tool. It establishes a
+project-owned, versioned way to generate the verified-YAML input shape from an
+operator-supplied endpoint. This historical smoke remains blocked as recorded;
+the first historical follow-up is superseded by the ZTH producer contract. A
+new live run is still required before the roadmap's real endpoint smoke item
+can be marked complete.

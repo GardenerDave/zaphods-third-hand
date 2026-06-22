@@ -76,6 +76,9 @@ approve their own outputs or move lifecycle state.
 
 ## LLM-Probe Preflight and Comparison
 
+- [`LLM_PROBE_PRODUCER_CONTRACT.md`](LLM_PROBE_PRODUCER_CONTRACT.md) —
+  endpoint-backed ZTH smoke-probe producer, verified-YAML contract, local
+  evidence layout, privacy rules, and producer-to-importer workflow.
 - [`LLM_PROBE_PREFLIGHT.md`](LLM_PROBE_PREFLIGHT.md) — model-free import,
   source preservation, capability manifests, regression comparison, optional
   OKF-style export, and the optional board-audition gate boundary.

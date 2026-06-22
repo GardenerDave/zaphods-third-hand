@@ -8,6 +8,7 @@ This folder contains the manager-side helper scripts for supervised local-worker
 - `run_single_worker.py`: executes one audited single-worker run folder and writes `OUTPUT.md` plus `METRICS.json`.
 - `run_aider_worker.py`: executes one audited Aider task from `MODEL_REQUEST.md`, adds Gemma-local
   preflight safeguards, can prewarm the endpoint, and records command output plus debug artifacts.
+- `llm_probe_smoke_probe.py`: calls one operator-supplied OpenAI-compatible endpoint with three fixed ZTH smoke probes and writes importer-compatible verified YAML plus raw local evidence; see [`docs/LLM_PROBE_PRODUCER_CONTRACT.md`](../docs/LLM_PROBE_PRODUCER_CONTRACT.md).
 - `llm_probe_preflight_ingest.py`: imports versioned LLM-probe JSON as preflight-only plain-file evidence; see [`docs/LLM_PROBE_PREFLIGHT.md`](../docs/LLM_PROBE_PREFLIGHT.md).
 - `llm_probe_preflight_compare.py`: compares two canonical preflight capability manifests and writes aggregate, human-reviewable regression evidence; see [`docs/LLM_PROBE_PREFLIGHT.md`](../docs/LLM_PROBE_PREFLIGHT.md).
 - `preflight_audition_plan.py`: validates operator-supplied paths and prints a model-free, non-executing command plan from LLM-probe evidence or a capability manifest to a gated suite or board audition; see [`docs/PREFLIGHT_AUDITION_PLAN.md`](../docs/PREFLIGHT_AUDITION_PLAN.md).

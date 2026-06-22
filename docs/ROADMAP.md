@@ -29,6 +29,8 @@ This model is implemented first through the structured Agent Task Session harnes
 ## Implemented
 
 - LLM-probe preflight import scaffold.
+- ZTH-owned local smoke-probe producer and versioned verified-YAML producer
+  contract for supervised endpoint preflight evidence.
 - Real LLM-probe verified YAML import.
 - Source preservation and SHA-256 evidence for imported preflight data.
 - `preflight_capability_manifest.json` as a conservative ZTH-owned preflight summary.
@@ -43,12 +45,13 @@ This model is implemented first through the structured Agent Task Session harnes
 
 ## Next
 
-- Real local endpoint smoke run using actual LLM-probe output. A partial
+- Real local endpoint smoke run using newly generated verified preflight
+  output. A partial
   upstream-shaped-fixture run reached the endpoint and verified fail-closed
-  gating. A follow-up confirmed the endpoint is available but found no
-  approved LLM-probe executable, package, checkout, or genuine verified
-  output. Keep this open until the authoritative tool source and invocation
-  contract are available. See
+  gating. The missing producer contract is now addressed by the ZTH-owned
+  smoke probe; keep this item open until that producer is exercised against
+  the real endpoint and its generated manifest reaches an honest unwaived
+  gate result. See
   [`REAL_LLM_PROBE_PREFLIGHT_SMOKE_2026-06-21.md`](reports/preflight_smoke/REAL_LLM_PROBE_PREFLIGHT_SMOKE_2026-06-21.md).
 
 ## Conversation-Derived Backlog
