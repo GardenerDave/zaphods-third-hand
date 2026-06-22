@@ -1,8 +1,8 @@
 # LLM-Probe Preflight Import
 
 The LLM-probe preflight importer turns one supported JSON result file or one
-upstream-shaped LLM-probe `verified/<provider>.yaml` file into plain-file
-evidence for human review.
+supported `verified/<provider>.yaml` file into plain-file evidence for human
+review.
 
 It is an import and normalization layer only. It does not run a model, evaluate
 role suitability, run LLM-probe, or make deployment decisions.
@@ -40,6 +40,13 @@ The preflight importer does not:
 
 Preflight observations are evidence to inspect, not authorization for later
 actions.
+
+For a small ZTH-owned endpoint-backed producer of the verified-YAML input
+shape, see
+[`LLM_PROBE_PRODUCER_CONTRACT.md`](LLM_PROBE_PRODUCER_CONTRACT.md).
+`local_harness/llm_probe_smoke_probe.py` is not an external upstream
+LLM-probe implementation. It runs three fixed smoke probes and writes local
+evidence for this importer.
 
 ## Supported JSON Input Shape
 
@@ -91,10 +98,10 @@ The bundled sanitized JSON fixture is:
 examples/llm_probe_preflight_fixture/results.json
 ```
 
-## Supported LLM-Probe YAML Shape
+## Supported Verified-YAML Shape
 
-The YAML adapter accepts an upstream-shaped LLM-probe
-`verified/<provider>.yaml` document:
+The YAML adapter accepts a `verified/<provider>.yaml` document with this core
+shape:
 
 ```yaml
 provider: synthetic-provider
@@ -118,8 +125,12 @@ date, and source format remain visible in the observation.
 Malformed individual models or tests are written to `invalid_records.jsonl`.
 Malformed YAML, a missing top-level `models` field, or a non-list `models`
 field fails closed before an output directory is created. Unknown top-level
-YAML fields are ignored safely because real verified files may contain
-additional upstream metadata.
+YAML fields are ignored safely so producers may retain additional identity,
+version, and diagnostic metadata.
+
+This shape may come from separately reviewed external evidence or from the
+ZTH-owned smoke producer. Importing either form does not establish compatibility
+between those producers.
 
 The YAML path uses `yaml.safe_load`. PyYAML must already be available in the
 environment; the importer does not install dependencies automatically. JSON
@@ -258,6 +269,22 @@ find "$tmpdir/preflight" -type f -print | sort
 python3 -m json.tool "$tmpdir/preflight/preflight_summary.json"
 sed -n '1,240p' "$tmpdir/preflight/preflight_summary.md"
 ```
+
+Produce a small verified-YAML file from an existing local endpoint before
+importing it:
+
+```bash
+source config.env
+python3 local_harness/llm_probe_smoke_probe.py \
+  --base-url "$ICM_ROUTER_BASE_URL" \
+  --model "$ICM_ROUTER_MODEL" \
+  --out-dir .work/llm_probe_real_smoke_2026-06-21
+```
+
+See
+[`LLM_PROBE_PRODUCER_CONTRACT.md`](LLM_PROBE_PRODUCER_CONTRACT.md) for the
+fixed probe set, output layout, endpoint privacy rules, and full
+producer-to-planner sequence.
 
 ## Run the Focused Tests
 
