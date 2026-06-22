@@ -38,10 +38,11 @@ This model is implemented first through the structured Agent Task Session harnes
 - Board audition preflight gate through `run_model_audition_board.py`.
 - Human-review boundary: a preflight pass permits an audition to run; it does not promote, approve, rank, or assign a model.
 - Agent Task Session packets with deterministic IDs, path allowlists, required checks, validation, JSON handoff, and optional closeout guidance.
+- Model-free operator planner for reviewable import → manifest → gated suite or
+  board audition commands. The planner does not execute the chain.
 
 ## Next
 
-- Operator convenience flow for the full import → manifest → gated audition chain.
 - Real local endpoint smoke run using actual LLM-probe output.
 
 ## Conversation-Derived Backlog

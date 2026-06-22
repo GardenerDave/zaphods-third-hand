@@ -79,6 +79,9 @@ approve their own outputs or move lifecycle state.
 - [`LLM_PROBE_PREFLIGHT.md`](LLM_PROBE_PREFLIGHT.md) — model-free import,
   source preservation, capability manifests, regression comparison, optional
   OKF-style export, and the optional board-audition gate boundary.
+- [`PREFLIGHT_AUDITION_PLAN.md`](PREFLIGHT_AUDITION_PLAN.md) — model-free,
+  read-only-by-default planning from raw LLM-probe evidence or an existing
+  capability manifest to a gated suite or board audition command sequence.
 
 ## Model Auditions
 
