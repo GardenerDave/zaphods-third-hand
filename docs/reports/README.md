@@ -68,6 +68,8 @@ does not establish production readiness.
 - `model_auditions/` — model audition cards and comparison reports.
 - `preflight_smoke/` — supervised preflight → manifest → planner → gated
   audition smoke evidence, including honest blockers and retry conditions.
+  The current reports include a partial fixture-backed endpoint run and a
+  genuine-output attempt blocked by missing LLM-probe tooling.
 
 ## Safety Reminder
 

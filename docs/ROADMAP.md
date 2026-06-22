@@ -45,8 +45,11 @@ This model is implemented first through the structured Agent Task Session harnes
 
 - Real local endpoint smoke run using actual LLM-probe output. A partial
   upstream-shaped-fixture run reached the endpoint and verified fail-closed
-  gating; repeat with genuine LLM-probe output before marking complete. See
-  [`REAL_PREFLIGHT_SMOKE_2026-06-21.md`](reports/preflight_smoke/REAL_PREFLIGHT_SMOKE_2026-06-21.md).
+  gating. A follow-up confirmed the endpoint is available but found no
+  approved LLM-probe executable, package, checkout, or genuine verified
+  output. Keep this open until the authoritative tool source and invocation
+  contract are available. See
+  [`REAL_LLM_PROBE_PREFLIGHT_SMOKE_2026-06-21.md`](reports/preflight_smoke/REAL_LLM_PROBE_PREFLIGHT_SMOKE_2026-06-21.md).
 
 ## Conversation-Derived Backlog
 
