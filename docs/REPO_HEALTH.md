@@ -137,5 +137,5 @@ Confirm:
 - new relative Markdown links resolve;
 - private paths, endpoint hosts, credentials, and source material are absent;
 - ignored/generated evidence was reviewed separately if being published;
-- human-supervised and evidence-only boundaries remain explicit;
+- supervised and evidence-only boundaries remain explicit;
 - humans made publication, lifecycle, acceptance, and follow-up decisions.

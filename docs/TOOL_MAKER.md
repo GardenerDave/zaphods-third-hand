@@ -140,7 +140,7 @@ During review:
 7. Verify that validation checks distinguish attempted work from proven
    success.
 8. Keep destructive actions, cleanup, publication, acceptance, and lifecycle
-   movement human-supervised.
+   movement behind explicit authorized approval.
 
 This reflection is a lifecycle-hardening mechanism, not a blame ritual. Pride
 identifies what should be preserved, discomfort identifies what must not be

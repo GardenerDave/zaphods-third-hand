@@ -5,9 +5,10 @@ Start here: [`README.md`](../README.md) ->
 
 ## Operating Model
 
-Zaphod's Third Hand is a plain-file, human-supervised workflow kit. Tools
-prepare, transform, execute, and compare evidence. Humans retain authority over
-acceptance, model assignment, repository changes, and lifecycle movement.
+Zaphod's Third Hand is a plain-file, supervised workflow kit. Humans and agents
+may prepare, transform, execute, and compare evidence inside explicit scope.
+Humans retain decision authority over acceptance, model assignment, repository
+changes, publication, destructive cleanup, and lifecycle movement.
 
 The repository or operator environment owns:
 
@@ -40,8 +41,8 @@ Every workflow follows the same control pattern:
 source or packet
     -> bounded tool or supervised model call
     -> plain-file evidence
-    -> human review
-    -> explicit human decision, if any
+    -> authorized review
+    -> explicit authorized decision, if any
 ```
 
 Evidence creation does not itself:

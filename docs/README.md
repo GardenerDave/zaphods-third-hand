@@ -13,7 +13,9 @@ This index groups the public documentation by operator task.
   start or stop a temporary local llama.cpp server.
 
 These labels describe runtime dependencies, not authority. All generated
-outputs remain evidence until a human reviews the next action.
+outputs remain evidence until an authorized reviewer decides the next action.
+Humans and agents may perform scoped workflow steps, but acting agents do not
+approve their own outputs or move lifecycle state.
 
 ## First Success / Quickstart
 
@@ -103,7 +105,8 @@ gates.
 ## Management-Team Workflows
 
 The packet, lifecycle, routing, and evidence-note formats are model-free.
-Actual role execution depends on the supervised executor chosen by the human.
+Actual role execution depends on the supervised executor chosen by the
+operator and the authority recorded in the active packet.
 
 - [`MANAGEMENT_TEAM_OVERVIEW.md`](MANAGEMENT_TEAM_OVERVIEW.md) — canonical role
   authority model.

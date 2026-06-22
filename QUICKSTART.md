@@ -6,11 +6,15 @@ checks succeed.
 
 ## Boundaries
 
-- ZTH is human-supervised and file-based.
+- ZTH is supervised and file-based; humans and agents may perform scoped
+  workflow steps.
 - Generated summaries, patches, scores, and role outputs remain evidence until
-  reviewed.
+  authorized review.
 - No workflow automatically promotes a model, accepts generated context, moves
   lifecycle state, or establishes production readiness.
+- Destructive actions, publication, promotion, disclosure, cleanup, and
+  lifecycle movement require authorized approval outside the acting agent's
+  own output.
 - Core model-backed workflows use an existing OpenAI-compatible endpoint. The
   optional small-model exploratory harness is the only workflow that can
   manage temporary local llama.cpp servers.
@@ -181,10 +185,10 @@ If review identifies an accepted follow-up:
 1. Create a narrow packet from `templates/job_packet_template.md`.
 2. Record the objective, allowed files, off-limits files, verification, and
    stop conditions.
-3. Have a human review and activate the packet.
+3. Have an authorized reviewer—normally a human—review and activate the packet.
 4. Use one supervised route, such as an authorized Implementer, Aider, or a
    human terminal session.
-5. Record the result and human acceptance, rework, or rejection decision.
+5. Record the result and authorized acceptance, rework, or rejection decision.
 
 Use:
 
