@@ -10,6 +10,7 @@ This folder contains the manager-side helper scripts for supervised local-worker
   preflight safeguards, can prewarm the endpoint, and records command output plus debug artifacts.
 - `llm_probe_preflight_ingest.py`: imports versioned LLM-probe JSON as preflight-only plain-file evidence; see [`docs/LLM_PROBE_PREFLIGHT.md`](../docs/LLM_PROBE_PREFLIGHT.md).
 - `llm_probe_preflight_compare.py`: compares two canonical preflight capability manifests and writes aggregate, human-reviewable regression evidence; see [`docs/LLM_PROBE_PREFLIGHT.md`](../docs/LLM_PROBE_PREFLIGHT.md).
+- `preflight_audition_plan.py`: validates operator-supplied paths and prints a model-free, non-executing command plan from LLM-probe evidence or a capability manifest to a gated suite or board audition; see [`docs/PREFLIGHT_AUDITION_PLAN.md`](../docs/PREFLIGHT_AUDITION_PLAN.md).
 - `model_auditions/`: optional exploratory small-model harness that can download candidate GGUFs, manage temporary local llama.cpp tmux sessions, or call existing local/LAN OpenAI-compatible endpoints; see [`model_auditions/README.md`](model_auditions/README.md).
 - `logic_probe.py`: validates and mechanically scores ZTH-specific model logic probes, and can preserve raw evidence from existing OpenAI-compatible endpoints; see [`docs/LOGIC_PROBES.md`](../docs/LOGIC_PROBES.md).
 - `change_closeout.py`: prepares a bounded, model-free final-review evidence packet and Markdown closeout scaffold; see [`docs/CHANGE_CLOSEOUT.md`](../docs/CHANGE_CLOSEOUT.md).
