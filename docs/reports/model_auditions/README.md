@@ -101,11 +101,10 @@ The `qwen3-1.7b-gpu-40k` run reached `ACCEPT`: the 1.7B model produced an
 accepted constrained human patch checklist from a corrected supervised patch
 packet.
 
-This is evidence that small models can perform bounded complex work when tasks
-are decomposed, supervised, and validated. It is not evidence that this model
-has broad autonomous project understanding. The demonstrated value is in the
-packet design, constrained output, validation, provenance, and operator
-acceptance gates.
+This is evidence of guided capability: small models can perform bounded
+complex work when tasks are decomposed, supervised, and validated. It is not
+evidence of general intelligence. The demonstrated value is in packet design,
+constrained output, validation, provenance, and operator acceptance gates.
 
 The accepted artifact retains review caveats:
 

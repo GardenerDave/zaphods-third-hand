@@ -47,9 +47,9 @@ This model is implemented first through the structured Agent Task Session harnes
   [`LIVE_ZTH_SMOKE_PROBE_PREFLIGHT_2026-06-22.md`](reports/preflight_smoke/LIVE_ZTH_SMOKE_PROBE_PREFLIGHT_2026-06-22.md).
 - Direct supervised patch-probe milestone: `qwen3-1.7b-gpu-40k` reached
   `ACCEPT` on a corrected, constrained patch packet and produced a reviewed
-  human patch checklist. This demonstrates bounded workflow utility, not
-  autonomous project understanding; weak `stop_conditions` and broad “All
-  board names” wording remain review caveats. See the
+  human patch checklist. This demonstrates guided capability inside a bounded
+  supervised workflow, not general intelligence; weak `stop_conditions` and
+  broad “All board names” wording remain review caveats. See the
   [model-audition report guidance](reports/model_auditions/README.md#direct-supervised-patch-probe-milestone).
 
 ## Conversation-Derived Backlog
