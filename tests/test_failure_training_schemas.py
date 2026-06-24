@@ -69,3 +69,28 @@ def test_curriculum_candidate_message_roles_are_controlled():
     role_enum = schema["properties"]["messages"]["items"]["properties"]["role"]["enum"]
 
     assert role_enum == ["system", "user", "assistant"]
+def test_training_row_schema_is_valid_json():
+    schema = load_schema("training_row.schema.json")
+
+    assert schema["title"] == "Training Row"
+    assert schema["type"] == "object"
+
+
+def test_training_row_schema_requires_messages():
+    schema = load_schema("training_row.schema.json")
+    required = set(schema["required"])
+
+    assert required == {"messages"}
+
+
+def test_training_row_message_roles_are_controlled():
+    schema = load_schema("training_row.schema.json")
+    role_enum = schema["properties"]["messages"]["items"]["properties"]["role"]["enum"]
+
+    assert role_enum == ["system", "user", "assistant"]
+
+
+def test_training_row_allows_metadata():
+    schema = load_schema("training_row.schema.json")
+
+    assert "metadata" in schema["properties"]
