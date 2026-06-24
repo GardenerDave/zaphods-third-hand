@@ -176,3 +176,47 @@ def test_adapter_manifest_training_method_is_controlled():
         "sft",
         "external",
     ]
+def test_evaluation_report_schema_is_valid_json():
+    schema = load_schema("evaluation_report.schema.json")
+
+    assert schema["title"] == "Evaluation Report"
+    assert schema["type"] == "object"
+
+
+def test_evaluation_report_schema_requires_core_comparison_fields():
+    schema = load_schema("evaluation_report.schema.json")
+    required = set(schema["required"])
+
+    assert "evaluation_id" in required
+    assert "cycle_id" in required
+    assert "adapter_id" in required
+    assert "base_model_id" in required
+    assert "target_capability" in required
+    assert "metrics" in required
+    assert "artifact_paths" in required
+
+
+def test_evaluation_report_status_is_controlled():
+    schema = load_schema("evaluation_report.schema.json")
+    allowed = schema["properties"]["status"]["enum"]
+
+    assert allowed == [
+        "planned",
+        "running",
+        "completed",
+        "failed",
+        "skipped",
+    ]
+
+
+def test_evaluation_report_verdict_is_controlled():
+    schema = load_schema("evaluation_report.schema.json")
+    allowed = schema["properties"]["verdict"]["enum"]
+
+    assert allowed == [
+        "improved",
+        "regressed",
+        "mixed",
+        "no_change",
+        "unknown",
+    ]

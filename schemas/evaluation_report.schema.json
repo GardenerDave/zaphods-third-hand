@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "adapter_id": {
+      "type": "string"
+    },
+    "adapted_model_id": {
+      "type": "string"
+    },
+    "adapted_run_id": {
+      "type": "string"
+    },
+    "artifact_paths": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "baseline_run_id": {
+      "type": "string"
+    },
+    "base_model_id": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "cycle_id": {
+      "type": "string"
+    },
+    "evaluation_id": {
+      "type": "string"
+    },
+    "metrics": {
+      "additionalProperties": true,
+      "properties": {
+        "adapted_score": {
+          "type": "number"
+        },
+        "baseline_score": {
+          "type": "number"
+        },
+        "delta": {
+          "type": "number"
+        },
+        "improvements": {
+          "type": "array"
+        },
+        "regressions": {
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "planned",
+        "running",
+        "completed",
+        "failed",
+        "skipped"
+      ],
+      "type": "string"
+    },
+    "target_capability": {
+      "type": "string"
+    },
+    "verdict": {
+      "enum": [
+        "improved",
+        "regressed",
+        "mixed",
+        "no_change",
+        "unknown"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "evaluation_id",
+    "cycle_id",
+    "adapter_id",
+    "created_at",
+    "base_model_id",
+    "target_capability",
+    "status",
+    "verdict",
+    "metrics",
+    "artifact_paths"
+  ],
+  "title": "Evaluation Report",
+  "type": "object"
+}
