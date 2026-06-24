@@ -34,3 +34,38 @@ def test_failure_event_score_result_is_controlled():
     allowed = schema["properties"]["score_result"]["enum"]
 
     assert allowed == ["fail", "partial", "unknown"]
+def test_curriculum_candidate_schema_is_valid_json():
+    schema = load_schema("curriculum_candidate.schema.json")
+
+    assert schema["title"] == "Curriculum Candidate"
+    assert schema["type"] == "object"
+
+
+def test_curriculum_candidate_schema_requires_review_and_provenance():
+    schema = load_schema("curriculum_candidate.schema.json")
+    required = set(schema["required"])
+
+    assert "failure_event_id" in required
+    assert "messages" in required
+    assert "review_status" in required
+    assert "provenance" in required
+
+
+def test_curriculum_candidate_review_status_is_controlled():
+    schema = load_schema("curriculum_candidate.schema.json")
+    allowed = schema["properties"]["review_status"]["enum"]
+
+    assert allowed == [
+        "candidate",
+        "accepted",
+        "rejected",
+        "holdout_locked",
+        "needs_revision",
+    ]
+
+
+def test_curriculum_candidate_message_roles_are_controlled():
+    schema = load_schema("curriculum_candidate.schema.json")
+    role_enum = schema["properties"]["messages"]["items"]["properties"]["role"]["enum"]
+
+    assert role_enum == ["system", "user", "assistant"]
