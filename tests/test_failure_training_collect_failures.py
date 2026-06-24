@@ -93,3 +93,24 @@ def test_collect_failures_from_jsonl_round_trip(tmp_path):
     assert loaded[0]["probe_id"] == "case_1"
     assert loaded[0]["prompt"] == "Give strict JSON"
     assert loaded[0]["raw_output"] == "{broken"
+
+
+def test_collect_failure_events_preserves_corrected_outputs():
+    rows = [
+        {
+            "probe_id": "json_case",
+            "score_result": "fail",
+            "prompt": "return json",
+            "raw_output": "not json",
+            "model_id": "tiny-model",
+            "corrected_output": '{"ok": true}',
+        },
+    ]
+
+    events = collect_failure_events(
+        rows,
+        cycle_id="cycle_0001",
+        source_run_id="audition_001",
+    )
+
+    assert events[0]["corrected_output"] == '{"ok": true}'

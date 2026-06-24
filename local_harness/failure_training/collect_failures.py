@@ -78,7 +78,7 @@ def normalize_failure_event(
         "|".join([cycle_id, source_run_id, model_id, probe_id, prompt, raw_output])
     )[:12]
 
-    return {
+    event = {
         "id": f"failure_{index:04d}_{event_hash}",
         "cycle_id": cycle_id,
         "source_run_id": source_run_id,
@@ -96,6 +96,13 @@ def normalize_failure_event(
         "source_artifact_paths": source_paths,
         "source_row": row,
     }
+
+    for key in ("corrected_output", "expected_output", "gold_output", "desired_output"):
+        value = row.get(key)
+        if isinstance(value, str) and value.strip():
+            event[key] = value
+
+    return event
 
 
 def collect_failure_events(
