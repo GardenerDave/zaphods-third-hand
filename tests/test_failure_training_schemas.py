@@ -133,3 +133,46 @@ def test_cycle_manifest_artifact_paths_are_string_map():
 
     assert artifact_paths["type"] == "object"
     assert artifact_paths["additionalProperties"]["type"] == "string"
+def test_adapter_manifest_schema_is_valid_json():
+    schema = load_schema("adapter_manifest.schema.json")
+
+    assert schema["title"] == "Adapter Manifest"
+    assert schema["type"] == "object"
+
+
+def test_adapter_manifest_schema_requires_core_training_fields():
+    schema = load_schema("adapter_manifest.schema.json")
+    required = set(schema["required"])
+
+    assert "adapter_id" in required
+    assert "cycle_id" in required
+    assert "base_model_id" in required
+    assert "training_method" in required
+    assert "status" in required
+    assert "dataset_paths" in required
+    assert "artifact_paths" in required
+
+
+def test_adapter_manifest_status_is_controlled():
+    schema = load_schema("adapter_manifest.schema.json")
+    allowed = schema["properties"]["status"]["enum"]
+
+    assert allowed == [
+        "planned",
+        "running",
+        "completed",
+        "failed",
+        "skipped",
+    ]
+
+
+def test_adapter_manifest_training_method_is_controlled():
+    schema = load_schema("adapter_manifest.schema.json")
+    allowed = schema["properties"]["training_method"]["enum"]
+
+    assert allowed == [
+        "lora",
+        "qlora",
+        "sft",
+        "external",
+    ]
