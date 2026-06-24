@@ -34,6 +34,8 @@ def test_run_cycle_cli_with_fixture(tmp_path):
     )
 
     assert result.returncode == 0
+    assert "Run completed:" in result.stdout
+    assert "failures=2 candidates=2 accepted=0 train=0" in result.stdout
 
     cycle_dir = work_root / "cycles" / "cycle_fixture"
     manifest_path = cycle_dir / "cycle_manifest.json"

@@ -164,7 +164,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--strip-metadata", action="store_true")
     args = parser.parse_args(argv)
 
-    run_cycle(
+    manifest = run_cycle(
         input_path=args.input,
         work_root=args.work_root,
         cycle_id=args.cycle_id,
@@ -172,6 +172,14 @@ def main(argv: list[str] | None = None) -> int:
         target_capability=args.target_capability,
         validation_ratio=args.validation_ratio,
         include_metadata=not args.strip_metadata,
+    )
+
+    cycle_dir = Path(args.work_root) / "cycles" / args.cycle_id
+    counts = manifest["counts"]
+    print(f"Run completed: {cycle_dir}")
+    print(
+        "failures={failure_events} candidates={curriculum_candidates} "
+        "accepted={accepted} train={train}".format(**counts)
     )
     return 0
 
