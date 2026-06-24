@@ -94,3 +94,42 @@ def test_training_row_allows_metadata():
     schema = load_schema("training_row.schema.json")
 
     assert "metadata" in schema["properties"]
+def test_cycle_manifest_schema_is_valid_json():
+    schema = load_schema("cycle_manifest.schema.json")
+
+    assert schema["title"] == "Cycle Manifest"
+    assert schema["type"] == "object"
+
+
+def test_cycle_manifest_schema_requires_core_lifecycle_fields():
+    schema = load_schema("cycle_manifest.schema.json")
+    required = set(schema["required"])
+
+    assert "cycle_id" in required
+    assert "created_at" in required
+    assert "source_run_id" in required
+    assert "target_capability" in required
+    assert "status" in required
+    assert "artifact_paths" in required
+
+
+def test_cycle_manifest_status_is_controlled():
+    schema = load_schema("cycle_manifest.schema.json")
+    allowed = schema["properties"]["status"]["enum"]
+
+    assert allowed == [
+        "initialized",
+        "running",
+        "completed",
+        "failed",
+        "accepted",
+        "rejected",
+    ]
+
+
+def test_cycle_manifest_artifact_paths_are_string_map():
+    schema = load_schema("cycle_manifest.schema.json")
+    artifact_paths = schema["properties"]["artifact_paths"]
+
+    assert artifact_paths["type"] == "object"
+    assert artifact_paths["additionalProperties"]["type"] == "string"
