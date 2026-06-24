@@ -30,6 +30,7 @@ A review decision file uses JSONL rows with this shape:
 
 ```json
 {"candidate_id":"candidate_id_here","review_status":"accepted","reviewer":"dave","review_notes":"Gold answer checked."}
+```
 
 ## Adapter planning
 
