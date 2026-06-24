@@ -21,3 +21,12 @@ raw probe rows
   -> review split
   -> train / validation / holdout
   -> SFT chat-message exports
+
+## Explicit review flow
+
+Generated candidates are not training data until a reviewer explicitly promotes them.
+
+A review decision file uses JSONL rows with this shape:
+
+```json
+{"candidate_id":"candidate_id_here","review_status":"accepted","reviewer":"dave","review_notes":"Gold answer checked."}
