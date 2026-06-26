@@ -37,5 +37,5 @@ The improvement held across the full validation set. The adapter fully corrected
 
 This report is evidence for supervised review. It shows measured improvement in
 structured-output behavior on the recorded held-out validation split. It does
-not establish production readiness, broad autonomous project understanding, or
+not establish production readiness, broad independent project judgment, or
 authority to deploy the adapter without operator review.
