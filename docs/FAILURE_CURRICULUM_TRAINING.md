@@ -375,6 +375,70 @@ evidence into measurable adapter improvement on bounded structured-output
 behavior. It does not demonstrate independent project judgment, deployment
 readiness, or unsupervised model improvement.
 
+## Helper scripts
+
+The `local_harness/failure_training/` helpers are model-free convenience tools.
+They read and write local files only. They do not launch training, call a
+model, manage adapters, publish reports, or grant deployment authority.
+
+Validate JSONL:
+
+```bash
+python3 local_harness/failure_training/validate_jsonl.py \
+  --train data/v6_mixed/v6_mixed_train.jsonl \
+  --validation data/v6_mixed/v6_mixed_validation.jsonl \
+  --require-assistant-json
+```
+
+Mix curriculum rows:
+
+```bash
+python3 local_harness/failure_training/mix_curriculum.py \
+  --base-train data/v5_structured_mixed/v5_structured_mixed_train.jsonl \
+  --base-validation data/v5_structured_mixed/v5_structured_mixed_validation.jsonl \
+  --new-train data/v6_exact_key_no_extra/v6_train.jsonl \
+  --new-validation data/v6_exact_key_no_extra/v6_validation.jsonl \
+  --new-weight 3 \
+  --out-train data/v6_mixed/v6_mixed_train.jsonl \
+  --out-validation data/v6_mixed/v6_mixed_validation.jsonl
+```
+
+Score evaluation JSONL:
+
+```bash
+python3 local_harness/failure_training/score_eval_jsonl.py \
+  --input base_vs_adapter_eval_v6_exact_key_no_extra_full.jsonl \
+  --output-md reports/v6_metrics.md
+```
+
+Extract review scaffolds:
+
+```bash
+python3 local_harness/failure_training/extract_non_exact_review.py \
+  --input base_vs_adapter_eval_v6_exact_key_no_extra_full.jsonl \
+  --output reports/v6_non_exact_failure_review.md
+
+python3 local_harness/failure_training/extract_extra_field_review.py \
+  --input base_vs_adapter_eval_v6_exact_key_no_extra_full.jsonl \
+  --output reports/v6_extra_field_leak_review.md
+```
+
+Write a compact round report:
+
+```bash
+python3 local_harness/failure_training/write_round_report.py \
+  --output reports/v6_result.md \
+  --run-label v6 \
+  --adapter-name zth-qwen3-1p7b-failure-curriculum-r8-v6 \
+  --dataset-name v6_mixed \
+  --base-model Qwen3-1.7B \
+  --train-rows 177 \
+  --validation-rows 48 \
+  --final-eval-loss 1.3099 \
+  --metrics-md reports/v6_metrics.md \
+  --summary "Measured structured-output behavior improvement."
+```
+
 ## Next recommended iteration
 
 Do not immediately add another small weighted dataset. Recommended next

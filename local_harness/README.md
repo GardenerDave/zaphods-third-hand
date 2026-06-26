@@ -14,6 +14,10 @@ This folder contains the manager-side helper scripts for supervised local-worker
 - `preflight_audition_plan.py`: validates operator-supplied paths and prints a model-free, non-executing command plan from LLM-probe evidence or a capability manifest to a gated suite or board audition; see [`docs/PREFLIGHT_AUDITION_PLAN.md`](../docs/PREFLIGHT_AUDITION_PLAN.md).
 - `model_auditions/`: optional exploratory small-model harness that can download candidate GGUFs, manage temporary local llama.cpp tmux sessions, or call existing local/LAN OpenAI-compatible endpoints; see [`model_auditions/README.md`](model_auditions/README.md).
 - `logic_probe.py`: validates and mechanically scores ZTH-specific model logic probes, and can preserve raw evidence from existing OpenAI-compatible endpoints; see [`docs/LOGIC_PROBES.md`](../docs/LOGIC_PROBES.md).
+- `failure_training/*.py`: model-free helpers for validating failure-curriculum
+  JSONL, mixing curriculum rows, scoring eval JSONL, extracting miss-review
+  scaffolds, and writing compact round reports; see
+  [`docs/FAILURE_CURRICULUM_TRAINING.md`](../docs/FAILURE_CURRICULUM_TRAINING.md).
 - `change_closeout.py`: prepares a bounded, model-free final-review evidence packet and Markdown closeout scaffold; see [`docs/CHANGE_CLOSEOUT.md`](../docs/CHANGE_CLOSEOUT.md).
 - `tool_maker.py`: prepares a bounded, model-free workflow evidence packet and Markdown lifecycle draft scaffold; see [`docs/TOOL_MAKER.md`](../docs/TOOL_MAKER.md).
 - `validate_scaffold.py`: validates Tool Maker and Change Closeout scaffold shape and metadata consistency without reading original sources or judging truth, safety, completeness, or promotion readiness.
