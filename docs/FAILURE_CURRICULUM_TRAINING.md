@@ -423,6 +423,18 @@ python3 local_harness/failure_training/extract_extra_field_review.py \
   --output reports/v6_extra_field_leak_review.md
 ```
 
+Convert completed review scaffolds into draft curriculum candidates:
+
+```bash
+python3 local_harness/failure_training/review_to_curriculum_candidates.py \
+  --input reports/v6_non_exact_failure_review.md \
+  --input reports/v6_extra_field_leak_review.md \
+  --output data/v7_candidates/v7_candidate_drafts.jsonl \
+  --curriculum v7_candidate_drafts
+```
+
+Candidate drafts still need operator review. They are not final training data.
+
 Write a compact round report:
 
 ```bash

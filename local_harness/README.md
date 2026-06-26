@@ -16,7 +16,8 @@ This folder contains the manager-side helper scripts for supervised local-worker
 - `logic_probe.py`: validates and mechanically scores ZTH-specific model logic probes, and can preserve raw evidence from existing OpenAI-compatible endpoints; see [`docs/LOGIC_PROBES.md`](../docs/LOGIC_PROBES.md).
 - `failure_training/*.py`: model-free helpers for validating failure-curriculum
   JSONL, mixing curriculum rows, scoring eval JSONL, extracting miss-review
-  scaffolds, and writing compact round reports; see
+  scaffolds, converting completed reviews to draft curriculum candidates, and
+  writing compact round reports; see
   [`docs/FAILURE_CURRICULUM_TRAINING.md`](../docs/FAILURE_CURRICULUM_TRAINING.md).
 - `change_closeout.py`: prepares a bounded, model-free final-review evidence packet and Markdown closeout scaffold; see [`docs/CHANGE_CLOSEOUT.md`](../docs/CHANGE_CLOSEOUT.md).
 - `tool_maker.py`: prepares a bounded, model-free workflow evidence packet and Markdown lifecycle draft scaffold; see [`docs/TOOL_MAKER.md`](../docs/TOOL_MAKER.md).
