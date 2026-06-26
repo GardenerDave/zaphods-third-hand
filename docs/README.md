@@ -108,6 +108,14 @@ The exploratory small-model and logic-probe harnesses have outputs different
 from the board/capability-card workflow. Neither currently consumes preflight
 gates.
 
+## Failure-Curriculum Training
+
+- [`FAILURE_CURRICULUM_TRAINING.md`](FAILURE_CURRICULUM_TRAINING.md) —
+  practical guide for supervised failure-curriculum adapter-training evidence,
+  base-vs-adapter evaluation, and current safety boundaries.
+- [`reports/failure_training/`](reports/failure_training/) — local-first smoke
+  summaries and measured adapter behavior reports.
+
 ## Management-Team Workflows
 
 The packet, lifecycle, routing, and evidence-note formats are model-free.

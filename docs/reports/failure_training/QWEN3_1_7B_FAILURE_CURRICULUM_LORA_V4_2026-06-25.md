@@ -32,3 +32,10 @@ Held-out validation, n=36:
 
 Conclusion:
 The improvement held across the full validation set. The adapter fully corrected raw JSON parseability on this validation split, substantially improved top-level schema obedience, and more than tripled exact-match outputs.
+
+## Boundary
+
+This report is evidence for supervised review. It shows measured improvement in
+structured-output behavior on the recorded held-out validation split. It does
+not establish production readiness, broad autonomous project understanding, or
+authority to deploy the adapter without operator review.

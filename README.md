@@ -15,8 +15,8 @@ lifecycle movement require authorized approval.
 ## Why “Third Hand”?
 
 The name borrows from Zaphod carving out hidden space in his own head and
-gaining a third arm. For this project, that means externalized cognition: it gives you or your agent
-extra working capacity—not autonomous control.
+gaining a third arm. For this project, that means externalized cognition:
+ZTH gives you or your agent extra working capacity, not autonomous control.
 
 ## In Plain English
 
@@ -65,7 +65,7 @@ audit trail and human control.
 | User type | Usable now? |
 |---|---|
 | Has Python/Bash only | Partial: metrics smoke test |
-| Has local OpenAI-compatible endpoint | Yes: Context Distiller and model auditions |
+| Has local OpenAI-compatible endpoint | Yes: Context Distiller, model auditions, and logic probes |
 | Wants autonomous agent | No |
 | Wants polished app | No |
 | Wants supervised file workflow | Yes |
@@ -171,6 +171,9 @@ Start with:
 - [`local_harness/model_auditions/README.md`](local_harness/model_auditions/README.md) for optional small-model download and temporary local-server support
 - [`docs/LOGIC_PROBES.md`](docs/LOGIC_PROBES.md) for ZTH-specific authority,
   evidence, scope, cleanup, contradiction, and structured-output diagnostics
+- [`docs/FAILURE_CURRICULUM_TRAINING.md`](docs/FAILURE_CURRICULUM_TRAINING.md)
+  for supervised failure-curriculum adapter-training evidence and current
+  measured limits
 - [`docs/reports/model_auditions/qwen_local_models_2026-06-18/comparison.md`](docs/reports/model_auditions/qwen_local_models_2026-06-18/comparison.md)
 
 ### Layer 3: Supervised Management-Team Workflow

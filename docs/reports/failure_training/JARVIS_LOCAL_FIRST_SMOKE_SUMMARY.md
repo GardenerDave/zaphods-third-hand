@@ -4,8 +4,8 @@ Status: completed
 
 ## Environment
 
-Host: jarvis
-Model: /home/navigator/ai/models/small-auditions/qwen3-1.7b/Qwen_Qwen3-1.7B-Q4_K_M.gguf
+Host: local workstation
+Model: `<MODEL_ROOT>/small-auditions/qwen3-1.7b/Qwen_Qwen3-1.7B-Q4_K_M.gguf`
 Runtime: llama.cpp
 Training status: not launched
 
@@ -21,4 +21,6 @@ Training status: not launched
 
 ## Boundary
 
-This smoke proves the local-first evidence loop and training/evaluation seams. It does not claim adapter training or model improvement.
+This smoke proves the local-first evidence loop and training/evaluation seams.
+It does not claim adapter training, model improvement, production readiness, or
+autonomous project understanding.
