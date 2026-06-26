@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "adapter_id": {
+      "type": "string"
+    },
+    "artifact_paths": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "base_model_id": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "cycle_id": {
+      "type": "string"
+    },
+    "dataset_paths": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "metrics": {
+      "type": "object"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "planned",
+        "running",
+        "completed",
+        "failed",
+        "skipped"
+      ],
+      "type": "string"
+    },
+    "training_method": {
+      "enum": [
+        "lora",
+        "qlora",
+        "sft",
+        "external"
+      ],
+      "type": "string"
+    },
+    "trainer": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "adapter_id",
+    "cycle_id",
+    "created_at",
+    "base_model_id",
+    "training_method",
+    "status",
+    "dataset_paths",
+    "artifact_paths"
+  ],
+  "title": "Adapter Manifest",
+  "type": "object"
+}

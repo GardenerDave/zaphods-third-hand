@@ -66,6 +66,9 @@ does not establish production readiness.
 ## Current Report Areas
 
 - `model_auditions/` — model audition cards and comparison reports.
+- `failure_training/` — supervised failure-curriculum and adapter-training
+  evidence, including local hardware smoke summaries and measured
+  base-vs-adapter behavior comparisons.
 - `preflight_smoke/` — supervised preflight → manifest → planner → gated
   audition smoke evidence, including honest blockers and retry conditions.
   The current reports include a partial fixture-backed run, a tooling-blocker

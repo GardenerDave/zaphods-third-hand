@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "cycle_id": {
+      "type": "string"
+    },
+    "expected_contract": {
+      "type": "string"
+    },
+    "failure_mode": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "model_id": {
+      "type": "string"
+    },
+    "probe_id": {
+      "type": "string"
+    },
+    "prompt": {
+      "type": "string"
+    },
+    "prompt_hash": {
+      "type": "string"
+    },
+    "raw_output": {
+      "type": "string"
+    },
+    "raw_output_hash": {
+      "type": "string"
+    },
+    "score_result": {
+      "enum": [
+        "fail",
+        "partial",
+        "unknown"
+      ],
+      "type": "string"
+    },
+    "severity": {
+      "type": "string"
+    },
+    "source_artifact_paths": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "source_run_id": {
+      "type": "string"
+    },
+    "suite": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "cycle_id",
+    "source_run_id",
+    "model_id",
+    "probe_id",
+    "prompt",
+    "raw_output",
+    "score_result",
+    "failure_mode",
+    "severity",
+    "prompt_hash",
+    "raw_output_hash"
+  ],
+  "title": "Failure Event",
+  "type": "object"
+}

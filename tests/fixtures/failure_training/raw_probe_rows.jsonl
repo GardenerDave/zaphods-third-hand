@@ -1,0 +1,3 @@
+{"probe_id":"pass_json","score_result":"pass","prompt":"Return a JSON object with key ok.","raw_output":"{\"ok\": true}","model_id":"tiny-model","expected_contract":"Valid JSON object."}
+{"probe_id":"fail_json_uncorrected","score_result":"fail","prompt":"Return a JSON object with key ok.","raw_output":"not json","model_id":"tiny-model","expected_contract":"Valid JSON object."}
+{"probe_id":"fail_json_corrected","score_result":"fail","prompt":"Return a JSON object with key fixed.","raw_output":"fixed: yes","model_id":"tiny-model","expected_contract":"Valid JSON object.","corrected_output":"{\"fixed\": true}"}

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "artifact_paths": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "cycle_id": {
+      "type": "string"
+    },
+    "failure_modes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "source_run_id": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "initialized",
+        "running",
+        "completed",
+        "failed",
+        "accepted",
+        "rejected"
+      ],
+      "type": "string"
+    },
+    "target_capability": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "cycle_id",
+    "created_at",
+    "source_run_id",
+    "target_capability",
+    "status",
+    "artifact_paths"
+  ],
+  "title": "Cycle Manifest",
+  "type": "object"
+}

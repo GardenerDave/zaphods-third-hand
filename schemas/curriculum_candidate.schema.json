@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "cycle_id": {
+      "type": "string"
+    },
+    "failure_event_id": {
+      "type": "string"
+    },
+    "failure_modes_targeted": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "id": {
+      "type": "string"
+    },
+    "messages": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "system",
+              "user",
+              "assistant"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "content"
+        ],
+        "type": "object"
+      },
+      "minItems": 2,
+      "type": "array"
+    },
+    "provenance": {
+      "type": "object"
+    },
+    "review_status": {
+      "enum": [
+        "candidate",
+        "accepted",
+        "rejected",
+        "holdout_locked",
+        "needs_revision"
+      ],
+      "type": "string"
+    },
+    "target_behavior": {
+      "type": "string"
+    },
+    "task_type": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "failure_event_id",
+    "cycle_id",
+    "task_type",
+    "target_behavior",
+    "messages",
+    "failure_modes_targeted",
+    "review_status",
+    "provenance"
+  ],
+  "title": "Curriculum Candidate",
+  "type": "object"
+}

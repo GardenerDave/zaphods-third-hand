@@ -15,8 +15,8 @@ lifecycle movement require authorized approval.
 ## Why “Third Hand”?
 
 The name borrows from Zaphod carving out hidden space in his own head and
-gaining a third arm. For this project, that means externalized cognition,
-supervised delegation, and extra working capacity—not autonomous control.
+gaining a third arm. For this project, that means externalized cognition: it gives you or your agent
+extra working capacity—not autonomous control.
 
 ## In Plain English
 
