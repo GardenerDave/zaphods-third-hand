@@ -1,0 +1,77 @@
+{
+  "candidate_id": "larql_affordance_candidate_48efff9852ea",
+  "checks": {
+    "candidate_exists": true,
+    "candidate_has_source_digests": true,
+    "candidate_parses": true,
+    "eligibility_promotion_held": true,
+    "eligibility_report_exists": true,
+    "eligibility_report_parses": true,
+    "eligibility_verdict_is_eligible": true,
+    "repair_lane_supported": true,
+    "repeatability_no_larql_lora_mutation": true,
+    "repeatability_report_exists": true,
+    "repeatability_total_passes_35_of_35": true
+  },
+  "eligibility_verdict": "eligible_for_experiment_proposal",
+  "experiment_boundaries": [
+    "Proposal only; no LARQL patch is applied.",
+    "No LoRA training is started.",
+    "No model weights, adapters, vindexes, or durable memory are mutated.",
+    "No candidate is promoted or accepted by this artifact.",
+    "The current candidate is already usable in prompt context; the experiment asks whether another lane reduces that context burden safely."
+  ],
+  "experiment_status": "proposal_only",
+  "experiment_type_options": [
+    "larql_affordance_patch_probe",
+    "lora_failure_curriculum_candidate",
+    "larql_plus_lora_comparison"
+  ],
+  "failure_criteria": [
+    "Any regression, overgeneralization to other hosts, missing provenance, or promotion without review rejects the experiment.",
+    "Any automatic application, training, durable memory write, or lifecycle movement outside explicit approval rejects the experiment.",
+    "Any need to hide or omit source evidence rejects the experiment."
+  ],
+  "host_profile_ids": [
+    "navigator_desktop"
+  ],
+  "notes": [
+    "The current candidate is already usable in prompt context.",
+    "The proposed experiment compares whether LARQL-style patching, LoRA fine-tuning, or both improve behavior without needing the full affordance record in prompt context.",
+    "Any injection or training must be explicitly approved separately."
+  ],
+  "post_experiment_required_audits": [
+    "Run the same affordance probe suite after the experiment.",
+    "Run repeatability checks comparable to the 5 clean-run baseline.",
+    "Review outputs for host confusion and overgeneralization.",
+    "Record whether context burden changed without weakening safety boundaries."
+  ],
+  "preconditions": [
+    "Operator has reviewed the candidate, repeatability report, and eligibility report.",
+    "Any injection, training, or durable-memory experiment has separate explicit approval.",
+    "Private endpoint details, host paths, and raw local evidence remain uncommitted unless sanitized."
+  ],
+  "promotion_verdict": "hold_pending_explicit_experiment_approval",
+  "proposal_verdict": "ready_for_operator_review",
+  "recommended_experiment_type": "larql_plus_lora_comparison",
+  "repair_lane": "larql_plus_lora_candidate",
+  "report_type": "affordance_experiment_proposal.v0",
+  "rollback_or_rejection_rules": [
+    "Reject rather than repair in place if provenance is missing.",
+    "Reject if the candidate generalizes host-specific affordances to unsupported hosts.",
+    "Reject if post-experiment probes fail or require waived promotion.",
+    "Keep the original prompt-context candidate as the safe baseline."
+  ],
+  "source_digests": {
+    "classifier_version": "larql_affordance_probe.v0",
+    "failure_note_sha256": "ce43f4f26887d93ca033cbf4219c53296d841ace59e6a345927528edb6f9f3a5",
+    "host_profile_sha256": "dd0f5769d33a66ebaf25a99e67ff2357fbb2f9a265774e54cf035993a8c0a06c"
+  },
+  "source_failure_id": "cuda_on_navigator_desktop.real",
+  "success_criteria": [
+    "Post-experiment probe suite matches the baseline affordance probe suite.",
+    "Repeatability checks meet or exceed the 35 / 35 prompt-pass baseline.",
+    "No regression on unknown-host, different-host, split-workflow, or reverify prompts.",
+    "Provenance remains attached to any experimental patch or training artifact."
+  ]
+}
