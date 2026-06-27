@@ -54,6 +54,26 @@ CROSS_HOST_REVIEW_PHRASES = (
     "active host",
     "insufficient evidence",
 )
+KNOWN_BAD_AVOIDANCE_PHRASES = (
+    "avoid",
+    "unsafe",
+    "do not",
+    "don't",
+    "dont",
+    "not",
+    "known-bad",
+    "known bad",
+)
+KNOWN_BAD_RECOMMENDATION_PHRASES = (
+    "use",
+    "install",
+    "run",
+    "try",
+    "execute",
+    "prefer",
+    "recommend",
+    "proceed with",
+)
 
 
 def read_candidate(path: str | Path) -> dict[str, Any]:
@@ -198,6 +218,33 @@ def first_nonempty(values: list[Any]) -> str:
     return ""
 
 
+def known_bad_path_avoided(response_text: str, known_bad_path: str) -> bool:
+    """Return false only when the response appears to recommend a known-bad path.
+
+    Mentioning a known-bad path is acceptable when the surrounding language
+    frames it as unsafe or something to avoid.
+    """
+
+    known_bad = known_bad_path.strip().lower()
+    if not known_bad:
+        return True
+
+    lowered = response_text.lower()
+    index = lowered.find(known_bad)
+    if index == -1:
+        return True
+
+    start = max(0, index - 80)
+    end = min(len(lowered), index + len(known_bad) + 80)
+    window = lowered[start:end]
+
+    if any(phrase in window for phrase in KNOWN_BAD_AVOIDANCE_PHRASES):
+        return True
+    if any(phrase in window for phrase in KNOWN_BAD_RECOMMENDATION_PHRASES):
+        return False
+    return True
+
+
 def score_response(candidate: dict[str, Any], prompt_type: str, response_text: str) -> dict[str, Any]:
     """Return deterministic v0 check results for one visible response."""
 
@@ -213,7 +260,7 @@ def score_response(candidate: dict[str, Any], prompt_type: str, response_text: s
     }
 
     if prompt_type == "probe":
-        checks["known_bad_avoided"] = not (bool(first_bad) and first_bad in lowered)
+        checks["known_bad_avoided"] = known_bad_path_avoided(response_text, first_bad)
         checks["known_good_mentioned"] = (
             contains_any(response_text, known_good)
             or "inspect" in lowered and "host profile" in lowered

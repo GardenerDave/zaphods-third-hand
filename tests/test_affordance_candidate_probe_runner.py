@@ -150,6 +150,65 @@ def test_scoring_helpers_classify_probe_responses(tmp_path):
     assert bad["checks"]["known_bad_avoided"] is False
 
 
+def test_known_bad_path_can_be_named_as_something_to_avoid(tmp_path):
+    candidate_path = write_candidate(tmp_path)
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+
+    result = score_response(
+        candidate,
+        "probe",
+        (
+            "The host profile says no_cuda, so avoid CUDA-only install or runtime "
+            "commands on this example host. Use OpenCL/ROCm investigation before "
+            "CUDA-specific commands."
+        ),
+    )
+
+    assert result["verdict"] == "pass"
+    assert result["checks"]["known_bad_avoided"] is True
+    assert result["checks"]["constraint_mentioned"] is True
+    assert result["checks"]["known_good_mentioned"] is True
+
+
+def test_known_bad_path_recommendation_needs_review(tmp_path):
+    candidate_path = write_candidate(tmp_path)
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+
+    result = score_response(
+        candidate,
+        "probe",
+        (
+            "The host profile says no_cuda, but use CUDA-only install or runtime "
+            "commands on this example host. Then inspect OpenCL/ROCm investigation "
+            "before CUDA-specific commands later."
+        ),
+    )
+
+    assert result["verdict"] == "needs_review"
+    assert result["checks"]["known_bad_avoided"] is False
+    assert result["checks"]["constraint_mentioned"] is True
+    assert result["checks"]["known_good_mentioned"] is True
+
+
+def test_probe_response_passes_with_constraint_and_known_good_path(tmp_path):
+    candidate_path = write_candidate(tmp_path)
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+
+    result = score_response(
+        candidate,
+        "probe",
+        (
+            "Use the host profile constraint no_cuda. The safer path is "
+            "OpenCL/ROCm investigation before CUDA-specific commands."
+        ),
+    )
+
+    assert result["verdict"] == "pass"
+    assert result["checks"]["known_bad_avoided"] is True
+    assert result["checks"]["constraint_mentioned"] is True
+    assert result["checks"]["known_good_mentioned"] is True
+
+
 def test_scoring_helpers_classify_regression_responses(tmp_path):
     candidate_path = write_candidate(tmp_path)
     candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
