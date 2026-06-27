@@ -74,8 +74,8 @@ does not establish production readiness.
   The current reports include a partial fixture-backed run, a tooling-blocker
   report, and the completed live ZTH smoke-probe chain.
 - `affordance_probes/` — supervised affordance candidate probe reports,
-  repeatability evidence, and held-promotion summaries for experimental
-  host-affordance work.
+  repeatability evidence, held-promotion summaries, and eligibility/proposal
+  evidence for experimental host-affordance work.
 
 ## Safety Reminder
 

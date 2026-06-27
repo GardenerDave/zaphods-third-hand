@@ -131,6 +131,9 @@ gates.
 - [`experiments/AFFORDANCE_EXPERIMENT_ELIGIBILITY_V0.md`](experiments/AFFORDANCE_EXPERIMENT_ELIGIBILITY_V0.md)
   — model-free eligibility/reporting gate for deciding whether a probe-passing
   affordance candidate has enough evidence for a future experiment proposal.
+- [`experiments/AFFORDANCE_EXPERIMENT_PROPOSAL_V0.md`](experiments/AFFORDANCE_EXPERIMENT_PROPOSAL_V0.md)
+  — model-free proposal scaffold for turning eligible affordance evidence into
+  a reviewable experiment proposal while holding promotion and implementation.
 
 ## Management-Team Workflows
 
