@@ -95,18 +95,41 @@ def normalized_text(profile: dict[str, Any], note: str) -> str:
     ).lower()
 
 
+def string_list(profile: dict[str, Any], key: str) -> list[str]:
+    values = profile.get(key, [])
+    if not isinstance(values, list):
+        return []
+    return [str(value) for value in values if str(value).strip()]
+
+
+def first_or_fallback(values: list[str], fallback: str) -> str:
+    return values[0] if values else fallback
+
+
+def host_affordance_context(profile: dict[str, Any]) -> dict[str, list[str]]:
+    return {
+        "known_good_paths": string_list(profile, "known_good_paths"),
+        "known_bad_paths": string_list(profile, "known_bad_paths"),
+        "constraints": string_list(profile, "constraints"),
+    }
+
+
 def classify_failure(profile: dict[str, Any], failure_note: str) -> dict[str, str]:
     text = normalized_text(profile, failure_note)
     evidence_status = str(profile.get("evidence_status", "")).lower()
     host_id = str(profile.get("host_id", "unknown_host"))
+    context = host_affordance_context(profile)
+    good_path = first_or_fallback(context["known_good_paths"], "refresh host evidence")
+    bad_path = first_or_fallback(context["known_bad_paths"], "unverified host-specific repair path")
+    constraint = first_or_fallback(context["constraints"], "insufficient_host_evidence")
 
     if "unknown" in evidence_status or "insufficient_host_evidence" in text:
         return {
             "repair_lane": "review_only",
             "failure_summary": "Insufficient host-profile evidence for an affordance patch.",
             "affordance_claim": "No durable host affordance can be claimed yet.",
-            "negative_constraint": "Do not reuse another host's constraints for this host.",
-            "positive_alternative": "Collect or refresh the host profile before repair selection.",
+            "negative_constraint": f"Do not reuse another host's constraints for this host; current constraint marker: {constraint}.",
+            "positive_alternative": f"Collect or refresh the host profile before repair selection; suggested safe path: {good_path}.",
             "staleness_risk": "All host-specific facts are unverified.",
             "scope": f"{host_id}; review-only until host evidence exists.",
         }
@@ -118,8 +141,8 @@ def classify_failure(profile: dict[str, Any], failure_note: str) -> dict[str, st
             "repair_lane": "larql_plus_lora_candidate",
             "failure_summary": "CUDA/NVIDIA-specific path conflicts with host GPU affordance evidence.",
             "affordance_claim": "This host should not receive CUDA-first repair guidance unless the profile is reverified.",
-            "negative_constraint": "Avoid CUDA-only commands as the first repair path for this host profile.",
-            "positive_alternative": "Inspect host profile, then choose CPU fallback or OpenCL/ROCm investigation.",
+            "negative_constraint": f"Avoid known-bad path for this host: {bad_path}. Constraint marker: {constraint}.",
+            "positive_alternative": f"Prefer known-good/safe path for this host: {good_path}.",
             "staleness_risk": "GPU, driver, or runtime changes can invalidate this claim.",
             "scope": f"{host_id} only.",
         }
@@ -131,8 +154,8 @@ def classify_failure(profile: dict[str, Any], failure_note: str) -> dict[str, st
             "repair_lane": "larql_candidate",
             "failure_summary": "AVX2-required artifact conflicts with host CPU affordance evidence.",
             "affordance_claim": "This host should not receive AVX2-required binaries unless CPU flags are reverified.",
-            "negative_constraint": "Avoid AVX2-required binaries for this host profile.",
-            "positive_alternative": "Select a non-AVX2 build or inspect CPU flags before selecting artifacts.",
+            "negative_constraint": f"Avoid known-bad path for this host: {bad_path}. Constraint marker: {constraint}.",
+            "positive_alternative": f"Prefer known-good/safe path for this host: {good_path}.",
             "staleness_risk": "Hardware, virtualization, or binary build target changes can invalidate this claim.",
             "scope": f"{host_id} only.",
         }
@@ -142,8 +165,8 @@ def classify_failure(profile: dict[str, Any], failure_note: str) -> dict[str, st
             "repair_lane": "lora_candidate",
             "failure_summary": "Failure appears procedural or behavioral rather than host-affordance-specific.",
             "affordance_claim": "No host-specific LARQL affordance claim is established.",
-            "negative_constraint": "Do not encode mutable host facts into weights.",
-            "positive_alternative": "Consider supervised LoRA/SFT curriculum only after reviewed examples exist.",
+            "negative_constraint": f"Do not encode mutable host facts into weights. Host constraint context: {constraint}.",
+            "positive_alternative": f"Consider supervised LoRA/SFT curriculum only after reviewed examples exist. Host-safe path context: {good_path}.",
             "staleness_risk": "Behavioral evidence may not transfer across workflows.",
             "scope": f"{host_id}; behavior lane only.",
         }
@@ -153,8 +176,8 @@ def classify_failure(profile: dict[str, Any], failure_note: str) -> dict[str, st
             "repair_lane": "host_profile_only",
             "failure_summary": "Failure suggests the host profile needs update or clarification.",
             "affordance_claim": "Host profile must be refreshed before patch or training decisions.",
-            "negative_constraint": "Do not create LARQL or LoRA candidates from stale host facts.",
-            "positive_alternative": "Refresh host profile evidence and rerun classification.",
+            "negative_constraint": f"Do not create LARQL or LoRA candidates from stale host facts. Current known-bad context: {bad_path}.",
+            "positive_alternative": f"Refresh host profile evidence and rerun classification. Current known-good context: {good_path}.",
             "staleness_risk": "Host facts are stale or incomplete.",
             "scope": f"{host_id}; profile maintenance only.",
         }
@@ -163,8 +186,8 @@ def classify_failure(profile: dict[str, Any], failure_note: str) -> dict[str, st
         "repair_lane": "review_only",
         "failure_summary": "Failure evidence is insufficient for a repair-lane claim.",
         "affordance_claim": "No durable affordance claim established.",
-        "negative_constraint": "Do not create patch or training candidates from ambiguous evidence.",
-        "positive_alternative": "Collect more failure evidence and rerun classification.",
+        "negative_constraint": f"Do not create patch or training candidates from ambiguous evidence. Current known-bad context: {bad_path}.",
+        "positive_alternative": f"Collect more failure evidence and rerun classification. Current known-good context: {good_path}.",
         "staleness_risk": "Unknown until evidence is improved.",
         "scope": f"{host_id}; review-only.",
     }
@@ -184,18 +207,26 @@ def default_do_not_generalize(profile: dict[str, Any]) -> list[str]:
     ]
 
 
-def prompt_set(profile: dict[str, Any], classification: dict[str, str]) -> tuple[list[str], list[str]]:
+def prompt_set(
+    profile: dict[str, Any],
+    classification: dict[str, str],
+    affordance_context: dict[str, list[str]],
+) -> tuple[list[str], list[str]]:
     host_id = profile["host_id"]
     lane = classification["repair_lane"]
+    good_path = first_or_fallback(affordance_context["known_good_paths"], "refresh host evidence")
+    bad_path = first_or_fallback(affordance_context["known_bad_paths"], "unverified host-specific repair path")
+    constraint = first_or_fallback(affordance_context["constraints"], "no verified constraint")
     probe_prompts = [
-        f"A repair failed on {host_id}. Which host profile fact should be inspected first?",
-        f"For {host_id}, what negative constraint applies to this failure?",
-        f"What safe alternative should be tried for {host_id} before generalizing this repair?",
+        f"A repair failed on {host_id}. Which host profile constraint applies: {constraint}?",
+        f"For {host_id}, why is this known-bad path unsafe here: {bad_path}?",
+        f"What known-good or safer alternative should be tried for {host_id}: {good_path}?",
     ]
     regression_prompts = [
         f"Should this {lane} constraint be applied to an unknown host?",
         f"Should this {lane} constraint be applied to a different host profile without matching evidence?",
-        f"If {host_id} hardware changes, what evidence must be refreshed before using this candidate?",
+        f"If {host_id} hardware changes, should the known-good path '{good_path}' and known-bad path '{bad_path}' be reverified?",
+        f"In a split workflow where {host_id} is the active host but another workflow host has different constraints or known-good paths, what prevents borrowing that other host's affordance map?",
     ]
     return probe_prompts, regression_prompts
 
@@ -208,7 +239,12 @@ def build_candidate(
     failure_note_text: str,
 ) -> dict[str, Any]:
     classification = classify_failure(host_profile, failure_note_text)
-    probe_prompts, regression_prompts = prompt_set(host_profile, classification)
+    affordance_context = host_affordance_context(host_profile)
+    probe_prompts, regression_prompts = prompt_set(
+        host_profile,
+        classification,
+        affordance_context,
+    )
     lane = classification["repair_lane"]
 
     return {
@@ -224,6 +260,7 @@ def build_candidate(
             "host_profile": host_profile_path.as_posix(),
             "failure_note": failure_note_path.as_posix(),
         },
+        "host_affordance_context": affordance_context,
         "failure_summary": classification["failure_summary"],
         "repair_lane": lane,
         "affordance_claim": classification["affordance_claim"],
@@ -235,7 +272,8 @@ def build_candidate(
         "larql_lql_draft": {
             "status": "draft_not_applied",
             "draft": (
-                f"HOST {host_profile['host_id']}: {classification['negative_constraint']}"
+                f"HOST {host_profile['host_id']}: {classification['negative_constraint']} "
+                f"PREFER: {classification['positive_alternative']}"
                 if lane in {"larql_candidate", "larql_plus_lora_candidate"}
                 else ""
             ),
@@ -274,6 +312,17 @@ def render_probe_plan(candidate: dict[str, Any]) -> str:
         f"Candidate: `{candidate['candidate_id']}`",
         f"Repair lane: `{candidate['repair_lane']}`",
         "Status: draft / needs_probe",
+        "",
+        "## Host Affordance Context",
+        "",
+        "Known-good paths:",
+        *markdown_list(candidate["host_affordance_context"]["known_good_paths"]),
+        "",
+        "Known-bad paths:",
+        *markdown_list(candidate["host_affordance_context"]["known_bad_paths"]),
+        "",
+        "Constraints:",
+        *markdown_list(candidate["host_affordance_context"]["constraints"]),
         "",
         "## Probe Prompts",
         "",
@@ -315,6 +364,17 @@ def render_classification_report(candidate: dict[str, Any]) -> str:
         "## Positive Alternative",
         "",
         candidate["positive_alternative"],
+        "",
+        "## Host Affordance Context",
+        "",
+        "Known-good paths:",
+        *markdown_list(candidate["host_affordance_context"]["known_good_paths"]),
+        "",
+        "Known-bad paths:",
+        *markdown_list(candidate["host_affordance_context"]["known_bad_paths"]),
+        "",
+        "Constraints:",
+        *markdown_list(candidate["host_affordance_context"]["constraints"]),
         "",
         "## Do Not Generalize To",
         "",

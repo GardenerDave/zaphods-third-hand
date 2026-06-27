@@ -37,6 +37,16 @@ def run_example(tmp_path: Path, profile: Path, note: Path) -> dict:
     return json.loads((out / "affordance_patch_candidate.json").read_text(encoding="utf-8"))
 
 
+def run_example_with_out(tmp_path: Path, profile: Path, note: Path) -> tuple[dict, Path]:
+    out = tmp_path / "out"
+    result = run_probe("--host-profile", profile, "--failure-note", note, "--out", out)
+    assert result.returncode == 0, result.stdout + result.stderr
+    return (
+        json.loads((out / "affordance_patch_candidate.json").read_text(encoding="utf-8")),
+        out,
+    )
+
+
 def test_script_runs_on_example_inputs_and_writes_valid_json(tmp_path):
     candidate = run_example(tmp_path, NAVIGATOR_PROFILE, CUDA_NOTE)
 
@@ -81,6 +91,46 @@ def test_output_includes_probe_and_regression_prompts(tmp_path):
 
     assert len(candidate["probe_prompts"]) >= 3
     assert len(candidate["regression_prompts"]) >= 3
+
+
+def test_candidate_includes_host_affordance_context(tmp_path):
+    candidate = run_example(tmp_path, NAVIGATOR_PROFILE, CUDA_NOTE)
+
+    context = candidate["host_affordance_context"]
+    assert "CPU fallback for small smoke tests" in context["known_good_paths"]
+    assert "CUDA-only install or runtime commands on this example host" in context["known_bad_paths"]
+    assert "no_cuda" in context["constraints"]
+
+
+def test_prompts_use_specific_host_profile_affordances(tmp_path):
+    candidate = run_example(tmp_path, NAVIGATOR_PROFILE, CUDA_NOTE)
+    prompt_text = "\n".join(candidate["probe_prompts"] + candidate["regression_prompts"])
+
+    assert "no_cuda" in prompt_text
+    assert "CUDA-only install or runtime commands on this example host" in prompt_text
+    assert "OpenCL/ROCm investigation before CUDA-specific commands" in prompt_text
+
+
+def test_regression_prompts_cover_split_workflow_host_confusion(tmp_path):
+    candidate = run_example(tmp_path, NAVIGATOR_PROFILE, CUDA_NOTE)
+    prompt_text = "\n".join(candidate["regression_prompts"])
+
+    assert "split workflow" in prompt_text
+    assert "navigator_desktop_example is the active host" in prompt_text
+    assert "another workflow host" in prompt_text
+    assert "borrowing that other host's affordance map" in prompt_text
+
+
+def test_reports_include_specific_host_affordance_context(tmp_path):
+    _candidate, out = run_example_with_out(tmp_path, R420_PROFILE, AVX2_NOTE)
+    report = (out / "classification_report.md").read_text(encoding="utf-8")
+    plan = (out / "probe_plan.md").read_text(encoding="utf-8")
+
+    assert "CPU binaries built without AVX2" in report
+    assert "AVX2-required binaries on this example host" in report
+    assert "no_avx2" in report
+    assert "CPU binaries built without AVX2" in plan
+    assert "AVX2-required binaries on this example host" in plan
 
 
 def test_script_refuses_missing_files(tmp_path):
