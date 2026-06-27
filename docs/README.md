@@ -134,6 +134,9 @@ gates.
 - [`experiments/AFFORDANCE_EXPERIMENT_PROPOSAL_V0.md`](experiments/AFFORDANCE_EXPERIMENT_PROPOSAL_V0.md)
   — model-free proposal scaffold for turning eligible affordance evidence into
   a reviewable experiment proposal while holding promotion and implementation.
+- [`experiments/AFFORDANCE_EXPERIMENT_DECISION_V0.md`](experiments/AFFORDANCE_EXPERIMENT_DECISION_V0.md)
+  — model-free decision record for approving plan drafting, holding revision,
+  or rejecting an affordance experiment proposal without executing it.
 
 ## Management-Team Workflows
 
