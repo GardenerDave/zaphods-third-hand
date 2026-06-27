@@ -1,0 +1,67 @@
+{
+  "allowed_actions": [
+    "use_existing_candidate_in_prompt_context",
+    "run_bounded_baseline_probe_prompts",
+    "write_baseline_lane_result_report",
+    "write_post_run_audit_report"
+  ],
+  "allowed_next_step": "draft_baseline_prompt_context_execution_packet",
+  "approval_decision": "approved_for_bounded_lane_execution",
+  "approval_verdict": "approved_for_baseline_lane_only",
+  "candidate_id": "larql_affordance_candidate_48efff9852ea",
+  "checks": {
+    "lane_allowed_by_plan": true,
+    "lane_is_baseline_prompt_context": true,
+    "lane_supported": true,
+    "plan_execution_not_approved": true,
+    "plan_exists": true,
+    "plan_parses": true,
+    "plan_promotion_held": true,
+    "plan_verdict_ready": true
+  },
+  "disallowed_actions": [
+    "apply_larql_patch",
+    "train_lora_adapter",
+    "mutate_model_weights",
+    "write_durable_memory",
+    "run_larql_lane",
+    "run_lora_lane",
+    "run_comparison_lane",
+    "promote_candidate",
+    "hide_or_drop_source_provenance"
+  ],
+  "execution_verdict": "approved_for_baseline_prompt_context_execution_only",
+  "experiment_status": "execution_approval_only",
+  "notes": [
+    "This records approval status for one bounded lane only.",
+    "Baseline lane approval does not authorize LARQL, LoRA, comparison, durable memory, model mutation, or candidate promotion."
+  ],
+  "operator_note": "Approve the baseline prompt-context control lane only. No LARQL patch, LoRA training, comparison lane, durable memory write, or promotion approved.",
+  "plan_verdict": "ready_for_execution_approval_review",
+  "promotion_verdict": "hold_pending_explicit_experiment_approval",
+  "recommended_experiment_type": "larql_plus_lora_comparison",
+  "repair_lane": "larql_plus_lora_candidate",
+  "report_type": "affordance_experiment_execution_approval.v0",
+  "required_post_run_artifacts": [
+    "baseline_lane_result_report.json",
+    "baseline_lane_result_report.md",
+    "post_run_audit_report.md"
+  ],
+  "required_pre_run_artifacts": [
+    "execution_approval.json",
+    "experiment_plan.json",
+    "affordance_patch_candidate.json with source digests",
+    "fixed prompt suite or prompt suite digest"
+  ],
+  "required_runner_constraints": [
+    "no mutation",
+    "no network dependency beyond already configured local endpoint",
+    "fixed prompt suite or explicitly recorded prompt suite digest",
+    "source candidate digest preserved",
+    "write all outputs to .work/",
+    "produce Markdown and JSON result reports",
+    "fail closed on missing provenance or unexpected lane"
+  ],
+  "selected_lane": "baseline_prompt_context_only",
+  "source_failure_id": "cuda_on_navigator_desktop.real"
+}
