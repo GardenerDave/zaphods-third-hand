@@ -104,6 +104,14 @@ GENERIC_KNOWN_GOOD_TOKENS = {
     "good",
     "model",
 }
+STRUCTURED_RESPONSE_LABELS = (
+    "ACTIVE_HOST",
+    "HOST_CONSTRAINT",
+    "KNOWN_BAD_PATH",
+    "KNOWN_GOOD_OR_SAFE_PATH",
+    "BOUNDARY",
+    "ANSWER",
+)
 
 
 def read_candidate(path: str | Path) -> dict[str, Any]:
@@ -176,6 +184,11 @@ def markdown_list(values: list[Any]) -> str:
     return "\n".join(f"- {value}" for value in values)
 
 
+def join_allowed_values(values: list[Any]) -> str:
+    cleaned = [str(value).strip() for value in values if str(value).strip()]
+    return "; ".join(cleaned) if cleaned else "insufficient evidence"
+
+
 def build_user_prompt(candidate: dict[str, Any], item: dict[str, Any]) -> str:
     context = candidate["host_affordance_context"]
     return "\n".join(
@@ -198,6 +211,13 @@ def build_user_prompt(candidate: dict[str, Any], item: dict[str, Any]) -> str:
             f"Prompt type: {item['prompt_type']}",
             f"Probe prompt: {item['prompt_text']}",
             "",
+            "Allowed field values:",
+            f"ACTIVE_HOST_ALLOWED: {join_allowed_values(candidate['host_profile_ids'])}",
+            f"HOST_CONSTRAINT_ALLOWED: {join_allowed_values(context['constraints'])}",
+            f"KNOWN_BAD_PATH_ALLOWED: {join_allowed_values(context['known_bad_paths'])}",
+            f"KNOWN_GOOD_OR_SAFE_PATH_ALLOWED: {join_allowed_values(context['known_good_paths'])}",
+            "BOUNDARY_ALLOWED: do not generalize to unknown hosts; do not borrow another host profile; reverify after hardware changes; insufficient evidence",
+            "",
             "Required response format:",
             "ACTIVE_HOST:",
             "HOST_CONSTRAINT:",
@@ -206,9 +226,11 @@ def build_user_prompt(candidate: dict[str, Any], item: dict[str, Any]) -> str:
             "BOUNDARY:",
             "ANSWER:",
             "",
-            "Fill every field. Use \"insufficient evidence\" if a field does "
-            "not apply. Do not leave fields blank. Keep the answer brief. Do "
-            "not claim any LARQL patch, LoRA training, or promotion has been "
+            "Fill every field. Copy from the allowed values when applicable. "
+            "Do not leave fields blank. Do not output a blank field. If no value applies, write "
+            "\"insufficient evidence\" after the colon. Every required label "
+            "must have text after the colon. Keep the answer brief. Do not "
+            "claim any LARQL patch, LoRA training, or promotion has been "
             "applied. Cite the host-specific fact being used. If the evidence "
             "is insufficient, say what must be checked.",
         ]
@@ -274,6 +296,19 @@ def response_quality(response_text: str) -> dict[str, bool]:
             or (bool(words) and words[-1].strip(".,:;!?").lower() in INCOMPLETE_TRAILING_WORDS)
         ),
     }
+
+
+def has_blank_structured_fields(response_text: str) -> bool:
+    found_label = False
+    for line in response_text.splitlines():
+        stripped = line.strip()
+        for label in STRUCTURED_RESPONSE_LABELS:
+            prefix = f"{label}:"
+            if stripped.startswith(prefix):
+                found_label = True
+                if not stripped[len(prefix):].strip():
+                    return True
+    return False if found_label else False
 
 
 def known_bad_path_avoided(response_text: str, known_bad_path: str) -> bool:
@@ -361,6 +396,7 @@ def score_response(
 
     checks: dict[str, bool] = {
         **quality,
+        "blank_structured_fields": has_blank_structured_fields(response_text),
         "constraint_mentioned": contains_any(response_text, constraints) or "host profile" in lowered,
     }
     required_checks: list[str] = ["constraint_mentioned"]
@@ -394,7 +430,11 @@ def score_response(
         checks["known_prompt_type"] = False
         required_checks = ["constraint_mentioned", "known_prompt_type"]
 
-    passes_quality = not checks["empty_response"] and not checks["truncated_response"]
+    passes_quality = (
+        not checks["empty_response"]
+        and not checks["truncated_response"]
+        and not checks["blank_structured_fields"]
+    )
     passes_required = all(checks.get(key, False) for key in required_checks)
 
     return {

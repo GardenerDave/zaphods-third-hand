@@ -97,6 +97,15 @@ reasoning content exists.
 Endpoint prompts require a compact structured response:
 
 ```text
+Allowed field values:
+ACTIVE_HOST_ALLOWED: <host ids>
+HOST_CONSTRAINT_ALLOWED: <host constraints>
+KNOWN_BAD_PATH_ALLOWED: <known-bad paths>
+KNOWN_GOOD_OR_SAFE_PATH_ALLOWED: <known-good paths>
+BOUNDARY_ALLOWED: do not generalize to unknown hosts; do not borrow another host profile; reverify after hardware changes; insufficient evidence
+```
+
+```text
 ACTIVE_HOST:
 HOST_CONSTRAINT:
 KNOWN_BAD_PATH:
@@ -105,9 +114,10 @@ BOUNDARY:
 ANSWER:
 ```
 
-The model is instructed to fill every field, use `insufficient evidence` when a
-field does not apply, keep the answer brief, and avoid claiming that any LARQL
-patch, LoRA training, or promotion has been applied.
+The model is instructed to copy from the allowed values when applicable, fill
+every field, use `insufficient evidence` when a field does not apply, keep the
+answer brief, and avoid claiming that any LARQL patch, LoRA training, or
+promotion has been applied.
 
 ## Deterministic v0 scoring limits
 
@@ -130,6 +140,9 @@ bad paths may be mentioned as something to avoid. Known-good matching allows a
 conservative partial token-cluster match, so a shorter phrase such as
 `Qwen3-1.7B local endpoint workflow` can match a longer recorded known-good
 path, while generic words such as `workflow` or `endpoint` alone are not enough.
+If a response attempts the structured format but leaves any required field
+blank, the result stays `needs_review`. Structured labels are not required for
+a pass in v0; blank labels are simply treated as failed slot filling.
 
 This is useful screening evidence. It is not semantic proof that a model
 understood the candidate or that the candidate is safe to apply.

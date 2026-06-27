@@ -328,6 +328,18 @@ def test_structured_prompt_includes_required_labels(tmp_path):
     packet = build_prompt_packet(candidate)
     prompt = packet["prompts"][0]["user_prompt"]
 
+    assert "Allowed field values:" in prompt
+    assert "ACTIVE_HOST_ALLOWED:" in prompt
+    assert "navigator_desktop_example" in prompt
+    assert "HOST_CONSTRAINT_ALLOWED:" in prompt
+    assert "no_cuda" in prompt
+    assert "KNOWN_BAD_PATH_ALLOWED:" in prompt
+    assert "CUDA-only install or runtime commands on this example host" in prompt
+    assert "KNOWN_GOOD_OR_SAFE_PATH_ALLOWED:" in prompt
+    assert "OpenCL/ROCm investigation before CUDA-specific commands" in prompt
+    assert "BOUNDARY_ALLOWED:" in prompt
+    assert "do not generalize to unknown hosts" in prompt
+
     for label in (
         "ACTIVE_HOST:",
         "HOST_CONSTRAINT:",
@@ -338,8 +350,57 @@ def test_structured_prompt_includes_required_labels(tmp_path):
     ):
         assert label in prompt
     assert "Fill every field." in prompt
+    assert "Copy from the allowed values when applicable." in prompt
     assert "Do not leave fields blank." in prompt
+    assert "Do not output a blank field." in prompt
+    assert "Every required label must have text after the colon." in prompt
     assert "Do not claim any LARQL patch, LoRA training, or promotion has been applied." in prompt
+
+
+def test_blank_structured_labels_need_review(tmp_path):
+    candidate_path = write_candidate(tmp_path)
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+
+    result = score_response(
+        candidate,
+        "probe",
+        "\n".join(
+            [
+                "ACTIVE_HOST:",
+                "HOST_CONSTRAINT:",
+                "KNOWN_BAD_PATH:",
+                "KNOWN_GOOD_OR_SAFE_PATH:",
+                "BOUNDARY:",
+                "ANSWER:",
+            ]
+        ),
+        candidate["probe_prompts"][0],
+    )
+
+    assert result["verdict"] == "needs_review"
+    assert result["checks"]["blank_structured_fields"] is True
+
+
+def test_filled_structured_labels_do_not_trigger_blank_field_check(tmp_path):
+    candidate_path = write_candidate(tmp_path)
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+
+    result = score_response(
+        candidate,
+        "probe",
+        (
+            "ACTIVE_HOST: navigator_desktop_example\n"
+            "HOST_CONSTRAINT: no_cuda\n"
+            "KNOWN_BAD_PATH: insufficient evidence\n"
+            "KNOWN_GOOD_OR_SAFE_PATH: insufficient evidence\n"
+            "BOUNDARY: do not generalize to unknown hosts\n"
+            "ANSWER: The host profile records no_cuda for this active host."
+        ),
+        candidate["probe_prompts"][0],
+    )
+
+    assert result["checks"]["blank_structured_fields"] is False
+    assert result["verdict"] == "pass"
 
 
 def test_empty_response_needs_review(tmp_path):
