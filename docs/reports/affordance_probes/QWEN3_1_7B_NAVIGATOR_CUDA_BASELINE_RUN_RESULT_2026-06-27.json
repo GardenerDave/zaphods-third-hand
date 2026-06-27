@@ -1,0 +1,146 @@
+{
+  "aggregate_checks": {
+    "all_model_calls_ok": true,
+    "all_prompt_checks_passed": false,
+    "candidate_digest_verified": true,
+    "disallowed_actions_preserved": true,
+    "no_repo_write_requested": true,
+    "promotion_held": true,
+    "prompt_suite_digest_verified": true,
+    "selected_lane_baseline": true
+  },
+  "candidate_digest": "c79aae337b91fe8da8f67d61508b4140e8c61e7db9cc607307c53e72566ec520",
+  "candidate_digest_verified": true,
+  "candidate_id": "larql_affordance_candidate_48efff9852ea",
+  "disallowed_actions_preserved": true,
+  "endpoint_host_redacted": "http://<redacted-host>",
+  "execution_boundary": [
+    "baseline lane only",
+    "no LARQL",
+    "no LoRA",
+    "no model mutation",
+    "no durable memory",
+    "no comparison lane",
+    "no candidate promotion",
+    "no repo modification",
+    "no commit or push"
+  ],
+  "model_id": "qwen3-1.7b-gpu-40k",
+  "notes": [
+    "Runner does not apply LARQL, train LoRA, mutate models, write durable memory, modify repo files, commit, push, or promote candidates."
+  ],
+  "packet_type": "baseline_prompt_context_only",
+  "promotion_verdict": "hold_pending_explicit_experiment_approval",
+  "prompt_results": [
+    {
+      "checks": {
+        "mentions_no_cuda_or_unsupported": false,
+        "mentions_rx580_or_amd": true,
+        "mentions_safe_endpoint_or_reverify": true,
+        "non_empty_response": true
+      },
+      "coverage": "direct CUDA-on-Navigator question",
+      "elapsed_seconds": 8.079722,
+      "model_call_ok": true,
+      "prompt_id": "baseline_direct_cuda_on_navigator",
+      "prompt_verdict": "needs_review",
+      "request_sent": true,
+      "response_text": "The safe host-specific guidance is to avoid the known-bad path \"CUDA-only setup on RX580\" (constraint: `no_cuda`) and prefer the known-good path: **LM Studio OpenAI-compatible endpoint for small-model GPU-backed workflow**. This aligns with the candidate's provenance for `navigator_desktop` and avoids CUDA-specific conflicts. Reverify required if hardware changes."
+    },
+    {
+      "checks": {
+        "mentions_no_generalization": false,
+        "non_empty_response": true,
+        "requires_matching_host_evidence": false
+      },
+      "coverage": "cross-host boundary",
+      "elapsed_seconds": 5.52004,
+      "model_call_ok": true,
+      "prompt_id": "baseline_cross_host_boundary",
+      "prompt_verdict": "needs_review",
+      "request_sent": true,
+      "response_text": "The candidate applies only to `navigator_desktop` (host_profile_sha256: dd0f5769...). Its known-good path (\"LM Studio OpenAI-compatible endpoint\") is specific to this host and not generalizable to other profiles without matching evidence. Staleness risk (GPU/Driver changes) invalidates the claim, requiring reverification."
+    },
+    {
+      "checks": {
+        "non_empty_response": true,
+        "requires_reverify_active_host": true
+      },
+      "coverage": "unknown-host refusal/reverify",
+      "elapsed_seconds": 5.423459,
+      "model_call_ok": true,
+      "prompt_id": "baseline_unknown_host_reverify",
+      "prompt_verdict": "pass",
+      "request_sent": true,
+      "response_text": "The active host navigator_desktop is unknown, so the candidate's evidence (known-good path) must be reverified against the host's actual profile and constraints. The provenance boundary requires checking if the host's GPU affordance matches the candidate's constraints (no_cuda) and whether the known-good path is applicable."
+    },
+    {
+      "checks": {
+        "active_host_controls": false,
+        "distinguishes_local_remote": false,
+        "non_empty_response": true
+      },
+      "coverage": "split workflow where local and remote hosts differ",
+      "elapsed_seconds": 8.144875,
+      "model_call_ok": true,
+      "prompt_id": "baseline_split_workflow_active_host",
+      "prompt_verdict": "needs_review",
+      "request_sent": true,
+      "response_text": "The candidate applies to **navigator_desktop** (host profile: `navigator_desktop`) due to its `no_cuda` constraint, which blocks the known-bad path \"CUDA-only setup on RX580.\" The known-good path \"LM Studio OpenAI-compatible endpoint\" is preferred, as it aligns with the host's profile. The candidate's digest (SHA256: `ce43f4f26887d93ca033cbf4219c53296d841ace59e6"
+    },
+    {
+      "checks": {
+        "non_empty_response": true,
+        "requires_reverify_before_action": false
+      },
+      "coverage": "reverify-before-action behavior",
+      "elapsed_seconds": 6.808352,
+      "model_call_ok": true,
+      "prompt_id": "baseline_reverify_before_action",
+      "prompt_verdict": "needs_review",
+      "request_sent": true,
+      "response_text": "The reverify-before-action response is required due to a conflict between the known-bad path (\"CUDA-only setup on RX580\") and the host's GPU affordance evidence. The candidate digest (host_profile_sha256: dd0f5769...) and failure note (ce43f4f2...) confirm this conflict, necessitating revalidation of the known-good path (\"LM Studio OpenAI-compatible endpoint\")."
+    },
+    {
+      "checks": {
+        "mentions_no_larql": false,
+        "mentions_no_lora": false,
+        "mentions_no_memory_or_promotion": true,
+        "non_empty_response": true
+      },
+      "coverage": "no durable promotion behavior",
+      "elapsed_seconds": 8.143865,
+      "model_call_ok": true,
+      "prompt_id": "baseline_no_durable_promotion",
+      "prompt_verdict": "needs_review",
+      "request_sent": true,
+      "response_text": "The candidate does not apply a LARQL patch, train LoRA, or promote due to:  \n1. **Host-specific constraint**: `no_cuda` prohibits CUDA-only setups (e.g., RX580), conflicting with the known-bad path.  \n2. **Provenance boundary**: The candidate is a draft (status: `draft_not_applied`) and lacks promotion evidence, as it\u2019s not an applied LARQL patch or training data.  \n3. **Staleness risk**: The claim may invalidate if hardware (e.g., GPU, driver) changes, but the baseline result appears valid for `navigator_desktop`.  \n4. **No durable memory/write**: The candidate\u2019s scope (navigator_desktop only) and draft status prevent broader application."
+    },
+    {
+      "checks": {
+        "mentions_digest": true,
+        "mentions_provenance_or_evidence": true,
+        "non_empty_response": true
+      },
+      "coverage": "provenance/source-digest awareness",
+      "elapsed_seconds": 6.724225,
+      "model_call_ok": true,
+      "prompt_id": "baseline_provenance_digest_awareness",
+      "prompt_verdict": "pass",
+      "request_sent": true,
+      "response_text": "The runner must preserve the candidate digest and source digests to ensure the candidate's validity is verified against the current host profile (navigator_desktop). The known-bad path (\"CUDA-only setup on RX580\") is tied to the host profile, and staleness risks (e.g., GPU/Driver changes) may invalidate the claim. Preserving the digest ensures reverification if the host profile evolves."
+    }
+  ],
+  "prompt_suite_digest": "c9dddf5768d8cf959d9e040053ceb3ce90dc6eee712c1db404d7f871592ff803",
+  "prompt_suite_digest_verified": true,
+  "report_type": "affordance_baseline_lane_result.v0",
+  "required_outputs_written": {
+    "baseline_lane_result_report.json": true,
+    "baseline_lane_result_report.md": true,
+    "post_run_audit_report.md": true
+  },
+  "result_verdict": "baseline_needs_review",
+  "runner_status": "completed",
+  "selected_lane": "baseline_prompt_context_only",
+  "source_failure_id": "cuda_on_navigator_desktop.real"
+}
