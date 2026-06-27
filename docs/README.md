@@ -149,6 +149,9 @@ gates.
 - [`experiments/AFFORDANCE_BASELINE_RUNNER_V0.md`](experiments/AFFORDANCE_BASELINE_RUNNER_V0.md)
   — bounded endpoint-backed runner for the baseline prompt-context control
   lane; it writes local result/audit reports and does not promote candidates.
+- [`experiments/AFFORDANCE_BASELINE_RUN_REVIEW_V0.md`](experiments/AFFORDANCE_BASELINE_RUN_REVIEW_V0.md)
+  — model-free review/adjudication record for completed baseline runs; it
+  preserves the original verdict and keeps promotion held.
 
 ## Management-Team Workflows
 

@@ -76,7 +76,7 @@ does not establish production readiness.
 - `affordance_probes/` — supervised affordance candidate probe reports,
   repeatability evidence, held-promotion summaries, and eligibility, proposal,
   decision, plan, execution-approval, baseline execution-packet, and baseline
-  runner evidence for experimental host-affordance work.
+  runner/review evidence for experimental host-affordance work.
 
 ## Safety Reminder
 
