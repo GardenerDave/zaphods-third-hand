@@ -377,6 +377,8 @@ Requirements:
   failures into host-profile, LARQL patch, LoRA training, stacked, or
   review-only repair candidates. This is an experimental file workflow only;
   no model editing or training is performed.
+- Affordance Dogfood Report v0 scaffold for reviewing one generated affordance
+  candidate while keeping promotion held pending probes.
 - Provider config generation for LLM-probe from ZTH model configs.
 - Output-failure heuristics such as empty response, degenerate output, and thinking-block leakage in ZTH audition scoring.
 - Optional hardware report attachment to preflight or audition metadata.
