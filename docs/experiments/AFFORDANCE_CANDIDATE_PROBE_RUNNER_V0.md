@@ -72,12 +72,19 @@ python3 local_harness/affordance_candidate_probe_runner.py \
   --out .work/affordance_candidate_probe_runs/navigator_cuda_probe_v0 \
   --endpoint-url http://127.0.0.1:1234/v1 \
   --model-id qwen3-1.7b-gpu-40k \
+  --max-tokens 512 \
   --allow-model-calls
 ```
 
 Endpoint mode calls an OpenAI-compatible `/chat/completions` endpoint with a
 fixed supervised system prompt and conservative generation settings. It does
 not retry, stream, start endpoints, or manage endpoint lifecycle.
+
+`--max-tokens` controls the endpoint completion budget and defaults to `512`.
+For Qwen3-style endpoints that otherwise spend the budget in
+`reasoning_content`, `--qwen-no-think` prepends `/no_think` to the endpoint
+user prompt. This prefix is only applied to explicit endpoint calls; dry-run
+prompt packets remain unchanged.
 
 Endpoint events record observability metadata when the server provides it:
 `finish_reason`, `usage`, `timings`, and whether Qwen-style

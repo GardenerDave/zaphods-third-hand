@@ -438,6 +438,34 @@ def chat_completion_url(endpoint_url: str) -> str:
     return f"{endpoint_url.rstrip('/')}/chat/completions"
 
 
+def endpoint_user_prompt(user_prompt: str, *, qwen_no_think: bool) -> str:
+    if qwen_no_think:
+        return f"/no_think\n{user_prompt}"
+    return user_prompt
+
+
+def build_chat_completion_payload(
+    *,
+    model_id: str,
+    system_prompt: str,
+    user_prompt: str,
+    max_tokens: int,
+    qwen_no_think: bool,
+) -> dict[str, Any]:
+    return {
+        "model": model_id,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {
+                "role": "user",
+                "content": endpoint_user_prompt(user_prompt, qwen_no_think=qwen_no_think),
+            },
+        ],
+        "temperature": 0,
+        "max_tokens": max_tokens,
+    }
+
+
 def extract_chat_completion_payload(parsed: dict[str, Any]) -> dict[str, Any]:
     choices = parsed.get("choices")
     if not isinstance(choices, list) or not choices:
@@ -483,16 +511,16 @@ def call_chat_completion(
     system_prompt: str,
     user_prompt: str,
     timeout_seconds: float,
+    max_tokens: int,
+    qwen_no_think: bool,
 ) -> dict[str, Any]:
-    payload = {
-        "model": model_id,
-        "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ],
-        "temperature": 0,
-        "max_tokens": 512,
-    }
+    payload = build_chat_completion_payload(
+        model_id=model_id,
+        system_prompt=system_prompt,
+        user_prompt=user_prompt,
+        max_tokens=max_tokens,
+        qwen_no_think=qwen_no_think,
+    )
     request = urllib.request.Request(
         chat_completion_url(endpoint_url),
         data=json.dumps(payload).encode("utf-8"),
@@ -530,6 +558,8 @@ def endpoint_events(
     endpoint_url: str,
     model_id: str,
     timeout_seconds: float,
+    max_tokens: int,
+    qwen_no_think: bool,
 ) -> list[dict[str, Any]]:
     events = []
     for item in packet["prompts"]:
@@ -540,6 +570,8 @@ def endpoint_events(
             "prompt_type": item["prompt_type"],
             "prompt_text": item["prompt_text"],
             "model_id": model_id,
+            "qwen_no_think": qwen_no_think,
+            "max_tokens": max_tokens,
         }
         try:
             completion = call_chat_completion(
@@ -548,6 +580,8 @@ def endpoint_events(
                 system_prompt=item["system_prompt"],
                 user_prompt=item["user_prompt"],
                 timeout_seconds=timeout_seconds,
+                max_tokens=max_tokens,
+                qwen_no_think=qwen_no_think,
             )
         except (
             TimeoutError,
@@ -605,6 +639,8 @@ def event_to_result(event: dict[str, Any]) -> dict[str, Any]:
         "verdict": event["verdict"],
     }
     for key in (
+        "qwen_no_think",
+        "max_tokens",
         "finish_reason",
         "reasoning_content_present",
         "reasoning_content_chars",
@@ -627,6 +663,8 @@ def build_report(
     model_id: str | None,
     endpoint_url: str | None,
     events: list[dict[str, Any]],
+    qwen_no_think: bool,
+    max_tokens: int,
 ) -> dict[str, Any]:
     per_prompt_results = [event_to_result(event) for event in events]
     verdict = overall_verdict(per_prompt_results, run_mode=run_mode)
@@ -643,6 +681,8 @@ def build_report(
         "source_failure_id": candidate["source_failure_id"],
         "run_mode": run_mode,
         "model_id": model_id,
+        "qwen_no_think": qwen_no_think,
+        "max_tokens": max_tokens,
         "endpoint_url_redacted_or_recorded": redact_endpoint(endpoint_url),
         "model_calls_performed": run_mode == "endpoint",
         "prompt_count": probe_count + regression_count,
@@ -716,11 +756,15 @@ def run_probe(
     endpoint_url: str | None = None,
     model_id: str | None = None,
     timeout_seconds: float = 120.0,
+    max_tokens: int = 512,
+    qwen_no_think: bool = False,
 ) -> dict[str, Any]:
     candidate = read_candidate(candidate_path)
     out = Path(out_dir)
     validate_out_dir(out)
     out.mkdir(parents=True, exist_ok=True)
+    if max_tokens <= 0:
+        raise ValueError("--max-tokens must be greater than 0")
 
     packet = build_prompt_packet(candidate)
     run_mode = "endpoint" if allow_model_calls else "dry_run"
@@ -733,6 +777,8 @@ def run_probe(
             endpoint_url=endpoint_url,
             model_id=model_id,
             timeout_seconds=timeout_seconds,
+            max_tokens=max_tokens,
+            qwen_no_think=qwen_no_think,
         )
     else:
         events = dry_run_events(packet)
@@ -743,6 +789,8 @@ def run_probe(
         model_id=model_id if allow_model_calls else None,
         endpoint_url=endpoint_url if allow_model_calls else None,
         events=events,
+        qwen_no_think=qwen_no_think if allow_model_calls else False,
+        max_tokens=max_tokens,
     )
 
     (out / "probe_prompt_packet.json").write_text(
@@ -777,6 +825,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--endpoint-url")
     parser.add_argument("--model-id")
     parser.add_argument("--timeout-seconds", type=float, default=120.0)
+    parser.add_argument("--max-tokens", type=int, default=512)
+    parser.add_argument(
+        "--qwen-no-think",
+        action="store_true",
+        help="In endpoint mode, prepend /no_think to the user prompt for Qwen3-style models.",
+    )
     return parser
 
 
@@ -791,6 +845,8 @@ def main(argv: list[str] | None = None) -> int:
             endpoint_url=args.endpoint_url,
             model_id=args.model_id,
             timeout_seconds=args.timeout_seconds,
+            max_tokens=args.max_tokens,
+            qwen_no_think=args.qwen_no_think,
         )
     except ValueError as exc:
         print(f"ERROR: {exc}")

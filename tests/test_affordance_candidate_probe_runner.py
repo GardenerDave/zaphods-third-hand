@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 
 from local_harness.affordance_candidate_probe_runner import (
+    build_chat_completion_payload,
     build_prompt_packet,
     endpoint_events,
     extract_chat_completion_payload,
@@ -139,11 +140,15 @@ def test_endpoint_events_record_reasoning_finish_usage_and_timings(tmp_path, mon
         endpoint_url="http://127.0.0.1:1234/v1",
         model_id="example-model",
         timeout_seconds=1,
+        max_tokens=128,
+        qwen_no_think=True,
     )
 
     assert len(events) == 1
     event = events[0]
     assert event["status"] == "completed"
+    assert event["qwen_no_think"] is True
+    assert event["max_tokens"] == 128
     assert event["reasoning_content"] == "internal trace"
     assert event["reasoning_content_present"] is True
     assert event["reasoning_content_chars"] == len("internal trace")
@@ -152,11 +157,81 @@ def test_endpoint_events_record_reasoning_finish_usage_and_timings(tmp_path, mon
     assert event["timings"] == {"total_ms": 2}
 
 
+def test_chat_completion_payload_adds_no_think_only_when_enabled():
+    normal = build_chat_completion_payload(
+        model_id="example-model",
+        system_prompt="system",
+        user_prompt="user prompt",
+        max_tokens=77,
+        qwen_no_think=False,
+    )
+    no_think = build_chat_completion_payload(
+        model_id="example-model",
+        system_prompt="system",
+        user_prompt="user prompt",
+        max_tokens=88,
+        qwen_no_think=True,
+    )
+
+    assert normal["messages"][1]["content"] == "user prompt"
+    assert normal["max_tokens"] == 77
+    assert no_think["messages"][1]["content"] == "/no_think\nuser prompt"
+    assert no_think["max_tokens"] == 88
+
+
+def test_endpoint_report_records_qwen_no_think_max_tokens_and_hold_pending(tmp_path, monkeypatch):
+    candidate = write_candidate(tmp_path)
+
+    def fake_call_chat_completion(**kwargs):
+        assert kwargs["qwen_no_think"] is True
+        assert kwargs["max_tokens"] == 96
+        return {
+            "response_text": (
+                "ACTIVE_HOST: navigator_desktop_example\n"
+                "HOST_CONSTRAINT: no_cuda\n"
+                "KNOWN_BAD_PATH: insufficient evidence\n"
+                "KNOWN_GOOD_OR_SAFE_PATH: insufficient evidence\n"
+                "BOUNDARY: no LARQL patch, LoRA training, or promotion applied\n"
+                "ANSWER: The host profile says no_cuda applies here."
+            ),
+            "reasoning_content": None,
+            "reasoning_content_present": False,
+            "reasoning_content_chars": 0,
+            "finish_reason": "stop",
+            "usage": {"completion_tokens": 24},
+            "timings": {"total_ms": 10},
+        }
+
+    monkeypatch.setattr(
+        "local_harness.affordance_candidate_probe_runner.call_chat_completion",
+        fake_call_chat_completion,
+    )
+
+    report = run_probe(
+        candidate_path=candidate,
+        out_dir=tmp_path / "out",
+        allow_model_calls=True,
+        endpoint_url="http://127.0.0.1:1234/v1",
+        model_id="example-model",
+        max_tokens=96,
+        qwen_no_think=True,
+    )
+
+    assert report["run_mode"] == "endpoint"
+    assert report["qwen_no_think"] is True
+    assert report["max_tokens"] == 96
+    assert report["promotion_verdict"] == "hold_pending_probe_review"
+    assert report["per_prompt_results"][0]["qwen_no_think"] is True
+    assert report["per_prompt_results"][0]["max_tokens"] == 96
+
+
 def test_help_works():
     result = run_runner("--help")
 
     assert result.returncode == 0
     assert "usage:" in result.stdout
+    assert "--qwen-no-think" in result.stdout
+    assert "--max-tokens" in result.stdout
 
 
 def test_dry_run_creates_exactly_four_files(tmp_path):
@@ -178,8 +253,9 @@ def test_dry_run_writes_pending_model_call_events(tmp_path):
     candidate = write_candidate(tmp_path)
     out = tmp_path / "probe_run"
 
-    run_probe(candidate_path=candidate, out_dir=out)
+    run_probe(candidate_path=candidate, out_dir=out, qwen_no_think=True, max_tokens=64)
     events = read_jsonl(out / "probe_run.jsonl")
+    packet = json.loads((out / "probe_prompt_packet.json").read_text(encoding="utf-8"))
 
     assert events
     assert {event["status"] for event in events} == {"pending_model_call"}
@@ -190,6 +266,9 @@ def test_dry_run_writes_pending_model_call_events(tmp_path):
     assert "finish_reason" not in events[0]
     assert "usage" not in events[0]
     assert "timings" not in events[0]
+    assert "qwen_no_think" not in events[0]
+    assert "max_tokens" not in events[0]
+    assert not packet["prompts"][0]["user_prompt"].startswith("/no_think")
 
 
 
