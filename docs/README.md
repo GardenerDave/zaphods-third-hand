@@ -125,6 +125,9 @@ gates.
 - [`experiments/AFFORDANCE_DOGFOOD_REPORT_V0.md`](experiments/AFFORDANCE_DOGFOOD_REPORT_V0.md)
   — experimental, model-free report scaffold for reviewing one generated
   affordance candidate while holding promotion pending probes.
+- [`experiments/AFFORDANCE_CANDIDATE_PROBE_RUNNER_V0.md`](experiments/AFFORDANCE_CANDIDATE_PROBE_RUNNER_V0.md)
+  — experimental runner that packages one affordance candidate’s probe prompts
+  and defaults to dry-run artifacts before any explicit endpoint-backed probe.
 
 ## Management-Team Workflows
 

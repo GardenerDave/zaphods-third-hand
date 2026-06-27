@@ -379,6 +379,9 @@ Requirements:
   no model editing or training is performed.
 - Affordance Dogfood Report v0 scaffold for reviewing one generated affordance
   candidate while keeping promotion held pending probes.
+- Affordance Candidate Probe Runner v0 scaffold for packaging one generated
+  affordance candidate's probe and regression prompts into dry-run artifacts or
+  explicit supervised endpoint probes. Promotion remains held pending review.
 - Provider config generation for LLM-probe from ZTH model configs.
 - Output-failure heuristics such as empty response, degenerate output, and thinking-block leakage in ZTH audition scoring.
 - Optional hardware report attachment to preflight or audition metadata.
