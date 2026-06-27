@@ -146,6 +146,9 @@ gates.
 - [`experiments/AFFORDANCE_BASELINE_EXECUTION_PACKET_V0.md`](experiments/AFFORDANCE_BASELINE_EXECUTION_PACKET_V0.md)
   — model-free packet scaffold for a later baseline prompt-context runner;
   it embeds a fixed prompt suite but does not call a model.
+- [`experiments/AFFORDANCE_BASELINE_RUNNER_V0.md`](experiments/AFFORDANCE_BASELINE_RUNNER_V0.md)
+  — bounded endpoint-backed runner for the baseline prompt-context control
+  lane; it writes local result/audit reports and does not promote candidates.
 
 ## Management-Team Workflows
 
