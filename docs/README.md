@@ -152,6 +152,9 @@ gates.
 - [`experiments/AFFORDANCE_BASELINE_RUN_REVIEW_V0.md`](experiments/AFFORDANCE_BASELINE_RUN_REVIEW_V0.md)
   — model-free review/adjudication record for completed baseline runs; it
   preserves the original verdict and keeps promotion held.
+- [`experiments/AFFORDANCE_BASELINE_REPAIR_PROPOSAL_V0.md`](experiments/AFFORDANCE_BASELINE_REPAIR_PROPOSAL_V0.md)
+  — model-free proposal for baseline prompt/scorer repairs after reviewed run
+  evidence; it does not apply repairs or rerun the baseline.
 
 ## Management-Team Workflows
 
