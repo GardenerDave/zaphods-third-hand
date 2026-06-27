@@ -1,0 +1,42 @@
+{
+  "host_id": "r420_server_example",
+  "display_name": "R420 server example",
+  "profile_version": "example.v0",
+  "last_verified": "example-only",
+  "evidence_status": "example_only",
+  "hardware": {
+    "cpu": "older x86_64 server placeholder",
+    "avx2": "not_available_in_this_example",
+    "gpu": "none_or_not_relevant_in_this_example"
+  },
+  "os": {
+    "family": "linux",
+    "details": "example-only"
+  },
+  "known_good_paths": [
+    "CPU binaries built without AVX2",
+    "container or package selection that declares CPU feature requirements"
+  ],
+  "known_bad_paths": [
+    "AVX2-required binaries on this example host",
+    "assuming workstation CPU flags apply to the server"
+  ],
+  "preferred_roles": [
+    "non-AVX2 service smoke",
+    "artifact storage",
+    "low-risk CPU-only validation"
+  ],
+  "constraints": [
+    "no_avx2",
+    "verify_cpu_flags_before_binary_selection"
+  ],
+  "staleness_policy": {
+    "reverify_before": "installing CPU-feature-specific binaries",
+    "stale_if": [
+      "server hardware changed",
+      "virtualization layer changed",
+      "binary build target changed"
+    ]
+  },
+  "notes": "Example profile only. Do not generalize this CPU constraint to other hosts."
+}

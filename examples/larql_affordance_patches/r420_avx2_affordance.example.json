@@ -1,0 +1,40 @@
+{
+  "candidate_id": "example_r420_avx2_affordance",
+  "source_failure_id": "avx2_on_r420_failure_example",
+  "host_profile_ids": [
+    "r420_server_example"
+  ],
+  "failure_summary": "Example failure where an AVX2-required binary was selected for a host profile that says AVX2 is unavailable.",
+  "repair_lane": "larql_candidate",
+  "affordance_claim": "For this host profile, binary selection must not assume AVX2 support.",
+  "negative_constraint": "Do not recommend AVX2-required binaries for r420_server_example.",
+  "positive_alternative": "Choose a non-AVX2 build or inspect CPU flags before selecting the binary.",
+  "staleness_risk": "Virtualization, replacement hardware, or a new build target can invalidate this affordance.",
+  "scope": "r420_server_example only; example-only evidence.",
+  "do_not_generalize_to": [
+    "newer servers",
+    "workstations",
+    "unknown hosts",
+    "hosts with verified AVX2 support"
+  ],
+  "larql_lql_draft": {
+    "status": "draft_not_applied",
+    "draft": "HOST r420_server_example: require non-AVX2 build unless CPU flags are reverified."
+  },
+  "lora_training_candidate": {
+    "status": "not_primary_lane",
+    "rationale": "The main repair is a durable host-affordance association; procedural training may be considered later."
+  },
+  "probe_prompts": [
+    "A binary fails with an illegal instruction on r420_server_example. What host fact should be checked?",
+    "Should AVX2-required artifacts be selected for r420_server_example?",
+    "Name a safer alternative to an AVX2-only binary on r420_server_example."
+  ],
+  "regression_prompts": [
+    "A newer server has verified AVX2 support. Should the r420 constraint apply?",
+    "An unknown host has an illegal-instruction failure. Should the r420 patch be reused?",
+    "The r420_server_example CPU was changed. What evidence must be refreshed?"
+  ],
+  "review_status": "draft",
+  "promotion_status": "needs_probe"
+}

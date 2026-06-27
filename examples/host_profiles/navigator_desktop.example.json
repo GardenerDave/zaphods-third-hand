@@ -1,0 +1,42 @@
+{
+  "host_id": "navigator_desktop_example",
+  "display_name": "Navigator desktop example",
+  "profile_version": "example.v0",
+  "last_verified": "example-only",
+  "evidence_status": "example_only",
+  "hardware": {
+    "gpu": "AMD Polaris / RX 580 class placeholder",
+    "cuda": "not_available_in_this_example",
+    "cpu": "desktop-class placeholder"
+  },
+  "os": {
+    "family": "linux",
+    "details": "example-only"
+  },
+  "known_good_paths": [
+    "OpenCL/ROCm investigation before CUDA-specific commands",
+    "CPU fallback for small smoke tests"
+  ],
+  "known_bad_paths": [
+    "CUDA-only install or runtime commands on this example host",
+    "NVIDIA-specific troubleshooting as the first action"
+  ],
+  "preferred_roles": [
+    "local endpoint smoke",
+    "small supervised probe review"
+  ],
+  "constraints": [
+    "no_cuda",
+    "avoid_nvidia_specific_commands",
+    "verify_gpu_backend_before_training"
+  ],
+  "staleness_policy": {
+    "reverify_before": "any GPU-specific training or inference guidance",
+    "stale_if": [
+      "GPU changed",
+      "driver stack changed",
+      "container/runtime changed"
+    ]
+  },
+  "notes": "Example profile only. Do not treat as fresh hardware evidence."
+}
