@@ -1,0 +1,40 @@
+{
+  "allowed_next_step": "draft_bounded_affordance_experiment_plan",
+  "candidate_id": "larql_affordance_candidate_48efff9852ea",
+  "checks": {
+    "proposal_exists": true,
+    "proposal_has_recommended_experiment_type": true,
+    "proposal_parses": true,
+    "proposal_promotion_held": true,
+    "proposal_verdict_ready": true
+  },
+  "decision_verdict": "accepted_for_plan_drafting_only",
+  "disallowed_actions": [
+    "apply_larql_patch",
+    "train_lora_adapter",
+    "mutate_model_weights",
+    "write_durable_memory",
+    "execute_experiment",
+    "promote_candidate",
+    "move_lifecycle_state_without_separate_approval"
+  ],
+  "experiment_status": "decision_only",
+  "notes": [
+    "This records an operator decision about proposal handling only.",
+    "Approval to draft a plan is not approval to execute the experiment.",
+    "Execution still requires a separate explicit approval."
+  ],
+  "operator_decision": "approved_to_draft_experiment_plan",
+  "operator_note": "Approve drafting a bounded experiment plan only. No LARQL/LoRA execution approved.",
+  "promotion_verdict": "hold_pending_explicit_experiment_approval",
+  "proposal_verdict": "ready_for_operator_review",
+  "recommended_experiment_type": "larql_plus_lora_comparison",
+  "repair_lane": "larql_plus_lora_candidate",
+  "report_type": "affordance_experiment_decision.v0",
+  "required_followup_artifacts": [
+    "bounded_affordance_experiment_plan",
+    "explicit_experiment_execution_approval_record_before_any_execution",
+    "post_experiment_reaudition_report_if_execution_is_later_approved"
+  ],
+  "source_failure_id": "cuda_on_navigator_desktop.real"
+}
