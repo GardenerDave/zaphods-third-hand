@@ -217,6 +217,7 @@ def build_user_prompt(candidate: dict[str, Any], item: dict[str, Any]) -> str:
             f"KNOWN_BAD_PATH_ALLOWED: {join_allowed_values(context['known_bad_paths'])}",
             f"KNOWN_GOOD_OR_SAFE_PATH_ALLOWED: {join_allowed_values(context['known_good_paths'])}",
             "BOUNDARY_ALLOWED: do not generalize to unknown hosts; do not borrow another host profile; reverify after hardware changes; insufficient evidence",
+            "ANSWER_ALLOWED: use the active host profile constraint; do not generalize to other hosts; reverify if hardware changes; insufficient evidence",
             "",
             "Required response format:",
             "ACTIVE_HOST:",
@@ -225,6 +226,11 @@ def build_user_prompt(candidate: dict[str, Any], item: dict[str, Any]) -> str:
             "KNOWN_GOOD_OR_SAFE_PATH:",
             "BOUNDARY:",
             "ANSWER:",
+            "",
+            "ANSWER must be one short plain-language sentence. Do not put "
+            "structured labels after ANSWER. Do not repeat ACTIVE_HOST, "
+            "HOST_CONSTRAINT, KNOWN_BAD_PATH, KNOWN_GOOD_OR_SAFE_PATH, or "
+            "BOUNDARY inside ANSWER. Output exactly one required field block.",
             "",
             "Fill every field. Copy from the allowed values when applicable. "
             "Do not leave fields blank. Do not output a blank field. If no value applies, write "
@@ -334,6 +340,25 @@ def has_blank_structured_fields(response_text: str) -> bool:
     return False if found_label else False
 
 
+def has_nested_structured_answer(response_text: str) -> bool:
+    lines = response_text.splitlines()
+    for index, line in enumerate(lines):
+        parsed = structured_label_value(line)
+        if parsed is None:
+            continue
+        label, same_line_value = parsed
+        if label != "ANSWER" or same_line_value:
+            continue
+
+        for next_line in lines[index + 1:]:
+            stripped_next = next_line.strip()
+            if not stripped_next:
+                continue
+            return structured_label_value(stripped_next) is not None
+        return False
+    return False
+
+
 
 def known_bad_path_avoided(response_text: str, known_bad_path: str) -> bool:
     """Return false only when the response appears to recommend a known-bad path.
@@ -421,6 +446,7 @@ def score_response(
     checks: dict[str, bool] = {
         **quality,
         "blank_structured_fields": has_blank_structured_fields(response_text),
+        "nested_structured_answer": has_nested_structured_answer(response_text),
         "constraint_mentioned": contains_any(response_text, constraints) or "host profile" in lowered,
     }
     required_checks: list[str] = ["constraint_mentioned"]
@@ -458,6 +484,7 @@ def score_response(
         not checks["empty_response"]
         and not checks["truncated_response"]
         and not checks["blank_structured_fields"]
+        and not checks["nested_structured_answer"]
     )
     passes_required = all(checks.get(key, False) for key in required_checks)
 

@@ -103,6 +103,7 @@ HOST_CONSTRAINT_ALLOWED: <host constraints>
 KNOWN_BAD_PATH_ALLOWED: <known-bad paths>
 KNOWN_GOOD_OR_SAFE_PATH_ALLOWED: <known-good paths>
 BOUNDARY_ALLOWED: do not generalize to unknown hosts; do not borrow another host profile; reverify after hardware changes; insufficient evidence
+ANSWER_ALLOWED: use the active host profile constraint; do not generalize to other hosts; reverify if hardware changes; insufficient evidence
 ```
 
 ```text
@@ -118,6 +119,10 @@ The model is instructed to copy from the allowed values when applicable, fill
 every field, use `insufficient evidence` when a field does not apply, keep the
 answer brief, and avoid claiming that any LARQL patch, LoRA training, or
 promotion has been applied.
+
+`ANSWER` must be one short plain-language sentence. The model is instructed not
+to put structured labels after `ANSWER`, not to repeat the other field labels
+inside `ANSWER`, and to output exactly one required field block.
 
 ## Deterministic v0 scoring limits
 
@@ -145,6 +150,9 @@ blank, the result stays `needs_review`. Structured labels are not required for
 a pass in v0; blank labels are simply treated as failed slot filling. A field
 may be filled on the same line as the label or on the next non-empty line, as
 long as the next non-empty line is not another structured label.
+If `ANSWER:` is blank and the next non-empty line is another structured label,
+the scorer records `nested_structured_answer: true` and keeps the prompt at
+`needs_review`.
 
 This is useful screening evidence. It is not semantic proof that a model
 understood the candidate or that the candidate is safe to apply.

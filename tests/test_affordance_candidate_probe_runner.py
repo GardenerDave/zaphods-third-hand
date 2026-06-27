@@ -340,6 +340,8 @@ def test_structured_prompt_includes_required_labels(tmp_path):
     assert "OpenCL/ROCm investigation before CUDA-specific commands" in prompt
     assert "BOUNDARY_ALLOWED:" in prompt
     assert "do not generalize to unknown hosts" in prompt
+    assert "ANSWER_ALLOWED:" in prompt
+    assert "use the active host profile constraint" in prompt
 
     for label in (
         "ACTIVE_HOST:",
@@ -355,6 +357,13 @@ def test_structured_prompt_includes_required_labels(tmp_path):
     assert "Do not leave fields blank." in prompt
     assert "Do not output a blank field." in prompt
     assert "Every required label must have text after the colon." in prompt
+    assert "ANSWER must be one short plain-language sentence." in prompt
+    assert "Do not put structured labels after ANSWER." in prompt
+    assert (
+        "Do not repeat ACTIVE_HOST, HOST_CONSTRAINT, KNOWN_BAD_PATH, "
+        "KNOWN_GOOD_OR_SAFE_PATH, or BOUNDARY inside ANSWER."
+    ) in prompt
+    assert "Output exactly one required field block." in prompt
     assert "Do not claim any LARQL patch, LoRA training, or promotion has been applied." in prompt
 
 
@@ -380,6 +389,81 @@ def test_blank_structured_labels_need_review(tmp_path):
 
     assert result["verdict"] == "needs_review"
     assert result["checks"]["blank_structured_fields"] is True
+
+
+def test_nested_structured_labels_after_answer_need_review(tmp_path):
+    candidate_path = write_candidate(tmp_path)
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+
+    result = score_response(
+        candidate,
+        "probe",
+        (
+            "ACTIVE_HOST: navigator_desktop\n"
+            "HOST_CONSTRAINT: no_cuda\n"
+            "KNOWN_BAD_PATH: CUDA-only setup on RX580\n"
+            "KNOWN_GOOD_OR_SAFE_PATH: LM Studio OpenAI-compatible endpoint for small-model GPU-backed workflow\n"
+            "BOUNDARY: reverify after hardware changes\n"
+            "ANSWER:\n"
+            "ACTIVE_HOST: navigator_desktop\n"
+            "HOST_CONSTRAINT: no_cuda\n"
+            "KNOWN_BAD_PATH: CUDA-only setup on RX580\n"
+            "KNOWN_GOOD_OR_SAFE_PATH: LM Studio OpenAI-compatible endpoint for small-model GPU-backed workflow\n"
+            "BOUNDARY: reverify after hardware changes"
+        ),
+        candidate["probe_prompts"][0],
+    )
+
+    assert result["verdict"] == "needs_review"
+    assert result["checks"]["nested_structured_answer"] is True
+    assert result["checks"]["blank_structured_fields"] is True
+
+
+def test_same_line_answer_does_not_trigger_nested_structured_answer(tmp_path):
+    candidate_path = write_candidate(tmp_path)
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+
+    result = score_response(
+        candidate,
+        "probe",
+        (
+            "ACTIVE_HOST: navigator_desktop_example\n"
+            "HOST_CONSTRAINT: no_cuda\n"
+            "KNOWN_BAD_PATH: insufficient evidence\n"
+            "KNOWN_GOOD_OR_SAFE_PATH: insufficient evidence\n"
+            "BOUNDARY: reverify after hardware changes\n"
+            "ANSWER: use the active host profile constraint."
+        ),
+        candidate["probe_prompts"][0],
+    )
+
+    assert result["checks"]["nested_structured_answer"] is False
+    assert result["checks"]["blank_structured_fields"] is False
+    assert result["verdict"] == "pass"
+
+
+def test_multiline_answer_does_not_trigger_nested_structured_answer(tmp_path):
+    candidate_path = write_candidate(tmp_path)
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+
+    result = score_response(
+        candidate,
+        "probe",
+        (
+            "ACTIVE_HOST: navigator_desktop_example\n"
+            "HOST_CONSTRAINT: no_cuda\n"
+            "KNOWN_BAD_PATH: insufficient evidence\n"
+            "KNOWN_GOOD_OR_SAFE_PATH: insufficient evidence\n"
+            "BOUNDARY: reverify after hardware changes\n"
+            "ANSWER:\n"
+            "use the active host profile constraint."
+        ),
+        candidate["probe_prompts"][0],
+    )
+
+    assert result["checks"]["nested_structured_answer"] is False
+    assert result["checks"]["blank_structured_fields"] is False
+    assert result["verdict"] == "pass"
 
 
 def test_same_line_structured_fields_are_not_blank():
