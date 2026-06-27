@@ -438,6 +438,44 @@ def chat_completion_url(endpoint_url: str) -> str:
     return f"{endpoint_url.rstrip('/')}/chat/completions"
 
 
+def extract_chat_completion_payload(parsed: dict[str, Any]) -> dict[str, Any]:
+    choices = parsed.get("choices")
+    if not isinstance(choices, list) or not choices:
+        raise ValueError("endpoint response missing choices")
+    choice = choices[0]
+    if not isinstance(choice, dict):
+        raise ValueError("endpoint response choice must be an object")
+    message = choice.get("message", {})
+    if not isinstance(message, dict):
+        raise ValueError("endpoint response missing message")
+
+    content = message.get("content", "")
+    if content is None:
+        content = ""
+    if not isinstance(content, str):
+        raise ValueError("endpoint response message.content must be a string or null")
+
+    reasoning_present = "reasoning_content" in message and message.get("reasoning_content") is not None
+    reasoning_content: str | None = None
+    if reasoning_present:
+        raw_reasoning = message.get("reasoning_content")
+        reasoning_content = (
+            raw_reasoning
+            if isinstance(raw_reasoning, str)
+            else json.dumps(raw_reasoning, sort_keys=True)
+        )
+
+    return {
+        "response_text": content,
+        "reasoning_content": reasoning_content,
+        "reasoning_content_present": reasoning_present,
+        "reasoning_content_chars": len(reasoning_content or ""),
+        "finish_reason": choice.get("finish_reason"),
+        "usage": parsed.get("usage"),
+        "timings": parsed.get("timings", choice.get("timings")),
+    }
+
+
 def call_chat_completion(
     *,
     endpoint_url: str,
@@ -445,7 +483,7 @@ def call_chat_completion(
     system_prompt: str,
     user_prompt: str,
     timeout_seconds: float,
-) -> str:
+) -> dict[str, Any]:
     payload = {
         "model": model_id,
         "messages": [
@@ -464,14 +502,7 @@ def call_chat_completion(
     with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
         body = response.read().decode("utf-8")
     parsed = json.loads(body)
-    choices = parsed.get("choices")
-    if not isinstance(choices, list) or not choices:
-        raise ValueError("endpoint response missing choices")
-    message = choices[0].get("message", {})
-    content = message.get("content")
-    if not isinstance(content, str):
-        raise ValueError("endpoint response missing message.content")
-    return content
+    return extract_chat_completion_payload(parsed)
 
 
 def dry_run_events(packet: dict[str, Any]) -> list[dict[str, Any]]:
@@ -511,7 +542,7 @@ def endpoint_events(
             "model_id": model_id,
         }
         try:
-            response_text = call_chat_completion(
+            completion = call_chat_completion(
                 endpoint_url=endpoint_url,
                 model_id=model_id,
                 system_prompt=item["system_prompt"],
@@ -531,11 +562,18 @@ def endpoint_events(
                     "status": "error",
                     "error": str(exc),
                     "response_text": "",
+                    "reasoning_content": None,
+                    "reasoning_content_present": False,
+                    "reasoning_content_chars": 0,
+                    "finish_reason": None,
+                    "usage": None,
+                    "timings": None,
                     "checks": {},
                     "verdict": "error",
                 }
             )
         else:
+            response_text = completion["response_text"]
             score = score_response(
                 candidate,
                 item["prompt_type"],
@@ -545,6 +583,12 @@ def endpoint_events(
             event.update(
                 {
                     "response_text": response_text,
+                    "reasoning_content": completion["reasoning_content"],
+                    "reasoning_content_present": completion["reasoning_content_present"],
+                    "reasoning_content_chars": completion["reasoning_content_chars"],
+                    "finish_reason": completion["finish_reason"],
+                    "usage": completion["usage"],
+                    "timings": completion["timings"],
                     "checks": score["checks"],
                     "verdict": score["verdict"],
                 }
@@ -560,6 +604,15 @@ def event_to_result(event: dict[str, Any]) -> dict[str, Any]:
         "status": event["status"],
         "verdict": event["verdict"],
     }
+    for key in (
+        "finish_reason",
+        "reasoning_content_present",
+        "reasoning_content_chars",
+        "usage",
+        "timings",
+    ):
+        if key in event:
+            result[key] = event[key]
     if "checks" in event:
         result["checks"] = event["checks"]
     if "error" in event:

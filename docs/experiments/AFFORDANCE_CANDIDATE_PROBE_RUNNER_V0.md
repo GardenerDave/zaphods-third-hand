@@ -79,6 +79,14 @@ Endpoint mode calls an OpenAI-compatible `/chat/completions` endpoint with a
 fixed supervised system prompt and conservative generation settings. It does
 not retry, stream, start endpoints, or manage endpoint lifecycle.
 
+Endpoint events record observability metadata when the server provides it:
+`finish_reason`, `usage`, `timings`, and whether Qwen-style
+`message.reasoning_content` was present. The runner records
+`reasoning_content` presence and character count for review, but it does not
+score reasoning content as the final answer. Only `message.content` is scored.
+If `message.content` is empty, the prompt remains `needs_review` even when
+reasoning content exists.
+
 Endpoint prompts require a compact structured response:
 
 ```text

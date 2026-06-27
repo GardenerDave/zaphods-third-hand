@@ -5,6 +5,8 @@ from pathlib import Path
 
 from local_harness.affordance_candidate_probe_runner import (
     build_prompt_packet,
+    endpoint_events,
+    extract_chat_completion_payload,
     run_probe,
     score_response,
 )
@@ -47,6 +49,109 @@ def read_jsonl(path: Path) -> list[dict]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line]
 
 
+def test_extract_chat_completion_payload_preserves_endpoint_metadata():
+    payload = {
+        "choices": [
+            {
+                "message": {
+                    "content": "ACTIVE_HOST: navigator\nANSWER: use the host profile.",
+                    "reasoning_content": "hidden-ish reasoning trace",
+                },
+                "finish_reason": "stop",
+            }
+        ],
+        "usage": {"prompt_tokens": 10, "completion_tokens": 5},
+        "timings": {"total_ms": 123},
+    }
+
+    extracted = extract_chat_completion_payload(payload)
+
+    assert extracted["response_text"] == "ACTIVE_HOST: navigator\nANSWER: use the host profile."
+    assert extracted["reasoning_content"] == "hidden-ish reasoning trace"
+    assert extracted["reasoning_content_present"] is True
+    assert extracted["reasoning_content_chars"] == len("hidden-ish reasoning trace")
+    assert extracted["finish_reason"] == "stop"
+    assert extracted["usage"] == {"prompt_tokens": 10, "completion_tokens": 5}
+    assert extracted["timings"] == {"total_ms": 123}
+
+
+def test_empty_content_with_reasoning_content_still_needs_review(tmp_path):
+    candidate_path = write_candidate(tmp_path)
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+    extracted = extract_chat_completion_payload(
+        {
+            "choices": [
+                {
+                    "message": {
+                        "content": "",
+                        "reasoning_content": "I reasoned about no_cuda but did not answer.",
+                    },
+                    "finish_reason": "stop",
+                }
+            ]
+        }
+    )
+
+    result = score_response(
+        candidate,
+        "probe",
+        extracted["response_text"],
+        candidate["probe_prompts"][0],
+    )
+
+    assert extracted["reasoning_content_present"] is True
+    assert extracted["reasoning_content_chars"] > 0
+    assert result["verdict"] == "needs_review"
+    assert result["checks"]["empty_response"] is True
+
+
+def test_endpoint_events_record_reasoning_finish_usage_and_timings(tmp_path, monkeypatch):
+    candidate_path = write_candidate(tmp_path)
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+    packet = build_prompt_packet(candidate)
+
+    def fake_call_chat_completion(**_kwargs):
+        return {
+            "response_text": (
+                "ACTIVE_HOST: navigator_desktop_example\n"
+                "HOST_CONSTRAINT: no_cuda\n"
+                "KNOWN_BAD_PATH: insufficient evidence\n"
+                "KNOWN_GOOD_OR_SAFE_PATH: insufficient evidence\n"
+                "BOUNDARY: no LARQL patch, LoRA training, or promotion applied\n"
+                "ANSWER: The host profile says no_cuda applies here."
+            ),
+            "reasoning_content": "internal trace",
+            "reasoning_content_present": True,
+            "reasoning_content_chars": len("internal trace"),
+            "finish_reason": "stop",
+            "usage": {"prompt_tokens": 1},
+            "timings": {"total_ms": 2},
+        }
+
+    monkeypatch.setattr(
+        "local_harness.affordance_candidate_probe_runner.call_chat_completion",
+        fake_call_chat_completion,
+    )
+
+    events = endpoint_events(
+        candidate=candidate,
+        packet={"prompts": [packet["prompts"][0]]},
+        endpoint_url="http://127.0.0.1:1234/v1",
+        model_id="example-model",
+        timeout_seconds=1,
+    )
+
+    assert len(events) == 1
+    event = events[0]
+    assert event["status"] == "completed"
+    assert event["reasoning_content"] == "internal trace"
+    assert event["reasoning_content_present"] is True
+    assert event["reasoning_content_chars"] == len("internal trace")
+    assert event["finish_reason"] == "stop"
+    assert event["usage"] == {"prompt_tokens": 1}
+    assert event["timings"] == {"total_ms": 2}
+
+
 def test_help_works():
     result = run_runner("--help")
 
@@ -81,6 +186,11 @@ def test_dry_run_writes_pending_model_call_events(tmp_path):
     assert {event["event_type"] for event in events} == {"pending_model_call"}
     assert events[0]["prompt_id"] == "probe_001"
     assert events[-1]["prompt_id"].startswith("regression_")
+    assert "reasoning_content_present" not in events[0]
+    assert "finish_reason" not in events[0]
+    assert "usage" not in events[0]
+    assert "timings" not in events[0]
+
 
 
 def test_dry_run_report_has_hold_pending_values(tmp_path):
