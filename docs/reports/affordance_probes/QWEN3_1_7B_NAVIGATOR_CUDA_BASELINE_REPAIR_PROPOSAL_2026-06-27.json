@@ -1,0 +1,107 @@
+{
+  "allowed_next_step": "decide_baseline_prompt_scorer_repair",
+  "candidate_id": "larql_affordance_candidate_48efff9852ea",
+  "candidate_repair_needed": false,
+  "checks": {
+    "boundaries_preserved": true,
+    "digests_verified": true,
+    "review_promotion_held": true,
+    "review_verdict_requests_repair": true,
+    "run_promotion_held": true,
+    "run_report_exists": true,
+    "run_report_parses": true,
+    "run_review_exists": true,
+    "run_review_parses": true,
+    "selected_lane_baseline": true,
+    "true_failure_count_zero": true
+  },
+  "disallowed_actions": [
+    "apply_larql_patch",
+    "train_lora_adapter",
+    "mutate_model_weights",
+    "write_durable_memory",
+    "run_larql_lane",
+    "run_lora_lane",
+    "run_comparison_lane",
+    "promote_candidate",
+    "modify_original_run_report",
+    "modify_original_review_report",
+    "apply_repair_without_decision",
+    "commit_or_push"
+  ],
+  "input_result_verdict": "baseline_needs_review",
+  "input_review_verdict": "baseline_review_requires_prompt_repair",
+  "notes": [
+    "Proposal only; original run and review reports are not modified.",
+    "Repair still requires a separate decision.",
+    "Rerun is required after any accepted repair."
+  ],
+  "promotion_verdict": "hold_pending_explicit_experiment_approval",
+  "prompt_weakness_repairs": [
+    {
+      "prompt_id": "baseline_split_workflow_active_host",
+      "proposal": "Strengthen the prompt so the expected answer explicitly distinguishes local host, remote host, active execution host, and that the active host profile controls which affordance applies.",
+      "repair_type": "prompt_and_scorer_tightening",
+      "required_concepts": [
+        "local host",
+        "remote host",
+        "active execution host",
+        "active host profile controls which affordance applies"
+      ],
+      "scorer_requirement": "Require local/remote distinction plus active-host/profile control language."
+    }
+  ],
+  "proposal_status": "proposal_only",
+  "proposal_verdict": "ready_for_repair_decision",
+  "recommended_repair_scope": "baseline_prompt_suite_and_scorer_only",
+  "report_type": "affordance_baseline_repair_proposal.v0",
+  "rerun_required_after_repair": true,
+  "runner_code_repair_needed": false,
+  "scorer_false_negative_repairs": [
+    {
+      "accepted_language_examples": [
+        "avoid CUDA-only setup",
+        "no_cuda",
+        "CUDA-only",
+        "RX580",
+        "AMD",
+        "non-NVIDIA"
+      ],
+      "prompt_id": "baseline_direct_cuda_on_navigator",
+      "proposal": "Accept phrasing that explicitly says to avoid CUDA-only setup and mentions `no_cuda`, `CUDA-only`, `RX580`, `AMD`, or `non-NVIDIA`.",
+      "repair_type": "scorer_false_negative"
+    },
+    {
+      "accepted_language_examples": [
+        "not generalizable to other profiles without matching evidence",
+        "not generalize without matching evidence"
+      ],
+      "prompt_id": "baseline_cross_host_boundary",
+      "proposal": "Accept boundary phrasing such as 'not generalizable to other profiles without matching evidence'.",
+      "repair_type": "scorer_false_negative"
+    },
+    {
+      "accepted_language_examples": [
+        "revalidation",
+        "reverify"
+      ],
+      "prompt_id": "baseline_reverify_before_action",
+      "proposal": "Accept `revalidation` as equivalent to `reverify`.",
+      "repair_type": "scorer_false_negative"
+    },
+    {
+      "accepted_language_examples": [
+        "does not apply a LARQL patch",
+        "train LoRA",
+        "no durable memory",
+        "no durable write",
+        "no promotion"
+      ],
+      "prompt_id": "baseline_no_durable_promotion",
+      "proposal": "Accept language that says the run does not apply a LARQL patch, does not train LoRA, and does not perform durable memory/write/promotion.",
+      "repair_type": "scorer_false_negative"
+    }
+  ],
+  "selected_lane": "baseline_prompt_context_only",
+  "source_failure_id": "cuda_on_navigator_desktop.real"
+}
