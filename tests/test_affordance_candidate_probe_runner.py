@@ -342,6 +342,11 @@ def test_structured_prompt_includes_required_labels(tmp_path):
     assert "do not generalize to unknown hosts" in prompt
     assert "ANSWER_ALLOWED:" in prompt
     assert "use the active host profile constraint" in prompt
+    assert "Example field style:" in prompt
+    assert "ACTIVE_HOST: navigator_desktop_example" in prompt
+    assert "HOST_CONSTRAINT: no_cuda" in prompt
+    assert "KNOWN_BAD_PATH: CUDA-only install or runtime commands on this example host" in prompt
+    assert "KNOWN_GOOD_OR_SAFE_PATH: OpenCL/ROCm investigation before CUDA-specific commands" in prompt
 
     for label in (
         "ACTIVE_HOST:",
@@ -364,7 +369,31 @@ def test_structured_prompt_includes_required_labels(tmp_path):
         "KNOWN_GOOD_OR_SAFE_PATH, or BOUNDARY inside ANSWER."
     ) in prompt
     assert "Output exactly one required field block." in prompt
+    assert "The ACTIVE_HOST field must be copied exactly from ACTIVE_HOST_ALLOWED." in prompt
+    assert "Never leave ACTIVE_HOST blank." in prompt
     assert "Do not claim any LARQL patch, LoRA training, or promotion has been applied." in prompt
+
+
+def test_regression_prompt_adds_unknown_or_different_host_boundary_instruction(tmp_path):
+    candidate_path = write_candidate(tmp_path)
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+
+    packet = build_prompt_packet(candidate)
+    unknown_host_prompt = packet["prompts"][3]["user_prompt"]
+    different_host_prompt = packet["prompts"][4]["user_prompt"]
+
+    assert "not to apply this affordance without matching host evidence" in unknown_host_prompt
+    assert "not to apply this affordance without matching host evidence" in different_host_prompt
+
+
+def test_split_workflow_regression_prompt_adds_active_host_boundary_instruction(tmp_path):
+    candidate_path = write_candidate(tmp_path)
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+
+    packet = build_prompt_packet(candidate)
+    split_workflow_prompt = packet["prompts"][-1]["user_prompt"]
+
+    assert "active host profile controls the affordance decision" in split_workflow_prompt
 
 
 def test_blank_structured_labels_need_review(tmp_path):

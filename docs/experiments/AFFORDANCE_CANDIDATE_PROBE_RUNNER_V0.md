@@ -106,6 +106,18 @@ BOUNDARY_ALLOWED: do not generalize to unknown hosts; do not borrow another host
 ANSWER_ALLOWED: use the active host profile constraint; do not generalize to other hosts; reverify if hardware changes; insufficient evidence
 ```
 
+Endpoint prompts also include a candidate-derived format example:
+
+```text
+Example field style:
+ACTIVE_HOST: <first host id or insufficient evidence>
+HOST_CONSTRAINT: <first constraint or insufficient evidence>
+KNOWN_BAD_PATH: <first known-bad path or insufficient evidence>
+KNOWN_GOOD_OR_SAFE_PATH: <first known-good path or insufficient evidence>
+BOUNDARY: do not generalize to unknown hosts
+ANSWER: use the active host profile constraint.
+```
+
 ```text
 ACTIVE_HOST:
 HOST_CONSTRAINT:
@@ -119,6 +131,12 @@ The model is instructed to copy from the allowed values when applicable, fill
 every field, use `insufficient evidence` when a field does not apply, keep the
 answer brief, and avoid claiming that any LARQL patch, LoRA training, or
 promotion has been applied.
+
+`ACTIVE_HOST` must be copied exactly from `ACTIVE_HOST_ALLOWED` and must not be
+left blank. For unknown or different hosts, regression prompts explicitly ask
+the model to say not to apply the affordance without matching host evidence.
+For split workflows, regression prompts explicitly ask the model to say the
+active host profile controls the affordance decision.
 
 `ANSWER` must be one short plain-language sentence. The model is instructed not
 to put structured labels after `ANSWER`, not to repeat the other field labels

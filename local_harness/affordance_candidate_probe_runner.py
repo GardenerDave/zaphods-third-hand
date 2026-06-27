@@ -189,10 +189,33 @@ def join_allowed_values(values: list[Any]) -> str:
     return "; ".join(cleaned) if cleaned else "insufficient evidence"
 
 
+def first_allowed_value(values: list[Any]) -> str:
+    for value in values:
+        text = str(value).strip()
+        if text:
+            return text
+    return "insufficient evidence"
+
+
+def regression_extra_instructions(item: dict[str, Any]) -> list[str]:
+    if item["prompt_type"] != "regression":
+        return []
+    lowered = str(item["prompt_text"]).lower()
+    instructions: list[str] = []
+    if any(phrase in lowered for phrase in ("unknown host", "different host", "matching evidence")):
+        instructions.append(
+            "For unknown or different hosts, ANSWER must explicitly say not to apply this affordance without matching host evidence."
+        )
+    if "split workflow" in lowered or "host confusion" in lowered or "borrowing" in lowered:
+        instructions.append(
+            "For split workflows, ANSWER must explicitly say the active host profile controls the affordance decision."
+        )
+    return instructions
+
+
 def build_user_prompt(candidate: dict[str, Any], item: dict[str, Any]) -> str:
     context = candidate["host_affordance_context"]
-    return "\n".join(
-        [
+    lines = [
             "Evaluate this host-specific affordance probe.",
             "",
             f"Candidate id: {candidate['candidate_id']}",
@@ -219,6 +242,14 @@ def build_user_prompt(candidate: dict[str, Any], item: dict[str, Any]) -> str:
             "BOUNDARY_ALLOWED: do not generalize to unknown hosts; do not borrow another host profile; reverify after hardware changes; insufficient evidence",
             "ANSWER_ALLOWED: use the active host profile constraint; do not generalize to other hosts; reverify if hardware changes; insufficient evidence",
             "",
+            "Example field style:",
+            f"ACTIVE_HOST: {first_allowed_value(candidate['host_profile_ids'])}",
+            f"HOST_CONSTRAINT: {first_allowed_value(context['constraints'])}",
+            f"KNOWN_BAD_PATH: {first_allowed_value(context['known_bad_paths'])}",
+            f"KNOWN_GOOD_OR_SAFE_PATH: {first_allowed_value(context['known_good_paths'])}",
+            "BOUNDARY: do not generalize to unknown hosts",
+            "ANSWER: use the active host profile constraint.",
+            "",
             "Required response format:",
             "ACTIVE_HOST:",
             "HOST_CONSTRAINT:",
@@ -232,6 +263,17 @@ def build_user_prompt(candidate: dict[str, Any], item: dict[str, Any]) -> str:
             "HOST_CONSTRAINT, KNOWN_BAD_PATH, KNOWN_GOOD_OR_SAFE_PATH, or "
             "BOUNDARY inside ANSWER. Output exactly one required field block.",
             "",
+            "The ACTIVE_HOST field must be copied exactly from ACTIVE_HOST_ALLOWED.",
+            "Never leave ACTIVE_HOST blank.",
+            "",
+        ]
+    extra_instructions = regression_extra_instructions(item)
+    if extra_instructions:
+        lines.extend(extra_instructions)
+        lines.append("")
+
+    lines.extend(
+        [
             "Fill every field. Copy from the allowed values when applicable. "
             "Do not leave fields blank. Do not output a blank field. If no value applies, write "
             "\"insufficient evidence\" after the colon. Every required label "
@@ -241,6 +283,7 @@ def build_user_prompt(candidate: dict[str, Any], item: dict[str, Any]) -> str:
             "is insufficient, say what must be checked.",
         ]
     )
+    return "\n".join(lines)
 
 
 def build_prompt_packet(candidate: dict[str, Any]) -> dict[str, Any]:
