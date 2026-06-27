@@ -1,4 +1,5 @@
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -55,6 +56,15 @@ def test_script_runs_on_example_inputs_and_writes_valid_json(tmp_path):
     assert candidate["promotion_status"] == "needs_probe"
 
 
+def test_candidate_includes_source_digests(tmp_path):
+    candidate = run_example(tmp_path, NAVIGATOR_PROFILE, CUDA_NOTE)
+    digests = candidate["source_digests"]
+
+    assert re.fullmatch(r"[0-9a-f]{64}", digests["host_profile_sha256"])
+    assert re.fullmatch(r"[0-9a-f]{64}", digests["failure_note_sha256"])
+    assert digests["classifier_version"] == "larql_affordance_probe.v0"
+
+
 def test_cuda_gpu_mismatch_classifies_as_stacked_candidate(tmp_path):
     candidate = run_example(tmp_path, NAVIGATOR_PROFILE, CUDA_NOTE)
 
@@ -74,6 +84,34 @@ def test_unknown_host_classifies_as_review_only(tmp_path):
 
     assert candidate["repair_lane"] == "review_only"
     assert "Insufficient" in candidate["failure_summary"]
+
+
+def test_host_profile_digest_and_candidate_id_change_when_profile_content_changes(tmp_path):
+    original = run_example(tmp_path / "original", NAVIGATOR_PROFILE, CUDA_NOTE)
+
+    modified_profile = tmp_path / "modified_profile.json"
+    profile = json.loads(NAVIGATOR_PROFILE.read_text(encoding="utf-8"))
+    profile["constraints"] = [*profile["constraints"], "new_example_constraint"]
+    profile["known_good_paths"] = [
+        *profile["known_good_paths"],
+        "new example known-good path",
+    ]
+    modified_profile.write_text(
+        json.dumps(profile, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    modified = run_example(tmp_path / "modified", modified_profile, CUDA_NOTE)
+
+    assert modified["repair_lane"] == original["repair_lane"]
+    assert (
+        modified["source_digests"]["host_profile_sha256"]
+        != original["source_digests"]["host_profile_sha256"]
+    )
+    assert modified["source_digests"]["failure_note_sha256"] == (
+        original["source_digests"]["failure_note_sha256"]
+    )
+    assert modified["candidate_id"] != original["candidate_id"]
 
 
 def test_output_never_marks_anything_accepted(tmp_path):

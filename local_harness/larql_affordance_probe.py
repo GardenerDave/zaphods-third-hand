@@ -14,6 +14,8 @@ from pathlib import Path
 from typing import Any
 
 
+CLASSIFIER_VERSION = "larql_affordance_probe.v0"
+
 REQUIRED_HOST_PROFILE_KEYS = {
     "host_id",
     "display_name",
@@ -48,6 +50,10 @@ def read_json(path: str | Path) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise ValueError(f"{p}: expected a JSON object")
     return payload
+
+
+def sha256_file(path: str | Path) -> str:
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
 def validate_host_profile(profile: dict[str, Any], *, path: str | Path) -> None:
@@ -238,6 +244,11 @@ def build_candidate(
     failure_note_path: Path,
     failure_note_text: str,
 ) -> dict[str, Any]:
+    source_digests = {
+        "host_profile_sha256": sha256_file(host_profile_path),
+        "failure_note_sha256": sha256_file(failure_note_path),
+        "classifier_version": CLASSIFIER_VERSION,
+    }
     classification = classify_failure(host_profile, failure_note_text)
     affordance_context = host_affordance_context(host_profile)
     probe_prompts, regression_prompts = prompt_set(
@@ -251,7 +262,8 @@ def build_candidate(
         "candidate_id": stable_id(
             host_profile["host_id"],
             failure_note_path.as_posix(),
-            failure_note_text,
+            source_digests["host_profile_sha256"],
+            source_digests["failure_note_sha256"],
             lane,
         ),
         "source_failure_id": failure_note_path.stem,
@@ -260,6 +272,7 @@ def build_candidate(
             "host_profile": host_profile_path.as_posix(),
             "failure_note": failure_note_path.as_posix(),
         },
+        "source_digests": source_digests,
         "host_affordance_context": affordance_context,
         "failure_summary": classification["failure_summary"],
         "repair_lane": lane,
