@@ -116,6 +116,13 @@ gates.
 - [`reports/failure_training/`](reports/failure_training/) — local-first smoke
   summaries and measured adapter behavior reports.
 
+## Experiments
+
+- [`experiments/LARQL_AFFORDANCE_PATCH_PROBE_V0.md`](experiments/LARQL_AFFORDANCE_PATCH_PROBE_V0.md)
+  — experimental, model-free scaffold for classifying machine-specific failures
+  into host-profile, LARQL patch, LoRA training, stacked, or review-only repair
+  candidates. No model editing or training is performed.
+
 ## Management-Team Workflows
 
 The packet, lifecycle, routing, and evidence-note formats are model-free.

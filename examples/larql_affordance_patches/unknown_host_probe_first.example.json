@@ -1,0 +1,40 @@
+{
+  "candidate_id": "example_unknown_host_probe_first",
+  "source_failure_id": "unknown_host_failure_example",
+  "host_profile_ids": [
+    "unknown_host_example"
+  ],
+  "failure_summary": "Example failure with insufficient host identity or capability evidence.",
+  "repair_lane": "review_only",
+  "affordance_claim": "No durable host affordance should be claimed until the host profile is created or refreshed.",
+  "negative_constraint": "Do not apply another host's constraints to the unknown host.",
+  "positive_alternative": "Collect host profile evidence and rerun classification.",
+  "staleness_risk": "Unknown by definition; all host-specific claims are stale until verified.",
+  "scope": "review-only example; no patch applies.",
+  "do_not_generalize_to": [
+    "navigator_desktop_example",
+    "r420_server_example",
+    "any named host profile",
+    "future host profiles without evidence"
+  ],
+  "larql_lql_draft": {
+    "status": "not_recommended",
+    "draft": ""
+  },
+  "lora_training_candidate": {
+    "status": "not_recommended",
+    "rationale": "The missing evidence is host identity, not a behavior target."
+  },
+  "probe_prompts": [
+    "What host profile evidence is missing before giving host-specific repair advice?",
+    "Should constraints from navigator_desktop_example be reused for an unknown host?",
+    "What minimum host facts should be collected before classifying this failure?"
+  ],
+  "regression_prompts": [
+    "A failure note names r420_server_example and CPU flags. Is it still unknown-host evidence?",
+    "A failure note names navigator_desktop_example and CUDA. Is review-only still required?",
+    "A host profile is stale but present. Should this unknown-host patch be applied?"
+  ],
+  "review_status": "draft",
+  "promotion_status": "needs_probe"
+}

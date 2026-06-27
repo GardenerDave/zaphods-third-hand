@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ZTH LARQL Affordance Patch Candidate",
+  "type": "object",
+  "required": [
+    "candidate_id",
+    "source_failure_id",
+    "host_profile_ids",
+    "failure_summary",
+    "repair_lane",
+    "affordance_claim",
+    "negative_constraint",
+    "positive_alternative",
+    "staleness_risk",
+    "scope",
+    "do_not_generalize_to",
+    "larql_lql_draft",
+    "lora_training_candidate",
+    "probe_prompts",
+    "regression_prompts",
+    "review_status",
+    "promotion_status"
+  ],
+  "properties": {
+    "candidate_id": { "type": "string" },
+    "source_failure_id": { "type": "string" },
+    "host_profile_ids": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "failure_summary": { "type": "string" },
+    "repair_lane": {
+      "type": "string",
+      "enum": [
+        "host_profile_only",
+        "larql_candidate",
+        "lora_candidate",
+        "larql_plus_lora_candidate",
+        "review_only"
+      ]
+    },
+    "affordance_claim": { "type": "string" },
+    "negative_constraint": { "type": "string" },
+    "positive_alternative": { "type": "string" },
+    "staleness_risk": { "type": "string" },
+    "scope": { "type": "string" },
+    "do_not_generalize_to": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "larql_lql_draft": { "type": "object" },
+    "lora_training_candidate": { "type": "object" },
+    "probe_prompts": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "regression_prompts": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "review_status": { "type": "string" },
+    "promotion_status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "rejected",
+        "needs_probe",
+        "probe_passed",
+        "probe_failed",
+        "accepted_for_training_candidate",
+        "accepted_for_larql_patch_candidate"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,40 @@
+{
+  "candidate_id": "example_navigator_cuda_affordance",
+  "source_failure_id": "cuda_on_rx580_failure_example",
+  "host_profile_ids": [
+    "navigator_desktop_example"
+  ],
+  "failure_summary": "Example failure where CUDA-specific guidance was suggested for a host profile that says CUDA is unavailable.",
+  "repair_lane": "larql_plus_lora_candidate",
+  "affordance_claim": "For this host profile, GPU-specific setup should not assume CUDA/NVIDIA availability.",
+  "negative_constraint": "Do not recommend CUDA-only commands as the first path for this host profile.",
+  "positive_alternative": "Inspect the host profile and prefer CPU fallback or an OpenCL/ROCm investigation path.",
+  "staleness_risk": "GPU or driver changes can invalidate this affordance.",
+  "scope": "navigator_desktop_example only; example-only evidence.",
+  "do_not_generalize_to": [
+    "NVIDIA CUDA hosts",
+    "other desktop machines",
+    "unknown hosts",
+    "servers with a different GPU profile"
+  ],
+  "larql_lql_draft": {
+    "status": "draft_not_applied",
+    "draft": "HOST navigator_desktop_example: avoid CUDA-first repair paths unless host profile is reverified."
+  },
+  "lora_training_candidate": {
+    "status": "draft_candidate",
+    "rationale": "Teach behavior to ask which host profile applies before emitting GPU-specific commands."
+  },
+  "probe_prompts": [
+    "A task failed on navigator_desktop_example after CUDA setup commands. What should be inspected before retrying?",
+    "Which host profile fact controls whether CUDA commands are appropriate on navigator_desktop_example?",
+    "Suggest a safe first repair path for GPU-related setup on navigator_desktop_example."
+  ],
+  "regression_prompts": [
+    "A separate host has an NVIDIA CUDA GPU. Should navigator_desktop_example constraints be applied there?",
+    "An unknown host reports GPU setup failure. Should this patch be assumed valid?",
+    "The navigator_desktop_example GPU was replaced. What evidence must be refreshed before using the patch?"
+  ],
+  "review_status": "draft",
+  "promotion_status": "needs_probe"
+}

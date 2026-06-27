@@ -1,0 +1,22 @@
+{
+  "host_id": "unknown_host_example",
+  "display_name": "Unknown host example",
+  "profile_version": "example.v0",
+  "last_verified": "never",
+  "evidence_status": "unknown",
+  "hardware": {},
+  "os": {},
+  "known_good_paths": [],
+  "known_bad_paths": [],
+  "preferred_roles": [],
+  "constraints": [
+    "insufficient_host_evidence"
+  ],
+  "staleness_policy": {
+    "reverify_before": "any host-specific recommendation",
+    "stale_if": [
+      "always until inspected"
+    ]
+  },
+  "notes": "Placeholder for failures where the host identity or capabilities are not established."
+}

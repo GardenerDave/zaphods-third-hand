@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ZTH Host Profile Example Schema",
+  "type": "object",
+  "required": [
+    "host_id",
+    "display_name",
+    "profile_version",
+    "last_verified",
+    "evidence_status",
+    "hardware",
+    "os",
+    "known_good_paths",
+    "known_bad_paths",
+    "preferred_roles",
+    "constraints",
+    "staleness_policy",
+    "notes"
+  ],
+  "properties": {
+    "host_id": { "type": "string", "minLength": 1 },
+    "display_name": { "type": "string" },
+    "profile_version": { "type": "string" },
+    "last_verified": { "type": "string" },
+    "evidence_status": {
+      "type": "string",
+      "enum": ["example_only", "operator_verified", "stale", "unknown"]
+    },
+    "hardware": { "type": "object" },
+    "os": { "type": "object" },
+    "known_good_paths": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "known_bad_paths": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "preferred_roles": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "constraints": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "staleness_policy": { "type": "object" },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": true
+}
