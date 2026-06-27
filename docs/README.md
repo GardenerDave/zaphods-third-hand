@@ -128,6 +128,9 @@ gates.
 - [`experiments/AFFORDANCE_CANDIDATE_PROBE_RUNNER_V0.md`](experiments/AFFORDANCE_CANDIDATE_PROBE_RUNNER_V0.md)
   — experimental runner that packages one affordance candidate’s probe prompts
   and defaults to dry-run artifacts before any explicit endpoint-backed probe.
+- [`experiments/AFFORDANCE_EXPERIMENT_ELIGIBILITY_V0.md`](experiments/AFFORDANCE_EXPERIMENT_ELIGIBILITY_V0.md)
+  — model-free eligibility/reporting gate for deciding whether a probe-passing
+  affordance candidate has enough evidence for a future experiment proposal.
 
 ## Management-Team Workflows
 

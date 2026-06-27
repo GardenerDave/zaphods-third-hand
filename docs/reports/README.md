@@ -73,6 +73,9 @@ does not establish production readiness.
   audition smoke evidence, including honest blockers and retry conditions.
   The current reports include a partial fixture-backed run, a tooling-blocker
   report, and the completed live ZTH smoke-probe chain.
+- `affordance_probes/` — supervised affordance candidate probe reports,
+  repeatability evidence, and held-promotion summaries for experimental
+  host-affordance work.
 
 ## Safety Reminder
 
