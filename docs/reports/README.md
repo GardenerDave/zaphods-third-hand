@@ -75,7 +75,7 @@ does not establish production readiness.
   report, and the completed live ZTH smoke-probe chain.
 - `affordance_probes/` — supervised affordance candidate probe reports,
   repeatability evidence, held-promotion summaries, and eligibility, proposal,
-  and decision evidence for experimental host-affordance work.
+  decision, and plan evidence for experimental host-affordance work.
 
 ## Safety Reminder
 

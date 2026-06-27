@@ -137,6 +137,9 @@ gates.
 - [`experiments/AFFORDANCE_EXPERIMENT_DECISION_V0.md`](experiments/AFFORDANCE_EXPERIMENT_DECISION_V0.md)
   — model-free decision record for approving plan drafting, holding revision,
   or rejecting an affordance experiment proposal without executing it.
+- [`experiments/AFFORDANCE_EXPERIMENT_PLAN_V0.md`](experiments/AFFORDANCE_EXPERIMENT_PLAN_V0.md)
+  — model-free bounded plan scaffold for preparing execution-approval review
+  material without running LARQL, LoRA, or comparison lanes.
 
 ## Management-Team Workflows
 
