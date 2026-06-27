@@ -140,6 +140,9 @@ gates.
 - [`experiments/AFFORDANCE_EXPERIMENT_PLAN_V0.md`](experiments/AFFORDANCE_EXPERIMENT_PLAN_V0.md)
   — model-free bounded plan scaffold for preparing execution-approval review
   material without running LARQL, LoRA, or comparison lanes.
+- [`experiments/AFFORDANCE_EXPERIMENT_EXECUTION_APPROVAL_V0.md`](experiments/AFFORDANCE_EXPERIMENT_EXECUTION_APPROVAL_V0.md)
+  — model-free approval record for one bounded affordance experiment lane;
+  v0 can approve only the baseline prompt-context control lane.
 
 ## Management-Team Workflows
 
