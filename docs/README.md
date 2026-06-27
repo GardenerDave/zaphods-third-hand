@@ -143,6 +143,9 @@ gates.
 - [`experiments/AFFORDANCE_EXPERIMENT_EXECUTION_APPROVAL_V0.md`](experiments/AFFORDANCE_EXPERIMENT_EXECUTION_APPROVAL_V0.md)
   — model-free approval record for one bounded affordance experiment lane;
   v0 can approve only the baseline prompt-context control lane.
+- [`experiments/AFFORDANCE_BASELINE_EXECUTION_PACKET_V0.md`](experiments/AFFORDANCE_BASELINE_EXECUTION_PACKET_V0.md)
+  — model-free packet scaffold for a later baseline prompt-context runner;
+  it embeds a fixed prompt suite but does not call a model.
 
 ## Management-Team Workflows
 
