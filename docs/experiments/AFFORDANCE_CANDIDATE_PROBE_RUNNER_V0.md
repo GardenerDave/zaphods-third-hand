@@ -142,7 +142,9 @@ conservative partial token-cluster match, so a shorter phrase such as
 path, while generic words such as `workflow` or `endpoint` alone are not enough.
 If a response attempts the structured format but leaves any required field
 blank, the result stays `needs_review`. Structured labels are not required for
-a pass in v0; blank labels are simply treated as failed slot filling.
+a pass in v0; blank labels are simply treated as failed slot filling. A field
+may be filled on the same line as the label or on the next non-empty line, as
+long as the next non-empty line is not another structured label.
 
 This is useful screening evidence. It is not semantic proof that a model
 understood the candidate or that the candidate is safe to apply.

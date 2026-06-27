@@ -298,17 +298,41 @@ def response_quality(response_text: str) -> dict[str, bool]:
     }
 
 
+def structured_label_value(line: str) -> tuple[str, str] | None:
+    stripped = line.strip()
+    for label in STRUCTURED_RESPONSE_LABELS:
+        prefix = f"{label}:"
+        if stripped.startswith(prefix):
+            return label, stripped[len(prefix):].strip()
+    return None
+
+
 def has_blank_structured_fields(response_text: str) -> bool:
+    lines = response_text.splitlines()
     found_label = False
-    for line in response_text.splitlines():
-        stripped = line.strip()
-        for label in STRUCTURED_RESPONSE_LABELS:
-            prefix = f"{label}:"
-            if stripped.startswith(prefix):
-                found_label = True
-                if not stripped[len(prefix):].strip():
-                    return True
+    for index, line in enumerate(lines):
+        parsed = structured_label_value(line)
+        if parsed is None:
+            continue
+        found_label = True
+        _label, same_line_value = parsed
+        if same_line_value:
+            continue
+
+        next_value = ""
+        for next_line in lines[index + 1:]:
+            stripped_next = next_line.strip()
+            if not stripped_next:
+                continue
+            if structured_label_value(stripped_next) is not None:
+                return True
+            next_value = stripped_next
+            break
+        if not next_value:
+            return True
+
     return False if found_label else False
+
 
 
 def known_bad_path_avoided(response_text: str, known_bad_path: str) -> bool:

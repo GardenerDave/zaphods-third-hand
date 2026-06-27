@@ -8,6 +8,7 @@ from local_harness.affordance_candidate_probe_runner import (
     build_prompt_packet,
     endpoint_events,
     extract_chat_completion_payload,
+    has_blank_structured_fields,
     run_probe,
     score_response,
 )
@@ -381,6 +382,59 @@ def test_blank_structured_labels_need_review(tmp_path):
     assert result["checks"]["blank_structured_fields"] is True
 
 
+def test_same_line_structured_fields_are_not_blank():
+    response = "\n".join(
+        [
+            "ACTIVE_HOST: navigator_desktop",
+            "HOST_CONSTRAINT: no_cuda",
+            "KNOWN_BAD_PATH: CUDA-only setup on RX580",
+            "KNOWN_GOOD_OR_SAFE_PATH: LM Studio OpenAI-compatible endpoint",
+            "BOUNDARY: reverify after hardware changes",
+            "ANSWER: use the host profile.",
+        ]
+    )
+
+    assert has_blank_structured_fields(response) is False
+
+
+def test_multiline_structured_fields_are_not_blank():
+    response = "\n\n".join(
+        [
+            "ACTIVE_HOST:\nnavigator_desktop",
+            "HOST_CONSTRAINT:\nno_cuda",
+            "KNOWN_BAD_PATH:\nCUDA-only setup on RX580",
+            "KNOWN_GOOD_OR_SAFE_PATH:\nLM Studio OpenAI-compatible endpoint",
+            "BOUNDARY:\nreverify after hardware changes",
+            "ANSWER:\nuse the host profile.",
+        ]
+    )
+
+    assert has_blank_structured_fields(response) is False
+
+
+def test_label_followed_by_another_label_is_blank():
+    response = "\n".join(
+        [
+            "ACTIVE_HOST:",
+            "HOST_CONSTRAINT: no_cuda",
+            "ANSWER: use the host profile.",
+        ]
+    )
+
+    assert has_blank_structured_fields(response) is True
+
+
+def test_label_at_end_of_response_is_blank():
+    response = "\n".join(
+        [
+            "ACTIVE_HOST: navigator_desktop",
+            "ANSWER:",
+        ]
+    )
+
+    assert has_blank_structured_fields(response) is True
+
+
 def test_filled_structured_labels_do_not_trigger_blank_field_check(tmp_path):
     candidate_path = write_candidate(tmp_path)
     candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
@@ -400,6 +454,39 @@ def test_filled_structured_labels_do_not_trigger_blank_field_check(tmp_path):
     )
 
     assert result["checks"]["blank_structured_fields"] is False
+    assert result["verdict"] == "pass"
+
+
+def test_v4_style_multiline_response_can_pass_when_other_checks_pass(tmp_path):
+    candidate_path = write_candidate(tmp_path)
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+    candidate["host_affordance_context"]["known_good_paths"] = [
+        "LM Studio OpenAI-compatible endpoint for small-model GPU-backed workflow",
+    ]
+
+    result = score_response(
+        candidate,
+        "probe",
+        (
+            "ACTIVE_HOST:\n"
+            "navigator_desktop\n\n"
+            "HOST_CONSTRAINT:\n"
+            "no_cuda\n\n"
+            "KNOWN_BAD_PATH:\n"
+            "CUDA-only setup on RX580\n\n"
+            "KNOWN_GOOD_OR_SAFE_PATH:\n"
+            "LM Studio OpenAI-compatible endpoint for small-model GPU-backed workflow\n\n"
+            "BOUNDARY:\n"
+            "reverify after hardware changes\n\n"
+            "ANSWER:\n"
+            "Use the host profile path for the active host only."
+        ),
+        "What known-good or safer alternative should be tried for navigator_desktop_example?",
+    )
+
+    assert result["checks"]["blank_structured_fields"] is False
+    assert result["checks"]["known_good_mentioned"] is True
+    assert result["checks"]["constraint_mentioned"] is True
     assert result["verdict"] == "pass"
 
 
