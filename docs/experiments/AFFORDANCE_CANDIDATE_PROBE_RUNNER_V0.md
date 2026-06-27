@@ -79,12 +79,42 @@ Endpoint mode calls an OpenAI-compatible `/chat/completions` endpoint with a
 fixed supervised system prompt and conservative generation settings. It does
 not retry, stream, start endpoints, or manage endpoint lifecycle.
 
+Endpoint prompts require a compact structured response:
+
+```text
+ACTIVE_HOST:
+HOST_CONSTRAINT:
+KNOWN_BAD_PATH:
+KNOWN_GOOD_OR_SAFE_PATH:
+BOUNDARY:
+ANSWER:
+```
+
+The model is instructed to fill every field, use `insufficient evidence` when a
+field does not apply, keep the answer brief, and avoid claiming that any LARQL
+patch, LoRA training, or promotion has been applied.
+
 ## Deterministic v0 scoring limits
 
 The v0 scorer uses simple text checks only. It checks whether responses mention
 candidate constraints or the host profile, avoid known-bad paths in probe
 responses, mention known-good paths or reinspection when appropriate, and avoid
 cross-host generalization in regression responses.
+
+The scorer is prompt-aware:
+
+- constraint prompts require the host constraint or host profile;
+- known-bad prompts require constraint evidence and avoidance of the known-bad
+  path as a recommendation;
+- known-good prompts require a known-good or safer path plus constraint or host
+  profile evidence;
+- regression prompts require cross-host caution language.
+
+Empty responses and obviously truncated responses stay `needs_review`. Known
+bad paths may be mentioned as something to avoid. Known-good matching allows a
+conservative partial token-cluster match, so a shorter phrase such as
+`Qwen3-1.7B local endpoint workflow` can match a longer recorded known-good
+path, while generic words such as `workflow` or `endpoint` alone are not enough.
 
 This is useful screening evidence. It is not semantic proof that a model
 understood the candidate or that the candidate is safe to apply.

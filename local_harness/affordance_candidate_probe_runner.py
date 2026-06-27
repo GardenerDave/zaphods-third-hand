@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -53,6 +54,13 @@ CROSS_HOST_REVIEW_PHRASES = (
     "host profile",
     "active host",
     "insufficient evidence",
+    "matching evidence",
+    "without matching evidence",
+    "do not apply",
+    "should not apply",
+    "must be reverified",
+    "reverified",
+    "active host profile",
 )
 KNOWN_BAD_AVOIDANCE_PHRASES = (
     "avoid",
@@ -74,6 +82,28 @@ KNOWN_BAD_RECOMMENDATION_PHRASES = (
     "recommend",
     "proceed with",
 )
+INCOMPLETE_TRAILING_WORDS = {
+    "the",
+    "a",
+    "an",
+    "and",
+    "or",
+    "because",
+    "with",
+    "to",
+    "of",
+}
+GENERIC_KNOWN_GOOD_TOKENS = {
+    "workflow",
+    "endpoint",
+    "local",
+    "path",
+    "safe",
+    "safer",
+    "known",
+    "good",
+    "model",
+}
 
 
 def read_candidate(path: str | Path) -> dict[str, Any]:
@@ -168,8 +198,19 @@ def build_user_prompt(candidate: dict[str, Any], item: dict[str, Any]) -> str:
             f"Prompt type: {item['prompt_type']}",
             f"Probe prompt: {item['prompt_text']}",
             "",
-            "Answer briefly. Cite the host-specific fact being used. If the "
-            "evidence is insufficient, say what must be checked.",
+            "Required response format:",
+            "ACTIVE_HOST:",
+            "HOST_CONSTRAINT:",
+            "KNOWN_BAD_PATH:",
+            "KNOWN_GOOD_OR_SAFE_PATH:",
+            "BOUNDARY:",
+            "ANSWER:",
+            "",
+            "Fill every field. Use \"insufficient evidence\" if a field does "
+            "not apply. Do not leave fields blank. Keep the answer brief. Do "
+            "not claim any LARQL patch, LoRA training, or promotion has been "
+            "applied. Cite the host-specific fact being used. If the evidence "
+            "is insufficient, say what must be checked.",
         ]
     )
 
@@ -218,6 +259,23 @@ def first_nonempty(values: list[Any]) -> str:
     return ""
 
 
+def word_count(text: str) -> int:
+    return len(re.findall(r"\b[\w.+-]+\b", text))
+
+
+def response_quality(response_text: str) -> dict[str, bool]:
+    stripped = response_text.strip()
+    words = re.findall(r"\b[\w.+-]+\b", stripped.lower())
+    return {
+        "empty_response": not stripped,
+        "truncated_response": bool(stripped)
+        and (
+            len(words) < 8
+            or (bool(words) and words[-1].strip(".,:;!?").lower() in INCOMPLETE_TRAILING_WORDS)
+        ),
+    }
+
+
 def known_bad_path_avoided(response_text: str, known_bad_path: str) -> bool:
     """Return false only when the response appears to recommend a known-bad path.
 
@@ -245,7 +303,52 @@ def known_bad_path_avoided(response_text: str, known_bad_path: str) -> bool:
     return True
 
 
-def score_response(candidate: dict[str, Any], prompt_type: str, response_text: str) -> dict[str, Any]:
+def known_good_tokens(text: str) -> list[str]:
+    return [
+        token
+        for token in re.findall(r"[a-z0-9][a-z0-9.+-]*", text.lower())
+        if len(token) >= 4
+    ]
+
+
+def known_good_mentioned(response_text: str, known_good_paths: list[Any]) -> bool:
+    lowered = response_text.lower()
+    for path in known_good_paths:
+        known_good = str(path).strip().lower()
+        if not known_good:
+            continue
+        if known_good in lowered:
+            return True
+
+        path_tokens = known_good_tokens(known_good)
+        if not path_tokens:
+            continue
+        matched_tokens = [token for token in path_tokens if token in lowered]
+        has_distinctive_token = any(
+            token not in GENERIC_KNOWN_GOOD_TOKENS for token in matched_tokens
+        )
+        if len(matched_tokens) >= 3 and has_distinctive_token:
+            return True
+    return False
+
+
+def inferred_probe_focus(prompt_text: str) -> str:
+    lowered = prompt_text.lower()
+    if "which host profile constraint" in lowered or "which" in lowered and "constraint applies" in lowered:
+        return "constraint"
+    if "known-bad" in lowered and "unsafe" in lowered:
+        return "known_bad"
+    if "known-good" in lowered or "safer alternative" in lowered:
+        return "known_good"
+    return "unknown"
+
+
+def score_response(
+    candidate: dict[str, Any],
+    prompt_type: str,
+    response_text: str,
+    prompt_text: str = "",
+) -> dict[str, Any]:
     """Return deterministic v0 check results for one visible response."""
 
     context = candidate["host_affordance_context"]
@@ -254,28 +357,49 @@ def score_response(candidate: dict[str, Any], prompt_type: str, response_text: s
     known_good = context["known_good_paths"]
     known_bad = context["known_bad_paths"]
     first_bad = first_nonempty(known_bad).lower()
+    quality = response_quality(response_text)
 
     checks: dict[str, bool] = {
+        **quality,
         "constraint_mentioned": contains_any(response_text, constraints) or "host profile" in lowered,
     }
+    required_checks: list[str] = ["constraint_mentioned"]
 
     if prompt_type == "probe":
         checks["known_bad_avoided"] = known_bad_path_avoided(response_text, first_bad)
         checks["known_good_mentioned"] = (
-            contains_any(response_text, known_good)
+            known_good_mentioned(response_text, known_good)
             or "inspect" in lowered and "host profile" in lowered
             or "reverify" in lowered and "host profile" in lowered
         )
+        focus = inferred_probe_focus(prompt_text)
+        if focus == "constraint":
+            required_checks = ["constraint_mentioned"]
+        elif focus == "known_bad":
+            required_checks = ["constraint_mentioned", "known_bad_avoided"]
+        elif focus == "known_good":
+            required_checks = ["known_good_mentioned", "constraint_mentioned"]
+        else:
+            required_checks = [
+                "constraint_mentioned",
+                "known_bad_avoided",
+                "known_good_mentioned",
+            ]
     elif prompt_type == "regression":
         checks["no_cross_host_generalization"] = any(
             phrase in lowered for phrase in CROSS_HOST_REVIEW_PHRASES
         )
+        required_checks = ["constraint_mentioned", "no_cross_host_generalization"]
     else:
         checks["known_prompt_type"] = False
+        required_checks = ["constraint_mentioned", "known_prompt_type"]
+
+    passes_quality = not checks["empty_response"] and not checks["truncated_response"]
+    passes_required = all(checks.get(key, False) for key in required_checks)
 
     return {
         "checks": checks,
-        "verdict": "pass" if all(checks.values()) else "needs_review",
+        "verdict": "pass" if passes_quality and passes_required else "needs_review",
     }
 
 
@@ -412,7 +536,12 @@ def endpoint_events(
                 }
             )
         else:
-            score = score_response(candidate, item["prompt_type"], response_text)
+            score = score_response(
+                candidate,
+                item["prompt_type"],
+                response_text,
+                item["prompt_text"],
+            )
             event.update(
                 {
                     "response_text": response_text,

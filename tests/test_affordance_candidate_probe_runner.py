@@ -3,7 +3,11 @@ import subprocess
 import sys
 from pathlib import Path
 
-from local_harness.affordance_candidate_probe_runner import run_probe, score_response
+from local_harness.affordance_candidate_probe_runner import (
+    build_prompt_packet,
+    run_probe,
+    score_response,
+)
 from local_harness.larql_affordance_probe import build_candidate, read_failure_note, read_json
 
 
@@ -128,6 +132,120 @@ def test_missing_required_candidate_field_fails_clearly(tmp_path):
     assert "host_affordance_context" in result.stdout
 
 
+def test_structured_prompt_includes_required_labels(tmp_path):
+    candidate_path = write_candidate(tmp_path)
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+
+    packet = build_prompt_packet(candidate)
+    prompt = packet["prompts"][0]["user_prompt"]
+
+    for label in (
+        "ACTIVE_HOST:",
+        "HOST_CONSTRAINT:",
+        "KNOWN_BAD_PATH:",
+        "KNOWN_GOOD_OR_SAFE_PATH:",
+        "BOUNDARY:",
+        "ANSWER:",
+    ):
+        assert label in prompt
+    assert "Fill every field." in prompt
+    assert "Do not leave fields blank." in prompt
+    assert "Do not claim any LARQL patch, LoRA training, or promotion has been applied." in prompt
+
+
+def test_empty_response_needs_review(tmp_path):
+    candidate_path = write_candidate(tmp_path)
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+
+    result = score_response(candidate, "probe", "", candidate["probe_prompts"][0])
+
+    assert result["verdict"] == "needs_review"
+    assert result["checks"]["empty_response"] is True
+
+
+def test_one_word_truncated_response_needs_review(tmp_path):
+    candidate_path = write_candidate(tmp_path)
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+
+    result = score_response(candidate, "regression", "The", candidate["regression_prompts"][0])
+
+    assert result["verdict"] == "needs_review"
+    assert result["checks"]["truncated_response"] is True
+
+
+def test_probe_constraint_prompt_can_pass_without_known_good(tmp_path):
+    candidate_path = write_candidate(tmp_path)
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+
+    result = score_response(
+        candidate,
+        "probe",
+        (
+            "ACTIVE_HOST: navigator_desktop_example\n"
+            "HOST_CONSTRAINT: no_cuda\n"
+            "KNOWN_BAD_PATH: insufficient evidence\n"
+            "KNOWN_GOOD_OR_SAFE_PATH: insufficient evidence\n"
+            "BOUNDARY: no LARQL patch, LoRA training, or promotion applied\n"
+            "ANSWER: The no_cuda host profile constraint applies to this host."
+        ),
+        candidate["probe_prompts"][0],
+    )
+
+    assert result["verdict"] == "pass"
+    assert result["checks"]["constraint_mentioned"] is True
+    assert result["checks"]["known_good_mentioned"] is False
+
+
+def test_probe_known_bad_prompt_can_pass_without_known_good(tmp_path):
+    candidate_path = write_candidate(tmp_path)
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+
+    result = score_response(
+        candidate,
+        "probe",
+        (
+            "ACTIVE_HOST: navigator_desktop_example\n"
+            "HOST_CONSTRAINT: no_cuda\n"
+            "KNOWN_BAD_PATH: avoid CUDA-only install or runtime commands on this example host\n"
+            "KNOWN_GOOD_OR_SAFE_PATH: insufficient evidence\n"
+            "BOUNDARY: no LARQL patch, LoRA training, or promotion applied\n"
+            "ANSWER: This is unsafe because the host profile records no_cuda."
+        ),
+        candidate["probe_prompts"][1],
+    )
+
+    assert result["verdict"] == "pass"
+    assert result["checks"]["constraint_mentioned"] is True
+    assert result["checks"]["known_bad_avoided"] is True
+    assert result["checks"]["known_good_mentioned"] is False
+
+
+def test_probe_known_good_prompt_allows_conservative_partial_match(tmp_path):
+    candidate_path = write_candidate(tmp_path)
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+    candidate["host_affordance_context"]["known_good_paths"] = [
+        "Qwen3-1.7B local endpoint workflow already proven for ZTH probes",
+    ]
+
+    result = score_response(
+        candidate,
+        "probe",
+        (
+            "ACTIVE_HOST: navigator_desktop_example\n"
+            "HOST_CONSTRAINT: host profile says no_cuda\n"
+            "KNOWN_BAD_PATH: insufficient evidence\n"
+            "KNOWN_GOOD_OR_SAFE_PATH: Qwen3-1.7B local endpoint workflow\n"
+            "BOUNDARY: no LARQL patch, LoRA training, or promotion applied\n"
+            "ANSWER: Use that host profile path only after review."
+        ),
+        "What known-good or safer alternative should be tried for navigator_desktop_example?",
+    )
+
+    assert result["verdict"] == "pass"
+    assert result["checks"]["known_good_mentioned"] is True
+    assert result["checks"]["constraint_mentioned"] is True
+
+
 def test_scoring_helpers_classify_probe_responses(tmp_path):
     candidate_path = write_candidate(tmp_path)
     candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
@@ -229,6 +347,28 @@ def test_scoring_helpers_classify_regression_responses(tmp_path):
     assert good["checks"]["no_cross_host_generalization"] is True
     assert bad["verdict"] == "needs_review"
     assert bad["checks"]["no_cross_host_generalization"] is False
+
+
+def test_regression_answer_with_matching_evidence_phrase_passes(tmp_path):
+    candidate_path = write_candidate(tmp_path)
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+
+    result = score_response(
+        candidate,
+        "regression",
+        (
+            "ACTIVE_HOST: navigator_desktop_example\n"
+            "HOST_CONSTRAINT: host profile says no_cuda\n"
+            "KNOWN_BAD_PATH: insufficient evidence\n"
+            "KNOWN_GOOD_OR_SAFE_PATH: insufficient evidence\n"
+            "BOUNDARY: no LARQL patch, LoRA training, or promotion applied\n"
+            "ANSWER: Do not apply to an unknown host without matching evidence."
+        ),
+        candidate["regression_prompts"][0],
+    )
+
+    assert result["verdict"] == "pass"
+    assert result["checks"]["no_cross_host_generalization"] is True
 
 
 def test_no_positive_acceptance_or_promotion_status_is_emitted(tmp_path):
