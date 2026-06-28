@@ -152,6 +152,10 @@ def test_valid_packet_writes_outputs(tmp_path):
     assert "navigator_desktop" in payload["model_instruction"]
     assert "no_cuda" in payload["model_instruction"]
     assert "CUDA/NVIDIA troubleshooting is blocked on this host." in payload["model_instruction"]
+    assert "bounded advisory constraint" in payload["model_instruction"]
+    assert "preparing a bounded LARQL model-context packet" not in payload["model_instruction"]
+    assert "Do not apply any rule here." not in payload["model_instruction"]
+    assert "Do not modify runtime rules, write durable memory, promote candidates, train LoRA, or mutate model weights." in payload["model_instruction"]
     text = md_path.read_text(encoding="utf-8")
     assert "This is packet evidence only." in text
     assert "No candidate promotion is granted." in text

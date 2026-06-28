@@ -102,7 +102,7 @@ def build_runtime_rule_context(runtime_rule: dict[str, Any]) -> dict[str, Any]:
 def build_model_instruction(runtime_rule: dict[str, Any]) -> str:
     return "\n".join(
         [
-            "You are preparing a bounded LARQL model-context packet for later review.",
+            "Use the supplied LARQL runtime rule context as a bounded advisory constraint for this response.",
             "Active host is navigator_desktop.",
             "Host constraint is no_cuda.",
             "CUDA/NVIDIA troubleshooting is blocked on this host.",
@@ -110,7 +110,7 @@ def build_model_instruction(runtime_rule: dict[str, Any]) -> str:
             "Require reverify if host, profile, driver, GPU, endpoint, or digest evidence changes.",
             "Do not claim CUDA is available.",
             "Do not recommend installing NVIDIA CUDA on an RX580/no_cuda host.",
-            "Do not apply any rule here.",
+            "Do not modify runtime rules, write durable memory, promote candidates, train LoRA, or mutate model weights.",
             f"Rule id: {runtime_rule.get('rule_id') or 'unknown'}.",
         ]
     )
