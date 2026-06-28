@@ -124,8 +124,9 @@ def build_packet(source_failure_id: str, candidate_id: str, rule_id: str, behavi
             "rule_id": rule_id,
             "status": "draft_not_applied",
             "applies_when": [
-                "evidence is incomplete, stale, file-limited, search-limited, or otherwise bounded",
+                "evidence is incomplete, stale, file-limited, search-limited, or otherwise bounded evidence",
                 "search results do not cover the full target scope",
+                "missing search results are not proof of absence",
             ],
             "blocks_or_warns_on": [
                 "claiming a file, rule, test, artifact, path, branch, or record does not exist merely because it was not found",
@@ -133,6 +134,7 @@ def build_packet(source_failure_id: str, candidate_id: str, rule_id: str, behavi
             ],
             "recommends": [
                 "targeted inspection command or review step",
+                "absence from search is not proof of absence",
                 "keep lifecycle authority held until review evidence exists",
             ],
             "requires_reverify_when": [
