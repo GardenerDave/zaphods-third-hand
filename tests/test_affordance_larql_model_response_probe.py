@@ -20,13 +20,15 @@ def ready_packet(tmp_path: Path) -> Path:
     return out_dir / "larql_model_context_packet.json"
 
 
-def fake_urlopen(response_text: str):
+def fake_urlopen(response_text: str, reasoning_content: str = "", finish_reason: str = "stop"):
     payload = {
         "choices": [
             {
                 "message": {
                     "content": response_text,
-                }
+                    "reasoning_content": reasoning_content,
+                },
+                "finish_reason": finish_reason,
             }
         ]
     }
@@ -155,6 +157,27 @@ def test_valid_mocked_endpoint_writes_outputs(tmp_path, monkeypatch):
     assert payload["model_weights_mutated"] is False
     assert payload["response_sha256"]
     assert payload["model_response_path"] == "model_response.txt"
+    assert payload["finish_reason"] == "stop"
+    assert payload["reasoning_content_present"] is False
+
+
+def test_empty_content_with_reasoning_is_endpoint_empty_content(tmp_path, monkeypatch):
+    packet = ready_packet(tmp_path)
+    out_dir = tmp_path / "out"
+    monkeypatch.setenv("ZTH_ENDPOINT_URL", "http://example.invalid/v1")
+    monkeypatch.setenv("ZTH_MODEL_ID", "test-model")
+    with patch(
+        "local_harness.affordance_larql_model_response_probe.request.urlopen",
+        return_value=fake_urlopen("", reasoning_content="hidden chain of thought", finish_reason="stop"),
+    ):
+        report = write_reports(packet, out_dir)
+    assert report["probe_verdict"] == "larql_model_response_fail"
+    assert report["failure_mode"] == "endpoint_empty_content"
+    assert report["model_called"] is True
+    assert report["response_sha256"] == "e3b0c44298fc1c149afbf4c8996fb924" "27ae41e4649b934ca495991b7852b855"
+    assert report["finish_reason"] == "stop"
+    assert report["reasoning_content_present"] is True
+    assert report["score"]["rejects_cuda_install_recommendation"] is True
 
 
 def test_valid_report_boundary_flags_false(tmp_path, monkeypatch):
@@ -175,3 +198,43 @@ def test_valid_report_boundary_flags_false(tmp_path, monkeypatch):
     assert report["candidate_promoted"] is False
     assert report["lora_training_started"] is False
     assert report["model_weights_mutated"] is False
+
+
+def test_request_payload_prefixes_no_think_and_uses_600_tokens(tmp_path, monkeypatch):
+    packet = ready_packet(tmp_path)
+    monkeypatch.setenv("ZTH_ENDPOINT_URL", "http://example.invalid/v1")
+    monkeypatch.setenv("ZTH_MODEL_ID", "test-model")
+    captured = {}
+
+    def capture(req, timeout):
+        captured["body"] = json.loads(req.data.decode("utf-8"))
+        return fake_urlopen(
+            "The RX580/no_cuda host should not install NVIDIA CUDA. "
+            "Use the LM Studio OpenAI-compatible endpoint and reverify if hardware or digest evidence changes."
+        )
+
+    with patch("local_harness.affordance_larql_model_response_probe.request.urlopen", side_effect=capture):
+        write_reports(packet, tmp_path / "out")
+    assert captured["body"]["max_tokens"] == 600
+    assert captured["body"]["messages"][1]["content"].startswith("/no_think\n")
+
+
+def test_request_payload_preserves_existing_no_think_prefix(tmp_path, monkeypatch):
+    packet = ready_packet(tmp_path)
+    payload = json.loads(packet.read_text(encoding="utf-8"))
+    payload["user_input"] = "/no_think\nI need CUDA working on this RX580 box so I can train the small model locally. Should I install NVIDIA CUDA?"
+    packet.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    monkeypatch.setenv("ZTH_ENDPOINT_URL", "http://example.invalid/v1")
+    monkeypatch.setenv("ZTH_MODEL_ID", "test-model")
+    captured = {}
+
+    def capture(req, timeout):
+        captured["body"] = json.loads(req.data.decode("utf-8"))
+        return fake_urlopen(
+            "The RX580/no_cuda host should not install NVIDIA CUDA. "
+            "Use the LM Studio OpenAI-compatible endpoint and reverify if hardware or digest evidence changes."
+        )
+
+    with patch("local_harness.affordance_larql_model_response_probe.request.urlopen", side_effect=capture):
+        write_reports(packet, tmp_path / "out")
+    assert captured["body"]["messages"][1]["content"].startswith("/no_think\n")

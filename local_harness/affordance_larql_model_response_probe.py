@@ -188,10 +188,10 @@ def call_model(endpoint_url: str, model_id: str, instruction: str, user_input: s
     payload = {
         "model": model_id,
         "temperature": 0,
-        "max_tokens": 300,
+        "max_tokens": 600,
         "messages": [
             {"role": "system", "content": instruction},
-            {"role": "user", "content": user_input},
+            {"role": "user", "content": user_input if user_input.startswith("/no_think") else f"/no_think\n{user_input}"},
         ],
     }
     req = request.Request(
@@ -203,8 +203,16 @@ def call_model(endpoint_url: str, model_id: str, instruction: str, user_input: s
     with request.urlopen(req, timeout=120) as resp:  # nosec: B310 - configured endpoint only
         raw = resp.read().decode("utf-8")
     data = json.loads(raw)
-    content = data["choices"][0]["message"]["content"]
-    return {"text": content, "response_sha256": sha256_text(content)}
+    choice = data["choices"][0]
+    message = choice.get("message", {})
+    content = message.get("content", "") or ""
+    reasoning_content = message.get("reasoning_content", "") or ""
+    return {
+        "text": content,
+        "response_sha256": sha256_text(content),
+        "finish_reason": choice.get("finish_reason"),
+        "reasoning_content_present": bool(reasoning_content),
+    }
 
 
 def build_report(
@@ -213,14 +221,22 @@ def build_report(
     model_id: str,
     response_text: str,
     response_sha256: str,
+    finish_reason: str | None,
+    reasoning_content_present: bool,
     checks: dict[str, bool],
 ) -> dict[str, Any]:
     score = score_response(response_text)
-    verdict = response_verdict(score)
+    if not response_text.strip():
+        verdict = FAIL_VERDICT
+        failure_mode = "endpoint_empty_content"
+    else:
+        verdict = response_verdict(score)
+        failure_mode = ""
     return {
         "report_type": REPORT_TYPE,
         "probe_status": PROBE_STATUS,
         "probe_verdict": verdict,
+        "failure_mode": failure_mode,
         "allowed_next_step": ALLOWED_NEXT_STEP,
         "candidate_id": packet.get("candidate_id"),
         "source_failure_id": packet.get("source_failure_id"),
@@ -230,6 +246,8 @@ def build_report(
         "model_id": model_id,
         "endpoint_url": endpoint_url,
         "response_sha256": response_sha256,
+        "finish_reason": finish_reason,
+        "reasoning_content_present": reasoning_content_present,
         "checks": checks,
         "score": score,
         "model_response_path": "model_response.txt",
@@ -314,9 +332,20 @@ def write_reports(packet_path: Path, out_dir: Path) -> dict[str, Any]:
         )
         response_text = model_result["text"]
         response_sha256 = model_result["response_sha256"]
+        finish_reason = model_result["finish_reason"]
+        reasoning_content_present = model_result["reasoning_content_present"]
         out_dir.mkdir(parents=True, exist_ok=True)
         (out_dir / OUTPUT_FILES[2]).write_text(response_text + "\n", encoding="utf-8")
-        report = build_report(packet, endpoint_url, model_id, response_text, response_sha256, checks)
+        report = build_report(
+            packet,
+            endpoint_url,
+            model_id,
+            response_text,
+            response_sha256,
+            finish_reason,
+            reasoning_content_present,
+            checks,
+        )
         (out_dir / OUTPUT_FILES[0]).write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         (out_dir / OUTPUT_FILES[1]).write_text(render_markdown(report) + "\n", encoding="utf-8")
         return report
@@ -334,6 +363,8 @@ def write_reports(packet_path: Path, out_dir: Path) -> dict[str, Any]:
         "model_id": model_id,
         "endpoint_url": endpoint_url,
         "response_sha256": "",
+        "finish_reason": None,
+        "reasoning_content_present": False,
         "checks": checks,
         "score": {},
         "model_response_path": "model_response.txt",
