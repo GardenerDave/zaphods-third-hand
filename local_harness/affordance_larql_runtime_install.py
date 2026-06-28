@@ -184,7 +184,7 @@ def render_markdown(report: dict[str, Any], rule: dict[str, Any]) -> str:
             f"Install verdict: `{report['install_verdict']}`",
             f"Allowed next step: `{report['allowed_next_step']}`",
             "",
-            "This is packet only.",
+            "This is runtime install evidence only.",
             "The runtime rule is installed for consultation only.",
             "Durable memory is not written.",
             "The candidate is not promoted.",

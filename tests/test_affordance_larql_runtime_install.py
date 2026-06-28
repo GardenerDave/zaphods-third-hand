@@ -153,3 +153,15 @@ def test_runtime_rule_status_and_report_boundary(tmp_path):
     assert report["candidate_promoted"] is False
     assert report["lora_training_started"] is False
     assert report["model_weights_mutated"] is False
+
+
+def test_markdown_contains_runtime_install_evidence_wording(tmp_path):
+    packet = ready_packet_path(tmp_path)
+    review = ready_review_path(tmp_path)
+    out = tmp_path / "out"
+    write_reports(packet, review, out)
+    markdown = (out / "larql_runtime_install_report.md").read_text(encoding="utf-8")
+
+    assert "This is packet only." not in markdown
+    assert "This is runtime install evidence only." in markdown
+    assert "The runtime rule is installed for consultation only." in markdown
