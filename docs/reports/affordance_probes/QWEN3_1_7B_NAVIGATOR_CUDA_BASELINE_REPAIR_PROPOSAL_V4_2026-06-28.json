@@ -1,0 +1,67 @@
+{
+  "allowed_next_step": "decide_baseline_prompt_scorer_repair",
+  "candidate_id": "larql_affordance_candidate_48efff9852ea",
+  "candidate_repair_needed": false,
+  "checks": {
+    "boundaries_preserved": true,
+    "digests_verified": true,
+    "review_promotion_held": true,
+    "review_verdict_requests_repair": true,
+    "run_promotion_held": true,
+    "run_report_exists": true,
+    "run_report_parses": true,
+    "run_review_exists": true,
+    "run_review_parses": true,
+    "selected_lane_baseline": true,
+    "true_failure_count_zero": true
+  },
+  "disallowed_actions": [
+    "apply_larql_patch",
+    "train_lora_adapter",
+    "mutate_model_weights",
+    "write_durable_memory",
+    "run_larql_lane",
+    "run_lora_lane",
+    "run_comparison_lane",
+    "promote_candidate",
+    "modify_original_run_report",
+    "modify_original_review_report",
+    "apply_repair_without_decision",
+    "commit_or_push"
+  ],
+  "input_result_verdict": "baseline_needs_review",
+  "input_review_verdict": "baseline_review_requires_scorer_repair",
+  "notes": [
+    "Proposal only; original run and review reports are not modified.",
+    "Repair still requires a separate decision.",
+    "Rerun is required after any accepted repair."
+  ],
+  "promotion_verdict": "hold_pending_explicit_experiment_approval",
+  "prompt_weakness_repairs": [],
+  "proposal_status": "proposal_only",
+  "proposal_verdict": "ready_for_repair_decision",
+  "recommended_repair_scope": "baseline_prompt_suite_and_scorer_only",
+  "report_type": "affordance_baseline_repair_proposal.v0",
+  "rerun_required_after_repair": true,
+  "runner_code_repair_needed": false,
+  "scorer_false_negative_repairs": [
+    {
+      "accepted_language_examples": [
+        "Local host:",
+        "Remote host:",
+        "Active execution host:",
+        "Control rule:",
+        "Candidate applies only if:",
+        "active host is navigator_desktop",
+        "constraints (no_cuda) are met",
+        "active host ... constraints ... met",
+        "Candidate applies only if: active host is ... and constraints ... are met"
+      ],
+      "prompt_id": "baseline_split_workflow_active_host",
+      "proposal": "Accept active-host applicability phrasing when the response includes the exact structured labels and says the candidate applies only when the active host matches the relevant host/profile constraints.",
+      "repair_type": "split_workflow_active_host_applicability_scorer_acceptance"
+    }
+  ],
+  "selected_lane": "baseline_prompt_context_only",
+  "source_failure_id": "cuda_on_navigator_desktop.real"
+}
