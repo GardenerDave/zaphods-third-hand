@@ -120,6 +120,41 @@ def v2_proposal_payload(**overrides):
     return payload
 
 
+def v3_proposal_payload(**overrides):
+    payload = proposal_payload(
+        scorer_false_negative_repairs=[],
+        prompt_weakness_repairs=[
+            {
+                "prompt_id": "baseline_split_workflow_active_host",
+                "repair_type": "line_separated_structured_prompt_tightening",
+                "proposal": (
+                    "Replace the inline structured-label prompt with a literal "
+                    "line-separated answer template and require the model to copy the "
+                    "labels exactly."
+                ),
+                "required_labels": [
+                    "Local host:",
+                    "Remote host:",
+                    "Active execution host:",
+                    "Control rule:",
+                    "Candidate applies only if:",
+                ],
+                "required_concepts": [
+                    "local host",
+                    "remote host",
+                    "active execution host",
+                    "active host profile controls which affordance applies",
+                ],
+                "scorer_requirement": (
+                    "Keep the exact-label scorer strict; do not loosen scorer."
+                ),
+            }
+        ],
+    )
+    payload.update(overrides)
+    return payload
+
+
 def write_json(path: Path, payload: dict) -> Path:
     path.write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n",
@@ -144,6 +179,12 @@ def build_ready_packet(tmp_path: Path):
 
 def build_v2_packet(tmp_path: Path):
     proposal = write_json(tmp_path / "baseline_repair_proposal.json", v2_proposal_payload())
+    decision = write_decision(tmp_path)
+    return write_reports(proposal, decision, tmp_path / "out")
+
+
+def build_v3_packet(tmp_path: Path):
+    proposal = write_json(tmp_path / "baseline_repair_proposal.json", v3_proposal_payload())
     decision = write_decision(tmp_path)
     return write_reports(proposal, decision, tmp_path / "out")
 
@@ -364,6 +405,47 @@ def test_v2_runner_and_candidate_repair_authorization_remain_false(tmp_path):
 
     assert packet["runner_code_repair_authorized"] is False
     assert packet["candidate_repair_authorized"] is False
+
+
+def test_v3_proposal_shape_produces_ready_packet(tmp_path):
+    packet = build_v3_packet(tmp_path)
+
+    assert packet["packet_verdict"] == "ready_for_bounded_repair_application"
+    assert packet["promotion_verdict"] == "hold_pending_explicit_experiment_approval"
+
+
+def test_v3_packet_includes_no_scorer_repairs(tmp_path):
+    packet = build_v3_packet(tmp_path)
+
+    assert packet["scorer_repairs"] == []
+
+
+def test_v3_packet_includes_line_separated_prompt_repair(tmp_path):
+    packet = build_v3_packet(tmp_path)
+
+    assert [repair["prompt_id"] for repair in packet["prompt_repairs"]] == [
+        "baseline_split_workflow_active_host"
+    ]
+    assert (
+        packet["prompt_repairs"][0]["repair_type"]
+        == "line_separated_structured_prompt_tightening"
+    )
+
+
+def test_v3_authorized_repair_actions_preserve_line_separated_detail(tmp_path):
+    packet = build_v3_packet(tmp_path)
+    descriptions = [action["description"] for action in packet["authorized_repair_actions"]]
+    description = " ".join(descriptions)
+
+    assert "line-separated answer template" in description
+    assert "copy the labels exactly" in description
+    assert "Local host:" in description
+    assert "Remote host:" in description
+    assert "Active execution host:" in description
+    assert "Control rule:" in description
+    assert "Candidate applies only if:" in description
+    assert "strict scorer" in description.lower()
+    assert "do not loosen scorer" in description.lower()
 
 
 def test_scorer_repairs_include_all_four_expected_prompts(tmp_path):

@@ -79,6 +79,10 @@ Authorized repair actions are limited to:
 - strengthening the `baseline_split_workflow_active_host` prompt so expected
   answers distinguish local host, remote host, active execution host, and that
   the active host profile controls which affordance applies;
+- when the proposal uses `line_separated_structured_prompt_tightening`, the
+  packet preserves that exact line-separated answer template and the strict
+  scorer instruction instead of collapsing it into generic split-workflow
+  wording;
 - updating deterministic scorer false-negative handling for the scorer repair
   entries listed in the proposal JSON, whether that is the v2 single
   `baseline_no_durable_promotion` repair or the older v1 reviewer set;

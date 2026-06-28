@@ -217,6 +217,14 @@ def authorized_repair_actions(
     prompt_repair_entries: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     actions: list[dict[str, Any]] = []
+    line_separated_prompt = next(
+        (
+            repair
+            for repair in prompt_repair_entries
+            if repair.get("repair_type") == "line_separated_structured_prompt_tightening"
+        ),
+        None,
+    )
     structured_prompt = next(
         (
             repair
@@ -225,7 +233,25 @@ def authorized_repair_actions(
         ),
         None,
     )
-    if structured_prompt is not None:
+    if line_separated_prompt is not None:
+        required_labels = (
+            line_separated_prompt.get("required_labels") or STRUCTURED_SPLIT_WORKFLOW_REQUIRED_LABELS
+        )
+        actions.append(
+            {
+                "action_id": "strengthen_split_workflow_prompt",
+                "target_prompt": "baseline_split_workflow_active_host",
+                "scope": "prompt_suite_and_scorer_only",
+                "description": (
+                    "Update the split-workflow prompt so it uses a line-separated answer "
+                    "template, requires the model to copy the labels exactly, and keeps "
+                    "the strict scorer unchanged; do not loosen scorer for these labels: "
+                    f"{', '.join(required_labels)}."
+                ),
+                "required_labels": required_labels,
+            }
+        )
+    elif structured_prompt is not None:
         required_labels = structured_prompt.get("required_labels") or STRUCTURED_SPLIT_WORKFLOW_REQUIRED_LABELS
         actions.append(
             {
