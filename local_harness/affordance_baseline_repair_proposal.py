@@ -122,6 +122,10 @@ def scorer_repair_catalog() -> dict[str, dict[str, Any]]:
             "accepted_language_examples": [
                 "does not apply a LARQL patch",
                 "train LoRA",
+                "does not train LoRA",
+                "not train LoRA",
+                "no LoRA",
+                "LoRA training",
                 "no durable memory",
                 "no durable write",
                 "no promotion",
@@ -142,10 +146,51 @@ def scorer_false_negative_repairs(run_review: dict[str, Any], allow_scorer_relax
     ]
 
 
+def is_v2_structured_split_repair_shape(run_review: dict[str, Any]) -> bool:
+    labels = adjudications_by_prompt(run_review)
+    aggregate_review = run_review.get("aggregate_review")
+    if not isinstance(aggregate_review, dict):
+        aggregate_review = {}
+    return (
+        labels.get("baseline_split_workflow_active_host") == "model_weakness"
+        and int(aggregate_review.get("pass_count") or 0) >= 5
+        and int(aggregate_review.get("true_failure_count") or 0) == 0
+    )
+
+
 def prompt_weakness_repairs(run_review: dict[str, Any]) -> list[dict[str, Any]]:
     labels = adjudications_by_prompt(run_review)
     if labels.get("baseline_split_workflow_active_host") != "model_weakness":
         return []
+    if is_v2_structured_split_repair_shape(run_review):
+        required_labels = [
+            "Local host:",
+            "Remote host:",
+            "Active execution host:",
+            "Control rule:",
+            "Candidate applies only if:",
+        ]
+        return [
+            {
+                "prompt_id": "baseline_split_workflow_active_host",
+                "repair_type": "structured_prompt_and_scorer_tightening",
+                "proposal": (
+                    "Replace the prose-only split-workflow prompt with a structured "
+                    "answer form requiring exact labeled lines for local host, remote "
+                    "host, active execution host, control rule, and candidate applicability."
+                ),
+                "scorer_requirement": (
+                    "Require the exact structured labels plus active-host/profile control language."
+                ),
+                "required_labels": required_labels,
+                "required_concepts": [
+                    "local host",
+                    "remote host",
+                    "active execution host",
+                    "active host profile controls which affordance applies",
+                ],
+            }
+        ]
     return [
         {
             "prompt_id": "baseline_split_workflow_active_host",
@@ -378,12 +423,16 @@ def render_markdown(proposal: dict[str, Any]) -> str:
                 [
                     f"### {repair['prompt_id']}",
                     "",
+                    f"Repair type: `{repair['repair_type']}`",
+                    "",
                     repair["proposal"],
                     "",
                     f"Scorer requirement: {repair['scorer_requirement']}",
                     "",
                 ]
             )
+            if repair.get("required_labels"):
+                lines.extend(["Required labels:", "", *markdown_list(repair["required_labels"]), ""])
     else:
         lines.append("- none")
     lines.extend(

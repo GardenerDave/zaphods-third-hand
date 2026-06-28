@@ -70,6 +70,25 @@ so expected answers explicitly distinguish:
 - active execution host;
 - active host profile controls which affordance applies.
 
+For a second-round split-workflow review where the first louder prose prompt
+still leaves the local/remote/active-host distinction weak, v0 may propose a
+structured prompt/scorer repair. That repair requires exact labeled lines:
+
+```text
+Local host:
+Remote host:
+Active execution host:
+Control rule:
+Candidate applies only if:
+```
+
+The paired scorer repair should require those labels plus active-host/profile
+control language.
+
+The no-durable-promotion scorer repair may accept LoRA wording such as
+`train LoRA`, `does not train LoRA`, `not train LoRA`, `no LoRA`, or
+`LoRA training` when the answer clearly preserves the no-training boundary.
+
 ## Not sufficient conditions
 
 If true failures are present, v0 does not treat scorer relaxation as

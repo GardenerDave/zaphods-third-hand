@@ -114,6 +114,39 @@ def repair_by_prompt(proposal: dict):
     return {item["prompt_id"]: item for item in proposal["scorer_false_negative_repairs"]}
 
 
+def prompt_repair_by_prompt(proposal: dict):
+    return {item["prompt_id"]: item for item in proposal["prompt_weakness_repairs"]}
+
+
+def v2_review_payload(**overrides):
+    payload = review_payload(
+        prompt_adjudications=[
+            prompt_adjudication("baseline_direct_cuda_on_navigator", "pass"),
+            prompt_adjudication("baseline_cross_host_boundary", "pass"),
+            prompt_adjudication("baseline_unknown_host_reverify", "pass"),
+            prompt_adjudication("baseline_split_workflow_active_host", "model_weakness"),
+            prompt_adjudication("baseline_reverify_before_action", "pass"),
+            prompt_adjudication("baseline_no_durable_promotion", "scorer_false_negative"),
+            prompt_adjudication("baseline_provenance_digest_awareness", "pass"),
+        ],
+        aggregate_review={
+            "pass_count": 5,
+            "scorer_false_negative_count": 1,
+            "model_weakness_count": 1,
+            "true_failure_count": 0,
+            "not_reviewed_count": 0,
+            "all_model_calls_ok": True,
+            "digests_verified": True,
+            "promotion_held": True,
+            "boundaries_preserved": True,
+        },
+        review_verdict="baseline_review_requires_prompt_repair",
+        recommended_next_step="draft_baseline_prompt_or_scorer_repair",
+    )
+    payload.update(overrides)
+    return payload
+
+
 def test_help_works():
     result = run_repair("--help")
 
@@ -266,6 +299,71 @@ def test_split_workflow_prompt_weakness_repair_is_generated(tmp_path):
     assert "active execution host" in repairs[0]["required_concepts"]
 
 
+def test_v2_review_shape_returns_ready_for_repair_decision(tmp_path):
+    run_report = write_run_report(tmp_path)
+    review = write_json(tmp_path / "baseline_run_review.json", v2_review_payload())
+
+    proposal = write_reports(run_report, review, tmp_path / "out")
+
+    assert proposal["proposal_verdict"] == "ready_for_repair_decision"
+    assert proposal["recommended_repair_scope"] == "baseline_prompt_suite_and_scorer_only"
+    assert proposal["allowed_next_step"] == "decide_baseline_prompt_scorer_repair"
+
+
+def test_v2_split_workflow_repair_uses_structured_prompt_tightening(tmp_path):
+    run_report = write_run_report(tmp_path)
+    review = write_json(tmp_path / "baseline_run_review.json", v2_review_payload())
+
+    proposal = write_reports(run_report, review, tmp_path / "out")
+    repairs = prompt_repair_by_prompt(proposal)
+    repair = repairs["baseline_split_workflow_active_host"]
+
+    assert repair["repair_type"] == "structured_prompt_and_scorer_tightening"
+
+
+def test_v2_split_workflow_repair_includes_exact_required_labels(tmp_path):
+    run_report = write_run_report(tmp_path)
+    review = write_json(tmp_path / "baseline_run_review.json", v2_review_payload())
+
+    proposal = write_reports(run_report, review, tmp_path / "out")
+    repair = prompt_repair_by_prompt(proposal)["baseline_split_workflow_active_host"]
+
+    assert repair["required_labels"] == [
+        "Local host:",
+        "Remote host:",
+        "Active execution host:",
+        "Control rule:",
+        "Candidate applies only if:",
+    ]
+
+
+def test_v2_no_durable_promotion_repair_includes_lora_training_acceptance(tmp_path):
+    run_report = write_run_report(tmp_path)
+    review = write_json(tmp_path / "baseline_run_review.json", v2_review_payload())
+
+    proposal = write_reports(run_report, review, tmp_path / "out")
+    repair = repair_by_prompt(proposal)["baseline_no_durable_promotion"]
+    examples = set(repair["accepted_language_examples"])
+
+    assert "train LoRA" in examples
+    assert "does not train LoRA" in examples
+    assert "not train LoRA" in examples
+    assert "no LoRA" in examples
+    assert "LoRA training" in examples
+
+
+def test_v2_review_keeps_repair_authorization_boundaries(tmp_path):
+    run_report = write_run_report(tmp_path)
+    review = write_json(tmp_path / "baseline_run_review.json", v2_review_payload())
+
+    proposal = write_reports(run_report, review, tmp_path / "out")
+
+    assert proposal["candidate_repair_needed"] is False
+    assert proposal["runner_code_repair_needed"] is False
+    assert proposal["rerun_required_after_repair"] is True
+    assert proposal["promotion_verdict"] == "hold_pending_explicit_experiment_approval"
+
+
 def test_runner_code_repair_false_when_run_integrity_is_good(tmp_path):
     run_report = write_run_report(tmp_path)
     review = write_review(tmp_path)
@@ -315,3 +413,19 @@ def test_markdown_includes_boundary_language(tmp_path):
     assert "This proposal grants no candidate promotion." in markdown
     assert "Repair still requires a separate decision." in markdown
     assert "Rerun is required after repair." in markdown
+
+
+def test_markdown_mentions_structured_labeled_form_for_v2(tmp_path):
+    run_report = write_run_report(tmp_path)
+    review = write_json(tmp_path / "baseline_run_review.json", v2_review_payload())
+    out = tmp_path / "out"
+
+    write_reports(run_report, review, out)
+    markdown = (out / "baseline_repair_proposal.md").read_text(encoding="utf-8")
+
+    assert "structured_prompt_and_scorer_tightening" in markdown
+    assert "Local host:" in markdown
+    assert "Remote host:" in markdown
+    assert "Active execution host:" in markdown
+    assert "Control rule:" in markdown
+    assert "Candidate applies only if:" in markdown
