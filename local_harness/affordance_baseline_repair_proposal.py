@@ -131,6 +131,26 @@ def scorer_repair_catalog() -> dict[str, dict[str, Any]]:
                 "no promotion",
             ],
         },
+        "baseline_split_workflow_active_host": {
+            "prompt_id": "baseline_split_workflow_active_host",
+            "repair_type": "split_workflow_active_host_applicability_scorer_acceptance",
+            "proposal": (
+                "Accept active-host applicability phrasing when the response includes the "
+                "exact structured labels and says the candidate applies only when the "
+                "active host matches the relevant host/profile constraints."
+            ),
+            "accepted_language_examples": [
+                "Local host:",
+                "Remote host:",
+                "Active execution host:",
+                "Control rule:",
+                "Candidate applies only if:",
+                "active host is navigator_desktop",
+                "constraints (no_cuda) are met",
+                "active host ... constraints ... met",
+                "Candidate applies only if: active host is ... and constraints ... are met",
+            ],
+        },
     }
 
 

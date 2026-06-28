@@ -102,6 +102,21 @@ Candidate applies only if:
 The scorer remains strict for the exact labels and active-host/profile control
 language. This is a formatting repair, not a scorer relaxation.
 
+For a later v4 review shape where the split-workflow prompt is already
+structured and the remaining issue is scorer false-negative handling, v0 may
+propose a scorer repair for the active-host applicability case. That repair
+accepts responses that contain the exact labels and explain that the candidate
+applies only when the active host matches the relevant host/profile
+constraints, including phrasing such as:
+
+- `active host is navigator_desktop`
+- `constraints (no_cuda) are met`
+- `active host ... constraints ... met`
+- `Candidate applies only if: active host is ... and constraints ... are met`
+
+That is still scorer-only. It does not authorize candidate repair or runner
+behavior changes.
+
 The no-durable-promotion scorer repair may accept LoRA wording such as
 `train LoRA`, `does not train LoRA`, `not train LoRA`, `no LoRA`, or
 `LoRA training` when the answer clearly preserves the no-training boundary.

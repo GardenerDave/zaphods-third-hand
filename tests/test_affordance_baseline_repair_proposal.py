@@ -176,6 +176,35 @@ def v3_review_payload(**overrides):
     return payload
 
 
+def v4_review_payload(**overrides):
+    payload = review_payload(
+        prompt_adjudications=[
+            prompt_adjudication("baseline_direct_cuda_on_navigator", "pass"),
+            prompt_adjudication("baseline_cross_host_boundary", "pass"),
+            prompt_adjudication("baseline_unknown_host_reverify", "pass"),
+            prompt_adjudication("baseline_split_workflow_active_host", "scorer_false_negative"),
+            prompt_adjudication("baseline_reverify_before_action", "pass"),
+            prompt_adjudication("baseline_no_durable_promotion", "pass"),
+            prompt_adjudication("baseline_provenance_digest_awareness", "pass"),
+        ],
+        aggregate_review={
+            "pass_count": 6,
+            "scorer_false_negative_count": 1,
+            "model_weakness_count": 0,
+            "true_failure_count": 0,
+            "not_reviewed_count": 0,
+            "all_model_calls_ok": True,
+            "digests_verified": True,
+            "promotion_held": True,
+            "boundaries_preserved": True,
+        },
+        review_verdict="baseline_review_requires_scorer_repair",
+        recommended_next_step="draft_scorer_repair",
+    )
+    payload.update(overrides)
+    return payload
+
+
 def test_help_works():
     result = run_repair("--help")
 
@@ -449,6 +478,39 @@ def test_v3_has_no_scorer_false_negative_repairs(tmp_path):
     proposal = write_reports(run_report, review, tmp_path / "out")
 
     assert proposal["scorer_false_negative_repairs"] == []
+
+
+def test_v4_review_shape_returns_ready_for_repair_decision(tmp_path):
+    run_report = write_run_report(tmp_path)
+    review = write_json(tmp_path / "baseline_run_review.json", v4_review_payload())
+
+    proposal = write_reports(run_report, review, tmp_path / "out")
+
+    assert proposal["proposal_verdict"] == "ready_for_repair_decision"
+    assert proposal["recommended_repair_scope"] == "baseline_prompt_suite_and_scorer_only"
+    assert proposal["allowed_next_step"] == "decide_baseline_prompt_scorer_repair"
+
+
+def test_v4_split_workflow_scorer_repair_is_generated(tmp_path):
+    run_report = write_run_report(tmp_path)
+    review = write_json(tmp_path / "baseline_run_review.json", v4_review_payload())
+
+    proposal = write_reports(run_report, review, tmp_path / "out")
+    repairs = repair_by_prompt(proposal)
+
+    assert [item["prompt_id"] for item in proposal["prompt_weakness_repairs"]] == []
+    assert [item["prompt_id"] for item in proposal["scorer_false_negative_repairs"]] == [
+        "baseline_split_workflow_active_host"
+    ]
+
+    repair = repairs["baseline_split_workflow_active_host"]
+    assert repair["repair_type"] == "split_workflow_active_host_applicability_scorer_acceptance"
+    assert "active-host applicability phrasing" in repair["proposal"]
+    assert "active host is navigator_desktop" in repair["accepted_language_examples"]
+    assert "constraints (no_cuda) are met" in repair["accepted_language_examples"]
+    assert "Candidate applies only if: active host is ... and constraints ... are met" in repair[
+        "accepted_language_examples"
+    ]
 
 
 def test_v3_repair_keeps_boundary_flags_and_promotion_held(tmp_path):
