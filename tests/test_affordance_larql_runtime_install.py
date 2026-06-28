@@ -39,8 +39,10 @@ def test_help_works():
 
 def test_missing_packet_fails(tmp_path):
     review = ready_review_path(tmp_path)
-    report = write_reports(tmp_path / "missing.json", review, tmp_path / "out")
+    out = tmp_path / "out"
+    report = write_reports(tmp_path / "missing.json", review, out)
     assert report["install_verdict"] == "invalid_input"
+    assert not (out / "runtime_rules").exists()
 
 
 def test_missing_review_fails(tmp_path):
@@ -73,8 +75,10 @@ def test_wrong_review_verdict_fails(tmp_path):
     payload = json.loads(review.read_text(encoding="utf-8"))
     payload["review_verdict"] = "wrong"
     review.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    report = write_reports(packet, review, tmp_path / "out")
+    out = tmp_path / "out"
+    report = write_reports(packet, review, out)
     assert report["install_verdict"] == "invalid_input"
+    assert not (out / "runtime_rules").exists()
 
 
 def test_review_runtime_authorization_false_fails(tmp_path):
@@ -113,8 +117,10 @@ def test_missing_rule_payload_fails(tmp_path):
     payload = json.loads(packet.read_text(encoding="utf-8"))
     del payload["rule_payload"]
     packet.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    report = write_reports(packet, review, tmp_path / "out")
+    out = tmp_path / "out"
+    report = write_reports(packet, review, out)
     assert report["install_verdict"] == "invalid_input"
+    assert not (out / "runtime_rules").exists()
 
 
 def test_valid_inputs_write_runtime_rule_and_report(tmp_path):

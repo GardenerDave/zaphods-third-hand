@@ -209,15 +209,17 @@ def write_reports(packet_path: Path, review_path: Path, out_dir: Path) -> dict[s
     rule_payload = packet.get("rule_payload")
     if not isinstance(rule_payload, dict):
         rule_payload = {}
-    rule = installed_rule(rule_payload, review)
+    rule = rule_payload
     report = install_report(packet, review, checks)
     report["notes"] = [
         *packet_notes,
         *review_notes,
         *report["notes"],
     ]
-    (out_dir / RULE_OUTPUT).parent.mkdir(parents=True, exist_ok=True)
-    (out_dir / RULE_OUTPUT).write_text(json.dumps(rule, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    if report["install_verdict"] == INSTALL_VERDICT:
+        rule = installed_rule(rule_payload, review)
+        (out_dir / RULE_OUTPUT).parent.mkdir(parents=True, exist_ok=True)
+        (out_dir / RULE_OUTPUT).write_text(json.dumps(rule, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (out_dir / OUTPUT_FILES[0]).write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (out_dir / OUTPUT_FILES[1]).write_text(render_markdown(report, rule) + "\n", encoding="utf-8")
     return report
