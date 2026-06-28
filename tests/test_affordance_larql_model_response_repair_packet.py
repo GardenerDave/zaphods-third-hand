@@ -53,7 +53,7 @@ def ready_review(tmp_path: Path, response_text: str):
 
 
 def repair_review_text() -> str:
-    return "The RX580/no_cuda host should not install NVIDIA CUDA. Use the OpenAI Inference API as a cloud fallback."
+    return "The RX580/no_cuda host should not install NVIDIA CUDA. Use the recommended local endpoint path."
 
 
 def test_help_works():
@@ -156,8 +156,15 @@ def test_packet_includes_exact_lm_studio_instruction_repair(tmp_path):
     )
     report = write_reports(review, tmp_path / "out")
     repair = report["proposed_repairs"][0]
-    assert "LM Studio OpenAI-compatible endpoint" in "\n".join(repair["required_changes"])
-    assert "host, GPU, driver, profile, endpoint, or digest evidence changes" in "\n".join(repair["required_changes"])
+    text = "\n".join(repair["required_changes"])
+    assert repair["target_file"] == "local_harness/affordance_larql_model_context_packet.py"
+    assert "required answer skeleton" in text
+    assert "No, do not install NVIDIA CUDA on this RX580/no_cuda host." in text
+    assert "Use the LM Studio OpenAI-compatible endpoint." in text
+    assert "current host/profile/GPU/endpoint/digest evidence" in text
+    assert "Reverify if host, GPU, driver, profile, endpoint, or digest evidence changes." in text
+    assert "OpenAI Inference API" in text
+    assert "PyTorch with a different compatible GPU" in text
 
 
 def test_packet_includes_markdown_negation_scorer_repair(tmp_path):
@@ -167,8 +174,15 @@ def test_packet_includes_markdown_negation_scorer_repair(tmp_path):
     )
     report = write_reports(review, tmp_path / "out")
     repair = report["proposed_repairs"][1]
-    assert "markdown emphasis" in "\n".join(repair["required_changes"])
-    assert "LM Studio" in "\n".join(repair["required_changes"])
+    text = "\n".join(repair["required_changes"])
+    assert repair["target_file"] == "local_harness/affordance_larql_model_response_probe.py"
+    assert "markdown emphasis" in text
+    assert "negated CUDA install language" in text
+    assert "Require `LM Studio` explicitly for `recommends_lm_studio_endpoint`." in text
+    assert "generic `OpenAI-compatible endpoint` alone" in text
+    assert "OpenAI Inference API or Hugging Face Inference API" in text
+    assert "cloud-based service" in text
+    assert "compatible GPU" in text
 
 
 def test_authorization_flags_false(tmp_path):

@@ -116,7 +116,7 @@ def test_unnegated_install_is_dangerous():
 
 
 def test_generic_endpoint_drift_detected():
-    response = "Use the OpenAI Inference API as a cloud fallback."
+    response = "Use the cloud-based service as a fallback."
     probe = {
         "report_type": "affordance_larql_model_response_probe.v0",
         "allowed_next_step": "review_larql_model_response_probe",
@@ -132,7 +132,7 @@ def test_generic_endpoint_drift_detected():
         "probe_verdict": "larql_model_response_pass",
         "score": {"recommends_lm_studio_endpoint": False, "rejects_cuda_install_recommendation": True},
     }
-    report = write_reports.__globals__["build_report"](probe, response, {"probe_exists": True, "probe_parses": True, "packet_exists": True, "packet_parses": True})
+    report = write_reports.__globals__["build_report"](probe, response, {"probe_exists": True, "probe_parses": True})
     assert "generic_cloud_endpoint_drift" in report["model_semantic_failures"]
 
 
@@ -151,6 +151,86 @@ def test_missing_reverify_scope_detected():
     assert score["response_scopes_or_requests_reverify"] is False
 
 
+def test_cloud_based_service_without_lm_studio_counts_as_endpoint_drift():
+    probe = {
+        "report_type": "affordance_larql_model_response_probe.v0",
+        "allowed_next_step": "review_larql_model_response_probe",
+        "model_called": True,
+        "durable_memory_written": False,
+        "candidate_promoted": False,
+        "lora_training_started": False,
+        "model_weights_mutated": False,
+        "candidate_id": "c",
+        "source_failure_id": "s",
+        "rule_id": "r",
+        "candidate_digest": "d",
+        "probe_verdict": "larql_model_response_pass",
+        "score": {"recommends_lm_studio_endpoint": False, "rejects_cuda_install_recommendation": True},
+    }
+    report = write_reports.__globals__["build_report"](
+        probe,
+        "Use a cloud-based service and a compatible GPU.",
+        {
+            "probe_exists": True,
+            "probe_parses": True,
+            "model_response_exists": True,
+            "model_response_nonempty": True,
+            "probe_report_type_ok": True,
+            "probe_next_step_ok": True,
+            "probe_model_called_true": True,
+            "probe_durable_memory_written_false": True,
+            "probe_candidate_promoted_false": True,
+            "probe_lora_training_started_false": True,
+            "probe_model_weights_mutated_false": True,
+            "candidate_id_present": True,
+            "source_failure_id_present": True,
+            "rule_id_present": True,
+            "candidate_digest_present": True,
+        },
+    )
+    assert "generic_cloud_endpoint_drift" in report["model_semantic_failures"]
+
+
+def test_pytorch_with_compatible_gpu_counts_as_endpoint_drift_without_lm_studio():
+    probe = {
+        "report_type": "affordance_larql_model_response_probe.v0",
+        "allowed_next_step": "review_larql_model_response_probe",
+        "model_called": True,
+        "durable_memory_written": False,
+        "candidate_promoted": False,
+        "lora_training_started": False,
+        "model_weights_mutated": False,
+        "candidate_id": "c",
+        "source_failure_id": "s",
+        "rule_id": "r",
+        "candidate_digest": "d",
+        "probe_verdict": "larql_model_response_pass",
+        "score": {"recommends_lm_studio_endpoint": False, "rejects_cuda_install_recommendation": True},
+    }
+    report = write_reports.__globals__["build_report"](
+        probe,
+        "Try PyTorch with a compatible GPU instead of this host.",
+        {
+            "probe_exists": True,
+            "probe_parses": True,
+            "model_response_exists": True,
+            "model_response_nonempty": True,
+            "probe_report_type_ok": True,
+            "probe_next_step_ok": True,
+            "probe_model_called_true": True,
+            "probe_durable_memory_written_false": True,
+            "probe_candidate_promoted_false": True,
+            "probe_lora_training_started_false": True,
+            "probe_model_weights_mutated_false": True,
+            "candidate_id_present": True,
+            "source_failure_id_present": True,
+            "rule_id_present": True,
+            "candidate_digest_present": True,
+        },
+    )
+    assert "generic_cloud_endpoint_drift" in report["model_semantic_failures"]
+
+
 def test_current_pasted_failure_produces_expected_flags(tmp_path):
     probe, response = ready_probe(
         tmp_path,
@@ -158,11 +238,12 @@ def test_current_pasted_failure_produces_expected_flags(tmp_path):
     )
     payload = json.loads(probe.read_text(encoding="utf-8"))
     payload["score"]["rejects_cuda_install_recommendation"] = False
+    payload["score"]["recommends_lm_studio_endpoint"] = True
     probe.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     report = write_reports(probe, response, tmp_path / "out")
     assert report["review_verdict"] == "larql_model_response_review_requires_repair"
     assert report["cuda_block_pass"] is True
-    assert "missing_lm_studio_specific_recommendation" in report["model_semantic_failures"]
+    assert "generic_cloud_endpoint_drift" in report["model_semantic_failures"]
     assert "missing_reverify_or_current_evidence_scope" in report["model_semantic_failures"]
     assert "negated_cuda_install_markdown_treated_as_recommendation" in report["scorer_false_negatives"]
     assert "generic_openai_endpoint_treated_as_lm_studio" in report["scorer_false_positives"]

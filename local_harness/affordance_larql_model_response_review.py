@@ -164,9 +164,23 @@ def classify(
     model_semantic_failures: list[str] = []
     scorer_false_positives: list[str] = []
     scorer_false_negatives: list[str] = []
+    lowered = response_text.lower()
 
     if not score["response_mentions_lm_studio"]:
-        model_semantic_failures.append("missing_lm_studio_specific_recommendation")
+        if any(
+            phrase in lowered
+            for phrase in (
+                "openai-compatible endpoint",
+                "cloud-based service",
+                "cloud service",
+                "cloud fallback",
+                "compatible gpu",
+                "pytorch with a compatible gpu",
+            )
+        ):
+            model_semantic_failures.append("generic_cloud_endpoint_drift")
+        else:
+            model_semantic_failures.append("missing_lm_studio_specific_recommendation")
     if not score["response_scopes_or_requests_reverify"]:
         model_semantic_failures.append("missing_reverify_or_current_evidence_scope")
     if score["response_recommends_generic_cloud_api"] and not score["response_mentions_lm_studio"]:

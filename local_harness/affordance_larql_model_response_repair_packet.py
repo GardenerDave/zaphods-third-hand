@@ -65,27 +65,41 @@ def review_ready(review: dict[str, Any]) -> bool:
     )
 
 
+def review_needs_instruction_skeleton_repair(review: dict[str, Any]) -> bool:
+    return (
+        review_ready(review)
+        and "missing_lm_studio_specific_recommendation" in review.get("model_semantic_failures", [])
+        and "missing_reverify_or_current_evidence_scope" in review.get("model_semantic_failures", [])
+        and not review.get("scorer_false_positives")
+        and not review.get("scorer_false_negatives")
+    )
+
+
 def build_proposed_repairs() -> list[dict[str, Any]]:
     return [
         {
             "target_file": "local_harness/affordance_larql_model_context_packet.py",
-            "repair_type": "model_instruction_tightening",
+            "repair_type": "instruction_skeleton_tightening",
             "required_changes": [
-                "Make the model instruction require the exact phrase `LM Studio OpenAI-compatible endpoint`.",
-                "Do not recommend OpenAI Inference API, Hugging Face Inference API, or generic cloud APIs as the primary path for this rule.",
-                "Scope the answer to current host/profile/GPU/endpoint/digest evidence.",
-                "Require reverify if host, GPU, driver, profile, endpoint, or digest evidence changes.",
+                "Replace advisory wording with a required answer skeleton.",
+                "The model response must include these exact lines or equivalent fields:",
+                "1. \"No, do not install NVIDIA CUDA on this RX580/no_cuda host.\"",
+                "2. \"Use the LM Studio OpenAI-compatible endpoint.\"",
+                "3. \"This recommendation is scoped to the current host/profile/GPU/endpoint/digest evidence.\"",
+                "4. \"Reverify if host, GPU, driver, profile, endpoint, or digest evidence changes.\"",
+                "The model must not recommend OpenAI Inference API, Hugging Face Inference API, generic cloud services, PyTorch with a different compatible GPU, or replacing hardware as the primary answer.",
             ],
         },
         {
             "target_file": "local_harness/affordance_larql_model_response_probe.py",
-            "repair_type": "response_scorer_tightening",
+            "repair_type": "response_scorer_drift_tightening",
             "required_changes": [
                 "Normalize markdown emphasis before detecting negated CUDA install language.",
                 "Treat `**not** install NVIDIA CUDA`, `do not install NVIDIA CUDA`, and `should not install NVIDIA CUDA` as rejecting CUDA install recommendations.",
                 "Require `LM Studio` explicitly for `recommends_lm_studio_endpoint`.",
                 "Do not count generic `OpenAI-compatible endpoint` alone as LM Studio-specific.",
                 "Do not count OpenAI Inference API or Hugging Face Inference API as LM Studio-specific.",
+                "Treat `cloud-based service`, `compatible GPU`, and `PyTorch with a compatible GPU` as endpoint/path drift when LM Studio is absent.",
             ],
         },
     ]
@@ -106,16 +120,17 @@ def disallowed_actions() -> list[str]:
 
 def build_report(review: dict[str, Any], checks: dict[str, bool]) -> dict[str, Any]:
     ready = review_ready(review)
+    repair_ready = review_needs_instruction_skeleton_repair(review)
     return {
         "report_type": REPORT_TYPE,
         "packet_status": PACKET_STATUS,
-        "packet_verdict": PACKET_VERDICT if ready else "invalid_input",
-        "allowed_next_step": ALLOWED_NEXT_STEP if ready else "repair_or_reverify_larql_model_response_review",
+        "packet_verdict": PACKET_VERDICT if ready and repair_ready else "invalid_input",
+        "allowed_next_step": ALLOWED_NEXT_STEP if ready and repair_ready else "repair_or_reverify_larql_model_response_review",
         "candidate_id": review.get("candidate_id"),
         "source_failure_id": review.get("source_failure_id"),
         "rule_id": review.get("rule_id"),
         "candidate_digest": review.get("candidate_digest"),
-        "proposed_repairs": build_proposed_repairs() if ready else [],
+        "proposed_repairs": build_proposed_repairs() if ready and repair_ready else [],
         "allowed_files": ALLOWED_FILES,
         "disallowed_actions": disallowed_actions(),
         "durable_memory_authorized": False,
