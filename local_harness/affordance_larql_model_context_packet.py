@@ -54,6 +54,10 @@ def contains_trigger(text: str) -> bool:
 
 def packet_ready(checks: dict[str, bool]) -> bool:
     required = [
+        "consultation_exists",
+        "consultation_parses",
+        "runtime_rule_exists",
+        "runtime_rule_parses",
         "consultation_report_type_ok",
         "consultation_verdict_ok",
         "consultation_next_step_ok",
@@ -219,10 +223,8 @@ def write_reports(
         "candidate_digest_matches": consultation.get("candidate_digest") == runtime_rule.get("candidate_digest"),
         "blocked_path_present": bool(consultation.get("blocked_path")),
         "recommended_path_present": bool(consultation.get("recommended_path")),
-        "active_host_is_navigator_desktop": consultation.get("checks", {}).get("active_host_matches") is True
-        or "navigator_desktop" in build_model_instruction(runtime_rule).lower(),
-        "host_constraint_no_cuda": consultation.get("checks", {}).get("host_constraint_matches") is True
-        or "no_cuda" in build_model_instruction(runtime_rule).lower(),
+        "active_host_is_navigator_desktop": consultation.get("checks", {}).get("active_host_matches") is True,
+        "host_constraint_no_cuda": consultation.get("checks", {}).get("host_constraint_matches") is True,
         "input_has_cuda_nvidia_trigger": contains_trigger(user_input),
     }
     report = build_report(consultation, runtime_rule, user_input, checks)

@@ -155,6 +155,7 @@ def test_valid_packet_writes_outputs(tmp_path):
     text = md_path.read_text(encoding="utf-8")
     assert "This is packet evidence only." in text
     assert "No candidate promotion is granted." in text
+    assert "bounded" in payload["model_instruction"].lower()
 
 
 def test_valid_packet_does_not_call_model(tmp_path):
@@ -166,3 +167,31 @@ def test_valid_packet_does_not_call_model(tmp_path):
         tmp_path / "out",
     )
     assert report["model_call_authorized"] is False
+
+
+def test_active_host_check_false_fails(tmp_path):
+    consultation, runtime_rule = ready_inputs(tmp_path)
+    payload = json.loads(consultation.read_text(encoding="utf-8"))
+    payload["checks"]["active_host_matches"] = False
+    consultation.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    report = write_reports(
+        consultation,
+        runtime_rule,
+        "I need CUDA working on this RX580 box so I can train the small model locally. Should I install NVIDIA CUDA?",
+        tmp_path / "out",
+    )
+    assert report["packet_verdict"] == "invalid_input"
+
+
+def test_host_constraint_check_false_fails(tmp_path):
+    consultation, runtime_rule = ready_inputs(tmp_path)
+    payload = json.loads(consultation.read_text(encoding="utf-8"))
+    payload["checks"]["host_constraint_matches"] = False
+    consultation.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    report = write_reports(
+        consultation,
+        runtime_rule,
+        "I need CUDA working on this RX580 box so I can train the small model locally. Should I install NVIDIA CUDA?",
+        tmp_path / "out",
+    )
+    assert report["packet_verdict"] == "invalid_input"
