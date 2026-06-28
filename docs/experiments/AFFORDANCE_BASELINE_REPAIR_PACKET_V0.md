@@ -88,7 +88,9 @@ Authorized repair actions are limited to:
   preserves a scorer-only repair that accepts active-host applicability
   phrasing while requiring the exact structured labels and the relevant host
   profile constraint language; this does not authorize prompt repair or
-  runner execution behavior changes;
+  runner execution behavior changes. If the specialized scorer repair fully
+  covers the split-workflow prompt, the packet does not emit an empty generic
+  scorer-repair action for that prompt;
 - updating deterministic scorer false-negative handling for the scorer repair
   entries listed in the proposal JSON, whether that is the v2 single
   `baseline_no_durable_promotion` repair or the older v1 reviewer set;

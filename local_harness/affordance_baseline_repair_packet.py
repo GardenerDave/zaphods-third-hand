@@ -321,9 +321,9 @@ def authorized_repair_actions(
         )
     if scorer_repair_entries:
         prompt_ids = [repair["prompt_id"] for repair in scorer_repair_entries if repair.get("prompt_id")]
+        if split_workflow_scorer is not None:
+            prompt_ids = [prompt_id for prompt_id in prompt_ids if prompt_id != "baseline_split_workflow_active_host"]
         if prompt_ids:
-            if split_workflow_scorer is not None:
-                prompt_ids = [prompt_id for prompt_id in prompt_ids if prompt_id != "baseline_split_workflow_active_host"]
             actions.append(
                 {
                     "action_id": "repair_scorer_false_negatives",

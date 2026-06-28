@@ -185,6 +185,40 @@ def v4_proposal_payload(**overrides):
     return payload
 
 
+def v4_mixed_proposal_payload(**overrides):
+    payload = proposal_payload(
+        scorer_false_negative_repairs=[
+            {
+                "prompt_id": "baseline_split_workflow_active_host",
+                "repair_type": "split_workflow_active_host_applicability_scorer_acceptance",
+                "proposal": (
+                    "Accept active-host applicability phrasing when the response includes the "
+                    "exact structured labels and says the candidate applies only when the active "
+                    "host matches the relevant host/profile constraints."
+                ),
+                "accepted_language_examples": [
+                    "Local host:",
+                    "Remote host:",
+                    "Active execution host:",
+                    "Control rule:",
+                    "Candidate applies only if:",
+                    "active host is navigator_desktop",
+                    "constraints (no_cuda) are met",
+                ],
+            },
+            {
+                "prompt_id": "baseline_reverify_before_action",
+                "repair_type": "scorer_false_negative",
+                "proposal": "Accept revalidation as equivalent to reverify.",
+                "accepted_language_examples": ["revalidation", "reverify"],
+            },
+        ],
+        prompt_weakness_repairs=[],
+    )
+    payload.update(overrides)
+    return payload
+
+
 def write_json(path: Path, payload: dict) -> Path:
     path.write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n",
@@ -221,6 +255,12 @@ def build_v3_packet(tmp_path: Path):
 
 def build_v4_packet(tmp_path: Path):
     proposal = write_json(tmp_path / "baseline_repair_proposal.json", v4_proposal_payload())
+    decision = write_decision(tmp_path)
+    return write_reports(proposal, decision, tmp_path / "out")
+
+
+def build_v4_mixed_packet(tmp_path: Path):
+    proposal = write_json(tmp_path / "baseline_repair_proposal.json", v4_mixed_proposal_payload())
     decision = write_decision(tmp_path)
     return write_reports(proposal, decision, tmp_path / "out")
 
@@ -521,6 +561,29 @@ def test_v4_authorized_repair_actions_preserve_scorer_detail(tmp_path):
     assert "constraints (no_cuda) are met" in description
     assert "no prompt repair is authorized" in description.lower()
     assert "no runner execution behavior change is authorized" in description.lower()
+    assert all("prompts: ." not in action["description"] for action in packet["authorized_repair_actions"])
+    assert packet["authorized_repair_actions"][0]["target_prompt"] == "baseline_split_workflow_active_host"
+    assert "target_prompts" not in packet["authorized_repair_actions"][0]
+
+
+def test_v4_mixed_packet_keeps_remaining_generic_scorer_repair(tmp_path):
+    packet = build_v4_mixed_packet(tmp_path)
+    scorer_actions = [action for action in packet["authorized_repair_actions"] if action["action_id"] == "repair_scorer_false_negatives"]
+
+    assert [repair["prompt_id"] for repair in packet["scorer_repairs"]] == [
+        "baseline_split_workflow_active_host",
+        "baseline_reverify_before_action",
+    ]
+    assert len(scorer_actions) == 2
+    split_action = next(
+        action for action in scorer_actions if action.get("target_prompt") == "baseline_split_workflow_active_host"
+    )
+    generic_action = next(
+        action for action in scorer_actions if action.get("target_prompts") == ["baseline_reverify_before_action"]
+    )
+    assert "scorer-only" in split_action["description"].lower()
+    assert "active-host applicability phrasing" in split_action["description"].lower()
+    assert "baseline_split_workflow_active_host" not in generic_action["description"]
 
 
 def test_scorer_repairs_include_all_four_expected_prompts(tmp_path):
