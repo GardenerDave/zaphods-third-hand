@@ -1,0 +1,88 @@
+{
+  "allowed_next_step": "review_larql_apply_packet",
+  "apply_review_criteria": [
+    "Rule remains scoped to navigator_desktop or matching host evidence/profile constraints.",
+    "Rule blocks or warns on CUDA/NVIDIA troubleshooting for RX580/no_cuda hosts.",
+    "Rule recommends the LM Studio OpenAI-compatible endpoint path only under matching evidence.",
+    "Rule requires reverify when active host is unknown, split, stale, or digest evidence mismatches.",
+    "Rule does not promote the candidate or write durable memory."
+  ],
+  "candidate_digest": "c79aae337b91fe8da8f67d61508b4140e8c61e7db9cc607307c53e72566ec520",
+  "candidate_id": "larql_affordance_candidate_48efff9852ea",
+  "candidate_promotion_authorized": false,
+  "checks": {
+    "candidate_id_matches": true,
+    "dry_run_packet_audit_verdict_ok": true,
+    "dry_run_packet_baseline_verdict_ok": true,
+    "dry_run_packet_candidate_digest_verified_ok": true,
+    "dry_run_packet_candidate_promotion_authorized_false": true,
+    "dry_run_packet_durable_memory_authorized_false": true,
+    "dry_run_packet_larql_application_authorized_false": true,
+    "dry_run_packet_lora_training_authorized_false": true,
+    "dry_run_packet_next_step_ok": true,
+    "dry_run_packet_promotion_held_ok": true,
+    "dry_run_packet_report_type_ok": true,
+    "dry_run_packet_rule_status_ok": true,
+    "dry_run_packet_verdict_ok": true,
+    "dry_run_review_candidate_promotion_authorized_false": true,
+    "dry_run_review_durable_memory_authorized_false": true,
+    "dry_run_review_larql_application_authorized_false": true,
+    "dry_run_review_lora_training_authorized_false": true,
+    "dry_run_review_next_step_ok": true,
+    "dry_run_review_promotion_held_ok": true,
+    "dry_run_review_report_type_ok": true,
+    "dry_run_review_verdict_ok": true,
+    "packet_exists": true,
+    "packet_parses": true,
+    "review_exists": true,
+    "review_parses": true,
+    "rule_id_matches": true,
+    "source_failure_id_matches": true
+  },
+  "disallowed_actions": [
+    "apply_larql_patch",
+    "mutate_durable_memory",
+    "train_lora_adapter",
+    "promote_candidate",
+    "modify_dry_run_packet",
+    "modify_dry_run_review",
+    "commit_or_push"
+  ],
+  "durable_memory_authorized": false,
+  "input_dry_run_packet_verdict": "ready_for_larql_dry_run_review",
+  "input_dry_run_review_verdict": "approved_for_larql_apply_packet_drafting_only",
+  "larql_application_authorized": false,
+  "lora_training_authorized": false,
+  "notes": [
+    "Apply-packet draft only; no LARQL patch is applied.",
+    "No durable memory, LoRA training, or candidate promotion is authorized."
+  ],
+  "packet_status": "packet_only",
+  "packet_verdict": "ready_for_larql_apply_review",
+  "promotion_verdict": "hold_pending_explicit_experiment_approval",
+  "proposed_larql_rule": {
+    "applies_when": [
+      "active execution host matches navigator_desktop or matching host evidence/profile constraints",
+      "host constraint includes no_cuda",
+      "known-bad path includes CUDA-only setup on RX580"
+    ],
+    "blocks_or_warns_on": [
+      "CUDA-only setup",
+      "NVIDIA/CUDA troubleshooting path on RX580/no_cuda host"
+    ],
+    "recommends": [
+      "LM Studio OpenAI-compatible endpoint for small-model GPU-backed workflow"
+    ],
+    "requires_reverify_when": [
+      "active host is unknown",
+      "local host and remote host differ",
+      "hardware, GPU, driver, endpoint, or host profile may have changed",
+      "candidate digest or source digests do not match"
+    ],
+    "rule_id": "navigator_cuda_no_cuda_rx580_lmstudio_affordance_v0",
+    "status": "proposed_not_applied"
+  },
+  "report_type": "affordance_larql_apply_packet.v0",
+  "rule_id": "navigator_cuda_no_cuda_rx580_lmstudio_affordance_v0",
+  "source_failure_id": "cuda_on_navigator_desktop.real"
+}
