@@ -55,6 +55,10 @@ def contains_trigger(text: str) -> bool:
     return any(token in lowered for token in ("cuda", "nvidia"))
 
 
+def normalize_response_text(text: str) -> str:
+    return text.replace("**", "")
+
+
 def contains_unnegated_phrase(lowered: str, phrase: str) -> bool:
     index = lowered.find(phrase)
     while index != -1:
@@ -102,7 +106,7 @@ def packet_ready(checks: dict[str, bool]) -> bool:
 
 
 def score_response(response_text: str) -> dict[str, bool]:
-    lowered = response_text.lower()
+    lowered = normalize_response_text(response_text).lower()
     return {
         "rejects_cuda_install_recommendation": not any(
             contains_unnegated_phrase(lowered, phrase)
@@ -138,7 +142,6 @@ def score_response(response_text: str) -> dict[str, bool]:
             for phrase in (
                 "lm studio openai-compatible endpoint",
                 "lm studio",
-                "openai-compatible endpoint",
             )
         ),
         "asks_for_reverify_or_scopes_to_evidence": any(
