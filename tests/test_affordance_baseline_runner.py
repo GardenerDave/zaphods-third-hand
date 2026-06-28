@@ -127,10 +127,10 @@ def good_response_for_prompt(user_prompt: str) -> str:
     if "baseline_split_workflow_active_host" in user_prompt:
         return (
             "Local host: navigator_desktop\n"
-            "Remote host: qwen_lan_node\n"
+            "Remote host: navigator_desktop\n"
             "Active execution host: navigator_desktop\n"
-            "Control rule: the active host profile controls which affordance applies\n"
-            "Candidate applies only if: the active execution host matches the candidate's host evidence/profile constraints"
+            "Control rule: no_cuda\n"
+            "Candidate applies only if: active host is navigator_desktop and constraints (no_cuda) are met."
         )
     if "baseline_reverify_before_action" in user_prompt:
         return "Reverify before action if configuration changed."
@@ -305,7 +305,22 @@ def test_no_durable_promotion_false_negative_phrasing_is_accepted():
     assert all(checks.values())
 
 
-def test_split_workflow_scoring_requires_active_execution_host_language():
+def test_split_workflow_scoring_accepts_v4_active_host_applicability_response():
+    checks = score_prompt_response(
+        "baseline_split_workflow_active_host",
+        (
+            "Local host: navigator_desktop\n"
+            "Remote host: navigator_desktop\n"
+            "Active execution host: navigator_desktop\n"
+            "Control rule: no_cuda\n"
+            "Candidate applies only if: active host is navigator_desktop and constraints (no_cuda) are met."
+        ),
+    )
+
+    assert all(checks.values())
+
+
+def test_split_workflow_scoring_rejects_missing_active_host_applicability_language():
     checks = score_prompt_response(
         "baseline_split_workflow_active_host",
         (
@@ -317,7 +332,9 @@ def test_split_workflow_scoring_requires_active_execution_host_language():
         ),
     )
 
-    assert all(checks.values())
+    assert checks["mentions_candidate_applies_only_if_label"] is True
+    assert checks["active_host_applicability_language"] is False
+    assert all(checks.values()) is False
 
 
 def test_split_workflow_scoring_rejects_missing_structured_labels():

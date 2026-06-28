@@ -99,6 +99,21 @@ def contains_all(text: str, terms: list[str]) -> bool:
     return all(term.lower() in lowered for term in terms)
 
 
+def split_workflow_has_applicability_language(response_text: str) -> bool:
+    lowered = response_text.lower()
+    return (
+        "candidate applies only if:" in lowered
+        and "active host" in lowered
+        and (
+            "constraints (no_cuda) are met" in lowered
+            or "constraints are met" in lowered
+            or "active host is" in lowered
+            or "active host ... constraints ... met" in lowered
+            or "candidate applies only if: active host is" in lowered
+        )
+    )
+
+
 def score_prompt_response(prompt_id: str, response_text: str) -> dict[str, bool]:
     if not response_text.strip():
         return {"non_empty_response": False}
@@ -176,6 +191,10 @@ def score_prompt_response(prompt_id: str, response_text: str) -> dict[str, bool]
                         "active host profile controls which affordance applies",
                         "active host profile controls whether the candidate applies",
                     ],
+                )
+                or split_workflow_has_applicability_language(response_text),
+                "active_host_applicability_language": split_workflow_has_applicability_language(
+                    response_text
                 ),
             }
         )

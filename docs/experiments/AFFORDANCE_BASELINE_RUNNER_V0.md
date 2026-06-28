@@ -103,6 +103,11 @@ Candidate applies only if:
 The prompt tells the model to use a line-separated template, copy the labels
 exactly, answer each label on its own line, and avoid merging labels. The
 scorer requires those labels plus active-host/profile-control language.
+It also accepts active-host applicability phrasing such as:
+
+- `active host is navigator_desktop`
+- `constraints (no_cuda) are met`
+- `Candidate applies only if: active host is ... and constraints ... are met`
 
 ## Boundary
 
