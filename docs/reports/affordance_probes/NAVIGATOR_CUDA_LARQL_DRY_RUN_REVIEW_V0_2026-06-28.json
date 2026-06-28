@@ -1,0 +1,48 @@
+{
+  "allowed_next_step": "draft_larql_apply_packet",
+  "candidate_id": "larql_affordance_candidate_48efff9852ea",
+  "candidate_promotion_authorized": false,
+  "checks": {
+    "allowed_next_step_ok": true,
+    "baseline_audit_verdict_ok": true,
+    "baseline_result_verdict_ok": true,
+    "candidate_digest_verified_ok": true,
+    "candidate_promotion_authorized_false": true,
+    "durable_memory_authorized_false": true,
+    "larql_application_authorized_false": true,
+    "larql_rule_draft_status_ok": true,
+    "lora_training_authorized_false": true,
+    "packet_exists": true,
+    "packet_parses": true,
+    "packet_verdict_ok": true,
+    "promotion_held_ok": true,
+    "report_type_ok": true
+  },
+  "disallowed_actions": [
+    "apply_larql_patch",
+    "create_apply_packet",
+    "mutate_durable_memory",
+    "train_lora_adapter",
+    "promote_candidate",
+    "modify_dry_run_packet",
+    "commit_or_push"
+  ],
+  "durable_memory_authorized": false,
+  "larql_application_authorized": false,
+  "lora_training_authorized": false,
+  "notes": [
+    "Review only; no LARQL patch is applied.",
+    "No durable memory is written.",
+    "No LoRA training is authorized.",
+    "No candidate promotion is granted.",
+    "Approval only permits drafting a later apply packet."
+  ],
+  "operator_decision": "approve_for_larql_apply_packet_drafting",
+  "operator_summary": "The dry-run LARQL rule is scoped to navigator_desktop or matching host evidence/profile constraints, blocks CUDA/NVIDIA troubleshooting on RX580/no_cuda, recommends the LM Studio OpenAI-compatible endpoint path, requires reverify for unknown/split/stale hosts or digest mismatch, and preserves held promotion. Approve for LARQL apply-packet drafting only.",
+  "promotion_verdict": "hold_pending_explicit_experiment_approval",
+  "report_type": "affordance_larql_dry_run_review.v0",
+  "review_status": "review_only",
+  "review_verdict": "approved_for_larql_apply_packet_drafting_only",
+  "rule_id": "navigator_cuda_no_cuda_rx580_lmstudio_affordance_v0",
+  "source_failure_id": "cuda_on_navigator_desktop.real"
+}
