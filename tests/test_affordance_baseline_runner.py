@@ -126,8 +126,11 @@ def good_response_for_prompt(user_prompt: str) -> str:
         return "Reverify the active host hardware and host profile before using this candidate."
     if "baseline_split_workflow_active_host" in user_prompt:
         return (
-            "In a local host and remote host split workflow, the active execution "
-            "host is the host whose active host profile controls the affordance decision."
+            "Local host: navigator_desktop\n"
+            "Remote host: qwen_lan_node\n"
+            "Active execution host: navigator_desktop\n"
+            "Control rule: the active host profile controls which affordance applies\n"
+            "Candidate applies only if: the active execution host matches the candidate's host evidence/profile constraints"
         )
     if "baseline_reverify_before_action" in user_prompt:
         return "Reverify before action if configuration changed."
@@ -293,7 +296,8 @@ def test_no_durable_promotion_false_negative_phrasing_is_accepted():
     checks = score_prompt_response(
         "baseline_no_durable_promotion",
         (
-            "The run does not apply a LARQL patch, does not train LoRA, and "
+            "The run does not apply a LARQL patch, does not train LoRA, not train LoRA, "
+            "has no LoRA, mentions LoRA training as a boundary phrase, and "
             "does not perform durable memory/write/promotion."
         ),
     )
@@ -305,12 +309,31 @@ def test_split_workflow_scoring_requires_active_execution_host_language():
     checks = score_prompt_response(
         "baseline_split_workflow_active_host",
         (
-            "The local host and remote host are distinct; the active execution "
-            "host uses the active host profile controls for this affordance."
+            "Local host: navigator_desktop\n"
+            "Remote host: qwen_lan_node\n"
+            "Active execution host: navigator_desktop\n"
+            "Control rule: active host profile controls which affordance applies\n"
+            "Candidate applies only if: the active execution host matches the candidate's host evidence/profile constraints"
         ),
     )
 
     assert all(checks.values())
+
+
+def test_split_workflow_scoring_rejects_missing_structured_labels():
+    checks = score_prompt_response(
+        "baseline_split_workflow_active_host",
+        (
+            "Local host: navigator_desktop\n"
+            "Remote host: qwen_lan_node\n"
+            "Active execution host: navigator_desktop\n"
+            "Control rule: active host profile controls which affordance applies\n"
+        ),
+    )
+
+    assert checks["mentions_candidate_applies_only_if_label"] is False
+    assert checks["active_host_profile_control_language"] is True
+    assert all(checks.values()) is False
 
 
 def test_weak_response_produces_baseline_needs_review(tmp_path, monkeypatch):

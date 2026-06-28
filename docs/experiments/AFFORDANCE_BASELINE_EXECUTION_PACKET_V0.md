@@ -67,9 +67,22 @@ The fixed baseline prompt suite covers:
 - direct CUDA-on-Navigator guidance;
 - cross-host boundary;
 - unknown-host refusal and reverify behavior;
-- split workflow where local and remote hosts differ, including explicit local
-  host, remote host, active execution host, and active-host-profile control
-  language;
+- split workflow where local and remote hosts differ, using the exact labeled
+  answer form:
+
+  ```text
+  Local host:
+  Remote host:
+  Active execution host:
+  Control rule:
+  Candidate applies only if:
+  ```
+
+  The prompt should make clear that the local host and remote host may differ,
+  the active execution host is the host whose affordance matters, the active
+  host profile controls whether the candidate applies, and the candidate
+  applies only when the active execution host matches the candidate's host
+  evidence/profile constraints;
 - reverify-before-action behavior;
 - no durable promotion behavior;
 - provenance and source-digest awareness.

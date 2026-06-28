@@ -254,10 +254,12 @@ def test_split_workflow_prompt_names_required_host_roles(tmp_path):
     }
     split_prompt = prompts["baseline_split_workflow_active_host"].lower()
 
-    assert "local host" in split_prompt
-    assert "remote host" in split_prompt
-    assert "active execution host" in split_prompt
-    assert "active host profile controls" in split_prompt
+    assert "local host:" in split_prompt
+    assert "remote host:" in split_prompt
+    assert "active execution host:" in split_prompt
+    assert "control rule:" in split_prompt
+    assert "candidate applies only if:" in split_prompt
+    assert "active execution host matches the candidate's host evidence/profile constraints" in split_prompt
 
 
 def test_disallowed_actions_include_required_boundaries(tmp_path):

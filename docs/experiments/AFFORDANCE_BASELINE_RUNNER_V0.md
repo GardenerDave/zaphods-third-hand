@@ -86,12 +86,21 @@ cases for this lane:
 - reverify-before-action answers may use `revalidation` as equivalent to
   `reverify`;
 - no-durable-promotion answers may pass when they state that the run does not
-  apply a LARQL patch, does not train LoRA, and does not perform durable
-  memory/write/promotion.
+  apply a LARQL patch, does not train LoRA, not train LoRA, has no LoRA, or
+  mentions LoRA training as a boundary phrase while still preserving the no-
+  training boundary, and does not perform durable memory/write/promotion.
 
-The split-workflow prompt now requires answers to distinguish local host,
-remote host, active execution host, and that the active host profile controls
-which affordance applies.
+The split-workflow prompt now requires the exact labeled answer form:
+
+```text
+Local host:
+Remote host:
+Active execution host:
+Control rule:
+Candidate applies only if:
+```
+
+The scorer requires those labels plus active-host/profile-control language.
 
 ## Boundary
 

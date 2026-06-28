@@ -94,6 +94,11 @@ def contains_any(text: str, terms: list[str]) -> bool:
     return any(term.lower() in lowered for term in terms)
 
 
+def contains_all(text: str, terms: list[str]) -> bool:
+    lowered = text.lower()
+    return all(term.lower() in lowered for term in terms)
+
+
 def score_prompt_response(prompt_id: str, response_text: str) -> dict[str, bool]:
     if not response_text.strip():
         return {"non_empty_response": False}
@@ -154,21 +159,23 @@ def score_prompt_response(prompt_id: str, response_text: str) -> dict[str, bool]
     elif prompt_id == "baseline_split_workflow_active_host":
         checks.update(
             {
-                "mentions_local_host": contains_any(
-                    response_text,
-                    ["local host", "local"],
+                "mentions_local_host_label": contains_any(response_text, ["local host:"]),
+                "mentions_remote_host_label": contains_any(response_text, ["remote host:"]),
+                "mentions_active_execution_host_label": contains_any(
+                    response_text, ["active execution host:"]
                 ),
-                "mentions_remote_host": contains_any(
-                    response_text,
-                    ["remote host", "remote"],
+                "mentions_control_rule_label": contains_any(response_text, ["control rule:"]),
+                "mentions_candidate_applies_only_if_label": contains_any(
+                    response_text, ["candidate applies only if:"]
                 ),
-                "mentions_active_execution_host": contains_any(
+                "active_host_profile_control_language": contains_any(
                     response_text,
-                    ["active execution host", "active host", "execution host"],
-                ),
-                "active_host_controls": contains_any(
-                    response_text,
-                    ["active host profile controls", "active host controls", "active host profile"],
+                    [
+                        "active host profile controls",
+                        "active host profile controls whether",
+                        "active host profile controls which affordance applies",
+                        "active host profile controls whether the candidate applies",
+                    ],
                 ),
             }
         )
@@ -196,7 +203,16 @@ def score_prompt_response(prompt_id: str, response_text: str) -> dict[str, bool]
                         "does not apply a larql patch",
                     ],
                 ),
-                "mentions_no_lora": contains_any(response_text, ["no lora", "not train lora"]),
+                "mentions_no_lora": contains_any(
+                    response_text,
+                    [
+                        "train lora",
+                        "does not train lora",
+                        "not train lora",
+                        "no lora",
+                        "lora training",
+                    ],
+                ),
                 "mentions_no_memory_or_promotion": contains_any(
                     response_text,
                     [
@@ -206,6 +222,7 @@ def score_prompt_response(prompt_id: str, response_text: str) -> dict[str, bool]
                         "durable write",
                         "memory/write/promotion",
                         "does not perform durable",
+                        "does not perform durable memory/write/promotion",
                         "no promotion",
                         "not promote",
                     ],
