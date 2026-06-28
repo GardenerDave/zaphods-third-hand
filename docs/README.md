@@ -158,6 +158,9 @@ gates.
 - [`experiments/AFFORDANCE_BASELINE_REPAIR_DECISION_V0.md`](experiments/AFFORDANCE_BASELINE_REPAIR_DECISION_V0.md)
   — model-free decision record for accepting, rejecting, or holding baseline
   prompt/scorer repair packet drafting; it does not apply repairs.
+- [`experiments/AFFORDANCE_BASELINE_REPAIR_PACKET_V0.md`](experiments/AFFORDANCE_BASELINE_REPAIR_PACKET_V0.md)
+  — model-free packet generator that bounds later baseline prompt/scorer repair
+  application to exact target files and actions.
 
 ## Management-Team Workflows
 
