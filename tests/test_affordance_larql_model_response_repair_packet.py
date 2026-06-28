@@ -145,7 +145,7 @@ def test_current_review_produces_packet_with_two_targets(tmp_path):
     payload = json.loads((out_dir / "larql_model_response_repair_packet.json").read_text(encoding="utf-8"))
     assert [item["target_file"] for item in payload["proposed_repairs"]] == [
         "local_harness/affordance_larql_model_context_packet.py",
-        "local_harness/affordance_larql_model_response_probe.py",
+        "local_harness/affordance_larql_model_response_review.py",
     ]
 
 
@@ -167,23 +167,20 @@ def test_packet_includes_exact_lm_studio_instruction_repair(tmp_path):
     assert "PyTorch with a different compatible GPU" in text
 
 
-def test_packet_includes_markdown_negation_scorer_repair(tmp_path):
+def test_packet_includes_review_drift_coverage_repair(tmp_path):
     review = ready_review(
         tmp_path,
         repair_review_text(),
     )
     report = write_reports(review, tmp_path / "out")
     repair = report["proposed_repairs"][1]
-    text = "\n".join(repair["required_changes"])
-    assert repair["target_file"] == "local_harness/affordance_larql_model_response_probe.py"
-    assert "markdown emphasis" in text
-    assert "negated CUDA install language" in text
-    assert "Require `LM Studio` explicitly for `recommends_lm_studio_endpoint`." in text
-    assert "generic `OpenAI-compatible endpoint` alone" in text
-    assert "OpenAI Inference API or Hugging Face Inference API" in text
+    text = "\\n".join(repair["required_changes"])
+    assert repair["target_file"] == "local_harness/affordance_larql_model_response_review.py"
     assert "cloud-based service" in text
     assert "compatible GPU" in text
-
+    assert "PyTorch with a compatible GPU" in text
+    assert "endpoint/path drift" in text
+    assert "model-response review coverage" in text
 
 def test_authorization_flags_false(tmp_path):
     review = ready_review(

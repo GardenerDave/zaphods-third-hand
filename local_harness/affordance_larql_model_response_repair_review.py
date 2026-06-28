@@ -19,7 +19,7 @@ OUTPUT_FILES = ("larql_model_response_repair_review.json", "larql_model_response
 
 ALLOWED_FILES = {
     "local_harness/affordance_larql_model_context_packet.py",
-    "local_harness/affordance_larql_model_response_probe.py",
+    "local_harness/affordance_larql_model_response_review.py",
 }
 
 
@@ -65,7 +65,7 @@ def repair_ready(packet: dict[str, Any]) -> bool:
             packet.get("model_weight_mutation_authorized") is False,
             tuple(packet.get("allowed_files") or ()) == (
                 "local_harness/affordance_larql_model_context_packet.py",
-                "local_harness/affordance_larql_model_response_probe.py",
+                "local_harness/affordance_larql_model_response_review.py",
             ),
         ]
     )
@@ -81,7 +81,7 @@ def proposed_repairs_ok(packet: dict[str, Any]) -> bool:
     if set(by_target) != ALLOWED_FILES:
         return False
     context = "\n".join(by_target["local_harness/affordance_larql_model_context_packet.py"].get("required_changes") or []).lower()
-    probe = "\n".join(by_target["local_harness/affordance_larql_model_response_probe.py"].get("required_changes") or []).lower()
+    review = "\n".join(by_target["local_harness/affordance_larql_model_response_review.py"].get("required_changes") or []).lower()
     return all(
         [
             "lm studio openai-compatible endpoint" in context,
@@ -90,12 +90,10 @@ def proposed_repairs_ok(packet: dict[str, Any]) -> bool:
             "generic cloud" in context,
             "host/profile/gpu/endpoint/digest evidence" in context,
             "reverify if host, gpu, driver, profile, endpoint, or digest evidence changes" in context,
-            "markdown emphasis" in probe,
-            "negated cuda install language" in probe,
-            "lm studio" in probe,
-            "openai-compatible endpoint" in probe,
-            "openai inference api" in probe,
-            "hugging face inference api" in probe,
+            "cloud-based service" in review,
+            "compatible gpu" in review,
+            "pytorch with a compatible gpu" in review,
+            "endpoint/path drift" in review,
         ]
     )
 
@@ -112,7 +110,7 @@ def build_checks(packet: dict[str, Any]) -> dict[str, bool]:
         "source_failure_id_present": bool(packet.get("source_failure_id")),
         "allowed_files_exact": tuple(packet.get("allowed_files") or ()) == (
             "local_harness/affordance_larql_model_context_packet.py",
-            "local_harness/affordance_larql_model_response_probe.py",
+            "local_harness/affordance_larql_model_response_review.py",
         ),
         "repair_targets_exact": set((item or {}).get("target_file") for item in (packet.get("proposed_repairs") or []) if isinstance(item, dict))
         == ALLOWED_FILES,

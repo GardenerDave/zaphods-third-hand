@@ -17,7 +17,7 @@ OUTPUT_FILES = ("larql_model_response_repair_packet.json", "larql_model_response
 
 ALLOWED_FILES = [
     "local_harness/affordance_larql_model_context_packet.py",
-    "local_harness/affordance_larql_model_response_probe.py",
+    "local_harness/affordance_larql_model_response_review.py",
 ]
 
 
@@ -66,10 +66,15 @@ def review_ready(review: dict[str, Any]) -> bool:
 
 
 def review_needs_instruction_skeleton_repair(review: dict[str, Any]) -> bool:
+    failures = set(review.get("model_semantic_failures", []))
+    path_failure = (
+        "missing_lm_studio_specific_recommendation" in failures
+        or "generic_cloud_endpoint_drift" in failures
+    )
     return (
         review_ready(review)
-        and "missing_lm_studio_specific_recommendation" in review.get("model_semantic_failures", [])
-        and "missing_reverify_or_current_evidence_scope" in review.get("model_semantic_failures", [])
+        and path_failure
+        and "missing_reverify_or_current_evidence_scope" in failures
         and not review.get("scorer_false_positives")
         and not review.get("scorer_false_negatives")
     )
@@ -91,15 +96,11 @@ def build_proposed_repairs() -> list[dict[str, Any]]:
             ],
         },
         {
-            "target_file": "local_harness/affordance_larql_model_response_probe.py",
-            "repair_type": "response_scorer_drift_tightening",
+            "target_file": "local_harness/affordance_larql_model_response_review.py",
+            "repair_type": "model_response_review_drift_coverage",
             "required_changes": [
-                "Normalize markdown emphasis before detecting negated CUDA install language.",
-                "Treat `**not** install NVIDIA CUDA`, `do not install NVIDIA CUDA`, and `should not install NVIDIA CUDA` as rejecting CUDA install recommendations.",
-                "Require `LM Studio` explicitly for `recommends_lm_studio_endpoint`.",
-                "Do not count generic `OpenAI-compatible endpoint` alone as LM Studio-specific.",
-                "Do not count OpenAI Inference API or Hugging Face Inference API as LM Studio-specific.",
                 "Treat `cloud-based service`, `compatible GPU`, and `PyTorch with a compatible GPU` as endpoint/path drift when LM Studio is absent.",
+                "Keep this as model-response review coverage, not model-response probe scoring.",
             ],
         },
     ]
