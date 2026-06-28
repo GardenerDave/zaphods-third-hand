@@ -44,6 +44,14 @@ REQUIRED_TESTS = [
     "git diff --check",
 ]
 
+STRUCTURED_SPLIT_WORKFLOW_REQUIRED_LABELS = [
+    "Local host:",
+    "Remote host:",
+    "Active execution host:",
+    "Control rule:",
+    "Candidate applies only if:",
+]
+
 
 def validate_out_dir(path: Path) -> None:
     if any(part == ".." for part in path.parts):
@@ -76,7 +84,13 @@ def read_json_object(path: Path, label: str) -> tuple[dict[str, Any], dict[str, 
     return payload, checks, notes
 
 
-def scorer_repairs() -> list[dict[str, Any]]:
+def string_list(value: Any) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [item for item in value if isinstance(item, str)]
+
+
+def default_scorer_repairs() -> list[dict[str, Any]]:
     return [
         {
             "prompt_id": "baseline_direct_cuda_on_navigator",
@@ -131,7 +145,25 @@ def scorer_repairs() -> list[dict[str, Any]]:
     ]
 
 
-def prompt_repairs() -> list[dict[str, Any]]:
+def normalize_scorer_repair(entry: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "prompt_id": str(entry.get("prompt_id") or ""),
+        "repair_type": str(entry.get("repair_type") or "scorer_false_negative"),
+        "authorized_change": str(entry.get("authorized_change") or entry.get("proposal") or ""),
+        "accepted_language_examples": string_list(entry.get("accepted_language_examples")),
+    }
+
+
+def scorer_repairs(proposal: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    if proposal is not None and "scorer_false_negative_repairs" in proposal:
+        entries = proposal.get("scorer_false_negative_repairs")
+        if isinstance(entries, list):
+            return [normalize_scorer_repair(entry) for entry in entries if isinstance(entry, dict)]
+        return []
+    return default_scorer_repairs()
+
+
+def default_prompt_repairs() -> list[dict[str, Any]]:
     return [
         {
             "prompt_id": "baseline_split_workflow_active_host",
@@ -154,40 +186,107 @@ def prompt_repairs() -> list[dict[str, Any]]:
     ]
 
 
-def authorized_repair_actions() -> list[dict[str, Any]]:
-    return [
-        {
-            "action_id": "strengthen_split_workflow_prompt",
-            "target_prompt": "baseline_split_workflow_active_host",
-            "scope": "prompt_suite_and_scorer_only",
-            "description": prompt_repairs()[0]["authorized_change"],
-        },
-        {
-            "action_id": "repair_scorer_false_negatives",
-            "target_prompts": [repair["prompt_id"] for repair in scorer_repairs()],
-            "scope": "prompt_suite_and_scorer_only",
-            "description": (
-                "Update deterministic scorer acceptance for the four reviewed "
-                "false-negative prompt checks."
-            ),
-        },
-        {
-            "action_id": "update_focused_tests",
-            "scope": "tests_only",
-            "description": (
-                "Update focused tests for revised scorer behavior and strengthened "
-                "split-workflow prompt coverage."
-            ),
-        },
-        {
-            "action_id": "update_experiment_docs",
-            "scope": "docs_only",
-            "description": (
-                "Update experiment docs to describe the revised baseline "
-                "prompt/scorer behavior."
-            ),
-        },
-    ]
+def normalize_prompt_repair(entry: dict[str, Any]) -> dict[str, Any]:
+    repair_type = str(entry.get("repair_type") or "prompt_and_scorer_tightening")
+    required_labels = string_list(entry.get("required_labels"))
+    if repair_type == "structured_prompt_and_scorer_tightening" and not required_labels:
+        required_labels = list(STRUCTURED_SPLIT_WORKFLOW_REQUIRED_LABELS)
+    normalized = {
+        "prompt_id": str(entry.get("prompt_id") or ""),
+        "repair_type": repair_type,
+        "authorized_change": str(entry.get("authorized_change") or entry.get("proposal") or ""),
+        "required_concepts": string_list(entry.get("required_concepts")),
+        "scorer_requirement": str(entry.get("scorer_requirement") or ""),
+    }
+    if required_labels:
+        normalized["required_labels"] = required_labels
+    return normalized
+
+
+def prompt_repairs(proposal: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    if proposal is not None and "prompt_weakness_repairs" in proposal:
+        entries = proposal.get("prompt_weakness_repairs")
+        if isinstance(entries, list):
+            return [normalize_prompt_repair(entry) for entry in entries if isinstance(entry, dict)]
+        return []
+    return default_prompt_repairs()
+
+
+def authorized_repair_actions(
+    scorer_repair_entries: list[dict[str, Any]],
+    prompt_repair_entries: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    actions: list[dict[str, Any]] = []
+    structured_prompt = next(
+        (
+            repair
+            for repair in prompt_repair_entries
+            if repair.get("repair_type") == "structured_prompt_and_scorer_tightening"
+        ),
+        None,
+    )
+    if structured_prompt is not None:
+        required_labels = structured_prompt.get("required_labels") or STRUCTURED_SPLIT_WORKFLOW_REQUIRED_LABELS
+        actions.append(
+            {
+                "action_id": "strengthen_split_workflow_prompt",
+                "target_prompt": "baseline_split_workflow_active_host",
+                "scope": "prompt_suite_and_scorer_only",
+                "description": (
+                    "Update the structured split-workflow prompt so it requires exact "
+                    f"labels: {', '.join(required_labels)}."
+                ),
+                "required_labels": required_labels,
+            }
+        )
+    elif prompt_repair_entries:
+        prompt_ids = [repair["prompt_id"] for repair in prompt_repair_entries if repair.get("prompt_id")]
+        actions.append(
+            {
+                "action_id": "strengthen_split_workflow_prompt",
+                "target_prompts": prompt_ids,
+                "scope": "prompt_suite_and_scorer_only",
+                "description": (
+                    "Update the split-workflow prompt so the expected answer distinguishes "
+                    "local host, remote host, active execution host, and active-host-profile control language."
+                ),
+            }
+        )
+    if scorer_repair_entries:
+        prompt_ids = [repair["prompt_id"] for repair in scorer_repair_entries if repair.get("prompt_id")]
+        if prompt_ids:
+            actions.append(
+                {
+                    "action_id": "repair_scorer_false_negatives",
+                    "target_prompts": prompt_ids,
+                    "scope": "prompt_suite_and_scorer_only",
+                    "description": (
+                        "Update deterministic scorer acceptance for the reviewed "
+                        f"false-negative prompts: {', '.join(f'`{prompt_id}`' for prompt_id in prompt_ids)}."
+                    ),
+                }
+            )
+    actions.extend(
+        [
+            {
+                "action_id": "update_focused_tests",
+                "scope": "tests_only",
+                "description": (
+                    "Update focused tests for revised scorer behavior and strengthened "
+                    "split-workflow prompt coverage."
+                ),
+            },
+            {
+                "action_id": "update_experiment_docs",
+                "scope": "docs_only",
+                "description": (
+                    "Update experiment docs to describe the revised baseline "
+                    "prompt/scorer behavior."
+                ),
+            },
+        ]
+    )
+    return actions
 
 
 def disallowed_actions() -> list[str]:
@@ -298,6 +397,8 @@ def build_packet(proposal_path: Path, decision_path: Path) -> dict[str, Any]:
     checks = build_checks(proposal, decision, proposal_checks, decision_checks)
     verdict = packet_verdict(checks)
     failed_checks = [name for name, passed in checks.items() if not passed]
+    scorer_repair_entries = scorer_repairs(proposal)
+    prompt_repair_entries = prompt_repairs(proposal)
     notes = [
         *proposal_notes,
         *decision_notes,
@@ -324,9 +425,12 @@ def build_packet(proposal_path: Path, decision_path: Path) -> dict[str, Any]:
         "input_decision_verdict": decision.get("decision_verdict"),
         "allowed_next_step": allowed_next_step(verdict),
         "authorized_target_files": AUTHORIZED_TARGET_FILES,
-        "authorized_repair_actions": authorized_repair_actions(),
-        "scorer_repairs": scorer_repairs(),
-        "prompt_repairs": prompt_repairs(),
+        "authorized_repair_actions": authorized_repair_actions(
+            scorer_repair_entries,
+            prompt_repair_entries,
+        ),
+        "scorer_repairs": scorer_repair_entries,
+        "prompt_repairs": prompt_repair_entries,
         "required_tests": REQUIRED_TESTS,
         "rerun_required_after_repair": bool(
             proposal.get("rerun_required_after_repair")
@@ -402,8 +506,16 @@ def render_markdown(packet: dict[str, Any]) -> str:
         lines.extend(
             [
                 f"- `{repair['prompt_id']}`: {repair['authorized_change']}",
+                f"  - Repair type: `{repair['repair_type']}`",
             ]
         )
+        if repair.get("required_labels"):
+            lines.extend(
+                [
+                    "  - Required labels:",
+                    *[f"    - {label}" for label in repair["required_labels"]],
+                ]
+            )
     lines.extend(
         [
             "",

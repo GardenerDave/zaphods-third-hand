@@ -60,6 +60,11 @@ hold_pending_explicit_experiment_approval
 The packet authorizes only baseline prompt-suite and scorer repair drafting
 against the listed target files.
 
+The packet mirrors the repair entries present in the repair proposal JSON. That
+lets later packets reflect the current proposal shape instead of a frozen
+historical list. Older v1-style proposals that omit explicit repair lists still
+fall back to the original packet shape.
+
 The target files are limited to:
 
 - `local_harness/affordance_baseline_execution_packet.py`
@@ -74,10 +79,22 @@ Authorized repair actions are limited to:
 - strengthening the `baseline_split_workflow_active_host` prompt so expected
   answers distinguish local host, remote host, active execution host, and that
   the active host profile controls which affordance applies;
-- updating deterministic scorer false-negative handling for the four reviewed
-  baseline prompts;
+- updating deterministic scorer false-negative handling for the scorer repair
+  entries listed in the proposal JSON, whether that is the v2 single
+  `baseline_no_durable_promotion` repair or the older v1 reviewer set;
 - updating focused tests for that prompt/scorer behavior;
 - updating experiment docs to describe the revised behavior.
+
+When a structured split-workflow repair is present, the packet carries the
+exact required labels from the proposal:
+
+```text
+Local host:
+Remote host:
+Active execution host:
+Control rule:
+Candidate applies only if:
+```
 
 Runner execution behavior repair is not authorized. Candidate repair is not
 authorized.

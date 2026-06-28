@@ -65,6 +65,61 @@ def decision_payload(**overrides):
     return payload
 
 
+def v2_proposal_payload(**overrides):
+    payload = proposal_payload(
+        scorer_false_negative_repairs=[
+            {
+                "prompt_id": "baseline_no_durable_promotion",
+                "repair_type": "scorer_false_negative",
+                "proposal": (
+                    "Accept language that says the run does not apply a LARQL patch, "
+                    "does not train LoRA, and does not perform durable memory/write/promotion."
+                ),
+                "accepted_language_examples": [
+                    "does not apply a LARQL patch",
+                    "train LoRA",
+                    "does not train LoRA",
+                    "not train LoRA",
+                    "no LoRA",
+                    "LoRA training",
+                    "no durable memory",
+                    "no durable write",
+                    "no promotion",
+                ],
+            }
+        ],
+        prompt_weakness_repairs=[
+            {
+                "prompt_id": "baseline_split_workflow_active_host",
+                "repair_type": "structured_prompt_and_scorer_tightening",
+                "proposal": (
+                    "Replace the prose-only split-workflow prompt with a structured "
+                    "answer form requiring exact labeled lines for local host, remote "
+                    "host, active execution host, control rule, and candidate applicability."
+                ),
+                "required_labels": [
+                    "Local host:",
+                    "Remote host:",
+                    "Active execution host:",
+                    "Control rule:",
+                    "Candidate applies only if:",
+                ],
+                "required_concepts": [
+                    "local host",
+                    "remote host",
+                    "active execution host",
+                    "active host profile controls which affordance applies",
+                ],
+                "scorer_requirement": (
+                    "Require the exact structured labels plus active-host/profile control language."
+                ),
+            }
+        ],
+    )
+    payload.update(overrides)
+    return payload
+
+
 def write_json(path: Path, payload: dict) -> Path:
     path.write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n",
@@ -83,6 +138,12 @@ def write_decision(tmp_path: Path, **overrides) -> Path:
 
 def build_ready_packet(tmp_path: Path):
     proposal = write_proposal(tmp_path)
+    decision = write_decision(tmp_path)
+    return write_reports(proposal, decision, tmp_path / "out")
+
+
+def build_v2_packet(tmp_path: Path):
+    proposal = write_json(tmp_path / "baseline_repair_proposal.json", v2_proposal_payload())
     decision = write_decision(tmp_path)
     return write_reports(proposal, decision, tmp_path / "out")
 
@@ -239,6 +300,72 @@ def test_authorized_target_files_are_exactly_bounded(tmp_path):
     assert packet["authorized_target_files"] == AUTHORIZED_TARGET_FILES
 
 
+def test_v2_proposal_shape_produces_ready_packet(tmp_path):
+    packet = build_v2_packet(tmp_path)
+
+    assert packet["packet_verdict"] == "ready_for_bounded_repair_application"
+    assert packet["promotion_verdict"] == "hold_pending_explicit_experiment_approval"
+
+
+def test_v2_packet_includes_exactly_one_scorer_repair(tmp_path):
+    packet = build_v2_packet(tmp_path)
+
+    assert [repair["prompt_id"] for repair in packet["scorer_repairs"]] == [
+        "baseline_no_durable_promotion"
+    ]
+
+
+def test_v2_no_durable_promotion_repair_includes_lora_acceptance_terms(tmp_path):
+    packet = build_v2_packet(tmp_path)
+    examples = set(packet["scorer_repairs"][0]["accepted_language_examples"])
+
+    assert "train LoRA" in examples
+    assert "does not train LoRA" in examples
+    assert "not train LoRA" in examples
+    assert "no LoRA" in examples
+    assert "LoRA training" in examples
+
+
+def test_v2_packet_includes_exactly_one_prompt_repair(tmp_path):
+    packet = build_v2_packet(tmp_path)
+
+    assert [repair["prompt_id"] for repair in packet["prompt_repairs"]] == [
+        "baseline_split_workflow_active_host"
+    ]
+
+
+def test_v2_prompt_repair_preserves_structured_repair_type(tmp_path):
+    packet = build_v2_packet(tmp_path)
+
+    assert packet["prompt_repairs"][0]["repair_type"] == "structured_prompt_and_scorer_tightening"
+
+
+def test_v2_prompt_repair_preserves_required_labels(tmp_path):
+    packet = build_v2_packet(tmp_path)
+
+    assert packet["prompt_repairs"][0]["required_labels"] == [
+        "Local host:",
+        "Remote host:",
+        "Active execution host:",
+        "Control rule:",
+        "Candidate applies only if:",
+    ]
+
+
+def test_v2_authorized_repair_actions_mention_structured_split_workflow_repair(tmp_path):
+    packet = build_v2_packet(tmp_path)
+
+    descriptions = [action["description"] for action in packet["authorized_repair_actions"]]
+    assert any("structured split-workflow" in description.lower() for description in descriptions)
+
+
+def test_v2_runner_and_candidate_repair_authorization_remain_false(tmp_path):
+    packet = build_v2_packet(tmp_path)
+
+    assert packet["runner_code_repair_authorized"] is False
+    assert packet["candidate_repair_authorized"] is False
+
+
 def test_scorer_repairs_include_all_four_expected_prompts(tmp_path):
     packet = build_ready_packet(tmp_path)
     prompt_ids = {repair["prompt_id"] for repair in packet["scorer_repairs"]}
@@ -291,3 +418,22 @@ def test_markdown_includes_boundary_language(tmp_path):
     assert "This packet is not comparison lane execution." in markdown
     assert "This packet grants no candidate promotion." in markdown
     assert "Rerun is required after any accepted repair." in markdown
+
+
+def test_markdown_includes_structured_labels(tmp_path):
+    packet = build_v2_packet(tmp_path)
+    out = tmp_path / "out"
+
+    write_reports(
+        write_json(tmp_path / "baseline_repair_proposal.json", v2_proposal_payload()),
+        write_decision(tmp_path),
+        out,
+    )
+    markdown = (out / "baseline_repair_packet.md").read_text(encoding="utf-8")
+
+    assert "structured_prompt_and_scorer_tightening" in markdown
+    assert "Local host:" in markdown
+    assert "Remote host:" in markdown
+    assert "Active execution host:" in markdown
+    assert "Control rule:" in markdown
+    assert "Candidate applies only if:" in markdown
