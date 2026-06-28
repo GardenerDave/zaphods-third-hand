@@ -30,11 +30,6 @@ Selected lane: `baseline_prompt_context_only`
 - Scope: `prompt_suite_and_scorer_only`
 - Description: Scorer-only repair: accept active-host applicability phrasing when the response includes the exact structured labels and says the candidate applies only when the active host matches the relevant host/profile constraints. Required labels: Local host:, Remote host:, Active execution host:, Control rule:, Candidate applies only if:. Accepted phrasing examples include active host is navigator_desktop, constraints (no_cuda) are met, active host ... constraints ... met, and Candidate applies only if: active host is ... and constraints ... are met. No prompt repair is authorized. No runner execution behavior change is authorized.
 
-### `repair_scorer_false_negatives`
-
-- Scope: `prompt_suite_and_scorer_only`
-- Description: Update deterministic scorer acceptance for the reviewed false-negative prompts: .
-
 ### `update_focused_tests`
 
 - Scope: `tests_only`

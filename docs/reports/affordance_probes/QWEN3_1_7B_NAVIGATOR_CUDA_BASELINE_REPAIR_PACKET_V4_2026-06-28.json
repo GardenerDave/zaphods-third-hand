@@ -26,12 +26,6 @@
       "target_prompt": "baseline_split_workflow_active_host"
     },
     {
-      "action_id": "repair_scorer_false_negatives",
-      "description": "Update deterministic scorer acceptance for the reviewed false-negative prompts: .",
-      "scope": "prompt_suite_and_scorer_only",
-      "target_prompts": []
-    },
-    {
       "action_id": "update_focused_tests",
       "description": "Update focused tests for revised scorer behavior and strengthened split-workflow prompt coverage.",
       "scope": "tests_only"
