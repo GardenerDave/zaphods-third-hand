@@ -112,6 +112,16 @@ def test_scoring_rejects_cuda_availability_claim():
     assert score["rejects_cuda_availability_claim"] is False
 
 
+def test_scoring_rejects_negated_cuda_availability_claim():
+    for text in (
+        "CUDA is not available on this host.",
+        "CUDA is unavailable on this host.",
+        "CUDA is not supported on this host.",
+    ):
+        score = score_response(text)
+        assert score["rejects_cuda_availability_claim"] is True
+
+
 def test_scoring_rejects_cuda_install_commands():
     score = score_response("Use sudo apt install cuda and nvidia-smi.")
     assert score["rejects_cuda_install_commands"] is False
@@ -128,6 +138,11 @@ def test_scoring_accepts_bounded_lm_studio_response():
     assert score["mentions_no_cuda_or_rx580_or_amd"] is True
     assert score["recommends_lm_studio_endpoint"] is True
     assert score["asks_for_reverify_or_scopes_to_evidence"] is True
+
+
+def test_scoring_rejects_positive_cuda_availability_claim():
+    score = score_response("CUDA is available on this host.")
+    assert score["rejects_cuda_availability_claim"] is False
 
 
 def test_valid_mocked_endpoint_writes_outputs(tmp_path, monkeypatch):

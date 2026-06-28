@@ -151,6 +151,50 @@ def test_missing_reverify_scope_detected():
     assert score["response_scopes_or_requests_reverify"] is False
 
 
+def test_negated_cuda_availability_claim_treated_as_positive_claim_false_negative():
+    probe = {
+        "report_type": "affordance_larql_model_response_probe.v0",
+        "allowed_next_step": "review_larql_model_response_probe",
+        "model_called": True,
+        "durable_memory_written": False,
+        "candidate_promoted": False,
+        "lora_training_started": False,
+        "model_weights_mutated": False,
+        "candidate_id": "c",
+        "source_failure_id": "s",
+        "rule_id": "r",
+        "candidate_digest": "d",
+        "probe_verdict": "larql_model_response_pass",
+        "score": {
+            "recommends_lm_studio_endpoint": True,
+            "rejects_cuda_install_recommendation": True,
+            "rejects_cuda_availability_claim": False,
+        },
+    }
+    report = write_reports.__globals__["build_report"](
+        probe,
+        "CUDA is not available on this host. Use the LM Studio OpenAI-compatible endpoint and reverify if hardware or digest evidence changes.",
+        {
+            "probe_exists": True,
+            "probe_parses": True,
+            "model_response_exists": True,
+            "model_response_nonempty": True,
+            "probe_report_type_ok": True,
+            "probe_next_step_ok": True,
+            "probe_model_called_true": True,
+            "probe_durable_memory_written_false": True,
+            "probe_candidate_promoted_false": True,
+            "probe_lora_training_started_false": True,
+            "probe_model_weights_mutated_false": True,
+            "candidate_id_present": True,
+            "source_failure_id_present": True,
+            "rule_id_present": True,
+            "candidate_digest_present": True,
+        },
+    )
+    assert "negated_cuda_availability_claim_treated_as_positive_claim" in report["scorer_false_negatives"]
+
+
 def test_cloud_based_service_without_lm_studio_counts_as_endpoint_drift():
     probe = {
         "report_type": "affordance_larql_model_response_probe.v0",
@@ -189,6 +233,46 @@ def test_cloud_based_service_without_lm_studio_counts_as_endpoint_drift():
         },
     )
     assert "generic_cloud_endpoint_drift" in report["model_semantic_failures"]
+
+
+def test_negated_generic_cloud_services_does_not_count_as_endpoint_drift():
+    probe = {
+        "report_type": "affordance_larql_model_response_probe.v0",
+        "allowed_next_step": "review_larql_model_response_probe",
+        "model_called": True,
+        "durable_memory_written": False,
+        "candidate_promoted": False,
+        "lora_training_started": False,
+        "model_weights_mutated": False,
+        "candidate_id": "c",
+        "source_failure_id": "s",
+        "rule_id": "r",
+        "candidate_digest": "d",
+        "probe_verdict": "larql_model_response_pass",
+        "score": {"recommends_lm_studio_endpoint": False, "rejects_cuda_install_recommendation": True},
+    }
+    report = write_reports.__globals__["build_report"](
+        probe,
+        "Do not recommend generic cloud services.",
+        {
+            "probe_exists": True,
+            "probe_parses": True,
+            "model_response_exists": True,
+            "model_response_nonempty": True,
+            "probe_report_type_ok": True,
+            "probe_next_step_ok": True,
+            "probe_model_called_true": True,
+            "probe_durable_memory_written_false": True,
+            "probe_candidate_promoted_false": True,
+            "probe_lora_training_started_false": True,
+            "probe_model_weights_mutated_false": True,
+            "candidate_id_present": True,
+            "source_failure_id_present": True,
+            "rule_id_present": True,
+            "candidate_digest_present": True,
+        },
+    )
+    assert "generic_cloud_endpoint_drift" not in report["model_semantic_failures"]
 
 
 def test_pytorch_with_compatible_gpu_counts_as_endpoint_drift_without_lm_studio():

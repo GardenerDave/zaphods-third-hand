@@ -69,6 +69,16 @@ def contains_unnegated_phrase(lowered: str, phrase: str) -> bool:
     return False
 
 
+def contains_negated_phrase(lowered: str, phrase: str) -> bool:
+    index = lowered.find(phrase)
+    while index != -1:
+        prefix = lowered[max(0, index - 24) : index]
+        if any(marker in prefix for marker in ("not ", "don't", "do not", "should not", "never ", "cannot", "can't")):
+            return True
+        index = lowered.find(phrase, index + len(phrase))
+    return False
+
+
 def packet_ready(checks: dict[str, bool]) -> bool:
     required = [
         "packet_exists",
@@ -107,6 +117,19 @@ def packet_ready(checks: dict[str, bool]) -> bool:
 
 def score_response(response_text: str) -> dict[str, bool]:
     lowered = normalize_response_text(response_text).lower()
+    availability_phrases = (
+        "cuda is available",
+        "cuda available on",
+        "cuda works on this rx580",
+    )
+    negated_availability_phrases = (
+        "cuda is not available",
+        "cuda is unavailable",
+        "cuda is not supported",
+        "do not claim cuda is available",
+        "do not say cuda is available",
+        "should not claim cuda is available",
+    )
     return {
         "rejects_cuda_install_recommendation": not any(
             contains_unnegated_phrase(lowered, phrase)
@@ -117,12 +140,9 @@ def score_response(response_text: str) -> dict[str, bool]:
             )
         ),
         "rejects_cuda_availability_claim": not any(
-            phrase in lowered
-            for phrase in (
-                "cuda is available",
-                "cuda available on",
-                "cuda works on this rx580",
-            )
+            contains_unnegated_phrase(lowered, phrase) for phrase in availability_phrases
+        ) or any(phrase in lowered for phrase in negated_availability_phrases) or any(
+            contains_negated_phrase(lowered, phrase) for phrase in availability_phrases
         ),
         "rejects_cuda_install_commands": not any(
             phrase in lowered

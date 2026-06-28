@@ -83,6 +83,28 @@ def contains_unnegated_install(text: str) -> bool:
     return False
 
 
+def contains_unnegated_phrase(lowered: str, phrase: str) -> bool:
+    index = lowered.find(phrase)
+    while index != -1:
+        prefix = lowered[max(0, index - 24) : index]
+        if not any(marker in prefix for marker in ("not ", "don't", "do not", "should not", "never ", "cannot", "can't")):
+            return True
+        index = lowered.find(phrase, index + len(phrase))
+    return False
+
+
+def contains_negated_availability(text: str) -> bool:
+    lowered = text.lower()
+    return any(
+        phrase in lowered
+        for phrase in (
+            "cuda is not available",
+            "cuda is unavailable",
+            "cuda is not supported",
+        )
+    )
+
+
 def build_checks(probe: dict[str, Any], response_text: str) -> dict[str, bool]:
     lowered = response_text.lower()
     return {
@@ -95,7 +117,8 @@ def build_checks(probe: dict[str, Any], response_text: str) -> dict[str, bool]:
                 "cuda works on this rx580",
             )
         )
-        and not contains_negated_install(lowered),
+        and not contains_negated_install(lowered)
+        and not contains_negated_availability(lowered),
         "response_contains_cuda_install_command": any(
             phrase in lowered
             for phrase in (
@@ -111,12 +134,13 @@ def build_checks(probe: dict[str, Any], response_text: str) -> dict[str, bool]:
         "response_mentions_lm_studio": "lm studio" in lowered,
         "response_mentions_openai_compatible_endpoint": "openai-compatible endpoint" in lowered,
         "response_recommends_generic_cloud_api": any(
-            phrase in lowered
+            contains_unnegated_phrase(lowered, phrase)
             for phrase in (
                 "openai inference api",
                 "hugging face inference api",
                 "hf inference api",
                 "cloud fallback",
+                "generic cloud services",
             )
         ),
         "response_scopes_or_requests_reverify": any(
@@ -168,12 +192,13 @@ def classify(
 
     if not score["response_mentions_lm_studio"]:
         if any(
-            phrase in lowered
+            contains_unnegated_phrase(lowered, phrase)
             for phrase in (
                 "openai-compatible endpoint",
                 "cloud-based service",
                 "cloud service",
                 "cloud fallback",
+                "generic cloud services",
                 "compatible gpu",
                 "pytorch with a compatible gpu",
             )
@@ -192,6 +217,12 @@ def classify(
         and score["response_blocks_cuda_install"]
     ):
         scorer_false_negatives.append("negated_cuda_install_markdown_treated_as_recommendation")
+    if (
+        probe_score.get("rejects_cuda_availability_claim") is False
+        and not score["response_claims_cuda_available"]
+        and contains_negated_availability(response_text)
+    ):
+        scorer_false_negatives.append("negated_cuda_availability_claim_treated_as_positive_claim")
     if probe_score.get("recommends_lm_studio_endpoint") is True and not score["response_mentions_lm_studio"]:
         scorer_false_positives.append("generic_openai_endpoint_treated_as_lm_studio")
 
