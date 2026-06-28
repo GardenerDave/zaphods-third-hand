@@ -4,8 +4,9 @@ import sys
 from pathlib import Path
 
 from local_harness.affordance_larql_runtime_install import write_reports as write_install
+from local_harness.affordance_larql_runtime_install_review import write_reports as write_review
 from local_harness.affordance_larql_runtime_validate import write_reports
-from tests.test_affordance_larql_runtime_install import ready_packet_path, ready_review_path
+from tests.test_affordance_larql_runtime_install import ready_packet_path
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -24,9 +25,10 @@ def run_validate(*args: str | Path) -> subprocess.CompletedProcess[str]:
 
 def ready_runtime_bundle(tmp_path: Path) -> Path:
     packet = ready_packet_path(tmp_path)
-    review = ready_review_path(tmp_path)
+    review_dir = tmp_path / "runtime_review"
+    write_review(packet, "approve_runtime_install", "Approve runtime install only.", review_dir)
     install_dir = tmp_path / "install"
-    write_install(packet, review, install_dir)
+    write_install(packet, review_dir / "larql_runtime_install_review.json", install_dir)
     return install_dir
 
 
