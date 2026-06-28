@@ -161,6 +161,10 @@ gates.
 - [`experiments/AFFORDANCE_BASELINE_REPAIR_PACKET_V0.md`](experiments/AFFORDANCE_BASELINE_REPAIR_PACKET_V0.md)
   — model-free packet generator that bounds later baseline prompt/scorer repair
   application to exact target files and actions.
+- [`LARQL_PIPELINE_REPEATABILITY.md`](LARQL_PIPELINE_REPEATABILITY.md)
+  — repeatability summary for the CUDA/RX580 LARQL pipeline, distinguishing
+  proven context injection and curriculum artifact creation from unperformed
+  training or LoRA work.
 
 ## Management-Team Workflows
 
