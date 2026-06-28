@@ -132,8 +132,10 @@ def baseline_prompt_suite(candidate: dict[str, Any]) -> dict[str, Any]:
             "prompt_id": "baseline_split_workflow_active_host",
             "coverage": "split workflow where local and remote hosts differ",
             "prompt": (
-                f"{prefix} A workflow uses one local host and one remote host. Explain that "
-                "the active host profile controls which affordance applies."
+                f"{prefix} A workflow uses one local host and one remote host. "
+                "Explicitly distinguish the local host, the remote host, and the "
+                "active execution host. Explain that the active host profile controls "
+                "which affordance applies."
             ),
         },
         {

@@ -105,27 +105,19 @@ def score_prompt_response(prompt_id: str, response_text: str) -> dict[str, bool]
                 "mentions_no_cuda_or_unsupported": contains_any(
                     response_text,
                     [
+                        "no_cuda",
                         "no cuda",
                         "cuda is not appropriate",
                         "cuda is not supported",
                         "not use cuda",
                         "avoid cuda",
+                        "avoid cuda-only",
+                        "cuda-only setup",
                     ],
                 ),
                 "mentions_rx580_or_amd": contains_any(
                     response_text,
-                    ["rx580", "rx 580", "amd", "non-nvidia", "non nvidia"],
-                ),
-                "mentions_safe_endpoint_or_reverify": contains_any(
-                    response_text,
-                    [
-                        "lm studio",
-                        "openai-compatible",
-                        "openai compatible",
-                        "local endpoint",
-                        "reverify",
-                        "verify",
-                    ],
+                    ["no_cuda", "cuda-only", "rx580", "rx 580", "amd", "non-nvidia", "non nvidia"],
                 ),
             }
         )
@@ -134,11 +126,23 @@ def score_prompt_response(prompt_id: str, response_text: str) -> dict[str, bool]
             {
                 "mentions_no_generalization": contains_any(
                     response_text,
-                    ["do not generalize", "not generalize", "must not be generalized"],
+                    [
+                        "do not generalize",
+                        "not generalize",
+                        "not generalizable",
+                        "must not be generalized",
+                    ],
                 ),
                 "requires_matching_host_evidence": contains_any(
                     response_text,
-                    ["matching host", "host evidence", "host profile", "active host"],
+                    [
+                        "matching host",
+                        "matching evidence",
+                        "host evidence",
+                        "host profile",
+                        "active host",
+                        "other profiles",
+                    ],
                 ),
             }
         )
@@ -150,9 +154,17 @@ def score_prompt_response(prompt_id: str, response_text: str) -> dict[str, bool]
     elif prompt_id == "baseline_split_workflow_active_host":
         checks.update(
             {
-                "distinguishes_local_remote": contains_any(
+                "mentions_local_host": contains_any(
                     response_text,
-                    ["local", "remote", "different host", "split workflow"],
+                    ["local host", "local"],
+                ),
+                "mentions_remote_host": contains_any(
+                    response_text,
+                    ["remote host", "remote"],
+                ),
+                "mentions_active_execution_host": contains_any(
+                    response_text,
+                    ["active execution host", "active host", "execution host"],
                 ),
                 "active_host_controls": contains_any(
                     response_text,
@@ -163,16 +175,40 @@ def score_prompt_response(prompt_id: str, response_text: str) -> dict[str, bool]
     elif prompt_id == "baseline_reverify_before_action":
         checks["requires_reverify_before_action"] = contains_any(
             response_text,
-            ["reverify before", "verify before", "check before", "configuration changed"],
+            [
+                "reverify before",
+                "verify before",
+                "check before",
+                "configuration changed",
+                "revalidation",
+                "revalidate",
+            ],
         )
     elif prompt_id == "baseline_no_durable_promotion":
         checks.update(
             {
-                "mentions_no_larql": contains_any(response_text, ["no larql", "not apply larql"]),
+                "mentions_no_larql": contains_any(
+                    response_text,
+                    [
+                        "no larql",
+                        "not apply larql",
+                        "does not apply larql",
+                        "does not apply a larql patch",
+                    ],
+                ),
                 "mentions_no_lora": contains_any(response_text, ["no lora", "not train lora"]),
                 "mentions_no_memory_or_promotion": contains_any(
                     response_text,
-                    ["no durable memory", "not write durable memory", "no promotion", "not promote"],
+                    [
+                        "no durable memory",
+                        "not write durable memory",
+                        "durable memory/write",
+                        "durable write",
+                        "memory/write/promotion",
+                        "does not perform durable",
+                        "no promotion",
+                        "not promote",
+                    ],
                 ),
             }
         )

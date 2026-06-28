@@ -67,7 +67,9 @@ The fixed baseline prompt suite covers:
 - direct CUDA-on-Navigator guidance;
 - cross-host boundary;
 - unknown-host refusal and reverify behavior;
-- split workflow where local and remote hosts differ;
+- split workflow where local and remote hosts differ, including explicit local
+  host, remote host, active execution host, and active-host-profile control
+  language;
 - reverify-before-action behavior;
 - no durable promotion behavior;
 - provenance and source-digest awareness.

@@ -242,6 +242,24 @@ def test_prompt_suite_digest_is_stable_and_present(tmp_path):
     assert len(first["prompt_suite"]["prompts"]) >= 7
 
 
+def test_split_workflow_prompt_names_required_host_roles(tmp_path):
+    candidate = write_candidate(tmp_path)
+    approval = write_approval(tmp_path)
+    plan = write_plan(tmp_path)
+
+    packet = write_reports(candidate, approval, plan, tmp_path / "out")
+    prompts = {
+        prompt["prompt_id"]: prompt["prompt"]
+        for prompt in packet["prompt_suite"]["prompts"]
+    }
+    split_prompt = prompts["baseline_split_workflow_active_host"].lower()
+
+    assert "local host" in split_prompt
+    assert "remote host" in split_prompt
+    assert "active execution host" in split_prompt
+    assert "active host profile controls" in split_prompt
+
+
 def test_disallowed_actions_include_required_boundaries(tmp_path):
     candidate = write_candidate(tmp_path)
     approval = write_approval(tmp_path)

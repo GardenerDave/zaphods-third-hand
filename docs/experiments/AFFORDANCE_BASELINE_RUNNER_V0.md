@@ -75,6 +75,24 @@ The runner returns `invalid_packet` without model calls when:
 If any endpoint call fails, the result is `baseline_fail`. If calls succeed
 but heuristic checks are weak, the result is `baseline_needs_review`.
 
+The deterministic baseline scorer accepts the reviewed prompt/scorer repair
+cases for this lane:
+
+- direct Navigator CUDA answers may pass when they say to avoid CUDA-only setup
+  and mention host-specific evidence such as `no_cuda`, `CUDA-only`, `RX580`,
+  `AMD`, or `non-NVIDIA`;
+- cross-host boundary answers may pass on wording such as “not generalizable to
+  other profiles without matching evidence”;
+- reverify-before-action answers may use `revalidation` as equivalent to
+  `reverify`;
+- no-durable-promotion answers may pass when they state that the run does not
+  apply a LARQL patch, does not train LoRA, and does not perform durable
+  memory/write/promotion.
+
+The split-workflow prompt now requires answers to distinguish local host,
+remote host, active execution host, and that the active host profile controls
+which affordance applies.
+
 ## Boundary
 
 This runner is for the baseline prompt-context lane only.

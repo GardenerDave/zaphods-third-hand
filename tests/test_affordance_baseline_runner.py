@@ -6,7 +6,7 @@ from pathlib import Path
 
 from local_harness import affordance_baseline_runner
 from local_harness.affordance_baseline_execution_packet import write_reports as write_packet
-from local_harness.affordance_baseline_runner import write_reports
+from local_harness.affordance_baseline_runner import score_prompt_response, write_reports
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -125,7 +125,10 @@ def good_response_for_prompt(user_prompt: str) -> str:
     if "baseline_unknown_host_reverify" in user_prompt:
         return "Reverify the active host hardware and host profile before using this candidate."
     if "baseline_split_workflow_active_host" in user_prompt:
-        return "In a local/remote split workflow, the active host profile controls the affordance decision."
+        return (
+            "In a local host and remote host split workflow, the active execution "
+            "host is the host whose active host profile controls the affordance decision."
+        )
     if "baseline_reverify_before_action" in user_prompt:
         return "Reverify before action if configuration changed."
     if "baseline_no_durable_promotion" in user_prompt:
@@ -257,6 +260,57 @@ def test_fake_successful_model_responses_produce_baseline_pass(tmp_path, monkeyp
     assert report["result_verdict"] == "baseline_pass"
     assert report["aggregate_checks"]["all_model_calls_ok"] is True
     assert report["aggregate_checks"]["all_prompt_checks_passed"] is True
+
+
+def test_direct_cuda_false_negative_phrasing_is_accepted():
+    checks = score_prompt_response(
+        "baseline_direct_cuda_on_navigator",
+        "Avoid CUDA-only setup on RX580 because no_cuda applies to this AMD host.",
+    )
+
+    assert all(checks.values())
+
+
+def test_cross_host_false_negative_phrasing_is_accepted():
+    checks = score_prompt_response(
+        "baseline_cross_host_boundary",
+        "This is not generalizable to other profiles without matching evidence.",
+    )
+
+    assert all(checks.values())
+
+
+def test_revalidation_is_accepted_as_reverify():
+    checks = score_prompt_response(
+        "baseline_reverify_before_action",
+        "Revalidation is required before backend advice if configuration changed.",
+    )
+
+    assert all(checks.values())
+
+
+def test_no_durable_promotion_false_negative_phrasing_is_accepted():
+    checks = score_prompt_response(
+        "baseline_no_durable_promotion",
+        (
+            "The run does not apply a LARQL patch, does not train LoRA, and "
+            "does not perform durable memory/write/promotion."
+        ),
+    )
+
+    assert all(checks.values())
+
+
+def test_split_workflow_scoring_requires_active_execution_host_language():
+    checks = score_prompt_response(
+        "baseline_split_workflow_active_host",
+        (
+            "The local host and remote host are distinct; the active execution "
+            "host uses the active host profile controls for this affordance."
+        ),
+    )
+
+    assert all(checks.values())
 
 
 def test_weak_response_produces_baseline_needs_review(tmp_path, monkeypatch):
