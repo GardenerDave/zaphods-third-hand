@@ -1,0 +1,146 @@
+{
+  "allowed_next_step": "apply_baseline_prompt_scorer_repair_packet",
+  "authorized_repair_actions": [
+    {
+      "action_id": "strengthen_split_workflow_prompt",
+      "description": "Update the structured split-workflow prompt so it requires exact labels: Local host:, Remote host:, Active execution host:, Control rule:, Candidate applies only if:.",
+      "required_labels": [
+        "Local host:",
+        "Remote host:",
+        "Active execution host:",
+        "Control rule:",
+        "Candidate applies only if:"
+      ],
+      "scope": "prompt_suite_and_scorer_only",
+      "target_prompt": "baseline_split_workflow_active_host"
+    },
+    {
+      "action_id": "repair_scorer_false_negatives",
+      "description": "Update deterministic scorer acceptance for the reviewed false-negative prompts: `baseline_no_durable_promotion`.",
+      "scope": "prompt_suite_and_scorer_only",
+      "target_prompts": [
+        "baseline_no_durable_promotion"
+      ]
+    },
+    {
+      "action_id": "update_focused_tests",
+      "description": "Update focused tests for revised scorer behavior and strengthened split-workflow prompt coverage.",
+      "scope": "tests_only"
+    },
+    {
+      "action_id": "update_experiment_docs",
+      "description": "Update experiment docs to describe the revised baseline prompt/scorer behavior.",
+      "scope": "docs_only"
+    }
+  ],
+  "authorized_target_files": [
+    "local_harness/affordance_baseline_execution_packet.py",
+    "local_harness/affordance_baseline_runner.py",
+    "tests/test_affordance_baseline_execution_packet.py",
+    "tests/test_affordance_baseline_runner.py",
+    "docs/experiments/AFFORDANCE_BASELINE_EXECUTION_PACKET_V0.md",
+    "docs/experiments/AFFORDANCE_BASELINE_RUNNER_V0.md"
+  ],
+  "candidate_id": "larql_affordance_candidate_48efff9852ea",
+  "candidate_repair_authorized": false,
+  "checks": {
+    "accepted_repair_scope_ok": true,
+    "candidate_repair_not_authorized": true,
+    "decision_promotion_held": true,
+    "decision_rerun_required_after_repair": true,
+    "decision_selected_lane_baseline": true,
+    "decision_verdict_accepted": true,
+    "proposal_promotion_held": true,
+    "proposal_rerun_required_after_repair": true,
+    "proposal_selected_lane_baseline": true,
+    "proposal_verdict_ready": true,
+    "repair_decision_exists": true,
+    "repair_decision_parses": true,
+    "repair_proposal_exists": true,
+    "repair_proposal_parses": true,
+    "runner_code_repair_not_authorized": true,
+    "selected_lane_matches": true
+  },
+  "disallowed_actions": [
+    "apply_larql_patch",
+    "train_lora_adapter",
+    "mutate_model_weights",
+    "write_durable_memory",
+    "run_larql_lane",
+    "run_lora_lane",
+    "run_comparison_lane",
+    "promote_candidate",
+    "modify_original_run_report",
+    "modify_original_review_report",
+    "modify_original_proposal_report",
+    "modify_original_decision_report",
+    "modify_candidate",
+    "modify_runner_execution_behavior",
+    "authorize_runner_code_repair",
+    "authorize_candidate_repair",
+    "run_repaired_baseline_without_packet",
+    "commit_or_push"
+  ],
+  "input_decision_verdict": "accepted_for_repair_packet_drafting_only",
+  "input_proposal_verdict": "ready_for_repair_decision",
+  "notes": [
+    "Packet only; no repair is applied.",
+    "Original run, review, proposal, and decision verdicts remain preserved.",
+    "Runner execution behavior is not authorized for repair.",
+    "Candidate repair is not authorized.",
+    "Rerun is required after any accepted repair."
+  ],
+  "packet_status": "packet_only",
+  "packet_verdict": "ready_for_bounded_repair_application",
+  "promotion_verdict": "hold_pending_explicit_experiment_approval",
+  "prompt_repairs": [
+    {
+      "authorized_change": "Replace the prose-only split-workflow prompt with a structured answer form requiring exact labeled lines for local host, remote host, active execution host, control rule, and candidate applicability.",
+      "prompt_id": "baseline_split_workflow_active_host",
+      "repair_type": "structured_prompt_and_scorer_tightening",
+      "required_concepts": [
+        "local host",
+        "remote host",
+        "active execution host",
+        "active host profile controls which affordance applies"
+      ],
+      "required_labels": [
+        "Local host:",
+        "Remote host:",
+        "Active execution host:",
+        "Control rule:",
+        "Candidate applies only if:"
+      ],
+      "scorer_requirement": "Require the exact structured labels plus active-host/profile control language."
+    }
+  ],
+  "repair_scope": "baseline_prompt_suite_and_scorer_only",
+  "report_type": "affordance_baseline_repair_packet.v0",
+  "required_tests": [
+    "python3 -m pytest tests/test_affordance_baseline_execution_packet.py tests/test_affordance_baseline_runner.py",
+    "python3 local_harness/repo_health_check.py",
+    "git diff --check"
+  ],
+  "rerun_required_after_repair": true,
+  "runner_code_repair_authorized": false,
+  "scorer_repairs": [
+    {
+      "accepted_language_examples": [
+        "does not apply a LARQL patch",
+        "train LoRA",
+        "does not train LoRA",
+        "not train LoRA",
+        "no LoRA",
+        "LoRA training",
+        "no durable memory",
+        "no durable write",
+        "no promotion"
+      ],
+      "authorized_change": "Accept language that says the run does not apply a LARQL patch, does not train LoRA, and does not perform durable memory/write/promotion.",
+      "prompt_id": "baseline_no_durable_promotion",
+      "repair_type": "scorer_false_negative"
+    }
+  ],
+  "selected_lane": "baseline_prompt_context_only",
+  "source_failure_id": "cuda_on_navigator_desktop.real"
+}
