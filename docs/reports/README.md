@@ -78,6 +78,9 @@ does not establish production readiness.
   decision, plan, execution-approval, baseline execution-packet, and baseline
   runner/review/repair-proposal/repair-decision/repair-packet evidence for
   experimental host-affordance work.
+- `affordance_larql/` — LARQL pipeline closeout evidence, including
+  `CUDA_RX580_LARQL_PIPELINE_CLOSEOUT_2026-06-28.md` for the completed
+  CUDA/RX580 guided-capability path.
 
 ## Safety Reminder
 
