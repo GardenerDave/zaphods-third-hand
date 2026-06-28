@@ -57,6 +57,7 @@ def test_help_works():
 def test_missing_probe_fails(tmp_path):
     report = write_reports(tmp_path / "missing.json", tmp_path / "missing.txt", tmp_path / "out")
     assert report["review_verdict"] == "larql_model_response_review_requires_repair"
+    assert report["checks"]["probe_exists"] is False
 
 
 def test_malformed_probe_fails(tmp_path):
@@ -66,6 +67,7 @@ def test_malformed_probe_fails(tmp_path):
     response.write_text("ok\n", encoding="utf-8")
     report = write_reports(probe, response, tmp_path / "out")
     assert report["review_verdict"] == "larql_model_response_review_requires_repair"
+    assert report["checks"]["probe_parses"] is False
 
 
 def test_missing_model_response_fails(tmp_path):
@@ -76,6 +78,7 @@ def test_missing_model_response_fails(tmp_path):
     )
     report = write_reports(probe, tmp_path / "missing.txt", tmp_path / "out")
     assert report["review_verdict"] == "larql_model_response_review_requires_repair"
+    assert report["checks"]["model_response_exists"] is False
 
 
 def test_empty_model_response_is_endpoint_failure_review(tmp_path):
@@ -83,6 +86,7 @@ def test_empty_model_response_is_endpoint_failure_review(tmp_path):
     report = write_reports(probe, response, tmp_path / "out")
     assert report["review_verdict"] == "larql_model_response_review_requires_repair"
     assert report["cuda_block_pass"] is False
+    assert report["checks"]["model_response_nonempty"] is False
 
 
 def test_negated_install_is_detected_as_blocking():
@@ -175,3 +179,51 @@ def test_valid_report_boundary_flags_false(tmp_path):
     assert report["candidate_promoted"] is False
     assert report["lora_training_started"] is False
     assert report["model_weights_mutated"] is False
+
+
+def test_valid_good_response_requires_valid_probe_metadata(tmp_path):
+    probe, response = ready_probe(
+        tmp_path,
+        "The RX580/no_cuda host should not install NVIDIA CUDA. "
+        "Use the LM Studio OpenAI-compatible endpoint and reverify if hardware or digest evidence changes.",
+    )
+    payload = json.loads(probe.read_text(encoding="utf-8"))
+    payload["report_type"] = "wrong"
+    probe.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    report = write_reports(probe, response, tmp_path / "out")
+    assert report["review_verdict"] == "larql_model_response_review_requires_repair"
+    assert report["checks"]["probe_report_type_ok"] is False
+
+
+def test_valid_good_response_fails_if_model_called_false(tmp_path):
+    probe, response = ready_probe(
+        tmp_path,
+        "The RX580/no_cuda host should not install NVIDIA CUDA. "
+        "Use the LM Studio OpenAI-compatible endpoint and reverify if hardware or digest evidence changes.",
+    )
+    payload = json.loads(probe.read_text(encoding="utf-8"))
+    payload["model_called"] = False
+    probe.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    report = write_reports(probe, response, tmp_path / "out")
+    assert report["review_verdict"] == "larql_model_response_review_requires_repair"
+    assert report["checks"]["probe_model_called_true"] is False
+
+
+def test_valid_good_response_fails_if_boundary_flags_true(tmp_path):
+    probe, response = ready_probe(
+        tmp_path,
+        "The RX580/no_cuda host should not install NVIDIA CUDA. "
+        "Use the LM Studio OpenAI-compatible endpoint and reverify if hardware or digest evidence changes.",
+    )
+    payload = json.loads(probe.read_text(encoding="utf-8"))
+    payload["durable_memory_written"] = True
+    payload["candidate_promoted"] = True
+    payload["lora_training_started"] = True
+    payload["model_weights_mutated"] = True
+    probe.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    report = write_reports(probe, response, tmp_path / "out")
+    assert report["review_verdict"] == "larql_model_response_review_requires_repair"
+    assert report["checks"]["probe_durable_memory_written_false"] is False
+    assert report["checks"]["probe_candidate_promoted_false"] is False
+    assert report["checks"]["probe_lora_training_started_false"] is False
+    assert report["checks"]["probe_model_weights_mutated_false"] is False

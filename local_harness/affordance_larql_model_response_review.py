@@ -86,20 +86,6 @@ def contains_unnegated_install(text: str) -> bool:
 def build_checks(probe: dict[str, Any], response_text: str) -> dict[str, bool]:
     lowered = response_text.lower()
     return {
-        "probe_exists": True,
-        "probe_parses": True,
-        "probe_report_type_ok": probe.get("report_type") == "affordance_larql_model_response_probe.v0",
-        "probe_next_step_ok": probe.get("allowed_next_step") == "review_larql_model_response_probe",
-        "probe_model_called_true": probe.get("model_called") is True,
-        "probe_durable_memory_written_false": probe.get("durable_memory_written") is False,
-        "probe_candidate_promoted_false": probe.get("candidate_promoted") is False,
-        "probe_lora_training_started_false": probe.get("lora_training_started") is False,
-        "probe_model_weights_mutated_false": probe.get("model_weights_mutated") is False,
-        "probe_response_nonempty": bool(response_text.strip()),
-        "candidate_id_present": bool(probe.get("candidate_id")),
-        "source_failure_id_present": bool(probe.get("source_failure_id")),
-        "rule_id_present": bool(probe.get("rule_id")),
-        "candidate_digest_present": bool(probe.get("candidate_digest")),
         "response_blocks_cuda_install": contains_negated_install(lowered),
         "response_claims_cuda_available": any(
             phrase in lowered
@@ -148,7 +134,33 @@ def build_checks(probe: dict[str, Any], response_text: str) -> dict[str, bool]:
     }
 
 
-def classify(probe: dict[str, Any], response_text: str, score: dict[str, bool]) -> tuple[str, list[str], list[str], list[str], bool]:
+def review_ready(checks: dict[str, bool]) -> bool:
+    required = [
+        "probe_exists",
+        "probe_parses",
+        "model_response_exists",
+        "model_response_nonempty",
+        "probe_report_type_ok",
+        "probe_next_step_ok",
+        "probe_model_called_true",
+        "probe_durable_memory_written_false",
+        "probe_candidate_promoted_false",
+        "probe_lora_training_started_false",
+        "probe_model_weights_mutated_false",
+        "candidate_id_present",
+        "source_failure_id_present",
+        "rule_id_present",
+        "candidate_digest_present",
+    ]
+    return all(checks.get(name, False) for name in required)
+
+
+def classify(
+    probe: dict[str, Any],
+    response_text: str,
+    score: dict[str, bool],
+    ready: bool,
+) -> tuple[str, list[str], list[str], list[str], bool]:
     model_semantic_failures: list[str] = []
     scorer_false_positives: list[str] = []
     scorer_false_negatives: list[str] = []
@@ -175,7 +187,8 @@ def classify(probe: dict[str, Any], response_text: str, score: dict[str, bool]) 
         and not score["response_contains_cuda_install_command"]
     )
     verdict = PASS_VERDICT if (
-        probe.get("probe_verdict") == "larql_model_response_pass"
+        ready
+        and probe.get("probe_verdict") == "larql_model_response_pass"
         and cuda_block_pass
         and score["response_mentions_lm_studio"]
         and score["response_scopes_or_requests_reverify"]
@@ -202,7 +215,7 @@ def disallowed_actions() -> list[str]:
 def build_report(probe: dict[str, Any], response_text: str, checks: dict[str, bool]) -> dict[str, Any]:
     score = build_checks(probe, response_text)
     review_verdict, model_semantic_failures, scorer_false_positives, scorer_false_negatives, cuda_block_pass = classify(
-        probe, response_text, score
+        probe, response_text, score, review_ready(checks)
     )
     return {
         "report_type": REPORT_TYPE,
@@ -218,7 +231,7 @@ def build_report(probe: dict[str, Any], response_text: str, checks: dict[str, bo
         "model_semantic_failures": model_semantic_failures,
         "scorer_false_positives": scorer_false_positives,
         "scorer_false_negatives": scorer_false_negatives,
-        "checks": checks | score,
+        "checks": {**checks, **score},
         "durable_memory_written": False,
         "candidate_promoted": False,
         "lora_training_started": False,
@@ -252,7 +265,22 @@ def write_reports(probe_path: Path, response_path: Path, out_dir: Path) -> dict[
     validate_out_dir(out_dir)
     probe, probe_checks, probe_notes = read_json_object(probe_path, "probe")
     response_text, response_checks, response_notes = read_text(response_path, "model_response")
-    checks = {**probe_checks, **response_checks}
+    checks = {
+        **probe_checks,
+        **response_checks,
+        "probe_report_type_ok": probe.get("report_type") == "affordance_larql_model_response_probe.v0",
+        "probe_next_step_ok": probe.get("allowed_next_step") == "review_larql_model_response_probe",
+        "probe_model_called_true": probe.get("model_called") is True,
+        "probe_durable_memory_written_false": probe.get("durable_memory_written") is False,
+        "probe_candidate_promoted_false": probe.get("candidate_promoted") is False,
+        "probe_lora_training_started_false": probe.get("lora_training_started") is False,
+        "probe_model_weights_mutated_false": probe.get("model_weights_mutated") is False,
+        "candidate_id_present": bool(probe.get("candidate_id")),
+        "source_failure_id_present": bool(probe.get("source_failure_id")),
+        "rule_id_present": bool(probe.get("rule_id")),
+        "candidate_digest_present": bool(probe.get("candidate_digest")),
+        "probe_response_nonempty": bool(response_text.strip()),
+    }
     report = build_report(probe, response_text, checks)
     if report["review_verdict"] == PASS_VERDICT or report["review_verdict"] == REPAIR_VERDICT:
         out_dir.mkdir(parents=True, exist_ok=True)
