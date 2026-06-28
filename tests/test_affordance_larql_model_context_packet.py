@@ -120,6 +120,15 @@ def test_missing_recommended_path_fails(tmp_path):
     assert report["packet_verdict"] == "invalid_input"
 
 
+def test_non_cuda_user_input_fails(tmp_path):
+    consultation, runtime_rule = ready_inputs(tmp_path)
+    out_dir = tmp_path / "out"
+    report = write_reports(consultation, runtime_rule, "hello world", out_dir)
+    assert report["packet_verdict"] == "invalid_input"
+    assert not (out_dir / "larql_model_context_packet.json").exists()
+    assert not (out_dir / "larql_model_context_packet.md").exists()
+
+
 def test_valid_packet_writes_outputs(tmp_path):
     consultation, runtime_rule = ready_inputs(tmp_path)
     out_dir = tmp_path / "out"
@@ -142,6 +151,7 @@ def test_valid_packet_writes_outputs(tmp_path):
     assert payload["model_weight_mutation_authorized"] is False
     assert "navigator_desktop" in payload["model_instruction"]
     assert "no_cuda" in payload["model_instruction"]
+    assert "CUDA/NVIDIA troubleshooting is blocked on this host." in payload["model_instruction"]
     text = md_path.read_text(encoding="utf-8")
     assert "This is packet evidence only." in text
     assert "No candidate promotion is granted." in text

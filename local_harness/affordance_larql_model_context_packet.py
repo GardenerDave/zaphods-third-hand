@@ -47,36 +47,38 @@ def read_json_object(path: Path, label: str) -> tuple[dict[str, Any], dict[str, 
     return payload, checks, notes
 
 
-def consultation_ready(consultation: dict[str, Any], runtime_rule: dict[str, Any]) -> bool:
-    return all(
-        [
-            consultation.get("report_type") == "affordance_larql_runtime_consultation_probe.v0",
-            consultation.get("consultation_verdict") == "runtime_rule_consulted",
-            consultation.get("allowed_next_step") == "draft_larql_model_context_packet",
-            consultation.get("matched_runtime_rule") is True,
-            consultation.get("model_called") is False,
-            consultation.get("durable_memory_written") is False,
-            consultation.get("candidate_promoted") is False,
-            consultation.get("lora_training_started") is False,
-            consultation.get("model_weights_mutated") is False,
-            runtime_rule.get("report_type") == "affordance_larql_rule.v0",
-            runtime_rule.get("runtime_installation_status") == "installed_for_runtime_consultation",
-            runtime_rule.get("runtime_scope") == "consultation_only",
-            runtime_rule.get("durable_memory_status") == "not_written",
-            runtime_rule.get("candidate_promotion_status") == "not_promoted",
-            consultation.get("candidate_id") == runtime_rule.get("candidate_id"),
-            consultation.get("source_failure_id") == runtime_rule.get("source_failure_id"),
-            consultation.get("candidate_digest") == runtime_rule.get("candidate_digest"),
-            consultation.get("rule_id") == runtime_rule.get("rule_id"),
-            consultation.get("blocked_path"),
-            consultation.get("recommended_path"),
-        ]
-    )
-
-
 def contains_trigger(text: str) -> bool:
     lowered = text.lower()
     return any(token in lowered for token in ("cuda", "nvidia"))
+
+
+def packet_ready(checks: dict[str, bool]) -> bool:
+    required = [
+        "consultation_report_type_ok",
+        "consultation_verdict_ok",
+        "consultation_next_step_ok",
+        "consultation_matched_runtime_rule_true",
+        "consultation_model_called_false",
+        "consultation_durable_memory_written_false",
+        "consultation_candidate_promoted_false",
+        "consultation_lora_training_started_false",
+        "consultation_model_weights_mutated_false",
+        "runtime_rule_report_type_ok",
+        "runtime_rule_status_ok",
+        "runtime_rule_scope_ok",
+        "runtime_rule_durable_memory_status_ok",
+        "runtime_rule_candidate_promotion_status_ok",
+        "candidate_id_matches",
+        "source_failure_id_matches",
+        "rule_id_matches",
+        "candidate_digest_matches",
+        "blocked_path_present",
+        "recommended_path_present",
+        "active_host_is_navigator_desktop",
+        "host_constraint_no_cuda",
+        "input_has_cuda_nvidia_trigger",
+    ]
+    return all(checks.get(name, False) for name in required)
 
 
 def build_runtime_rule_context(runtime_rule: dict[str, Any]) -> dict[str, Any]:
@@ -129,7 +131,7 @@ def build_report(
     user_input: str,
     checks: dict[str, bool],
 ) -> dict[str, Any]:
-    consulted = consultation_ready(consultation, runtime_rule)
+    consulted = packet_ready(checks)
     return {
         "report_type": REPORT_TYPE,
         "packet_status": PACKET_STATUS,
@@ -217,9 +219,10 @@ def write_reports(
         "candidate_digest_matches": consultation.get("candidate_digest") == runtime_rule.get("candidate_digest"),
         "blocked_path_present": bool(consultation.get("blocked_path")),
         "recommended_path_present": bool(consultation.get("recommended_path")),
-        "active_host_is_navigator_desktop": "navigator_desktop" in user_input.lower()
+        "active_host_is_navigator_desktop": consultation.get("checks", {}).get("active_host_matches") is True
         or "navigator_desktop" in build_model_instruction(runtime_rule).lower(),
-        "host_constraint_no_cuda": "no_cuda" in build_model_instruction(runtime_rule).lower(),
+        "host_constraint_no_cuda": consultation.get("checks", {}).get("host_constraint_matches") is True
+        or "no_cuda" in build_model_instruction(runtime_rule).lower(),
         "input_has_cuda_nvidia_trigger": contains_trigger(user_input),
     }
     report = build_report(consultation, runtime_rule, user_input, checks)
