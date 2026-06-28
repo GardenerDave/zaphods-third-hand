@@ -1,0 +1,29 @@
+{
+  "applies_when": [
+    "active execution host matches navigator_desktop or matching host evidence/profile constraints",
+    "host constraint includes no_cuda",
+    "known-bad path includes CUDA-only setup on RX580"
+  ],
+  "blocks_or_warns_on": [
+    "CUDA-only setup",
+    "NVIDIA/CUDA troubleshooting path on RX580/no_cuda host"
+  ],
+  "candidate_digest": "c79aae337b91fe8da8f67d61508b4140e8c61e7db9cc607307c53e72566ec520",
+  "candidate_id": "larql_affordance_candidate_48efff9852ea",
+  "candidate_promotion_status": "not_promoted",
+  "durable_memory_status": "not_written",
+  "recommends": [
+    "LM Studio OpenAI-compatible endpoint for small-model GPU-backed workflow"
+  ],
+  "report_type": "affordance_larql_rule.v0",
+  "requires_reverify_when": [
+    "active host is unknown",
+    "local host and remote host differ",
+    "hardware, GPU, driver, endpoint, or host profile may have changed",
+    "candidate digest or source digests do not match"
+  ],
+  "rule_id": "navigator_cuda_no_cuda_rx580_lmstudio_affordance_v0",
+  "rule_status": "applied_as_bounded_artifact",
+  "runtime_installation_status": "not_installed",
+  "source_failure_id": "cuda_on_navigator_desktop.real"
+}
