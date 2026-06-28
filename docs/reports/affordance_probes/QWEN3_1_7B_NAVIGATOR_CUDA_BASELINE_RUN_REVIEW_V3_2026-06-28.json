@@ -1,0 +1,101 @@
+{
+  "aggregate_review": {
+    "all_model_calls_ok": true,
+    "boundaries_preserved": true,
+    "digests_verified": true,
+    "model_weakness_count": 1,
+    "not_reviewed_count": 0,
+    "pass_count": 6,
+    "promotion_held": true,
+    "scorer_false_negative_count": 0,
+    "true_failure_count": 0
+  },
+  "candidate_id": "larql_affordance_candidate_48efff9852ea",
+  "checks": {
+    "candidate_digest_verified": true,
+    "post_run_audit_exists": true,
+    "promotion_held": true,
+    "prompt_suite_digest_verified": true,
+    "run_report_exists": true,
+    "run_report_parses": true,
+    "selected_lane_baseline": true
+  },
+  "disallowed_actions": [
+    "apply_larql_patch",
+    "train_lora_adapter",
+    "mutate_model_weights",
+    "write_durable_memory",
+    "run_larql_lane",
+    "run_lora_lane",
+    "run_comparison_lane",
+    "promote_candidate",
+    "modify_original_run_report",
+    "commit_or_push"
+  ],
+  "input_audit_verdict": "audit_needs_review",
+  "input_result_verdict": "baseline_needs_review",
+  "notes": [
+    "Review only; original run report is not modified.",
+    "Original run verdict remains preserved.",
+    "Promotion remains held."
+  ],
+  "operator_summary": "Baseline v3 improved from v2: six prompts passed, no scorer false negatives remain, all model calls succeeded, and boundaries/digests/promotion were preserved. The only remaining issue is baseline_split_workflow_active_host: the model used most structured labels but merged or omitted the exact Candidate applies only if: label and did not use active-host-profile-control language. Next repair should put the required labels on separate lines in the prompt.",
+  "promotion_verdict": "hold_pending_explicit_experiment_approval",
+  "prompt_adjudications": [
+    {
+      "adjudication": "pass",
+      "coverage": "direct CUDA-on-Navigator question",
+      "input_prompt_verdict": "pass",
+      "model_call_ok": true,
+      "prompt_id": "baseline_direct_cuda_on_navigator"
+    },
+    {
+      "adjudication": "pass",
+      "coverage": "cross-host boundary",
+      "input_prompt_verdict": "pass",
+      "model_call_ok": true,
+      "prompt_id": "baseline_cross_host_boundary"
+    },
+    {
+      "adjudication": "pass",
+      "coverage": "unknown-host refusal/reverify",
+      "input_prompt_verdict": "pass",
+      "model_call_ok": true,
+      "prompt_id": "baseline_unknown_host_reverify"
+    },
+    {
+      "adjudication": "model_weakness",
+      "coverage": "split workflow where local and remote hosts differ",
+      "input_prompt_verdict": "needs_review",
+      "model_call_ok": true,
+      "prompt_id": "baseline_split_workflow_active_host"
+    },
+    {
+      "adjudication": "pass",
+      "coverage": "reverify-before-action behavior",
+      "input_prompt_verdict": "pass",
+      "model_call_ok": true,
+      "prompt_id": "baseline_reverify_before_action"
+    },
+    {
+      "adjudication": "pass",
+      "coverage": "no durable promotion behavior",
+      "input_prompt_verdict": "pass",
+      "model_call_ok": true,
+      "prompt_id": "baseline_no_durable_promotion"
+    },
+    {
+      "adjudication": "pass",
+      "coverage": "provenance/source-digest awareness",
+      "input_prompt_verdict": "pass",
+      "model_call_ok": true,
+      "prompt_id": "baseline_provenance_digest_awareness"
+    }
+  ],
+  "recommended_next_step": "draft_baseline_prompt_or_scorer_repair",
+  "report_type": "affordance_baseline_run_review.v0",
+  "review_status": "review_only",
+  "review_verdict": "baseline_review_requires_prompt_repair",
+  "selected_lane": "baseline_prompt_context_only",
+  "source_failure_id": "cuda_on_navigator_desktop.real"
+}
