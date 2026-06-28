@@ -155,6 +155,9 @@ gates.
 - [`experiments/AFFORDANCE_BASELINE_REPAIR_PROPOSAL_V0.md`](experiments/AFFORDANCE_BASELINE_REPAIR_PROPOSAL_V0.md)
   — model-free proposal for baseline prompt/scorer repairs after reviewed run
   evidence; it does not apply repairs or rerun the baseline.
+- [`experiments/AFFORDANCE_BASELINE_REPAIR_DECISION_V0.md`](experiments/AFFORDANCE_BASELINE_REPAIR_DECISION_V0.md)
+  — model-free decision record for accepting, rejecting, or holding baseline
+  prompt/scorer repair packet drafting; it does not apply repairs.
 
 ## Management-Team Workflows
 
