@@ -38,6 +38,7 @@ def test_help_works():
 def test_missing_packet_fails_closed(tmp_path):
     report = write_reports(tmp_path / "missing.json", tmp_path / "out")
     assert report["review_verdict"] == "larql_model_response_repair_review_rejected"
+    assert report["checks"]["packet_exists"] is False
 
 
 def test_malformed_packet_fails_closed(tmp_path):
@@ -45,6 +46,7 @@ def test_malformed_packet_fails_closed(tmp_path):
     packet.write_text("{not json\n", encoding="utf-8")
     report = write_reports(packet, tmp_path / "out")
     assert report["review_verdict"] == "larql_model_response_repair_review_rejected"
+    assert report["checks"]["packet_parses"] is False
 
 
 def test_wrong_report_type_fails_closed(tmp_path):
@@ -113,7 +115,43 @@ def test_wrong_proposed_repair_target_fails_closed(tmp_path):
 def test_missing_required_repair_phrase_fails_closed(tmp_path):
     packet = ready_packet(tmp_path)
     payload = json.loads(packet.read_text(encoding="utf-8"))
-    payload["proposed_repairs"][0]["required_changes"][0] = "No LM Studio mention."
+    payload["proposed_repairs"][1]["required_changes"] = [
+        "Normalize markdown emphasis before detecting negated CUDA install language.",
+        "Treat `**not** install NVIDIA CUDA`, `do not install NVIDIA CUDA`, and `should not install NVIDIA CUDA` as rejecting CUDA install recommendations.",
+    ]
+    packet.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    report = write_reports(packet, tmp_path / "out")
+    assert report["review_verdict"] == "larql_model_response_repair_review_rejected"
+
+
+def test_missing_generic_endpoint_block_fails_closed(tmp_path):
+    packet = ready_packet(tmp_path)
+    payload = json.loads(packet.read_text(encoding="utf-8"))
+    payload["proposed_repairs"][0]["required_changes"] = [
+        "Make the model instruction require the exact phrase `LM Studio OpenAI-compatible endpoint`.",
+        "Scope the answer to current host/profile/GPU/endpoint/digest evidence.",
+        "Require reverify if host, GPU, driver, profile, endpoint, or digest evidence changes.",
+    ]
+    packet.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    report = write_reports(packet, tmp_path / "out")
+    assert report["review_verdict"] == "larql_model_response_repair_review_rejected"
+
+
+def test_missing_openai_huggingface_exclusion_fails_closed(tmp_path):
+    packet = ready_packet(tmp_path)
+    payload = json.loads(packet.read_text(encoding="utf-8"))
+    payload["proposed_repairs"][0]["required_changes"] = [
+        "Make the model instruction require the exact phrase `LM Studio OpenAI-compatible endpoint`.",
+        "Do not recommend OpenAI Inference API, Hugging Face Inference API, or generic cloud APIs as the primary path for this rule.",
+        "Scope the answer to current host/profile/GPU/endpoint/digest evidence.",
+        "Require reverify if host, GPU, driver, profile, endpoint, or digest evidence changes.",
+    ]
+    payload["proposed_repairs"][1]["required_changes"] = [
+        "Normalize markdown emphasis before detecting negated CUDA install language.",
+        "Treat `**not** install NVIDIA CUDA`, `do not install NVIDIA CUDA`, and `should not install NVIDIA CUDA` as rejecting CUDA install recommendations.",
+        "Require `LM Studio` explicitly for `recommends_lm_studio_endpoint`.",
+        "Do not count generic `OpenAI-compatible endpoint` alone as LM Studio-specific.",
+    ]
     packet.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     report = write_reports(packet, tmp_path / "out")
     assert report["review_verdict"] == "larql_model_response_repair_review_rejected"

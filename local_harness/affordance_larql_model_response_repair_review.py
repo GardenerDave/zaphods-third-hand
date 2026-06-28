@@ -75,34 +75,33 @@ def proposed_repairs_ok(packet: dict[str, Any]) -> bool:
     repairs = packet.get("proposed_repairs") or []
     if len(repairs) != 2:
         return False
-    targets = {rep.get("target_file") for rep in repairs if isinstance(rep, dict)}
-    if targets != ALLOWED_FILES:
-        return False
     if any(not isinstance(rep, dict) for rep in repairs):
         return False
-    text = "\n".join(
-        "\n".join(item.get("required_changes") or [])
-        for item in repairs
-        if isinstance(item, dict)
-    ).lower()
+    by_target = {rep.get("target_file"): rep for rep in repairs}
+    if set(by_target) != ALLOWED_FILES:
+        return False
+    context = "\n".join(by_target["local_harness/affordance_larql_model_context_packet.py"].get("required_changes") or []).lower()
+    probe = "\n".join(by_target["local_harness/affordance_larql_model_response_probe.py"].get("required_changes") or []).lower()
     return all(
         [
-            "lm studio openai-compatible endpoint" in text,
-            "openai inference api" in text,
-            "hugging face inference api" in text,
-            "generic cloud" in text,
-            "host/profile/gpu/endpoint/digest evidence" in text,
-            "reverify if host, gpu, driver, profile, endpoint, or digest evidence changes" in text,
-            "markdown emphasis" in text,
-            "lm studio" in text,
+            "lm studio openai-compatible endpoint" in context,
+            "openai inference api" in context,
+            "hugging face inference api" in context,
+            "generic cloud" in context,
+            "host/profile/gpu/endpoint/digest evidence" in context,
+            "reverify if host, gpu, driver, profile, endpoint, or digest evidence changes" in context,
+            "markdown emphasis" in probe,
+            "negated cuda install language" in probe,
+            "lm studio" in probe,
+            "openai-compatible endpoint" in probe,
+            "openai inference api" in probe,
+            "hugging face inference api" in probe,
         ]
     )
 
 
 def build_checks(packet: dict[str, Any]) -> dict[str, bool]:
     return {
-        "packet_exists": True,
-        "packet_parses": True,
         "packet_report_type_ok": packet.get("report_type") == "affordance_larql_model_response_repair_packet.v0",
         "packet_status_ok": packet.get("packet_status") == "packet_only",
         "packet_verdict_ok": packet.get("packet_verdict") == "ready_for_larql_model_response_repair_review",
@@ -207,7 +206,7 @@ def render_markdown(report: dict[str, Any]) -> str:
 def write_reports(packet_path: Path, out_dir: Path) -> dict[str, Any]:
     validate_out_dir(out_dir)
     packet, packet_checks, packet_notes = read_json_object(packet_path, "packet")
-    checks = {**packet_checks, **build_checks(packet)}
+    checks = {**build_checks(packet), **packet_checks}
     report = build_report(packet, checks)
     if report["review_verdict"] in {APPROVAL_VERDICT, REJECTION_VERDICT}:
         out_dir.mkdir(parents=True, exist_ok=True)
