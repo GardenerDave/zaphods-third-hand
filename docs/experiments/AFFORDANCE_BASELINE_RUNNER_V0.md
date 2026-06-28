@@ -100,7 +100,9 @@ Control rule:
 Candidate applies only if:
 ```
 
-The scorer requires those labels plus active-host/profile-control language.
+The prompt tells the model to use a line-separated template, copy the labels
+exactly, answer each label on its own line, and avoid merging labels. The
+scorer requires those labels plus active-host/profile-control language.
 
 ## Boundary
 

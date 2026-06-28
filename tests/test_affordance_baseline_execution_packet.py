@@ -254,12 +254,17 @@ def test_split_workflow_prompt_names_required_host_roles(tmp_path):
     }
     split_prompt = prompts["baseline_split_workflow_active_host"].lower()
 
+    assert "answer using this exact line-separated template." in split_prompt
+    assert "copy the labels exactly." in split_prompt
+    assert "answer each label on its own line." in split_prompt
+    assert "do not merge labels." in split_prompt
+    assert "the active host profile controls whether the candidate applies." in split_prompt
+    assert "the candidate applies only when the active execution host matches the candidate's host evidence/profile constraints." in split_prompt
     assert "local host:" in split_prompt
     assert "remote host:" in split_prompt
     assert "active execution host:" in split_prompt
     assert "control rule:" in split_prompt
     assert "candidate applies only if:" in split_prompt
-    assert "active execution host matches the candidate's host evidence/profile constraints" in split_prompt
 
 
 def test_disallowed_actions_include_required_boundaries(tmp_path):

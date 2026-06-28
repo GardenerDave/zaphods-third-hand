@@ -67,8 +67,8 @@ The fixed baseline prompt suite covers:
 - direct CUDA-on-Navigator guidance;
 - cross-host boundary;
 - unknown-host refusal and reverify behavior;
-- split workflow where local and remote hosts differ, using the exact labeled
-  answer form:
+- split workflow where local and remote hosts differ, using the exact
+  line-separated answer form:
 
   ```text
   Local host:
@@ -78,9 +78,10 @@ The fixed baseline prompt suite covers:
   Candidate applies only if:
   ```
 
-  The prompt should make clear that the local host and remote host may differ,
-  the active execution host is the host whose affordance matters, the active
-  host profile controls whether the candidate applies, and the candidate
+  The prompt requires the model to copy the labels exactly, answer each label
+  on its own line, avoid merging labels, make clear that the active execution
+  host is the host whose affordance matters, state that the active host
+  profile controls whether the candidate applies, and say the candidate
   applies only when the active execution host matches the candidate's host
   evidence/profile constraints;
 - reverify-before-action behavior;
