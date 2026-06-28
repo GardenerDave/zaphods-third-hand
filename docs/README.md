@@ -165,6 +165,9 @@ gates.
   — model-free scaffold for keeping absence-of-evidence claims bounded and
   requiring targeted inspection before any irreversible file- or lifecycle
   authority is granted.
+- [`experiments/AFFORDANCE_LARQL_ABSENCE_OF_EVIDENCE_RUNTIME_RULE_PACKET_V0.md`](experiments/AFFORDANCE_LARQL_ABSENCE_OF_EVIDENCE_RUNTIME_RULE_PACKET_V0.md)
+  — model-free packet scaffold for drafting an absence-of-evidence runtime rule
+  before any installation or runtime-rule modification is authorized.
 - [`LARQL_PIPELINE_REPEATABILITY.md`](LARQL_PIPELINE_REPEATABILITY.md)
   — repeatability summary for the CUDA/RX580 LARQL pipeline, distinguishing
   proven context injection and curriculum artifact creation from unperformed
