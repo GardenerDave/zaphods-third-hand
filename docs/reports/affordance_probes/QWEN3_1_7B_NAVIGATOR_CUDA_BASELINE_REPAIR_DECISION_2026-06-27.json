@@ -1,0 +1,52 @@
+{
+  "accepted_repair_scope": "baseline_prompt_suite_and_scorer_only",
+  "allowed_next_step": "draft_baseline_prompt_scorer_repair_packet",
+  "candidate_id": "larql_affordance_candidate_48efff9852ea",
+  "candidate_repair_authorized": false,
+  "checks": {
+    "candidate_repair_not_needed": true,
+    "promotion_held": true,
+    "proposal_verdict_ready": true,
+    "recommended_repair_scope_ok": true,
+    "repair_proposal_exists": true,
+    "repair_proposal_parses": true,
+    "rerun_required_after_repair": true,
+    "runner_code_repair_not_needed": true,
+    "selected_lane_baseline": true
+  },
+  "decision_status": "decision_only",
+  "decision_verdict": "accepted_for_repair_packet_drafting_only",
+  "disallowed_actions": [
+    "apply_larql_patch",
+    "train_lora_adapter",
+    "mutate_model_weights",
+    "write_durable_memory",
+    "run_larql_lane",
+    "run_lora_lane",
+    "run_comparison_lane",
+    "promote_candidate",
+    "modify_original_run_report",
+    "modify_original_review_report",
+    "modify_original_proposal_report",
+    "apply_repair_without_packet",
+    "apply_repair_without_decision",
+    "run_repaired_baseline_without_packet",
+    "commit_or_push"
+  ],
+  "input_proposal_verdict": "ready_for_repair_decision",
+  "input_recommended_repair_scope": "baseline_prompt_suite_and_scorer_only",
+  "notes": [
+    "Decision only; no repair is applied.",
+    "Original run, review, and proposal verdicts remain preserved.",
+    "Repair packet is still required before any code, prompt, or scorer change.",
+    "Rerun is required after any accepted repair."
+  ],
+  "operator_decision": "accept_prompt_scorer_repair_for_packet_drafting",
+  "operator_rationale": "Accept the proposal for bounded prompt/scorer repair packet drafting only. The baseline run had no true failures, preserved digests and boundaries, and identified one split-workflow prompt weakness plus four scorer false negatives.",
+  "promotion_verdict": "hold_pending_explicit_experiment_approval",
+  "report_type": "affordance_baseline_repair_decision.v0",
+  "rerun_required_after_repair": true,
+  "runner_code_repair_authorized": false,
+  "selected_lane": "baseline_prompt_context_only",
+  "source_failure_id": "cuda_on_navigator_desktop.real"
+}
