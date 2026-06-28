@@ -122,6 +122,19 @@ def split_workflow_is_clear(response_text: str) -> bool:
     )
 
 
+def split_workflow_has_applicability_language(response_text: str) -> bool:
+    return contains_any(
+        response_text,
+        [
+            "active host is",
+            "constraints are met",
+            "candidate applies only if",
+            "constraints",
+            "no_cuda",
+        ],
+    )
+
+
 def adjudicate_prompt(prompt: dict[str, Any]) -> str:
     prompt_id = str(prompt.get("prompt_id") or "")
     response_text = str(prompt.get("response_text") or "")
@@ -145,7 +158,9 @@ def adjudicate_prompt(prompt: dict[str, Any]) -> str:
     ):
         return "scorer_false_negative"
     if prompt_id == "baseline_split_workflow_active_host":
-        if split_workflow_is_clear(response_text):
+        if split_workflow_is_clear(response_text) or split_workflow_has_applicability_language(
+            response_text
+        ):
             return "scorer_false_negative"
         return "model_weakness"
     return "not_reviewed"

@@ -65,6 +65,12 @@ hold_pending_explicit_experiment_approval
 The v0 heuristics are intentionally narrow. They are designed to preserve a
 review record for known baseline run shapes, not to replace operator judgment.
 
+For the structured split-workflow prompt, a response can be a scorer false
+negative when it fills the exact labels and uses active-host applicability
+language such as `Candidate applies only if: active host is ... and
+constraints (...) are met.` That is still review-only evidence, not a formal
+pass.
+
 ## Recommended next steps
 
 - true failure: `repair_baseline_packet_or_candidate_before_rerun`

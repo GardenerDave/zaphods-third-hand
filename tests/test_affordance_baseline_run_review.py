@@ -73,7 +73,7 @@ def run_report_payload(**overrides):
             ),
             prompt_result(
                 "baseline_split_workflow_active_host",
-                "Check the machine before using this answer.",
+                "Candidate applies only if: active host is navigator_desktop and constraints (no_cuda) are met.",
             ),
         ],
     }
@@ -200,18 +200,29 @@ def test_prompt_adjudication_labels_expected_run_shape(tmp_path):
     assert labels["baseline_cross_host_boundary"] == "scorer_false_negative"
     assert labels["baseline_reverify_before_action"] == "scorer_false_negative"
     assert labels["baseline_no_durable_promotion"] == "scorer_false_negative"
-    assert labels["baseline_split_workflow_active_host"] == "model_weakness"
+    assert labels["baseline_split_workflow_active_host"] == "scorer_false_negative"
+    assert review["aggregate_review"]["pass_count"] == 1
+    assert review["aggregate_review"]["scorer_false_negative_count"] == 5
+    assert review["aggregate_review"]["model_weakness_count"] == 0
+    assert review["aggregate_review"]["true_failure_count"] == 0
+    assert review["aggregate_review"]["promotion_held"] is True
 
 
-def test_recommendation_with_model_weakness_is_prompt_or_scorer_repair(tmp_path):
+def test_recommendation_with_scorer_false_negative_is_scorer_repair(tmp_path):
     run_report = write_run_report(tmp_path)
     audit = write_audit(tmp_path)
 
-    review = write_reports(run_report, audit, tmp_path / "out", "split host answer remains weak")
+    review = write_reports(
+        run_report,
+        audit,
+        tmp_path / "out",
+        "split host answer is a scorer false negative",
+    )
 
-    assert review["review_verdict"] == "baseline_review_requires_prompt_repair"
-    assert review["recommended_next_step"] == "draft_baseline_prompt_or_scorer_repair"
-    assert review["aggregate_review"]["model_weakness_count"] == 1
+    assert review["review_verdict"] == "baseline_review_requires_scorer_repair"
+    assert review["recommended_next_step"] == "draft_scorer_repair"
+    assert review["aggregate_review"]["scorer_false_negative_count"] == 5
+    assert review["aggregate_review"]["model_weakness_count"] == 0
 
 
 def test_promotion_verdict_is_always_held(tmp_path):
