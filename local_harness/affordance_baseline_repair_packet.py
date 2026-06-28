@@ -217,6 +217,15 @@ def authorized_repair_actions(
     prompt_repair_entries: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     actions: list[dict[str, Any]] = []
+    split_workflow_scorer = next(
+        (
+            repair
+            for repair in scorer_repair_entries
+            if repair.get("repair_type")
+            == "split_workflow_active_host_applicability_scorer_acceptance"
+        ),
+        None,
+    )
     line_separated_prompt = next(
         (
             repair
@@ -251,6 +260,38 @@ def authorized_repair_actions(
                 "required_labels": required_labels,
             }
         )
+    elif split_workflow_scorer is not None:
+        accepted_examples = split_workflow_scorer.get("accepted_language_examples") or []
+        if not isinstance(accepted_examples, list):
+            accepted_examples = []
+        accepted_examples = [str(example) for example in accepted_examples if str(example)]
+        required_labels = [
+            "Local host:",
+            "Remote host:",
+            "Active execution host:",
+            "Control rule:",
+            "Candidate applies only if:",
+        ]
+        actions.append(
+            {
+                "action_id": "repair_scorer_false_negatives",
+                "target_prompt": "baseline_split_workflow_active_host",
+                "scope": "prompt_suite_and_scorer_only",
+                "description": (
+                    "Scorer-only repair: accept active-host applicability phrasing when the "
+                    "response includes the exact structured labels and says the candidate "
+                    "applies only when the active host matches the relevant host/profile "
+                    f"constraints. Required labels: {', '.join(required_labels)}. Accepted "
+                    "phrasing examples include active host is navigator_desktop, "
+                    "constraints (no_cuda) are met, active host ... constraints ... met, "
+                    "and Candidate applies only if: active host is ... and constraints ... "
+                    "are met. No prompt repair is authorized. No runner execution "
+                    "behavior change is authorized."
+                ),
+                "required_labels": required_labels,
+                "accepted_language_examples": accepted_examples,
+            }
+        )
     elif structured_prompt is not None:
         required_labels = structured_prompt.get("required_labels") or STRUCTURED_SPLIT_WORKFLOW_REQUIRED_LABELS
         actions.append(
@@ -281,6 +322,8 @@ def authorized_repair_actions(
     if scorer_repair_entries:
         prompt_ids = [repair["prompt_id"] for repair in scorer_repair_entries if repair.get("prompt_id")]
         if prompt_ids:
+            if split_workflow_scorer is not None:
+                prompt_ids = [prompt_id for prompt_id in prompt_ids if prompt_id != "baseline_split_workflow_active_host"]
             actions.append(
                 {
                     "action_id": "repair_scorer_false_negatives",

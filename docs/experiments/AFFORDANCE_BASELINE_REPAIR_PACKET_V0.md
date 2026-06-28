@@ -83,6 +83,12 @@ Authorized repair actions are limited to:
   packet preserves that exact line-separated answer template and the strict
   scorer instruction instead of collapsing it into generic split-workflow
   wording;
+- when the proposal uses
+  `split_workflow_active_host_applicability_scorer_acceptance`, the packet
+  preserves a scorer-only repair that accepts active-host applicability
+  phrasing while requiring the exact structured labels and the relevant host
+  profile constraint language; this does not authorize prompt repair or
+  runner execution behavior changes;
 - updating deterministic scorer false-negative handling for the scorer repair
   entries listed in the proposal JSON, whether that is the v2 single
   `baseline_no_durable_promotion` repair or the older v1 reviewer set;

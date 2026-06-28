@@ -155,6 +155,36 @@ def v3_proposal_payload(**overrides):
     return payload
 
 
+def v4_proposal_payload(**overrides):
+    payload = proposal_payload(
+        scorer_false_negative_repairs=[
+            {
+                "prompt_id": "baseline_split_workflow_active_host",
+                "repair_type": "split_workflow_active_host_applicability_scorer_acceptance",
+                "proposal": (
+                    "Accept active-host applicability phrasing when the response includes the "
+                    "exact structured labels and says the candidate applies only when the active "
+                    "host matches the relevant host/profile constraints."
+                ),
+                "accepted_language_examples": [
+                    "Local host:",
+                    "Remote host:",
+                    "Active execution host:",
+                    "Control rule:",
+                    "Candidate applies only if:",
+                    "active host is navigator_desktop",
+                    "constraints (no_cuda) are met",
+                    "active host ... constraints ... met",
+                    "Candidate applies only if: active host is ... and constraints ... are met",
+                ],
+            }
+        ],
+        prompt_weakness_repairs=[],
+    )
+    payload.update(overrides)
+    return payload
+
+
 def write_json(path: Path, payload: dict) -> Path:
     path.write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n",
@@ -185,6 +215,12 @@ def build_v2_packet(tmp_path: Path):
 
 def build_v3_packet(tmp_path: Path):
     proposal = write_json(tmp_path / "baseline_repair_proposal.json", v3_proposal_payload())
+    decision = write_decision(tmp_path)
+    return write_reports(proposal, decision, tmp_path / "out")
+
+
+def build_v4_packet(tmp_path: Path):
+    proposal = write_json(tmp_path / "baseline_repair_proposal.json", v4_proposal_payload())
     decision = write_decision(tmp_path)
     return write_reports(proposal, decision, tmp_path / "out")
 
@@ -446,6 +482,45 @@ def test_v3_authorized_repair_actions_preserve_line_separated_detail(tmp_path):
     assert "Candidate applies only if:" in description
     assert "strict scorer" in description.lower()
     assert "do not loosen scorer" in description.lower()
+
+
+def test_v4_proposal_shape_produces_ready_packet(tmp_path):
+    packet = build_v4_packet(tmp_path)
+
+    assert packet["packet_verdict"] == "ready_for_bounded_repair_application"
+    assert packet["promotion_verdict"] == "hold_pending_explicit_experiment_approval"
+
+
+def test_v4_packet_has_no_prompt_repairs(tmp_path):
+    packet = build_v4_packet(tmp_path)
+
+    assert packet["prompt_repairs"] == []
+
+
+def test_v4_packet_has_one_split_workflow_scorer_repair(tmp_path):
+    packet = build_v4_packet(tmp_path)
+
+    assert [repair["prompt_id"] for repair in packet["scorer_repairs"]] == [
+        "baseline_split_workflow_active_host"
+    ]
+
+
+def test_v4_authorized_repair_actions_preserve_scorer_detail(tmp_path):
+    packet = build_v4_packet(tmp_path)
+    descriptions = [action["description"] for action in packet["authorized_repair_actions"]]
+    description = " ".join(descriptions)
+
+    assert "scorer-only" in description.lower()
+    assert "active-host applicability phrasing" in description.lower()
+    assert "Local host:" in description
+    assert "Remote host:" in description
+    assert "Active execution host:" in description
+    assert "Control rule:" in description
+    assert "Candidate applies only if:" in description
+    assert "active host is navigator_desktop" in description
+    assert "constraints (no_cuda) are met" in description
+    assert "no prompt repair is authorized" in description.lower()
+    assert "no runner execution behavior change is authorized" in description.lower()
 
 
 def test_scorer_repairs_include_all_four_expected_prompts(tmp_path):
