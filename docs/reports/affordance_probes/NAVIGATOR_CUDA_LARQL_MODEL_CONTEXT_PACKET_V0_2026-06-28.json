@@ -1,0 +1,88 @@
+{
+  "allowed_next_step": "run_larql_model_response_probe",
+  "candidate_digest": "c79aae337b91fe8da8f67d61508b4140e8c61e7db9cc607307c53e72566ec520",
+  "candidate_id": "larql_affordance_candidate_48efff9852ea",
+  "candidate_promotion_authorized": false,
+  "checks": {
+    "active_host_is_navigator_desktop": true,
+    "blocked_path_present": true,
+    "candidate_digest_matches": true,
+    "candidate_id_matches": true,
+    "consultation_candidate_promoted_false": true,
+    "consultation_durable_memory_written_false": true,
+    "consultation_exists": true,
+    "consultation_lora_training_started_false": true,
+    "consultation_matched_runtime_rule_true": true,
+    "consultation_model_called_false": true,
+    "consultation_model_weights_mutated_false": true,
+    "consultation_next_step_ok": true,
+    "consultation_parses": true,
+    "consultation_report_type_ok": true,
+    "consultation_verdict_ok": true,
+    "host_constraint_no_cuda": true,
+    "input_has_cuda_nvidia_trigger": true,
+    "recommended_path_present": true,
+    "rule_id_matches": true,
+    "runtime_rule_candidate_promotion_status_ok": true,
+    "runtime_rule_durable_memory_status_ok": true,
+    "runtime_rule_exists": true,
+    "runtime_rule_parses": true,
+    "runtime_rule_report_type_ok": true,
+    "runtime_rule_scope_ok": true,
+    "runtime_rule_status_ok": true,
+    "source_failure_id_matches": true
+  },
+  "disallowed_actions": [
+    "call_model",
+    "write_durable_memory",
+    "promote_candidate",
+    "train_lora_adapter",
+    "mutate_model_weights",
+    "modify_runtime_rule",
+    "modify_consultation_probe",
+    "commit_or_push"
+  ],
+  "durable_memory_authorized": false,
+  "lora_training_authorized": false,
+  "model_call_authorized": false,
+  "model_instruction": "Use the supplied LARQL runtime rule context as a bounded advisory constraint for this response.\nActive host is navigator_desktop.\nHost constraint is no_cuda.\nCUDA/NVIDIA troubleshooting is blocked on this host.\nRecommend the LM Studio OpenAI-compatible endpoint path for the small-model GPU-backed workflow.\nRequire reverify if host, profile, driver, GPU, endpoint, or digest evidence changes.\nDo not claim CUDA is available.\nDo not recommend installing NVIDIA CUDA on an RX580/no_cuda host.\nDo not modify runtime rules, write durable memory, promote candidates, train LoRA, or mutate model weights.\nRule id: navigator_cuda_no_cuda_rx580_lmstudio_affordance_v0.",
+  "model_weight_mutation_authorized": false,
+  "notes": [
+    "Packet only; no model is called.",
+    "No durable memory is written.",
+    "No candidate promotion is granted.",
+    "No LoRA training is authorized.",
+    "No model weights are mutated."
+  ],
+  "packet_status": "packet_only",
+  "packet_verdict": "ready_for_larql_model_response_probe",
+  "report_type": "affordance_larql_model_context_packet.v0",
+  "rule_id": "navigator_cuda_no_cuda_rx580_lmstudio_affordance_v0",
+  "runtime_rule_context": {
+    "applies_when": [
+      "active execution host matches navigator_desktop or matching host evidence/profile constraints",
+      "host constraint includes no_cuda",
+      "known-bad path includes CUDA-only setup on RX580"
+    ],
+    "blocks_or_warns_on": [
+      "CUDA-only setup",
+      "NVIDIA/CUDA troubleshooting path on RX580/no_cuda host"
+    ],
+    "candidate_promotion_status": "not_promoted",
+    "durable_memory_status": "not_written",
+    "recommends": [
+      "LM Studio OpenAI-compatible endpoint for small-model GPU-backed workflow"
+    ],
+    "requires_reverify_when": [
+      "active host is unknown",
+      "local host and remote host differ",
+      "hardware, GPU, driver, endpoint, or host profile may have changed",
+      "candidate digest or source digests do not match"
+    ],
+    "rule_id": "navigator_cuda_no_cuda_rx580_lmstudio_affordance_v0",
+    "runtime_installation_status": "installed_for_runtime_consultation",
+    "runtime_scope": "consultation_only"
+  },
+  "source_failure_id": "cuda_on_navigator_desktop.real",
+  "user_input": "I need CUDA working on this RX580 box so I can train the small model locally. Should I install NVIDIA CUDA?"
+}
