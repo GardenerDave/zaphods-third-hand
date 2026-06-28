@@ -1,0 +1,57 @@
+{
+  "allowed_next_step": "review_larql_dry_run_packet",
+  "baseline_audit_verdict": "audit_pass",
+  "baseline_result_verdict": "baseline_pass",
+  "candidate_digest": "c79aae337b91fe8da8f67d61508b4140e8c61e7db9cc607307c53e72566ec520",
+  "candidate_digest_verified": true,
+  "candidate_id": "larql_affordance_candidate_48efff9852ea",
+  "candidate_promotion_authorized": false,
+  "checks": {
+    "baseline_audit_verdict_pass": true,
+    "baseline_result_exists": true,
+    "baseline_result_parses": true,
+    "baseline_result_verdict_pass": true,
+    "candidate_digest_matches": true,
+    "candidate_exists": true,
+    "candidate_id_matches": true,
+    "candidate_parses": true,
+    "post_run_audit_exists": true,
+    "promotion_held": true,
+    "selected_lane_baseline": true
+  },
+  "durable_memory_authorized": false,
+  "larql_application_authorized": false,
+  "larql_rule_draft": {
+    "applies_when": [
+      "active execution host matches navigator_desktop or matching host evidence/profile constraints",
+      "host constraint includes no_cuda",
+      "known-bad path includes CUDA-only setup on RX580"
+    ],
+    "blocks_or_warns_on": [
+      "CUDA-only setup",
+      "NVIDIA/CUDA troubleshooting path on RX580/no_cuda host"
+    ],
+    "recommends": [
+      "LM Studio OpenAI-compatible endpoint for small-model GPU-backed workflow"
+    ],
+    "requires_reverify_when": [
+      "active host is unknown",
+      "local host and remote host differ",
+      "hardware, GPU, driver, endpoint, or host profile may have changed",
+      "candidate digest or source digests do not match"
+    ],
+    "rule_id": "navigator_cuda_no_cuda_rx580_lmstudio_affordance_v0",
+    "status": "draft_not_applied"
+  },
+  "lora_training_authorized": false,
+  "notes": [
+    "Dry-run packet only; no LARQL patch is applied.",
+    "No durable memory, LoRA training, or candidate promotion is authorized."
+  ],
+  "packet_status": "packet_only",
+  "packet_verdict": "ready_for_larql_dry_run_review",
+  "promotion_verdict": "hold_pending_explicit_experiment_approval",
+  "report_type": "affordance_larql_dry_run_packet.v0",
+  "selected_lane": "baseline_prompt_context_only",
+  "source_failure_id": "cuda_on_navigator_desktop.real"
+}
