@@ -85,6 +85,23 @@ Candidate applies only if:
 The paired scorer repair should require those labels plus active-host/profile
 control language.
 
+For a later v3 review shape where the structured prompt is already present but
+the answer template is still too inline, v0 may propose a narrower formatting
+repair. That repair replaces the inline structured-label prompt with a literal
+line-separated answer template and requires the model to copy the labels
+exactly:
+
+```text
+Local host:
+Remote host:
+Active execution host:
+Control rule:
+Candidate applies only if:
+```
+
+The scorer remains strict for the exact labels and active-host/profile control
+language. This is a formatting repair, not a scorer relaxation.
+
 The no-durable-promotion scorer repair may accept LoRA wording such as
 `train LoRA`, `does not train LoRA`, `not train LoRA`, `no LoRA`, or
 `LoRA training` when the answer clearly preserves the no-training boundary.

@@ -147,6 +147,35 @@ def v2_review_payload(**overrides):
     return payload
 
 
+def v3_review_payload(**overrides):
+    payload = review_payload(
+        prompt_adjudications=[
+            prompt_adjudication("baseline_direct_cuda_on_navigator", "pass"),
+            prompt_adjudication("baseline_cross_host_boundary", "pass"),
+            prompt_adjudication("baseline_unknown_host_reverify", "pass"),
+            prompt_adjudication("baseline_split_workflow_active_host", "model_weakness"),
+            prompt_adjudication("baseline_reverify_before_action", "pass"),
+            prompt_adjudication("baseline_no_durable_promotion", "pass"),
+            prompt_adjudication("baseline_provenance_digest_awareness", "pass"),
+        ],
+        aggregate_review={
+            "pass_count": 6,
+            "scorer_false_negative_count": 0,
+            "model_weakness_count": 1,
+            "true_failure_count": 0,
+            "not_reviewed_count": 0,
+            "all_model_calls_ok": True,
+            "digests_verified": True,
+            "promotion_held": True,
+            "boundaries_preserved": True,
+        },
+        review_verdict="baseline_review_requires_prompt_repair",
+        recommended_next_step="draft_baseline_prompt_or_scorer_repair",
+    )
+    payload.update(overrides)
+    return payload
+
+
 def test_help_works():
     result = run_repair("--help")
 
@@ -364,6 +393,76 @@ def test_v2_review_keeps_repair_authorization_boundaries(tmp_path):
     assert proposal["promotion_verdict"] == "hold_pending_explicit_experiment_approval"
 
 
+def test_v3_review_shape_returns_ready_for_repair_decision(tmp_path):
+    run_report = write_run_report(tmp_path)
+    review = write_json(tmp_path / "baseline_run_review.json", v3_review_payload())
+
+    proposal = write_reports(run_report, review, tmp_path / "out")
+
+    assert proposal["proposal_verdict"] == "ready_for_repair_decision"
+    assert proposal["recommended_repair_scope"] == "baseline_prompt_suite_and_scorer_only"
+    assert proposal["allowed_next_step"] == "decide_baseline_prompt_scorer_repair"
+
+
+def test_v3_repair_emits_line_separated_structured_prompt_tightening(tmp_path):
+    run_report = write_run_report(tmp_path)
+    review = write_json(tmp_path / "baseline_run_review.json", v3_review_payload())
+
+    proposal = write_reports(run_report, review, tmp_path / "out")
+    repair = prompt_repair_by_prompt(proposal)["baseline_split_workflow_active_host"]
+
+    assert repair["repair_type"] == "line_separated_structured_prompt_tightening"
+
+
+def test_v3_repair_includes_exact_labels(tmp_path):
+    run_report = write_run_report(tmp_path)
+    review = write_json(tmp_path / "baseline_run_review.json", v3_review_payload())
+
+    proposal = write_reports(run_report, review, tmp_path / "out")
+    repair = prompt_repair_by_prompt(proposal)["baseline_split_workflow_active_host"]
+
+    assert repair["required_labels"] == [
+        "Local host:",
+        "Remote host:",
+        "Active execution host:",
+        "Control rule:",
+        "Candidate applies only if:",
+    ]
+
+
+def test_v3_repair_proposal_mentions_line_separated_template(tmp_path):
+    run_report = write_run_report(tmp_path)
+    review = write_json(tmp_path / "baseline_run_review.json", v3_review_payload())
+
+    proposal = write_reports(run_report, review, tmp_path / "out")
+    repair = prompt_repair_by_prompt(proposal)["baseline_split_workflow_active_host"]
+
+    assert "line-separated answer template" in repair["proposal"]
+    assert "copy the labels exactly" in repair["proposal"]
+    assert "Keep the exact-label scorer strict" in repair["scorer_requirement"]
+
+
+def test_v3_has_no_scorer_false_negative_repairs(tmp_path):
+    run_report = write_run_report(tmp_path)
+    review = write_json(tmp_path / "baseline_run_review.json", v3_review_payload())
+
+    proposal = write_reports(run_report, review, tmp_path / "out")
+
+    assert proposal["scorer_false_negative_repairs"] == []
+
+
+def test_v3_repair_keeps_boundary_flags_and_promotion_held(tmp_path):
+    run_report = write_run_report(tmp_path)
+    review = write_json(tmp_path / "baseline_run_review.json", v3_review_payload())
+
+    proposal = write_reports(run_report, review, tmp_path / "out")
+
+    assert proposal["runner_code_repair_needed"] is False
+    assert proposal["candidate_repair_needed"] is False
+    assert proposal["rerun_required_after_repair"] is True
+    assert proposal["promotion_verdict"] == "hold_pending_explicit_experiment_approval"
+
+
 def test_runner_code_repair_false_when_run_integrity_is_good(tmp_path):
     run_report = write_run_report(tmp_path)
     review = write_review(tmp_path)
@@ -429,3 +528,16 @@ def test_markdown_mentions_structured_labeled_form_for_v2(tmp_path):
     assert "Active execution host:" in markdown
     assert "Control rule:" in markdown
     assert "Candidate applies only if:" in markdown
+
+
+def test_markdown_mentions_line_separated_template_for_v3(tmp_path):
+    run_report = write_run_report(tmp_path)
+    review = write_json(tmp_path / "baseline_run_review.json", v3_review_payload())
+    out = tmp_path / "out"
+
+    write_reports(run_report, review, out)
+    markdown = (out / "baseline_repair_proposal.md").read_text(encoding="utf-8")
+
+    assert "line-separated answer template" in markdown
+    assert "copy the labels exactly" in markdown
+    assert "Keep the exact-label scorer strict" in markdown

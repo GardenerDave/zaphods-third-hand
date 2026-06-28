@@ -158,10 +158,52 @@ def is_v2_structured_split_repair_shape(run_review: dict[str, Any]) -> bool:
     )
 
 
+def is_v3_line_separated_split_repair_shape(run_review: dict[str, Any]) -> bool:
+    labels = adjudications_by_prompt(run_review)
+    aggregate_review = run_review.get("aggregate_review")
+    if not isinstance(aggregate_review, dict):
+        aggregate_review = {}
+    return (
+        labels.get("baseline_split_workflow_active_host") == "model_weakness"
+        and int(aggregate_review.get("pass_count") or 0) >= 6
+        and int(aggregate_review.get("scorer_false_negative_count") or 0) == 0
+        and int(aggregate_review.get("true_failure_count") or 0) == 0
+    )
+
+
 def prompt_weakness_repairs(run_review: dict[str, Any]) -> list[dict[str, Any]]:
     labels = adjudications_by_prompt(run_review)
     if labels.get("baseline_split_workflow_active_host") != "model_weakness":
         return []
+    if is_v3_line_separated_split_repair_shape(run_review):
+        required_labels = [
+            "Local host:",
+            "Remote host:",
+            "Active execution host:",
+            "Control rule:",
+            "Candidate applies only if:",
+        ]
+        return [
+            {
+                "prompt_id": "baseline_split_workflow_active_host",
+                "repair_type": "line_separated_structured_prompt_tightening",
+                "proposal": (
+                    "Replace the inline structured-label prompt with a literal "
+                    "line-separated answer template and require the model to copy "
+                    "the labels exactly."
+                ),
+                "scorer_requirement": (
+                    "Keep the exact-label scorer strict; do not loosen scorer."
+                ),
+                "required_labels": required_labels,
+                "required_concepts": [
+                    "local host",
+                    "remote host",
+                    "active execution host",
+                    "active host profile controls which affordance applies",
+                ],
+            }
+        ]
     if is_v2_structured_split_repair_shape(run_review):
         required_labels = [
             "Local host:",
