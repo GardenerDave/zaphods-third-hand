@@ -12,7 +12,7 @@ The synthetic noisy note can be reduced into a bounded candidate scaffold, then 
 
 That is the end-to-end proof target for the intake-to-install-boundary smoke path. It shows a guided capability workflow that remains bounded at every stage.
 
-This is supervised guided capability, not autonomous repo authority and not general intelligence.
+This is supervised guided capability, not autonomous repo authority.
 
 ## What this full-chain review does not prove
 

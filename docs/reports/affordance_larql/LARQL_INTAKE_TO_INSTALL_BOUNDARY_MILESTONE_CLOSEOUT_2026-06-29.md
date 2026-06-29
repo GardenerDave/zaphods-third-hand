@@ -12,7 +12,7 @@ One synthetic noisy note was converted into a bounded candidate scaffold, moved 
 
 That is the complete proof target for this path: a narrow messy-input bridge that reaches the install boundary without authorizing install.
 
-This is supervised guided capability, not autonomous repo authority and not general intelligence.
+This is supervised guided capability, not autonomous repo authority.
 
 ## Proof chain
 

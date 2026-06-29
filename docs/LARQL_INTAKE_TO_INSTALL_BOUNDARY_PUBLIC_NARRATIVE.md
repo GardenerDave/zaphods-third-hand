@@ -2,7 +2,7 @@
 
 ## One-sentence summary
 
-ZTH proved that a supervised file workflow can turn one messy note into bounded, reviewable lifecycle artifacts while preserving provenance and authority boundaries all the way to an install hold.
+ZTH proved that a supervised file workflow can turn one messy note into bounded, reviewable lifecycle artifacts while preserving provenance and authority boundaries all the way to an install-boundary hold.
 
 ## Non-technical explanation
 
@@ -31,7 +31,7 @@ The important technical detail is that the packet-stage `allowed_claim` was sepa
 
 The install-boundary hold is a review boundary, not install authorization. It records that the chain can reach the edge of installation without crossing into install, promotion, or registry mutation. The completed registry remains unchanged. The chain preserves provenance across stages and keeps the authority boundaries explicit throughout.
 
-What remains unproven is broader: arbitrary messy input is not solved generally, the candidate is not proven correct in the abstract, the runtime rule is not proven install-worthy, the completed registry is not proven in need of change, and the process is not autonomous. The non-claims section below states the stronger exclusions explicitly.
+What remains unproven is broader: arbitrary messy input is not solved generally, the candidate is not proven correct in the abstract, the runtime rule is not proven install-worthy, the completed registry is not proven in need of change, and the process is not autonomous. The non-claims section below states the stronger exclusions explicitly, including the absence of any claim of general intelligence.
 
 ## What this does not claim
 
