@@ -1,0 +1,119 @@
+{
+  "registry_id": "larql_rule_registry.v0",
+  "rules": [
+    {
+      "allowed_next_step": "document_absence_of_evidence_json_model_context_pass_closeout",
+      "candidate_id": "absence_of_evidence_file_authority",
+      "closeout_report": "docs/reports/affordance_larql/ABSENCE_OF_EVIDENCE_JSON_MODEL_CONTEXT_PASS_CLOSEOUT_2026-06-28.md",
+      "current_lifecycle_step": "closeout_recorded",
+      "evidence_paths": [
+        ".work/affordance_larql_candidates/absence_of_evidence_file_authority/absence_of_evidence_file_authority_candidate.json",
+        ".work/affordance_larql_candidate_reviews/absence_of_evidence_file_authority/absence_of_evidence_file_authority_candidate_review.json",
+        ".work/affordance_larql_runtime_rule_packets/absence_of_evidence_file_authority/absence_of_evidence_file_authority_runtime_rule_packet.json",
+        ".work/affordance_larql_runtime_rule_packet_reviews/absence_of_evidence_file_authority/absence_of_evidence_file_authority_runtime_rule_packet_review.json",
+        ".work/affordance_larql_runtime_installs/absence_of_evidence_file_authority_v0/unsupported_file_target_authority_runtime_rule_install.json"
+      ],
+      "installed_rule_artifact": ".work/affordance_larql_runtime_installs/absence_of_evidence_file_authority_v0/runtime_rules/absence_of_evidence_file_authority_v0.json",
+      "json_contract": {
+        "allowed_claim": "not found in the searched scope",
+        "evidence_boundary": "searched docs/reports only",
+        "evidence_to_preserve": [
+          "searched scope",
+          "search term",
+          "not-found result"
+        ],
+        "global_claim_authorized": false,
+        "held_claims": [
+          "cleanup",
+          "delete",
+          "promote",
+          "canonicalize",
+          "overwrite"
+        ],
+        "required_next_step": "targeted inspection or review"
+      },
+      "rule_family_id": "absence-of-evidence",
+      "source_failure_id": "absence_of_evidence_file_authority.real",
+      "rule_id": "absence_of_evidence_file_authority_v0",
+      "status": "passed"
+    },
+    {
+      "allowed_next_step": "record_unsupported_certainty_json_model_context_probe_pass",
+      "candidate_id": "unsupported_certainty_scope_claim",
+      "closeout_report": "docs/reports/affordance_larql/UNSUPPORTED_CERTAINTY_JSON_MODEL_CONTEXT_PASS_CLOSEOUT_2026-06-29.md",
+      "current_lifecycle_step": "closeout_recorded",
+      "evidence_paths": [
+        ".work/affordance_larql_candidates/unsupported_certainty_scope_claim/unsupported_certainty_scope_claim_candidate.json",
+        ".work/affordance_larql_candidate_reviews/unsupported_certainty_scope_claim/unsupported_certainty_scope_claim_candidate_review.json",
+        ".work/affordance_larql_runtime_rule_packets/unsupported_certainty_scope_claim/unsupported_certainty_scope_claim_runtime_rule_packet.json",
+        ".work/affordance_larql_runtime_rule_packet_reviews/unsupported_certainty_scope_claim/unsupported_certainty_scope_claim_runtime_rule_packet_review.json",
+        ".work/affordance_larql_runtime_installs/unsupported_certainty_scope_claim_v0/unsupported_certainty_scope_claim_runtime_rule_install.json"
+      ],
+      "installed_rule_artifact": ".work/affordance_larql_runtime_installs/unsupported_certainty_scope_claim_v0/runtime_rules/unsupported_certainty_scope_claim_v0.json",
+      "json_contract": {
+        "allowed_claim": "the checked scope passed",
+        "evidence_boundary": "checked scope only",
+        "evidence_to_preserve": [
+          "checked scope",
+          "validation output",
+          "unreviewed scope"
+        ],
+        "global_claim_authorized": false,
+        "held_claims": [
+          "all issues are fixed",
+          "no problems remain",
+          "whole repo is clean",
+          "safe to merge",
+          "task complete"
+        ],
+        "required_next_step": "broader validation or review"
+      },
+      "rule_family_id": "unsupported-certainty-scope-claim",
+      "source_failure_id": "unsupported_certainty_scope_claim.real",
+      "rule_id": "unsupported_certainty_scope_claim_v0",
+      "status": "passed"
+    },
+    {
+      "allowed_next_step": "document_unsupported_file_target_authority_json_model_context_pass_closeout",
+      "candidate_id": "unsupported_file_target_authority",
+      "closeout_report": "docs/reports/affordance_larql/UNSUPPORTED_FILE_TARGET_AUTHORITY_JSON_MODEL_CONTEXT_PASS_CLOSEOUT_2026-06-29.md",
+      "current_lifecycle_step": "closeout_recorded",
+      "evidence_paths": [
+        ".work/affordance_larql_candidates/unsupported_file_target_authority/unsupported_file_target_authority_candidate.json",
+        ".work/affordance_larql_candidate_reviews/unsupported_file_target_authority/unsupported_file_target_authority_candidate_review.json",
+        ".work/affordance_larql_runtime_rule_packets/unsupported_file_target_authority/unsupported_file_target_authority_runtime_rule_packet.json",
+        ".work/affordance_larql_runtime_rule_packet_reviews/unsupported_file_target_authority/unsupported_file_target_authority_runtime_rule_packet_review.json",
+        ".work/affordance_larql_runtime_installs/unsupported_file_target_authority_v0/unsupported_file_target_authority_runtime_rule_install.json",
+        ".work/affordance_larql_runtime_consultation_probes/unsupported_file_target_authority_v0/unsupported_file_target_authority_runtime_consultation_probe.json",
+        ".work/affordance_larql_json_model_context_probes/unsupported_file_target_authority_v0/",
+        ".work/affordance_larql_json_model_context_probes/unsupported_file_target_authority_v0_transport_repair1/",
+        ".work/affordance_larql_json_model_context_probe_reviews/unsupported_file_target_authority_v0_transport_repair1/unsupported_file_target_authority_json_model_context_probe_review.json"
+      ],
+      "failed_probe_preserved": true,
+      "installed_rule_artifact": ".work/affordance_larql_runtime_installs/unsupported_file_target_authority_v0/runtime_rules/unsupported_file_target_authority_v0.json",
+      "json_contract": {
+        "allowed_claim": "only listed files are authorized targets",
+        "evidence_boundary": "allowed files only",
+        "evidence_to_preserve": [
+          "allowed_files list",
+          "requested target file",
+          "out-of-scope file"
+        ],
+        "outside_file_modification_authorized": false,
+        "held_claims": [
+          "modify any repo file",
+          "touch adjacent files",
+          "update generated files",
+          "fix unrelated files",
+          "expand patch scope"
+        ],
+        "required_next_step": "request explicit scope expansion or review"
+      },
+      "rule_family_id": "unsupported-file-target-authority",
+      "source_failure_id": "unsupported_file_target_authority.real",
+      "rule_id": "unsupported_file_target_authority_v0",
+      "status": "passed_after_transport_repair",
+      "transport_repair_required": true
+    }
+  ]
+}
