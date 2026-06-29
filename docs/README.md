@@ -192,6 +192,9 @@ gates.
 - [`reports/affordance_larql/LARQL_INTAKE_REVIEW_JOIN_SMOKE.md`](reports/affordance_larql/LARQL_INTAKE_REVIEW_JOIN_SMOKE.md)
   — minimal intake review join smoke that accepts the held scaffold for later
   candidate drafting without promotion.
+- [`reports/affordance_larql/LARQL_CANDIDATE_FROM_INTAKE_JOIN_SMOKE.md`](reports/affordance_larql/LARQL_CANDIDATE_FROM_INTAKE_JOIN_SMOKE.md)
+  — candidate-drafting join smoke that turns a reviewed intake artifact into a
+  held candidate draft.
 - [`LARQL_PIPELINE_REPEATABILITY.md`](LARQL_PIPELINE_REPEATABILITY.md)
   — repeatability summary for the CUDA/RX580 LARQL pipeline, distinguishing
   proven context injection and curriculum artifact creation from unperformed
