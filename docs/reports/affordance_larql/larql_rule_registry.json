@@ -11,7 +11,8 @@
         ".work/affordance_larql_candidate_reviews/absence_of_evidence_file_authority/absence_of_evidence_file_authority_candidate_review.json",
         ".work/affordance_larql_runtime_rule_packets/absence_of_evidence_file_authority/absence_of_evidence_file_authority_runtime_rule_packet.json",
         ".work/affordance_larql_runtime_rule_packet_reviews/absence_of_evidence_file_authority/absence_of_evidence_file_authority_runtime_rule_packet_review.json",
-        ".work/affordance_larql_runtime_installs/absence_of_evidence_file_authority_v0/unsupported_file_target_authority_runtime_rule_install.json"
+        ".work/affordance_larql_runtime_installs/absence_of_evidence_file_authority_v0/runtime_rule_install_record.json",
+        ".work/affordance_larql_runtime_installs/absence_of_evidence_file_authority_v0/runtime_rule_install_record.md"
       ],
       "installed_rule_artifact": ".work/affordance_larql_runtime_installs/absence_of_evidence_file_authority_v0/runtime_rules/absence_of_evidence_file_authority_v0.json",
       "json_contract": {

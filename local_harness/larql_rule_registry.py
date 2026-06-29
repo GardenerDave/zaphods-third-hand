@@ -99,6 +99,7 @@ def render_markdown(registry: dict[str, Any], checks: dict[str, bool]) -> str:
         "| --- | --- | --- | --- | --- | --- | --- |",
     ]
     for entry in registry["rules"]:
+        closeout_label = Path(entry["closeout_report"]).name
         lines.append(
             "| {rule_id} | {status} | {current_lifecycle_step} | {allowed_next_step} | {transport} | {failed} | {closeout} |".format(
                 rule_id=entry["rule_id"],
@@ -107,7 +108,7 @@ def render_markdown(registry: dict[str, Any], checks: dict[str, bool]) -> str:
                 allowed_next_step=entry["allowed_next_step"],
                 transport=str(bool(entry.get("transport_repair_required", False))).lower(),
                 failed=str(bool(entry.get("failed_probe_preserved", False))).lower(),
-                closeout=f"[link]({entry['closeout_report']})",
+                closeout=f"[link]({closeout_label})",
             )
         )
 

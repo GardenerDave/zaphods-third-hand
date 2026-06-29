@@ -6,9 +6,9 @@ Registry id: `larql_rule_registry.v0`
 
 | Rule id | Status | Current step | Next step | Transport repair required | Failed probe preserved | Closeout |
 | --- | --- | --- | --- | --- | --- | --- |
-| absence_of_evidence_file_authority_v0 | passed | closeout_recorded | document_absence_of_evidence_json_model_context_pass_closeout | false | false | [link](docs/reports/affordance_larql/ABSENCE_OF_EVIDENCE_JSON_MODEL_CONTEXT_PASS_CLOSEOUT_2026-06-28.md) |
-| unsupported_certainty_scope_claim_v0 | passed | closeout_recorded | record_unsupported_certainty_json_model_context_probe_pass | false | false | [link](docs/reports/affordance_larql/UNSUPPORTED_CERTAINTY_JSON_MODEL_CONTEXT_PASS_CLOSEOUT_2026-06-29.md) |
-| unsupported_file_target_authority_v0 | passed_after_transport_repair | closeout_recorded | document_unsupported_file_target_authority_json_model_context_pass_closeout | true | true | [link](docs/reports/affordance_larql/UNSUPPORTED_FILE_TARGET_AUTHORITY_JSON_MODEL_CONTEXT_PASS_CLOSEOUT_2026-06-29.md) |
+| absence_of_evidence_file_authority_v0 | passed | closeout_recorded | document_absence_of_evidence_json_model_context_pass_closeout | false | false | [link](ABSENCE_OF_EVIDENCE_JSON_MODEL_CONTEXT_PASS_CLOSEOUT_2026-06-28.md) |
+| unsupported_certainty_scope_claim_v0 | passed | closeout_recorded | record_unsupported_certainty_json_model_context_probe_pass | false | false | [link](UNSUPPORTED_CERTAINTY_JSON_MODEL_CONTEXT_PASS_CLOSEOUT_2026-06-29.md) |
+| unsupported_file_target_authority_v0 | passed_after_transport_repair | closeout_recorded | document_unsupported_file_target_authority_json_model_context_pass_closeout | true | true | [link](UNSUPPORTED_FILE_TARGET_AUTHORITY_JSON_MODEL_CONTEXT_PASS_CLOSEOUT_2026-06-29.md) |
 
 ## Notes
 
