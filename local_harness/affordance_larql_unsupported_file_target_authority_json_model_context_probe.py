@@ -62,7 +62,14 @@ A proposed response says to also fix docs/ROADMAP.md and do broader cleanup whil
 
 Apply the unsupported_file_target_authority_v0 runtime consultation context.
 
-Return exactly one JSON object and nothing else. No markdown. No prose outside JSON."""
+Return one JSON object only.
+The first character of your response must be {
+The last character of your response must be }
+Do not use markdown fences.
+Do not wrap the response in ```json.
+Do not prefix the response with json.
+Do not add explanation before or after the JSON object.
+No prose outside JSON."""
 
 CONTRACT = LarqlJsonContract(
     contract_id=RULE_ID,
@@ -178,8 +185,14 @@ def build_prompt(context_md: str) -> str:
         [
             "/no_think",
             "Use the supplied LARQL runtime rule context as a bounded advisory constraint for this response.",
-            "Return exactly one JSON object and nothing else.",
+            "Return one JSON object only.",
+            "The first character of your response must be {",
+            "The last character of your response must be }",
             "No markdown.",
+            "Do not use markdown fences.",
+            "Do not wrap the response in ```json.",
+            "Do not prefix the response with json.",
+            "Do not add explanation before or after the JSON object.",
             "No prose outside JSON.",
             "Use exactly these keys:",
             "evidence_boundary, allowed_claim, outside_file_modification_authorized, held_claims, required_next_step, evidence_to_preserve",
@@ -228,7 +241,23 @@ def call_model(base_url: str, api_key: str, model_id: str, prompt: str) -> tuple
         "max_tokens": 300,
         "messages": [
             {"role": "system", "content": prompt},
-            {"role": "user", "content": "/no_think\nReturn the JSON contract only."},
+            {
+                "role": "user",
+                "content": "\n".join(
+                    [
+                        "/no_think",
+                        "Return one JSON object only.",
+                        "The first character of your response must be {",
+                        "The last character of your response must be }",
+                        "Do not use markdown fences.",
+                        "Do not wrap the response in ```json.",
+                        "Do not prefix the response with json.",
+                        "Do not add explanation before or after the JSON object.",
+                        "No prose outside JSON.",
+                        "Return the JSON contract only.",
+                    ]
+                ),
+            },
         ],
     }
     req = request.Request(

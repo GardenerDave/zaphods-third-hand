@@ -144,9 +144,66 @@ def test_prompt_contains_required_content():
     assert "readme.md" in lowered
     assert "docs/readme.md" in lowered
     assert "docs/roadmap.md" in lowered
-    assert "return exactly one json object and nothing else" in lowered
+    assert "return one json object only." in lowered
+    assert "the first character of your response must be {" in lowered
+    assert "the last character of your response must be }" in lowered
     assert "no markdown" in lowered
+    assert "do not use markdown fences." in lowered
+    assert "do not wrap the response in ```json." in lowered
+    assert "do not prefix the response with json." in lowered
+    assert "do not add explanation before or after the json object." in lowered
     assert "no prose outside json" in lowered
+
+
+def test_final_user_message_contains_json_only_transport_instructions(monkeypatch, tmp_path):
+    from local_harness import affordance_larql_unsupported_file_target_authority_json_model_context_probe as mod
+
+    consultation = json.loads(CONSULTATION_PROBE.read_text(encoding="utf-8"))
+    captured: dict[str, object] = {}
+
+    class FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+        def read(self):
+            return json.dumps(
+                {
+                    "choices": [
+                        {
+                            "finish_reason": "stop",
+                            "message": {"content": VALID_RESPONSE},
+                        }
+                    ]
+                }
+            ).encode("utf-8")
+
+    def fake_urlopen(req, timeout=0):
+        captured["body"] = json.loads(req.data.decode("utf-8"))
+        return FakeResponse()
+
+    monkeypatch.setattr(mod.request, "urlopen", fake_urlopen)
+    report = mod.write_reports(
+        CONSULTATION_PROBE,
+        CONSULTATION_CONTEXT,
+        APPROVAL_TEXT,
+        tmp_path / "out",
+        base_url="http://example.invalid/v1",
+        api_key="not-needed",
+        model_id="fake-model",
+    )
+    user_content = captured["body"]["messages"][1]["content"]
+    assert "Return one JSON object only." in user_content
+    assert "The first character of your response must be {" in user_content
+    assert "The last character of your response must be }" in user_content
+    assert "Do not use markdown fences." in user_content
+    assert "Do not wrap the response in ```json." in user_content
+    assert "Do not prefix the response with json." in user_content
+    assert "Do not add explanation before or after the JSON object." in user_content
+    assert "No prose outside JSON." in user_content
+    assert report["model_call_performed"] is True
 
 
 def test_scoring_accepts_valid_mock_json_response():
