@@ -131,7 +131,8 @@ does not establish production readiness.
   for the first reversible direct tensor-delta smoke on the LARQL-core path,
   and `LARQL_DIRECT_LAYER_EDIT_REAUDITION_2026-06-29.md` for the supervised
   reaudition packet and optional local comparison path for an effective patched
-  model copy.
+  model copy, and `LARQL_DIRECT_LAYER_EDIT_REAUDITION_REVIEW_2026-06-29.md`
+  for the first supervised review of the base-vs-patched comparison evidence.
 
 ## Safety Reminder
 

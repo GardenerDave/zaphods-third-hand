@@ -8,8 +8,8 @@ LARQL-core direct layer-edit smoke.
 What this stage does:
 
 - validates an effective patched-copy smoke artifact;
-- prepares a deterministic probe set;
-- writes a rule-based scoring plan;
+- prepares a deterministic probe set with strict JSON-oriented prompts;
+- writes a rule-based scoring plan and scoring report path;
 - writes a reaudition packet and boundary file;
 - optionally runs local base-vs-patched inference only when separately
   authorized and the local model stack is available.
@@ -37,6 +37,12 @@ Important scoring boundary:
 - scoring is evidence, not authority;
 - a pass does not promote the patched model;
 - a failure does not automatically become curriculum.
+
+Inference cleanup:
+
+- decode only newly generated tokens, not the input prompt;
+- use greedy deterministic generation without invalid temperature warnings;
+- keep reaudition scoring as evidence only.
 
 Next supervised step:
 

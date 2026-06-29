@@ -190,6 +190,30 @@ def test_probe_set_contains_four_required_probes(tmp_path):
     } <= ids
 
 
+def test_file_scope_probes_require_json_output():
+    from local_harness.larql_direct_layer_edit_reaudition import build_probe_set
+
+    probes = {probe["probe_id"]: probe for probe in build_probe_set()}
+    for probe_id in [
+        "original_larql_behavior_replay",
+        "adjacent_file_anti_overfit",
+        "all_files_authorized_control",
+    ]:
+        prompt = probes[probe_id]["prompt"]
+        assert "Return only valid JSON" in prompt
+        assert '"allowed_targets"' in prompt
+        assert '"held_targets"' in prompt
+
+
+def test_unrelated_regression_probe_requires_json_output():
+    from local_harness.larql_direct_layer_edit_reaudition import build_probe_set
+
+    probes = {probe["probe_id"]: probe for probe in build_probe_set()}
+    prompt = probes["unrelated_task_regression"]["prompt"]
+    assert "Return only valid JSON" in prompt
+    assert '"summary"' in prompt
+
+
 def test_scoring_plan_includes_evidence_not_authority_language(tmp_path):
     from local_harness.larql_direct_layer_edit_reaudition import write_reaudition
 
@@ -201,6 +225,66 @@ def test_scoring_plan_includes_evidence_not_authority_language(tmp_path):
     )
     plan = json.loads((tmp_path / "out/reaudition_009/scoring_plan.json").read_text(encoding="utf-8"))
     assert "evidence, not authority" in plan["note"]
+
+
+def test_scoring_report_path_present_after_inference(tmp_path, monkeypatch):
+    from local_harness import larql_direct_layer_edit_reaudition as mod
+
+    base_model = tmp_path / "base_model"
+    patched_model = tmp_path / "patched_model"
+    base_model.mkdir()
+    patched_model.mkdir()
+
+    smoke = smoke_payload()
+    smoke["base_model_path"] = str(base_model)
+    smoke["patched_model_path"] = str(patched_model)
+
+    monkeypatch.setattr(mod, "inference_stack_available", lambda: True)
+    monkeypatch.setattr(
+        mod,
+        "run_model_inference",
+        lambda *, model_path, probe_set, out_path: out_path.write_text(
+            "\n".join(
+                json.dumps(
+                    {
+                        "probe_id": probe["probe_id"],
+                        "output": json.dumps(
+                            {
+                                "allowed_targets": ["docs/README.md", "docs/ROADMAP.md"],
+                                "held_targets": [],
+                                "scope_expansion_required": False,
+                                "install_authorized": False,
+                                "registry_mutation_authorized": False,
+                                "reason": "ok",
+                            }
+                            if probe["probe_id"] != "unrelated_task_regression"
+                            else {
+                                "summary": "ok",
+                                "install_authorized": False,
+                                "registry_mutation_authorized": False,
+                            }
+                        ),
+                    },
+                    sort_keys=True,
+                )
+                for probe in probe_set
+            )
+            + "\n",
+            encoding="utf-8",
+        ),
+    )
+
+    record = mod.write_reaudition(
+        write_json(tmp_path / "smoke.json", smoke),
+        "reaudition_009b",
+        tmp_path / "out",
+        authorize_larql_direct_layer_edit_reaudition=True,
+        base_model_path=base_model,
+        patched_model_path=patched_model,
+        run_inference=True,
+        authorize_model_inference=True,
+    )
+    assert record["scoring_report_path"] is not None
 
 
 def test_mocked_inference_path_writes_outputs_and_comparison_report(tmp_path, monkeypatch):
@@ -220,7 +304,33 @@ def test_mocked_inference_path_writes_outputs_and_comparison_report(tmp_path, mo
 
     def fake_run_model_inference(*, model_path: Path, probe_set: list[dict[str, Any]], out_path: Path) -> None:
         tag = "base" if model_path == base_model else "patched"
-        rows = [{"probe_id": probe["probe_id"], "output": f"{tag}:{probe['probe_id']}"} for probe in probe_set]
+        rows = []
+        for probe in probe_set:
+            if probe["probe_id"] == "unrelated_task_regression":
+                payload = {
+                    "summary": f"{tag} summary",
+                    "install_authorized": False,
+                    "registry_mutation_authorized": False,
+                }
+            elif probe["probe_id"] == "all_files_authorized_control":
+                payload = {
+                    "allowed_targets": ["docs/README.md", "docs/ROADMAP.md"],
+                    "held_targets": [],
+                    "scope_expansion_required": False,
+                    "install_authorized": False,
+                    "registry_mutation_authorized": False,
+                    "reason": f"{tag} ok",
+                }
+            else:
+                payload = {
+                    "allowed_targets": ["docs/README.md"] if probe["probe_id"] == "original_larql_behavior_replay" else ["docs/QUICKSTART.md"],
+                    "held_targets": ["docs/ROADMAP.md", "adjacent docs", "generated files"] if probe["probe_id"] == "original_larql_behavior_replay" else ["docs/ARCHITECTURE.md"],
+                    "scope_expansion_required": True,
+                    "install_authorized": False,
+                    "registry_mutation_authorized": False,
+                    "reason": f"{tag} constrained",
+                }
+            rows.append({"probe_id": probe["probe_id"], "output": json.dumps(payload)})
         out_path.write_text(
             "\n".join(json.dumps(row, sort_keys=True) for row in rows) + "\n",
             encoding="utf-8",
@@ -244,3 +354,12 @@ def test_mocked_inference_path_writes_outputs_and_comparison_report(tmp_path, mo
     assert record["base_outputs_path"] is not None
     assert record["patched_outputs_path"] is not None
     assert record["comparison_report_path"] is not None
+    assert record["scoring_report_path"] is not None
+    assert Path(record["base_outputs_path"]).exists()
+    assert Path(record["patched_outputs_path"]).exists()
+    assert Path(record["comparison_report_path"]).exists()
+    assert Path(record["scoring_report_path"]).exists()
+    scoring = json.loads(Path(record["scoring_report_path"]).read_text(encoding="utf-8"))
+    assert scoring["evidence_only"] is True
+    assert scoring["promotion_authorized"] is False
+    assert scoring["automatic_failure_to_curriculum_capture_authorized"] is False
