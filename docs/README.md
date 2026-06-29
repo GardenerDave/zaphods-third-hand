@@ -204,6 +204,9 @@ gates.
 - [`reports/affordance_larql/LARQL_PACKET_REVIEW_FROM_INTAKE_CANDIDATE_JOIN_SMOKE.md`](reports/affordance_larql/LARQL_PACKET_REVIEW_FROM_INTAKE_CANDIDATE_JOIN_SMOKE.md)
   — packet-review join smoke that turns a held runtime-rule packet draft into
   an install-boundary hold.
+- [`reports/affordance_larql/LARQL_INTAKE_TO_INSTALL_BOUNDARY_CHAIN_REVIEW.md`](reports/affordance_larql/LARQL_INTAKE_TO_INSTALL_BOUNDARY_CHAIN_REVIEW.md)
+  — full-chain review that summarizes the intake-to-install-boundary smoke path
+  as one bounded proof artifact.
 - [`LARQL_PIPELINE_REPEATABILITY.md`](LARQL_PIPELINE_REPEATABILITY.md)
   — repeatability summary for the CUDA/RX580 LARQL pipeline, distinguishing
   proven context injection and curriculum artifact creation from unperformed

@@ -111,7 +111,9 @@ does not establish production readiness.
   `LARQL_PACKET_FROM_INTAKE_CANDIDATE_JOIN_SMOKE.md` for the join that turns
   the reviewed candidate into a held runtime-rule packet draft, and
   `LARQL_PACKET_REVIEW_FROM_INTAKE_CANDIDATE_JOIN_SMOKE.md` for the join that
-  turns the held runtime-rule packet draft into an install-boundary hold.
+  turns the held runtime-rule packet draft into an install-boundary hold, and
+  `LARQL_INTAKE_TO_INSTALL_BOUNDARY_CHAIN_REVIEW.md` for the full-chain review
+  that summarizes the entire intake-to-install-boundary smoke path.
 
 ## Safety Reminder
 
