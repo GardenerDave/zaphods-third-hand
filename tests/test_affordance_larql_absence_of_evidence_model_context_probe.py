@@ -61,7 +61,12 @@ def test_prompt_builder_includes_context_and_rule_id(tmp_path):
     assert "absence_of_evidence_file_authority_v0" in prompt
     assert "evidence boundary" in prompt.lower()
     assert "distinguish not found in searched scope from does not exist" in prompt.lower()
+    assert "you must not say the file does not exist" in prompt.lower()
+    assert "does not exist in docs/reports" in prompt.lower()
+    assert "use not found in the searched scope instead" in prompt.lower()
+    assert "any nonexistence conclusion requires targeted inspection or review" in prompt.lower()
     assert "targeted inspection or review" in prompt.lower()
+    assert "preserve the searched-scope evidence and failed search result" in prompt.lower()
     assert "Scenario text" in prompt
     assert consultation_probe.exists()
 
