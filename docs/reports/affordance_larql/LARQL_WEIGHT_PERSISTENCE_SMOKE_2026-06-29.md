@@ -2,7 +2,16 @@
 
 Date: 2026-06-29
 
-This is the first weight-persistence smoke bridge from a completed LARQL model-modification candidate.
+This is the first weight-persistence smoke bridge from a completed LARQL
+model-modification candidate.
+
+Clarification:
+
+- the adapter/LoRA route documented here is now classified as an adapter
+  baseline or fallback only;
+- it is not the LARQL-core mechanism;
+- the LARQL-core mechanism under review is direct layer
+  decomposition/injection/recompile.
 
 What was prepared:
 

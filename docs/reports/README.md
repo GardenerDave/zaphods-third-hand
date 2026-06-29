@@ -122,7 +122,9 @@ does not establish production readiness.
   LARQL model-modification candidate handoff from that completed chain, and
   `LARQL_WEIGHT_PERSISTENCE_SMOKE_2026-06-29.md` for the first explicit
   weight-persistence smoke bridge from that completed LARQL model-modification
-  candidate.
+  candidate, and `LARQL_DIRECT_LAYER_EDIT_CANDIDATE_2026-06-29.md` for the
+  reviewable LARQL-core redirect from the adapter baseline toward direct layer
+  decomposition/injection/recompile.
 
 ## Safety Reminder
 
