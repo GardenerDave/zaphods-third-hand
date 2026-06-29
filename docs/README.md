@@ -168,6 +168,9 @@ gates.
 - [`experiments/AFFORDANCE_LARQL_ABSENCE_OF_EVIDENCE_RUNTIME_RULE_PACKET_V0.md`](experiments/AFFORDANCE_LARQL_ABSENCE_OF_EVIDENCE_RUNTIME_RULE_PACKET_V0.md)
   — model-free packet scaffold for drafting an absence-of-evidence runtime rule
   before any installation or runtime-rule modification is authorized.
+- [`LARQL_JSON_CONTRACT_PROBE_WORKFLOW.md`](LARQL_JSON_CONTRACT_PROBE_WORKFLOW.md)
+  — reusable bounded JSON-contract workflow for LARQL probes, scorer checks,
+  and independent review.
 - [`LARQL_PIPELINE_REPEATABILITY.md`](LARQL_PIPELINE_REPEATABILITY.md)
   — repeatability summary for the CUDA/RX580 LARQL pipeline, distinguishing
   proven context injection and curriculum artifact creation from unperformed
