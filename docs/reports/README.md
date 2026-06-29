@@ -98,7 +98,9 @@ does not establish production readiness.
   audit identifying the smallest reusable workflow layer to package the three
   completed hand-built rule trials, and
   `LARQL_JSON_RULE_TRIAL_TEMPLATE_EXTRACTION_2026-06-29.md` for the extracted
-  reusable lifecycle across both completed JSON-contract rule trials.
+  reusable lifecycle across both completed JSON-contract rule trials, while
+  `LARQL_LIFECYCLE_STATUS.md` and `LARQL_RULE_REGISTRY_STATUS.md` provide the
+  compact current-state summaries for the completed rule set.
 
 ## Safety Reminder
 

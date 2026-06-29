@@ -183,6 +183,9 @@ gates.
 - [`LARQL_COMPLETED_RULE_DEMO.md`](LARQL_COMPLETED_RULE_DEMO.md) — concise
   walkthrough of one completed LARQL JSON rule trial from candidate to
   closeout, using unsupported-file-target authority as the example.
+- [`LARQL_MACHINERY_QUICKSTART.md`](LARQL_MACHINERY_QUICKSTART.md) — shortest
+  path to the completed LARQL registry, evidence packet, lifecycle status,
+  and demo documents.
 - [`LARQL_PIPELINE_REPEATABILITY.md`](LARQL_PIPELINE_REPEATABILITY.md)
   — repeatability summary for the CUDA/RX580 LARQL pipeline, distinguishing
   proven context injection and curriculum artifact creation from unperformed
