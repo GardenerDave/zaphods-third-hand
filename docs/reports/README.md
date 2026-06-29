@@ -101,8 +101,10 @@ does not establish production readiness.
   reusable lifecycle across both completed JSON-contract rule trials, while
   `LARQL_LIFECYCLE_STATUS.md` and `LARQL_RULE_REGISTRY_STATUS.md` provide the
   compact current-state summaries for the completed rule set, and
-  `LARQL_INTAKE_SMOKE_REVIEW.md` for the minimal intake smoke that turns a
-  noisy note into a held candidate scaffold.
+  `LARQL_INTAKE_SMOKE_REVIEW.md` and `LARQL_INTAKE_REVIEW_JOIN_SMOKE.md` for
+  the minimal intake smoke and intake-review join smoke that turn a noisy note
+  into a held candidate scaffold and then into an explicit candidate-drafting
+  handoff.
 
 ## Safety Reminder
 
