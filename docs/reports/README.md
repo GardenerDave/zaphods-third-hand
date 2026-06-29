@@ -128,7 +128,10 @@ does not establish production readiness.
   `LARQL_LAYER_EDIT_MECHANISM_SELECTION_2026-06-29.md` for the held mechanism
   selection stage that prepares the first direct layer-edit smoke without
   performing a weight edit, and `LARQL_DIRECT_LAYER_EDIT_SMOKE_2026-06-29.md`
-  for the first reversible direct tensor-delta smoke on the LARQL-core path.
+  for the first reversible direct tensor-delta smoke on the LARQL-core path,
+  and `LARQL_DIRECT_LAYER_EDIT_REAUDITION_2026-06-29.md` for the supervised
+  reaudition packet and optional local comparison path for an effective patched
+  model copy.
 
 ## Safety Reminder
 
