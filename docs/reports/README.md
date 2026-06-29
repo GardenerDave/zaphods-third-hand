@@ -82,10 +82,12 @@ does not establish production readiness.
   `CUDA_RX580_LARQL_PIPELINE_CLOSEOUT_2026-06-28.md` for the completed
   CUDA/RX580 guided-capability path,
   `ABSENCE_OF_EVIDENCE_LARQL_INSTALL_BOUNDARY_CLOSEOUT_2026-06-28.md` for the
-  reviewed install-boundary milestone on the absence-of-evidence candidate, and
+  reviewed install-boundary milestone on the absence-of-evidence candidate,
   `ABSENCE_OF_EVIDENCE_MODEL_CONTEXT_FAILURE_MODE_2026-06-28.md` for the
   prompt/response failure mode discovered while trying to tighten the bounded
-  model-context probe.
+  model-context probe, and
+  `ABSENCE_OF_EVIDENCE_JSON_MODEL_CONTEXT_PASS_CLOSEOUT_2026-06-28.md` for the
+  successful JSON-only model-context pass milestone.
 
 ## Safety Reminder
 
