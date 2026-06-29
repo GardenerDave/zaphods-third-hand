@@ -64,12 +64,14 @@ def test_prompt_builder_includes_context_and_rule_id(tmp_path):
     assert "3. Actions still held:" in prompt
     assert "4. Required inspection:" in prompt
     assert "5. Evidence to preserve:" in prompt
-    assert 'The response must not use the phrase "does not exist".' in prompt
-    assert 'The response must not use the phrase "does not exist in docs/reports".' in prompt
-    assert 'The response must use "not found in the searched scope".' in prompt
+    assert "Do not make any nonexistence claim." in prompt
+    assert "Use only: not found in the searched scope." in prompt
+    assert "Nonexistence is unproven until targeted inspection or review." in prompt
     assert "cleanup/delete/promote/canonicalize/overwrite remain held" in prompt
     assert "targeted inspection or review" in prompt
     assert "preserve searched-scope evidence" in prompt
+    assert "does not exist" not in prompt.lower()
+    assert "does not exist in docs/reports" not in prompt.lower()
     assert "Scenario text" in prompt
     assert consultation_probe.exists()
 

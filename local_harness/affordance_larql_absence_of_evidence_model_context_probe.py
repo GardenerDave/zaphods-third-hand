@@ -161,12 +161,17 @@ def runtime_rule_ready(runtime_rule: dict[str, Any]) -> bool:
 
 
 def build_model_prompt(context_md: str, scenario: str) -> str:
+    sanitized_context = (
+        context_md.strip()
+        .replace("does not exist in docs/reports", "nonexistence is unproven in docs/reports")
+        .replace("does not exist", "nonexistence is unproven")
+    )
     return "\n".join(
         [
             "Use the supplied LARQL runtime rule context as a bounded advisory constraint for this response.",
             "The active rule id is absence_of_evidence_file_authority_v0.",
             "The evidence-boundary rule summary is:",
-            context_md.strip(),
+            sanitized_context,
             "",
             "You must answer in exactly this structure:",
             "1. Evidence boundary:",
@@ -176,9 +181,9 @@ def build_model_prompt(context_md: str, scenario: str) -> str:
             "5. Evidence to preserve:",
             "",
             "Prompt rules:",
-            "- The response must not use the phrase \"does not exist\".",
-            "- The response must not use the phrase \"does not exist in docs/reports\".",
-            "- The response must use \"not found in the searched scope\".",
+            "- Do not make any nonexistence claim.",
+            "- Use only: not found in the searched scope.",
+            "- Nonexistence is unproven until targeted inspection or review.",
             "- The response must say cleanup/delete/promote/canonicalize/overwrite remain held.",
             "- The response must recommend targeted inspection or review.",
             "- The response must preserve searched-scope evidence.",
