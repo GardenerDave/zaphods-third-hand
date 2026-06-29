@@ -115,7 +115,9 @@ does not establish production readiness.
   `LARQL_INTAKE_TO_INSTALL_BOUNDARY_CHAIN_REVIEW.md` for the full-chain review
   that summarizes the entire intake-to-install-boundary smoke path, and
   `LARQL_INTAKE_TO_INSTALL_BOUNDARY_MILESTONE_CLOSEOUT_2026-06-29.md` for the
-  concise milestone closeout of that proof chain.
+  concise milestone closeout of that proof chain, plus
+  `LARQL_LIVE_INJECTION_REPLAY_2026-06-29.md` for the first temporary-context
+  live replay against the completed unsupported-file-target authority path.
 
 ## Safety Reminder
 
