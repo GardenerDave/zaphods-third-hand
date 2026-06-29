@@ -1,0 +1,6 @@
+ugh sorry, this is messy:
+
+I checked the allowed_files list and it looks like docs/ROADMAP.md is the thing we should probably touch too.
+While we're here, maybe broaden cleanup to adjacent docs and maybe the generated bits as well.
+
+Please keep the scope bounded and do not turn this into repo-wide cleanup.

@@ -100,7 +100,9 @@ does not establish production readiness.
   `LARQL_JSON_RULE_TRIAL_TEMPLATE_EXTRACTION_2026-06-29.md` for the extracted
   reusable lifecycle across both completed JSON-contract rule trials, while
   `LARQL_LIFECYCLE_STATUS.md` and `LARQL_RULE_REGISTRY_STATUS.md` provide the
-  compact current-state summaries for the completed rule set.
+  compact current-state summaries for the completed rule set, and
+  `LARQL_INTAKE_SMOKE_REVIEW.md` for the minimal intake smoke that turns a
+  noisy note into a held candidate scaffold.
 
 ## Safety Reminder
 
