@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import importlib.util
+import io
 import json
 import os
 import shutil
@@ -155,6 +156,21 @@ def tensor_stack_available() -> bool:
     return importlib.util.find_spec("torch") is not None and importlib.util.find_spec("safetensors") is not None
 
 
+def tensor_audit_hash(tensor: Any) -> str:
+    import torch
+
+    buf = io.BytesIO()
+    cpu_tensor = tensor.detach().cpu().contiguous()
+    torch.save(cpu_tensor, buf)
+    return hashlib.sha256(buf.getvalue()).hexdigest()
+
+
+def tensor_norm_float32(tensor: Any) -> float:
+    import torch
+
+    return float(torch.linalg.vector_norm(tensor.detach().float().cpu()).item())
+
+
 def create_direct_delta_artifact(
     *,
     base_model_path: Path,
@@ -181,10 +197,10 @@ def create_direct_delta_artifact(
     delta_path = out_dir / "direct_delta.safetensors"
     save_file({tensor_name: delta}, str(delta_path))
 
-    original_hash = hashlib.sha256(tensor.cpu().numpy().tobytes()).hexdigest()
-    delta_hash = hashlib.sha256(delta.cpu().numpy().tobytes()).hexdigest()
-    delta_norm = float(torch.linalg.vector_norm(delta).item())
-    original_norm = float(torch.linalg.vector_norm(tensor).item())
+    original_hash = tensor_audit_hash(tensor)
+    delta_hash = tensor_audit_hash(delta)
+    delta_norm = tensor_norm_float32(delta)
+    original_norm = tensor_norm_float32(tensor)
     relative_norm = float(delta_norm / original_norm) if original_norm else None
     return {
         "tensor_shape": list(tensor.shape),

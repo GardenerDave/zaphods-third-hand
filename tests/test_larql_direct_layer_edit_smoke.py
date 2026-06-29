@@ -5,6 +5,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "local_harness/larql_direct_layer_edit_smoke.py"
@@ -331,3 +333,16 @@ def test_mocked_patched_model_copy_sets_model_artifact_written(tmp_path, monkeyp
         "automatic_failure_to_curriculum_capture_authorized",
     ]:
         assert smoke[key] is False
+
+
+def test_bfloat16_audit_helpers_if_torch_available():
+    torch = pytest.importorskip("torch")
+    from local_harness.larql_direct_layer_edit_smoke import tensor_audit_hash, tensor_norm_float32
+
+    tensor = torch.tensor([[1.0, -2.0], [3.0, 0.5]], dtype=torch.bfloat16)
+    digest = tensor_audit_hash(tensor)
+    norm = tensor_norm_float32(tensor)
+
+    assert isinstance(digest, str)
+    assert digest
+    assert isinstance(norm, float)
