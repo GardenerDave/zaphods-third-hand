@@ -124,7 +124,10 @@ does not establish production readiness.
   weight-persistence smoke bridge from that completed LARQL model-modification
   candidate, and `LARQL_DIRECT_LAYER_EDIT_CANDIDATE_2026-06-29.md` for the
   reviewable LARQL-core redirect from the adapter baseline toward direct layer
-  decomposition/injection/recompile.
+  decomposition/injection/recompile, and
+  `LARQL_LAYER_EDIT_MECHANISM_SELECTION_2026-06-29.md` for the held mechanism
+  selection stage that prepares the first direct layer-edit smoke without
+  performing a weight edit.
 
 ## Safety Reminder
 
