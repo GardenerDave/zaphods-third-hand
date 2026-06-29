@@ -80,9 +80,12 @@ does not establish production readiness.
   experimental host-affordance work.
 - `affordance_larql/` — LARQL pipeline closeout evidence, including
   `CUDA_RX580_LARQL_PIPELINE_CLOSEOUT_2026-06-28.md` for the completed
-  CUDA/RX580 guided-capability path, and
+  CUDA/RX580 guided-capability path,
   `ABSENCE_OF_EVIDENCE_LARQL_INSTALL_BOUNDARY_CLOSEOUT_2026-06-28.md` for the
-  reviewed install-boundary milestone on the absence-of-evidence candidate.
+  reviewed install-boundary milestone on the absence-of-evidence candidate, and
+  `ABSENCE_OF_EVIDENCE_MODEL_CONTEXT_FAILURE_MODE_2026-06-28.md` for the
+  prompt/response failure mode discovered while trying to tighten the bounded
+  model-context probe.
 
 ## Safety Reminder
 
