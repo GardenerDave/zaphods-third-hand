@@ -91,6 +91,32 @@ def test_missing_approval_text_rejected(tmp_path):
     assert result.returncode != 0
 
 
+def test_approval_text_rejects_permissive_training_language(tmp_path):
+    packet, review = ready_runtime_rule_review_file(tmp_path)
+    record = write_reports(
+        packet,
+        review,
+        "I approve installing the reviewed absence-of-evidence LARQL runtime rule as a local runtime rule artifact only. "
+        "You may write training data and you may promote a candidate.",
+        tmp_path / "out",
+    )
+    assert record["install_verdict"] == "absence_of_evidence_runtime_rule_install_rejected"
+    assert record["checks"]["approval_text_safe"] is False
+
+
+def test_approval_text_rejects_permissive_weight_language(tmp_path):
+    packet, review = ready_runtime_rule_review_file(tmp_path)
+    record = write_reports(
+        packet,
+        review,
+        "I approve installing the reviewed absence-of-evidence LARQL runtime rule as a local runtime rule artifact only. "
+        "You may mutate model weights and automatic failure-to-curriculum capture is allowed.",
+        tmp_path / "out",
+    )
+    assert record["install_verdict"] == "absence_of_evidence_runtime_rule_install_rejected"
+    assert record["checks"]["approval_text_safe"] is False
+
+
 def test_wrong_review_verdict_rejected(tmp_path):
     packet, review = ready_runtime_rule_review_file(tmp_path)
     payload = json.loads(review.read_text(encoding="utf-8"))
@@ -157,8 +183,13 @@ def test_runtime_rule_boundary_fields_present(tmp_path):
     runtime_rule_path = Path(record["runtime_rule_artifact_path"])
     runtime_rule = json.loads(runtime_rule_path.read_text(encoding="utf-8"))
     assert runtime_rule["purpose"].startswith("Prevent treating missing or incomplete evidence")
-    assert "kept pending review evidence" not in runtime_rule["purpose"].lower()  # purpose is specific
-    assert "held pending review evidence" in "\n".join(runtime_rule["blocks_or_warns_on"]).lower() or True
+    combined_blocks = "\n".join(runtime_rule["blocks_or_warns_on"]).lower()
+    combined_behavior = "\n".join(runtime_rule["required_response_behavior"]).lower()
+    assert "held pending review evidence" in combined_behavior
+    assert "does not exist merely because it was not found" in combined_blocks
+    assert "distinguish not found in searched scope from does not exist" in combined_behavior
+    assert "recommend targeted inspection or review" in combined_behavior
+    assert "preserve failed-run or search-boundary evidence where relevant" in combined_behavior
     assert runtime_rule["provenance"]["explicit_user_approval_captured"] is True
     assert record["model_call_performed"] is False
     assert record["training_data_written"] is False

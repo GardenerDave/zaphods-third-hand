@@ -58,18 +58,28 @@ def sha256_text(text: str) -> str:
 
 def approval_text_is_safe(text: str) -> bool:
     lowered = text.lower()
-    required = [
-        "i approve installing the reviewed absence-of-evidence larql runtime rule as a local runtime rule artifact only",
+    required_intent = (
+        "i approve installing the reviewed absence-of-evidence larql runtime rule as a local runtime rule artifact only"
+    )
+    explicit_ban = (
+        "do not call a model, write training data, write dataset artifacts, write durable memory, promote a candidate, "
+        "train lora, mutate model weights, or perform automatic failure-to-curriculum capture."
+    )
+    prohibitions = (
         "do not call a model",
-        "write training data",
-        "write dataset artifacts",
-        "write durable memory",
-        "promote a candidate",
-        "mutate model weights",
-        "automatic failure-to-curriculum capture",
-        "train lora",
-    ]
-    return all(item in lowered for item in required)
+        "do not write training data",
+        "do not write dataset artifacts",
+        "do not write durable memory",
+        "do not promote a candidate",
+        "do not train lora",
+        "do not mutate model weights",
+        "do not perform automatic failure-to-curriculum capture",
+    )
+    if required_intent not in lowered:
+        return False
+    if explicit_ban in lowered:
+        return True
+    return all(item in lowered for item in prohibitions)
 
 
 def draft_is_safe(draft: dict[str, Any]) -> bool:
