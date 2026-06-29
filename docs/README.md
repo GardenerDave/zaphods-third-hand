@@ -180,6 +180,9 @@ gates.
   installing, probing, and closing out LARQL JSON-contract rule trials while
   keeping install, model-call, training, and capture authority explicitly
   bounded.
+- [`LARQL_COMPLETED_RULE_DEMO.md`](LARQL_COMPLETED_RULE_DEMO.md) — concise
+  walkthrough of one completed LARQL JSON rule trial from candidate to
+  closeout, using unsupported-file-target authority as the example.
 - [`LARQL_PIPELINE_REPEATABILITY.md`](LARQL_PIPELINE_REPEATABILITY.md)
   — repeatability summary for the CUDA/RX580 LARQL pipeline, distinguishing
   proven context injection and curriculum artifact creation from unperformed

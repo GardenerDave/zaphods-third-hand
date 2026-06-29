@@ -96,7 +96,7 @@ does not establish production readiness.
   authority boundaries after transport repair, plus
   `LARQL_MACHINERY_PACKAGING_AUDIT_2026-06-29.md` for the follow-up machinery
   audit identifying the smallest reusable workflow layer to package the three
-  completed hand-built rule trials, plus
+  completed hand-built rule trials, and
   `LARQL_JSON_RULE_TRIAL_TEMPLATE_EXTRACTION_2026-06-29.md` for the extracted
   reusable lifecycle across both completed JSON-contract rule trials.
 
