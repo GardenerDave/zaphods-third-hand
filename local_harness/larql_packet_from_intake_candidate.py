@@ -101,6 +101,7 @@ def build_packet(review: dict[str, Any], review_path: Path) -> dict[str, Any]:
     source_failure_id = review["source_failure_id"]
     candidate_id = review["candidate_id"]
     held_actions = list(review["held_actions"])
+    source_allowed_claim = review["allowed_claim"]
     packet = {
         "report_type": "larql_packet_from_intake_candidate.v0",
         "packet_status": "held_for_packet_review",
@@ -109,7 +110,8 @@ def build_packet(review: dict[str, Any], review_path: Path) -> dict[str, Any]:
         "candidate_id": candidate_id,
         "proposed_rule_family_id": family,
         "evidence_boundary": review["evidence_boundary"],
-        "allowed_claim": review["allowed_claim"],
+        "allowed_claim": PACKET_JSON_CONTRACT["allowed_claim"],
+        "source_allowed_claim": source_allowed_claim,
         "held_actions": held_actions,
         "required_next_step": "supervised_runtime_rule_packet_review",
         "registry_promotion_authorized": False,
@@ -126,7 +128,8 @@ def build_packet(review: dict[str, Any], review_path: Path) -> dict[str, Any]:
             "candidate_id": candidate_id,
             "failure_pattern": "allowed_files boundary treated as exclusive authority",
             "authority_boundary": "allowed_files only; no adjacent, generated, unrelated, or repo-wide edits",
-            "allowed_claim": review["allowed_claim"],
+            "allowed_claim": PACKET_JSON_CONTRACT["allowed_claim"],
+            "source_allowed_claim": source_allowed_claim,
             "held_actions": held_actions,
             "evidence_boundary": review["evidence_boundary"],
             "json_contract": dict(PACKET_JSON_CONTRACT),
@@ -155,6 +158,7 @@ def render_markdown(packet: dict[str, Any]) -> str:
         f"Source failure id: `{packet['source_failure_id']}`",
         f"Candidate id: `{packet['candidate_id']}`",
         f"Proposed rule family id: `{packet['proposed_rule_family_id']}`",
+        f"Upstream intake/candidate allowed claim preserved separately: `{packet['source_allowed_claim']}`",
         "",
         "## What this join smoke proves",
         "",

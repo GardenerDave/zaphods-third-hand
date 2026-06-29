@@ -119,6 +119,8 @@ def test_accepts_valid_candidate_review_payload(tmp_path):
     assert packet["source_failure_id"] == "synthetic_unsupported_file_target_authority_noisy_note.real"
     assert packet["candidate_id"] == "larql_intake_smoke_unsupported_file_target_authority_candidate"
     assert packet["proposed_rule_family_id"] == "unsupported_file_target_authority"
+    assert packet["allowed_claim"] == "only listed files are authorized targets"
+    assert packet["source_allowed_claim"] == "the noisy note can be reduced into a bounded candidate scaffold"
     assert packet["required_next_step"] == "supervised_runtime_rule_packet_review"
     assert packet["registry_promotion_authorized"] is False
     assert packet["runtime_rule_creation_authorized"] is False
@@ -127,7 +129,10 @@ def test_accepts_valid_candidate_review_payload(tmp_path):
     assert packet["candidate_promotion_authorized"] is False
     assert packet["packet_promotion_authorized"] is False
     assert packet["authority_boundaries_preserved"] is True
+    assert packet["runtime_rule_packet_draft"]["allowed_claim"] == "only listed files are authorized targets"
     assert packet["runtime_rule_packet_draft"]["json_contract"]["outside_file_modification_authorized"] is False
+    assert packet["runtime_rule_packet_draft"]["json_contract"]["allowed_claim"] == "only listed files are authorized targets"
+    assert packet["runtime_rule_packet_draft"]["source_allowed_claim"] == "the noisy note can be reduced into a bounded candidate scaffold"
 
 
 def test_writes_packet_draft_markdown(tmp_path):
@@ -145,6 +150,7 @@ def test_packet_draft_includes_provenance(tmp_path):
     provenance = packet["provenance"]
     assert provenance["source_note_path"].endswith("larql_intake_smoke_noisy_note.txt")
     assert isinstance(provenance["source_note_sha256"], str) and provenance["source_note_sha256"]
+    assert packet["source_allowed_claim"] == "the noisy note can be reduced into a bounded candidate scaffold"
 
 
 def test_packet_draft_keeps_registry_promotion_false(tmp_path):

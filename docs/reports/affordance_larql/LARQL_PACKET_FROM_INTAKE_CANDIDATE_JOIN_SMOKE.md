@@ -45,6 +45,8 @@ The packet draft preserves the same authority boundaries as the reviewed candida
 - no runtime rule modification
 - no automatic failure-to-curriculum capture
 
+The upstream intake-stage allowed claim is preserved separately as provenance/context, but it is not reused as the packet-stage rule claim.
+
 ## Why this is not runtime-rule creation or install
 
 The packet draft is only a review artifact. It does not create a rule, does not install a rule, and does not change the completed registry.
