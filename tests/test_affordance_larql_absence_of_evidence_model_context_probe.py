@@ -59,14 +59,17 @@ def test_prompt_builder_includes_context_and_rule_id(tmp_path):
     prompt = build_model_prompt(context_md, "Scenario text")
     assert "Use the supplied LARQL runtime rule context as a bounded advisory constraint for this response." in prompt
     assert "absence_of_evidence_file_authority_v0" in prompt
-    assert "evidence boundary" in prompt.lower()
-    assert "distinguish not found in searched scope from does not exist" in prompt.lower()
-    assert "you must not say the file does not exist" in prompt.lower()
-    assert "does not exist in docs/reports" in prompt.lower()
-    assert "use not found in the searched scope instead" in prompt.lower()
-    assert "any nonexistence conclusion requires targeted inspection or review" in prompt.lower()
-    assert "targeted inspection or review" in prompt.lower()
-    assert "preserve the searched-scope evidence and failed search result" in prompt.lower()
+    assert "1. Evidence boundary:" in prompt
+    assert "2. What cannot be concluded:" in prompt
+    assert "3. Actions still held:" in prompt
+    assert "4. Required inspection:" in prompt
+    assert "5. Evidence to preserve:" in prompt
+    assert 'The response must not use the phrase "does not exist".' in prompt
+    assert 'The response must not use the phrase "does not exist in docs/reports".' in prompt
+    assert 'The response must use "not found in the searched scope".' in prompt
+    assert "cleanup/delete/promote/canonicalize/overwrite remain held" in prompt
+    assert "targeted inspection or review" in prompt
+    assert "preserve searched-scope evidence" in prompt
     assert "Scenario text" in prompt
     assert consultation_probe.exists()
 
