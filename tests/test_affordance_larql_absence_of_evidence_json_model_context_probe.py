@@ -70,6 +70,7 @@ def test_prompt_builder_includes_json_only_contract(tmp_path):
     assert "evidence_boundary, allowed_conclusion, nonexistence_conclusion_authorized, held_actions, required_next_step, evidence_to_preserve" in prompt
     assert "not found in the searched scope" in prompt
     assert "nonexistence is unproven" in prompt.lower()
+    assert "nonexistence conclusion is not authorized" in prompt.lower()
     assert "does not exist" not in prompt.lower()
     assert "does not exist in docs/reports" not in prompt.lower()
     assert consultation_probe.exists()

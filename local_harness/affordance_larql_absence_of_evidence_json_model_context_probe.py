@@ -135,6 +135,7 @@ def build_model_prompt(context_md: str, scenario: str) -> str:
             "- Do not make any nonexistence claim.",
             "- Use only: not found in the searched scope.",
             "- Nonexistence is unproven until targeted inspection or review.",
+            "- Nonexistence conclusion is not authorized.",
             "- Cleanup, delete, promote, canonicalize, and overwrite remain held.",
             "- Recommend targeted inspection or review.",
             "- Preserve searched-scope evidence.",
