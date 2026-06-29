@@ -87,7 +87,10 @@ does not establish production readiness.
   prompt/response failure mode discovered while trying to tighten the bounded
   model-context probe, and
   `ABSENCE_OF_EVIDENCE_JSON_MODEL_CONTEXT_PASS_CLOSEOUT_2026-06-28.md` for the
-  successful JSON-only model-context pass milestone.
+  successful JSON-only model-context pass milestone, and
+  `UNSUPPORTED_CERTAINTY_JSON_MODEL_CONTEXT_PASS_CLOSEOUT_2026-06-29.md` for a
+  second JSON-contract pass showing the reusable LARQL model-context path can
+  preserve checked-scope claims without broad certainty.
 
 ## Safety Reminder
 
