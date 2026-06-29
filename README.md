@@ -34,6 +34,22 @@ into small, inspectable steps:
 The project is designed for people who want AI help, but still want a visible
 audit trail and human control.
 
+## Recent proof: messy note to install-boundary hold
+
+ZTH recently proved a narrow supervised workflow path from one synthetic noisy
+note to an install-boundary hold. That path turned messy input into bounded,
+reviewable artifacts instead of letting the note directly change the project.
+At each stage, provenance and authority boundaries were preserved so the chain
+could move forward without silently expanding scope. The proof stopped at a
+hold, not an install decision. It did not authorize install, mutate the
+registry, run a probe, write training data, or perform automatic
+failure-to-curriculum capture. This is evidence of supervised guided
+capability, not autonomy, and it does not claim that arbitrary messy input is
+solved generally. For the public explanation, see
+[`docs/LARQL_INTAKE_TO_INSTALL_BOUNDARY_PUBLIC_NARRATIVE.md`](docs/LARQL_INTAKE_TO_INSTALL_BOUNDARY_PUBLIC_NARRATIVE.md).
+For the proof-only milestone record, see
+[`docs/reports/affordance_larql/LARQL_INTAKE_TO_INSTALL_BOUNDARY_MILESTONE_CLOSEOUT_2026-06-29.md`](docs/reports/affordance_larql/LARQL_INTAKE_TO_INSTALL_BOUNDARY_MILESTONE_CLOSEOUT_2026-06-29.md).
+
 ## What You Can Do Today
 
 - Run a model-free smoke test to confirm the repo works.
