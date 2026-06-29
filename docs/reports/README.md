@@ -107,7 +107,9 @@ does not establish production readiness.
   handoff, `LARQL_CANDIDATE_FROM_INTAKE_JOIN_SMOKE.md` for the next join that
   turns the reviewed intake artifact into a held candidate draft, and
   `LARQL_CANDIDATE_REVIEW_FROM_INTAKE_JOIN_SMOKE.md` for the join that turns
-  the held candidate draft into a packet-drafting handoff.
+  the held candidate draft into a packet-drafting handoff, plus
+  `LARQL_PACKET_FROM_INTAKE_CANDIDATE_JOIN_SMOKE.md` for the join that turns
+  the reviewed candidate into a held runtime-rule packet draft.
 
 ## Safety Reminder
 
