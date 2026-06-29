@@ -91,6 +91,9 @@ does not establish production readiness.
   `UNSUPPORTED_CERTAINTY_JSON_MODEL_CONTEXT_PASS_CLOSEOUT_2026-06-29.md` for a
   second JSON-contract pass showing the reusable LARQL model-context path can
   preserve checked-scope claims without broad certainty, plus
+  `UNSUPPORTED_FILE_TARGET_AUTHORITY_JSON_MODEL_CONTEXT_PASS_CLOSEOUT_2026-06-29.md`
+  for a third JSON-contract pass showing the same path can preserve allowed-file
+  authority boundaries after transport repair, plus
   `LARQL_JSON_RULE_TRIAL_TEMPLATE_EXTRACTION_2026-06-29.md` for the extracted
   reusable lifecycle across both completed JSON-contract rule trials.
 
