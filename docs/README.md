@@ -207,6 +207,8 @@ gates.
 - [`reports/affordance_larql/LARQL_INTAKE_TO_INSTALL_BOUNDARY_CHAIN_REVIEW.md`](reports/affordance_larql/LARQL_INTAKE_TO_INSTALL_BOUNDARY_CHAIN_REVIEW.md)
   — full-chain review that summarizes the intake-to-install-boundary smoke path
   as one bounded proof artifact.
+- [`reports/affordance_larql/LARQL_INTAKE_TO_INSTALL_BOUNDARY_MILESTONE_CLOSEOUT_2026-06-29.md`](reports/affordance_larql/LARQL_INTAKE_TO_INSTALL_BOUNDARY_MILESTONE_CLOSEOUT_2026-06-29.md)
+  — concise closeout of the completed intake-to-install-boundary proof chain.
 - [`LARQL_PIPELINE_REPEATABILITY.md`](LARQL_PIPELINE_REPEATABILITY.md)
   — repeatability summary for the CUDA/RX580 LARQL pipeline, distinguishing
   proven context injection and curriculum artifact creation from unperformed
