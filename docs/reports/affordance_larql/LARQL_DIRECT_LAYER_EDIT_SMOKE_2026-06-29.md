@@ -15,7 +15,9 @@ What this stage does:
 - prepares a reversible direct tensor-delta artifact when the local tensor stack
   and base model path are available;
 - optionally materializes a patched model copy only with separate explicit
-  authorization.
+  authorization;
+- automatically verifies whether a materialized patched model copy actually
+  differs from the base tensor at the target key.
 
 What this stage does not do:
 
@@ -31,6 +33,8 @@ Key boundary conditions:
 - base model overwrite is never authorized;
 - delta artifact creation is reversible;
 - patched model copy requires separate explicit authorization;
+- patched model copy verification records whether the effective patch was
+  actually applied;
 - behavioral success requires later re-audition;
 - the first delta smoke is not, by itself, a behavioral success claim.
 
@@ -43,6 +47,7 @@ Outputs:
 - `reaudition_plan.md`
 - `direct_delta.safetensors` when delta creation succeeds
 - `patched_model/` only when separately authorized
+- `patch_verification.json` when patched model materialization is attempted
 
 Next step:
 

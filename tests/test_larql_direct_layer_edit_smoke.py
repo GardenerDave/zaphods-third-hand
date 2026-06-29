@@ -222,6 +222,8 @@ def test_successful_mocked_delta_creation_without_patched_model(tmp_path, monkey
     assert smoke["smoke_status"] == "completed_direct_delta_artifact"
     assert smoke["direct_delta_artifact_written"] is True
     assert smoke["model_artifact_written"] is False
+    assert smoke["effective_patch_applied"] is None
+    assert smoke["patch_verification_path"] is None
     manifest = json.loads((tmp_path / "out/smoke_005/direct_delta_manifest.json").read_text(encoding="utf-8"))
     assert manifest["not_lora"] is True
     assert manifest["not_training"] is True
@@ -306,8 +308,27 @@ def test_mocked_patched_model_copy_sets_model_artifact_written(tmp_path, monkeyp
         patched_dir.mkdir(parents=True, exist_ok=True)
         return str(patched_dir)
 
+    def fake_verify(**kwargs):
+        return {
+            "target_tensor_key": kwargs["target_tensor_key"],
+            "source_shard": str(kwargs["source_shard_path"]),
+            "patched_shard": str(kwargs["patched_shard_path"]),
+            "delta_artifact_path": str(kwargs["delta_artifact_path"]),
+            "base_dtype": "bfloat16",
+            "patched_dtype": "bfloat16",
+            "delta_dtype": "bfloat16",
+            "observed_delta_norm": 0.01,
+            "expected_delta_norm": 0.01,
+            "max_abs_observed": 0.01,
+            "max_abs_expected": 0.01,
+            "max_abs_observed_minus_expected": 0.0,
+            "effective_patch_applied": True,
+            "note": "BF16 rounding can make very small deltas ineffective",
+        }
+
     monkeypatch.setattr(mod, "create_direct_delta_artifact", fake_delta)
     monkeypatch.setattr(mod, "materialize_patched_model_copy", fake_materialize)
+    monkeypatch.setattr(mod, "verify_effective_patch", fake_verify)
 
     smoke = mod.write_smoke(
         write_selection_fixture(tmp_path),
@@ -321,6 +342,8 @@ def test_mocked_patched_model_copy_sets_model_artifact_written(tmp_path, monkeyp
     )
     assert smoke["smoke_status"] == "completed_patched_model_copy"
     assert smoke["model_artifact_written"] is True
+    assert smoke["effective_patch_applied"] is True
+    assert smoke["patch_verification_path"] is not None
     for key in [
         "base_model_overwrite_authorized",
         "irreversible_patch_authorized",
@@ -333,6 +356,113 @@ def test_mocked_patched_model_copy_sets_model_artifact_written(tmp_path, monkeyp
         "automatic_failure_to_curriculum_capture_authorized",
     ]:
         assert smoke[key] is False
+
+
+def test_mocked_ineffective_patch_sets_ineffective_status(tmp_path, monkeypatch):
+    from local_harness import larql_direct_layer_edit_smoke as mod
+
+    model_dir = tmp_path / "model"
+    model_dir.mkdir()
+    shard = model_dir / "model-00001-of-00001.safetensors"
+    shard.write_bytes(b"placeholder")
+    write_json(model_dir / "model.safetensors.index.json", {
+        "weight_map": {"model.layers.0.mlp.up_proj.weight": shard.name}
+    })
+
+    monkeypatch.setattr(mod, "tensor_stack_available", lambda: True)
+    monkeypatch.setattr(mod, "create_direct_delta_artifact", lambda **kwargs: {
+        "tensor_shape": [2, 2],
+        "dtype": "bfloat16",
+        "original_tensor_hash": "orig",
+        "delta_hash": "delta",
+        "delta_norm": 1e-6,
+        "relative_delta_norm": 1e-6,
+        "delta_artifact_path": str(kwargs["out_dir"] / "direct_delta.safetensors"),
+        "target_tensor_key": kwargs["target_tensor_key"],
+        "source_shard_path": str(kwargs["source_shard_path"]),
+        "selected_mechanism": kwargs["selected_mechanism"],
+        "selected_module_family": kwargs["selected_module_family"],
+        "delta_scale": kwargs["delta_scale"],
+        "deterministic_seed_hash": kwargs["seed_hash"],
+    })
+    monkeypatch.setattr(mod, "materialize_patched_model_copy", lambda **kwargs: str(kwargs["patched_model_dir"]))
+    monkeypatch.setattr(mod, "verify_effective_patch", lambda **kwargs: {
+        "target_tensor_key": kwargs["target_tensor_key"],
+        "source_shard": str(kwargs["source_shard_path"]),
+        "patched_shard": str(kwargs["patched_shard_path"]),
+        "delta_artifact_path": str(kwargs["delta_artifact_path"]),
+        "base_dtype": "bfloat16",
+        "patched_dtype": "bfloat16",
+        "delta_dtype": "bfloat16",
+        "observed_delta_norm": 0.0,
+        "expected_delta_norm": 1e-6,
+        "max_abs_observed": 0.0,
+        "max_abs_expected": 1e-6,
+        "max_abs_observed_minus_expected": 1e-6,
+        "effective_patch_applied": False,
+        "note": "BF16 rounding can make very small deltas ineffective",
+    })
+
+    smoke = mod.write_smoke(
+        write_selection_fixture(tmp_path),
+        "smoke_008",
+        tmp_path / "out",
+        base_model_path=model_dir,
+        target_tensor_key="model.layers.0.mlp.up_proj.weight",
+        authorize_larql_direct_layer_edit_smoke=True,
+        materialize_patched_model=True,
+        authorize_patched_model_copy=True,
+    )
+    assert smoke["smoke_status"] == "completed_patched_model_copy_but_ineffective_delta"
+    assert smoke["effective_patch_applied"] is False
+
+
+def test_verification_failure_sets_verification_failed_status(tmp_path, monkeypatch):
+    from local_harness import larql_direct_layer_edit_smoke as mod
+
+    model_dir = tmp_path / "model"
+    model_dir.mkdir()
+    shard = model_dir / "model-00001-of-00001.safetensors"
+    shard.write_bytes(b"placeholder")
+    write_json(model_dir / "model.safetensors.index.json", {
+        "weight_map": {"model.layers.0.mlp.up_proj.weight": shard.name}
+    })
+
+    monkeypatch.setattr(mod, "tensor_stack_available", lambda: True)
+    monkeypatch.setattr(mod, "create_direct_delta_artifact", lambda **kwargs: {
+        "tensor_shape": [2, 2],
+        "dtype": "bfloat16",
+        "original_tensor_hash": "orig",
+        "delta_hash": "delta",
+        "delta_norm": 1e-2,
+        "relative_delta_norm": 1e-2,
+        "delta_artifact_path": str(kwargs["out_dir"] / "direct_delta.safetensors"),
+        "target_tensor_key": kwargs["target_tensor_key"],
+        "source_shard_path": str(kwargs["source_shard_path"]),
+        "selected_mechanism": kwargs["selected_mechanism"],
+        "selected_module_family": kwargs["selected_module_family"],
+        "delta_scale": kwargs["delta_scale"],
+        "deterministic_seed_hash": kwargs["seed_hash"],
+    })
+    monkeypatch.setattr(mod, "materialize_patched_model_copy", lambda **kwargs: str(kwargs["patched_model_dir"]))
+
+    def explode(**kwargs):
+        raise RuntimeError("verification exploded")
+
+    monkeypatch.setattr(mod, "verify_effective_patch", explode)
+
+    smoke = mod.write_smoke(
+        write_selection_fixture(tmp_path),
+        "smoke_009",
+        tmp_path / "out",
+        base_model_path=model_dir,
+        target_tensor_key="model.layers.0.mlp.up_proj.weight",
+        authorize_larql_direct_layer_edit_smoke=True,
+        materialize_patched_model=True,
+        authorize_patched_model_copy=True,
+    )
+    assert smoke["smoke_status"] == "completed_patched_model_copy_but_verification_failed"
+    assert smoke["effective_patch_applied"] is None
 
 
 def test_bfloat16_audit_helpers_if_torch_available():

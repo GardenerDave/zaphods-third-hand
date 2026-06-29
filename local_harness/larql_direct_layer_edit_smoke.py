@@ -271,6 +271,50 @@ def materialize_patched_model_copy(
     return str(patched_model_dir)
 
 
+def verify_effective_patch(
+    *,
+    source_shard_path: Path,
+    patched_shard_path: Path,
+    delta_artifact_path: Path,
+    target_tensor_key: str,
+) -> dict[str, Any]:
+    from safetensors import safe_open
+    from safetensors.torch import load_file
+
+    with safe_open(str(source_shard_path), framework="pt", device="cpu") as handle:
+        base_tensor = handle.get_tensor(target_tensor_key)
+    with safe_open(str(patched_shard_path), framework="pt", device="cpu") as handle:
+        patched_tensor = handle.get_tensor(target_tensor_key)
+    delta_tensors = load_file(str(delta_artifact_path))
+    delta_tensor = delta_tensors[target_tensor_key]
+
+    observed = patched_tensor.detach().float().cpu() - base_tensor.detach().float().cpu()
+    expected = delta_tensor.detach().float().cpu()
+    observed_delta_norm = tensor_norm_float32(observed)
+    expected_delta_norm = tensor_norm_float32(expected)
+    max_abs_observed = float(observed.abs().max().item())
+    max_abs_expected = float(expected.abs().max().item())
+    max_abs_observed_minus_expected = float((observed - expected).abs().max().item())
+    effective_patch_applied = observed_delta_norm > 0.0
+
+    return {
+        "target_tensor_key": target_tensor_key,
+        "source_shard": str(source_shard_path),
+        "patched_shard": str(patched_shard_path),
+        "delta_artifact_path": str(delta_artifact_path),
+        "base_dtype": str(base_tensor.dtype).replace("torch.", ""),
+        "patched_dtype": str(patched_tensor.dtype).replace("torch.", ""),
+        "delta_dtype": str(delta_tensor.dtype).replace("torch.", ""),
+        "observed_delta_norm": observed_delta_norm,
+        "expected_delta_norm": expected_delta_norm,
+        "max_abs_observed": max_abs_observed,
+        "max_abs_expected": max_abs_expected,
+        "max_abs_observed_minus_expected": max_abs_observed_minus_expected,
+        "effective_patch_applied": effective_patch_applied,
+        "note": "BF16 rounding can make very small deltas ineffective",
+    }
+
+
 def render_reaudition_plan() -> str:
     return "\n".join(
         [
@@ -361,6 +405,8 @@ def build_smoke_record(
     patch_bundle_path: Path,
     direct_delta_artifact_written: bool,
     model_artifact_written: bool,
+    effective_patch_applied: bool | None,
+    patch_verification_path: Path | None,
 ) -> dict[str, Any]:
     return {
         "report_type": REPORT_TYPE,
@@ -377,6 +423,8 @@ def build_smoke_record(
         "patched_model_path": patched_model_path,
         "direct_delta_path": direct_delta_path,
         "reversible_patch_bundle_path": str(patch_bundle_path),
+        "effective_patch_applied": effective_patch_applied,
+        "patch_verification_path": str(patch_verification_path) if patch_verification_path is not None else None,
         "base_model_overwrite_authorized": False,
         "irreversible_patch_authorized": False,
         "adapter_merge_authorized": False,
@@ -433,6 +481,8 @@ def write_smoke(
     patched_model_path: str | None = None
     direct_delta_artifact_written = False
     model_artifact_written = False
+    effective_patch_applied: bool | None = None
+    patch_verification_path: Path | None = None
 
     try:
         if not base_model_path.exists():
@@ -469,7 +519,42 @@ def write_smoke(
                         patched_model_dir=out_dir / "patched_model",
                     )
                     model_artifact_written = True
-                    status = "completed_patched_model_copy"
+                    patch_verification_path = out_dir / "patch_verification.json"
+                    try:
+                        verification = verify_effective_patch(
+                            source_shard_path=Path(source_shard_path),
+                            patched_shard_path=Path(patched_model_path) / Path(source_shard_path).name,
+                            delta_artifact_path=Path(direct_delta_path),
+                            target_tensor_key=target_tensor_key,
+                        )
+                        effective_patch_applied = verification["effective_patch_applied"]
+                        patch_verification_path.write_text(
+                            json.dumps(verification, indent=2, sort_keys=True) + "\n",
+                            encoding="utf-8",
+                        )
+                        if effective_patch_applied:
+                            status = "completed_patched_model_copy"
+                        else:
+                            status = "completed_patched_model_copy_but_ineffective_delta"
+                    except Exception as exc:
+                        patch_verification_path.write_text(
+                            json.dumps(
+                                {
+                                    "target_tensor_key": target_tensor_key,
+                                    "source_shard": source_shard_path,
+                                    "patched_shard": str(Path(patched_model_path) / Path(source_shard_path).name),
+                                    "delta_artifact_path": direct_delta_path,
+                                    "effective_patch_applied": None,
+                                    "verification_exception": f"{type(exc).__name__}: {exc}",
+                                    "note": "BF16 rounding can make very small deltas ineffective",
+                                },
+                                indent=2,
+                                sort_keys=True,
+                            )
+                            + "\n",
+                            encoding="utf-8",
+                        )
+                        status = "completed_patched_model_copy_but_verification_failed"
     except Exception as exc:
         manifest["exception"] = f"{type(exc).__name__}: {exc}"
         status = "failed_direct_layer_edit_exception"
@@ -495,6 +580,8 @@ def write_smoke(
         patch_bundle_path=patch_bundle_path,
         direct_delta_artifact_written=direct_delta_artifact_written,
         model_artifact_written=model_artifact_written,
+        effective_patch_applied=effective_patch_applied,
+        patch_verification_path=patch_verification_path,
     )
     (out_dir / "larql_direct_layer_edit_smoke.json").write_text(
         json.dumps(smoke, indent=2, sort_keys=True) + "\n",
