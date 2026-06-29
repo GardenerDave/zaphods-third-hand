@@ -195,6 +195,9 @@ gates.
 - [`reports/affordance_larql/LARQL_CANDIDATE_FROM_INTAKE_JOIN_SMOKE.md`](reports/affordance_larql/LARQL_CANDIDATE_FROM_INTAKE_JOIN_SMOKE.md)
   — candidate-drafting join smoke that turns a reviewed intake artifact into a
   held candidate draft.
+- [`reports/affordance_larql/LARQL_CANDIDATE_REVIEW_FROM_INTAKE_JOIN_SMOKE.md`](reports/affordance_larql/LARQL_CANDIDATE_REVIEW_FROM_INTAKE_JOIN_SMOKE.md)
+  — candidate-review join smoke that turns a held candidate draft into a
+  handoff for runtime-rule packet drafting.
 - [`LARQL_PIPELINE_REPEATABILITY.md`](LARQL_PIPELINE_REPEATABILITY.md)
   — repeatability summary for the CUDA/RX580 LARQL pipeline, distinguishing
   proven context injection and curriculum artifact creation from unperformed

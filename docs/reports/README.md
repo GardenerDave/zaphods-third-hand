@@ -104,8 +104,10 @@ does not establish production readiness.
   `LARQL_INTAKE_SMOKE_REVIEW.md` and `LARQL_INTAKE_REVIEW_JOIN_SMOKE.md` for
   the minimal intake smoke and intake-review join smoke that turn a noisy note
   into a held candidate scaffold and then into an explicit candidate-drafting
-  handoff, and `LARQL_CANDIDATE_FROM_INTAKE_JOIN_SMOKE.md` for the next join
-  that turns the reviewed intake artifact into a held candidate draft.
+  handoff, `LARQL_CANDIDATE_FROM_INTAKE_JOIN_SMOKE.md` for the next join that
+  turns the reviewed intake artifact into a held candidate draft, and
+  `LARQL_CANDIDATE_REVIEW_FROM_INTAKE_JOIN_SMOKE.md` for the join that turns
+  the held candidate draft into a packet-drafting handoff.
 
 ## Safety Reminder
 
