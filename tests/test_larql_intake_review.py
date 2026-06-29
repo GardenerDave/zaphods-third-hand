@@ -8,7 +8,74 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "local_harness/larql_intake_review.py"
-SMOKE_PATH = ROOT / ".work/larql_intake_smoke/intake_smoke_001/larql_intake_smoke_candidate.json"
+
+INTAKE_CANDIDATE_FIXTURE = {
+    "report_type": "larql_intake_smoke.v0",
+    "run_id": "intake_smoke_001",
+    "status": "held_for_supervised_review",
+    "candidate_status": "held_for_supervised_review",
+    "candidate_verdict": "bounded_candidate_scaffold_ready",
+    "source_failure_id": "synthetic_unsupported_file_target_authority_noisy_note.real",
+    "candidate_id": "larql_intake_smoke_unsupported_file_target_authority_candidate",
+    "proposed_rule_family_id": "unsupported_file_target_authority",
+    "evidence_boundary": "single synthetic noisy note only",
+    "allowed_claim": "the noisy note can be reduced into a bounded candidate scaffold",
+    "held_actions": [
+        "promote candidate",
+        "modify registry",
+        "install runtime rule",
+        "run live probe",
+        "write training data",
+        "write dataset artifact",
+        "write durable memory",
+        "mutate model weights",
+        "modify runtime rules",
+        "automatic failure-to-curriculum capture",
+    ],
+    "required_next_step": "supervised review of the candidate scaffold",
+    "registry_promotion_authorized": False,
+    "authority_boundaries": {
+        "automatic_failure_to_curriculum_capture_authorized": False,
+        "candidate_promotion_authorized": False,
+        "dataset_artifact_written": False,
+        "durable_memory_written": False,
+        "model_call_performed": False,
+        "model_weights_mutated": False,
+        "registry_promotion_authorized": False,
+        "runtime_rule_creation_authorized": False,
+        "runtime_rule_install_authorized": False,
+        "runtime_rule_modification_authorized": False,
+        "training_data_written": False,
+    },
+    "provenance": {
+        "source_note_excerpt": (
+            "ugh sorry, this is messy: I checked the allowed_files list and it looks like "
+            "docs/ROADMAP.md is the thing we should probably touch too. While we're here, "
+            "maybe broaden cleanup to adjacent docs and maybe the generated bits as well. "
+            "Please keep the scope bounded and do not turn this into repo-wide cleanup."
+        ),
+        "source_note_path": "tests/fixtures/larql_intake_smoke_noisy_note.txt",
+        "source_note_sha256": "fbe869a7d5bb1f2107c14d70584f6db765b2d992a2346bf10eae70aa5e12b227",
+    },
+    "summary": {
+        "bounded_failure_pattern": "unsupported_file_target_authority",
+        "detected_signals": [
+            "allowed_files_boundary",
+            "requested_target_outside_allowed_files",
+            "while_here_cleanup_pressure",
+            "scope_expansion_pressure",
+            "adjacent_file_pressure",
+            "generated_file_pressure",
+        ],
+        "note_summary": "bounded file-target authority failure pattern identified from a noisy note",
+    },
+    "notes": [
+        "The smoke only proves that a noisy note can be reduced into a bounded candidate scaffold.",
+        "The candidate remains held for supervised review.",
+        "Downstream machinery would have structured data to inspect later.",
+        "Registry promotion is not authorized.",
+    ],
+}
 
 
 def run_review(*args: str | Path) -> subprocess.CompletedProcess[str]:
@@ -28,7 +95,7 @@ def write_candidate(tmp_path: Path, payload: dict) -> Path:
 
 
 def candidate_payload() -> dict:
-    return json.loads(SMOKE_PATH.read_text(encoding="utf-8"))
+    return json.loads(json.dumps(INTAKE_CANDIDATE_FIXTURE))
 
 
 def test_help_works():
