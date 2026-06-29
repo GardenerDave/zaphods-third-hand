@@ -175,6 +175,11 @@ gates.
 - [`LARQL_JSON_CONTRACT_PROBE_WORKFLOW.md`](LARQL_JSON_CONTRACT_PROBE_WORKFLOW.md)
   — reusable bounded JSON-contract workflow for LARQL probes, scorer checks,
   and independent review.
+- [`LARQL_JSON_RULE_TRIAL_TEMPLATE.md`](LARQL_JSON_RULE_TRIAL_TEMPLATE.md)
+  — reusable supervised lifecycle template for drafting, reviewing,
+  installing, probing, and closing out LARQL JSON-contract rule trials while
+  keeping install, model-call, training, and capture authority explicitly
+  bounded.
 - [`LARQL_PIPELINE_REPEATABILITY.md`](LARQL_PIPELINE_REPEATABILITY.md)
   — repeatability summary for the CUDA/RX580 LARQL pipeline, distinguishing
   proven context injection and curriculum artifact creation from unperformed
