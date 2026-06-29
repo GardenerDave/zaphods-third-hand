@@ -144,7 +144,8 @@ The system can produce evidence, but it does not grant itself authority.
 
 ## Next machinery step
 
-The next machinery step is a one-command evidence packet collector, followed by a small demo path that shows how to go from registry entry to evidence bundle without re-running the whole workflow.
+The next machinery step is a reusable lifecycle status driver.
 
-That is the direction to take now: package the completed rule trial, do not add another hand-built rule yet.
+The registry and evidence packet collector now exist. The next useful layer is a small driver that can read registry entries and evidence-packet outputs, summarize lifecycle state, and show what step is complete or held without re-running the whole workflow.
 
+That is the direction to take now: package and navigate the completed rule trials, do not add another hand-built rule yet.
