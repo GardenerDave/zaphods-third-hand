@@ -122,6 +122,10 @@ gates.
   — experimental, model-free scaffold for classifying machine-specific failures
   into host-profile, LARQL patch, LoRA training, stacked, or review-only repair
   candidates. No model editing or training is performed.
+- [`experiments/AFFORDANCE_LARQL_UNSUPPORTED_CERTAINTY_SCOPE_CLAIM_V0.md`](experiments/AFFORDANCE_LARQL_UNSUPPORTED_CERTAINTY_SCOPE_CLAIM_V0.md)
+  — experimental, model-free JSON-contract scaffold for keeping checked-scope
+  validation claims bounded and holding global certainty pending broader
+  validation or review.
 - [`experiments/AFFORDANCE_DOGFOOD_REPORT_V0.md`](experiments/AFFORDANCE_DOGFOOD_REPORT_V0.md)
   — experimental, model-free report scaffold for reviewing one generated
   affordance candidate while holding promotion pending probes.
