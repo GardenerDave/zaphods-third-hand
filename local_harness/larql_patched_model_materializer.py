@@ -145,28 +145,39 @@ def load_shard_tensor(shard_path: Path, target_module: str) -> tuple[list[list[f
     return tensor, "float32"
 
 
+def apply_delta_preserving_dtype(
+    base_tensor: list[list[float]],
+    delta_tensor: list[list[float]],
+    *,
+    base_dtype: str,
+) -> tuple[list[list[float]], str]:
+    patched_tensor = add_tensors(copy.deepcopy(base_tensor), delta_tensor)
+    return patched_tensor, base_dtype
+
+
 def write_shard_tensor(
     *,
     shard_path: Path,
     target_module: str,
     patched_tensor: list[list[float]],
+    target_dtype: str,
 ) -> None:
     if shard_path.suffix == ".safetensors":
         if importlib.util.find_spec("safetensors") is None:
             raise ValueError("safetensors shard present but safetensors is unavailable")
-        from safetensors import safe_open  # type: ignore
-        from safetensors.numpy import save_file  # type: ignore
-        import numpy as np  # type: ignore
+        if importlib.util.find_spec("torch") is None:
+            raise ValueError("safetensors shard present but torch is unavailable")
+        from safetensors.torch import load_file, save_file  # type: ignore
+        import torch  # type: ignore
 
-        tensor_map: dict[str, Any] = {}
-        with safe_open(str(shard_path), framework="np") as handle:
-            metadata = handle.metadata()
-            for key in handle.keys():
-                if key == target_module:
-                    tensor_map[key] = np.array(patched_tensor, dtype=np.float32)
-                else:
-                    tensor_map[key] = handle.get_tensor(key)
-        save_file(tensor_map, str(shard_path), metadata=metadata)
+        tensor_map = load_file(str(shard_path))
+        if target_module not in tensor_map:
+            raise ValueError("target tensor missing from safetensors shard")
+        target_tensor = tensor_map[target_module]
+        dtype = target_tensor.dtype
+        patched = torch.tensor(patched_tensor, dtype=torch.float32)
+        tensor_map[target_module] = patched.to(dtype=dtype)
+        save_file(tensor_map, str(shard_path))
         return
 
     payload = pickle.loads(shard_path.read_bytes())
@@ -219,21 +230,26 @@ def materialize_patched_model(
 
     out_dir = out_root / run_id
     patched_model_path = out_dir / patched_model_dir_name
-    out_dir.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(base_model_path, patched_model_path)
-
     base_shard_path = resolve_target_shard(base_model_path, target_module)
-    patched_shard_path = patched_model_path / base_shard_path.relative_to(base_model_path)
     base_tensor, base_dtype = load_shard_tensor(base_shard_path, target_module)
     if tensor_shape(base_tensor) != expected_shape:
         raise ValueError("target tensor shape does not match delta shape")
     base_tensor_sha = tensor_data_sha256(base_tensor)
-    patched_tensor = add_tensors(copy.deepcopy(base_tensor), delta_tensor)
+    patched_tensor, patched_dtype = apply_delta_preserving_dtype(
+        base_tensor,
+        delta_tensor,
+        base_dtype=base_dtype,
+    )
     patched_tensor_sha = tensor_data_sha256(patched_tensor)
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(base_model_path, patched_model_path)
+    patched_shard_path = patched_model_path / base_shard_path.relative_to(base_model_path)
     write_shard_tensor(
         shard_path=patched_shard_path,
         target_module=target_module,
         patched_tensor=patched_tensor,
+        target_dtype=patched_dtype,
     )
 
     materialization_record = {
@@ -253,7 +269,7 @@ def materialize_patched_model(
         "base_tensor_shape": tensor_shape(base_tensor),
         "patched_tensor_shape": tensor_shape(patched_tensor),
         "base_tensor_dtype": base_dtype,
-        "patched_tensor_dtype": base_dtype,
+        "patched_tensor_dtype": patched_dtype,
         "base_tensor_sha256_before": base_tensor_sha,
         "patched_tensor_sha256_after": patched_tensor_sha,
         "effective_delta_norm": tensor_norm(delta_tensor),

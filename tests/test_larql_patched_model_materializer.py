@@ -129,6 +129,7 @@ def test_artifact_hash_mismatch_fails_closed(tmp_path):
     )
     assert result.returncode != 0
     assert "sha256 mismatch" in result.stdout
+    assert not (out_root / "materialize_002/patched_model").exists()
 
 
 def test_artifact_record_not_marked_written_fails_closed(tmp_path):
@@ -171,6 +172,7 @@ def test_target_tensor_missing_fails_closed(tmp_path):
     )
     assert result.returncode != 0
     assert "target tensor missing" in result.stdout
+    assert not (out_root / "materialize_005/patched_model").exists()
 
 
 def test_shape_mismatch_fails_closed(tmp_path):
@@ -185,6 +187,7 @@ def test_shape_mismatch_fails_closed(tmp_path):
     )
     assert result.returncode != 0
     assert "target tensor shape does not match delta shape" in result.stdout
+    assert not (out_root / "materialize_006/patched_model").exists()
 
 
 def test_successful_fixture_writes_record_review_packet_and_patched_model_dir(tmp_path):
