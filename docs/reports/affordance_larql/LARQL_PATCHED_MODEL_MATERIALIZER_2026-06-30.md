@@ -20,4 +20,4 @@ What this stage does not do:
 
 Patched model materialization is a separate gate from delta artifact writing. Reaudition remains the next gate after this stage.
 
-The hardened materializer validates before copying so failure paths do not leave a partial patched model directory behind. In the safetensors path, the patched target tensor is written back using the original target dtype rather than silently widening it.
+The hardened materializer validates before copying so failure paths do not leave a partial patched model directory behind. In the safetensors path, real base shard loading uses the torch-backed safetensors path so BF16 target tensors are supported, and the patched target tensor is written back using the original target dtype rather than silently widening it.

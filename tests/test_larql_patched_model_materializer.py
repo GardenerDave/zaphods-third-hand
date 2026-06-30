@@ -221,3 +221,4 @@ def test_successful_fixture_writes_record_review_packet_and_patched_model_dir(tm
 def test_no_real_inference_is_run():
     script_text = SCRIPT.read_text(encoding="utf-8")
     assert "transformers" not in script_text
+    assert 'framework="np"' not in script_text

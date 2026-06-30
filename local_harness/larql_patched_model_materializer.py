@@ -92,11 +92,15 @@ def load_delta_artifact(artifact_path: Path, artifact_format: str) -> list[list[
     if artifact_format == "safetensors":
         if importlib.util.find_spec("safetensors") is None:
             raise ValueError("safetensors artifact present but safetensors is unavailable")
-        from safetensors import safe_open  # type: ignore
+        if importlib.util.find_spec("torch") is None:
+            raise ValueError("safetensors artifact present but torch is unavailable")
+        from safetensors.torch import load_file  # type: ignore
 
-        with safe_open(str(artifact_path), framework="np") as handle:
-            delta = handle.get_tensor("delta")
-            return [[float(value) for value in row] for row in delta.tolist()]
+        tensor_map = load_file(str(artifact_path))
+        if "delta" not in tensor_map:
+            raise ValueError("safetensors artifact missing delta tensor")
+        delta = tensor_map["delta"]
+        return [[float(value) for value in row] for row in delta.detach().float().cpu().tolist()]
 
     if artifact_format == "pt":
         payload = pickle.loads(artifact_path.read_bytes())
@@ -128,13 +132,15 @@ def load_shard_tensor(shard_path: Path, target_module: str) -> tuple[list[list[f
     if shard_path.suffix == ".safetensors":
         if importlib.util.find_spec("safetensors") is None:
             raise ValueError("safetensors shard present but safetensors is unavailable")
-        from safetensors import safe_open  # type: ignore
+        if importlib.util.find_spec("torch") is None:
+            raise ValueError("safetensors shard present but torch is unavailable")
+        from safetensors.torch import load_file  # type: ignore
 
-        with safe_open(str(shard_path), framework="np") as handle:
-            if target_module not in handle.keys():
-                raise ValueError("target tensor missing from safetensors shard")
-            tensor = handle.get_tensor(target_module)
-            return [[float(value) for value in row] for row in tensor.tolist()], str(tensor.dtype)
+        tensor_map = load_file(str(shard_path))
+        if target_module not in tensor_map:
+            raise ValueError("target tensor missing from safetensors shard")
+        tensor = tensor_map[target_module]
+        return [[float(value) for value in row] for row in tensor.detach().float().cpu().tolist()], str(tensor.dtype)
 
     payload = pickle.loads(shard_path.read_bytes())
     if not isinstance(payload, dict) or target_module not in payload:
