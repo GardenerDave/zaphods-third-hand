@@ -415,6 +415,76 @@ def generate_audit_text(
     return tokenizer.decode(new_tokens, skip_special_tokens=True).strip()
 
 
+def extract_captured_tensor_record(captured: list[dict[str, Any]]) -> dict[str, Any]:
+    if not captured:
+        raise ValueError("activation hook captured no outputs")
+    latest = captured[-1]
+    return {
+        "shape": list(latest["shape"]),
+        "dtype": str(latest["dtype"]),
+        "tensor": latest["tensor"].clone() if hasattr(latest["tensor"], "clone") else latest["tensor"],
+    }
+
+
+def capture_prompt_forward_activation(
+    *,
+    model: Any,
+    inputs: Any,
+    module_obj: Any,
+) -> dict[str, Any]:
+    captured: list[dict[str, Any]] = []
+
+    def hook(_module: Any, _inputs: Any, output: Any) -> None:
+        tensor = output[0] if isinstance(output, tuple) else output
+        if hasattr(tensor, "detach"):
+            tensor = tensor.detach().float().cpu()
+            captured.append(
+                {
+                    "shape": list(tensor.shape),
+                    "dtype": str(tensor.dtype).replace("torch.", ""),
+                    "tensor": tensor,
+                }
+            )
+
+    handle = module_obj.register_forward_hook(hook)
+    try:
+        model(**inputs)
+        return extract_captured_tensor_record(captured)
+    finally:
+        handle.remove()
+
+
+def capture_generation_step_activation(
+    *,
+    model: Any,
+    tokenizer: Any,
+    prompt: str,
+    module_obj: Any,
+) -> tuple[dict[str, Any], str]:
+    import torch
+
+    captured: list[dict[str, Any]] = []
+
+    def hook(_module: Any, _inputs: Any, output: Any) -> None:
+        tensor = output[0] if isinstance(output, tuple) else output
+        if hasattr(tensor, "detach"):
+            tensor = tensor.detach().float().cpu()
+            captured.append(
+                {
+                    "shape": list(tensor.shape),
+                    "dtype": str(tensor.dtype).replace("torch.", ""),
+                    "tensor": tensor,
+                }
+            )
+
+    handle = module_obj.register_forward_hook(hook)
+    try:
+        text = generate_audit_text(model=model, tokenizer=tokenizer, prompt=prompt)
+        return extract_captured_tensor_record(captured), text
+    finally:
+        handle.remove()
+
+
 def perform_activation_capture(
     *,
     base_model_path: Path,
@@ -445,157 +515,148 @@ def perform_activation_capture(
             continue
         module_obj = getattr(module_obj, part)
 
-    captured: list[dict[str, Any]] = []
     rows: list[dict[str, Any]] = []
 
-    def hook(_module: Any, _inputs: Any, output: Any) -> None:
-        tensor = output[0] if isinstance(output, tuple) else output
-        if hasattr(tensor, "detach"):
-            tensor = tensor.detach().float().cpu()
-            captured.append(
-                {
-                    "shape": list(tensor.shape),
-                    "dtype": str(tensor.dtype).replace("torch.", ""),
-                    "tensor": tensor,
-                }
+    for pair in probe_pairs:
+        for side_key, prompt_key in [("failure", "failure_prompt"), ("correction", "correction_prompt")]:
+            prompt = str(pair[prompt_key])
+            inputs = tokenizer(prompt, return_tensors="pt")
+            text = ""
+            prompt_side_activation_captured = False
+            generation_step_activation_captured = False
+            activation_source = capture_mode
+            generation_output_role = "audit_text_only" if capture_mode == "prompt_forward" else "activation_source"
+            delta_evidence_source = "prompt_side_activation" if capture_mode == "prompt_forward" else "generation_step_activation"
+            if capture_mode == "prompt_forward":
+                prompt_capture = capture_prompt_forward_activation(
+                    model=model,
+                    inputs=inputs,
+                    module_obj=module_obj,
+                )
+                prompt_side_activation_captured = True
+                text = generate_audit_text(model=model, tokenizer=tokenizer, prompt=prompt)
+                stats = prompt_capture
+            elif capture_mode == "generation_step":
+                generation_capture, text = capture_generation_step_activation(
+                    model=model,
+                    tokenizer=tokenizer,
+                    prompt=prompt,
+                    module_obj=module_obj,
+                )
+                generation_step_activation_captured = True
+                stats = generation_capture
+            else:
+                raise ValueError(f"unsupported capture mode: {capture_mode}")
+            tensor = stats["tensor"]
+            nested = tensor.tolist()
+            vector_stats = summarize_prompt_side_vectors(
+                nested,
+                dtype=stats["dtype"],
             )
+            if len(vector_stats["activation_shape"]) == 3:
+                seq_len = len(nested[0])
+                hidden = len(nested[0][0])
+                prompt_last_token_vector = list(nested[0][-1])
+                prompt_mean_pool_vector = [
+                    sum(float(nested[0][seq_idx][hidden_idx]) for seq_idx in range(seq_len)) / seq_len
+                    for hidden_idx in range(hidden)
+                ]
+            elif len(vector_stats["activation_shape"]) == 2:
+                prompt_last_token_vector = list(nested[0])
+                prompt_mean_pool_vector = list(nested[0])
+            else:
+                prompt_last_token_vector = list(nested)
+                prompt_mean_pool_vector = list(nested)
+            row = {
+                "probe_id": pair["probe_id"],
+                "side": side_key,
+                "target_module": target_module,
+                "target_layer": target_layer,
+                "activation_shape": vector_stats["activation_shape"],
+                "activation_dtype": vector_stats["activation_dtype"],
+                "activation_norm": vector_stats["activation_norm"],
+                "activation_mean": vector_stats["activation_mean"],
+                "activation_std": vector_stats["activation_std"],
+                "activation_abs_max": vector_stats["activation_abs_max"],
+                "capture_mode": capture_mode,
+                "activation_source": activation_source,
+                "generation_output_role": generation_output_role,
+                "delta_evidence_source": delta_evidence_source,
+                "prompt_side_activation_captured": prompt_side_activation_captured,
+                "generation_step_activation_captured": generation_step_activation_captured,
+                "prompt_sequence_length": vector_stats["prompt_sequence_length"],
+                "prompt_last_token_norm": vector_stats["prompt_last_token_norm"],
+                "prompt_last_token_mean": vector_stats["prompt_last_token_mean"],
+                "prompt_last_token_std": vector_stats["prompt_last_token_std"],
+                "prompt_last_token_abs_max": vector_stats["prompt_last_token_abs_max"],
+                "prompt_mean_pool_norm": vector_stats["prompt_mean_pool_norm"],
+                "prompt_mean_pool_mean": vector_stats["prompt_mean_pool_mean"],
+                "prompt_mean_pool_std": vector_stats["prompt_mean_pool_std"],
+                "prompt_mean_pool_abs_max": vector_stats["prompt_mean_pool_abs_max"],
+                "prompt_token_count": int(inputs["input_ids"].shape[-1]),
+                "model_output_text": text,
+                "raw_output_preserved": True,
+                "_prompt_last_token_vector": prompt_last_token_vector,
+                "_prompt_mean_pool_vector": prompt_mean_pool_vector,
+            }
+            rows.append(row)
 
-    handle = module_obj.register_forward_hook(hook)
-    try:
-        for pair in probe_pairs:
-            for side_key, prompt_key in [("failure", "failure_prompt"), ("correction", "correction_prompt")]:
-                captured.clear()
-                prompt = str(pair[prompt_key])
-                inputs = tokenizer(prompt, return_tensors="pt")
-                text = ""
-                prompt_side_activation_captured = False
-                generation_step_activation_captured = False
-                if capture_mode == "prompt_forward":
-                    with torch.no_grad():
-                        model(**inputs)
-                    prompt_side_activation_captured = bool(captured)
-                    text = generate_audit_text(model=model, tokenizer=tokenizer, prompt=prompt)
-                elif capture_mode == "generation_step":
-                    text = generate_audit_text(model=model, tokenizer=tokenizer, prompt=prompt)
-                    generation_step_activation_captured = bool(captured)
-                else:
-                    raise ValueError(f"unsupported capture mode: {capture_mode}")
-                if not captured:
-                    raise ValueError("activation hook captured no outputs")
-                stats = captured[-1]
-                tensor = stats["tensor"]
-                nested = tensor.tolist()
-                vector_stats = summarize_prompt_side_vectors(
-                    nested,
-                    dtype=stats["dtype"],
-                )
-                if vector_stats["prompt_sequence_length"] > 1:
-                    prompt_side_activation_captured = capture_mode == "prompt_forward"
-                elif capture_mode == "generation_step":
-                    generation_step_activation_captured = True
-                prompt_last_token_vector = (
-                    list(nested[0][-1]) if len(vector_stats["activation_shape"]) == 3 else
-                    (list(nested[0]) if len(vector_stats["activation_shape"]) == 2 else list(nested))
-                )
-                if len(vector_stats["activation_shape"]) == 3:
-                    seq_len = len(nested[0])
-                    hidden = len(nested[0][0])
-                    prompt_mean_pool_vector = [
-                        sum(float(nested[0][seq_idx][hidden_idx]) for seq_idx in range(seq_len)) / seq_len
-                        for hidden_idx in range(hidden)
-                    ]
-                elif len(vector_stats["activation_shape"]) == 2:
-                    prompt_mean_pool_vector = list(nested[0])
-                else:
-                    prompt_mean_pool_vector = list(nested)
-                row = {
-                    "probe_id": pair["probe_id"],
-                    "side": side_key,
-                    "target_module": target_module,
-                    "target_layer": target_layer,
-                    "activation_shape": vector_stats["activation_shape"],
-                    "activation_dtype": vector_stats["activation_dtype"],
-                    "activation_norm": vector_stats["activation_norm"],
-                    "activation_mean": vector_stats["activation_mean"],
-                    "activation_std": vector_stats["activation_std"],
-                    "activation_abs_max": vector_stats["activation_abs_max"],
-                    "capture_mode": capture_mode,
-                    "prompt_side_activation_captured": prompt_side_activation_captured,
-                    "generation_step_activation_captured": generation_step_activation_captured,
-                    "prompt_sequence_length": vector_stats["prompt_sequence_length"],
-                    "prompt_last_token_norm": vector_stats["prompt_last_token_norm"],
-                    "prompt_last_token_mean": vector_stats["prompt_last_token_mean"],
-                    "prompt_last_token_std": vector_stats["prompt_last_token_std"],
-                    "prompt_last_token_abs_max": vector_stats["prompt_last_token_abs_max"],
-                    "prompt_mean_pool_norm": vector_stats["prompt_mean_pool_norm"],
-                    "prompt_mean_pool_mean": vector_stats["prompt_mean_pool_mean"],
-                    "prompt_mean_pool_std": vector_stats["prompt_mean_pool_std"],
-                    "prompt_mean_pool_abs_max": vector_stats["prompt_mean_pool_abs_max"],
-                    "prompt_token_count": int(inputs["input_ids"].shape[-1]),
-                    "model_output_text": text,
-                    "raw_output_preserved": True,
-                    "_prompt_last_token_vector": prompt_last_token_vector,
-                    "_prompt_mean_pool_vector": prompt_mean_pool_vector,
-                }
-                rows.append(row)
-        records_path.write_text(
-            "\n".join(
-                json.dumps({k: v for k, v in row.items() if not k.startswith("_")}, sort_keys=True)
-                for row in rows
-            ) + "\n",
-            encoding="utf-8",
-        )
+    records_path.write_text(
+        "\n".join(
+            json.dumps({k: v for k, v in row.items() if not k.startswith("_")}, sort_keys=True)
+            for row in rows
+        ) + "\n",
+        encoding="utf-8",
+    )
 
-        by_probe: dict[str, dict[str, dict[str, Any]]] = {}
-        for row in rows:
-            by_probe.setdefault(row["probe_id"], {})[row["side"]] = row
-        per_probe = []
-        last_norm_diffs: list[float] = []
-        mean_norm_diffs: list[float] = []
-        last_cosines: list[float] = []
-        mean_cosines: list[float] = []
-        for probe_id, pair_rows in by_probe.items():
-            failure = pair_rows.get("failure")
-            correction = pair_rows.get("correction")
-            if failure is None or correction is None:
-                continue
-            comparison = compare_probe_pair(failure, correction)
-            per_probe.append(comparison)
-            last_norm_diffs.append(float(comparison["prompt_last_token_norm_difference"]))
-            mean_norm_diffs.append(float(comparison["prompt_mean_pool_norm_difference"]))
-            if comparison["prompt_last_token_cosine_similarity"] is not None:
-                last_cosines.append(float(comparison["prompt_last_token_cosine_similarity"]))
-            if comparison["prompt_mean_pool_cosine_similarity"] is not None:
-                mean_cosines.append(float(comparison["prompt_mean_pool_cosine_similarity"]))
-        classification = classify_prompt_signal(per_probe)
-        summary = {
-            "selected_method": "activation_difference_direction",
-            "target_module": target_module,
-            "target_layer": target_layer,
-            "target_module_family": target_module_family,
-            "per_probe_differences": per_probe,
-            "aggregate_mean_difference": sum(last_norm_diffs) / len(last_norm_diffs) if last_norm_diffs else 0.0,
-            "aggregate_cosine_similarity": sum(last_cosines) / len(last_cosines) if last_cosines else None,
-            "prompt_last_token_mean_norm_difference": (
-                sum(last_norm_diffs) / len(last_norm_diffs) if last_norm_diffs else 0.0
-            ),
-            "prompt_mean_pool_mean_norm_difference": (
-                sum(mean_norm_diffs) / len(mean_norm_diffs) if mean_norm_diffs else 0.0
-            ),
-            "prompt_last_token_mean_cosine_similarity": (
-                sum(last_cosines) / len(last_cosines) if last_cosines else None
-            ),
-            "prompt_mean_pool_mean_cosine_similarity": (
-                sum(mean_cosines) / len(mean_cosines) if mean_cosines else None
-            ),
-            **classification,
-            "delta_artifact_recommended": False,
-            "required_next_step": REQUIRED_NEXT_STEP,
-        }
-        summary_path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-        return True, True
-    finally:
-        handle.remove()
+    by_probe: dict[str, dict[str, dict[str, Any]]] = {}
+    for row in rows:
+        by_probe.setdefault(row["probe_id"], {})[row["side"]] = row
+    per_probe = []
+    last_norm_diffs: list[float] = []
+    mean_norm_diffs: list[float] = []
+    last_cosines: list[float] = []
+    mean_cosines: list[float] = []
+    for probe_id, pair_rows in by_probe.items():
+        failure = pair_rows.get("failure")
+        correction = pair_rows.get("correction")
+        if failure is None or correction is None:
+            continue
+        comparison = compare_probe_pair(failure, correction)
+        per_probe.append(comparison)
+        last_norm_diffs.append(float(comparison["prompt_last_token_norm_difference"]))
+        mean_norm_diffs.append(float(comparison["prompt_mean_pool_norm_difference"]))
+        if comparison["prompt_last_token_cosine_similarity"] is not None:
+            last_cosines.append(float(comparison["prompt_last_token_cosine_similarity"]))
+        if comparison["prompt_mean_pool_cosine_similarity"] is not None:
+            mean_cosines.append(float(comparison["prompt_mean_pool_cosine_similarity"]))
+    classification = classify_prompt_signal(per_probe)
+    summary = {
+        "selected_method": "activation_difference_direction",
+        "target_module": target_module,
+        "target_layer": target_layer,
+        "target_module_family": target_module_family,
+        "per_probe_differences": per_probe,
+        "aggregate_mean_difference": sum(last_norm_diffs) / len(last_norm_diffs) if last_norm_diffs else 0.0,
+        "aggregate_cosine_similarity": sum(last_cosines) / len(last_cosines) if last_cosines else None,
+        "prompt_last_token_mean_norm_difference": (
+            sum(last_norm_diffs) / len(last_norm_diffs) if last_norm_diffs else 0.0
+        ),
+        "prompt_mean_pool_mean_norm_difference": (
+            sum(mean_norm_diffs) / len(mean_norm_diffs) if mean_norm_diffs else 0.0
+        ),
+        "prompt_last_token_mean_cosine_similarity": (
+            sum(last_cosines) / len(last_cosines) if last_cosines else None
+        ),
+        "prompt_mean_pool_mean_cosine_similarity": (
+            sum(mean_cosines) / len(mean_cosines) if mean_cosines else None
+        ),
+        **classification,
+        "delta_artifact_recommended": False,
+        "required_next_step": REQUIRED_NEXT_STEP,
+    }
+    summary_path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return True, True
 
 
 def write_probe(
@@ -682,6 +743,14 @@ def write_probe(
             )
             model_inference_performed = activation_records_written and activation_summary_written
 
+    prompt_side_activation_captured = False
+    generation_step_activation_captured = False
+    if model_inference_performed:
+        if capture_mode == "prompt_forward":
+            prompt_side_activation_captured = True
+        elif capture_mode == "generation_step":
+            generation_step_activation_captured = True
+
     record = build_probe_record(
         run_id=run_id,
         source_plan_path=correction_delta_plan_path,
@@ -695,8 +764,8 @@ def write_probe(
         activation_records_written=activation_records_written,
         activation_summary_written=activation_summary_written,
         capture_mode=capture_mode,
-        prompt_side_activation_captured=(capture_mode == "prompt_forward" and model_inference_performed),
-        generation_step_activation_captured=(capture_mode == "generation_step" and model_inference_performed),
+        prompt_side_activation_captured=prompt_side_activation_captured,
+        generation_step_activation_captured=generation_step_activation_captured,
     )
     (out_dir / "larql_activation_capture_probe.json").write_text(
         json.dumps(record, indent=2, sort_keys=True) + "\n",

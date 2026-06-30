@@ -20,6 +20,7 @@ Prompt-side quality gate update:
 - generation-step capture was useful evidence, but it is not enough for
   correction-derived delta planning by itself;
 - prompt-side capture is now the default mode;
+- prompt-forward evidence is frozen before any audit text generation runs;
 - generation output is retained as audit text only;
 - prompt-side last-token and mean-pool summaries are now the candidate delta
   evidence.

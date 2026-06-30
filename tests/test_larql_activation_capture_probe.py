@@ -358,6 +358,242 @@ def test_summary_classifier_returns_unclear_when_no_usable_signals():
     assert result["selected_candidate_direction_status"] == "prompt_signal_unclear"
 
 
+def test_prompt_forward_records_include_activation_source_and_audit_role(tmp_path, monkeypatch):
+    from local_harness import larql_activation_capture_probe as mod
+
+    plan_dir = prepare_plan_dir(tmp_path)
+    out_root = tmp_path / "out"
+    base_model = tmp_path / "base_model"
+    base_model.mkdir()
+    monkeypatch.setattr(mod, "inference_stack_available", lambda: True)
+    monkeypatch.setattr(
+        mod,
+        "perform_activation_capture",
+        lambda **kwargs: (
+            kwargs["records_path"].write_text(
+                json.dumps(
+                    {
+                        "probe_id": "original_larql_behavior_replay",
+                        "side": "failure",
+                        "target_module": "model.layers.0.mlp.down_proj.weight",
+                        "target_layer": "0",
+                        "activation_shape": [1, 3, 2],
+                        "activation_dtype": "mock_float",
+                        "activation_norm": 1.0,
+                        "activation_mean": 0.0,
+                        "activation_std": 1.0,
+                        "activation_abs_max": 1.0,
+                        "capture_mode": "prompt_forward",
+                        "activation_source": "prompt_forward",
+                        "generation_output_role": "audit_text_only",
+                        "delta_evidence_source": "prompt_side_activation",
+                        "prompt_side_activation_captured": True,
+                        "generation_step_activation_captured": False,
+                        "prompt_sequence_length": 3,
+                        "prompt_last_token_norm": 1.0,
+                        "prompt_last_token_mean": 0.0,
+                        "prompt_last_token_std": 1.0,
+                        "prompt_last_token_abs_max": 1.0,
+                        "prompt_mean_pool_norm": 1.0,
+                        "prompt_mean_pool_mean": 0.0,
+                        "prompt_mean_pool_std": 1.0,
+                        "prompt_mean_pool_abs_max": 1.0,
+                        "prompt_token_count": 5,
+                        "model_output_text": "audit",
+                        "raw_output_preserved": True,
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            ),
+            kwargs["summary_path"].write_text(
+                json.dumps(
+                    {
+                        "selected_candidate_direction_status": "prompt_signal_detected",
+                        "delta_artifact_recommended": False,
+                        "required_next_step": "supervised_activation_capture_review",
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            ),
+            (True, True),
+        )[-1],
+    )
+    record = mod.write_probe(
+        run_id="capture_010",
+        out_root=out_root,
+        correction_delta_plan_path=plan_dir / "larql_correction_delta_plan.json",
+        base_model_path=base_model,
+        target_module=None,
+        target_layer=None,
+        target_module_family=None,
+        probe_pairs_path=None,
+        authorize_larql_activation_capture_probe=True,
+        run_inference=True,
+        authorize_model_inference=True,
+        capture_mode="prompt_forward",
+    )
+    assert record["prompt_side_activation_captured"] is True
+    assert record["generation_step_activation_captured"] is False
+    row = json.loads((out_root / "capture_010/activation_records.jsonl").read_text(encoding="utf-8").splitlines()[0])
+    assert row["activation_source"] == "prompt_forward"
+    assert row["generation_output_role"] == "audit_text_only"
+    assert row["delta_evidence_source"] == "prompt_side_activation"
+
+
+def test_successful_generation_step_mocked_run_reports_generation_flags(tmp_path, monkeypatch):
+    from local_harness import larql_activation_capture_probe as mod
+
+    plan_dir = prepare_plan_dir(tmp_path)
+    out_root = tmp_path / "out"
+    base_model = tmp_path / "base_model"
+    base_model.mkdir()
+    monkeypatch.setattr(mod, "inference_stack_available", lambda: True)
+    monkeypatch.setattr(
+        mod,
+        "perform_activation_capture",
+        lambda **kwargs: (
+            kwargs["records_path"].write_text(
+                json.dumps(
+                    {
+                        "probe_id": "original_larql_behavior_replay",
+                        "side": "failure",
+                        "target_module": "model.layers.0.mlp.down_proj.weight",
+                        "target_layer": "0",
+                        "activation_shape": [1, 1, 2048],
+                        "activation_dtype": "mock_float",
+                        "activation_norm": 1.0,
+                        "activation_mean": 0.0,
+                        "activation_std": 1.0,
+                        "activation_abs_max": 1.0,
+                        "capture_mode": "generation_step",
+                        "activation_source": "generation_step",
+                        "generation_output_role": "activation_source",
+                        "delta_evidence_source": "generation_step_activation",
+                        "prompt_side_activation_captured": False,
+                        "generation_step_activation_captured": True,
+                        "prompt_sequence_length": 1,
+                        "prompt_last_token_norm": 1.0,
+                        "prompt_last_token_mean": 0.0,
+                        "prompt_last_token_std": 1.0,
+                        "prompt_last_token_abs_max": 1.0,
+                        "prompt_mean_pool_norm": 1.0,
+                        "prompt_mean_pool_mean": 0.0,
+                        "prompt_mean_pool_std": 1.0,
+                        "prompt_mean_pool_abs_max": 1.0,
+                        "prompt_token_count": 5,
+                        "model_output_text": "audit",
+                        "raw_output_preserved": True,
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            ),
+            kwargs["summary_path"].write_text(
+                json.dumps(
+                    {
+                        "selected_candidate_direction_status": "prompt_signal_unclear",
+                        "delta_artifact_recommended": False,
+                        "required_next_step": "supervised_activation_capture_review",
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            ),
+            (True, True),
+        )[-1],
+    )
+    record = mod.write_probe(
+        run_id="capture_011",
+        out_root=out_root,
+        correction_delta_plan_path=plan_dir / "larql_correction_delta_plan.json",
+        base_model_path=base_model,
+        target_module=None,
+        target_layer=None,
+        target_module_family=None,
+        probe_pairs_path=None,
+        authorize_larql_activation_capture_probe=True,
+        run_inference=True,
+        authorize_model_inference=True,
+        capture_mode="generation_step",
+    )
+    assert record["prompt_side_activation_captured"] is False
+    assert record["generation_step_activation_captured"] is True
+
+
+def test_prompt_forward_capture_isolated_from_audit_generation():
+    from local_harness import larql_activation_capture_probe as mod
+
+    class FakeTensor:
+        def __init__(self, data):
+            self._data = data
+
+        @property
+        def shape(self):
+            if isinstance(self._data[0], list) and isinstance(self._data[0][0], list):
+                return (len(self._data), len(self._data[0]), len(self._data[0][0]))
+            if isinstance(self._data[0], list):
+                return (len(self._data), len(self._data[0]))
+            return (len(self._data),)
+
+        def detach(self):
+            return self
+
+        def float(self):
+            return self
+
+        def cpu(self):
+            return self
+
+        def clone(self):
+            return FakeTensor(json.loads(json.dumps(self._data)))
+
+        def tolist(self):
+            return json.loads(json.dumps(self._data))
+
+        @property
+        def dtype(self):
+            return "mock_float"
+
+    class FakeHandle:
+        def __init__(self, module):
+            self.module = module
+
+        def remove(self):
+            self.module.hook = None
+
+    class FakeModule:
+        def __init__(self):
+            self.hook = None
+
+        def register_forward_hook(self, hook):
+            self.hook = hook
+            return FakeHandle(self)
+
+    class FakeModel:
+        def __init__(self):
+            self.module = FakeModule()
+
+        def __call__(self, **inputs):
+            if self.module.hook:
+                self.module.hook(None, None, FakeTensor([[[1.0, 2.0], [3.0, 4.0]]]))
+
+    fake_model = FakeModel()
+    inputs = {"input_ids": object()}
+    capture = mod.capture_prompt_forward_activation(
+        model=fake_model,
+        inputs=inputs,
+        module_obj=fake_model.module,
+    )
+    # Simulate generation-side activity after prompt capture; it must not alter the stored capture.
+    if fake_model.module.hook:
+        fake_model.module.hook(None, None, FakeTensor([[[100.0, 200.0]]]))
+    stats = mod.summarize_prompt_side_vectors(capture["tensor"].tolist(), dtype=capture["dtype"])
+    assert stats["prompt_last_token_mean"] == 3.5
+    assert stats["prompt_mean_pool_mean"] == 2.5
+
+
 def test_no_real_inference_is_run_in_tests():
     script_text = SCRIPT.read_text(encoding="utf-8")
     assert "AutoModelForCausalLM" in script_text
