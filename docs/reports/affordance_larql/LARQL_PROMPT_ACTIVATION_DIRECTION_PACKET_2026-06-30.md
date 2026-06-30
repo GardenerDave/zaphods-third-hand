@@ -19,6 +19,7 @@ What the direction packet evaluates:
 
 - whether the three file-scope probes point in a coherent direction;
 - whether the unrelated regression guard is too aligned with that direction;
+- which prompt vector source has the stronger positive coherence margin;
 - whether a later supervised review should treat the direction as reviewable, unclear, or rejected.
 
 What remains out of scope:
@@ -32,3 +33,5 @@ What remains out of scope:
 - no automatic failure-to-curriculum capture.
 
 The code keeps `delta_artifact_recommended` false. Any later direct delta experiment still requires a separate supervised review step.
+
+Source selection uses coherence margin rather than a hard-coded last-token priority. The margin compares file-scope alignment against regression-guard entanglement. This still does not authorize any delta artifact.

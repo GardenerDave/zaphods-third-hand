@@ -68,7 +68,47 @@ def activation_summary_payload() -> dict:
     }
 
 
-def compact_vector_rows() -> list[dict]:
+def compact_vector_rows(*, use_mean_pool_advantage: bool = False, weak_margins: bool = False) -> list[dict]:
+    if weak_margins:
+        file_last = [
+            [1.0, 0.0, 0.0],
+            [0.95, 0.05, 0.0],
+            [0.9, 0.1, 0.0],
+        ]
+        file_mean = [
+            [0.8, 0.2, 0.0],
+            [0.75, 0.25, 0.0],
+            [0.7, 0.3, 0.0],
+        ]
+        regression_last = [0.98, 0.02, 0.0]
+        regression_mean = [0.78, 0.22, 0.0]
+    elif use_mean_pool_advantage:
+        file_last = [
+            [1.0, 0.0, 0.0],
+            [0.7, 0.3, 0.0],
+            [0.6, 0.4, 0.0],
+        ]
+        file_mean = [
+            [1.0, 0.0, 0.0],
+            [0.95, 0.05, 0.0],
+            [0.9, 0.1, 0.0],
+        ]
+        regression_last = [0.5, 0.5, 0.0]
+        regression_mean = [0.1, 0.9, 0.0]
+    else:
+        file_last = [
+            [1.0, 0.0, 0.0],
+            [0.95, 0.05, 0.0],
+            [0.9, 0.1, 0.0],
+        ]
+        file_mean = [
+            [0.8, 0.2, 0.0],
+            [0.75, 0.25, 0.0],
+            [0.7, 0.3, 0.0],
+        ]
+        regression_last = [0.1, 1.0, 0.0]
+        regression_mean = [0.4, 0.9, 0.0]
+
     return [
         {
             "probe_id": "original_larql_behavior_replay",
@@ -97,8 +137,8 @@ def compact_vector_rows() -> list[dict]:
             "vector_dtype": "float32",
             "prompt_sequence_length": 10,
             "vector_length": 3,
-            "prompt_last_token_vector": [1.0, 0.0, 0.0],
-            "prompt_mean_pool_vector": [1.0, 0.0, 0.0],
+            "prompt_last_token_vector": file_last[0],
+            "prompt_mean_pool_vector": file_mean[0],
             "raw_output_preserved": True,
             "model_output_text_sha256": "b",
             "generation_output_role": "audit_text_only",
@@ -113,8 +153,8 @@ def compact_vector_rows() -> list[dict]:
         {
             "probe_id": "adjacent_file_anti_overfit",
             "side": "correction",
-            "prompt_last_token_vector": [0.8, 0.2, 0.0],
-            "prompt_mean_pool_vector": [0.8, 0.2, 0.0],
+            "prompt_last_token_vector": file_last[1],
+            "prompt_mean_pool_vector": file_mean[1],
         },
         {
             "probe_id": "all_files_authorized_control",
@@ -125,8 +165,8 @@ def compact_vector_rows() -> list[dict]:
         {
             "probe_id": "all_files_authorized_control",
             "side": "correction",
-            "prompt_last_token_vector": [0.9, 0.1, 0.0],
-            "prompt_mean_pool_vector": [0.9, 0.1, 0.0],
+            "prompt_last_token_vector": file_last[2],
+            "prompt_mean_pool_vector": file_mean[2],
         },
         {
             "probe_id": "unrelated_task_regression",
@@ -137,18 +177,27 @@ def compact_vector_rows() -> list[dict]:
         {
             "probe_id": "unrelated_task_regression",
             "side": "correction",
-            "prompt_last_token_vector": [0.1, 1.0, 0.0],
-            "prompt_mean_pool_vector": [0.1, 1.0, 0.0],
+            "prompt_last_token_vector": regression_last,
+            "prompt_mean_pool_vector": regression_mean,
         },
     ]
 
 
-def prepare_inputs(tmp_path: Path, *, malformed: bool = False) -> tuple[Path, Path, Path]:
+def prepare_inputs(
+    tmp_path: Path,
+    *,
+    malformed: bool = False,
+    use_mean_pool_advantage: bool = False,
+    weak_margins: bool = False,
+) -> tuple[Path, Path, Path]:
     input_dir = tmp_path / "input"
     input_dir.mkdir()
     capture = write_json(input_dir / "larql_activation_capture_probe.json", activation_capture_record_payload())
     summary = write_json(input_dir / "activation_summary.json", activation_summary_payload())
-    rows = compact_vector_rows()
+    rows = compact_vector_rows(
+        use_mean_pool_advantage=use_mean_pool_advantage,
+        weak_margins=weak_margins,
+    )
     if malformed:
         rows = [dict(row) for row in rows]
         rows[-1]["prompt_mean_pool_vector"] = [1.0, 2.0]
@@ -253,16 +302,54 @@ def test_coherent_fixture_classifies_as_reviewable_and_computes_cosines(tmp_path
     coherence = json.loads((out_root / "direction_004/direction_coherence_report.json").read_text(encoding="utf-8"))
     candidates = json.loads((out_root / "direction_004/direction_candidates.json").read_text(encoding="utf-8"))
     assert payload["direction_candidate_status"] == "direction_candidate_reviewable"
-    assert payload["recommended_vector_source"] in {"prompt_last_token", "prompt_mean_pool"}
+    assert payload["recommended_vector_source"] == "prompt_last_token"
     assert len(coherence["file_scope_last_token_pairwise_cosines"]) >= 1
     assert len(coherence["file_scope_mean_pool_pairwise_cosines"]) >= 1
     assert coherence["regression_vs_file_scope_last_token_cosine"] is not None
+    assert coherence["last_token_coherence_margin"] is not None
+    assert coherence["mean_pool_coherence_margin"] is not None
+    assert coherence["selection_rule"] == "max_positive_coherence_margin"
     assert {item["probe_id"] for item in candidates["per_probe"]} == {
         "original_larql_behavior_replay",
         "adjacent_file_anti_overfit",
         "all_files_authorized_control",
         "unrelated_task_regression",
     }
+
+
+def test_mean_pool_higher_coherence_margin_selects_prompt_mean_pool(tmp_path):
+    capture, summary, compact = prepare_inputs(tmp_path, use_mean_pool_advantage=True)
+    out_root = tmp_path / "out"
+    run_script(
+        "--run-id", "direction_004b",
+        "--out-root", out_root,
+        "--compact-vectors", compact,
+        "--activation-summary", summary,
+        "--source-activation-capture-record", capture,
+        "--authorize-larql-direction-candidate-packet",
+    )
+    payload = json.loads((out_root / "direction_004b/larql_prompt_activation_direction_packet.json").read_text(encoding="utf-8"))
+    coherence = json.loads((out_root / "direction_004b/direction_coherence_report.json").read_text(encoding="utf-8"))
+    assert payload["direction_candidate_status"] == "direction_candidate_reviewable"
+    assert payload["recommended_vector_source"] == "prompt_mean_pool"
+    assert coherence["mean_pool_coherence_margin"] > coherence["last_token_coherence_margin"]
+
+
+def test_weak_or_regression_aligned_margins_return_unclear(tmp_path):
+    capture, summary, compact = prepare_inputs(tmp_path, weak_margins=True)
+    out_root = tmp_path / "out"
+    run_script(
+        "--run-id", "direction_004c",
+        "--out-root", out_root,
+        "--compact-vectors", compact,
+        "--activation-summary", summary,
+        "--source-activation-capture-record", capture,
+        "--authorize-larql-direction-candidate-packet",
+    )
+    payload = json.loads((out_root / "direction_004c/larql_prompt_activation_direction_packet.json").read_text(encoding="utf-8"))
+    coherence = json.loads((out_root / "direction_004c/direction_coherence_report.json").read_text(encoding="utf-8"))
+    assert payload["direction_candidate_status"] == "direction_candidate_unclear"
+    assert coherence["selection_rule"] == "max_positive_coherence_margin"
 
 
 def test_malformed_vector_fixture_classifies_as_rejected_or_unclear(tmp_path):

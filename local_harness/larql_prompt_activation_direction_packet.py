@@ -110,6 +110,46 @@ def pairwise_cosines(vectors: list[list[float]]) -> list[float]:
     return values
 
 
+def evaluate_source_selection(
+    *,
+    file_scope_vectors: list[list[float]],
+    regression_vector: list[float] | None,
+) -> dict[str, Any]:
+    avg_file_scope = average_vectors(file_scope_vectors)
+    file_scope_pairwise = pairwise_cosines(file_scope_vectors)
+    file_scope_mean_cosine = (
+        sum(file_scope_pairwise) / len(file_scope_pairwise) if file_scope_pairwise else None
+    )
+    regression_vs_file_scope_cosine = (
+        cosine_similarity(regression_vector, avg_file_scope)
+        if regression_vector is not None and avg_file_scope is not None
+        else None
+    )
+    coherence_margin = (
+        file_scope_mean_cosine - regression_vs_file_scope_cosine
+        if file_scope_mean_cosine is not None and regression_vs_file_scope_cosine is not None
+        else None
+    )
+    eligible = (
+        len(file_scope_vectors) == 3
+        and avg_file_scope is not None
+        and file_scope_mean_cosine is not None
+        and file_scope_mean_cosine > 0.0
+        and regression_vs_file_scope_cosine is not None
+        and coherence_margin is not None
+        and coherence_margin > 0.0
+    )
+    return {
+        "file_scope_vectors_present": len(file_scope_vectors),
+        "average_direction": avg_file_scope,
+        "pairwise_cosines": file_scope_pairwise,
+        "file_scope_mean_cosine": file_scope_mean_cosine,
+        "regression_vs_file_scope_cosine": regression_vs_file_scope_cosine,
+        "coherence_margin": coherence_margin,
+        "eligible": eligible,
+    }
+
+
 def split_probe_rows(compact_rows: list[dict[str, Any]]) -> dict[str, dict[str, dict[str, Any]]]:
     grouped: dict[str, dict[str, dict[str, Any]]] = {}
     for row in compact_rows:
@@ -160,51 +200,80 @@ def build_direction_candidates(compact_rows: list[dict[str, Any]]) -> tuple[dict
             regression_last_vector = last_direction
             regression_mean_vector = mean_direction
 
-    avg_file_scope_last = average_vectors(file_scope_last_vectors)
-    avg_file_scope_mean = average_vectors(file_scope_mean_vectors)
-    last_pairwise = pairwise_cosines(file_scope_last_vectors)
-    mean_pairwise = pairwise_cosines(file_scope_mean_vectors)
-    mean_last_pairwise = sum(last_pairwise) / len(last_pairwise) if last_pairwise else None
-    mean_mean_pairwise = sum(mean_pairwise) / len(mean_pairwise) if mean_pairwise else None
-    regression_last_cos = (
-        cosine_similarity(regression_last_vector, avg_file_scope_last)
-        if regression_last_vector is not None and avg_file_scope_last is not None
-        else None
+    last_eval = evaluate_source_selection(
+        file_scope_vectors=file_scope_last_vectors,
+        regression_vector=regression_last_vector,
     )
-    regression_mean_cos = (
-        cosine_similarity(regression_mean_vector, avg_file_scope_mean)
-        if regression_mean_vector is not None and avg_file_scope_mean is not None
-        else None
+    mean_eval = evaluate_source_selection(
+        file_scope_vectors=file_scope_mean_vectors,
+        regression_vector=regression_mean_vector,
     )
 
     status = "direction_candidate_rejected"
     recommended_vector_source = "none"
     rationale = "required direction vectors were missing or malformed"
     if not malformed and len(file_scope_last_vectors) == 3 and len(file_scope_mean_vectors) == 3:
-        coherent_last = mean_last_pairwise is not None and mean_last_pairwise > 0.0
-        coherent_mean = mean_mean_pairwise is not None and mean_mean_pairwise > 0.0
-        regression_separate_last = regression_last_cos is None or (
-            mean_last_pairwise is not None and regression_last_cos < mean_last_pairwise
-        )
-        regression_separate_mean = regression_mean_cos is None or (
-            mean_mean_pairwise is not None and regression_mean_cos < mean_mean_pairwise
-        )
-        if coherent_last and regression_separate_last:
+        selection_scores = {
+            "prompt_last_token": {
+                "file_scope_mean_cosine": last_eval["file_scope_mean_cosine"],
+                "regression_vs_file_scope_cosine": last_eval["regression_vs_file_scope_cosine"],
+                "coherence_margin": last_eval["coherence_margin"],
+                "eligible": last_eval["eligible"],
+            },
+            "prompt_mean_pool": {
+                "file_scope_mean_cosine": mean_eval["file_scope_mean_cosine"],
+                "regression_vs_file_scope_cosine": mean_eval["regression_vs_file_scope_cosine"],
+                "coherence_margin": mean_eval["coherence_margin"],
+                "eligible": mean_eval["eligible"],
+            },
+        }
+        eligible_sources = [
+            (source_name, score)
+            for source_name, score in selection_scores.items()
+            if score["eligible"]
+        ]
+        if eligible_sources:
+            eligible_sources.sort(
+                key=lambda item: (
+                    float(item[1]["coherence_margin"]),
+                    float(item[1]["file_scope_mean_cosine"]),
+                ),
+                reverse=True,
+            )
+            best_source, best_score = eligible_sources[0]
             status = "direction_candidate_reviewable"
-            recommended_vector_source = "prompt_last_token"
-            rationale = "file-scope last-token directions were positively aligned and less entangled with regression"
-        elif coherent_mean and regression_separate_mean:
-            status = "direction_candidate_reviewable"
-            recommended_vector_source = "prompt_mean_pool"
-            rationale = "file-scope mean-pool directions were positively aligned and less entangled with regression"
+            recommended_vector_source = best_source
+            rationale = (
+                f"selected {best_source} by max positive coherence margin "
+                f"({best_score['coherence_margin']}) against regression entanglement"
+            )
         else:
             status = "direction_candidate_unclear"
             rationale = "vectors exist but file-scope coherence was weak or regression alignment was too high"
+    else:
+        selection_scores = {
+            "prompt_last_token": {
+                "file_scope_mean_cosine": last_eval["file_scope_mean_cosine"],
+                "regression_vs_file_scope_cosine": last_eval["regression_vs_file_scope_cosine"],
+                "coherence_margin": last_eval["coherence_margin"],
+                "eligible": last_eval["eligible"],
+            },
+            "prompt_mean_pool": {
+                "file_scope_mean_cosine": mean_eval["file_scope_mean_cosine"],
+                "regression_vs_file_scope_cosine": mean_eval["regression_vs_file_scope_cosine"],
+                "coherence_margin": mean_eval["coherence_margin"],
+                "eligible": mean_eval["eligible"],
+            },
+        }
 
     direction_candidates = {
         "per_probe": per_probe,
-        "average_file_scope_last_token_direction_norm": vector_norm(avg_file_scope_last) if avg_file_scope_last else None,
-        "average_file_scope_mean_pool_direction_norm": vector_norm(avg_file_scope_mean) if avg_file_scope_mean else None,
+        "average_file_scope_last_token_direction_norm": (
+            vector_norm(last_eval["average_direction"]) if last_eval["average_direction"] else None
+        ),
+        "average_file_scope_mean_pool_direction_norm": (
+            vector_norm(mean_eval["average_direction"]) if mean_eval["average_direction"] else None
+        ),
         "regression_guard_last_token_direction_norm": (
             vector_norm(regression_last_vector) if regression_last_vector is not None else None
         ),
@@ -213,12 +282,16 @@ def build_direction_candidates(compact_rows: list[dict[str, Any]]) -> tuple[dict
         ),
     }
     coherence_report = {
-        "file_scope_last_token_pairwise_cosines": last_pairwise,
-        "file_scope_mean_pool_pairwise_cosines": mean_pairwise,
-        "file_scope_last_token_mean_cosine": mean_last_pairwise,
-        "file_scope_mean_pool_mean_cosine": mean_mean_pairwise,
-        "regression_vs_file_scope_last_token_cosine": regression_last_cos,
-        "regression_vs_file_scope_mean_pool_cosine": regression_mean_cos,
+        "file_scope_last_token_pairwise_cosines": last_eval["pairwise_cosines"],
+        "file_scope_mean_pool_pairwise_cosines": mean_eval["pairwise_cosines"],
+        "file_scope_last_token_mean_cosine": last_eval["file_scope_mean_cosine"],
+        "file_scope_mean_pool_mean_cosine": mean_eval["file_scope_mean_cosine"],
+        "regression_vs_file_scope_last_token_cosine": last_eval["regression_vs_file_scope_cosine"],
+        "regression_vs_file_scope_mean_pool_cosine": mean_eval["regression_vs_file_scope_cosine"],
+        "last_token_coherence_margin": last_eval["coherence_margin"],
+        "mean_pool_coherence_margin": mean_eval["coherence_margin"],
+        "selection_rule": "max_positive_coherence_margin",
+        "selection_scores": selection_scores,
         "selected_rationale": rationale,
         "direction_candidate_status": status,
         "recommended_vector_source": recommended_vector_source,
