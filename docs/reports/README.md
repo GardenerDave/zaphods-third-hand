@@ -144,7 +144,10 @@ does not establish production readiness.
   on the bounded LARQL probe set, and
   `LARQL_PATCHED_MODEL_LOGIT_SENSITIVITY_2026-06-30.md` for the follow-up
   forward-pass diagnostic that compares base-vs-patched logits when bounded
-  greedy outputs remain unchanged.
+  greedy outputs remain unchanged, and
+  `LARQL_TEACHER_FORCED_LIKELIHOOD_2026-06-30.md` for the teacher-forced
+  likelihood-margin diagnostic that compares corrected JSON continuations
+  against failure-style JSON under the base and patched models.
 
 ## Safety Reminder
 
