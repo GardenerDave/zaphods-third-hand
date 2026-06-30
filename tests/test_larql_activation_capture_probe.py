@@ -366,60 +366,58 @@ def test_prompt_forward_records_include_activation_source_and_audit_role(tmp_pat
     base_model = tmp_path / "base_model"
     base_model.mkdir()
     monkeypatch.setattr(mod, "inference_stack_available", lambda: True)
-    monkeypatch.setattr(
-        mod,
-        "perform_activation_capture",
-        lambda **kwargs: (
-            kwargs["records_path"].write_text(
-                json.dumps(
-                    {
-                        "probe_id": "original_larql_behavior_replay",
-                        "side": "failure",
-                        "target_module": "model.layers.0.mlp.down_proj.weight",
-                        "target_layer": "0",
-                        "activation_shape": [1, 3, 2],
-                        "activation_dtype": "mock_float",
-                        "activation_norm": 1.0,
-                        "activation_mean": 0.0,
-                        "activation_std": 1.0,
-                        "activation_abs_max": 1.0,
-                        "capture_mode": "prompt_forward",
-                        "activation_source": "prompt_forward",
-                        "generation_output_role": "audit_text_only",
-                        "delta_evidence_source": "prompt_side_activation",
-                        "prompt_side_activation_captured": True,
-                        "generation_step_activation_captured": False,
-                        "prompt_sequence_length": 3,
-                        "prompt_last_token_norm": 1.0,
-                        "prompt_last_token_mean": 0.0,
-                        "prompt_last_token_std": 1.0,
-                        "prompt_last_token_abs_max": 1.0,
-                        "prompt_mean_pool_norm": 1.0,
-                        "prompt_mean_pool_mean": 0.0,
-                        "prompt_mean_pool_std": 1.0,
-                        "prompt_mean_pool_abs_max": 1.0,
-                        "prompt_token_count": 5,
-                        "model_output_text": "audit",
-                        "raw_output_preserved": True,
-                    }
-                )
-                + "\n",
-                encoding="utf-8",
-            ),
-            kwargs["summary_path"].write_text(
-                json.dumps(
-                    {
-                        "selected_candidate_direction_status": "prompt_signal_detected",
-                        "delta_artifact_recommended": False,
-                        "required_next_step": "supervised_activation_capture_review",
-                    }
-                )
-                + "\n",
-                encoding="utf-8",
-            ),
-            (True, True),
-        )[-1],
-    )
+
+    def fake_capture(**kwargs):
+        kwargs["records_path"].write_text(
+            json.dumps(
+                {
+                    "probe_id": "original_larql_behavior_replay",
+                    "side": "failure",
+                    "target_module": "model.layers.0.mlp.down_proj.weight",
+                    "target_layer": "0",
+                    "activation_shape": [1, 3, 2],
+                    "activation_dtype": "mock_float",
+                    "activation_norm": 1.0,
+                    "activation_mean": 0.0,
+                    "activation_std": 1.0,
+                    "activation_abs_max": 1.0,
+                    "capture_mode": "prompt_forward",
+                    "activation_source": "prompt_forward",
+                    "generation_output_role": "audit_text_only",
+                    "delta_evidence_source": "prompt_side_activation",
+                    "prompt_side_activation_captured": True,
+                    "generation_step_activation_captured": False,
+                    "prompt_sequence_length": 3,
+                    "prompt_last_token_norm": 1.0,
+                    "prompt_last_token_mean": 0.0,
+                    "prompt_last_token_std": 1.0,
+                    "prompt_last_token_abs_max": 1.0,
+                    "prompt_mean_pool_norm": 1.0,
+                    "prompt_mean_pool_mean": 0.0,
+                    "prompt_mean_pool_std": 1.0,
+                    "prompt_mean_pool_abs_max": 1.0,
+                    "prompt_token_count": 5,
+                    "model_output_text": "audit",
+                    "raw_output_preserved": True,
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        kwargs["summary_path"].write_text(
+            json.dumps(
+                {
+                    "selected_candidate_direction_status": "prompt_signal_detected",
+                    "delta_artifact_recommended": False,
+                    "required_next_step": "supervised_activation_capture_review",
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        return True, True
+
+    monkeypatch.setattr(mod, "perform_activation_capture", fake_capture)
     record = mod.write_probe(
         run_id="capture_010",
         out_root=out_root,
@@ -450,60 +448,58 @@ def test_successful_generation_step_mocked_run_reports_generation_flags(tmp_path
     base_model = tmp_path / "base_model"
     base_model.mkdir()
     monkeypatch.setattr(mod, "inference_stack_available", lambda: True)
-    monkeypatch.setattr(
-        mod,
-        "perform_activation_capture",
-        lambda **kwargs: (
-            kwargs["records_path"].write_text(
-                json.dumps(
-                    {
-                        "probe_id": "original_larql_behavior_replay",
-                        "side": "failure",
-                        "target_module": "model.layers.0.mlp.down_proj.weight",
-                        "target_layer": "0",
-                        "activation_shape": [1, 1, 2048],
-                        "activation_dtype": "mock_float",
-                        "activation_norm": 1.0,
-                        "activation_mean": 0.0,
-                        "activation_std": 1.0,
-                        "activation_abs_max": 1.0,
-                        "capture_mode": "generation_step",
-                        "activation_source": "generation_step",
-                        "generation_output_role": "activation_source",
-                        "delta_evidence_source": "generation_step_activation",
-                        "prompt_side_activation_captured": False,
-                        "generation_step_activation_captured": True,
-                        "prompt_sequence_length": 1,
-                        "prompt_last_token_norm": 1.0,
-                        "prompt_last_token_mean": 0.0,
-                        "prompt_last_token_std": 1.0,
-                        "prompt_last_token_abs_max": 1.0,
-                        "prompt_mean_pool_norm": 1.0,
-                        "prompt_mean_pool_mean": 0.0,
-                        "prompt_mean_pool_std": 1.0,
-                        "prompt_mean_pool_abs_max": 1.0,
-                        "prompt_token_count": 5,
-                        "model_output_text": "audit",
-                        "raw_output_preserved": True,
-                    }
-                )
-                + "\n",
-                encoding="utf-8",
-            ),
-            kwargs["summary_path"].write_text(
-                json.dumps(
-                    {
-                        "selected_candidate_direction_status": "prompt_signal_unclear",
-                        "delta_artifact_recommended": False,
-                        "required_next_step": "supervised_activation_capture_review",
-                    }
-                )
-                + "\n",
-                encoding="utf-8",
-            ),
-            (True, True),
-        )[-1],
-    )
+
+    def fake_capture(**kwargs):
+        kwargs["records_path"].write_text(
+            json.dumps(
+                {
+                    "probe_id": "original_larql_behavior_replay",
+                    "side": "failure",
+                    "target_module": "model.layers.0.mlp.down_proj.weight",
+                    "target_layer": "0",
+                    "activation_shape": [1, 1, 2048],
+                    "activation_dtype": "mock_float",
+                    "activation_norm": 1.0,
+                    "activation_mean": 0.0,
+                    "activation_std": 1.0,
+                    "activation_abs_max": 1.0,
+                    "capture_mode": "generation_step",
+                    "activation_source": "generation_step",
+                    "generation_output_role": "activation_source",
+                    "delta_evidence_source": "generation_step_activation",
+                    "prompt_side_activation_captured": False,
+                    "generation_step_activation_captured": True,
+                    "prompt_sequence_length": 1,
+                    "prompt_last_token_norm": 1.0,
+                    "prompt_last_token_mean": 0.0,
+                    "prompt_last_token_std": 1.0,
+                    "prompt_last_token_abs_max": 1.0,
+                    "prompt_mean_pool_norm": 1.0,
+                    "prompt_mean_pool_mean": 0.0,
+                    "prompt_mean_pool_std": 1.0,
+                    "prompt_mean_pool_abs_max": 1.0,
+                    "prompt_token_count": 5,
+                    "model_output_text": "audit",
+                    "raw_output_preserved": True,
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        kwargs["summary_path"].write_text(
+            json.dumps(
+                {
+                    "selected_candidate_direction_status": "prompt_signal_unclear",
+                    "delta_artifact_recommended": False,
+                    "required_next_step": "supervised_activation_capture_review",
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        return True, True
+
+    monkeypatch.setattr(mod, "perform_activation_capture", fake_capture)
     record = mod.write_probe(
         run_id="capture_011",
         out_root=out_root,
