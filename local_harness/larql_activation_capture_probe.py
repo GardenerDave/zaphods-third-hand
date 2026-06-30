@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 import json
 import math
@@ -333,6 +334,10 @@ def build_probe_record(
     capture_mode: str,
     prompt_side_activation_captured: bool,
     generation_step_activation_captured: bool,
+    compact_vectors_requested: bool,
+    compact_vectors_authorized: bool,
+    compact_vectors_written: bool,
+    compact_vectors_path: Path | None,
 ) -> dict[str, Any]:
     return {
         "report_type": REPORT_TYPE,
@@ -351,6 +356,10 @@ def build_probe_record(
         "model_inference_performed": model_inference_performed,
         "activation_records_written": activation_records_written,
         "activation_summary_written": activation_summary_written,
+        "compact_vectors_requested": compact_vectors_requested,
+        "compact_vectors_authorized": compact_vectors_authorized,
+        "compact_vectors_written": compact_vectors_written,
+        "compact_vectors_path": str(compact_vectors_path) if compact_vectors_path is not None else None,
         "weight_edit_performed": False,
         "delta_artifact_written": False,
         "patched_model_materialized": False,
@@ -365,6 +374,43 @@ def build_probe_record(
         "automatic_failure_to_curriculum_capture_authorized": False,
         "required_next_step": REQUIRED_NEXT_STEP,
     }
+
+
+def hash_text_sha256(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def write_compact_vectors(
+    *,
+    rows: list[dict[str, Any]],
+    compact_vectors_path: Path,
+    target_module_family: str,
+) -> None:
+    compact_rows: list[dict[str, Any]] = []
+    for row in rows:
+        compact_rows.append(
+            {
+                "probe_id": row["probe_id"],
+                "side": row["side"],
+                "target_module": row["target_module"],
+                "target_layer": row["target_layer"],
+                "target_module_family": target_module_family,
+                "capture_mode": "prompt_forward",
+                "vector_dtype": row["activation_dtype"],
+                "prompt_sequence_length": row["prompt_sequence_length"],
+                "vector_length": len(row["_prompt_last_token_vector"]),
+                "prompt_last_token_vector": row["_prompt_last_token_vector"],
+                "prompt_mean_pool_vector": row["_prompt_mean_pool_vector"],
+                "raw_output_preserved": True,
+                "model_output_text_sha256": hash_text_sha256(row["model_output_text"]),
+                "generation_output_role": "audit_text_only",
+                "delta_evidence_source": "prompt_side_activation",
+            }
+        )
+    compact_vectors_path.write_text(
+        "\n".join(json.dumps(row, sort_keys=True) for row in compact_rows) + "\n",
+        encoding="utf-8",
+    )
 
 
 def resolve_targets(
@@ -495,7 +541,9 @@ def perform_activation_capture(
     records_path: Path,
     summary_path: Path,
     capture_mode: str,
-) -> tuple[bool, bool]:
+    compact_vectors_path: Path | None,
+    write_compact_vectors_enabled: bool,
+) -> tuple[bool, bool, bool]:
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -609,6 +657,19 @@ def perform_activation_capture(
         encoding="utf-8",
     )
 
+    compact_vectors_written = False
+    if write_compact_vectors_enabled:
+        if capture_mode != "prompt_forward":
+            raise ValueError("compact vectors require capture_mode prompt_forward")
+        if compact_vectors_path is None:
+            raise ValueError("compact vectors path is required when compact vectors are enabled")
+        write_compact_vectors(
+            rows=rows,
+            compact_vectors_path=compact_vectors_path,
+            target_module_family=target_module_family,
+        )
+        compact_vectors_written = True
+
     by_probe: dict[str, dict[str, dict[str, Any]]] = {}
     for row in rows:
         by_probe.setdefault(row["probe_id"], {})[row["side"]] = row
@@ -656,7 +717,7 @@ def perform_activation_capture(
         "required_next_step": REQUIRED_NEXT_STEP,
     }
     summary_path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    return True, True
+    return True, True, compact_vectors_written
 
 
 def write_probe(
@@ -673,6 +734,8 @@ def write_probe(
     run_inference: bool,
     authorize_model_inference: bool,
     capture_mode: str = "prompt_forward",
+    write_compact_vectors_requested: bool = False,
+    authorize_compact_vector_artifact: bool = False,
 ) -> dict[str, Any]:
     require_authorization(authorize_larql_activation_capture_probe)
 
@@ -718,20 +781,32 @@ def write_probe(
 
     activation_records_path = out_dir / "activation_records.jsonl"
     activation_summary_path = out_dir / "activation_summary.json"
+    compact_vectors_path = out_dir / "compact_prompt_vectors.jsonl"
     model_inference_performed = False
     activation_records_written = False
     activation_summary_written = False
+    compact_vectors_written = False
     source_plan_status = str(plan.get("source_reaudition_status", "unknown"))
+    compact_vectors_authorized = (
+        write_compact_vectors_requested
+        and authorize_compact_vector_artifact
+        and authorize_model_inference
+        and capture_mode == "prompt_forward"
+    )
 
     if run_inference:
         if not authorize_model_inference:
             raise ValueError("model inference requires explicit authorization")
+        if write_compact_vectors_requested and not authorize_compact_vector_artifact:
+            raise ValueError("compact vector artifact writing requires explicit authorization")
+        if write_compact_vectors_requested and capture_mode != "prompt_forward":
+            raise ValueError("compact vectors are only allowed in prompt_forward mode")
         if not inference_stack_available():
             source_plan_status = "blocked_missing_model_stack"
         elif base_model_path is None or not base_model_path.exists():
             source_plan_status = "blocked_missing_model_path"
         else:
-            activation_records_written, activation_summary_written = perform_activation_capture(
+            capture_result = perform_activation_capture(
                 base_model_path=base_model_path,
                 target_module=target_module_resolved,
                 target_layer=target_layer_resolved,
@@ -740,8 +815,19 @@ def write_probe(
                 records_path=activation_records_path,
                 summary_path=activation_summary_path,
                 capture_mode=capture_mode,
+                compact_vectors_path=compact_vectors_path if compact_vectors_authorized else None,
+                write_compact_vectors_enabled=compact_vectors_authorized,
             )
+            if len(capture_result) == 3:
+                activation_records_written, activation_summary_written, compact_vectors_written = capture_result
+            elif len(capture_result) == 2:
+                activation_records_written, activation_summary_written = capture_result
+                compact_vectors_written = False
+            else:
+                raise ValueError("perform_activation_capture returned unexpected result shape")
             model_inference_performed = activation_records_written and activation_summary_written
+    elif write_compact_vectors_requested:
+        raise ValueError("compact vectors require an authorized inference run")
 
     prompt_side_activation_captured = False
     generation_step_activation_captured = False
@@ -766,6 +852,10 @@ def write_probe(
         capture_mode=capture_mode,
         prompt_side_activation_captured=prompt_side_activation_captured,
         generation_step_activation_captured=generation_step_activation_captured,
+        compact_vectors_requested=write_compact_vectors_requested,
+        compact_vectors_authorized=compact_vectors_authorized,
+        compact_vectors_written=compact_vectors_written,
+        compact_vectors_path=compact_vectors_path if compact_vectors_written else None,
     )
     (out_dir / "larql_activation_capture_probe.json").write_text(
         json.dumps(record, indent=2, sort_keys=True) + "\n",
@@ -792,6 +882,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--authorize-larql-activation-capture-probe", action="store_true")
     parser.add_argument("--run-inference", action="store_true")
     parser.add_argument("--authorize-model-inference", action="store_true")
+    parser.add_argument("--write-compact-vectors", action="store_true")
+    parser.add_argument("--authorize-compact-vector-artifact", action="store_true")
     return parser.parse_args()
 
 
@@ -811,6 +903,8 @@ def main() -> int:
             run_inference=args.run_inference,
             authorize_model_inference=args.authorize_model_inference,
             capture_mode=args.capture_mode,
+            write_compact_vectors_requested=args.write_compact_vectors,
+            authorize_compact_vector_artifact=args.authorize_compact_vector_artifact,
         )
     except (OSError, ValueError, json.JSONDecodeError, KeyError, IndexError, TypeError, AttributeError) as exc:
         print(f"error: {exc}")

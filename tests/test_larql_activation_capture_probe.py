@@ -248,6 +248,26 @@ def test_inference_requested_without_model_authorization_is_blocked_and_writes_n
     assert not (out_dir / "activation_summary.json").exists()
 
 
+def test_compact_vector_writing_without_authorization_is_blocked(tmp_path):
+    plan_dir = prepare_plan_dir(tmp_path)
+    out_root = tmp_path / "out"
+    base_model = tmp_path / "base_model"
+    base_model.mkdir()
+    result = run_script(
+        "--run-id", "capture_005b",
+        "--out-root", out_root,
+        "--correction-delta-plan", plan_dir / "larql_correction_delta_plan.json",
+        "--base-model-path", base_model,
+        "--authorize-larql-activation-capture-probe",
+        "--run-inference",
+        "--authorize-model-inference",
+        "--write-compact-vectors",
+    )
+    assert result.returncode != 0
+    assert "compact vector artifact writing requires explicit authorization" in result.stdout
+    assert not (out_root / "capture_005b/compact_prompt_vectors.jsonl").exists()
+
+
 def test_missing_model_stack_with_inference_authorization_is_blocked_cleanly(tmp_path, monkeypatch):
     from local_harness import larql_activation_capture_probe as mod
 
@@ -271,6 +291,28 @@ def test_missing_model_stack_with_inference_authorization_is_blocked_cleanly(tmp
     assert record["model_inference_performed"] is False
     assert record["activation_records_written"] is False
     assert record["activation_summary_written"] is False
+
+
+def test_compact_vectors_only_allowed_in_prompt_forward_mode(tmp_path):
+    plan_dir = prepare_plan_dir(tmp_path)
+    out_root = tmp_path / "out"
+    base_model = tmp_path / "base_model"
+    base_model.mkdir()
+    result = run_script(
+        "--run-id", "capture_006b",
+        "--out-root", out_root,
+        "--correction-delta-plan", plan_dir / "larql_correction_delta_plan.json",
+        "--base-model-path", base_model,
+        "--authorize-larql-activation-capture-probe",
+        "--run-inference",
+        "--authorize-model-inference",
+        "--capture-mode", "generation_step",
+        "--write-compact-vectors",
+        "--authorize-compact-vector-artifact",
+    )
+    assert result.returncode != 0
+    assert "compact vectors are only allowed in prompt_forward mode" in result.stdout
+    assert not (out_root / "capture_006b/compact_prompt_vectors.jsonl").exists()
 
 
 def test_module_name_normalization_strips_trailing_weight():
@@ -440,6 +482,117 @@ def test_prompt_forward_records_include_activation_source_and_audit_role(tmp_pat
     assert row["delta_evidence_source"] == "prompt_side_activation"
 
 
+def test_authorized_prompt_forward_compact_vector_run_writes_compact_vectors(tmp_path, monkeypatch):
+    from local_harness import larql_activation_capture_probe as mod
+
+    plan_dir = prepare_plan_dir(tmp_path)
+    out_root = tmp_path / "out"
+    base_model = tmp_path / "base_model"
+    base_model.mkdir()
+    monkeypatch.setattr(mod, "inference_stack_available", lambda: True)
+
+    def fake_capture(**kwargs):
+        kwargs["records_path"].write_text(
+            json.dumps(
+                {
+                    "probe_id": "original_larql_behavior_replay",
+                    "side": "failure",
+                    "target_module": "model.layers.0.mlp.down_proj.weight",
+                    "target_layer": "0",
+                    "activation_shape": [1, 3, 2],
+                    "activation_dtype": "float32",
+                    "activation_norm": 1.0,
+                    "activation_mean": 0.0,
+                    "activation_std": 1.0,
+                    "activation_abs_max": 1.0,
+                    "capture_mode": "prompt_forward",
+                    "activation_source": "prompt_forward",
+                    "generation_output_role": "audit_text_only",
+                    "delta_evidence_source": "prompt_side_activation",
+                    "prompt_side_activation_captured": True,
+                    "generation_step_activation_captured": False,
+                    "prompt_sequence_length": 3,
+                    "prompt_last_token_norm": 1.0,
+                    "prompt_last_token_mean": 0.0,
+                    "prompt_last_token_std": 1.0,
+                    "prompt_last_token_abs_max": 1.0,
+                    "prompt_mean_pool_norm": 1.0,
+                    "prompt_mean_pool_mean": 0.0,
+                    "prompt_mean_pool_std": 1.0,
+                    "prompt_mean_pool_abs_max": 1.0,
+                    "prompt_token_count": 5,
+                    "model_output_text": "audit",
+                    "raw_output_preserved": True,
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        kwargs["summary_path"].write_text(
+            json.dumps(
+                {
+                    "selected_candidate_direction_status": "prompt_signal_detected",
+                    "delta_artifact_recommended": False,
+                    "required_next_step": "supervised_activation_capture_review",
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        kwargs["compact_vectors_path"].write_text(
+            json.dumps(
+                {
+                    "probe_id": "original_larql_behavior_replay",
+                    "side": "failure",
+                    "target_module": "model.layers.0.mlp.down_proj.weight",
+                    "target_layer": "0",
+                    "target_module_family": "mlp_projection",
+                    "capture_mode": "prompt_forward",
+                    "vector_dtype": "float32",
+                    "prompt_sequence_length": 3,
+                    "vector_length": 2,
+                    "prompt_last_token_vector": [0.25, -0.25],
+                    "prompt_mean_pool_vector": [0.5, -0.5],
+                    "raw_output_preserved": True,
+                    "model_output_text_sha256": "abc123",
+                    "generation_output_role": "audit_text_only",
+                    "delta_evidence_source": "prompt_side_activation",
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        assert kwargs["write_compact_vectors_enabled"] is True
+        return True, True, True
+
+    monkeypatch.setattr(mod, "perform_activation_capture", fake_capture)
+    record = mod.write_probe(
+        run_id="capture_010b",
+        out_root=out_root,
+        correction_delta_plan_path=plan_dir / "larql_correction_delta_plan.json",
+        base_model_path=base_model,
+        target_module=None,
+        target_layer=None,
+        target_module_family=None,
+        probe_pairs_path=None,
+        authorize_larql_activation_capture_probe=True,
+        run_inference=True,
+        authorize_model_inference=True,
+        capture_mode="prompt_forward",
+        write_compact_vectors_requested=True,
+        authorize_compact_vector_artifact=True,
+    )
+    assert record["compact_vectors_requested"] is True
+    assert record["compact_vectors_authorized"] is True
+    assert record["compact_vectors_written"] is True
+    row = json.loads((out_root / "capture_010b/compact_prompt_vectors.jsonl").read_text(encoding="utf-8").splitlines()[0])
+    assert row["prompt_last_token_vector"] == [0.25, -0.25]
+    assert row["prompt_mean_pool_vector"] == [0.5, -0.5]
+    assert row["vector_length"] == 2
+    assert "activation_shape" not in row
+    assert "full_sequence_tensor" not in row
+
+
 def test_successful_generation_step_mocked_run_reports_generation_flags(tmp_path, monkeypatch):
     from local_harness import larql_activation_capture_probe as mod
 
@@ -516,6 +669,41 @@ def test_successful_generation_step_mocked_run_reports_generation_flags(tmp_path
     )
     assert record["prompt_side_activation_captured"] is False
     assert record["generation_step_activation_captured"] is True
+
+
+def test_compact_vector_fields_remain_unwritten_without_authorized_compact_vector_run(tmp_path, monkeypatch):
+    from local_harness import larql_activation_capture_probe as mod
+
+    plan_dir = prepare_plan_dir(tmp_path)
+    out_root = tmp_path / "out"
+    base_model = tmp_path / "base_model"
+    base_model.mkdir()
+    monkeypatch.setattr(mod, "inference_stack_available", lambda: True)
+
+    def fake_capture(**kwargs):
+        kwargs["records_path"].write_text("{}\n", encoding="utf-8")
+        kwargs["summary_path"].write_text("{}\n", encoding="utf-8")
+        return True, True, False
+
+    monkeypatch.setattr(mod, "perform_activation_capture", fake_capture)
+    record = mod.write_probe(
+        run_id="capture_011b",
+        out_root=out_root,
+        correction_delta_plan_path=plan_dir / "larql_correction_delta_plan.json",
+        base_model_path=base_model,
+        target_module=None,
+        target_layer=None,
+        target_module_family=None,
+        probe_pairs_path=None,
+        authorize_larql_activation_capture_probe=True,
+        run_inference=True,
+        authorize_model_inference=True,
+        capture_mode="prompt_forward",
+    )
+    assert record["compact_vectors_written"] is False
+    assert record["compact_vectors_path"] is None
+    assert record["promotion_authorized"] is False
+    assert record["automatic_failure_to_curriculum_capture_authorized"] is False
 
 
 def test_prompt_forward_capture_isolated_from_audit_generation():
