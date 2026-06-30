@@ -141,7 +141,10 @@ does not establish production readiness.
   without writing any weight deltas, and
   `LARQL_PATCHED_MODEL_REAUDITION_2026-06-30.md` for the first separately
   authorized inference comparison between a base model and a patched model copy
-  on the bounded LARQL probe set.
+  on the bounded LARQL probe set, and
+  `LARQL_PATCHED_MODEL_LOGIT_SENSITIVITY_2026-06-30.md` for the follow-up
+  forward-pass diagnostic that compares base-vs-patched logits when bounded
+  greedy outputs remain unchanged.
 
 ## Safety Reminder
 
