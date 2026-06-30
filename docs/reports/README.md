@@ -135,7 +135,10 @@ does not establish production readiness.
   for the first supervised review of the base-vs-patched comparison evidence,
   and `LARQL_CORRECTION_DELTA_PLAN_2026-06-30.md` for the first packet-only
   planning scaffold that moves from a mechanically proven direct edit toward a
-  behavior-derived correction delta.
+  behavior-derived correction delta, and
+  `LARQL_ACTIVATION_CAPTURE_PROBE_2026-06-30.md` for the first packet-only
+  activation capture stage that prepares behavior-derived correction evidence
+  without writing any weight deltas.
 
 ## Safety Reminder
 

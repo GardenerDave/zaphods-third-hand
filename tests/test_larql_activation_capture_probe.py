@@ -1,0 +1,268 @@
+from __future__ import annotations
+
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+SCRIPT = ROOT / "local_harness/larql_activation_capture_probe.py"
+
+
+def write_json(path: Path, payload: dict | list) -> Path:
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return path
+
+
+def correction_delta_plan_payload() -> dict:
+    return {
+        "report_type": "larql_correction_delta_plan.v0",
+        "run_id": "larql_correction_delta_plan_001",
+        "source_reaudition_path": ".work/fake/reaudition.json",
+        "source_reaudition_status": "completed_model_comparison",
+        "source_outputs_equal_count": 4,
+        "source_normalized_outputs_equal_count": 4,
+        "behavioral_improvement_observed": False,
+        "planning_authorized": True,
+        "model_inference_performed": False,
+        "weight_edit_performed": False,
+        "delta_artifact_written": False,
+        "patched_model_materialized": False,
+        "training_performed": False,
+        "adapter_baseline_path": False,
+        "larql_core_path": True,
+        "promotion_authorized": False,
+        "base_model_overwrite_authorized": False,
+        "production_deployment_authorized": False,
+        "registry_mutation_authorized": False,
+        "install_authorized": False,
+        "automatic_failure_to_curriculum_capture_authorized": False,
+        "required_next_step": "supervised_correction_delta_plan_review",
+    }
+
+
+def selection_plan_payload() -> dict:
+    return {
+        "recommended_method": "activation_difference_direction",
+        "target_module": "model.layers.0.mlp.down_proj.weight",
+        "target_layer": "0",
+        "target_module_family": "mlp_projection",
+        "selection_reason": "bounded first experiment",
+        "authorizes_model_inference_now": False,
+        "authorizes_weight_edit_now": False,
+        "authorizes_delta_artifact_now": False,
+        "required_next_step": "implement_authorized_activation_capture_probe",
+    }
+
+
+def probe_pairs_payload() -> list[dict]:
+    return [
+        {
+            "probe_id": "original_larql_behavior_replay",
+            "failure_prompt": "failure one",
+            "correction_prompt": "correction one",
+            "expected_failure_shape": "bad",
+            "expected_correction_shape": "good",
+            "target_behavior": "bounded",
+            "must_not_authorize_install": True,
+            "must_not_authorize_registry_mutation": True,
+            "must_not_expand_scope_without_review": True,
+            "regression_guard": False,
+        },
+        {
+            "probe_id": "adjacent_file_anti_overfit",
+            "failure_prompt": "failure two",
+            "correction_prompt": "correction two",
+            "expected_failure_shape": "bad",
+            "expected_correction_shape": "good",
+            "target_behavior": "bounded",
+            "must_not_authorize_install": True,
+            "must_not_authorize_registry_mutation": True,
+            "must_not_expand_scope_without_review": True,
+            "regression_guard": False,
+        },
+        {
+            "probe_id": "all_files_authorized_control",
+            "failure_prompt": "failure three",
+            "correction_prompt": "correction three",
+            "expected_failure_shape": "bad",
+            "expected_correction_shape": "good",
+            "target_behavior": "bounded",
+            "must_not_authorize_install": True,
+            "must_not_authorize_registry_mutation": True,
+            "must_not_expand_scope_without_review": True,
+            "regression_guard": False,
+        },
+        {
+            "probe_id": "unrelated_task_regression",
+            "failure_prompt": "failure four",
+            "correction_prompt": "correction four",
+            "expected_failure_shape": "bad",
+            "expected_correction_shape": "good",
+            "target_behavior": "bounded",
+            "must_not_authorize_install": True,
+            "must_not_authorize_registry_mutation": True,
+            "must_not_expand_scope_without_review": False,
+            "regression_guard": True,
+        },
+    ]
+
+
+def prepare_plan_dir(tmp_path: Path) -> Path:
+    plan_dir = tmp_path / "plan"
+    plan_dir.mkdir()
+    write_json(plan_dir / "larql_correction_delta_plan.json", correction_delta_plan_payload())
+    write_json(plan_dir / "delta_selection_plan.json", selection_plan_payload())
+    write_json(plan_dir / "activation_contrast_probe_pairs.json", probe_pairs_payload())
+    return plan_dir
+
+
+def run_script(*args: str | Path) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [sys.executable, str(SCRIPT), *map(str, args)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+
+def test_help_works():
+    result = run_script("--help")
+    assert result.returncode == 0
+    assert "usage:" in result.stdout.lower()
+
+
+def test_missing_authorization_exits_nonzero_and_writes_no_packet(tmp_path):
+    plan_dir = prepare_plan_dir(tmp_path)
+    out_root = tmp_path / "out"
+    result = run_script(
+        "--run-id", "capture_001",
+        "--out-root", out_root,
+        "--correction-delta-plan", plan_dir / "larql_correction_delta_plan.json",
+    )
+    assert result.returncode != 0
+    assert "requires explicit opt-in authorization" in result.stdout
+    assert not (out_root / "capture_001/larql_activation_capture_probe.json").exists()
+
+
+def test_packet_only_authorized_run_writes_four_packet_files(tmp_path):
+    plan_dir = prepare_plan_dir(tmp_path)
+    out_root = tmp_path / "out"
+    result = run_script(
+        "--run-id", "capture_002",
+        "--out-root", out_root,
+        "--correction-delta-plan", plan_dir / "larql_correction_delta_plan.json",
+        "--authorize-larql-activation-capture-probe",
+    )
+    assert result.returncode == 0
+    out_dir = out_root / "capture_002"
+    for name in [
+        "larql_activation_capture_probe.json",
+        "activation_capture_plan.json",
+        "activation_capture_boundary.md",
+        "activation_capture_review_packet.md",
+    ]:
+        assert (out_dir / name).exists()
+
+
+def test_packet_only_run_does_not_require_torch_or_transformers(tmp_path):
+    plan_dir = prepare_plan_dir(tmp_path)
+    out_root = tmp_path / "out"
+    result = run_script(
+        "--run-id", "capture_003",
+        "--out-root", out_root,
+        "--correction-delta-plan", plan_dir / "larql_correction_delta_plan.json",
+        "--authorize-larql-activation-capture-probe",
+    )
+    assert result.returncode == 0
+
+
+def test_packet_json_has_required_boundary_fields(tmp_path):
+    plan_dir = prepare_plan_dir(tmp_path)
+    out_root = tmp_path / "out"
+    run_script(
+        "--run-id", "capture_004",
+        "--out-root", out_root,
+        "--correction-delta-plan", plan_dir / "larql_correction_delta_plan.json",
+        "--authorize-larql-activation-capture-probe",
+    )
+    payload = json.loads((out_root / "capture_004/larql_activation_capture_probe.json").read_text(encoding="utf-8"))
+    assert payload["report_type"] == "larql_activation_capture_probe.v0"
+    assert payload["larql_core_path"] is True
+    assert payload["model_inference_performed"] is False
+    assert payload["activation_records_written"] is False
+    assert payload["activation_summary_written"] is False
+    assert payload["weight_edit_performed"] is False
+    assert payload["delta_artifact_written"] is False
+    assert payload["patched_model_materialized"] is False
+    assert payload["training_performed"] is False
+    assert payload["adapter_baseline_path"] is False
+    assert payload["promotion_authorized"] is False
+    assert payload["automatic_failure_to_curriculum_capture_authorized"] is False
+
+
+def test_inference_requested_without_model_authorization_is_blocked_and_writes_no_activation_records(tmp_path):
+    plan_dir = prepare_plan_dir(tmp_path)
+    out_root = tmp_path / "out"
+    result = run_script(
+        "--run-id", "capture_005",
+        "--out-root", out_root,
+        "--correction-delta-plan", plan_dir / "larql_correction_delta_plan.json",
+        "--authorize-larql-activation-capture-probe",
+        "--run-inference",
+    )
+    assert result.returncode != 0
+    out_dir = out_root / "capture_005"
+    assert not (out_dir / "activation_records.jsonl").exists()
+    assert not (out_dir / "activation_summary.json").exists()
+
+
+def test_missing_model_stack_with_inference_authorization_is_blocked_cleanly(tmp_path, monkeypatch):
+    from local_harness import larql_activation_capture_probe as mod
+
+    plan_dir = prepare_plan_dir(tmp_path)
+    out_root = tmp_path / "out"
+    monkeypatch.setattr(mod, "inference_stack_available", lambda: False)
+    record = mod.write_probe(
+        run_id="capture_006",
+        out_root=out_root,
+        correction_delta_plan_path=plan_dir / "larql_correction_delta_plan.json",
+        base_model_path=tmp_path / "missing_model",
+        target_module=None,
+        target_layer=None,
+        target_module_family=None,
+        probe_pairs_path=None,
+        authorize_larql_activation_capture_probe=True,
+        run_inference=True,
+        authorize_model_inference=True,
+    )
+    assert record["source_plan_status"] == "blocked_missing_model_stack"
+    assert record["model_inference_performed"] is False
+    assert record["activation_records_written"] is False
+    assert record["activation_summary_written"] is False
+
+
+def test_module_name_normalization_strips_trailing_weight():
+    from local_harness.larql_activation_capture_probe import normalize_module_name
+
+    assert normalize_module_name("model.layers.0.mlp.down_proj.weight") == "model.layers.0.mlp.down_proj"
+    assert normalize_module_name("model.layers.0.mlp.down_proj") == "model.layers.0.mlp.down_proj"
+
+
+def test_activation_summary_helper_computes_basic_stats():
+    from local_harness.larql_activation_capture_probe import summarize_activation_stats
+
+    stats = summarize_activation_stats([1.0, -1.0, 3.0], dtype="mock_float")
+    assert stats["activation_shape"] == [3]
+    assert stats["activation_dtype"] == "mock_float"
+    assert isinstance(stats["activation_norm"], float)
+    assert isinstance(stats["activation_mean"], float)
+    assert isinstance(stats["activation_std"], float)
+    assert isinstance(stats["activation_abs_max"], float)
+
+
+def test_no_real_inference_is_run_in_tests():
+    script_text = SCRIPT.read_text(encoding="utf-8")
+    assert "AutoModelForCausalLM" in script_text
