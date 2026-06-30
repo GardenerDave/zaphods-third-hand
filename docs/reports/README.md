@@ -132,7 +132,10 @@ does not establish production readiness.
   and `LARQL_DIRECT_LAYER_EDIT_REAUDITION_2026-06-29.md` for the supervised
   reaudition packet and optional local comparison path for an effective patched
   model copy, and `LARQL_DIRECT_LAYER_EDIT_REAUDITION_REVIEW_2026-06-29.md`
-  for the first supervised review of the base-vs-patched comparison evidence.
+  for the first supervised review of the base-vs-patched comparison evidence,
+  and `LARQL_CORRECTION_DELTA_PLAN_2026-06-30.md` for the first packet-only
+  planning scaffold that moves from a mechanically proven direct edit toward a
+  behavior-derived correction delta.
 
 ## Safety Reminder
 
