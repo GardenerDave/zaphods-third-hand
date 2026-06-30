@@ -138,7 +138,10 @@ does not establish production readiness.
   behavior-derived correction delta, and
   `LARQL_ACTIVATION_CAPTURE_PROBE_2026-06-30.md` for the first packet-only
   activation capture stage that prepares behavior-derived correction evidence
-  without writing any weight deltas.
+  without writing any weight deltas, and
+  `LARQL_PATCHED_MODEL_REAUDITION_2026-06-30.md` for the first separately
+  authorized inference comparison between a base model and a patched model copy
+  on the bounded LARQL probe set.
 
 ## Safety Reminder
 
