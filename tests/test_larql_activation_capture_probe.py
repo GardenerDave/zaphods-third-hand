@@ -553,6 +553,11 @@ def test_authorized_prompt_forward_compact_vector_run_writes_compact_vectors(tmp
                     "vector_length": 2,
                     "prompt_last_token_vector": [0.25, -0.25],
                     "prompt_mean_pool_vector": [0.5, -0.5],
+                    "input_vector_dtype": "float32",
+                    "input_prompt_sequence_length": 3,
+                    "input_vector_length": 4,
+                    "prompt_last_token_input_vector": [1.0, 0.0, -1.0, 0.5],
+                    "prompt_mean_pool_input_vector": [0.5, 0.25, -0.5, 0.125],
                     "raw_output_preserved": True,
                     "model_output_text_sha256": "abc123",
                     "generation_output_role": "audit_text_only",
@@ -589,8 +594,12 @@ def test_authorized_prompt_forward_compact_vector_run_writes_compact_vectors(tmp
     assert row["prompt_last_token_vector"] == [0.25, -0.25]
     assert row["prompt_mean_pool_vector"] == [0.5, -0.5]
     assert row["vector_length"] == 2
+    assert row["prompt_last_token_input_vector"] == [1.0, 0.0, -1.0, 0.5]
+    assert row["prompt_mean_pool_input_vector"] == [0.5, 0.25, -0.5, 0.125]
+    assert row["input_vector_length"] == 4
     assert "activation_shape" not in row
     assert "full_sequence_tensor" not in row
+    assert "full_input_sequence_tensor" not in row
 
 
 def test_successful_generation_step_mocked_run_reports_generation_flags(tmp_path, monkeypatch):
@@ -704,6 +713,7 @@ def test_compact_vector_fields_remain_unwritten_without_authorized_compact_vecto
     assert record["compact_vectors_path"] is None
     assert record["promotion_authorized"] is False
     assert record["automatic_failure_to_curriculum_capture_authorized"] is False
+    assert not (out_root / "capture_011b/compact_prompt_vectors.jsonl").exists()
 
 
 def test_prompt_forward_capture_isolated_from_audit_generation():

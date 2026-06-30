@@ -401,6 +401,11 @@ def write_compact_vectors(
                 "vector_length": len(row["_prompt_last_token_vector"]),
                 "prompt_last_token_vector": row["_prompt_last_token_vector"],
                 "prompt_mean_pool_vector": row["_prompt_mean_pool_vector"],
+                "input_vector_dtype": row["_input_activation_dtype"],
+                "input_prompt_sequence_length": row["_input_prompt_sequence_length"],
+                "input_vector_length": len(row["_prompt_last_token_input_vector"]),
+                "prompt_last_token_input_vector": row["_prompt_last_token_input_vector"],
+                "prompt_mean_pool_input_vector": row["_prompt_mean_pool_input_vector"],
                 "raw_output_preserved": True,
                 "model_output_text_sha256": hash_text_sha256(row["model_output_text"]),
                 "generation_output_role": "audit_text_only",
@@ -469,7 +474,38 @@ def extract_captured_tensor_record(captured: list[dict[str, Any]]) -> dict[str, 
         "shape": list(latest["shape"]),
         "dtype": str(latest["dtype"]),
         "tensor": latest["tensor"].clone() if hasattr(latest["tensor"], "clone") else latest["tensor"],
+        "input_shape": list(latest["input_shape"]) if latest.get("input_shape") is not None else None,
+        "input_dtype": str(latest["input_dtype"]) if latest.get("input_dtype") is not None else None,
+        "input_tensor": (
+            latest["input_tensor"].clone() if hasattr(latest.get("input_tensor"), "clone") else latest.get("input_tensor")
+        ),
     }
+
+
+def derive_prompt_vectors_from_nested(
+    nested: list[Any],
+    *,
+    dtype: str,
+) -> tuple[dict[str, Any], list[float], list[float]]:
+    vector_stats = summarize_prompt_side_vectors(
+        nested,
+        dtype=dtype,
+    )
+    if len(vector_stats["activation_shape"]) == 3:
+        seq_len = len(nested[0])
+        hidden = len(nested[0][0])
+        prompt_last_token_vector = list(nested[0][-1])
+        prompt_mean_pool_vector = [
+            sum(float(nested[0][seq_idx][hidden_idx]) for seq_idx in range(seq_len)) / seq_len
+            for hidden_idx in range(hidden)
+        ]
+    elif len(vector_stats["activation_shape"]) == 2:
+        prompt_last_token_vector = list(nested[0])
+        prompt_mean_pool_vector = list(nested[0])
+    else:
+        prompt_last_token_vector = list(nested)
+        prompt_mean_pool_vector = list(nested)
+    return vector_stats, prompt_last_token_vector, prompt_mean_pool_vector
 
 
 def capture_prompt_forward_activation(
@@ -482,13 +518,24 @@ def capture_prompt_forward_activation(
 
     def hook(_module: Any, _inputs: Any, output: Any) -> None:
         tensor = output[0] if isinstance(output, tuple) else output
+        module_input = _inputs[0] if isinstance(_inputs, tuple) and _inputs else None
         if hasattr(tensor, "detach"):
             tensor = tensor.detach().float().cpu()
+            input_tensor = None
+            input_shape = None
+            input_dtype = None
+            if hasattr(module_input, "detach"):
+                input_tensor = module_input.detach().float().cpu()
+                input_shape = list(input_tensor.shape)
+                input_dtype = str(input_tensor.dtype).replace("torch.", "")
             captured.append(
                 {
                     "shape": list(tensor.shape),
                     "dtype": str(tensor.dtype).replace("torch.", ""),
                     "tensor": tensor,
+                    "input_shape": input_shape,
+                    "input_dtype": input_dtype,
+                    "input_tensor": input_tensor,
                 }
             )
 
@@ -597,24 +644,30 @@ def perform_activation_capture(
                 raise ValueError(f"unsupported capture mode: {capture_mode}")
             tensor = stats["tensor"]
             nested = tensor.tolist()
-            vector_stats = summarize_prompt_side_vectors(
+            vector_stats, prompt_last_token_vector, prompt_mean_pool_vector = derive_prompt_vectors_from_nested(
                 nested,
                 dtype=stats["dtype"],
             )
-            if len(vector_stats["activation_shape"]) == 3:
-                seq_len = len(nested[0])
-                hidden = len(nested[0][0])
-                prompt_last_token_vector = list(nested[0][-1])
-                prompt_mean_pool_vector = [
-                    sum(float(nested[0][seq_idx][hidden_idx]) for seq_idx in range(seq_len)) / seq_len
-                    for hidden_idx in range(hidden)
-                ]
-            elif len(vector_stats["activation_shape"]) == 2:
-                prompt_last_token_vector = list(nested[0])
-                prompt_mean_pool_vector = list(nested[0])
+            input_vector_stats = None
+            prompt_last_token_input_vector: list[float] | None = None
+            prompt_mean_pool_input_vector: list[float] | None = None
+            if stats.get("input_tensor") is not None and stats.get("input_dtype") is not None:
+                input_nested = stats["input_tensor"].tolist()
+                (
+                    input_vector_stats,
+                    prompt_last_token_input_vector,
+                    prompt_mean_pool_input_vector,
+                ) = derive_prompt_vectors_from_nested(
+                    input_nested,
+                    dtype=str(stats["input_dtype"]),
+                )
             else:
-                prompt_last_token_vector = list(nested)
-                prompt_mean_pool_vector = list(nested)
+                prompt_last_token_input_vector = []
+                prompt_mean_pool_input_vector = []
+                input_vector_stats = {
+                    "activation_dtype": None,
+                    "prompt_sequence_length": None,
+                }
             row = {
                 "probe_id": pair["probe_id"],
                 "side": side_key,
@@ -646,6 +699,10 @@ def perform_activation_capture(
                 "raw_output_preserved": True,
                 "_prompt_last_token_vector": prompt_last_token_vector,
                 "_prompt_mean_pool_vector": prompt_mean_pool_vector,
+                "_input_activation_dtype": input_vector_stats["activation_dtype"],
+                "_input_prompt_sequence_length": input_vector_stats["prompt_sequence_length"],
+                "_prompt_last_token_input_vector": prompt_last_token_input_vector,
+                "_prompt_mean_pool_input_vector": prompt_mean_pool_input_vector,
             }
             rows.append(row)
 
