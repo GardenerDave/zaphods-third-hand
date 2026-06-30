@@ -73,6 +73,140 @@ def load_probe_pairs(path: Path | None) -> list[dict[str, Any]]:
     return payload
 
 
+def _scalar_summary(values: list[float]) -> dict[str, float]:
+    if not values:
+        raise ValueError("values must be non-empty")
+    count = len(values)
+    mean = sum(values) / count
+    variance = sum((value - mean) ** 2 for value in values) / count
+    norm = math.sqrt(sum(value * value for value in values))
+    return {
+        "norm": norm,
+        "mean": mean,
+        "std": math.sqrt(variance),
+        "abs_max": max(abs(value) for value in values),
+    }
+
+
+def summarize_prompt_side_vectors(
+    tensor_data: Any,
+    *,
+    dtype: str = "mock_float",
+) -> dict[str, Any]:
+    if not isinstance(tensor_data, list) or not tensor_data:
+        raise ValueError("tensor_data must be a non-empty list")
+
+    if isinstance(tensor_data[0], list):
+        if tensor_data and isinstance(tensor_data[0], list) and tensor_data[0] and isinstance(tensor_data[0][0], list):
+            batch = tensor_data
+            batch_size = len(batch)
+            seq_len = len(batch[0])
+            hidden_size = len(batch[0][0])
+            last_token_values = list(batch[0][-1])
+            mean_pool_values = [
+                sum(batch[0][seq_idx][hidden_idx] for seq_idx in range(seq_len)) / seq_len
+                for hidden_idx in range(hidden_size)
+            ]
+            shape = [batch_size, seq_len, hidden_size]
+            prompt_sequence_length = seq_len
+        else:
+            batch = tensor_data
+            batch_size = len(batch)
+            hidden_size = len(batch[0])
+            last_token_values = list(batch[0])
+            mean_pool_values = list(batch[0])
+            shape = [batch_size, hidden_size]
+            prompt_sequence_length = 1
+    else:
+        hidden_size = len(tensor_data)
+        last_token_values = list(tensor_data)
+        mean_pool_values = list(tensor_data)
+        shape = [hidden_size]
+        prompt_sequence_length = 1
+
+    last_stats = _scalar_summary([float(value) for value in last_token_values])
+    mean_stats = _scalar_summary([float(value) for value in mean_pool_values])
+    full_stats = _scalar_summary([float(value) for value in last_token_values])
+    return {
+        "activation_shape": shape,
+        "activation_dtype": dtype,
+        "activation_norm": full_stats["norm"],
+        "activation_mean": full_stats["mean"],
+        "activation_std": full_stats["std"],
+        "activation_abs_max": full_stats["abs_max"],
+        "prompt_sequence_length": prompt_sequence_length,
+        "prompt_last_token_norm": last_stats["norm"],
+        "prompt_last_token_mean": last_stats["mean"],
+        "prompt_last_token_std": last_stats["std"],
+        "prompt_last_token_abs_max": last_stats["abs_max"],
+        "prompt_mean_pool_norm": mean_stats["norm"],
+        "prompt_mean_pool_mean": mean_stats["mean"],
+        "prompt_mean_pool_std": mean_stats["std"],
+        "prompt_mean_pool_abs_max": mean_stats["abs_max"],
+    }
+
+
+def cosine_similarity(a: list[float], b: list[float]) -> float | None:
+    if len(a) != len(b) or not a:
+        return None
+    dot = sum(x * y for x, y in zip(a, b))
+    a_norm = math.sqrt(sum(x * x for x in a))
+    b_norm = math.sqrt(sum(y * y for y in b))
+    if a_norm == 0.0 or b_norm == 0.0:
+        return None
+    return dot / (a_norm * b_norm)
+
+
+def compare_probe_pair(failure: dict[str, Any], correction: dict[str, Any]) -> dict[str, Any]:
+    last_cos = None
+    mean_cos = None
+    if isinstance(failure.get("_prompt_last_token_vector"), list) and isinstance(correction.get("_prompt_last_token_vector"), list):
+        last_cos = cosine_similarity(
+            [float(v) for v in failure["_prompt_last_token_vector"]],
+            [float(v) for v in correction["_prompt_last_token_vector"]],
+        )
+    if isinstance(failure.get("_prompt_mean_pool_vector"), list) and isinstance(correction.get("_prompt_mean_pool_vector"), list):
+        mean_cos = cosine_similarity(
+            [float(v) for v in failure["_prompt_mean_pool_vector"]],
+            [float(v) for v in correction["_prompt_mean_pool_vector"]],
+        )
+
+    prompt_side_ok = bool(failure.get("prompt_side_activation_captured")) and bool(correction.get("prompt_side_activation_captured"))
+    evidence_quality = "failed_prompt_capture"
+    if prompt_side_ok:
+        if last_cos is not None or mean_cos is not None:
+            evidence_quality = "usable_prompt_signal"
+        else:
+            evidence_quality = "unclear_prompt_signal"
+    return {
+        "probe_id": failure["probe_id"],
+        "prompt_last_token_norm_difference": abs(float(correction["prompt_last_token_norm"]) - float(failure["prompt_last_token_norm"])),
+        "prompt_last_token_cosine_similarity": last_cos,
+        "prompt_mean_pool_norm_difference": abs(float(correction["prompt_mean_pool_norm"]) - float(failure["prompt_mean_pool_norm"])),
+        "prompt_mean_pool_cosine_similarity": mean_cos,
+        "prompt_sequence_length_difference": abs(int(correction["prompt_sequence_length"]) - int(failure["prompt_sequence_length"])),
+        "evidence_quality": evidence_quality,
+    }
+
+
+def classify_prompt_signal(per_probe: list[dict[str, Any]]) -> dict[str, Any]:
+    usable = sum(1 for item in per_probe if item.get("evidence_quality") == "usable_prompt_signal")
+    unclear = sum(1 for item in per_probe if item.get("evidence_quality") == "unclear_prompt_signal")
+    failed = sum(1 for item in per_probe if item.get("evidence_quality") == "failed_prompt_capture")
+    if usable > 0:
+        status = "prompt_signal_detected"
+    elif unclear > 0:
+        status = "prompt_signal_unclear"
+    else:
+        status = "prompt_capture_failed"
+    return {
+        "usable_prompt_signal_count": usable,
+        "unclear_prompt_signal_count": unclear,
+        "failed_prompt_capture_count": failed,
+        "selected_candidate_direction_status": status,
+    }
+
+
 def build_activation_capture_plan(
     *,
     selected_method: str,
@@ -89,6 +223,10 @@ def build_activation_capture_plan(
         "target_layer": target_layer,
         "target_module_family": target_module_family,
         "intended_capture_point": normalize_module_name(target_module),
+        "default_capture_mode": "prompt_forward",
+        "available_capture_modes": ["prompt_forward", "generation_step"],
+        "generation_output_role": "audit_text_only",
+        "delta_evidence_source": "prompt_side_activation",
         "model_inference_authorization_required": True,
         "weight_mutation_authorized": False,
         "delta_artifact_authorized": False,
@@ -192,6 +330,9 @@ def build_probe_record(
     model_inference_performed: bool,
     activation_records_written: bool,
     activation_summary_written: bool,
+    capture_mode: str,
+    prompt_side_activation_captured: bool,
+    generation_step_activation_captured: bool,
 ) -> dict[str, Any]:
     return {
         "report_type": REPORT_TYPE,
@@ -203,6 +344,9 @@ def build_probe_record(
         "target_layer": target_layer,
         "target_module_family": target_module_family,
         "activation_capture_authorized": True,
+        "capture_mode": capture_mode,
+        "prompt_side_activation_captured": prompt_side_activation_captured,
+        "generation_step_activation_captured": generation_step_activation_captured,
         "model_inference_requested": model_inference_requested,
         "model_inference_performed": model_inference_performed,
         "activation_records_written": activation_records_written,
@@ -247,6 +391,30 @@ def load_selected_method(plan_path: Path) -> str:
     return str(selection_plan.get("recommended_method", "undecided"))
 
 
+def generate_audit_text(
+    *,
+    model: Any,
+    tokenizer: Any,
+    prompt: str,
+) -> str:
+    import torch
+
+    inputs = tokenizer(prompt, return_tensors="pt")
+    generate_kwargs = {
+        **inputs,
+        "do_sample": False,
+        "max_new_tokens": 256,
+    }
+    eos_token_id = getattr(tokenizer, "eos_token_id", None)
+    if eos_token_id is not None:
+        generate_kwargs["pad_token_id"] = eos_token_id
+    with torch.no_grad():
+        output_ids = model.generate(**generate_kwargs)
+    input_len = inputs["input_ids"].shape[-1]
+    new_tokens = output_ids[0][input_len:]
+    return tokenizer.decode(new_tokens, skip_special_tokens=True).strip()
+
+
 def perform_activation_capture(
     *,
     base_model_path: Path,
@@ -256,6 +424,7 @@ def perform_activation_capture(
     probe_pairs: list[dict[str, Any]],
     records_path: Path,
     summary_path: Path,
+    capture_mode: str,
 ) -> tuple[bool, bool]:
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -287,10 +456,7 @@ def perform_activation_capture(
                 {
                     "shape": list(tensor.shape),
                     "dtype": str(tensor.dtype).replace("torch.", ""),
-                    "norm": float(torch.linalg.vector_norm(tensor).item()),
-                    "mean": float(tensor.mean().item()),
-                    "std": float(tensor.std(unbiased=False).item()),
-                    "abs_max": float(tensor.abs().max().item()),
+                    "tensor": tensor,
                 }
             )
 
@@ -301,40 +467,82 @@ def perform_activation_capture(
                 captured.clear()
                 prompt = str(pair[prompt_key])
                 inputs = tokenizer(prompt, return_tensors="pt")
-                generate_kwargs = {
-                    **inputs,
-                    "do_sample": False,
-                    "max_new_tokens": 256,
-                }
-                eos_token_id = getattr(tokenizer, "eos_token_id", None)
-                if eos_token_id is not None:
-                    generate_kwargs["pad_token_id"] = eos_token_id
-                with torch.no_grad():
-                    output_ids = model.generate(**generate_kwargs)
-                input_len = inputs["input_ids"].shape[-1]
-                new_tokens = output_ids[0][input_len:]
-                text = tokenizer.decode(new_tokens, skip_special_tokens=True).strip()
+                text = ""
+                prompt_side_activation_captured = False
+                generation_step_activation_captured = False
+                if capture_mode == "prompt_forward":
+                    with torch.no_grad():
+                        model(**inputs)
+                    prompt_side_activation_captured = bool(captured)
+                    text = generate_audit_text(model=model, tokenizer=tokenizer, prompt=prompt)
+                elif capture_mode == "generation_step":
+                    text = generate_audit_text(model=model, tokenizer=tokenizer, prompt=prompt)
+                    generation_step_activation_captured = bool(captured)
+                else:
+                    raise ValueError(f"unsupported capture mode: {capture_mode}")
                 if not captured:
                     raise ValueError("activation hook captured no outputs")
                 stats = captured[-1]
+                tensor = stats["tensor"]
+                nested = tensor.tolist()
+                vector_stats = summarize_prompt_side_vectors(
+                    nested,
+                    dtype=stats["dtype"],
+                )
+                if vector_stats["prompt_sequence_length"] > 1:
+                    prompt_side_activation_captured = capture_mode == "prompt_forward"
+                elif capture_mode == "generation_step":
+                    generation_step_activation_captured = True
+                prompt_last_token_vector = (
+                    list(nested[0][-1]) if len(vector_stats["activation_shape"]) == 3 else
+                    (list(nested[0]) if len(vector_stats["activation_shape"]) == 2 else list(nested))
+                )
+                if len(vector_stats["activation_shape"]) == 3:
+                    seq_len = len(nested[0])
+                    hidden = len(nested[0][0])
+                    prompt_mean_pool_vector = [
+                        sum(float(nested[0][seq_idx][hidden_idx]) for seq_idx in range(seq_len)) / seq_len
+                        for hidden_idx in range(hidden)
+                    ]
+                elif len(vector_stats["activation_shape"]) == 2:
+                    prompt_mean_pool_vector = list(nested[0])
+                else:
+                    prompt_mean_pool_vector = list(nested)
                 row = {
                     "probe_id": pair["probe_id"],
                     "side": side_key,
                     "target_module": target_module,
                     "target_layer": target_layer,
-                    "activation_shape": stats["shape"],
-                    "activation_dtype": stats["dtype"],
-                    "activation_norm": stats["norm"],
-                    "activation_mean": stats["mean"],
-                    "activation_std": stats["std"],
-                    "activation_abs_max": stats["abs_max"],
+                    "activation_shape": vector_stats["activation_shape"],
+                    "activation_dtype": vector_stats["activation_dtype"],
+                    "activation_norm": vector_stats["activation_norm"],
+                    "activation_mean": vector_stats["activation_mean"],
+                    "activation_std": vector_stats["activation_std"],
+                    "activation_abs_max": vector_stats["activation_abs_max"],
+                    "capture_mode": capture_mode,
+                    "prompt_side_activation_captured": prompt_side_activation_captured,
+                    "generation_step_activation_captured": generation_step_activation_captured,
+                    "prompt_sequence_length": vector_stats["prompt_sequence_length"],
+                    "prompt_last_token_norm": vector_stats["prompt_last_token_norm"],
+                    "prompt_last_token_mean": vector_stats["prompt_last_token_mean"],
+                    "prompt_last_token_std": vector_stats["prompt_last_token_std"],
+                    "prompt_last_token_abs_max": vector_stats["prompt_last_token_abs_max"],
+                    "prompt_mean_pool_norm": vector_stats["prompt_mean_pool_norm"],
+                    "prompt_mean_pool_mean": vector_stats["prompt_mean_pool_mean"],
+                    "prompt_mean_pool_std": vector_stats["prompt_mean_pool_std"],
+                    "prompt_mean_pool_abs_max": vector_stats["prompt_mean_pool_abs_max"],
                     "prompt_token_count": int(inputs["input_ids"].shape[-1]),
                     "model_output_text": text,
                     "raw_output_preserved": True,
+                    "_prompt_last_token_vector": prompt_last_token_vector,
+                    "_prompt_mean_pool_vector": prompt_mean_pool_vector,
                 }
                 rows.append(row)
         records_path.write_text(
-            "\n".join(json.dumps(row, sort_keys=True) for row in rows) + "\n",
+            "\n".join(
+                json.dumps({k: v for k, v in row.items() if not k.startswith("_")}, sort_keys=True)
+                for row in rows
+            ) + "\n",
             encoding="utf-8",
         )
 
@@ -342,34 +550,45 @@ def perform_activation_capture(
         for row in rows:
             by_probe.setdefault(row["probe_id"], {})[row["side"]] = row
         per_probe = []
-        diff_values: list[float] = []
+        last_norm_diffs: list[float] = []
+        mean_norm_diffs: list[float] = []
+        last_cosines: list[float] = []
+        mean_cosines: list[float] = []
         for probe_id, pair_rows in by_probe.items():
             failure = pair_rows.get("failure")
             correction = pair_rows.get("correction")
             if failure is None or correction is None:
                 continue
-            norm_diff = abs(float(correction["activation_norm"]) - float(failure["activation_norm"]))
-            mean_diff = abs(float(correction["activation_mean"]) - float(failure["activation_mean"]))
-            per_probe.append(
-                {
-                    "probe_id": probe_id,
-                    "norm_difference": norm_diff,
-                    "mean_difference": mean_diff,
-                }
-            )
-            diff_values.append(norm_diff)
-        aggregate_mean_difference = sum(diff_values) / len(diff_values) if diff_values else 0.0
+            comparison = compare_probe_pair(failure, correction)
+            per_probe.append(comparison)
+            last_norm_diffs.append(float(comparison["prompt_last_token_norm_difference"]))
+            mean_norm_diffs.append(float(comparison["prompt_mean_pool_norm_difference"]))
+            if comparison["prompt_last_token_cosine_similarity"] is not None:
+                last_cosines.append(float(comparison["prompt_last_token_cosine_similarity"]))
+            if comparison["prompt_mean_pool_cosine_similarity"] is not None:
+                mean_cosines.append(float(comparison["prompt_mean_pool_cosine_similarity"]))
+        classification = classify_prompt_signal(per_probe)
         summary = {
             "selected_method": "activation_difference_direction",
             "target_module": target_module,
             "target_layer": target_layer,
             "target_module_family": target_module_family,
             "per_probe_differences": per_probe,
-            "aggregate_mean_difference": aggregate_mean_difference,
-            "aggregate_cosine_similarity": None,
-            "selected_candidate_direction_status": (
-                "activation_signal_detected" if aggregate_mean_difference > 0.0 else "activation_signal_unclear"
+            "aggregate_mean_difference": sum(last_norm_diffs) / len(last_norm_diffs) if last_norm_diffs else 0.0,
+            "aggregate_cosine_similarity": sum(last_cosines) / len(last_cosines) if last_cosines else None,
+            "prompt_last_token_mean_norm_difference": (
+                sum(last_norm_diffs) / len(last_norm_diffs) if last_norm_diffs else 0.0
             ),
+            "prompt_mean_pool_mean_norm_difference": (
+                sum(mean_norm_diffs) / len(mean_norm_diffs) if mean_norm_diffs else 0.0
+            ),
+            "prompt_last_token_mean_cosine_similarity": (
+                sum(last_cosines) / len(last_cosines) if last_cosines else None
+            ),
+            "prompt_mean_pool_mean_cosine_similarity": (
+                sum(mean_cosines) / len(mean_cosines) if mean_cosines else None
+            ),
+            **classification,
             "delta_artifact_recommended": False,
             "required_next_step": REQUIRED_NEXT_STEP,
         }
@@ -392,6 +611,7 @@ def write_probe(
     authorize_larql_activation_capture_probe: bool,
     run_inference: bool,
     authorize_model_inference: bool,
+    capture_mode: str = "prompt_forward",
 ) -> dict[str, Any]:
     require_authorization(authorize_larql_activation_capture_probe)
 
@@ -458,6 +678,7 @@ def write_probe(
                 probe_pairs=probe_pairs,
                 records_path=activation_records_path,
                 summary_path=activation_summary_path,
+                capture_mode=capture_mode,
             )
             model_inference_performed = activation_records_written and activation_summary_written
 
@@ -473,6 +694,9 @@ def write_probe(
         model_inference_performed=model_inference_performed,
         activation_records_written=activation_records_written,
         activation_summary_written=activation_summary_written,
+        capture_mode=capture_mode,
+        prompt_side_activation_captured=(capture_mode == "prompt_forward" and model_inference_performed),
+        generation_step_activation_captured=(capture_mode == "generation_step" and model_inference_performed),
     )
     (out_dir / "larql_activation_capture_probe.json").write_text(
         json.dumps(record, indent=2, sort_keys=True) + "\n",
@@ -491,6 +715,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--target-layer")
     parser.add_argument("--target-module-family")
     parser.add_argument("--probe-pairs-path", type=Path)
+    parser.add_argument(
+        "--capture-mode",
+        choices=["prompt_forward", "generation_step"],
+        default="prompt_forward",
+    )
     parser.add_argument("--authorize-larql-activation-capture-probe", action="store_true")
     parser.add_argument("--run-inference", action="store_true")
     parser.add_argument("--authorize-model-inference", action="store_true")
@@ -512,6 +741,7 @@ def main() -> int:
             authorize_larql_activation_capture_probe=args.authorize_larql_activation_capture_probe,
             run_inference=args.run_inference,
             authorize_model_inference=args.authorize_model_inference,
+            capture_mode=args.capture_mode,
         )
     except (OSError, ValueError, json.JSONDecodeError, KeyError, IndexError, TypeError, AttributeError) as exc:
         print(f"error: {exc}")

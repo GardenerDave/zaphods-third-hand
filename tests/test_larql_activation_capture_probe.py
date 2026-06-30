@@ -179,6 +179,34 @@ def test_packet_only_run_does_not_require_torch_or_transformers(tmp_path):
     assert result.returncode == 0
 
 
+def test_packet_plan_records_default_prompt_forward_mode(tmp_path):
+    plan_dir = prepare_plan_dir(tmp_path)
+    out_root = tmp_path / "out"
+    run_script(
+        "--run-id", "capture_003b",
+        "--out-root", out_root,
+        "--correction-delta-plan", plan_dir / "larql_correction_delta_plan.json",
+        "--authorize-larql-activation-capture-probe",
+    )
+    plan = json.loads((out_root / "capture_003b/activation_capture_plan.json").read_text(encoding="utf-8"))
+    assert plan["default_capture_mode"] == "prompt_forward"
+
+
+def test_activation_capture_plan_includes_available_modes_and_audit_role(tmp_path):
+    plan_dir = prepare_plan_dir(tmp_path)
+    out_root = tmp_path / "out"
+    run_script(
+        "--run-id", "capture_003c",
+        "--out-root", out_root,
+        "--correction-delta-plan", plan_dir / "larql_correction_delta_plan.json",
+        "--authorize-larql-activation-capture-probe",
+    )
+    plan = json.loads((out_root / "capture_003c/activation_capture_plan.json").read_text(encoding="utf-8"))
+    assert plan["available_capture_modes"] == ["prompt_forward", "generation_step"]
+    assert plan["generation_output_role"] == "audit_text_only"
+    assert plan["delta_evidence_source"] == "prompt_side_activation"
+
+
 def test_packet_json_has_required_boundary_fields(tmp_path):
     plan_dir = prepare_plan_dir(tmp_path)
     out_root = tmp_path / "out"
@@ -201,6 +229,7 @@ def test_packet_json_has_required_boundary_fields(tmp_path):
     assert payload["adapter_baseline_path"] is False
     assert payload["promotion_authorized"] is False
     assert payload["automatic_failure_to_curriculum_capture_authorized"] is False
+    assert payload["capture_mode"] == "prompt_forward"
 
 
 def test_inference_requested_without_model_authorization_is_blocked_and_writes_no_activation_records(tmp_path):
@@ -251,16 +280,82 @@ def test_module_name_normalization_strips_trailing_weight():
     assert normalize_module_name("model.layers.0.mlp.down_proj") == "model.layers.0.mlp.down_proj"
 
 
-def test_activation_summary_helper_computes_basic_stats():
-    from local_harness.larql_activation_capture_probe import summarize_activation_stats
+def test_prompt_side_summary_for_batch_seq_hidden_returns_last_token_and_mean_pool():
+    from local_harness.larql_activation_capture_probe import summarize_prompt_side_vectors
 
-    stats = summarize_activation_stats([1.0, -1.0, 3.0], dtype="mock_float")
-    assert stats["activation_shape"] == [3]
+    stats = summarize_prompt_side_vectors(
+        [[[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]]],
+        dtype="mock_float",
+    )
+    assert stats["activation_shape"] == [1, 3, 2]
     assert stats["activation_dtype"] == "mock_float"
-    assert isinstance(stats["activation_norm"], float)
-    assert isinstance(stats["activation_mean"], float)
-    assert isinstance(stats["activation_std"], float)
-    assert isinstance(stats["activation_abs_max"], float)
+    assert stats["prompt_sequence_length"] == 3
+    assert isinstance(stats["prompt_last_token_norm"], float)
+    assert isinstance(stats["prompt_mean_pool_norm"], float)
+
+
+def test_prompt_side_summary_for_batch_hidden_treats_as_both_last_token_and_mean_pool():
+    from local_harness.larql_activation_capture_probe import summarize_prompt_side_vectors
+
+    stats = summarize_prompt_side_vectors([[1.0, 2.0, 3.0]], dtype="mock_float")
+    assert stats["activation_shape"] == [1, 3]
+    assert stats["prompt_sequence_length"] == 1
+    assert stats["prompt_last_token_norm"] == stats["prompt_mean_pool_norm"]
+    assert stats["prompt_last_token_mean"] == stats["prompt_mean_pool_mean"]
+
+
+def test_per_probe_comparison_helper_computes_norms_and_cosine():
+    from local_harness.larql_activation_capture_probe import compare_probe_pair
+
+    failure = {
+        "probe_id": "p1",
+        "prompt_side_activation_captured": True,
+        "prompt_last_token_norm": 2.0,
+        "prompt_mean_pool_norm": 1.0,
+        "prompt_sequence_length": 3,
+        "_prompt_last_token_vector": [1.0, 0.0],
+        "_prompt_mean_pool_vector": [0.5, 0.5],
+    }
+    correction = {
+        "probe_id": "p1",
+        "prompt_side_activation_captured": True,
+        "prompt_last_token_norm": 3.0,
+        "prompt_mean_pool_norm": 2.0,
+        "prompt_sequence_length": 4,
+        "_prompt_last_token_vector": [0.0, 1.0],
+        "_prompt_mean_pool_vector": [0.5, -0.5],
+    }
+    result = compare_probe_pair(failure, correction)
+    assert result["prompt_last_token_norm_difference"] == 1.0
+    assert result["prompt_mean_pool_norm_difference"] == 1.0
+    assert result["prompt_sequence_length_difference"] == 1
+    assert isinstance(result["prompt_last_token_cosine_similarity"], float)
+    assert isinstance(result["prompt_mean_pool_cosine_similarity"], float)
+
+
+def test_summary_classifier_detects_prompt_signal():
+    from local_harness.larql_activation_capture_probe import classify_prompt_signal
+
+    result = classify_prompt_signal(
+        [
+            {"evidence_quality": "usable_prompt_signal"},
+            {"evidence_quality": "usable_prompt_signal"},
+            {"evidence_quality": "unclear_prompt_signal"},
+        ]
+    )
+    assert result["selected_candidate_direction_status"] == "prompt_signal_detected"
+
+
+def test_summary_classifier_returns_unclear_when_no_usable_signals():
+    from local_harness.larql_activation_capture_probe import classify_prompt_signal
+
+    result = classify_prompt_signal(
+        [
+            {"evidence_quality": "unclear_prompt_signal"},
+            {"evidence_quality": "failed_prompt_capture"},
+        ]
+    )
+    assert result["selected_candidate_direction_status"] == "prompt_signal_unclear"
 
 
 def test_no_real_inference_is_run_in_tests():

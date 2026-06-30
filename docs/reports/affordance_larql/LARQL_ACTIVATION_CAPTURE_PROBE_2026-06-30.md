@@ -14,12 +14,24 @@ Why activation capture follows the correction delta plan:
 - the next bounded step is to capture failure-versus-correction activation
   evidence at the selected module and layer.
 
+Prompt-side quality gate update:
+
+- the previous activation capture succeeded mechanically;
+- generation-step capture was useful evidence, but it is not enough for
+  correction-derived delta planning by itself;
+- prompt-side capture is now the default mode;
+- generation output is retained as audit text only;
+- prompt-side last-token and mean-pool summaries are now the candidate delta
+  evidence.
+
 What this stage captures:
 
 - a packet describing the selected capture method;
 - the probe ids and prompt-pair count;
 - the intended capture point for the selected module family;
 - the review boundary and the follow-up authorization gate;
+- prompt-side last-token vector summaries;
+- prompt-side mean-pooled vector summaries;
 - when separately authorized outside this Codex task, compact activation
   summary statistics rather than full tensors.
 
@@ -32,6 +44,7 @@ What this stage is not:
 - not LoRA;
 - not PEFT;
 - not model promotion.
+- not a weight edit or delta-writing authorization.
 
 Authority boundaries:
 
