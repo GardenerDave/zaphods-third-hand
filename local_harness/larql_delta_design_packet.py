@@ -161,9 +161,12 @@ def build_delta_design(
     compact_rows: list[dict[str, Any]],
     direction_packet: dict[str, Any],
     source_capture_record: dict[str, Any],
+    vector_source_override: str | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     grouped = group_rows(compact_rows)
-    selected_source = str(direction_packet.get("recommended_vector_source", "none"))
+    original_recommended_vector_source = str(direction_packet.get("recommended_vector_source", "none"))
+    selected_source = vector_source_override or original_recommended_vector_source
+    vector_source_override_used = vector_source_override is not None
     target_module, target_layer, target_module_family = resolve_target_metadata(
         direction_packet,
         source_capture_record,
@@ -178,7 +181,11 @@ def build_delta_design(
         try:
             output_field, input_field = select_vector_fields(selected_source)
             status = "delta_design_reviewable"
-            rationale = "selected vector source produced a reviewable direction basis"
+            rationale = (
+                "supervised alternate-vector-source experiment selected a reviewable direction basis"
+                if vector_source_override_used
+                else "selected vector source produced a reviewable direction basis"
+            )
         except ValueError:
             output_field = input_field = None
             status = "delta_design_rejected"
@@ -247,6 +254,8 @@ def build_delta_design(
 
     design = {
         "selected_vector_source": selected_source,
+        "vector_source_override_used": vector_source_override_used,
+        "original_recommended_vector_source": original_recommended_vector_source,
         "target_module": target_module,
         "target_layer": target_layer,
         "target_module_family": target_module_family,
@@ -266,6 +275,8 @@ def build_delta_design(
     }
     packet = {
         "selected_vector_source": selected_source,
+        "vector_source_override_used": vector_source_override_used,
+        "original_recommended_vector_source": original_recommended_vector_source,
         "target_module": target_module,
         "target_layer": target_layer,
         "target_module_family": target_module_family,
@@ -309,6 +320,8 @@ def render_review_packet(*, packet: dict[str, Any]) -> str:
             "- output-space direction alone is not enough for a weight delta;",
             "- module-input vectors are required to define a rank-1 design candidate;",
             f"- selected vector source: `{packet['selected_vector_source']}`;",
+            f"- vector source override used: `{packet['vector_source_override_used']}`;",
+            f"- original recommended vector source: `{packet['original_recommended_vector_source']}`;",
             f"- proposed delta shape: `{packet['proposed_delta_shape']}`;",
             f"- delta design status: `{packet['delta_design_status']}`;",
             "- no delta artifact is written in this task;",
@@ -327,6 +340,7 @@ def write_packet(
     direction_coherence_report_path: Path,
     source_activation_capture_record_path: Path,
     authorize_larql_delta_design_packet: bool,
+    vector_source_override: str | None = None,
 ) -> dict[str, Any]:
     require_authorization(authorize_larql_delta_design_packet)
     compact_rows = load_jsonl(compact_vectors_path)
@@ -338,6 +352,8 @@ def write_packet(
         source_capture_record=source_capture_record,
         compact_rows=compact_rows,
     )
+    if vector_source_override is not None:
+        select_vector_fields(vector_source_override)
 
     out_dir = out_root / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -345,6 +361,7 @@ def write_packet(
         compact_rows=compact_rows,
         direction_packet=direction_packet,
         source_capture_record=source_capture_record,
+        vector_source_override=vector_source_override,
     )
 
     (out_dir / "rank1_delta_design.json").write_text(
@@ -405,6 +422,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--direction-packet", required=True, type=Path)
     parser.add_argument("--direction-coherence-report", required=True, type=Path)
     parser.add_argument("--source-activation-capture-record", required=True, type=Path)
+    parser.add_argument("--vector-source-override")
     parser.add_argument("--authorize-larql-delta-design-packet", action="store_true")
     return parser.parse_args()
 
@@ -420,6 +438,7 @@ def main() -> int:
             direction_coherence_report_path=args.direction_coherence_report,
             source_activation_capture_record_path=args.source_activation_capture_record,
             authorize_larql_delta_design_packet=args.authorize_larql_delta_design_packet,
+            vector_source_override=args.vector_source_override,
         )
     except (OSError, ValueError, json.JSONDecodeError, KeyError, TypeError) as exc:
         print(f"error: {exc}")

@@ -241,6 +241,8 @@ def test_packet_computes_rank1_design_shape_and_keeps_boundaries_false(tmp_path)
     design = json.loads((out_root / "delta_003/rank1_delta_design.json").read_text(encoding="utf-8"))
     assert payload["report_type"] == "larql_delta_design_packet.v0"
     assert payload["selected_vector_source"] == "prompt_mean_pool"
+    assert payload["vector_source_override_used"] is False
+    assert payload["original_recommended_vector_source"] == "prompt_mean_pool"
     assert payload["target_module"] == "model.layers.0.mlp.down_proj.weight"
     assert payload["target_layer"] == "0"
     assert payload["target_module_family"] == "mlp_projection"
@@ -258,6 +260,50 @@ def test_packet_computes_rank1_design_shape_and_keeps_boundaries_false(tmp_path)
     assert design["rank"] == 1
     assert design["writes_tensor_artifact"] is False
     assert design["target_module"] == "model.layers.0.mlp.down_proj.weight"
+
+
+def test_valid_override_selects_prompt_last_token_and_records_provenance(tmp_path):
+    capture, direction, coherence, compact = prepare_inputs(tmp_path)
+    out_root = tmp_path / "out"
+    result = run_script(
+        "--run-id", "delta_003_override",
+        "--out-root", out_root,
+        "--compact-vectors", compact,
+        "--direction-packet", direction,
+        "--direction-coherence-report", coherence,
+        "--source-activation-capture-record", capture,
+        "--vector-source-override", "prompt_last_token",
+        "--authorize-larql-delta-design-packet",
+    )
+    assert result.returncode == 0
+    payload = json.loads((out_root / "delta_003_override/larql_delta_design_packet.json").read_text(encoding="utf-8"))
+    design = json.loads((out_root / "delta_003_override/rank1_delta_design.json").read_text(encoding="utf-8"))
+    assert payload["selected_vector_source"] == "prompt_last_token"
+    assert payload["vector_source_override_used"] is True
+    assert payload["original_recommended_vector_source"] == "prompt_mean_pool"
+    assert payload["proposed_delta_shape"] == [2, 3]
+    assert design["selected_vector_source"] == "prompt_last_token"
+    assert design["vector_source_override_used"] is True
+    assert design["original_recommended_vector_source"] == "prompt_mean_pool"
+    assert design["writes_tensor_artifact"] is False
+
+
+def test_invalid_override_fails_closed(tmp_path):
+    capture, direction, coherence, compact = prepare_inputs(tmp_path)
+    out_root = tmp_path / "out"
+    result = run_script(
+        "--run-id", "delta_003_invalid_override",
+        "--out-root", out_root,
+        "--compact-vectors", compact,
+        "--direction-packet", direction,
+        "--direction-coherence-report", coherence,
+        "--source-activation-capture-record", capture,
+        "--vector-source-override", "bad_source",
+        "--authorize-larql-delta-design-packet",
+    )
+    assert result.returncode != 0
+    assert "selected vector source must be prompt_last_token or prompt_mean_pool" in result.stdout
+    assert not (out_root / "delta_003_invalid_override/larql_delta_design_packet.json").exists()
 
 
 def test_real_style_direction_packet_without_target_fields_resolves_from_source_capture_record(tmp_path):
