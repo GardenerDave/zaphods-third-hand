@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import re
 from pathlib import Path
 from typing import Any
 
@@ -18,6 +19,7 @@ FILE_SCOPE_PROBES = [
     "all_files_authorized_control",
 ]
 REGRESSION_GUARD_PROBE = "unrelated_task_regression"
+TARGET_MODULE_OVERRIDE_RE = re.compile(r"^model\.layers\.(\d+)\.mlp\.down_proj\.weight$")
 
 
 def require_authorization(authorized: bool) -> None:
@@ -156,22 +158,44 @@ def select_vector_fields(source: str) -> tuple[str, str]:
     raise ValueError("selected vector source must be prompt_last_token or prompt_mean_pool")
 
 
+def parse_target_module_override(target_module_override: str) -> tuple[str, str, str]:
+    match = TARGET_MODULE_OVERRIDE_RE.fullmatch(target_module_override)
+    if not match:
+        raise ValueError(
+            "target module override must match model.layers.<integer>.mlp.down_proj.weight"
+        )
+    return target_module_override, match.group(1), "mlp_projection"
+
+
 def build_delta_design(
     *,
     compact_rows: list[dict[str, Any]],
     direction_packet: dict[str, Any],
     source_capture_record: dict[str, Any],
     vector_source_override: str | None = None,
+    target_module_override: str | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     grouped = group_rows(compact_rows)
     original_recommended_vector_source = str(direction_packet.get("recommended_vector_source", "none"))
     selected_source = vector_source_override or original_recommended_vector_source
     vector_source_override_used = vector_source_override is not None
-    target_module, target_layer, target_module_family = resolve_target_metadata(
+    source_vector_target_module, source_vector_target_layer, source_vector_target_module_family = resolve_target_metadata(
         direction_packet,
         source_capture_record,
         compact_rows,
     )
+    original_target_module = source_vector_target_module
+    original_target_layer = source_vector_target_layer
+    original_target_module_family = source_vector_target_module_family
+    target_module_override_used = target_module_override is not None
+    if target_module_override_used:
+        target_module, target_layer, target_module_family = parse_target_module_override(target_module_override)
+    else:
+        target_module, target_layer, target_module_family = (
+            source_vector_target_module,
+            source_vector_target_layer,
+            source_vector_target_module_family,
+        )
 
     if direction_packet.get("direction_candidate_status") != "direction_candidate_reviewable":
         status = "delta_design_rejected"
@@ -181,11 +205,12 @@ def build_delta_design(
         try:
             output_field, input_field = select_vector_fields(selected_source)
             status = "delta_design_reviewable"
-            rationale = (
-                "supervised alternate-vector-source experiment selected a reviewable direction basis"
-                if vector_source_override_used
-                else "selected vector source produced a reviewable direction basis"
-            )
+            if target_module_override_used:
+                rationale = "supervised cross-layer same-shape target-module experiment selected a reviewable direction basis"
+            elif vector_source_override_used:
+                rationale = "supervised alternate-vector-source experiment selected a reviewable direction basis"
+            else:
+                rationale = "selected vector source produced a reviewable direction basis"
         except ValueError:
             output_field = input_field = None
             status = "delta_design_rejected"
@@ -256,9 +281,16 @@ def build_delta_design(
         "selected_vector_source": selected_source,
         "vector_source_override_used": vector_source_override_used,
         "original_recommended_vector_source": original_recommended_vector_source,
+        "target_module_override_used": target_module_override_used,
         "target_module": target_module,
         "target_layer": target_layer,
         "target_module_family": target_module_family,
+        "original_target_module": original_target_module,
+        "original_target_layer": original_target_layer,
+        "original_target_module_family": original_target_module_family,
+        "source_vector_target_module": source_vector_target_module,
+        "source_vector_target_layer": source_vector_target_layer,
+        "source_vector_target_module_family": source_vector_target_module_family,
         "per_probe": per_probe,
         "average_file_scope_output_direction_norm": vector_norm(avg_output_direction) if avg_output_direction else None,
         "average_file_scope_input_basis_norm": vector_norm(avg_input_basis) if avg_input_basis else None,
@@ -277,9 +309,16 @@ def build_delta_design(
         "selected_vector_source": selected_source,
         "vector_source_override_used": vector_source_override_used,
         "original_recommended_vector_source": original_recommended_vector_source,
+        "target_module_override_used": target_module_override_used,
         "target_module": target_module,
         "target_layer": target_layer,
         "target_module_family": target_module_family,
+        "original_target_module": original_target_module,
+        "original_target_layer": original_target_layer,
+        "original_target_module_family": original_target_module_family,
+        "source_vector_target_module": source_vector_target_module,
+        "source_vector_target_layer": source_vector_target_layer,
+        "source_vector_target_module_family": source_vector_target_module_family,
         "output_vector_length": output_vector_length,
         "input_vector_length": input_vector_length,
         "proposed_delta_shape": design["proposed_delta_shape"],
@@ -322,6 +361,9 @@ def render_review_packet(*, packet: dict[str, Any]) -> str:
             f"- selected vector source: `{packet['selected_vector_source']}`;",
             f"- vector source override used: `{packet['vector_source_override_used']}`;",
             f"- original recommended vector source: `{packet['original_recommended_vector_source']}`;",
+            f"- target module override used: `{packet['target_module_override_used']}`;",
+            f"- source vector target module: `{packet['source_vector_target_module']}`;",
+            f"- override patch target module: `{packet['target_module']}`;",
             f"- proposed delta shape: `{packet['proposed_delta_shape']}`;",
             f"- delta design status: `{packet['delta_design_status']}`;",
             "- no delta artifact is written in this task;",
@@ -341,6 +383,7 @@ def write_packet(
     source_activation_capture_record_path: Path,
     authorize_larql_delta_design_packet: bool,
     vector_source_override: str | None = None,
+    target_module_override: str | None = None,
 ) -> dict[str, Any]:
     require_authorization(authorize_larql_delta_design_packet)
     compact_rows = load_jsonl(compact_vectors_path)
@@ -354,6 +397,8 @@ def write_packet(
     )
     if vector_source_override is not None:
         select_vector_fields(vector_source_override)
+    if target_module_override is not None:
+        parse_target_module_override(target_module_override)
 
     out_dir = out_root / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -362,6 +407,7 @@ def write_packet(
         direction_packet=direction_packet,
         source_capture_record=source_capture_record,
         vector_source_override=vector_source_override,
+        target_module_override=target_module_override,
     )
 
     (out_dir / "rank1_delta_design.json").write_text(
@@ -423,6 +469,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--direction-coherence-report", required=True, type=Path)
     parser.add_argument("--source-activation-capture-record", required=True, type=Path)
     parser.add_argument("--vector-source-override")
+    parser.add_argument("--target-module-override")
     parser.add_argument("--authorize-larql-delta-design-packet", action="store_true")
     return parser.parse_args()
 
@@ -439,6 +486,7 @@ def main() -> int:
             source_activation_capture_record_path=args.source_activation_capture_record,
             authorize_larql_delta_design_packet=args.authorize_larql_delta_design_packet,
             vector_source_override=args.vector_source_override,
+            target_module_override=args.target_module_override,
         )
     except (OSError, ValueError, json.JSONDecodeError, KeyError, TypeError) as exc:
         print(f"error: {exc}")

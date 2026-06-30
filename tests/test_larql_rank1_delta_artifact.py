@@ -30,6 +30,10 @@ def delta_design_packet_payload(*, status: str = "delta_design_reviewable") -> d
         "target_module": "model.layers.0.mlp.down_proj.weight",
         "target_layer": "0",
         "target_module_family": "mlp_projection",
+        "target_module_override_used": False,
+        "source_vector_target_module": "model.layers.0.mlp.down_proj.weight",
+        "source_vector_target_layer": "0",
+        "source_vector_target_module_family": "mlp_projection",
         "output_vector_length": 2,
         "input_vector_length": 3,
         "proposed_delta_shape": [2, 3],
@@ -197,6 +201,31 @@ def test_valid_fixture_writes_record_and_one_tensor_artifact(tmp_path):
     assert artifact_path.exists()
     assert artifact_path.parent == out_dir
     assert not (out_dir / "patched_model").exists()
+
+
+def test_artifact_writer_carries_overridden_target_module_into_record(tmp_path):
+    capture, packet, design, compact = prepare_inputs(tmp_path)
+    packet_payload = json.loads(packet.read_text(encoding="utf-8"))
+    packet_payload["target_module"] = "model.layers.14.mlp.down_proj.weight"
+    packet_payload["target_layer"] = "14"
+    packet_payload["target_module_override_used"] = True
+    write_json(packet, packet_payload)
+    out_root = tmp_path / "out"
+    result = run_script(
+        "--run-id", "artifact_003_override",
+        "--out-root", out_root,
+        "--compact-vectors", compact,
+        "--delta-design-packet", packet,
+        "--rank1-delta-design", design,
+        "--source-activation-capture-record", capture,
+        "--delta-scale", "0.01",
+        "--authorize-larql-rank1-delta-artifact",
+    )
+    assert result.returncode == 0
+    record = json.loads((out_root / "artifact_003_override/larql_rank1_delta_artifact_record.json").read_text(encoding="utf-8"))
+    assert record["target_module"] == "model.layers.14.mlp.down_proj.weight"
+    assert record["target_layer"] == "14"
+    assert record["target_module_family"] == "mlp_projection"
 
 
 def test_no_real_inference_or_model_directory_is_written():
