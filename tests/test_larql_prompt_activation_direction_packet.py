@@ -276,6 +276,9 @@ def test_packet_json_has_required_boundary_fields(tmp_path):
     )
     payload = json.loads((out_root / "direction_003/larql_prompt_activation_direction_packet.json").read_text(encoding="utf-8"))
     assert payload["report_type"] == "larql_prompt_activation_direction_packet.v0"
+    assert payload["target_module"] == "model.layers.0.mlp.down_proj.weight"
+    assert payload["target_layer"] == "0"
+    assert payload["target_module_family"] == "mlp_projection"
     assert payload["model_inference_performed"] is False
     assert payload["weight_edit_performed"] is False
     assert payload["delta_artifact_written"] is False

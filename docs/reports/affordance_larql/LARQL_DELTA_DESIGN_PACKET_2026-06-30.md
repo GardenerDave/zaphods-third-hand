@@ -23,6 +23,15 @@ For a linear projection with `output = input @ W.T`, a rank-1 design needs both:
 
 This stage computes design metadata only. It does not write a safetensors delta, mutate weights, materialize a patched model, or authorize promotion.
 
+Target provenance is resolved deterministically from the strongest available reviewed source:
+
+- direction packet;
+- source activation capture record;
+- compact vector rows;
+- otherwise fail closed.
+
+The packet does not silently continue with `unknown` target metadata.
+
 The design packet may describe a future rank-1 formula:
 
 `delta_W = scale * normalize(output_direction) outer normalize(input_basis)`

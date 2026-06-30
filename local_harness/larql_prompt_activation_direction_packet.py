@@ -299,6 +299,31 @@ def build_direction_candidates(compact_rows: list[dict[str, Any]]) -> tuple[dict
     return direction_candidates, coherence_report
 
 
+def resolve_target_metadata(
+    capture_record: dict[str, Any],
+    compact_rows: list[dict[str, Any]],
+) -> tuple[str, str, str]:
+    for key in ["target_module", "target_layer", "target_module_family"]:
+        value = capture_record.get(key)
+        if value not in (None, "", "unknown"):
+            continue
+        break
+    else:
+        return (
+            str(capture_record["target_module"]),
+            str(capture_record["target_layer"]),
+            str(capture_record["target_module_family"]),
+        )
+
+    for row in compact_rows:
+        module = row.get("target_module")
+        layer = row.get("target_layer")
+        family = row.get("target_module_family")
+        if module not in (None, "", "unknown") and layer not in (None, "", "unknown") and family not in (None, "", "unknown"):
+            return str(module), str(layer), str(family)
+    raise ValueError("unable to resolve target metadata from source activation capture record or compact vectors")
+
+
 def render_risk_register() -> str:
     return "\n".join(
         [
@@ -368,6 +393,10 @@ def write_packet(
         activation_summary=activation_summary,
         compact_rows=compact_rows,
     )
+    target_module, target_layer, target_module_family = resolve_target_metadata(
+        capture_record,
+        compact_rows,
+    )
 
     out_dir = out_root / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -400,6 +429,9 @@ def write_packet(
         "source_activation_capture_record_path": str(source_activation_capture_record_path),
         "source_activation_summary_path": str(activation_summary_path),
         "compact_vectors_path": str(compact_vectors_path),
+        "target_module": target_module,
+        "target_layer": target_layer,
+        "target_module_family": target_module_family,
         "direction_packet_authorized": True,
         "model_inference_performed": False,
         "weight_edit_performed": False,

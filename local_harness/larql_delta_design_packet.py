@@ -96,6 +96,51 @@ def validate_inputs(
         raise ValueError("compact vector rows are required")
 
 
+def resolve_target_metadata(
+    direction_packet: dict[str, Any],
+    source_capture_record: dict[str, Any],
+    compact_rows: list[dict[str, Any]],
+) -> tuple[str, str, str]:
+    compact_target_module = None
+    compact_target_layer = None
+    compact_target_family = None
+    for row in compact_rows:
+        module = row.get("target_module")
+        layer = row.get("target_layer")
+        family = row.get("target_module_family")
+        if module is not None:
+            compact_target_module = str(module)
+        if layer is not None:
+            compact_target_layer = str(layer)
+        if family is not None:
+            compact_target_family = str(family)
+        if compact_target_module and compact_target_layer and compact_target_family:
+            break
+
+    resolved: dict[str, str] = {}
+    for key, compact_value in [
+        ("target_module", compact_target_module),
+        ("target_layer", compact_target_layer),
+        ("target_module_family", compact_target_family),
+    ]:
+        candidates: list[tuple[str, str]] = []
+        packet_value = direction_packet.get(key)
+        if packet_value not in (None, "", "unknown"):
+            candidates.append(("direction_packet", str(packet_value)))
+        capture_value = source_capture_record.get(key)
+        if capture_value not in (None, "", "unknown"):
+            candidates.append(("source_activation_capture_record", str(capture_value)))
+        if compact_value not in (None, "", "unknown"):
+            candidates.append(("compact_vector_rows", str(compact_value)))
+        if not candidates:
+            raise ValueError(f"unable to resolve {key} from direction packet, source capture record, or compact vectors")
+        values = {value for _, value in candidates}
+        if len(values) > 1:
+            raise ValueError(f"{key} provenance mismatch across sources: {candidates}")
+        resolved[key] = candidates[0][1]
+    return resolved["target_module"], resolved["target_layer"], resolved["target_module_family"]
+
+
 def group_rows(compact_rows: list[dict[str, Any]]) -> dict[str, dict[str, dict[str, Any]]]:
     grouped: dict[str, dict[str, dict[str, Any]]] = {}
     for row in compact_rows:
@@ -115,12 +160,15 @@ def build_delta_design(
     *,
     compact_rows: list[dict[str, Any]],
     direction_packet: dict[str, Any],
+    source_capture_record: dict[str, Any],
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     grouped = group_rows(compact_rows)
     selected_source = str(direction_packet.get("recommended_vector_source", "none"))
-    target_module = str(direction_packet.get("target_module", "unknown"))
-    target_layer = str(direction_packet.get("target_layer", "unknown"))
-    target_module_family = str(direction_packet.get("target_module_family", "unknown"))
+    target_module, target_layer, target_module_family = resolve_target_metadata(
+        direction_packet,
+        source_capture_record,
+        compact_rows,
+    )
 
     if direction_packet.get("direction_candidate_status") != "direction_candidate_reviewable":
         status = "delta_design_rejected"
@@ -296,6 +344,7 @@ def write_packet(
     packet_bits, design = build_delta_design(
         compact_rows=compact_rows,
         direction_packet=direction_packet,
+        source_capture_record=source_capture_record,
     )
 
     (out_dir / "rank1_delta_design.json").write_text(

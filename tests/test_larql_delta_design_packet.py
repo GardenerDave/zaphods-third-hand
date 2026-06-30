@@ -20,21 +20,34 @@ def activation_capture_record_payload() -> dict:
         "report_type": "larql_activation_capture_probe.v0",
         "capture_mode": "prompt_forward",
         "compact_vectors_written": True,
+        "target_module": "model.layers.0.mlp.down_proj.weight",
+        "target_layer": "0",
+        "target_module_family": "mlp_projection",
         "larql_core_path": True,
         "adapter_baseline_path": False,
     }
 
 
-def direction_packet_payload(*, selected_source: str = "prompt_mean_pool", status: str = "direction_candidate_reviewable") -> dict:
-    return {
+def direction_packet_payload(
+    *,
+    selected_source: str = "prompt_mean_pool",
+    status: str = "direction_candidate_reviewable",
+    include_target_metadata: bool = True,
+    target_module: str = "model.layers.0.mlp.down_proj.weight",
+    target_layer: str = "0",
+    target_module_family: str = "mlp_projection",
+) -> dict:
+    payload = {
         "report_type": "larql_prompt_activation_direction_packet.v0",
         "direction_candidate_status": status,
         "recommended_vector_source": selected_source,
-        "target_module": "model.layers.0.mlp.down_proj.weight",
-        "target_layer": "0",
-        "target_module_family": "mlp_projection",
         "delta_artifact_recommended": False,
     }
+    if include_target_metadata:
+        payload["target_module"] = target_module
+        payload["target_layer"] = target_layer
+        payload["target_module_family"] = target_module_family
+    return payload
 
 
 def coherence_payload() -> dict:
@@ -115,15 +128,43 @@ def prepare_inputs(
     missing_input: bool = False,
     selected_source: str = "prompt_mean_pool",
     status: str = "direction_candidate_reviewable",
+    include_direction_target_metadata: bool = True,
+    capture_has_target_metadata: bool = True,
+    compact_has_target_metadata: bool = True,
+    direction_target_module: str = "model.layers.0.mlp.down_proj.weight",
+    direction_target_layer: str = "0",
+    direction_target_module_family: str = "mlp_projection",
 ) -> tuple[Path, Path, Path, Path]:
     input_dir = tmp_path / "input"
     input_dir.mkdir()
-    capture = write_json(input_dir / "larql_activation_capture_probe.json", activation_capture_record_payload())
-    direction = write_json(input_dir / "larql_prompt_activation_direction_packet.json", direction_packet_payload(selected_source=selected_source, status=status))
+    capture_payload = activation_capture_record_payload()
+    if not capture_has_target_metadata:
+        capture_payload.pop("target_module", None)
+        capture_payload.pop("target_layer", None)
+        capture_payload.pop("target_module_family", None)
+    capture = write_json(input_dir / "larql_activation_capture_probe.json", capture_payload)
+    direction = write_json(
+        input_dir / "larql_prompt_activation_direction_packet.json",
+        direction_packet_payload(
+            selected_source=selected_source,
+            status=status,
+            include_target_metadata=include_direction_target_metadata,
+            target_module=direction_target_module,
+            target_layer=direction_target_layer,
+            target_module_family=direction_target_module_family,
+        ),
+    )
     coherence = write_json(input_dir / "direction_coherence_report.json", coherence_payload())
+    rows = compact_rows(missing_input=missing_input)
+    if not compact_has_target_metadata:
+        rows = [dict(row) for row in rows]
+        for row in rows:
+            row.pop("target_module", None)
+            row.pop("target_layer", None)
+            row.pop("target_module_family", None)
     compact = input_dir / "compact_prompt_vectors.jsonl"
     compact.write_text(
-        "\n".join(json.dumps(row, sort_keys=True) for row in compact_rows(missing_input=missing_input)) + "\n",
+        "\n".join(json.dumps(row, sort_keys=True) for row in rows) + "\n",
         encoding="utf-8",
     )
     return capture, direction, coherence, compact
@@ -200,6 +241,9 @@ def test_packet_computes_rank1_design_shape_and_keeps_boundaries_false(tmp_path)
     design = json.loads((out_root / "delta_003/rank1_delta_design.json").read_text(encoding="utf-8"))
     assert payload["report_type"] == "larql_delta_design_packet.v0"
     assert payload["selected_vector_source"] == "prompt_mean_pool"
+    assert payload["target_module"] == "model.layers.0.mlp.down_proj.weight"
+    assert payload["target_layer"] == "0"
+    assert payload["target_module_family"] == "mlp_projection"
     assert payload["proposed_delta_shape"] == [2, 3]
     assert payload["delta_design_status"] == "delta_design_reviewable"
     assert payload["model_inference_performed"] is False
@@ -213,6 +257,92 @@ def test_packet_computes_rank1_design_shape_and_keeps_boundaries_false(tmp_path)
     assert payload["delta_artifact_recommended"] is False
     assert design["rank"] == 1
     assert design["writes_tensor_artifact"] is False
+    assert design["target_module"] == "model.layers.0.mlp.down_proj.weight"
+
+
+def test_real_style_direction_packet_without_target_fields_resolves_from_source_capture_record(tmp_path):
+    capture, direction, coherence, compact = prepare_inputs(
+        tmp_path,
+        include_direction_target_metadata=False,
+    )
+    out_root = tmp_path / "out"
+    run_script(
+        "--run-id", "delta_003b",
+        "--out-root", out_root,
+        "--compact-vectors", compact,
+        "--direction-packet", direction,
+        "--direction-coherence-report", coherence,
+        "--source-activation-capture-record", capture,
+        "--authorize-larql-delta-design-packet",
+    )
+    payload = json.loads((out_root / "delta_003b/larql_delta_design_packet.json").read_text(encoding="utf-8"))
+    assert payload["target_module"] == "model.layers.0.mlp.down_proj.weight"
+    assert payload["target_layer"] == "0"
+    assert payload["target_module_family"] == "mlp_projection"
+
+
+def test_direction_source_target_mismatch_fails_closed(tmp_path):
+    capture, direction, coherence, compact = prepare_inputs(
+        tmp_path,
+        direction_target_module="model.layers.1.mlp.down_proj.weight",
+    )
+    out_root = tmp_path / "out"
+    result = run_script(
+        "--run-id", "delta_003c",
+        "--out-root", out_root,
+        "--compact-vectors", compact,
+        "--direction-packet", direction,
+        "--direction-coherence-report", coherence,
+        "--source-activation-capture-record", capture,
+        "--authorize-larql-delta-design-packet",
+    )
+    assert result.returncode != 0
+    assert "target_module provenance mismatch" in result.stdout
+    assert not (out_root / "delta_003c/larql_delta_design_packet.json").exists()
+
+
+def test_compact_rows_can_resolve_target_metadata_when_other_sources_lack_it(tmp_path):
+    capture, direction, coherence, compact = prepare_inputs(
+        tmp_path,
+        include_direction_target_metadata=False,
+        capture_has_target_metadata=False,
+    )
+    out_root = tmp_path / "out"
+    run_script(
+        "--run-id", "delta_003d",
+        "--out-root", out_root,
+        "--compact-vectors", compact,
+        "--direction-packet", direction,
+        "--direction-coherence-report", coherence,
+        "--source-activation-capture-record", capture,
+        "--authorize-larql-delta-design-packet",
+    )
+    payload = json.loads((out_root / "delta_003d/larql_delta_design_packet.json").read_text(encoding="utf-8"))
+    assert payload["target_module"] == "model.layers.0.mlp.down_proj.weight"
+    assert payload["target_layer"] == "0"
+    assert payload["target_module_family"] == "mlp_projection"
+
+
+def test_no_target_metadata_anywhere_fails_closed(tmp_path):
+    capture, direction, coherence, compact = prepare_inputs(
+        tmp_path,
+        include_direction_target_metadata=False,
+        capture_has_target_metadata=False,
+        compact_has_target_metadata=False,
+    )
+    out_root = tmp_path / "out"
+    result = run_script(
+        "--run-id", "delta_003e",
+        "--out-root", out_root,
+        "--compact-vectors", compact,
+        "--direction-packet", direction,
+        "--direction-coherence-report", coherence,
+        "--source-activation-capture-record", capture,
+        "--authorize-larql-delta-design-packet",
+    )
+    assert result.returncode != 0
+    assert "unable to resolve target_module" in result.stdout
+    assert not (out_root / "delta_003e/larql_delta_design_packet.json").exists()
 
 
 def test_missing_input_vectors_is_rejected_or_unclear(tmp_path):
