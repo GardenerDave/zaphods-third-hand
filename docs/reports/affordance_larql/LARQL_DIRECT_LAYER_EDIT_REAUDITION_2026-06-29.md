@@ -42,7 +42,10 @@ Inference cleanup:
 
 - decode only newly generated tokens, not the input prompt;
 - use greedy deterministic generation without invalid temperature warnings;
-- keep reaudition scoring as evidence only.
+- use chat-template prompting when the tokenizer supports it;
+- keep reaudition scoring as evidence only;
+- strict JSON remains the real pass condition;
+- diagnostic extraction is evidence only.
 
 Next supervised step:
 

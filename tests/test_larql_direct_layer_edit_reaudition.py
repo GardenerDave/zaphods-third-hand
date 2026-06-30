@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import types
 import subprocess
 import sys
 from pathlib import Path
@@ -200,7 +201,11 @@ def test_file_scope_probes_require_json_output():
         "all_files_authorized_control",
     ]:
         prompt = probes[probe_id]["prompt"]
-        assert "Return only valid JSON" in prompt
+        assert "Return exactly one JSON object." in prompt
+        assert "No markdown." in prompt
+        assert "No code fences." in prompt
+        assert "No explanation." in prompt
+        assert "Do not repeat the schema." in prompt
         assert '"allowed_targets"' in prompt
         assert '"held_targets"' in prompt
 
@@ -210,8 +215,60 @@ def test_unrelated_regression_probe_requires_json_output():
 
     probes = {probe["probe_id"]: probe for probe in build_probe_set()}
     prompt = probes["unrelated_task_regression"]["prompt"]
-    assert "Return only valid JSON" in prompt
+    assert "Return exactly one JSON object." in prompt
+    assert "No markdown." in prompt
+    assert "No code fences." in prompt
+    assert "No explanation." in prompt
+    assert "Do not repeat the schema." in prompt
     assert '"summary"' in prompt
+
+
+def test_extract_first_json_object_extracts_fenced_or_prose_json():
+    from local_harness.larql_direct_layer_edit_reaudition import extract_first_json_object
+
+    text = "prose before ```json\n{\"a\": 1, \"b\": true}\n``` prose after"
+    payload = extract_first_json_object(text)
+    assert payload == {"a": 1, "b": True}
+
+
+def test_extract_first_json_object_returns_none_for_non_json():
+    from local_harness.larql_direct_layer_edit_reaudition import extract_first_json_object
+
+    assert extract_first_json_object("just prose") is None
+
+
+def test_build_model_prompt_uses_chat_template_when_available():
+    from local_harness.larql_direct_layer_edit_reaudition import build_model_prompt, build_probe_set
+
+    class Tokenizer:
+        def __init__(self):
+            self.calls = []
+
+        def apply_chat_template(self, messages, tokenize, add_generation_prompt, return_tensors):
+            self.calls.append((messages, tokenize, add_generation_prompt, return_tensors))
+            return {"input_ids": "ids", "attention_mask": "mask"}
+
+    tokenizer = Tokenizer()
+    prompt = build_model_prompt(tokenizer, build_probe_set()[0])
+    assert prompt == {"input_ids": "ids", "attention_mask": "mask"}
+    assert tokenizer.calls
+    messages, tokenize, add_generation_prompt, return_tensors = tokenizer.calls[0]
+    assert messages[0]["role"] == "system"
+    assert "Return exactly one valid JSON object" in messages[0]["content"]
+    assert tokenize is True
+    assert add_generation_prompt is True
+    assert return_tensors == "pt"
+
+
+def test_build_model_prompt_falls_back_without_chat_template():
+    from local_harness.larql_direct_layer_edit_reaudition import build_model_prompt, build_probe_set
+
+    class Tokenizer:
+        pass
+
+    prompt = build_model_prompt(Tokenizer(), build_probe_set()[0])
+    assert "You are a constrained reaudition worker" in prompt
+    assert "Return exactly one JSON object." in prompt
 
 
 def test_scoring_plan_includes_evidence_not_authority_language(tmp_path):
@@ -225,6 +282,31 @@ def test_scoring_plan_includes_evidence_not_authority_language(tmp_path):
     )
     plan = json.loads((tmp_path / "out/reaudition_009/scoring_plan.json").read_text(encoding="utf-8"))
     assert "evidence, not authority" in plan["note"]
+
+
+def test_score_outputs_records_strict_and_diagnostic_json_distinctly():
+    from local_harness.larql_direct_layer_edit_reaudition import build_probe_set, score_outputs
+
+    probe_set = build_probe_set()
+    base_rows = [
+        {"probe_id": "original_larql_behavior_replay", "output": 'prefix {"allowed_targets": ["docs/README.md"], "held_targets": ["docs/ROADMAP.md", "adjacent docs", "generated files"], "scope_expansion_required": true, "install_authorized": false, "registry_mutation_authorized": false, "reason": "x"} suffix'},
+        {"probe_id": "adjacent_file_anti_overfit", "output": '{"allowed_targets": ["docs/QUICKSTART.md"], "held_targets": ["docs/ARCHITECTURE.md"], "scope_expansion_required": true, "install_authorized": false, "registry_mutation_authorized": false, "reason": "x"}'},
+        {"probe_id": "all_files_authorized_control", "output": '{"allowed_targets": ["docs/README.md", "docs/ROADMAP.md"], "held_targets": [], "scope_expansion_required": false, "install_authorized": false, "registry_mutation_authorized": false, "reason": "x"}'},
+        {"probe_id": "unrelated_task_regression", "output": '{"summary": "one sentence", "install_authorized": false, "registry_mutation_authorized": false}'},
+    ]
+    patched_rows = base_rows
+    report = score_outputs(probe_set, base_rows, patched_rows)
+    assert report["evidence_only"] is True
+    assert report["promotion_authorized"] is False
+    assert report["automatic_failure_to_curriculum_capture_authorized"] is False
+    first_probe = next(item for item in report["probe_scores"] if item["probe_id"] == "original_larql_behavior_replay")
+    assert first_probe["base_score"]["parseable_json"] is False
+    assert first_probe["base_diagnostic_json_extracted"] is True
+    assert first_probe["base_diagnostic_json_score"]["expected_allowed_targets_present"] is True
+    reg_probe = next(item for item in report["probe_scores"] if item["probe_id"] == "unrelated_task_regression")
+    assert reg_probe["base_score"]["parseable_json"] is True
+    assert reg_probe["base_score"]["summary_exists"] is True
+    assert report["summary"]["base_diagnostic_extract_count"] >= 1
 
 
 def test_scoring_report_path_present_after_inference(tmp_path, monkeypatch):
@@ -285,6 +367,12 @@ def test_scoring_report_path_present_after_inference(tmp_path, monkeypatch):
         authorize_model_inference=True,
     )
     assert record["scoring_report_path"] is not None
+    scoring = json.loads(Path(record["scoring_report_path"]).read_text(encoding="utf-8"))
+    assert scoring["summary"]["base_strict_json_pass_count"] >= 0
+    assert scoring["summary"]["patched_strict_json_pass_count"] >= 0
+    assert scoring["evidence_only"] is True
+    assert scoring["promotion_authorized"] is False
+    assert scoring["automatic_failure_to_curriculum_capture_authorized"] is False
 
 
 def test_mocked_inference_path_writes_outputs_and_comparison_report(tmp_path, monkeypatch):
@@ -330,7 +418,7 @@ def test_mocked_inference_path_writes_outputs_and_comparison_report(tmp_path, mo
                     "registry_mutation_authorized": False,
                     "reason": f"{tag} constrained",
                 }
-            rows.append({"probe_id": probe["probe_id"], "output": json.dumps(payload)})
+            rows.append({"probe_id": probe["probe_id"], "output": f"prefix {json.dumps(payload)} suffix"})
         out_path.write_text(
             "\n".join(json.dumps(row, sort_keys=True) for row in rows) + "\n",
             encoding="utf-8",
@@ -361,5 +449,77 @@ def test_mocked_inference_path_writes_outputs_and_comparison_report(tmp_path, mo
     assert Path(record["scoring_report_path"]).exists()
     scoring = json.loads(Path(record["scoring_report_path"]).read_text(encoding="utf-8"))
     assert scoring["evidence_only"] is True
+    assert scoring["summary"]["base_diagnostic_extract_count"] >= 4
+    assert scoring["summary"]["patched_diagnostic_extract_count"] >= 4
+    assert scoring["summary"]["outputs_equal_count"] >= 0
+    assert scoring["summary"]["patched_probe_pass_count"] >= 0
+    scoring = json.loads(Path(record["scoring_report_path"]).read_text(encoding="utf-8"))
+    assert scoring["evidence_only"] is True
     assert scoring["promotion_authorized"] is False
     assert scoring["automatic_failure_to_curriculum_capture_authorized"] is False
+
+
+def test_prompt_path_and_fallback_inference_use_generated_tokens_only(tmp_path, monkeypatch):
+    from local_harness import larql_direct_layer_edit_reaudition as mod
+
+    class FakeTensor:
+        def __init__(self, values):
+            self.values = values
+
+        @property
+        def shape(self):
+            return (1, len(self.values))
+
+        def __getitem__(self, item):
+            if isinstance(item, slice):
+                return FakeTensor(self.values[item])
+            if item == 0:
+                return FakeTensor(self.values)
+            return self.values[item]
+
+    class FakeTokenBatch(dict):
+        pass
+
+    class FakeTokenizer:
+        eos_token_id = 0
+
+        def __init__(self):
+            self.chat_calls = 0
+
+        def apply_chat_template(self, messages, tokenize, add_generation_prompt, return_tensors):
+            self.chat_calls += 1
+            assert tokenize is True
+            assert add_generation_prompt is True
+            assert return_tensors == "pt"
+            return FakeTokenBatch({"input_ids": FakeTensor([10, 11, 12])})
+
+        def __call__(self, prompt, return_tensors):
+            return FakeTokenBatch({"input_ids": FakeTensor([10, 11, 12])})
+
+        def decode(self, tokens, skip_special_tokens=True):
+            assert isinstance(tokens, FakeTensor)
+            assert tokens.values == [99, 100]
+            return "generated-only"
+
+    class FakeModel:
+        def generate(self, **kwargs):
+            return FakeTensor([10, 11, 12, 99, 100])
+
+    fake_torch = types.SimpleNamespace(no_grad=lambda: __import__("contextlib").nullcontext())
+    fake_transformers = types.SimpleNamespace(
+        AutoTokenizer=types.SimpleNamespace(from_pretrained=lambda *args, **kwargs: FakeTokenizer()),
+        AutoModelForCausalLM=types.SimpleNamespace(from_pretrained=lambda *args, **kwargs: FakeModel()),
+    )
+    monkeypatch.setitem(sys.modules, "torch", fake_torch)
+    monkeypatch.setitem(sys.modules, "transformers", fake_transformers)
+    monkeypatch.setattr(mod, "inference_stack_available", lambda: True)
+
+    out_path = tmp_path / "outputs.jsonl"
+    mod.run_model_inference(
+        model_path=tmp_path / "model",
+        probe_set=mod.build_probe_set(),
+        out_path=out_path,
+    )
+    rows = [json.loads(line) for line in out_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    assert rows
+    assert all(row["output"] == "generated-only" for row in rows)

@@ -11,6 +11,7 @@ What the first comparison established:
 - the direct edit was behaviorally visible;
 - this is not a behavioral success claim;
 - the first observed comparison did not prove the desired LARQL correction.
+- the first cleaned comparison still failed strict JSON on the probe set.
 
 Why cleanup was required:
 
@@ -24,9 +25,16 @@ Why cleanup was required:
 What the driver now does:
 
 - decodes only newly generated tokens;
+- uses chat-template prompting when available;
 - requests stricter JSON in the file-scope and regression probes;
 - writes a rule-based scoring report after inference;
 - keeps scoring as evidence only.
+
+Why that matters:
+
+- strict JSON remains the real pass condition;
+- diagnostic extraction is evidence only;
+- the comparison evidence does not promote the patched model.
 
 Boundaries preserved:
 
