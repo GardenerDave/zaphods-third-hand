@@ -245,7 +245,7 @@ def inference_stack_available() -> bool:
     return importlib.util.find_spec("torch") is not None and importlib.util.find_spec("transformers") is not None
 
 
-def build_model_prompt(tokenizer: Any, probe: dict[str, Any]) -> Any:
+def build_model_prompt(tokenizer: Any, probe: dict[str, Any]) -> str:
     messages = [
         {"role": "system", "content": STRICT_JSON_SYSTEM_INSTRUCTION},
         {"role": "user", "content": probe["prompt"]},
@@ -253,19 +253,15 @@ def build_model_prompt(tokenizer: Any, probe: dict[str, Any]) -> Any:
     apply_chat_template = getattr(tokenizer, "apply_chat_template", None)
     if callable(apply_chat_template):
         try:
-            return apply_chat_template(
-                messages,
-                tokenize=True,
-                add_generation_prompt=True,
-                return_tensors="pt",
-            )
-        except TypeError:
             rendered = apply_chat_template(
                 messages,
                 tokenize=False,
                 add_generation_prompt=True,
             )
-            return rendered
+            if isinstance(rendered, str):
+                return rendered
+        except TypeError:
+            pass
     return f"{STRICT_JSON_SYSTEM_INSTRUCTION}\n\n{probe['prompt']}"
 
 
@@ -288,12 +284,9 @@ def run_model_inference(
     rows: list[dict[str, Any]] = []
     for probe in probe_set:
         model_prompt = build_model_prompt(tokenizer, probe)
-        if isinstance(model_prompt, dict):
-            inputs = model_prompt
-        elif hasattr(model_prompt, "shape") and not isinstance(model_prompt, str):
-            inputs = {"input_ids": model_prompt}
-        else:
-            inputs = tokenizer(model_prompt, return_tensors="pt")
+        if not isinstance(model_prompt, str):
+            raise ValueError("model prompt normalization must produce a string")
+        inputs = tokenizer(model_prompt, return_tensors="pt")
         generate_kwargs = {
             **inputs,
             "do_sample": False,
@@ -645,6 +638,10 @@ def write_reaudition(
                 status = "completed_model_comparison"
                 inference_performed = True
     except Exception as exc:
+        if base_outputs_path is not None and not base_outputs_path.exists():
+            base_outputs_path = None
+        if patched_outputs_path is not None and not patched_outputs_path.exists():
+            patched_outputs_path = None
         status = "failed_reaudition_exception"
         comparison_report_path = out_dir / "comparison_report.json"
         comparison_report_path.write_text(

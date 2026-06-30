@@ -244,20 +244,19 @@ def test_build_model_prompt_uses_chat_template_when_available():
         def __init__(self):
             self.calls = []
 
-        def apply_chat_template(self, messages, tokenize, add_generation_prompt, return_tensors):
-            self.calls.append((messages, tokenize, add_generation_prompt, return_tensors))
-            return {"input_ids": "ids", "attention_mask": "mask"}
+        def apply_chat_template(self, messages, tokenize, add_generation_prompt):
+            self.calls.append((messages, tokenize, add_generation_prompt))
+            return "rendered-chat-prompt"
 
     tokenizer = Tokenizer()
     prompt = build_model_prompt(tokenizer, build_probe_set()[0])
-    assert prompt == {"input_ids": "ids", "attention_mask": "mask"}
+    assert prompt == "rendered-chat-prompt"
     assert tokenizer.calls
-    messages, tokenize, add_generation_prompt, return_tensors = tokenizer.calls[0]
+    messages, tokenize, add_generation_prompt = tokenizer.calls[0]
     assert messages[0]["role"] == "system"
     assert "Return exactly one valid JSON object" in messages[0]["content"]
-    assert tokenize is True
+    assert tokenize is False
     assert add_generation_prompt is True
-    assert return_tensors == "pt"
 
 
 def test_build_model_prompt_falls_back_without_chat_template():
@@ -485,15 +484,18 @@ def test_prompt_path_and_fallback_inference_use_generated_tokens_only(tmp_path, 
 
         def __init__(self):
             self.chat_calls = 0
+            self.prompts = []
 
-        def apply_chat_template(self, messages, tokenize, add_generation_prompt, return_tensors):
+        def apply_chat_template(self, messages, tokenize, add_generation_prompt):
             self.chat_calls += 1
-            assert tokenize is True
+            assert tokenize is False
             assert add_generation_prompt is True
-            assert return_tensors == "pt"
-            return FakeTokenBatch({"input_ids": FakeTensor([10, 11, 12])})
+            return "rendered prompt"
 
         def __call__(self, prompt, return_tensors):
+            self.prompts.append(prompt)
+            assert isinstance(prompt, str)
+            assert prompt == "rendered prompt"
             return FakeTokenBatch({"input_ids": FakeTensor([10, 11, 12])})
 
         def decode(self, tokens, skip_special_tokens=True):
@@ -523,3 +525,41 @@ def test_prompt_path_and_fallback_inference_use_generated_tokens_only(tmp_path, 
     rows = [json.loads(line) for line in out_path.read_text(encoding="utf-8").splitlines() if line.strip()]
     assert rows
     assert all(row["output"] == "generated-only" for row in rows)
+
+
+def test_failed_inference_does_not_claim_missing_output_paths(tmp_path, monkeypatch):
+    from local_harness import larql_direct_layer_edit_reaudition as mod
+
+    base_model = tmp_path / "base_model"
+    patched_model = tmp_path / "patched_model"
+    base_model.mkdir()
+    patched_model.mkdir()
+
+    smoke = smoke_payload()
+    smoke["base_model_path"] = str(base_model)
+    smoke["patched_model_path"] = str(patched_model)
+
+    def fake_run_model_inference(*, model_path: Path, probe_set: list[dict], out_path: Path) -> None:
+        raise ValueError("text input must be of type `str`")
+
+    monkeypatch.setattr(mod, "inference_stack_available", lambda: True)
+    monkeypatch.setattr(mod, "run_model_inference", fake_run_model_inference)
+
+    record = mod.write_reaudition(
+        write_json(tmp_path / "smoke.json", smoke),
+        "reaudition_011",
+        tmp_path / "out",
+        authorize_larql_direct_layer_edit_reaudition=True,
+        base_model_path=base_model,
+        patched_model_path=patched_model,
+        run_inference=True,
+        authorize_model_inference=True,
+    )
+    assert record["reaudition_status"] == "failed_reaudition_exception"
+    assert record["model_inference_performed"] is False
+    assert record["base_outputs_path"] is None
+    assert record["patched_outputs_path"] is None
+    assert record["scoring_report_path"] is None
+    assert record["comparison_report_path"] is not None
+    comparison = json.loads(Path(record["comparison_report_path"]).read_text(encoding="utf-8"))
+    assert "text input must be of type `str`" in comparison["exception"]
