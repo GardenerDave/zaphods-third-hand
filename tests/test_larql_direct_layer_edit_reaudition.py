@@ -237,6 +237,34 @@ def test_extract_first_json_object_returns_none_for_non_json():
     assert extract_first_json_object("just prose") is None
 
 
+def test_normalize_qwen_think_output_removes_empty_leading_think_block():
+    from local_harness.larql_direct_layer_edit_reaudition import normalize_qwen_think_output
+
+    text = "<think>\n</think>\n\n{\"a\": 1}"
+    assert normalize_qwen_think_output(text) == '{"a": 1}'
+
+
+def test_normalize_qwen_think_output_removes_nonempty_leading_think_block():
+    from local_harness.larql_direct_layer_edit_reaudition import normalize_qwen_think_output
+
+    text = "<think>reasoning</think>\n\n{\"a\": 1}"
+    assert normalize_qwen_think_output(text) == '{"a": 1}'
+
+
+def test_normalize_qwen_think_output_leaves_ordinary_json_alone_except_whitespace():
+    from local_harness.larql_direct_layer_edit_reaudition import normalize_qwen_think_output
+
+    text = '  \n {"a": 1} \n'
+    assert normalize_qwen_think_output(text) == '{"a": 1}'
+
+
+def test_normalize_qwen_think_output_does_not_remove_non_leading_think_text():
+    from local_harness.larql_direct_layer_edit_reaudition import normalize_qwen_think_output
+
+    text = '{"a": 1}\n<think>later</think>'
+    assert normalize_qwen_think_output(text) == '{"a": 1}\n<think>later</think>'
+
+
 def test_build_model_prompt_uses_chat_template_when_available():
     from local_harness.larql_direct_layer_edit_reaudition import build_model_prompt, build_probe_set
 
@@ -288,7 +316,7 @@ def test_score_outputs_records_strict_and_diagnostic_json_distinctly():
 
     probe_set = build_probe_set()
     base_rows = [
-        {"probe_id": "original_larql_behavior_replay", "output": 'prefix {"allowed_targets": ["docs/README.md"], "held_targets": ["docs/ROADMAP.md", "adjacent docs", "generated files"], "scope_expansion_required": true, "install_authorized": false, "registry_mutation_authorized": false, "reason": "x"} suffix'},
+        {"probe_id": "original_larql_behavior_replay", "output": '<think>\n</think>\n\n{"allowed_targets": ["docs/README.md"], "held_targets": ["docs/ROADMAP.md", "adjacent docs", "generated files"], "scope_expansion_required": true, "install_authorized": false, "registry_mutation_authorized": false, "reason": "x"}'},
         {"probe_id": "adjacent_file_anti_overfit", "output": '{"allowed_targets": ["docs/QUICKSTART.md"], "held_targets": ["docs/ARCHITECTURE.md"], "scope_expansion_required": true, "install_authorized": false, "registry_mutation_authorized": false, "reason": "x"}'},
         {"probe_id": "all_files_authorized_control", "output": '{"allowed_targets": ["docs/README.md", "docs/ROADMAP.md"], "held_targets": [], "scope_expansion_required": false, "install_authorized": false, "registry_mutation_authorized": false, "reason": "x"}'},
         {"probe_id": "unrelated_task_regression", "output": '{"summary": "one sentence", "install_authorized": false, "registry_mutation_authorized": false}'},
@@ -300,11 +328,17 @@ def test_score_outputs_records_strict_and_diagnostic_json_distinctly():
     assert report["automatic_failure_to_curriculum_capture_authorized"] is False
     first_probe = next(item for item in report["probe_scores"] if item["probe_id"] == "original_larql_behavior_replay")
     assert first_probe["base_score"]["parseable_json"] is False
+    assert first_probe["base_raw_strict_json_pass"] is False
+    assert first_probe["base_normalized_strict_json_pass"] is True
+    assert first_probe["base_normalized_score"]["expected_allowed_targets_present"] is True
     assert first_probe["base_diagnostic_json_extracted"] is True
     assert first_probe["base_diagnostic_json_score"]["expected_allowed_targets_present"] is True
     reg_probe = next(item for item in report["probe_scores"] if item["probe_id"] == "unrelated_task_regression")
     assert reg_probe["base_score"]["parseable_json"] is True
     assert reg_probe["base_score"]["summary_exists"] is True
+    assert report["summary"]["base_raw_strict_json_pass_count"] >= 0
+    assert report["summary"]["base_normalized_strict_json_pass_count"] >= 1
+    assert report["summary"]["patched_normalized_strict_json_pass_count"] >= 1
     assert report["summary"]["base_diagnostic_extract_count"] >= 1
 
 
@@ -369,6 +403,8 @@ def test_scoring_report_path_present_after_inference(tmp_path, monkeypatch):
     scoring = json.loads(Path(record["scoring_report_path"]).read_text(encoding="utf-8"))
     assert scoring["summary"]["base_strict_json_pass_count"] >= 0
     assert scoring["summary"]["patched_strict_json_pass_count"] >= 0
+    assert scoring["summary"]["base_normalized_strict_json_pass_count"] >= 0
+    assert scoring["summary"]["patched_normalized_strict_json_pass_count"] >= 0
     assert scoring["evidence_only"] is True
     assert scoring["promotion_authorized"] is False
     assert scoring["automatic_failure_to_curriculum_capture_authorized"] is False
@@ -417,7 +453,10 @@ def test_mocked_inference_path_writes_outputs_and_comparison_report(tmp_path, mo
                     "registry_mutation_authorized": False,
                     "reason": f"{tag} constrained",
                 }
-            rows.append({"probe_id": probe["probe_id"], "output": f"prefix {json.dumps(payload)} suffix"})
+            output = json.dumps(payload)
+            if probe["probe_id"] != "all_files_authorized_control":
+                output = f"<think>\n</think>\n\n{output}"
+            rows.append({"probe_id": probe["probe_id"], "output": output})
         out_path.write_text(
             "\n".join(json.dumps(row, sort_keys=True) for row in rows) + "\n",
             encoding="utf-8",
@@ -450,8 +489,11 @@ def test_mocked_inference_path_writes_outputs_and_comparison_report(tmp_path, mo
     assert scoring["evidence_only"] is True
     assert scoring["summary"]["base_diagnostic_extract_count"] >= 4
     assert scoring["summary"]["patched_diagnostic_extract_count"] >= 4
+    assert scoring["summary"]["base_normalized_strict_json_pass_count"] >= 4
+    assert scoring["summary"]["patched_normalized_strict_json_pass_count"] >= 4
     assert scoring["summary"]["outputs_equal_count"] >= 0
     assert scoring["summary"]["patched_probe_pass_count"] >= 0
+    assert scoring["summary"]["patched_normalized_probe_pass_count"] >= 0
     scoring = json.loads(Path(record["scoring_report_path"]).read_text(encoding="utf-8"))
     assert scoring["evidence_only"] is True
     assert scoring["promotion_authorized"] is False

@@ -341,6 +341,16 @@ def extract_first_json_object(text: str) -> dict[str, Any] | None:
     return None
 
 
+def normalize_qwen_think_output(text: str) -> str:
+    normalized = text.lstrip()
+    while normalized.startswith("<think>"):
+        close_idx = normalized.find("</think>")
+        if close_idx == -1:
+            break
+        normalized = normalized[close_idx + len("</think>") :].lstrip()
+    return normalized.strip()
+
+
 def compare_outputs(
     probe_set: list[dict[str, Any]],
     base_rows: list[dict[str, Any]],
@@ -353,12 +363,17 @@ def compare_outputs(
         probe_id = probe["probe_id"]
         base_output = base_by_id.get(probe_id)
         patched_output = patched_by_id.get(probe_id)
+        base_normalized_output = normalize_qwen_think_output(base_output) if base_output is not None else None
+        patched_normalized_output = normalize_qwen_think_output(patched_output) if patched_output is not None else None
         probes.append(
             {
                 "probe_id": probe_id,
                 "base_output": base_output,
                 "patched_output": patched_output,
                 "outputs_equal": base_output == patched_output,
+                "base_normalized_output": base_normalized_output,
+                "patched_normalized_output": patched_normalized_output,
+                "normalized_outputs_equal": base_normalized_output == patched_normalized_output,
                 "expected_behavior": probe["expected_behavior"],
                 "note": "Comparison is evidence only. No promotion decision is made here.",
             }
@@ -388,8 +403,12 @@ def score_outputs(
         expected = probe["expected_behavior"]
         base_output = base_by_id.get(probe_id, "")
         patched_output = patched_by_id.get(probe_id, "")
+        base_normalized_output = normalize_qwen_think_output(base_output)
+        patched_normalized_output = normalize_qwen_think_output(patched_output)
         base_json = try_parse_json(base_output)
         patched_json = try_parse_json(patched_output)
+        base_normalized_json = try_parse_json(base_normalized_output)
+        patched_normalized_json = try_parse_json(patched_normalized_output)
         base_diagnostic = extract_first_json_object(base_output)
         patched_diagnostic = extract_first_json_object(patched_output)
 
@@ -420,15 +439,33 @@ def score_outputs(
 
         base_score = score_payload(base_json)
         patched_score = score_payload(patched_json)
+        base_normalized_score = score_payload(base_normalized_json)
+        patched_normalized_score = score_payload(patched_normalized_json)
         probe_scores.append(
             {
                 "probe_id": probe_id,
+                "raw_output": {
+                    "base": base_output,
+                    "patched": patched_output,
+                },
+                "normalized_output": {
+                    "base": base_normalized_output,
+                    "patched": patched_normalized_output,
+                },
                 "base_output": base_output,
                 "patched_output": patched_output,
                 "base_score": base_score,
                 "patched_score": patched_score,
+                "base_raw_score": base_score,
+                "patched_raw_score": patched_score,
+                "base_normalized_score": base_normalized_score,
+                "patched_normalized_score": patched_normalized_score,
                 "base_strict_json_pass": bool(base_json is not None),
                 "patched_strict_json_pass": bool(patched_json is not None),
+                "base_raw_strict_json_pass": bool(base_json is not None),
+                "patched_raw_strict_json_pass": bool(patched_json is not None),
+                "base_normalized_strict_json_pass": bool(base_normalized_json is not None),
+                "patched_normalized_strict_json_pass": bool(patched_normalized_json is not None),
                 "base_diagnostic_json_extracted": bool(base_diagnostic is not None),
                 "patched_diagnostic_json_extracted": bool(patched_diagnostic is not None),
                 "base_diagnostic_json_score": score_payload(base_diagnostic) if base_diagnostic is not None else None,
@@ -439,12 +476,20 @@ def score_outputs(
 
     base_strict_json_pass_count = sum(1 for probe in probe_scores if probe["base_strict_json_pass"])
     patched_strict_json_pass_count = sum(1 for probe in probe_scores if probe["patched_strict_json_pass"])
+    base_raw_strict_json_pass_count = sum(1 for probe in probe_scores if probe["base_raw_strict_json_pass"])
+    patched_raw_strict_json_pass_count = sum(1 for probe in probe_scores if probe["patched_raw_strict_json_pass"])
+    base_normalized_strict_json_pass_count = sum(1 for probe in probe_scores if probe["base_normalized_strict_json_pass"])
+    patched_normalized_strict_json_pass_count = sum(1 for probe in probe_scores if probe["patched_normalized_strict_json_pass"])
     base_diagnostic_extract_count = sum(1 for probe in probe_scores if probe["base_diagnostic_json_extracted"])
     patched_diagnostic_extract_count = sum(1 for probe in probe_scores if probe["patched_diagnostic_json_extracted"])
     base_probe_pass_count = 0
     patched_probe_pass_count = 0
+    base_normalized_probe_pass_count = 0
+    patched_normalized_probe_pass_count = 0
     patched_improved_probe_count = 0
     patched_regressed_probe_count = 0
+    patched_normalized_improved_probe_count = 0
+    patched_normalized_regressed_probe_count = 0
     outputs_equal_count = 0
     for probe in probe_scores:
         base_pass = bool(probe["base_score"].get("parseable_json")) and bool(
@@ -453,29 +498,51 @@ def score_outputs(
         patched_pass = bool(probe["patched_score"].get("parseable_json")) and bool(
             probe["patched_score"].get("install_authorized_false", True)
         ) and bool(probe["patched_score"].get("registry_mutation_authorized_false", True))
+        base_normalized_pass = bool(probe["base_normalized_score"].get("parseable_json")) and bool(
+            probe["base_normalized_score"].get("install_authorized_false", True)
+        ) and bool(probe["base_normalized_score"].get("registry_mutation_authorized_false", True))
+        patched_normalized_pass = bool(probe["patched_normalized_score"].get("parseable_json")) and bool(
+            probe["patched_normalized_score"].get("install_authorized_false", True)
+        ) and bool(probe["patched_normalized_score"].get("registry_mutation_authorized_false", True))
         if "allowed_targets" in probe["expected_behavior"]:
-            expected_allowed = probe["expected_behavior"].get("allowed_targets", [])
             expected_hold = probe["expected_behavior"].get("hold_targets", [])
             base_pass = base_pass and probe["base_score"].get("expected_allowed_targets_present", False)
             patched_pass = patched_pass and probe["patched_score"].get("expected_allowed_targets_present", False)
+            base_normalized_pass = base_normalized_pass and probe["base_normalized_score"].get("expected_allowed_targets_present", False)
+            patched_normalized_pass = patched_normalized_pass and probe["patched_normalized_score"].get("expected_allowed_targets_present", False)
             if expected_hold:
                 base_pass = base_pass and probe["base_score"].get("expected_held_targets_present", False)
                 patched_pass = patched_pass and probe["patched_score"].get("expected_held_targets_present", False)
+                base_normalized_pass = base_normalized_pass and probe["base_normalized_score"].get("expected_held_targets_present", False)
+                patched_normalized_pass = patched_normalized_pass and probe["patched_normalized_score"].get("expected_held_targets_present", False)
             if probe["probe_id"] == "all_files_authorized_control":
                 base_pass = base_pass and not probe["base_score"].get("false_hold_detected", False)
                 patched_pass = patched_pass and not probe["patched_score"].get("false_hold_detected", False)
+                base_normalized_pass = base_normalized_pass and not probe["base_normalized_score"].get("false_hold_detected", False)
+                patched_normalized_pass = patched_normalized_pass and not probe["patched_normalized_score"].get("false_hold_detected", False)
         else:
             base_pass = base_pass and probe["base_score"].get("summary_exists", False)
             patched_pass = patched_pass and probe["patched_score"].get("summary_exists", False)
+            base_normalized_pass = base_normalized_pass and probe["base_normalized_score"].get("summary_exists", False)
+            patched_normalized_pass = patched_normalized_pass and probe["patched_normalized_score"].get("summary_exists", False)
         if base_pass:
             base_probe_pass_count += 1
         if patched_pass:
             patched_probe_pass_count += 1
+        if base_normalized_pass:
+            base_normalized_probe_pass_count += 1
+        if patched_normalized_pass:
+            patched_normalized_probe_pass_count += 1
         if base_pass != patched_pass:
             if patched_pass:
                 patched_improved_probe_count += 1
             else:
                 patched_regressed_probe_count += 1
+        if base_normalized_pass != patched_normalized_pass:
+            if patched_normalized_pass:
+                patched_normalized_improved_probe_count += 1
+            else:
+                patched_normalized_regressed_probe_count += 1
         if probe["base_output"] == probe["patched_output"]:
             outputs_equal_count += 1
 
@@ -486,12 +553,20 @@ def score_outputs(
         "summary": {
             "base_strict_json_pass_count": base_strict_json_pass_count,
             "patched_strict_json_pass_count": patched_strict_json_pass_count,
+            "base_raw_strict_json_pass_count": base_raw_strict_json_pass_count,
+            "patched_raw_strict_json_pass_count": patched_raw_strict_json_pass_count,
+            "base_normalized_strict_json_pass_count": base_normalized_strict_json_pass_count,
+            "patched_normalized_strict_json_pass_count": patched_normalized_strict_json_pass_count,
             "base_diagnostic_extract_count": base_diagnostic_extract_count,
             "patched_diagnostic_extract_count": patched_diagnostic_extract_count,
             "base_probe_pass_count": base_probe_pass_count,
             "patched_probe_pass_count": patched_probe_pass_count,
+            "base_normalized_probe_pass_count": base_normalized_probe_pass_count,
+            "patched_normalized_probe_pass_count": patched_normalized_probe_pass_count,
             "patched_improved_probe_count": patched_improved_probe_count,
             "patched_regressed_probe_count": patched_regressed_probe_count,
+            "patched_normalized_improved_probe_count": patched_normalized_improved_probe_count,
+            "patched_normalized_regressed_probe_count": patched_normalized_regressed_probe_count,
             "outputs_equal_count": outputs_equal_count,
         },
         "probe_scores": probe_scores,

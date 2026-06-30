@@ -5,6 +5,15 @@ Date: 2026-06-29
 This review records the first completed base-vs-patched reaudition as evidence
 only.
 
+Latest scoring note:
+
+- `_005` completed and showed base/patched equality on all probes;
+- strict raw JSON failed because Qwen-style `<think></think>` wrappers preceded
+  the JSON object;
+- diagnostic extraction still found valid JSON in all probes;
+- this patch adds conservative normalization of leading think blocks for
+  diagnostic compatibility scoring only.
+
 What the first comparison established:
 
 - the first base-vs-patched reaudition executed successfully;
@@ -33,6 +42,8 @@ What the driver now does:
 Why that matters:
 
 - strict JSON remains the real pass condition;
+- raw output remains the audit source;
+- normalized scoring is diagnostic evidence only;
 - diagnostic extraction is evidence only;
 - the comparison evidence does not promote the patched model.
 

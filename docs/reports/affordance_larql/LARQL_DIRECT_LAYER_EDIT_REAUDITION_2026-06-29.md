@@ -45,6 +45,9 @@ Inference cleanup:
 - use chat-template prompting when the tokenizer supports it;
 - keep reaudition scoring as evidence only;
 - strict JSON remains the real pass condition;
+- raw output remains the audit source;
+- normalized strict JSON is a diagnostic compatibility measure for leading
+  Qwen-style think tags only;
 - diagnostic extraction is evidence only.
 
 Next supervised step:
