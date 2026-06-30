@@ -147,7 +147,10 @@ does not establish production readiness.
   greedy outputs remain unchanged, and
   `LARQL_TEACHER_FORCED_LIKELIHOOD_2026-06-30.md` for the teacher-forced
   likelihood-margin diagnostic that compares corrected JSON continuations
-  against failure-style JSON under the base and patched models.
+  against failure-style JSON under the base and patched models, and
+  `LARQL_LIKELIHOOD_SCALE_COMPARISON_2026-06-30.md` for the packet-only
+  comparison across teacher-forced likelihood runs that summarizes per-scale
+  margin movement before any further scaling decision.
 
 ## Safety Reminder
 
