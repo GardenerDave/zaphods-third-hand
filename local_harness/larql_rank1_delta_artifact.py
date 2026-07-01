@@ -30,6 +30,7 @@ CONTROL_PROBES = [
 ]
 DEFAULT_DIRECTION_BASIS_MODE = "file_scope_mean"
 TARGET_CONTROL_ORTHOGONAL_MODE = "target_control_orthogonal"
+ORTHOGONALIZATION_SIDES = {"output_and_input", "output_only", "input_only"}
 
 
 def require_authorization(authorized: bool) -> None:
@@ -148,9 +149,14 @@ def validate_inputs(
         for key in [
             "target_probe_ids",
             "control_probe_ids",
+            "control_probe_subset",
             "orthogonalization_applied",
+            "orthogonalization_strength",
+            "orthogonalization_side",
             "output_control_projection_removed_norm",
             "input_control_projection_removed_norm",
+            "output_control_projection_applied_norm",
+            "input_control_projection_applied_norm",
             "output_target_control_cosine_before_projection",
             "input_target_control_cosine_before_projection",
             "orthogonal_output_direction_norm",
@@ -158,6 +164,24 @@ def validate_inputs(
         ]:
             if key not in rank1_delta_design:
                 raise ValueError("orthogonal mode provenance missing from rank1 delta design")
+        try:
+            strength = float(rank1_delta_design["orthogonalization_strength"])
+        except (TypeError, ValueError) as exc:
+            raise ValueError("orthogonalization strength must be in [0.0, 1.0]") from exc
+        if strength < 0.0 or strength > 1.0:
+            raise ValueError("orthogonalization strength must be in [0.0, 1.0]")
+        side = str(rank1_delta_design["orthogonalization_side"])
+        if side not in ORTHOGONALIZATION_SIDES:
+            raise ValueError(
+                "orthogonalization side must be output_and_input, output_only, or input_only"
+            )
+        subset = rank1_delta_design["control_probe_subset"]
+        if not isinstance(subset, list) or not subset:
+            raise ValueError("control probe subset must not be empty")
+        if len(set(str(x) for x in subset)) != len(subset):
+            raise ValueError("control probe subset must not contain duplicate probe ids")
+        if any(str(x) not in CONTROL_PROBES for x in subset):
+            raise ValueError("control probe subset contains unknown probe ids")
 
 
 def group_rows(compact_rows: list[dict[str, Any]]) -> dict[str, dict[str, dict[str, Any]]]:
@@ -178,9 +202,14 @@ def recompute_vectors(
         "direction_basis_mode": DEFAULT_DIRECTION_BASIS_MODE,
         "target_probe_ids": TARGET_PROBES,
         "control_probe_ids": CONTROL_PROBES,
+        "control_probe_subset": CONTROL_PROBES,
         "orthogonalization_applied": False,
+        "orthogonalization_strength": 1.0,
+        "orthogonalization_side": "output_and_input",
         "output_control_projection_removed_norm": None,
         "input_control_projection_removed_norm": None,
+        "output_control_projection_applied_norm": None,
+        "input_control_projection_applied_norm": None,
         "output_target_control_cosine_before_projection": None,
         "input_target_control_cosine_before_projection": None,
         "orthogonal_output_direction_norm": None,
@@ -217,6 +246,8 @@ def recompute_vectors_target_control_orthogonal(
     selected_vector_source: str,
     target_probe_ids: list[str],
     control_probe_ids: list[str],
+    orthogonalization_strength: float,
+    orthogonalization_side: str,
 ) -> tuple[list[float], float, list[float], float, dict[str, Any]]:
     output_field, input_field = select_vector_fields(selected_vector_source)
     grouped = group_rows(compact_rows)
@@ -255,17 +286,39 @@ def recompute_vectors_target_control_orthogonal(
     input_target_control_cosine = cosine_similarity(target_input_basis, control_input_basis)
     output_projection, output_projection_norm = project_vector(target_output_direction, control_output_direction)
     input_projection, input_projection_norm = project_vector(target_input_basis, control_input_basis)
-    orthogonal_output = vector_subtract(target_output_direction, output_projection)
-    orthogonal_input = vector_subtract(target_input_basis, input_projection)
+    scaled_output_projection = vector_scale(output_projection, orthogonalization_strength)
+    scaled_input_projection = vector_scale(input_projection, orthogonalization_strength)
+    output_applied_norm = vector_norm(scaled_output_projection)
+    input_applied_norm = vector_norm(scaled_input_projection)
+    if orthogonalization_side == "output_and_input":
+        orthogonal_output = vector_subtract(target_output_direction, scaled_output_projection)
+        orthogonal_input = vector_subtract(target_input_basis, scaled_input_projection)
+    elif orthogonalization_side == "output_only":
+        orthogonal_output = vector_subtract(target_output_direction, scaled_output_projection)
+        orthogonal_input = target_input_basis
+        input_applied_norm = 0.0
+    elif orthogonalization_side == "input_only":
+        orthogonal_output = target_output_direction
+        orthogonal_input = vector_subtract(target_input_basis, scaled_input_projection)
+        output_applied_norm = 0.0
+    else:
+        raise ValueError(
+            "orthogonalization side must be output_and_input, output_only, or input_only"
+        )
     output_unit, output_norm = normalize_vector(orthogonal_output)
     input_unit, input_norm = normalize_vector(orthogonal_input)
     provenance = {
         "direction_basis_mode": TARGET_CONTROL_ORTHOGONAL_MODE,
         "target_probe_ids": target_probe_ids,
         "control_probe_ids": control_probe_ids,
+        "control_probe_subset": control_probe_ids,
         "orthogonalization_applied": True,
+        "orthogonalization_strength": orthogonalization_strength,
+        "orthogonalization_side": orthogonalization_side,
         "output_control_projection_removed_norm": output_projection_norm,
         "input_control_projection_removed_norm": input_projection_norm,
+        "output_control_projection_applied_norm": output_applied_norm,
+        "input_control_projection_applied_norm": input_applied_norm,
         "output_target_control_cosine_before_projection": output_target_control_cosine,
         "input_target_control_cosine_before_projection": input_target_control_cosine,
         "orthogonal_output_direction_norm": output_norm,
@@ -359,7 +412,18 @@ def write_record(
             compact_rows=compact_rows,
             selected_vector_source=selected_vector_source,
             target_probe_ids=[str(x) for x in delta_design_packet.get("target_probe_ids", [])],
-            control_probe_ids=[str(x) for x in delta_design_packet.get("control_probe_ids", [])],
+            control_probe_ids=[
+                str(x)
+                for x in delta_design_packet.get(
+                    "control_probe_subset", delta_design_packet.get("control_probe_ids", [])
+                )
+            ],
+            orthogonalization_strength=float(
+                delta_design_packet.get("orthogonalization_strength", 1.0)
+            ),
+            orthogonalization_side=str(
+                delta_design_packet.get("orthogonalization_side", "output_and_input")
+            ),
         )
     else:
         output_unit, output_norm, input_unit, input_norm, direction_basis_provenance = recompute_vectors(
@@ -394,9 +458,14 @@ def write_record(
         "target_module_family": target_module_family,
         "target_probe_ids": direction_basis_provenance["target_probe_ids"],
         "control_probe_ids": direction_basis_provenance["control_probe_ids"],
+        "control_probe_subset": direction_basis_provenance["control_probe_subset"],
         "orthogonalization_applied": direction_basis_provenance["orthogonalization_applied"],
+        "orthogonalization_strength": direction_basis_provenance["orthogonalization_strength"],
+        "orthogonalization_side": direction_basis_provenance["orthogonalization_side"],
         "output_control_projection_removed_norm": direction_basis_provenance["output_control_projection_removed_norm"],
         "input_control_projection_removed_norm": direction_basis_provenance["input_control_projection_removed_norm"],
+        "output_control_projection_applied_norm": direction_basis_provenance["output_control_projection_applied_norm"],
+        "input_control_projection_applied_norm": direction_basis_provenance["input_control_projection_applied_norm"],
         "output_target_control_cosine_before_projection": direction_basis_provenance["output_target_control_cosine_before_projection"],
         "input_target_control_cosine_before_projection": direction_basis_provenance["input_target_control_cosine_before_projection"],
         "orthogonal_output_direction_norm": direction_basis_provenance["orthogonal_output_direction_norm"],

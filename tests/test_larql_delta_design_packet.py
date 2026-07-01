@@ -185,8 +185,8 @@ def orthogonal_rows(*, zero_output: bool = False, zero_input: bool = False, miss
         },
         "all_files_authorized_control": {
             "failure_out": [0.0, 0.0],
-            "correction_out": [0.9, 0.1] if not zero_output else [0.9, 0.1],
-            "failure_in": [0.9, 0.0, 0.1] if not zero_input else [0.9, 0.05, 0.05],
+            "correction_out": [0.0, 1.0] if not zero_output else [0.9, 0.1],
+            "failure_in": [0.0, 1.0, 0.0] if not zero_input else [0.9, 0.05, 0.05],
         },
         "unrelated_task_regression": {
             "failure_out": [0.0, 0.0],
@@ -234,6 +234,35 @@ def orthogonal_rows(*, zero_output: bool = False, zero_input: bool = False, miss
             }
         )
     return rows
+
+
+def run_orthogonal(
+    tmp_path: Path,
+    *,
+    rows: list[dict] | None = None,
+    extra_args: list[str] | None = None,
+    run_id: str = "delta_orthogonal",
+) -> subprocess.CompletedProcess[str]:
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    capture, direction, coherence, compact = prepare_inputs(tmp_path)
+    compact.write_text(
+        "\n".join(json.dumps(row, sort_keys=True) for row in (rows or orthogonal_rows())) + "\n",
+        encoding="utf-8",
+    )
+    out_root = tmp_path / "out"
+    args = [
+        "--run-id", run_id,
+        "--out-root", out_root,
+        "--compact-vectors", compact,
+        "--direction-packet", direction,
+        "--direction-coherence-report", coherence,
+        "--source-activation-capture-record", capture,
+        "--direction-basis-mode", "target_control_orthogonal",
+    ]
+    if extra_args:
+        args.extend(extra_args)
+    args.append("--authorize-larql-delta-design-packet")
+    return run_script(*args)
 
 
 def run_script(*args: str | Path) -> subprocess.CompletedProcess[str]:
@@ -432,31 +461,22 @@ def test_invalid_target_module_override_fails_closed(tmp_path):
 
 
 def test_target_control_orthogonal_mode_records_required_fields(tmp_path):
-    capture, direction, coherence, compact = prepare_inputs(tmp_path)
-    compact.write_text(
-        "\n".join(json.dumps(row, sort_keys=True) for row in orthogonal_rows()) + "\n",
-        encoding="utf-8",
-    )
     out_root = tmp_path / "out"
-    result = run_script(
-        "--run-id", "delta_003_orthogonal",
-        "--out-root", out_root,
-        "--compact-vectors", compact,
-        "--direction-packet", direction,
-        "--direction-coherence-report", coherence,
-        "--source-activation-capture-record", capture,
-        "--direction-basis-mode", "target_control_orthogonal",
-        "--authorize-larql-delta-design-packet",
-    )
+    result = run_orthogonal(tmp_path, run_id="delta_003_orthogonal")
     assert result.returncode == 0
     payload = json.loads((out_root / "delta_003_orthogonal/larql_delta_design_packet.json").read_text(encoding="utf-8"))
     design = json.loads((out_root / "delta_003_orthogonal/rank1_delta_design.json").read_text(encoding="utf-8"))
     assert payload["direction_basis_mode"] == "target_control_orthogonal"
     assert payload["target_probe_ids"] == ["original_larql_behavior_replay", "adjacent_file_anti_overfit"]
     assert payload["control_probe_ids"] == ["all_files_authorized_control", "unrelated_task_regression"]
+    assert payload["control_probe_subset"] == ["all_files_authorized_control", "unrelated_task_regression"]
     assert payload["orthogonalization_applied"] is True
+    assert payload["orthogonalization_strength"] == 1.0
+    assert payload["orthogonalization_side"] == "output_and_input"
     assert isinstance(payload["output_control_projection_removed_norm"], float)
     assert isinstance(payload["input_control_projection_removed_norm"], float)
+    assert isinstance(payload["output_control_projection_applied_norm"], float)
+    assert isinstance(payload["input_control_projection_applied_norm"], float)
     assert isinstance(payload["output_target_control_cosine_before_projection"], float)
     assert isinstance(payload["input_target_control_cosine_before_projection"], float)
     assert payload["orthogonal_output_direction_norm"] > 0.0
@@ -482,6 +502,121 @@ def test_invalid_direction_basis_mode_fails_closed(tmp_path):
     assert result.returncode != 0
     assert "direction basis mode must be file_scope_mean or target_control_orthogonal" in result.stdout
     assert not (out_root / "delta_003_bad_basis/larql_delta_design_packet.json").exists()
+
+
+def test_orthogonalization_args_without_orthogonal_mode_fail_closed(tmp_path):
+    capture, direction, coherence, compact = prepare_inputs(tmp_path)
+    out_root = tmp_path / "out"
+    result = run_script(
+        "--run-id", "delta_args_bad_mode",
+        "--out-root", out_root,
+        "--compact-vectors", compact,
+        "--direction-packet", direction,
+        "--direction-coherence-report", coherence,
+        "--source-activation-capture-record", capture,
+        "--orthogonalization-strength", "0.5",
+        "--authorize-larql-delta-design-packet",
+    )
+    assert result.returncode != 0
+    assert "orthogonalization parameters require direction basis mode target_control_orthogonal" in result.stdout
+
+
+def test_strength_half_records_correct_strength(tmp_path):
+    out_root = tmp_path / "out"
+    result = run_orthogonal(
+        tmp_path,
+        extra_args=["--orthogonalization-strength", "0.5"],
+        run_id="delta_strength_half",
+    )
+    assert result.returncode == 0
+    payload = json.loads((out_root / "delta_strength_half/larql_delta_design_packet.json").read_text(encoding="utf-8"))
+    assert payload["orthogonalization_strength"] == 0.5
+
+
+def test_strength_zero_is_accepted_and_records_zero_applied_norms(tmp_path):
+    out_root = tmp_path / "out"
+    result = run_orthogonal(
+        tmp_path,
+        extra_args=["--orthogonalization-strength", "0.0"],
+        run_id="delta_strength_zero",
+    )
+    assert result.returncode == 0
+    payload = json.loads((out_root / "delta_strength_zero/larql_delta_design_packet.json").read_text(encoding="utf-8"))
+    assert payload["orthogonalization_strength"] == 0.0
+    assert payload["output_control_projection_applied_norm"] == 0.0
+    assert payload["input_control_projection_applied_norm"] == 0.0
+
+
+def test_invalid_strengths_fail_closed(tmp_path):
+    for bad in ["-0.1", "1.1", "abc"]:
+        result = run_orthogonal(
+            tmp_path / bad.replace(".", "_").replace("-", "n"),
+            extra_args=["--orthogonalization-strength", bad],
+            run_id="delta_bad_strength",
+        )
+        assert result.returncode != 0
+
+
+def test_output_only_records_input_projection_not_applied(tmp_path):
+    out_root = tmp_path / "out"
+    result = run_orthogonal(
+        tmp_path,
+        extra_args=["--orthogonalization-side", "output_only"],
+        run_id="delta_output_only",
+    )
+    assert result.returncode == 0
+    payload = json.loads((out_root / "delta_output_only/larql_delta_design_packet.json").read_text(encoding="utf-8"))
+    assert payload["orthogonalization_side"] == "output_only"
+    assert payload["output_control_projection_applied_norm"] > 0.0
+    assert payload["input_control_projection_applied_norm"] == 0.0
+
+
+def test_input_only_records_output_projection_not_applied(tmp_path):
+    out_root = tmp_path / "out"
+    result = run_orthogonal(
+        tmp_path,
+        extra_args=["--orthogonalization-side", "input_only"],
+        run_id="delta_input_only",
+    )
+    assert result.returncode == 0
+    payload = json.loads((out_root / "delta_input_only/larql_delta_design_packet.json").read_text(encoding="utf-8"))
+    assert payload["orthogonalization_side"] == "input_only"
+    assert payload["output_control_projection_applied_norm"] == 0.0
+    assert payload["input_control_projection_applied_norm"] > 0.0
+
+
+def test_valid_single_control_subsets(tmp_path):
+    out_root = tmp_path / "out"
+    result_a = run_orthogonal(
+        tmp_path / "a",
+        extra_args=["--control-probe-subset", "all_files_authorized_control"],
+        run_id="delta_subset_a",
+    )
+    assert result_a.returncode == 0
+    payload_a = json.loads(((tmp_path / "a") / "out/delta_subset_a/larql_delta_design_packet.json").read_text(encoding="utf-8"))
+    assert payload_a["control_probe_subset"] == ["all_files_authorized_control"]
+    result_b = run_orthogonal(
+        tmp_path / "b",
+        extra_args=["--control-probe-subset", "unrelated_task_regression"],
+        run_id="delta_subset_b",
+    )
+    assert result_b.returncode == 0
+    payload_b = json.loads(((tmp_path / "b") / "out/delta_subset_b/larql_delta_design_packet.json").read_text(encoding="utf-8"))
+    assert payload_b["control_probe_subset"] == ["unrelated_task_regression"]
+
+
+def test_invalid_control_probe_subsets_fail_closed(tmp_path):
+    for subset in [
+        "all_files_authorized_control,all_files_authorized_control",
+        "unknown_probe",
+        "",
+    ]:
+        result = run_orthogonal(
+            tmp_path / (subset or "empty"),
+            extra_args=["--control-probe-subset", subset],
+            run_id="delta_bad_subset",
+        )
+        assert result.returncode != 0
 
 
 def test_missing_required_control_probe_fails_closed(tmp_path):

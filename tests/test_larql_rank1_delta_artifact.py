@@ -37,9 +37,14 @@ def delta_design_packet_payload(*, status: str = "delta_design_reviewable") -> d
         "source_vector_target_module_family": "mlp_projection",
         "target_probe_ids": ["original_larql_behavior_replay", "adjacent_file_anti_overfit"],
         "control_probe_ids": ["all_files_authorized_control", "unrelated_task_regression"],
+        "control_probe_subset": ["all_files_authorized_control", "unrelated_task_regression"],
         "orthogonalization_applied": False,
+        "orthogonalization_strength": 1.0,
+        "orthogonalization_side": "output_and_input",
         "output_control_projection_removed_norm": None,
         "input_control_projection_removed_norm": None,
+        "output_control_projection_applied_norm": None,
+        "input_control_projection_applied_norm": None,
         "output_target_control_cosine_before_projection": None,
         "input_target_control_cosine_before_projection": None,
         "orthogonal_output_direction_norm": None,
@@ -57,9 +62,14 @@ def rank1_delta_design_payload() -> dict:
         "direction_basis_mode": "file_scope_mean",
         "target_probe_ids": ["original_larql_behavior_replay", "adjacent_file_anti_overfit"],
         "control_probe_ids": ["all_files_authorized_control", "unrelated_task_regression"],
+        "control_probe_subset": ["all_files_authorized_control", "unrelated_task_regression"],
         "orthogonalization_applied": False,
+        "orthogonalization_strength": 1.0,
+        "orthogonalization_side": "output_and_input",
         "output_control_projection_removed_norm": None,
         "input_control_projection_removed_norm": None,
+        "output_control_projection_applied_norm": None,
+        "input_control_projection_applied_norm": None,
         "output_target_control_cosine_before_projection": None,
         "input_target_control_cosine_before_projection": None,
         "orthogonal_output_direction_norm": None,
@@ -81,8 +91,8 @@ def compact_rows() -> list[dict]:
         },
         "all_files_authorized_control": {
             "failure_out": [0.0, 0.0],
-            "correction_out": [0.9, 0.1],
-            "failure_in": [0.9, 0.0, 0.1],
+            "correction_out": [0.0, 1.0],
+            "failure_in": [0.0, 1.0, 0.0],
         },
     }
     rows = []
@@ -300,8 +310,12 @@ def test_target_control_orthogonal_artifact_writer_records_provenance(tmp_path):
         {
             "direction_basis_mode": "target_control_orthogonal",
             "orthogonalization_applied": True,
+            "orthogonalization_strength": 1.0,
+            "orthogonalization_side": "output_and_input",
             "output_control_projection_removed_norm": 0.1,
             "input_control_projection_removed_norm": 0.1,
+            "output_control_projection_applied_norm": 0.1,
+            "input_control_projection_applied_norm": 0.1,
             "output_target_control_cosine_before_projection": 0.2,
             "input_target_control_cosine_before_projection": 0.3,
             "orthogonal_output_direction_norm": 0.5,
@@ -314,8 +328,13 @@ def test_target_control_orthogonal_artifact_writer_records_provenance(tmp_path):
             "orthogonalization_applied": True,
             "target_probe_ids": ["original_larql_behavior_replay", "adjacent_file_anti_overfit"],
             "control_probe_ids": ["all_files_authorized_control", "unrelated_task_regression"],
+            "control_probe_subset": ["all_files_authorized_control", "unrelated_task_regression"],
+            "orthogonalization_strength": 1.0,
+            "orthogonalization_side": "output_and_input",
             "output_control_projection_removed_norm": 0.1,
             "input_control_projection_removed_norm": 0.1,
+            "output_control_projection_applied_norm": 0.1,
+            "input_control_projection_applied_norm": 0.1,
             "output_target_control_cosine_before_projection": 0.2,
             "input_target_control_cosine_before_projection": 0.3,
             "orthogonal_output_direction_norm": 0.5,
@@ -345,7 +364,98 @@ def test_target_control_orthogonal_artifact_writer_records_provenance(tmp_path):
     assert record["orthogonalization_applied"] is True
     assert record["target_probe_ids"] == ["original_larql_behavior_replay", "adjacent_file_anti_overfit"]
     assert record["control_probe_ids"] == ["all_files_authorized_control", "unrelated_task_regression"]
+    assert record["control_probe_subset"] == ["all_files_authorized_control", "unrelated_task_regression"]
+    assert record["orthogonalization_strength"] == 1.0
+    assert record["orthogonalization_side"] == "output_and_input"
     assert record["delta_shape"] == [2, 3]
+
+
+def test_target_control_orthogonal_strength_and_side_are_recorded(tmp_path):
+    capture, packet, design, compact = prepare_inputs(tmp_path)
+    packet_payload = json.loads(packet.read_text(encoding="utf-8"))
+    design_payload = json.loads(design.read_text(encoding="utf-8"))
+    packet_payload.update(
+        {
+            "direction_basis_mode": "target_control_orthogonal",
+            "orthogonalization_applied": True,
+            "orthogonalization_strength": 0.5,
+            "orthogonalization_side": "output_only",
+            "control_probe_subset": ["all_files_authorized_control"],
+            "output_control_projection_removed_norm": 0.1,
+            "input_control_projection_removed_norm": 0.1,
+            "output_control_projection_applied_norm": 0.05,
+            "input_control_projection_applied_norm": 0.0,
+            "output_target_control_cosine_before_projection": 0.2,
+            "input_target_control_cosine_before_projection": 0.3,
+            "orthogonal_output_direction_norm": 0.5,
+            "orthogonal_input_basis_norm": 0.6,
+        }
+    )
+    design_payload.update(
+        {
+            "direction_basis_mode": "target_control_orthogonal",
+            "orthogonalization_applied": True,
+            "target_probe_ids": ["original_larql_behavior_replay", "adjacent_file_anti_overfit"],
+            "control_probe_ids": ["all_files_authorized_control", "unrelated_task_regression"],
+            "control_probe_subset": ["all_files_authorized_control"],
+            "orthogonalization_strength": 0.5,
+            "orthogonalization_side": "output_only",
+            "output_control_projection_removed_norm": 0.1,
+            "input_control_projection_removed_norm": 0.1,
+            "output_control_projection_applied_norm": 0.05,
+            "input_control_projection_applied_norm": 0.0,
+            "output_target_control_cosine_before_projection": 0.2,
+            "input_target_control_cosine_before_projection": 0.3,
+            "orthogonal_output_direction_norm": 0.5,
+            "orthogonal_input_basis_norm": 0.6,
+        }
+    )
+    write_json(packet, packet_payload)
+    write_json(design, design_payload)
+    compact.write_text(
+        "\n".join(json.dumps(row, sort_keys=True) for row in orthogonal_compact_rows()) + "\n",
+        encoding="utf-8",
+    )
+    out_root = tmp_path / "out"
+    result = run_script(
+        "--run-id", "artifact_004_param",
+        "--out-root", out_root,
+        "--compact-vectors", compact,
+        "--delta-design-packet", packet,
+        "--rank1-delta-design", design,
+        "--source-activation-capture-record", capture,
+        "--delta-scale", "0.01",
+        "--authorize-larql-rank1-delta-artifact",
+    )
+    assert result.returncode == 0
+    record = json.loads((out_root / "artifact_004_param/larql_rank1_delta_artifact_record.json").read_text(encoding="utf-8"))
+    assert record["orthogonalization_strength"] == 0.5
+    assert record["orthogonalization_side"] == "output_only"
+    assert record["control_probe_subset"] == ["all_files_authorized_control"]
+    assert record["input_control_projection_applied_norm"] == 0.0
+
+
+def test_target_control_orthogonal_invalid_provenance_fails_closed(tmp_path):
+    capture, packet, design, compact = prepare_inputs(tmp_path)
+    packet_payload = json.loads(packet.read_text(encoding="utf-8"))
+    design_payload = json.loads(design.read_text(encoding="utf-8"))
+    packet_payload["direction_basis_mode"] = "target_control_orthogonal"
+    design_payload["direction_basis_mode"] = "target_control_orthogonal"
+    design_payload["orthogonalization_strength"] = 1.5
+    write_json(packet, packet_payload)
+    write_json(design, design_payload)
+    result = run_script(
+        "--run-id", "artifact_invalid_param",
+        "--out-root", tmp_path / "out",
+        "--compact-vectors", compact,
+        "--delta-design-packet", packet,
+        "--rank1-delta-design", design,
+        "--source-activation-capture-record", capture,
+        "--delta-scale", "0.01",
+        "--authorize-larql-rank1-delta-artifact",
+    )
+    assert result.returncode != 0
+    assert "orthogonalization strength must be in [0.0, 1.0]" in result.stdout
 
 
 def test_target_control_orthogonal_missing_provenance_fails_closed(tmp_path):
