@@ -13,12 +13,22 @@ from typing import Any
 
 REPORT_TYPE = "larql_delta_design_packet.v0"
 REQUIRED_NEXT_STEP = "supervised_delta_design_review"
+DEFAULT_DIRECTION_BASIS_MODE = "file_scope_mean"
+TARGET_CONTROL_ORTHOGONAL_MODE = "target_control_orthogonal"
 FILE_SCOPE_PROBES = [
     "original_larql_behavior_replay",
     "adjacent_file_anti_overfit",
     "all_files_authorized_control",
 ]
 REGRESSION_GUARD_PROBE = "unrelated_task_regression"
+TARGET_PROBES = [
+    "original_larql_behavior_replay",
+    "adjacent_file_anti_overfit",
+]
+CONTROL_PROBES = [
+    "all_files_authorized_control",
+    "unrelated_task_regression",
+]
 TARGET_MODULE_OVERRIDE_RE = re.compile(r"^model\.layers\.(\d+)\.mlp\.down_proj\.weight$")
 
 
@@ -74,6 +84,35 @@ def average_vectors(vectors: list[list[float]]) -> list[float] | None:
     if any(len(vec) != length for vec in vectors):
         return None
     return [sum(float(vec[i]) for vec in vectors) / len(vectors) for i in range(length)]
+
+
+def vector_scale(vec: list[float], scalar: float) -> list[float]:
+    return [float(x) * float(scalar) for x in vec]
+
+
+def vector_dot(a: list[float], b: list[float]) -> float:
+    if len(a) != len(b):
+        raise ValueError("vector length mismatch")
+    return sum(float(x) * float(y) for x, y in zip(a, b))
+
+
+def project_vector(source: list[float], onto: list[float]) -> tuple[list[float], float]:
+    onto_norm_sq = vector_dot(onto, onto)
+    if onto_norm_sq <= 0.0:
+        raise ValueError("control vector norm must be positive for projection")
+    scalar = vector_dot(source, onto) / onto_norm_sq
+    projected = vector_scale(onto, scalar)
+    return projected, vector_norm(projected)
+
+
+def parse_direction_basis_mode(direction_basis_mode: str | None) -> str:
+    if direction_basis_mode in (None, "", DEFAULT_DIRECTION_BASIS_MODE):
+        return DEFAULT_DIRECTION_BASIS_MODE
+    if direction_basis_mode == TARGET_CONTROL_ORTHOGONAL_MODE:
+        return TARGET_CONTROL_ORTHOGONAL_MODE
+    raise ValueError(
+        "direction basis mode must be file_scope_mean or target_control_orthogonal"
+    )
 
 
 def validate_inputs(
@@ -174,6 +213,7 @@ def build_delta_design(
     source_capture_record: dict[str, Any],
     vector_source_override: str | None = None,
     target_module_override: str | None = None,
+    direction_basis_mode: str = DEFAULT_DIRECTION_BASIS_MODE,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     grouped = group_rows(compact_rows)
     original_recommended_vector_source = str(direction_packet.get("recommended_vector_source", "none"))
@@ -223,6 +263,15 @@ def build_delta_design(
     per_probe: list[dict[str, Any]] = []
     output_vector_length = 0
     input_vector_length = 0
+    orthogonalization_applied = direction_basis_mode == TARGET_CONTROL_ORTHOGONAL_MODE
+    output_control_projection_removed_norm: float | None = None
+    input_control_projection_removed_norm: float | None = None
+    output_target_control_cosine_before_projection: float | None = None
+    input_target_control_cosine_before_projection: float | None = None
+    orthogonal_output_direction_norm: float | None = None
+    orthogonal_input_basis_norm: float | None = None
+    final_output_direction: list[float] | None = None
+    final_input_basis: list[float] | None = None
 
     if output_field is not None and input_field is not None:
         for probe_id in FILE_SCOPE_PROBES + [REGRESSION_GUARD_PROBE]:
@@ -267,7 +316,70 @@ def build_delta_design(
     )
 
     if status != "delta_design_rejected":
-        if malformed or len(file_scope_output_directions) != 3 or len(file_scope_input_basis) != 3:
+        if direction_basis_mode == TARGET_CONTROL_ORTHOGONAL_MODE:
+            target_output_directions = [probe["output_direction_norm"] for probe in per_probe if probe["probe_id"] in TARGET_PROBES]
+            control_output_directions = [probe["output_direction_norm"] for probe in per_probe if probe["probe_id"] in CONTROL_PROBES]
+            if len(target_output_directions) != len(TARGET_PROBES):
+                status = "delta_design_rejected"
+                rationale = "required target probes were missing for target_control_orthogonal mode"
+            elif len(control_output_directions) != len(CONTROL_PROBES):
+                status = "delta_design_rejected"
+                rationale = "required control probes were missing for target_control_orthogonal mode"
+            else:
+                try:
+                    target_output_vectors: list[list[float]] = []
+                    control_output_vectors: list[list[float]] = []
+                    target_input_vectors: list[list[float]] = []
+                    control_input_vectors: list[list[float]] = []
+                    for probe_id in TARGET_PROBES + CONTROL_PROBES:
+                        pair = grouped[probe_id]
+                        failure = pair["failure"]
+                        correction = pair["correction"]
+                        failure_output = [float(v) for v in failure[output_field]]
+                        correction_output = [float(v) for v in correction[output_field]]
+                        failure_input = [float(v) for v in failure[input_field]]
+                        output_direction = vector_subtract(correction_output, failure_output)
+                        if probe_id in TARGET_PROBES:
+                            target_output_vectors.append(output_direction)
+                            target_input_vectors.append(failure_input)
+                        else:
+                            control_output_vectors.append(output_direction)
+                            control_input_vectors.append(failure_input)
+                    target_output_direction = average_vectors(target_output_vectors)
+                    control_output_direction = average_vectors(control_output_vectors)
+                    target_input_basis = average_vectors(target_input_vectors)
+                    control_input_basis = average_vectors(control_input_vectors)
+                    if (
+                        target_output_direction is None
+                        or control_output_direction is None
+                        or target_input_basis is None
+                        or control_input_basis is None
+                    ):
+                        raise ValueError("required target/control vectors were malformed")
+                    output_target_control_cosine_before_projection = cosine_similarity(
+                        target_output_direction, control_output_direction
+                    )
+                    input_target_control_cosine_before_projection = cosine_similarity(
+                        target_input_basis, control_input_basis
+                    )
+                    output_projection, output_control_projection_removed_norm = project_vector(
+                        target_output_direction, control_output_direction
+                    )
+                    input_projection, input_control_projection_removed_norm = project_vector(
+                        target_input_basis, control_input_basis
+                    )
+                    final_output_direction = vector_subtract(target_output_direction, output_projection)
+                    final_input_basis = vector_subtract(target_input_basis, input_projection)
+                    orthogonal_output_direction_norm = vector_norm(final_output_direction)
+                    orthogonal_input_basis_norm = vector_norm(final_input_basis)
+                    if orthogonal_output_direction_norm <= 1e-12:
+                        raise ValueError("orthogonalized output direction norm must be positive")
+                    if orthogonal_input_basis_norm <= 1e-12:
+                        raise ValueError("orthogonalized input basis norm must be positive")
+                except (KeyError, TypeError, ValueError) as exc:
+                    status = "delta_design_rejected"
+                    rationale = str(exc)
+        elif malformed or len(file_scope_output_directions) != 3 or len(file_scope_input_basis) != 3:
             status = "delta_design_rejected"
             rationale = "required file-scope output or input vectors were missing or malformed"
         elif avg_output_direction is None or avg_input_basis is None or output_vector_length == 0 or input_vector_length == 0:
@@ -276,8 +388,21 @@ def build_delta_design(
         elif regression_input_alignment is not None and regression_input_alignment >= 0.95:
             status = "delta_design_unclear"
             rationale = "regression guard input basis was too aligned with the file-scope input basis"
+        else:
+            final_output_direction = avg_output_direction
+            final_input_basis = avg_input_basis
+
+    if status != "delta_design_rejected" and direction_basis_mode == DEFAULT_DIRECTION_BASIS_MODE:
+        final_output_direction = avg_output_direction
+        final_input_basis = avg_input_basis
+        orthogonal_output_direction_norm = vector_norm(final_output_direction) if final_output_direction else None
+        orthogonal_input_basis_norm = vector_norm(final_input_basis) if final_input_basis else None
 
     design = {
+        "direction_basis_mode": direction_basis_mode,
+        "target_probe_ids": TARGET_PROBES,
+        "control_probe_ids": CONTROL_PROBES,
+        "orthogonalization_applied": orthogonalization_applied,
         "selected_vector_source": selected_source,
         "vector_source_override_used": vector_source_override_used,
         "original_recommended_vector_source": original_recommended_vector_source,
@@ -295,6 +420,12 @@ def build_delta_design(
         "average_file_scope_output_direction_norm": vector_norm(avg_output_direction) if avg_output_direction else None,
         "average_file_scope_input_basis_norm": vector_norm(avg_input_basis) if avg_input_basis else None,
         "regression_input_alignment_cosine": regression_input_alignment,
+        "output_control_projection_removed_norm": output_control_projection_removed_norm,
+        "input_control_projection_removed_norm": input_control_projection_removed_norm,
+        "output_target_control_cosine_before_projection": output_target_control_cosine_before_projection,
+        "input_target_control_cosine_before_projection": input_target_control_cosine_before_projection,
+        "orthogonal_output_direction_norm": orthogonal_output_direction_norm,
+        "orthogonal_input_basis_norm": orthogonal_input_basis_norm,
         "output_vector_length": output_vector_length,
         "input_vector_length": input_vector_length,
         "proposed_delta_shape": [output_vector_length, input_vector_length] if output_vector_length and input_vector_length else None,
@@ -306,6 +437,10 @@ def build_delta_design(
         "delta_design_status": status,
     }
     packet = {
+        "direction_basis_mode": direction_basis_mode,
+        "target_probe_ids": TARGET_PROBES,
+        "control_probe_ids": CONTROL_PROBES,
+        "orthogonalization_applied": orthogonalization_applied,
         "selected_vector_source": selected_source,
         "vector_source_override_used": vector_source_override_used,
         "original_recommended_vector_source": original_recommended_vector_source,
@@ -324,6 +459,12 @@ def build_delta_design(
         "proposed_delta_shape": design["proposed_delta_shape"],
         "delta_design_status": status,
         "regression_input_alignment_cosine": regression_input_alignment,
+        "output_control_projection_removed_norm": output_control_projection_removed_norm,
+        "input_control_projection_removed_norm": input_control_projection_removed_norm,
+        "output_target_control_cosine_before_projection": output_target_control_cosine_before_projection,
+        "input_target_control_cosine_before_projection": input_target_control_cosine_before_projection,
+        "orthogonal_output_direction_norm": orthogonal_output_direction_norm,
+        "orthogonal_input_basis_norm": orthogonal_input_basis_norm,
         "selected_rationale": rationale,
     }
     return packet, design
@@ -362,6 +503,7 @@ def render_review_packet(*, packet: dict[str, Any]) -> str:
             f"- vector source override used: `{packet['vector_source_override_used']}`;",
             f"- original recommended vector source: `{packet['original_recommended_vector_source']}`;",
             f"- target module override used: `{packet['target_module_override_used']}`;",
+            f"- direction basis mode: `{packet['direction_basis_mode']}`;",
             f"- source vector target module: `{packet['source_vector_target_module']}`;",
             f"- override patch target module: `{packet['target_module']}`;",
             f"- proposed delta shape: `{packet['proposed_delta_shape']}`;",
@@ -384,8 +526,10 @@ def write_packet(
     authorize_larql_delta_design_packet: bool,
     vector_source_override: str | None = None,
     target_module_override: str | None = None,
+    direction_basis_mode: str | None = None,
 ) -> dict[str, Any]:
     require_authorization(authorize_larql_delta_design_packet)
+    resolved_direction_basis_mode = parse_direction_basis_mode(direction_basis_mode)
     compact_rows = load_jsonl(compact_vectors_path)
     direction_packet = load_json_object(direction_packet_path)
     _direction_coherence_report = load_json_object(direction_coherence_report_path)
@@ -400,15 +544,19 @@ def write_packet(
     if target_module_override is not None:
         parse_target_module_override(target_module_override)
 
-    out_dir = out_root / run_id
-    out_dir.mkdir(parents=True, exist_ok=True)
     packet_bits, design = build_delta_design(
         compact_rows=compact_rows,
         direction_packet=direction_packet,
         source_capture_record=source_capture_record,
         vector_source_override=vector_source_override,
         target_module_override=target_module_override,
+        direction_basis_mode=resolved_direction_basis_mode,
     )
+    if resolved_direction_basis_mode == TARGET_CONTROL_ORTHOGONAL_MODE and packet_bits["delta_design_status"] != "delta_design_reviewable":
+        raise ValueError(str(packet_bits["selected_rationale"]))
+
+    out_dir = out_root / run_id
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     (out_dir / "rank1_delta_design.json").write_text(
         json.dumps(
@@ -470,6 +618,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--source-activation-capture-record", required=True, type=Path)
     parser.add_argument("--vector-source-override")
     parser.add_argument("--target-module-override")
+    parser.add_argument("--direction-basis-mode")
     parser.add_argument("--authorize-larql-delta-design-packet", action="store_true")
     return parser.parse_args()
 
@@ -487,6 +636,7 @@ def main() -> int:
             authorize_larql_delta_design_packet=args.authorize_larql_delta_design_packet,
             vector_source_override=args.vector_source_override,
             target_module_override=args.target_module_override,
+            direction_basis_mode=args.direction_basis_mode,
         )
     except (OSError, ValueError, json.JSONDecodeError, KeyError, TypeError) as exc:
         print(f"error: {exc}")

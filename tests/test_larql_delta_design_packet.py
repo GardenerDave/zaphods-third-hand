@@ -170,6 +170,72 @@ def prepare_inputs(
     return capture, direction, coherence, compact
 
 
+def orthogonal_rows(*, zero_output: bool = False, zero_input: bool = False, missing_control_probe: bool = False) -> list[dict]:
+    rows = []
+    probe_specs = {
+        "original_larql_behavior_replay": {
+            "failure_out": [0.0, 0.0],
+            "correction_out": [1.0, 0.0],
+            "failure_in": [1.0, 0.0, 0.0],
+        },
+        "adjacent_file_anti_overfit": {
+            "failure_out": [0.0, 0.0],
+            "correction_out": [0.8, 0.2],
+            "failure_in": [0.8, 0.1, 0.1],
+        },
+        "all_files_authorized_control": {
+            "failure_out": [0.0, 0.0],
+            "correction_out": [0.9, 0.1] if not zero_output else [0.9, 0.1],
+            "failure_in": [0.9, 0.0, 0.1] if not zero_input else [0.9, 0.05, 0.05],
+        },
+        "unrelated_task_regression": {
+            "failure_out": [0.0, 0.0],
+            "correction_out": [0.1, 1.0] if not zero_output else [0.9, 0.1],
+            "failure_in": [0.0, 1.0, 0.0] if not zero_input else [0.9, 0.05, 0.05],
+        },
+    }
+    for probe_id, spec in probe_specs.items():
+        if missing_control_probe and probe_id == "unrelated_task_regression":
+            continue
+        rows.append(
+            {
+                "probe_id": probe_id,
+                "side": "failure",
+                "target_module": "model.layers.0.mlp.down_proj.weight",
+                "target_layer": "0",
+                "target_module_family": "mlp_projection",
+                "capture_mode": "prompt_forward",
+                "vector_dtype": "float32",
+                "vector_length": 2,
+                "prompt_last_token_vector": spec["failure_out"],
+                "prompt_mean_pool_vector": spec["failure_out"],
+                "input_vector_dtype": "float32",
+                "input_vector_length": 3,
+                "prompt_last_token_input_vector": spec["failure_in"],
+                "prompt_mean_pool_input_vector": spec["failure_in"],
+            }
+        )
+        rows.append(
+            {
+                "probe_id": probe_id,
+                "side": "correction",
+                "target_module": "model.layers.0.mlp.down_proj.weight",
+                "target_layer": "0",
+                "target_module_family": "mlp_projection",
+                "capture_mode": "prompt_forward",
+                "vector_dtype": "float32",
+                "vector_length": 2,
+                "prompt_last_token_vector": spec["correction_out"],
+                "prompt_mean_pool_vector": spec["correction_out"],
+                "input_vector_dtype": "float32",
+                "input_vector_length": 3,
+                "prompt_last_token_input_vector": spec["failure_in"],
+                "prompt_mean_pool_input_vector": spec["failure_in"],
+            }
+        )
+    return rows
+
+
 def run_script(*args: str | Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         [sys.executable, str(SCRIPT), *map(str, args)],
@@ -363,6 +429,125 @@ def test_invalid_target_module_override_fails_closed(tmp_path):
     assert result.returncode != 0
     assert "target module override must match model.layers.<integer>.mlp.down_proj.weight" in result.stdout
     assert not (out_root / "delta_003_invalid_target_override/larql_delta_design_packet.json").exists()
+
+
+def test_target_control_orthogonal_mode_records_required_fields(tmp_path):
+    capture, direction, coherence, compact = prepare_inputs(tmp_path)
+    compact.write_text(
+        "\n".join(json.dumps(row, sort_keys=True) for row in orthogonal_rows()) + "\n",
+        encoding="utf-8",
+    )
+    out_root = tmp_path / "out"
+    result = run_script(
+        "--run-id", "delta_003_orthogonal",
+        "--out-root", out_root,
+        "--compact-vectors", compact,
+        "--direction-packet", direction,
+        "--direction-coherence-report", coherence,
+        "--source-activation-capture-record", capture,
+        "--direction-basis-mode", "target_control_orthogonal",
+        "--authorize-larql-delta-design-packet",
+    )
+    assert result.returncode == 0
+    payload = json.loads((out_root / "delta_003_orthogonal/larql_delta_design_packet.json").read_text(encoding="utf-8"))
+    design = json.loads((out_root / "delta_003_orthogonal/rank1_delta_design.json").read_text(encoding="utf-8"))
+    assert payload["direction_basis_mode"] == "target_control_orthogonal"
+    assert payload["target_probe_ids"] == ["original_larql_behavior_replay", "adjacent_file_anti_overfit"]
+    assert payload["control_probe_ids"] == ["all_files_authorized_control", "unrelated_task_regression"]
+    assert payload["orthogonalization_applied"] is True
+    assert isinstance(payload["output_control_projection_removed_norm"], float)
+    assert isinstance(payload["input_control_projection_removed_norm"], float)
+    assert isinstance(payload["output_target_control_cosine_before_projection"], float)
+    assert isinstance(payload["input_target_control_cosine_before_projection"], float)
+    assert payload["orthogonal_output_direction_norm"] > 0.0
+    assert payload["orthogonal_input_basis_norm"] > 0.0
+    assert payload["proposed_delta_shape"] == [2, 3]
+    assert design["direction_basis_mode"] == "target_control_orthogonal"
+    assert design["writes_tensor_artifact"] is False
+
+
+def test_invalid_direction_basis_mode_fails_closed(tmp_path):
+    capture, direction, coherence, compact = prepare_inputs(tmp_path)
+    out_root = tmp_path / "out"
+    result = run_script(
+        "--run-id", "delta_003_bad_basis",
+        "--out-root", out_root,
+        "--compact-vectors", compact,
+        "--direction-packet", direction,
+        "--direction-coherence-report", coherence,
+        "--source-activation-capture-record", capture,
+        "--direction-basis-mode", "bad_basis",
+        "--authorize-larql-delta-design-packet",
+    )
+    assert result.returncode != 0
+    assert "direction basis mode must be file_scope_mean or target_control_orthogonal" in result.stdout
+    assert not (out_root / "delta_003_bad_basis/larql_delta_design_packet.json").exists()
+
+
+def test_missing_required_control_probe_fails_closed(tmp_path):
+    capture, direction, coherence, compact = prepare_inputs(tmp_path)
+    compact.write_text(
+        "\n".join(json.dumps(row, sort_keys=True) for row in orthogonal_rows(missing_control_probe=True)) + "\n",
+        encoding="utf-8",
+    )
+    out_root = tmp_path / "out"
+    result = run_script(
+        "--run-id", "delta_003_missing_control",
+        "--out-root", out_root,
+        "--compact-vectors", compact,
+        "--direction-packet", direction,
+        "--direction-coherence-report", coherence,
+        "--source-activation-capture-record", capture,
+        "--direction-basis-mode", "target_control_orthogonal",
+        "--authorize-larql-delta-design-packet",
+    )
+    assert result.returncode != 0
+    assert "required control probes were missing for target_control_orthogonal mode" in result.stdout
+    assert not (out_root / "delta_003_missing_control/larql_delta_design_packet.json").exists()
+
+
+def test_zero_orthogonalized_output_direction_fails_closed(tmp_path):
+    capture, direction, coherence, compact = prepare_inputs(tmp_path)
+    compact.write_text(
+        "\n".join(json.dumps(row, sort_keys=True) for row in orthogonal_rows(zero_output=True)) + "\n",
+        encoding="utf-8",
+    )
+    out_root = tmp_path / "out"
+    result = run_script(
+        "--run-id", "delta_003_zero_output",
+        "--out-root", out_root,
+        "--compact-vectors", compact,
+        "--direction-packet", direction,
+        "--direction-coherence-report", coherence,
+        "--source-activation-capture-record", capture,
+        "--direction-basis-mode", "target_control_orthogonal",
+        "--authorize-larql-delta-design-packet",
+    )
+    assert result.returncode != 0
+    assert "orthogonalized output direction norm must be positive" in result.stdout
+    assert not (out_root / "delta_003_zero_output/larql_delta_design_packet.json").exists()
+
+
+def test_zero_orthogonalized_input_basis_fails_closed(tmp_path):
+    capture, direction, coherence, compact = prepare_inputs(tmp_path)
+    compact.write_text(
+        "\n".join(json.dumps(row, sort_keys=True) for row in orthogonal_rows(zero_input=True)) + "\n",
+        encoding="utf-8",
+    )
+    out_root = tmp_path / "out"
+    result = run_script(
+        "--run-id", "delta_003_zero_input",
+        "--out-root", out_root,
+        "--compact-vectors", compact,
+        "--direction-packet", direction,
+        "--direction-coherence-report", coherence,
+        "--source-activation-capture-record", capture,
+        "--direction-basis-mode", "target_control_orthogonal",
+        "--authorize-larql-delta-design-packet",
+    )
+    assert result.returncode != 0
+    assert "orthogonalized input basis norm must be positive" in result.stdout
+    assert not (out_root / "delta_003_zero_input/larql_delta_design_packet.json").exists()
 
 
 def test_real_style_direction_packet_without_target_fields_resolves_from_source_capture_record(tmp_path):

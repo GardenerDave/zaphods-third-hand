@@ -20,6 +20,16 @@ FILE_SCOPE_PROBES = [
     "adjacent_file_anti_overfit",
     "all_files_authorized_control",
 ]
+TARGET_PROBES = [
+    "original_larql_behavior_replay",
+    "adjacent_file_anti_overfit",
+]
+CONTROL_PROBES = [
+    "all_files_authorized_control",
+    "unrelated_task_regression",
+]
+DEFAULT_DIRECTION_BASIS_MODE = "file_scope_mean"
+TARGET_CONTROL_ORTHOGONAL_MODE = "target_control_orthogonal"
 
 
 def require_authorization(authorized: bool) -> None:
@@ -65,6 +75,35 @@ def average_vectors(vectors: list[list[float]]) -> list[float]:
     return [sum(float(vec[i]) for vec in vectors) / len(vectors) for i in range(length)]
 
 
+def cosine_similarity(a: list[float], b: list[float]) -> float | None:
+    if len(a) != len(b) or not a:
+        return None
+    a_norm = vector_norm(a)
+    b_norm = vector_norm(b)
+    if a_norm == 0.0 or b_norm == 0.0:
+        return None
+    return vector_dot(a, b) / (a_norm * b_norm)
+
+
+def vector_dot(a: list[float], b: list[float]) -> float:
+    if len(a) != len(b):
+        raise ValueError("vector length mismatch")
+    return sum(float(x) * float(y) for x, y in zip(a, b))
+
+
+def vector_scale(vec: list[float], scalar: float) -> list[float]:
+    return [float(x) * float(scalar) for x in vec]
+
+
+def project_vector(source: list[float], onto: list[float]) -> tuple[list[float], float]:
+    onto_norm_sq = vector_dot(onto, onto)
+    if onto_norm_sq <= 0.0:
+        raise ValueError("control vector norm must be positive for projection")
+    scalar = vector_dot(source, onto) / onto_norm_sq
+    projected = vector_scale(onto, scalar)
+    return projected, vector_norm(projected)
+
+
 def normalize_vector(vec: list[float]) -> tuple[list[float], float]:
     norm = vector_norm(vec)
     if norm <= 0.0:
@@ -104,6 +143,21 @@ def validate_inputs(
         raise ValueError("source activation capture report_type mismatch")
     if source_capture_record.get("compact_vectors_written") is not True:
         raise ValueError("source activation capture must have compact vectors written")
+    direction_basis_mode = str(delta_design_packet.get("direction_basis_mode", DEFAULT_DIRECTION_BASIS_MODE))
+    if direction_basis_mode == TARGET_CONTROL_ORTHOGONAL_MODE:
+        for key in [
+            "target_probe_ids",
+            "control_probe_ids",
+            "orthogonalization_applied",
+            "output_control_projection_removed_norm",
+            "input_control_projection_removed_norm",
+            "output_target_control_cosine_before_projection",
+            "input_target_control_cosine_before_projection",
+            "orthogonal_output_direction_norm",
+            "orthogonal_input_basis_norm",
+        ]:
+            if key not in rank1_delta_design:
+                raise ValueError("orthogonal mode provenance missing from rank1 delta design")
 
 
 def group_rows(compact_rows: list[dict[str, Any]]) -> dict[str, dict[str, dict[str, Any]]]:
@@ -117,9 +171,21 @@ def recompute_vectors(
     *,
     compact_rows: list[dict[str, Any]],
     selected_vector_source: str,
-) -> tuple[list[float], float, list[float], float]:
+) -> tuple[list[float], float, list[float], float, dict[str, Any]]:
     output_field, input_field = select_vector_fields(selected_vector_source)
     grouped = group_rows(compact_rows)
+    direction_basis_provenance = {
+        "direction_basis_mode": DEFAULT_DIRECTION_BASIS_MODE,
+        "target_probe_ids": TARGET_PROBES,
+        "control_probe_ids": CONTROL_PROBES,
+        "orthogonalization_applied": False,
+        "output_control_projection_removed_norm": None,
+        "input_control_projection_removed_norm": None,
+        "output_target_control_cosine_before_projection": None,
+        "input_target_control_cosine_before_projection": None,
+        "orthogonal_output_direction_norm": None,
+        "orthogonal_input_basis_norm": None,
+    }
     output_directions: list[list[float]] = []
     input_basis_vectors: list[list[float]] = []
     for probe_id in FILE_SCOPE_PROBES:
@@ -140,7 +206,72 @@ def recompute_vectors(
     avg_input_basis = average_vectors(input_basis_vectors)
     output_unit, output_norm = normalize_vector(avg_output_direction)
     input_unit, input_norm = normalize_vector(avg_input_basis)
-    return output_unit, output_norm, input_unit, input_norm
+    direction_basis_provenance["orthogonal_output_direction_norm"] = output_norm
+    direction_basis_provenance["orthogonal_input_basis_norm"] = input_norm
+    return output_unit, output_norm, input_unit, input_norm, direction_basis_provenance
+
+
+def recompute_vectors_target_control_orthogonal(
+    *,
+    compact_rows: list[dict[str, Any]],
+    selected_vector_source: str,
+    target_probe_ids: list[str],
+    control_probe_ids: list[str],
+) -> tuple[list[float], float, list[float], float, dict[str, Any]]:
+    output_field, input_field = select_vector_fields(selected_vector_source)
+    grouped = group_rows(compact_rows)
+    target_output_vectors: list[list[float]] = []
+    control_output_vectors: list[list[float]] = []
+    target_input_vectors: list[list[float]] = []
+    control_input_vectors: list[list[float]] = []
+    for probe_id in target_probe_ids + control_probe_ids:
+        pair = grouped.get(probe_id, {})
+        failure = pair.get("failure")
+        correction = pair.get("correction")
+        if failure is None or correction is None:
+            raise ValueError(f"missing failure/correction rows for {probe_id}")
+        try:
+            failure_output = [float(v) for v in failure[output_field]]
+            correction_output = [float(v) for v in correction[output_field]]
+            failure_input = [float(v) for v in failure[input_field]]
+        except (KeyError, TypeError, ValueError):
+            raise ValueError(f"malformed vectors for {probe_id}")
+        output_direction = vector_subtract(correction_output, failure_output)
+        if probe_id in target_probe_ids:
+            target_output_vectors.append(output_direction)
+            target_input_vectors.append(failure_input)
+        else:
+            control_output_vectors.append(output_direction)
+            control_input_vectors.append(failure_input)
+    if len(target_output_vectors) != len(target_probe_ids):
+        raise ValueError("required target probes were missing for target_control_orthogonal mode")
+    if len(control_output_vectors) != len(control_probe_ids):
+        raise ValueError("required control probes were missing for target_control_orthogonal mode")
+    target_output_direction = average_vectors(target_output_vectors)
+    control_output_direction = average_vectors(control_output_vectors)
+    target_input_basis = average_vectors(target_input_vectors)
+    control_input_basis = average_vectors(control_input_vectors)
+    output_target_control_cosine = cosine_similarity(target_output_direction, control_output_direction)
+    input_target_control_cosine = cosine_similarity(target_input_basis, control_input_basis)
+    output_projection, output_projection_norm = project_vector(target_output_direction, control_output_direction)
+    input_projection, input_projection_norm = project_vector(target_input_basis, control_input_basis)
+    orthogonal_output = vector_subtract(target_output_direction, output_projection)
+    orthogonal_input = vector_subtract(target_input_basis, input_projection)
+    output_unit, output_norm = normalize_vector(orthogonal_output)
+    input_unit, input_norm = normalize_vector(orthogonal_input)
+    provenance = {
+        "direction_basis_mode": TARGET_CONTROL_ORTHOGONAL_MODE,
+        "target_probe_ids": target_probe_ids,
+        "control_probe_ids": control_probe_ids,
+        "orthogonalization_applied": True,
+        "output_control_projection_removed_norm": output_projection_norm,
+        "input_control_projection_removed_norm": input_projection_norm,
+        "output_target_control_cosine_before_projection": output_target_control_cosine,
+        "input_target_control_cosine_before_projection": input_target_control_cosine,
+        "orthogonal_output_direction_norm": output_norm,
+        "orthogonal_input_basis_norm": input_norm,
+    }
+    return output_unit, output_norm, input_unit, input_norm, provenance
 
 
 def write_artifact(
@@ -184,6 +315,7 @@ def render_review_packet(record: dict[str, Any]) -> str:
             "",
             f"- target module: `{record['target_module']}`;",
             f"- selected vector source: `{record['selected_vector_source']}`;",
+            f"- direction basis mode: `{record['direction_basis_mode']}`;",
             f"- delta shape: `{record['delta_shape']}`;",
             f"- artifact format: `{record['artifact_format']}`;",
             "",
@@ -221,11 +353,19 @@ def write_record(
     target_module = str(delta_design_packet["target_module"])
     target_layer = str(delta_design_packet["target_layer"])
     target_module_family = str(delta_design_packet["target_module_family"])
-
-    output_unit, output_norm, input_unit, input_norm = recompute_vectors(
-        compact_rows=compact_rows,
-        selected_vector_source=selected_vector_source,
-    )
+    direction_basis_mode = str(delta_design_packet.get("direction_basis_mode", DEFAULT_DIRECTION_BASIS_MODE))
+    if direction_basis_mode == TARGET_CONTROL_ORTHOGONAL_MODE:
+        output_unit, output_norm, input_unit, input_norm, direction_basis_provenance = recompute_vectors_target_control_orthogonal(
+            compact_rows=compact_rows,
+            selected_vector_source=selected_vector_source,
+            target_probe_ids=[str(x) for x in delta_design_packet.get("target_probe_ids", [])],
+            control_probe_ids=[str(x) for x in delta_design_packet.get("control_probe_ids", [])],
+        )
+    else:
+        output_unit, output_norm, input_unit, input_norm, direction_basis_provenance = recompute_vectors(
+            compact_rows=compact_rows,
+            selected_vector_source=selected_vector_source,
+        )
     delta_tensor = outer_product(output_unit, input_unit, delta_scale)
     delta_shape = [len(delta_tensor), len(delta_tensor[0]) if delta_tensor else 0]
     delta_tensor_norm = math.sqrt(sum(value * value for row in delta_tensor for value in row))
@@ -247,10 +387,20 @@ def write_record(
         "source_activation_capture_record_path": str(source_activation_capture_record_path),
         "compact_vectors_path": str(compact_vectors_path),
         "rank1_delta_artifact_authorized": True,
+        "direction_basis_mode": direction_basis_mode,
         "selected_vector_source": selected_vector_source,
         "target_module": target_module,
         "target_layer": target_layer,
         "target_module_family": target_module_family,
+        "target_probe_ids": direction_basis_provenance["target_probe_ids"],
+        "control_probe_ids": direction_basis_provenance["control_probe_ids"],
+        "orthogonalization_applied": direction_basis_provenance["orthogonalization_applied"],
+        "output_control_projection_removed_norm": direction_basis_provenance["output_control_projection_removed_norm"],
+        "input_control_projection_removed_norm": direction_basis_provenance["input_control_projection_removed_norm"],
+        "output_target_control_cosine_before_projection": direction_basis_provenance["output_target_control_cosine_before_projection"],
+        "input_target_control_cosine_before_projection": direction_basis_provenance["input_target_control_cosine_before_projection"],
+        "orthogonal_output_direction_norm": direction_basis_provenance["orthogonal_output_direction_norm"],
+        "orthogonal_input_basis_norm": direction_basis_provenance["orthogonal_input_basis_norm"],
         "delta_scale": delta_scale,
         "output_vector_length": len(output_unit),
         "input_vector_length": len(input_unit),
