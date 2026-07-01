@@ -26,6 +26,42 @@ Humans retain decision authority over priority, taste, architecture, merge, rele
 
 This model is implemented first through the structured Agent Task Session harness: a reviewable wrapper around scoped Codex work, validation, plain-file handoff, and closeout guidance. It produces draft evidence for human review but does not merge, release, promote, or move lifecycle state on its own.
 
+## Local-First Accessibility and Variant Economy
+
+ZTH's long-term goal is AI accessibility under ordinary local constraints, not
+requiring frontier-scale hardware as the default operating assumption. The
+roadmap direction is local-first and supervised: make bounded useful work
+possible on hardware people can actually own, inspect, route, and review.
+
+This implies a different stance toward small local models. The roadmap does
+not treat them as universal generalists that should absorb every task through a
+single prompt or one monolithic capability claim. Instead, small models should
+be treated as specialized workers inside a supervised bureaucracy: each worker
+has guided capability, bounded scopes, explicit evidence, and no unattended
+promotion.
+
+If local models can be adapted at home through variants, deltas, adapters,
+scaffolds, or other guided capability packaging, then the key roadmap question
+shifts. It becomes less "Can a small model handle this task?" and more "Do I
+have the right model variant, delta, adapter, scaffold, or capability card,
+and enough local storage, to move this task through a supervised workflow?"
+
+Under that thesis, storage, provenance, routing, and review become first-class
+infrastructure. ZTH should treat artifact lineage, variant selection,
+capability-card boundaries, evidence retention, and review checkpoints as core
+operating concerns rather than afterthoughts.
+
+Important target environments include cell phones, SBCs, used mini PCs, and
+cheap local servers. The roadmap interest is broad AI accessibility across
+those environments, with supervised routing and review doing more of the system
+work than any single model instance.
+
+This section is aspirational. It does not claim that ZTH has already solved
+phone- or SBC-class training, reliable direct behavior editing, or fully
+portable local variant management. Those remain roadmap-level problems that
+require evidence, not authority, and must stay behind explicit review and no
+unattended promotion boundaries.
+
 ## Implemented
 
 - LLM-probe preflight import scaffold.
