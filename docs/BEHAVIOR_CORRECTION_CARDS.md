@@ -120,6 +120,30 @@ This runner performs one model attempt only. It does not validate correctness,
 accept outputs, promote artifacts, train, write deltas, materialize models, or
 capture failures for curriculum.
 
+## Validating correction-aware model outputs
+
+After a model attempt, a separate model-free validator can inspect the raw
+output and compare it against the packet expectations.
+
+Example:
+
+```text
+python3 local_harness/validate_correction_aware_model_output.py \
+  --model-attempt-dir .work/example_model_attempt \
+  --job-packet .work/example_job_packet.json \
+  --prompt-packet .work/example_correction_aware_prompt_packet.json \
+  --out-dir .work/example_output_validation
+```
+
+Expected output artifacts:
+
+- `correction_aware_output_validation.json`
+- `correction_aware_output_validation.md`
+
+Validation is model-free. It does not accept, promote, train, write deltas, or
+perform supervised acceptance. It only records whether the observed output
+matches the explicit correction-card expectations.
+
 ## Validator role
 
 Validators can check whether a packet or response followed the card by looking
