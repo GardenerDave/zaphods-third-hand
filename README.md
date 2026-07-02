@@ -7,6 +7,11 @@ It helps turn chats, logs, model outputs, and role-work packets into reviewable
 files that an operator or authorized reviewer can inspect, compare, accept,
 reject, or refine.
 
+What ZTH actually does: it turns messy intent or model failure into a bounded,
+reviewable artifact chain. It gives models explicit scope, captures outputs
+and provenance, validates outputs model-free where possible, and requires
+supervised review and decision records before outputs count.
+
 ZTH workflows are supervised, not autonomous. Humans and agents may both
 operate inside the workflow, but authority boundaries are explicit.
 Destructive actions, publication, promotion, disclosure, cleanup, and
@@ -33,6 +38,10 @@ into small, inspectable steps:
 
 The project is designed for people who want AI help, but still want a visible
 audit trail and human control.
+
+What ZTH does not do: it does not grant unattended authority, it does not
+auto-promote outputs, and it does not rely on models to decide scope or
+lifecycle movement on their own.
 
 ## Recent proof: messy note to install-boundary hold
 
@@ -101,6 +110,12 @@ If you are new to this repo, begin with Context Distiller before using the
 management-team or external-agent layers.
 
 For the full documentation map, see [`docs/README.md`](docs/README.md).
+
+For behavior-correction details, see
+[`docs/BEHAVIOR_CORRECTION_CARDS.md`](docs/BEHAVIOR_CORRECTION_CARDS.md).
+
+For the proof report on the completed correction-aware supervised loop, see
+[`docs/reports/behavior_correction_cards/CORRECTION_AWARE_SUPERVISED_LOOP_DOGFOOD_2026-07-02.md`](docs/reports/behavior_correction_cards/CORRECTION_AWARE_SUPERVISED_LOOP_DOGFOOD_2026-07-02.md).
 
 For the model-free packet, scaffold, validation, repo-health, and Git-advice
 tools, see the informal [`Vogon Printer`](docs/VOGON_PRINTER.md) family

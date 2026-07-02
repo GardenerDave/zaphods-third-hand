@@ -26,6 +26,16 @@ approve their own outputs or move lifecycle state.
 - [`ROADMAP.md`](ROADMAP.md) — implemented, planned, and explicitly deferred
   work.
 
+## Where to Start
+
+- I want to understand what ZTH is: [`../README.md`](../README.md) and
+  [`ARCHITECTURE.md`](ARCHITECTURE.md)
+- I want to run the workflow: [`QUICKSTART.md`](../QUICKSTART.md)
+- I want behavior correction details:
+  [`BEHAVIOR_CORRECTION_CARDS.md`](BEHAVIOR_CORRECTION_CARDS.md)
+- I want the proof report:
+  [`reports/behavior_correction_cards/CORRECTION_AWARE_SUPERVISED_LOOP_DOGFOOD_2026-07-02.md`](reports/behavior_correction_cards/CORRECTION_AWARE_SUPERVISED_LOOP_DOGFOOD_2026-07-02.md)
+
 ## Endpoint Setup
 
 - [`OPENAI_COMPATIBLE_ENDPOINTS.md`](OPENAI_COMPATIBLE_ENDPOINTS.md) —
@@ -70,6 +80,8 @@ approve their own outputs or move lifecycle state.
   correction-card contract, explicit assignment rules, and validator framing.
 - [`behavior_correction_cards/README.md`](behavior_correction_cards/README.md)
   — index of example correction cards.
+- [`reports/behavior_correction_cards/CORRECTION_AWARE_SUPERVISED_LOOP_DOGFOOD_2026-07-02.md`](reports/behavior_correction_cards/CORRECTION_AWARE_SUPERVISED_LOOP_DOGFOOD_2026-07-02.md)
+  — completed correction-aware supervised loop dogfood evidence.
 
 ## Change Closeout
 

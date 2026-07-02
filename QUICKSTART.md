@@ -19,6 +19,69 @@ checks succeed.
   optional small-model exploratory harness is the only workflow that can
   manage temporary local llama.cpp servers.
 
+## Correction-aware supervised loop quickstart
+
+This is the practical path from a bounded failure to an explicit corrected
+artifact chain:
+
+1. prepare or inspect a job packet;
+2. assign a behavior correction explicitly;
+3. render the behavior correction scaffold;
+4. render the correction-aware prompt packet;
+5. run an authorized model attempt;
+6. validate the model output model-free;
+7. render the supervised review packet;
+8. render the supervised review decision record.
+
+Safe placeholder commands:
+
+```bash
+python3 local_harness/render_behavior_correction_scaffold.py \
+  --packet .work/example_job_packet/job_packet.json \
+  --out-dir .work/example_scaffold
+
+python3 local_harness/render_correction_aware_prompt_packet.py \
+  --job-packet .work/example_job_packet/job_packet.json \
+  --correction-scaffold .work/example_scaffold/behavior_correction_scaffold.json \
+  --out-dir .work/example_prompt_packet
+
+python3 local_harness/run_correction_aware_model_attempt.py \
+  --prompt-packet .work/example_prompt_packet/correction_aware_prompt_packet.json \
+  --out-dir .work/example_model_attempt \
+  --endpoint-url "$ZTH_BASE_URL" \
+  --model "$ZTH_MODEL" \
+  --authorize-model-attempt
+
+python3 local_harness/validate_correction_aware_model_output.py \
+  --model-attempt-dir .work/example_model_attempt \
+  --job-packet .work/example_job_packet/job_packet.json \
+  --prompt-packet .work/example_prompt_packet/correction_aware_prompt_packet.json \
+  --out-dir .work/example_validation
+
+python3 local_harness/render_supervised_review_packet.py \
+  --model-attempt-dir .work/example_model_attempt \
+  --job-packet .work/example_job_packet/job_packet.json \
+  --prompt-packet .work/example_prompt_packet/correction_aware_prompt_packet.json \
+  --validation-report .work/example_validation/correction_aware_output_validation.json \
+  --out-dir .work/example_review_packet
+
+python3 local_harness/render_supervised_review_decision_record.py \
+  --review-packet .work/example_review_packet/supervised_review_packet.json \
+  --decision accept_as_corrected_output \
+  --reviewer-id reviewer-id \
+  --rationale "Accepted as corrected output only." \
+  --out-dir .work/example_decision_record
+```
+
+Notes:
+
+- the model attempt runner requires explicit authorization;
+- validation does not accept outputs;
+- the review packet does not accept outputs;
+- the decision record can record `accept_as_corrected_output` only when that
+  decision is explicitly supplied;
+- acceptance is not promotion.
+
 Before use, confirm that your activity complies with [`LICENSE.md`](LICENSE.md)
 and [`COMMERCIAL_USE.md`](COMMERCIAL_USE.md).
 

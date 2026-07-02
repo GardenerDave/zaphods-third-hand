@@ -161,8 +161,9 @@ does not establish production readiness.
   of the corrected output only without promotion or downstream mutation.
 - `behavior_correction_cards/` — model-free correction-card scaffolds and
   dogfood evidence for explicit packet-level correction assignment,
-  correction-aware prompt packet composition, and prompt-facts tightening
-  evidence.
+  correction-aware prompt packet composition, prompt-facts tightening
+  evidence, and the completed live r5 correction-aware supervised loop
+  closeout report.
 
 ## Safety Reminder
 

@@ -21,6 +21,11 @@ Endpoint-backed model workers receive bounded requests and return output. They
 do not own repository files, source archives, job state, acceptance state, or
 canonical project memory.
 
+ZTH's mainline is prompt and scaffold steering plus artifact boundaries.
+Direct weight editing and patched-model comparison remain in the repository as
+parked research evidence, but they are not the architectural center of the
+public workflow.
+
 ## Runtime Classes
 
 | Runtime class | Meaning | Examples |
@@ -52,6 +57,24 @@ Evidence creation does not itself:
 - promote, approve, rank into a role, or assign a model;
 - certify a model or endpoint as production-ready;
 - approve unattended execution.
+
+The correction-aware supervised loop is the clearest end-to-end example of the
+current architecture in practice:
+
+```text
+behavior correction card
+    -> explicit job-packet assignment
+    -> behavior correction scaffold
+    -> correction-aware prompt packet
+    -> authorized local model attempt
+    -> model-free output validation
+    -> supervised review packet
+    -> supervised review decision record
+    -> accepted as corrected output only
+```
+
+That chain shows guided capability inside a supervised workflow. It does not
+mean the model learned autonomously or that the accepted output was promoted.
 
 ## Vogon Printer Family
 

@@ -122,7 +122,7 @@ remaining hardening, generalization, or operating-guide work.
 ### 1. Supervised Agent Use
 
 Clarify that ZTH is a supervised workflow system, not merely a
-human-supervised one. Humans and agents may both operate inside ZTH packets,
+model-only one. Humans and agents may both operate inside ZTH packets,
 scaffolds, closeouts, validators, and evidence structures.
 
 The workflow may help an agent handle a large job, but it does not grant

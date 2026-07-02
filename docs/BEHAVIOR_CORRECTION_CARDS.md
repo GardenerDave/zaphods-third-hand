@@ -11,6 +11,23 @@ The intent is practical: replace ad hoc prompt injection with a named,
 auditable, reusable correction step that can be assigned only when a packet
 explicitly requests it.
 
+## Full correction-aware loop
+
+The completed correction-aware loop is:
+
+1. behavior correction card
+2. explicit job-packet assignment
+3. behavior correction scaffold
+4. correction-aware prompt packet
+5. authorized local model attempt
+6. model-free output validation
+7. model-free supervised review packet
+8. explicit supervised review decision record
+9. accepted as corrected output only
+
+Each stage reads and writes bounded artifacts. None of the stages grant
+unattended authority.
+
 ## Core properties
 
 - explicit: the card must be assigned in a packet;
@@ -45,6 +62,14 @@ behavior_corrections:
 That assignment is explicit packet-level guidance only. It does not imply
 default use, automatic reuse, or unattended authority.
 
+## What `file_scope_hold_out_v1` does
+
+The initial example card addresses a file-scope authorization failure where a
+model is asked to choose between explicitly allowed files and plausible but
+unauthorized files. It tells the scaffold and prompt packet to hold out
+`docs/ROADMAP.md` unless the packet explicitly expands scope, while keeping
+`docs/README.md` as the allowed file.
+
 ## Rendering assigned corrections
 
 Assigned corrections can be rendered into a bounded scaffold section by a
@@ -68,6 +93,11 @@ The rendered scaffold remains explicit and bounded. It records the assigned
 corrections, the correction instructions, validator expectations, known
 failure modes, non-authorities, and provenance notes. It does not auto-assign
 corrections and it does not authorize model calls, edits, or promotion.
+
+It reads the job packet and the explicitly named correction card JSON. It
+writes the scaffold JSON and Markdown. It does not call a model, accept
+outputs, write deltas, materialize models, or capture failures for
+curriculum.
 
 ## Composing correction-aware prompt packets
 
@@ -93,6 +123,9 @@ boundary, correction guidance, and authority boundary into a prompt-ready
 artifact. It does not auto-assign corrections and it does not call a model.
 Prompt packets should render concrete decision facts, packet notes, and a
 required output contract rather than copyable empty-example outputs.
+
+It reads the job packet and scaffold JSON. It writes the prompt packet JSON
+and Markdown. It does not authorize file edits or scope expansion.
 
 ## Running a correction-aware model attempt
 
@@ -122,6 +155,9 @@ This runner performs one model attempt only. It does not validate correctness,
 accept outputs, promote artifacts, train, write deltas, materialize models, or
 capture failures for curriculum.
 
+It reads the prompt packet and writes raw output plus provenance. It requires
+explicit authorization before any model call.
+
 ## Validating correction-aware model outputs
 
 After a model attempt, a separate model-free validator can inspect the raw
@@ -145,6 +181,10 @@ Expected output artifacts:
 Validation is model-free. It does not accept, promote, train, write deltas, or
 perform supervised acceptance. It only records whether the observed output
 matches the explicit correction-card expectations.
+
+It reads the attempt record, raw output, job packet, and prompt packet. It
+writes the validation JSON and Markdown. It does not accept the output as
+truth.
 
 ## Rendering correction-aware supervised review packets
 
@@ -173,6 +213,10 @@ review artifact only.
 Use the JSON prompt packet path, not the Markdown packet, so the provenance
 fields and authority split remain explicit and machine-checkable.
 
+It reads the model attempt, raw output, validation report, job packet, and the
+JSON prompt packet. It writes the review packet JSON and Markdown. It does not
+accept outputs.
+
 ## Rendering supervised review decision records
 
 After a supervised review packet exists, a separate model-free renderer can
@@ -194,6 +238,10 @@ Expected output artifacts:
 
 This is a model-free decision record only. It does not promote, edit files,
 train, write deltas, materialize models, or capture failures for curriculum.
+
+It reads the supervised review packet JSON. It writes the decision record JSON
+and Markdown. Acceptance is an explicit supervised decision only; it is not
+promotion.
 
 ## Validator role
 
