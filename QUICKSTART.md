@@ -46,16 +46,19 @@ python3 local_harness/render_correction_aware_prompt_packet.py \
   --out-dir .work/example_prompt_packet
 
 python3 local_harness/run_correction_aware_model_attempt.py \
-  --prompt-packet .work/example_prompt_packet/correction_aware_prompt_packet.json \
+  --prompt-packet .work/example_prompt_packet/correction_aware_prompt_packet.md \
   --out-dir .work/example_model_attempt \
-  --endpoint-url "$ZTH_BASE_URL" \
+  --endpoint-url "$ZTH_ENDPOINT_URL" \
   --model "$ZTH_MODEL" \
+  --max-tokens 1024 \
+  --temperature 0.0 \
+  --timeout-seconds 240 \
   --authorize-model-attempt
 
 python3 local_harness/validate_correction_aware_model_output.py \
   --model-attempt-dir .work/example_model_attempt \
   --job-packet .work/example_job_packet/job_packet.json \
-  --prompt-packet .work/example_prompt_packet/correction_aware_prompt_packet.json \
+  --prompt-packet .work/example_prompt_packet/correction_aware_prompt_packet.md \
   --out-dir .work/example_validation
 
 python3 local_harness/render_supervised_review_packet.py \
@@ -81,6 +84,9 @@ Notes:
 - the decision record can record `accept_as_corrected_output` only when that
   decision is explicitly supplied;
 - acceptance is not promotion.
+- file edits, promotion, training, deltas, model materialization, and
+  failure-to-curriculum capture require separate explicit authorization if
+  they are ever added.
 
 Before use, confirm that your activity complies with [`LICENSE.md`](LICENSE.md)
 and [`COMMERCIAL_USE.md`](COMMERCIAL_USE.md).

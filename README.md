@@ -43,21 +43,21 @@ What ZTH does not do: it does not grant unattended authority, it does not
 auto-promote outputs, and it does not rely on models to decide scope or
 lifecycle movement on their own.
 
-## Recent proof: messy note to install-boundary hold
+## Recent proof: correction-aware supervised loop
 
-ZTH recently proved a narrow supervised workflow path from one synthetic noisy
-note to an install-boundary hold. That path turned messy input into bounded,
-reviewable artifacts instead of letting the note directly change the project.
-At each stage, provenance and authority boundaries were preserved so the chain
-could move forward without silently expanding scope. The proof stopped at a
-hold, not an install decision. It did not authorize install, mutate the
-registry, run a probe, write training data, or perform automatic
-failure-to-curriculum capture. This is evidence of supervised guided
-capability, not autonomy, and it does not claim that arbitrary messy input is
-solved generally. For the public explanation, see
-[`docs/LARQL_INTAKE_TO_INSTALL_BOUNDARY_PUBLIC_NARRATIVE.md`](docs/LARQL_INTAKE_TO_INSTALL_BOUNDARY_PUBLIC_NARRATIVE.md).
-For the proof-only milestone record, see
-[`docs/reports/affordance_larql/LARQL_INTAKE_TO_INSTALL_BOUNDARY_MILESTONE_CLOSEOUT_2026-06-29.md`](docs/reports/affordance_larql/LARQL_INTAKE_TO_INSTALL_BOUNDARY_MILESTONE_CLOSEOUT_2026-06-29.md).
+ZTH turns messy intent or model failure into a bounded, reviewable artifact
+chain. The current correction-aware supervised loop shows a local 1.7B model
+producing corrected scoped output after an explicit behavior correction,
+followed by model-free validation, supervised review, and an explicit decision
+record. The corrected output was accepted as a reviewed artifact only; no
+promotion, file edits, training, deltas, model materialization, or automatic
+failure-to-curriculum capture occurred.
+
+For the public explanation of the workflow, start with
+[`QUICKSTART.md`](QUICKSTART.md) and
+[`docs/BEHAVIOR_CORRECTION_CARDS.md`](docs/BEHAVIOR_CORRECTION_CARDS.md).
+For the proof report, see
+[`docs/reports/behavior_correction_cards/CORRECTION_AWARE_SUPERVISED_LOOP_DOGFOOD_2026-07-02.md`](docs/reports/behavior_correction_cards/CORRECTION_AWARE_SUPERVISED_LOOP_DOGFOOD_2026-07-02.md).
 
 ## What You Can Do Today
 

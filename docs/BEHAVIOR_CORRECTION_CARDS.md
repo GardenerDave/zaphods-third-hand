@@ -28,6 +28,31 @@ The completed correction-aware loop is:
 Each stage reads and writes bounded artifacts. None of the stages grant
 unattended authority.
 
+## Stage guide
+
+- behavior correction card: reads the failure pattern and provenance, writes a
+  bounded correction artifact, and does not authorize file edits, promotion,
+  training, deltas, model materialization, or automatic curriculum capture.
+- explicit job-packet assignment: reads the job packet, writes an explicit
+  correction assignment, and does not auto-assign corrections.
+- behavior correction scaffold: reads the job packet and correction card,
+  writes scaffold JSON/Markdown, and does not call a model or accept outputs.
+- correction-aware prompt packet: reads the job packet and scaffold, writes a
+  prompt packet JSON/Markdown, and does not authorize file edits or scope
+  expansion.
+- authorized local model attempt: reads the prompt packet, writes the attempt
+  record, raw output, summary, and status logs, and requires explicit
+  authorization before any model call.
+- model-free output validation: reads the attempt record, raw output, job
+  packet, and prompt packet, writes validation JSON/Markdown, and does not
+  accept the output as truth.
+- model-free supervised review packet: reads the attempt, raw output,
+  validation report, job packet, and JSON prompt packet, writes the review
+  packet JSON/Markdown, and does not accept outputs.
+- explicit supervised review decision record: reads the review packet JSON,
+  writes the decision record JSON/Markdown, and records an explicit
+  supervised decision only; acceptance is not promotion.
+
 ## Core properties
 
 - explicit: the card must be assigned in a packet;
@@ -138,8 +163,11 @@ Example:
 python3 local_harness/run_correction_aware_model_attempt.py \
   --prompt-packet .work/example_correction_aware_prompt_packet/correction_aware_prompt_packet.md \
   --out-dir .work/example_model_attempt \
-  --endpoint-url http://127.0.0.1:1234/v1 \
-  --model qwen3-1.7b-gpu-40k \
+  --endpoint-url "$ZTH_ENDPOINT_URL" \
+  --model "$ZTH_MODEL" \
+  --max-tokens 1024 \
+  --temperature 0.0 \
+  --timeout-seconds 240 \
   --authorize-model-attempt
 ```
 
@@ -169,7 +197,7 @@ Example:
 python3 local_harness/validate_correction_aware_model_output.py \
   --model-attempt-dir .work/example_model_attempt \
   --job-packet .work/example_job_packet.json \
-  --prompt-packet .work/example_correction_aware_prompt_packet.json \
+  --prompt-packet .work/example_correction_aware_prompt_packet.md \
   --out-dir .work/example_output_validation
 ```
 
@@ -226,7 +254,7 @@ record an explicit supervised decision without promoting anything:
 python3 local_harness/render_supervised_review_decision_record.py \
   --review-packet .work/example_supervised_review_packet/supervised_review_packet.json \
   --decision accept_as_corrected_output \
-  --reviewer-id david \
+  --reviewer-id "$USER" \
   --rationale "Validated r5 corrected output and confirmed ROADMAP.md is held out." \
   --out-dir .work/example_supervised_review_decision
 ```

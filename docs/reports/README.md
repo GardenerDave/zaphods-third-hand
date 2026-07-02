@@ -65,6 +65,12 @@ does not establish production readiness.
 
 ## Current Report Areas
 
+## High-Signal Reports
+
+- `behavior_correction_cards/CORRECTION_AWARE_SUPERVISED_LOOP_DOGFOOD_2026-07-02.md`
+  — completed correction-aware supervised loop evidence and explicit
+  acceptance of corrected output only.
+
 - `model_auditions/` — model audition cards and comparison reports.
 - `failure_training/` — supervised failure-curriculum and adapter-training
   evidence, local hardware smoke summaries, and measured base-vs-adapter

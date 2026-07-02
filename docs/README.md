@@ -35,6 +35,7 @@ approve their own outputs or move lifecycle state.
   [`BEHAVIOR_CORRECTION_CARDS.md`](BEHAVIOR_CORRECTION_CARDS.md)
 - I want the proof report:
   [`reports/behavior_correction_cards/CORRECTION_AWARE_SUPERVISED_LOOP_DOGFOOD_2026-07-02.md`](reports/behavior_correction_cards/CORRECTION_AWARE_SUPERVISED_LOOP_DOGFOOD_2026-07-02.md)
+- I want report history: [`reports/README.md`](reports/README.md)
 
 ## Endpoint Setup
 
