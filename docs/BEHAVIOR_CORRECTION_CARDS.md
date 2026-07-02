@@ -146,6 +146,31 @@ Validation is model-free. It does not accept, promote, train, write deltas, or
 perform supervised acceptance. It only records whether the observed output
 matches the explicit correction-card expectations.
 
+## Rendering correction-aware supervised review packets
+
+After validation, a separate model-free renderer can package the attempt,
+validation report, and source packets into a reviewer-facing packet.
+
+Example:
+
+```text
+python3 local_harness/render_supervised_review_packet.py \
+  --model-attempt-dir .work/example_model_attempt \
+  --job-packet .work/example_job_packet.json \
+  --prompt-packet .work/example_correction_aware_prompt_packet.json \
+  --validation-report .work/example_output_validation/correction_aware_output_validation.json \
+  --out-dir .work/example_supervised_review_packet
+```
+
+Expected output artifacts:
+
+- `supervised_review_packet.json`
+- `supervised_review_packet.md`
+
+The review packet is model-free and does not accept, promote, train, write
+deltas, materialize models, or capture failures for curriculum. It is a
+review artifact only.
+
 ## Validator role
 
 Validators can check whether a packet or response followed the card by looking
