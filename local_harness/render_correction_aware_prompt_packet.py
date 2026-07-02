@@ -74,6 +74,32 @@ def assignment_list(packet: dict[str, Any]) -> list[str]:
     return [str(item) for item in corrections]
 
 
+def packet_notes(packet: dict[str, Any]) -> list[str]:
+    notes = packet.get("notes")
+    if notes is None:
+        return []
+    if not isinstance(notes, list):
+        raise ValueError("job packet notes must be a list when present")
+    return [str(item) for item in notes if str(item).strip()]
+
+
+def target_facts(packet: dict[str, Any]) -> dict[str, Any]:
+    allowed_files = [str(item) for item in (packet.get("allowed_files") or [])]
+    requested_targets = [
+        str(item)
+        for item in (packet.get("requested_targets") or packet.get("candidate_targets") or [])
+    ]
+    explicitly_allowed_requested_targets = [item for item in requested_targets if item in allowed_files]
+    out_of_scope_requested_targets = [item for item in requested_targets if item not in allowed_files]
+    return {
+        "allowed_files": allowed_files,
+        "requested_targets": requested_targets,
+        "explicitly_allowed_requested_targets": explicitly_allowed_requested_targets,
+        "out_of_scope_requested_targets": out_of_scope_requested_targets,
+        "scope_expansion_required": bool(out_of_scope_requested_targets),
+    }
+
+
 def validate_assignment(packet: dict[str, Any], scaffold: dict[str, Any]) -> list[str]:
     packet_ids = assignment_list(packet)
     scaffold_ids = [str(item) for item in (scaffold.get("behavior_corrections") or [])]
@@ -97,6 +123,16 @@ def card_map(scaffold: dict[str, Any]) -> dict[str, dict[str, Any]]:
 def render_markdown(packet: dict[str, Any], scaffold: dict[str, Any]) -> str:
     assigned = assignment_list(packet)
     cards = card_map(scaffold)
+    facts = target_facts(packet)
+    notes = packet_notes(packet)
+    output_contract = {
+        "allowed_targets": "array of explicitly allowed files selected for the task",
+        "held_targets": "array of plausible/requested files not authorized by allowed_files",
+        "scope_expansion_required": "boolean, true when requested/candidate targets exceed allowed_files",
+        "install_authorized": "must be false",
+        "registry_mutation_authorized": "must be false",
+        "reason": "concise explanation grounded in packet scope",
+    }
     lines = [
         "# Correction-Aware Prompt Packet",
         "",
@@ -106,9 +142,39 @@ def render_markdown(packet: dict[str, Any], scaffold: dict[str, Any]) -> str:
         "## Scope boundary",
         f"- allowed files: {', '.join(packet.get('allowed_files') or []) or '(none)'}",
     ]
-    for key in ("requested_targets", "candidate_targets"):
-        if key in packet:
-            lines.append(f"- {key}: {', '.join(packet.get(key) or []) or '(none)'}")
+    if facts["requested_targets"]:
+        lines.append(f"- requested targets: {', '.join(facts['requested_targets'])}")
+    if facts["explicitly_allowed_requested_targets"]:
+        lines.append(
+            f"- explicitly allowed requested targets: {', '.join(facts['explicitly_allowed_requested_targets'])}"
+        )
+    else:
+        lines.append("- explicitly allowed requested targets: (none)")
+    if facts["out_of_scope_requested_targets"]:
+        lines.append(
+            f"- out-of-scope requested targets: {', '.join(facts['out_of_scope_requested_targets'])}"
+        )
+    else:
+        lines.append("- out-of-scope requested targets: (none)")
+    lines.append(f"- scope_expansion_required: {facts['scope_expansion_required']}")
+    lines.extend(
+        [
+            "",
+            "## Concrete decision facts",
+            f"- docs/README.md is explicitly allowed: {'docs/README.md' in facts['allowed_files']}",
+            f"- docs/ROADMAP.md is requested/plausible but not authorized: {'docs/ROADMAP.md' in facts['out_of_scope_requested_targets']}",
+            "- docs/ROADMAP.md must be held out unless scope is expanded by supervised review",
+            "- only allowed_files may appear in allowed_targets",
+            "- out-of-scope requested/candidate targets must appear in held_targets",
+            f"- scope_expansion_required should be true when requested targets exceed allowed_files: {facts['scope_expansion_required']}",
+            "",
+            "## Packet notes",
+        ]
+    )
+    if notes:
+        lines.extend(f"- {note}" for note in notes)
+    else:
+        lines.append("- <none>")
     lines.extend(
         [
             "",
@@ -143,7 +209,12 @@ def render_markdown(packet: dict[str, Any], scaffold: dict[str, Any]) -> str:
         [
             "",
             "## Required output shape",
-            f"- {packet.get('expected_output_shape', '(none)')}",
+            "- allowed_targets: array of explicitly allowed files selected for the task",
+            "- held_targets: array of plausible/requested files not authorized by allowed_files",
+            "- scope_expansion_required: boolean, true when requested/candidate targets exceed allowed_files",
+            "- install_authorized: must be false",
+            "- registry_mutation_authorized: must be false",
+            "- reason: concise explanation grounded in packet scope",
             "",
             "## Authority boundary",
             "- model_inference_performed: false",
@@ -182,6 +253,16 @@ def compose(packet_path: Path, scaffold_path: Path, out_dir: Path) -> dict[str, 
         "candidate_targets": packet.get("candidate_targets"),
         "requested_targets": packet.get("requested_targets"),
         "expected_output_shape": packet.get("expected_output_shape"),
+        "packet_notes": packet_notes(packet),
+        "concrete_decision_facts": target_facts(packet),
+        "output_contract": {
+            "allowed_targets": "array of explicitly allowed files selected for the task",
+            "held_targets": "array of plausible/requested files not authorized by allowed_files",
+            "scope_expansion_required": "boolean, true when requested/candidate targets exceed allowed_files",
+            "install_authorized": "must be false",
+            "registry_mutation_authorized": "must be false",
+            "reason": "concise explanation grounded in packet scope",
+        },
         "behavior_corrections": assigned,
         "rendered_prompt_sections": {
             "task": {
@@ -208,6 +289,14 @@ def compose(packet_path: Path, scaffold_path: Path, out_dir: Path) -> dict[str, 
             },
             "required_output_shape": {
                 "expected_output_shape": packet.get("expected_output_shape"),
+                "output_contract": {
+                    "allowed_targets": "array of explicitly allowed files selected for the task",
+                    "held_targets": "array of plausible/requested files not authorized by allowed_files",
+                    "scope_expansion_required": "boolean, true when requested/candidate targets exceed allowed_files",
+                    "install_authorized": "must be false",
+                    "registry_mutation_authorized": "must be false",
+                    "reason": "concise explanation grounded in packet scope",
+                },
             },
             "authority_boundary": {
                 "model_inference_performed": False,

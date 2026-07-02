@@ -91,6 +91,8 @@ Expected output artifacts:
 The composer is model-free. It only packages the explicit assignment, task
 boundary, correction guidance, and authority boundary into a prompt-ready
 artifact. It does not auto-assign corrections and it does not call a model.
+Prompt packets should render concrete decision facts, packet notes, and a
+required output contract rather than copyable empty-example outputs.
 
 ## Running a correction-aware model attempt
 

@@ -49,6 +49,10 @@ def make_packet(tmp_path: Path, ids: list[str] | None = None) -> Path:
         "allowed_files": ["docs/README.md"],
         "requested_targets": ["docs/README.md", "docs/ROADMAP.md"],
         "expected_output_shape": "explicit allowed_targets/held_targets split",
+        "notes": [
+            "docs/README.md is explicitly authorized.",
+            "docs/ROADMAP.md is plausible but not authorized and should be held out.",
+        ],
         "behavior_corrections": ["file_scope_hold_out_v1"] if ids is None else ids,
     }
     path = tmp_path / "packet.json"
@@ -77,9 +81,24 @@ def test_renders_assigned_packet(tmp_path: Path):
     assert payload["promotion_authorized"] is False
     assert payload["automatic_failure_curriculum_capture_authorized"] is False
     assert payload["behavior_corrections"] == ["file_scope_hold_out_v1"]
+    assert payload["packet_notes"] == [
+        "docs/README.md is explicitly authorized.",
+        "docs/ROADMAP.md is plausible but not authorized and should be held out.",
+    ]
+    assert "concrete_decision_facts" in payload
+    assert payload["output_contract"]["install_authorized"] == "must be false"
     md = (out / "correction_aware_prompt_packet.md").read_text(encoding="utf-8")
+    assert "Concrete decision facts" in md
+    assert "docs/README.md is explicitly allowed" in md
+    assert "docs/ROADMAP.md is requested/plausible but not authorized" in md
+    assert "docs/ROADMAP.md must be held out" in md
+    assert "scope_expansion_required should be true when requested targets exceed allowed_files" in md
+    assert "docs/README.md is explicitly authorized." in md
+    assert "docs/ROADMAP.md is plausible but not authorized and should be held out." in md
     assert "Hold out adjacent and unauthorized files explicitly" in md
     assert "does not authorize scope expansion" in md
+    assert "allowed_targets: array of explicitly allowed files selected for the task" in md
+    assert "held_targets: array of plausible/requested files not authorized by allowed_files" in md
 
 
 def test_mismatch_fails(tmp_path: Path):
@@ -115,3 +134,17 @@ def test_no_corrections_supported(tmp_path: Path):
     assert payload["auto_assigned_corrections"] is False
     assert "_No correction cards assigned._" in (out / "correction_aware_prompt_packet.md").read_text(encoding="utf-8")
 
+
+def test_expected_output_shape_is_rendered_as_contract(tmp_path: Path):
+    packet = make_packet(tmp_path)
+    scaffold = make_scaffold(tmp_path)
+    out = tmp_path / "out"
+    result = run_script("--job-packet", packet, "--correction-scaffold", scaffold, "--out-dir", out)
+    assert result.returncode == 0, result.stderr
+    md = (out / "correction_aware_prompt_packet.md").read_text(encoding="utf-8")
+    assert "allowed_targets: array of explicitly allowed files selected for the task" in md
+    assert "held_targets: array of plausible/requested files not authorized by allowed_files" in md
+    assert "scope_expansion_required: boolean, true when requested/candidate targets exceed allowed_files" in md
+    assert "allowed_targets: []" not in md
+    assert "held_targets: []" not in md
+    assert "scope_expansion_required: false" not in md
