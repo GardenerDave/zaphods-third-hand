@@ -92,6 +92,34 @@ The composer is model-free. It only packages the explicit assignment, task
 boundary, correction guidance, and authority boundary into a prompt-ready
 artifact. It does not auto-assign corrections and it does not call a model.
 
+## Running a correction-aware model attempt
+
+After a prompt packet exists, an explicit authorization can trigger one model
+attempt against an OpenAI-compatible endpoint.
+
+Example:
+
+```text
+python3 local_harness/run_correction_aware_model_attempt.py \
+  --prompt-packet .work/example_correction_aware_prompt_packet/correction_aware_prompt_packet.md \
+  --out-dir .work/example_model_attempt \
+  --endpoint-url http://127.0.0.1:1234/v1 \
+  --model qwen3-1.7b-gpu-40k \
+  --authorize-model-attempt
+```
+
+Expected output artifacts:
+
+- `model_attempt_record.json`
+- `raw_model_output.txt`
+- `model_attempt_summary.json`
+- `status.log`
+- `status_events.jsonl`
+
+This runner performs one model attempt only. It does not validate correctness,
+accept outputs, promote artifacts, train, write deltas, materialize models, or
+capture failures for curriculum.
+
 ## Validator role
 
 Validators can check whether a packet or response followed the card by looking
