@@ -68,10 +68,13 @@ def validate_source_record(record: dict[str, Any]) -> None:
         "registry_mutation_authorized",
         "install_authorized",
         "base_model_overwritten",
-        "base_model_overwrite_authorized",
         "automatic_failure_to_curriculum_capture_authorized",
     ]:
         if record.get(field) is not False:
+            raise ValueError(f"{field} must be false")
+    legacy_optional_false_fields = ["base_model_overwrite_authorized"]
+    for field in legacy_optional_false_fields:
+        if field in record and record.get(field) is not False:
             raise ValueError(f"{field} must be false")
     if record.get("base_model_path") in (None, ""):
         raise ValueError("source reaudition record missing base_model_path")

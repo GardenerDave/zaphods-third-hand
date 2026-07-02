@@ -39,7 +39,6 @@ def source_record_fixture(tmp_path: Path, *, mutate: dict | None = None) -> Path
         "registry_mutation_authorized": False,
         "install_authorized": False,
         "base_model_overwritten": False,
-        "base_model_overwrite_authorized": False,
         "automatic_failure_to_curriculum_capture_authorized": False,
     }
     if mutate:
@@ -176,6 +175,30 @@ def test_source_record_with_auto_failure_true_fails_closed(tmp_path):
     )
     assert result.returncode != 0
     assert "automatic_failure_to_curriculum_capture_authorized must be false" in result.stdout
+
+
+def test_source_record_missing_legacy_overwrite_authorized_is_accepted(tmp_path):
+    source = source_record_fixture(tmp_path)
+    payload = json.loads(source.read_text(encoding="utf-8"))
+    assert "base_model_overwrite_authorized" not in payload
+    MODULE.validate_source_record(payload)
+
+
+def test_source_record_legacy_overwrite_authorized_false_is_accepted(tmp_path):
+    source = source_record_fixture(tmp_path, mutate={"base_model_overwrite_authorized": False})
+    payload = json.loads(source.read_text(encoding="utf-8"))
+    MODULE.validate_source_record(payload)
+
+
+def test_source_record_legacy_overwrite_authorized_true_fails_closed(tmp_path):
+    source = source_record_fixture(tmp_path, mutate={"base_model_overwrite_authorized": True})
+    payload = json.loads(source.read_text(encoding="utf-8"))
+    try:
+        MODULE.validate_source_record(payload)
+    except ValueError as exc:
+        assert "base_model_overwrite_authorized must be false" in str(exc)
+    else:
+        raise AssertionError("expected validation failure")
 
 
 def test_duplicate_probe_ids_fail_closed(tmp_path):
