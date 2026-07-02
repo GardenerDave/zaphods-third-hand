@@ -64,6 +64,13 @@ approve their own outputs or move lifecycle state.
 - [`prompts/TOOL_MAKER_PROMPT.md`](../prompts/TOOL_MAKER_PROMPT.md) — compact
   extraction contract for supervised agents.
 
+## Behavior Correction Cards
+
+- [`BEHAVIOR_CORRECTION_CARDS.md`](BEHAVIOR_CORRECTION_CARDS.md) — packet-level
+  correction-card contract, explicit assignment rules, and validator framing.
+- [`behavior_correction_cards/README.md`](behavior_correction_cards/README.md)
+  — index of example correction cards.
+
 ## Change Closeout
 
 - [`CHANGE_CLOSEOUT.md`](CHANGE_CLOSEOUT.md) — supervised final review process

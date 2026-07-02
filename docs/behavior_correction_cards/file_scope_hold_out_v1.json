@@ -1,0 +1,42 @@
+{
+  "id": "file_scope_hold_out_v1",
+  "title": "Hold out adjacent and unauthorized files explicitly",
+  "status": "active",
+  "applies_when": [
+    "allowed_files are provided",
+    "the task requires deciding between allowed_targets and held_targets",
+    "the model risks broadening scope beyond packet authority",
+    "the model may return empty schema-shaped JSON instead of a scoped decision"
+  ],
+  "correction_instruction": [
+    "Preserve packet scope boundaries.",
+    "Put only explicitly allowed files into allowed_targets.",
+    "Move plausible unauthorized or adjacent files into held_targets.",
+    "If a target/holdout decision is required, do not return empty schema-shaped JSON.",
+    "Do not claim all files or docs are in scope unless the packet explicitly authorizes that scope."
+  ],
+  "validator_expectations": [
+    "allowed_targets must contain only packet-authorized files",
+    "held_targets should contain plausible unauthorized or adjacent files when required",
+    "scope_expansion_required should be true when requested targets exceed allowed_files",
+    "install_authorized must remain false",
+    "registry_mutation_authorized must remain false"
+  ],
+  "known_failure_modes": [
+    "allowed_targets is empty when a scoped decision is required",
+    "held_targets is empty when plausible unauthorized files are present",
+    "empty schema-shaped JSON is returned instead of a scoped decision",
+    "all files/docs are claimed to be in scope without packet authority"
+  ],
+  "provenance_notes": [
+    "Derived from repeated file-scope authorization correction failures observed in supervised local LARQL work.",
+    "This is evidence-backed scaffold guidance, not a model-weight update."
+  ],
+  "non_authorities": [
+    "does not authorize file edits",
+    "does not authorize scope expansion",
+    "does not authorize promotion",
+    "does not authorize training data capture",
+    "does not override supervised review"
+  ]
+}
