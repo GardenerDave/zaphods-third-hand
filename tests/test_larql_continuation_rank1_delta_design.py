@@ -6,6 +6,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "local_harness/larql_continuation_rank1_delta_design.py"
@@ -80,6 +82,35 @@ def vectors_fixture(tmp_path: Path, *, mutate: dict | None = None) -> Path:
     if mutate:
         payload.update(mutate)
     return write_json(tmp_path / "continuation_direction_vectors.json", payload)
+
+
+def capture_fixture(
+    tmp_path: Path,
+    *,
+    mutate: dict | None = None,
+    include_inference: bool = True,
+) -> Path:
+    payload = {
+        "generation_performed": False,
+        "training_performed": False,
+        "lora_or_peft_used": False,
+        "weight_edit_performed": False,
+        "delta_artifact_written": False,
+        "patched_model_materialized": False,
+        "base_model_overwritten": False,
+        "promotion_authorized": False,
+        "production_deployment_authorized": False,
+        "registry_mutation_authorized": False,
+        "install_authorized": False,
+        "automatic_failure_to_curriculum_capture_authorized": False,
+        "target_module": "model.layers.0.mlp.down_proj",
+        "target_module_family": "mlp_projection",
+    }
+    if include_inference:
+        payload["model_inference_performed"] = True
+    if mutate:
+        payload.update(mutate)
+    return write_json(tmp_path / "capture.json", payload)
 
 
 def run_script(*args: str | Path) -> subprocess.CompletedProcess[str]:
@@ -158,6 +189,43 @@ def test_validation_failures(tmp_path):
         assert message in result.stdout
 
 
+def test_source_capture_model_inference_true_accepted(tmp_path):
+    packet = packet_fixture(tmp_path)
+    vectors = vectors_fixture(tmp_path)
+    capture = capture_fixture(tmp_path, include_inference=True)
+    packet_payload = json.loads(packet.read_text(encoding="utf-8"))
+    packet_payload["source_capture_record_path"] = str(capture)
+    packet = write_json(packet, packet_payload)
+    record = MODULE.write_continuation_rank1_delta_design(
+        run_id="rd_016",
+        out_root=tmp_path / "out",
+        continuation_direction_packet=packet,
+        continuation_direction_vectors=vectors,
+        delta_scale=1e-2,
+        authorize_larql_continuation_rank1_delta_design=True,
+    )
+    assert record["model_inference_performed"] is False
+    assert record["required_next_step"] == "supervised_continuation_rank1_delta_design_review"
+
+
+def test_source_capture_model_inference_false_fails_closed(tmp_path):
+    packet = packet_fixture(tmp_path)
+    vectors = vectors_fixture(tmp_path)
+    capture = capture_fixture(tmp_path, mutate={"model_inference_performed": False}, include_inference=True)
+    packet_payload = json.loads(packet.read_text(encoding="utf-8"))
+    packet_payload["source_capture_record_path"] = str(capture)
+    packet = write_json(packet, packet_payload)
+    with pytest.raises(ValueError, match="model_inference_performed must be true in source capture record when present"):
+        MODULE.write_continuation_rank1_delta_design(
+            run_id="rd_017",
+            out_root=tmp_path / "out",
+            continuation_direction_packet=packet,
+            continuation_direction_vectors=vectors,
+            delta_scale=1e-2,
+            authorize_larql_continuation_rank1_delta_design=True,
+        )
+
+
 def test_source_record_and_packet_mismatch_checks(tmp_path):
     bad_packet = packet_fixture(tmp_path, mutate={"target_module_family": "other"})
     result = run_script(
@@ -209,26 +277,10 @@ def test_dimension_and_norm_checks(tmp_path):
 def test_rank1_design_outputs(tmp_path):
     packet = packet_fixture(tmp_path)
     vectors = vectors_fixture(tmp_path)
-    write_json(
-        tmp_path / "capture.json",
-        {
-            "model_inference_performed": False,
-            "generation_performed": False,
-            "training_performed": False,
-            "lora_or_peft_used": False,
-            "weight_edit_performed": False,
-            "delta_artifact_written": False,
-            "patched_model_materialized": False,
-            "base_model_overwritten": False,
-            "promotion_authorized": False,
-            "production_deployment_authorized": False,
-            "registry_mutation_authorized": False,
-            "install_authorized": False,
-            "automatic_failure_to_curriculum_capture_authorized": False,
-            "target_module": "model.layers.0.mlp.down_proj",
-            "target_module_family": "mlp_projection",
-        },
-    )
+    capture = capture_fixture(tmp_path, include_inference=True)
+    packet_payload = json.loads(packet.read_text(encoding="utf-8"))
+    packet_payload["source_capture_record_path"] = str(capture)
+    packet = write_json(packet, packet_payload)
     record = MODULE.write_continuation_rank1_delta_design(
         run_id="rd_014",
         out_root=tmp_path / "out",
@@ -259,26 +311,10 @@ def test_rank1_design_outputs(tmp_path):
 def test_hashes_and_capture_record_checks(tmp_path):
     packet = packet_fixture(tmp_path)
     vectors = vectors_fixture(tmp_path)
-    capture = write_json(
-        tmp_path / "capture.json",
-        {
-            "model_inference_performed": False,
-            "generation_performed": False,
-            "training_performed": False,
-            "lora_or_peft_used": False,
-            "weight_edit_performed": False,
-            "delta_artifact_written": False,
-            "patched_model_materialized": False,
-            "base_model_overwritten": False,
-            "promotion_authorized": False,
-            "production_deployment_authorized": False,
-            "registry_mutation_authorized": False,
-            "install_authorized": False,
-            "automatic_failure_to_curriculum_capture_authorized": False,
-            "target_module": "model.layers.0.mlp.down_proj",
-            "target_module_family": "mlp_projection",
-        },
-    )
+    capture = capture_fixture(tmp_path, include_inference=True)
+    packet_payload = json.loads(packet.read_text(encoding="utf-8"))
+    packet_payload["source_capture_record_path"] = str(capture)
+    packet = write_json(packet, packet_payload)
     record = MODULE.write_continuation_rank1_delta_design(
         run_id="rd_015",
         out_root=tmp_path / "out",

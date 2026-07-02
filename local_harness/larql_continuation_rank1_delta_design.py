@@ -116,8 +116,9 @@ def validate_vectors(packet: dict[str, Any], vectors: dict[str, Any], delta_scal
 
 
 def validate_source_capture_record(record: dict[str, Any], packet: dict[str, Any]) -> None:
+    if "model_inference_performed" in record and record.get("model_inference_performed") is not True:
+        raise ValueError("model_inference_performed must be true in source capture record when present")
     for field in [
-        "model_inference_performed",
         "generation_performed",
         "training_performed",
         "lora_or_peft_used",
