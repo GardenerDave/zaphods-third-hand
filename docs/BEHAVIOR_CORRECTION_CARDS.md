@@ -170,6 +170,8 @@ Expected output artifacts:
 The review packet is model-free and does not accept, promote, train, write
 deltas, materialize models, or capture failures for curriculum. It is a
 review artifact only.
+Use the JSON prompt packet path, not the Markdown packet, so the provenance
+fields and authority split remain explicit and machine-checkable.
 
 ## Validator role
 

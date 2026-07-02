@@ -137,6 +137,24 @@ def make_prompt_packet(tmp_path: Path) -> Path:
     return path
 
 
+def write_prompt_markdown(packet_json: Path, md_path: Path) -> Path:
+    payload = json.loads(packet_json.read_text(encoding="utf-8"))
+    md_path.write_text(
+        "\n".join(
+            [
+                "# Correction-Aware Prompt Packet",
+                "",
+                f"Task summary: {payload['task_summary']}",
+                f"Allowed files: {', '.join(payload['allowed_files'])}",
+                f"Behavior corrections: {', '.join(payload['behavior_corrections'])}",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return md_path
+
+
 def test_help():
     assert run_script("--help").returncode == 0
 
@@ -144,14 +162,16 @@ def test_help():
 def test_renders_review_packet(tmp_path: Path):
     attempt = make_attempt(tmp_path)
     validation = make_validation(tmp_path)
+    job_packet = make_job_packet(tmp_path)
+    prompt_packet = make_prompt_packet(tmp_path)
     out = tmp_path / "out"
     result = run_script(
         "--model-attempt-dir",
         attempt,
         "--job-packet",
-        make_job_packet(tmp_path),
+        job_packet,
         "--prompt-packet",
-        make_prompt_packet(tmp_path),
+        prompt_packet,
         "--validation-report",
         validation / "correction_aware_output_validation.json",
         "--out-dir",
@@ -167,9 +187,17 @@ def test_renders_review_packet(tmp_path: Path):
     assert payload["authority_flags"]["promotion_authorized"] is False
     assert payload["authority_flags"]["supervised_acceptance_performed"] is False
     assert payload["authority_flags"]["automatic_failure_curriculum_capture_authorized"] is False
+    assert payload["source_job_packet_sha256"]
+    assert payload["source_prompt_packet_sha256"]
+    assert payload["review_packet_authority_flags"]["model_inference_performed"] is False
+    assert payload["source_model_attempt_authority_flags"]["model_inference_performed"] is True
+    assert payload["source_model_attempt_authority_flags"]["generation_performed"] is True
+    assert payload["source_validation_authority_flags"]["model_inference_performed"] is False
     md = (out / "supervised_review_packet.md").read_text(encoding="utf-8")
     assert "accept_as_corrected_output" in md
     assert "needs_human_scope_decision" in md
+    assert "Source model attempt authority flags" in md
+    assert "Source validation authority flags" in md
 
 
 def test_validation_passed_does_not_auto_accept(tmp_path: Path):
@@ -191,6 +219,7 @@ def test_validation_passed_does_not_auto_accept(tmp_path: Path):
     payload = json.loads((out / "supervised_review_packet.json").read_text(encoding="utf-8"))
     assert payload["recommended_next_step"] == "supervised_review_required"
     assert payload["authority_flags"]["supervised_acceptance_performed"] is False
+    assert payload["review_packet_authority_flags"]["supervised_acceptance_performed"] is False
 
 
 def test_validation_failed_does_not_auto_reject(tmp_path: Path):
@@ -212,6 +241,38 @@ def test_validation_failed_does_not_auto_reject(tmp_path: Path):
     payload = json.loads((out / "supervised_review_packet.json").read_text(encoding="utf-8"))
     assert payload["validation_status"] == "validation_failed"
     assert payload["recommended_next_step"] == "supervised_review_required"
+    assert payload["review_packet_authority_flags"]["promotion_authorized"] is False
+
+
+def test_prompt_packet_json_path_is_explicit(tmp_path: Path):
+    prompt_json = make_prompt_packet(tmp_path)
+    prompt_md = write_prompt_markdown(prompt_json, tmp_path / "prompt.md")
+    assert prompt_json.suffix == ".json"
+    assert prompt_md.suffix == ".md"
+
+
+def test_review_packet_contains_hashes_and_provenance(tmp_path: Path):
+    attempt = make_attempt(tmp_path)
+    validation = make_validation(tmp_path)
+    job_packet = make_job_packet(tmp_path)
+    prompt_packet = make_prompt_packet(tmp_path)
+    out = tmp_path / "out"
+    run_script(
+        "--model-attempt-dir",
+        attempt,
+        "--job-packet",
+        job_packet,
+        "--prompt-packet",
+        prompt_packet,
+        "--validation-report",
+        validation / "correction_aware_output_validation.json",
+        "--out-dir",
+        out,
+    )
+    payload = json.loads((out / "supervised_review_packet.json").read_text(encoding="utf-8"))
+    assert payload["source_job_packet_sha256"]
+    assert payload["source_prompt_packet_sha256"]
+    assert payload["source_model_attempt_record_sha256"]
 
 
 def test_no_model_call_is_made():

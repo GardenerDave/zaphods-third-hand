@@ -37,6 +37,10 @@ def short_excerpt(text: str, limit: int = 320) -> str:
     return cleaned[:limit]
 
 
+def sha256_path(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def build_review_packet(
     *,
     model_attempt_record: dict[str, Any],
@@ -55,9 +59,22 @@ def build_review_packet(
         "needs_human_scope_decision",
     ]
     validation_status = str(validation_report.get("validation_status", "validation_failed"))
-    recommended_review = (
-        "supervised_review_required" if validation_status == "validation_passed" else "supervised_review_required"
-    )
+    review_packet_authority_flags = {
+        "model_inference_performed": False,
+        "generation_performed": False,
+        "training_performed": False,
+        "delta_written": False,
+        "patched_model_materialized": False,
+        "promotion_authorized": False,
+        "supervised_acceptance_performed": False,
+        "automatic_failure_curriculum_capture_authorized": False,
+    }
+    source_model_attempt_authority_flags = {
+        key: bool(model_attempt_record.get(key)) for key in review_packet_authority_flags
+    }
+    source_validation_authority_flags = {
+        key: bool(validation_report.get(key)) for key in review_packet_authority_flags
+    }
     return {
         "report_type": REPORT_TYPE,
         "source_model_attempt_dir": source_paths["model_attempt_dir"],
@@ -69,6 +86,8 @@ def build_review_packet(
         "source_model_attempt_record_sha256": sha256_text(
             json.dumps(model_attempt_record, sort_keys=True, separators=(",", ":"))
         ),
+        "source_job_packet_sha256": sha256_path(Path(source_paths["job_packet"])),
+        "source_prompt_packet_sha256": sha256_path(Path(source_paths["prompt_packet"])),
         "source_raw_output_sha256": sha256_text(raw_output_text),
         "source_validation_report_sha256": sha256_text(
             json.dumps(validation_report, sort_keys=True, separators=(",", ":"))
@@ -77,18 +96,12 @@ def build_review_packet(
         "findings": validation_report.get("findings") or [],
         "parsed_output": parsed_output,
         "raw_output_excerpt": short_excerpt(raw_output_text),
-        "authority_flags": {
-            "model_inference_performed": False,
-            "generation_performed": False,
-            "training_performed": False,
-            "delta_written": False,
-            "patched_model_materialized": False,
-            "promotion_authorized": False,
-            "supervised_acceptance_performed": False,
-            "automatic_failure_curriculum_capture_authorized": False,
-        },
+        "review_packet_authority_flags": review_packet_authority_flags,
+        "source_model_attempt_authority_flags": source_model_attempt_authority_flags,
+        "source_validation_authority_flags": source_validation_authority_flags,
+        "authority_flags": review_packet_authority_flags,
         "review_decision_options": review_decision_options,
-        "recommended_next_step": recommended_review,
+        "recommended_next_step": "supervised_review_required",
         "no_auto_acceptance": True,
         "packet_level_only": True,
         "job_packet_summary": job_packet.get("task_summary"),
@@ -106,6 +119,8 @@ def render_markdown(review_packet: dict[str, Any]) -> str:
         f"- validation report: `{review_packet['source_validation_report']}`",
         f"- job packet: `{review_packet['source_job_packet']}`",
         f"- prompt packet: `{review_packet['source_prompt_packet']}`",
+        f"- source job packet sha256: `{review_packet['source_job_packet_sha256']}`",
+        f"- source prompt packet sha256: `{review_packet['source_prompt_packet_sha256']}`",
         "",
         "## Validation",
         f"- validation status: `{review_packet['validation_status']}`",
@@ -126,7 +141,16 @@ def render_markdown(review_packet: dict[str, Any]) -> str:
             "## Authority flags",
         ]
     )
-    for key, value in review_packet["authority_flags"].items():
+    lines.append("### Review packet authority flags")
+    for key, value in review_packet["review_packet_authority_flags"].items():
+        lines.append(f"- {key}: {value}")
+    lines.append("")
+    lines.append("### Source model attempt authority flags")
+    for key, value in review_packet["source_model_attempt_authority_flags"].items():
+        lines.append(f"- {key}: {value}")
+    lines.append("")
+    lines.append("### Source validation authority flags")
+    for key, value in review_packet["source_validation_authority_flags"].items():
         lines.append(f"- {key}: {value}")
     lines.extend(
         [
