@@ -42,20 +42,7 @@ def render_scaffold(packet: dict[str, Any], card_dir: Path = CARD_DIR) -> dict[s
         raise ValueError("behavior_corrections must be a list when present")
 
     cards = [resolve_card(card_id, card_dir) for card_id in assigned_ids]
-    rendered_cards = []
-    for card in cards:
-        rendered_cards.append(
-            {
-                "id": card["id"],
-                "title": card["title"],
-                "status": card["status"],
-                "correction_instruction": card["correction_instruction"],
-                "validator_expectations": card["validator_expectations"],
-                "known_failure_modes": card["known_failure_modes"],
-                "provenance_notes": card["provenance_notes"],
-                "non_authorities": card["non_authorities"],
-            }
-        )
+    rendered_cards = [dict(card) for card in cards]
 
     scaffold = {
         "report_type": "behavior_correction_scaffold.v1",

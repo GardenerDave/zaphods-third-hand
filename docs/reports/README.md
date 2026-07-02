@@ -155,7 +155,8 @@ does not establish production readiness.
   closeout that parks the direct-edit branch as research evidence while the
   mainline returns to prompt/scaffold steering.
 - `behavior_correction_cards/` — model-free correction-card scaffolds and
-  dogfood evidence for explicit packet-level correction assignment.
+  dogfood evidence for explicit packet-level correction assignment and
+  correction-aware prompt packet composition.
 
 ## Safety Reminder
 

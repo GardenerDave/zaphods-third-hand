@@ -69,6 +69,29 @@ corrections, the correction instructions, validator expectations, known
 failure modes, non-authorities, and provenance notes. It does not auto-assign
 corrections and it does not authorize model calls, edits, or promotion.
 
+## Composing correction-aware prompt packets
+
+After a scaffold has been rendered, a separate model-free composer can turn a
+job packet plus the scaffold into a model-facing prompt packet.
+
+Example:
+
+```text
+python3 local_harness/render_correction_aware_prompt_packet.py \
+  --job-packet .work/example_job_packet.json \
+  --correction-scaffold .work/example_behavior_correction_scaffold/behavior_correction_scaffold.json \
+  --out-dir .work/example_correction_aware_prompt_packet
+```
+
+Expected output artifacts:
+
+- `correction_aware_prompt_packet.json`
+- `correction_aware_prompt_packet.md`
+
+The composer is model-free. It only packages the explicit assignment, task
+boundary, correction guidance, and authority boundary into a prompt-ready
+artifact. It does not auto-assign corrections and it does not call a model.
+
 ## Validator role
 
 Validators can check whether a packet or response followed the card by looking

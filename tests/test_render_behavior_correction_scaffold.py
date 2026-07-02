@@ -55,6 +55,7 @@ def test_renderer_renders_assigned_card(tmp_path: Path):
     assert payload["promotion_authorized"] is False
     assert payload["automatic_failure_curriculum_capture_authorized"] is False
     assert payload["corrections"][0]["non_authorities"]
+    assert "applies_when" in payload["corrections"][0]
 
 
 def test_renderer_no_corrections_is_explicit(tmp_path: Path):
@@ -86,4 +87,3 @@ def test_invalid_correction_card_fails(tmp_path: Path):
         check=False,
     )
     assert result.returncode != 0
-
