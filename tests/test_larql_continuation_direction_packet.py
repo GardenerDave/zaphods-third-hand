@@ -42,7 +42,6 @@ def vectors_fixture(tmp_path: Path, *, mutate: dict | None = None) -> Path:
             "contributes_to_margin_direction": True,
             "target_module": "model.layers.0.mlp.down_proj",
             "target_module_family": "mlp_projection",
-            "vector_source": "continuation_prediction_position",
             "prediction_position": 1,
             "module_input_vector": [3.0, 1.0, 0.0],
             "module_output_vector": [1.0, 2.0],
@@ -60,7 +59,6 @@ def vectors_fixture(tmp_path: Path, *, mutate: dict | None = None) -> Path:
             "contributes_to_margin_direction": True,
             "target_module": "model.layers.0.mlp.down_proj",
             "target_module_family": "mlp_projection",
-            "vector_source": "continuation_prediction_position",
             "prediction_position": 2,
             "module_input_vector": [5.0, 1.0, 0.0],
             "module_output_vector": [2.0, 1.0],
@@ -78,7 +76,6 @@ def vectors_fixture(tmp_path: Path, *, mutate: dict | None = None) -> Path:
             "contributes_to_margin_direction": True,
             "target_module": "model.layers.0.mlp.down_proj",
             "target_module_family": "mlp_projection",
-            "vector_source": "continuation_prediction_position",
             "prediction_position": 1,
             "module_input_vector": [1.0, 2.0, 0.0],
             "module_output_vector": [0.5, 0.5],
@@ -96,7 +93,6 @@ def vectors_fixture(tmp_path: Path, *, mutate: dict | None = None) -> Path:
             "contributes_to_margin_direction": True,
             "target_module": "model.layers.0.mlp.down_proj",
             "target_module_family": "mlp_projection",
-            "vector_source": "continuation_prediction_position",
             "prediction_position": 2,
             "module_input_vector": [2.0, 2.0, 0.0],
             "module_output_vector": [0.0, 1.0],
@@ -114,7 +110,6 @@ def vectors_fixture(tmp_path: Path, *, mutate: dict | None = None) -> Path:
             "contributes_to_margin_direction": False,
             "target_module": "model.layers.0.mlp.down_proj",
             "target_module_family": "mlp_projection",
-            "vector_source": "continuation_prediction_position",
             "prediction_position": 1,
             "module_input_vector": [2.0, 3.0, 0.0],
             "module_output_vector": [1.0, 0.0],
@@ -132,7 +127,6 @@ def vectors_fixture(tmp_path: Path, *, mutate: dict | None = None) -> Path:
             "contributes_to_margin_direction": False,
             "target_module": "model.layers.0.mlp.down_proj",
             "target_module_family": "mlp_projection",
-            "vector_source": "continuation_prediction_position",
             "prediction_position": 1,
             "module_input_vector": [4.0, 2.0, 0.0],
             "module_output_vector": [0.0, 1.0],
@@ -234,6 +228,56 @@ def test_validation_failures(tmp_path):
         )
         assert result.returncode != 0
         assert message in result.stdout
+
+
+def test_missing_row_vector_source_succeeds(tmp_path):
+    vectors = vectors_fixture(tmp_path)
+    rows = [json.loads(line) for line in vectors.read_text(encoding="utf-8").splitlines() if line.strip()]
+    for row in rows:
+        row.pop("vector_source", None)
+    write_jsonl(vectors, rows)
+    record = MODULE.write_continuation_direction_packet(
+        run_id="cd_030",
+        out_root=tmp_path / "out",
+        continuation_activation_vectors=vectors,
+        continuation_activation_summary=summary_fixture(tmp_path),
+        source_capture_record=capture_record_fixture(tmp_path),
+        direction_mode="target_minus_control",
+        authorize_larql_continuation_direction_packet=True,
+    )
+    assert record["recommended_next_step"] == "continuation_rank1_delta_design"
+
+
+def test_wrong_row_vector_source_fails_closed(tmp_path):
+    vectors = vectors_fixture(tmp_path)
+    rows = [json.loads(line) for line in vectors.read_text(encoding="utf-8").splitlines() if line.strip()]
+    rows[0]["vector_source"] = "other"
+    write_jsonl(vectors, rows)
+    result = run_script(
+        "--run-id", "cd_031",
+        "--out-root", tmp_path / "out",
+        "--continuation-activation-vectors", vectors,
+        "--continuation-activation-summary", summary_fixture(tmp_path),
+        "--source-capture-record", capture_record_fixture(tmp_path),
+        "--authorize-larql-continuation-direction-packet",
+    )
+    assert result.returncode != 0
+    assert "vector_source must be continuation_prediction_position" in result.stdout
+
+
+def test_wrong_capture_record_vector_source_fails_closed(tmp_path):
+    vectors = vectors_fixture(tmp_path)
+    capture = capture_record_fixture(tmp_path, mutate={"vector_source": "other"})
+    result = run_script(
+        "--run-id", "cd_032",
+        "--out-root", tmp_path / "out",
+        "--continuation-activation-vectors", vectors,
+        "--continuation-activation-summary", summary_fixture(tmp_path),
+        "--source-capture-record", capture,
+        "--authorize-larql-continuation-direction-packet",
+    )
+    assert result.returncode != 0
+    assert "vector_source in source capture record must be continuation_prediction_position" in result.stdout
 
 
 def test_missing_rows_and_inconsistent_rows_fail_closed(tmp_path):

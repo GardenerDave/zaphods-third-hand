@@ -158,8 +158,9 @@ def validate_rows(rows: list[dict[str, Any]], summary: dict[str, Any]) -> None:
         raise ValueError("module_output_vector lengths are inconsistent")
     if any(row.get("prediction_position") is None for row in rows):
         raise ValueError("prediction positions missing")
-    if any(row.get("vector_source") != "continuation_prediction_position" for row in rows):
-        raise ValueError("vector_source must be continuation_prediction_position")
+    for row in rows:
+        if "vector_source" in row and row.get("vector_source") != "continuation_prediction_position":
+            raise ValueError("vector_source must be continuation_prediction_position")
     if any(row.get("selection_action") not in REQUIRED_SELECTION_ACTIONS for row in rows):
         raise ValueError("unexpected selection action")
 
@@ -227,6 +228,8 @@ def write_continuation_direction_packet(
     if source_capture_record is not None:
         capture_record = load_json_object(source_capture_record)
         validate_source_record(capture_record)
+        if "vector_source" in capture_record and capture_record.get("vector_source") != "continuation_prediction_position":
+            raise ValueError("vector_source in source capture record must be continuation_prediction_position")
         if capture_record.get("target_module") not in (None, "", rows[0]["target_module"]):
             raise ValueError("target_module in source capture record does not match vector rows")
         if capture_record.get("target_module_family") not in (None, "", rows[0]["target_module_family"]):
