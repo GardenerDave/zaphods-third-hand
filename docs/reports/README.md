@@ -154,6 +154,8 @@ does not establish production readiness.
   `larql/LARQL_DIRECT_EDIT_SCALE_LADDER_2026-07-01.md` for the scale-ladder
   closeout that parks the direct-edit branch as research evidence while the
   mainline returns to prompt/scaffold steering.
+- `behavior_correction_cards/` — model-free correction-card scaffolds and
+  dogfood evidence for explicit packet-level correction assignment.
 
 ## Safety Reminder
 
