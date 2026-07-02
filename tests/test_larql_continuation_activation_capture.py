@@ -361,6 +361,7 @@ def test_prediction_position_and_alignment_helpers(monkeypatch):
         prompt=prompt,
         candidate_text="boost1 suppress1",
         selected_rows=rows,
+        target_module="model.layers.0.mlp.down_proj",
     )
     assert vectors[0]["prediction_position"] == 1
     assert vectors[1]["prediction_position"] == 2
@@ -387,6 +388,12 @@ def test_token_alignment_and_selection_actions(tmp_path, monkeypatch):
     assert (out_dir / "continuation_activation_vectors.jsonl").exists()
     assert (out_dir / "continuation_activation_capture_summary.json").exists()
     assert (out_dir / "continuation_activation_capture_review_packet.md").exists()
+    vector_rows = [
+        json.loads(line)
+        for line in (out_dir / "continuation_activation_vectors.jsonl").read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    assert vector_rows and all(row["target_module"] == "model.layers.0.mlp.down_proj" for row in vector_rows)
     assert record["model_inference_performed"] is True
     assert record["generation_performed"] is False
     assert record["training_performed"] is False

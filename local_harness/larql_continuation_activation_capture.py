@@ -131,6 +131,7 @@ def capture_selected_vectors(
     prompt: str,
     candidate_text: str,
     selected_rows: list[dict[str, Any]],
+    target_module: str,
 ) -> list[dict[str, Any]]:
     import torch
 
@@ -192,7 +193,7 @@ def capture_selected_vectors(
                 "prediction_position": prediction_position,
                 "continuation_token_position": continuation_token_position,
                 "prompt_len": prompt_len,
-                "target_module": row.get("target_module"),
+                "target_module": target_module,
                 "target_module_family": TARGET_MODULE_FAMILY,
                 "module_output_vector": output_vector,
                 "module_input_vector": input_vector,
@@ -359,6 +360,7 @@ def write_continuation_activation_capture(
                 prompt=prompt,
                 candidate_text=candidates[candidate_key],
                 selected_rows=rows_for_pair,
+                target_module=target_module,
             )
             vectors.extend(pair_vectors)
 
