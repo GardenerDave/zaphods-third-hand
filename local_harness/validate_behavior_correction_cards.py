@@ -64,6 +64,12 @@ def validate_card(card: dict[str, Any]) -> list[str]:
     return errors
 
 
+def validate_card_or_raise(card: dict[str, Any]) -> None:
+    errors = validate_card(card)
+    if errors:
+        raise ValueError("; ".join(errors))
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Validate behavior correction cards.")
     parser.add_argument("card", type=Path)
