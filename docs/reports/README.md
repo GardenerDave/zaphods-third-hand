@@ -154,6 +154,11 @@ does not establish production readiness.
   `larql/LARQL_DIRECT_EDIT_SCALE_LADDER_2026-07-01.md` for the scale-ladder
   closeout that parks the direct-edit branch as research evidence while the
   mainline returns to prompt/scaffold steering.
+- `behavior_correction_cards/CORRECTION_AWARE_SUPERVISED_LOOP_DOGFOOD_2026-07-02.md`
+  for the completed live r5 correction-aware supervised loop dogfood. It
+  documents the chain from explicit behavior correction through scoped model
+  output, model-free validation, supervised review, and explicit acceptance
+  of the corrected output only without promotion or downstream mutation.
 - `behavior_correction_cards/` — model-free correction-card scaffolds and
   dogfood evidence for explicit packet-level correction assignment,
   correction-aware prompt packet composition, and prompt-facts tightening

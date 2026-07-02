@@ -78,6 +78,13 @@ The product framing remains small-model guided capability: specialized workers
 inside supervised workflows, with variants, deltas, adapters, and scaffolded
 review used only when they improve evidence-backed capability.
 
+Completed correction-aware supervised loop dogfood:
+[`CORRECTION_AWARE_SUPERVISED_LOOP_DOGFOOD_2026-07-02.md`](reports/behavior_correction_cards/CORRECTION_AWARE_SUPERVISED_LOOP_DOGFOOD_2026-07-02.md).
+ZTH converted a small-model file-scope failure into an explicit behavior
+correction, produced corrected scoped output from a local 1.7B model,
+validated it model-free, packaged it for supervised review, and recorded
+explicit supervised acceptance without promotion or downstream mutation.
+
 ## Implemented
 
 - LLM-probe preflight import scaffold.
