@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import struct
 import subprocess
 import sys
 from pathlib import Path
@@ -25,6 +26,14 @@ def write_json(path: Path, payload: dict | list) -> Path:
 
 def stable_hash(values: list[float]) -> str:
     return MODULE.stable_vector_hash(values)
+
+
+def parse_safetensors_header(path: Path) -> tuple[dict, bytes]:
+    blob = path.read_bytes()
+    header_len = struct.unpack("<Q", blob[:8])[0]
+    header_bytes = blob[8 : 8 + header_len]
+    header = json.loads(header_bytes.decode("utf-8"))
+    return header, blob[8 + header_len :]
 
 
 def design_payload(*, mutate: dict | None = None) -> dict:
@@ -233,6 +242,13 @@ def test_successful_safetensors_write(tmp_path):
     review = (out_dir / "continuation_rank1_delta_artifact_review_packet.md").read_text(encoding="utf-8")
     artifact = out_dir / "rank1_delta.safetensors"
     assert artifact.exists()
+    header, data = parse_safetensors_header(artifact)
+    assert list(header) == [record["target_parameter"]]
+    tensor_meta = header[record["target_parameter"]]
+    assert tensor_meta["dtype"] == "F32"
+    assert tensor_meta["shape"] == record["delta_shape"]
+    assert tensor_meta["data_offsets"] == [0, record["delta_shape"][0] * record["delta_shape"][1] * 4]
+    assert len(data) == record["delta_shape"][0] * record["delta_shape"][1] * 4
     assert record["report_type"] == "larql_continuation_rank1_delta_artifact.v0"
     assert record["delta_artifact_written"] is True
     assert record["patched_model_materialized"] is False
@@ -249,6 +265,33 @@ def test_successful_safetensors_write(tmp_path):
     assert "target parameter key" in review
     assert len(record["artifact_sha256"]) == 64
     assert record["nonzero_count"] == 4
+
+
+def test_tensor_key_follows_target_module(tmp_path):
+    design, vectors = prepare_inputs(
+        tmp_path,
+        design_mutate={
+            "target_module": "model.layers.7.mlp.down_proj",
+            "source_continuation_direction_packet_path": "continuation_direction_packet.json",
+            "source_continuation_direction_vectors_path": "continuation_direction_vectors.json",
+        },
+        vectors_mutate={
+            "target_module": "model.layers.7.mlp.down_proj",
+        },
+    )
+    out_root = tmp_path / "out"
+    result = run_script(
+        "--run-id", "art_004",
+        "--out-root", out_root,
+        "--continuation-rank1-delta-design", design,
+        "--continuation-direction-vectors", vectors,
+        "--authorize-larql-continuation-rank1-delta-artifact",
+    )
+    assert result.returncode == 0
+    record = json.loads((out_root / "art_004" / "larql_continuation_rank1_delta_artifact_record.json").read_text(encoding="utf-8"))
+    header, _ = parse_safetensors_header(out_root / "art_004" / "rank1_delta.safetensors")
+    assert list(header) == [record["target_parameter"]]
+    assert record["target_parameter"] == "model.layers.7.mlp.down_proj.weight"
 
 
 def test_no_inference_generation_training_materialization_or_promotion_in_source():
