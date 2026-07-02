@@ -150,7 +150,10 @@ does not establish production readiness.
   against failure-style JSON under the base and patched models, and
   `LARQL_LIKELIHOOD_SCALE_COMPARISON_2026-06-30.md` for the packet-only
   comparison across teacher-forced likelihood runs that summarizes per-scale
-  margin movement before any further scaling decision.
+  margin movement before any further scaling decision, and
+  `larql/LARQL_DIRECT_EDIT_SCALE_LADDER_2026-07-01.md` for the scale-ladder
+  closeout that parks the direct-edit branch as research evidence while the
+  mainline returns to prompt/scaffold steering.
 
 ## Safety Reminder
 

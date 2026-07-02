@@ -62,6 +62,22 @@ portable local variant management. Those remain roadmap-level problems that
 require evidence, not authority, and must stay behind explicit review and no
 unattended promotion boundaries.
 
+## LARQL Direct Editing Status
+
+ZTH's mainline steering path remains prompt and scaffold injection: bounded
+packets, provenance, validators, supervised review, and reusable evidence
+artifacts.
+
+LARQL direct editing is parked as experimental research evidence. The
+end-to-end direct-edit pipeline mechanically worked, but the tested
+layer-0 continuation rank-1 edit did not produce behavior-level movement for
+the file-scope task. That makes the result useful as bounded evidence, not as
+the product path.
+
+The product framing remains small-model guided capability: specialized workers
+inside supervised workflows, with variants, deltas, adapters, and scaffolded
+review used only when they improve evidence-backed capability.
+
 ## Implemented
 
 - LLM-probe preflight import scaffold.
