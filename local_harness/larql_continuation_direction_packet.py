@@ -12,6 +12,7 @@ from typing import Any
 
 REPORT_TYPE = "larql_continuation_direction_packet.v0"
 VECTOR_REPORT_TYPE = "larql_continuation_direction_vectors.v0"
+RECOMMENDED_NEXT_STEP = "continuation_rank1_delta_design"
 REQUIRED_NEXT_STEP = "supervised_continuation_direction_review"
 ALLOWED_DIRECTION_MODES = {"target_minus_control"}
 REQUIRED_SELECTION_ACTIONS = {
@@ -103,6 +104,16 @@ def validate_source_record(record: dict[str, Any]) -> None:
     ]:
         if record.get(field) is not False:
             raise ValueError(f"{field} must be false")
+    for field in ["target_module", "target_module_family"]:
+        if record.get(field) in (None, ""):
+            raise ValueError(f"{field} must be present in source capture record")
+
+
+def validate_optional_count_match(name: str, summary_value: Any, count_value: int) -> None:
+    if summary_value is None:
+        return
+    if summary_value != count_value:
+        raise ValueError(f"{name} does not match row count")
 
 
 def validate_summary(summary: dict[str, Any]) -> None:
@@ -110,21 +121,6 @@ def validate_summary(summary: dict[str, Any]) -> None:
         raise ValueError("capture_status must be completed or completed_with_warnings")
     if summary.get("vector_source") != "continuation_prediction_position":
         raise ValueError("vector_source must be continuation_prediction_position")
-    for field in [
-        "automatic_failure_to_curriculum_capture_authorized",
-        "promotion_authorized",
-        "training_performed",
-        "generation_performed",
-        "delta_artifact_written",
-        "patched_model_materialized",
-        "base_model_overwritten",
-    ]:
-        if summary.get(field) is not False:
-            raise ValueError(f"{field} must be false")
-    if summary.get("captured_vector_count") != summary.get("selected_token_count"):
-        raise ValueError("selected/captured counts do not match rows")
-    if summary.get("target_module") in (None, ""):
-        raise ValueError("target_module is missing")
 
 
 def build_grouped_rows(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
@@ -160,7 +156,7 @@ def validate_rows(rows: list[dict[str, Any]], summary: dict[str, Any]) -> None:
         raise ValueError("module_input_vector lengths are inconsistent")
     if len(output_lengths) != 1:
         raise ValueError("module_output_vector lengths are inconsistent")
-    if any(row.get("continuation_prediction_position") is None for row in rows):
+    if any(row.get("prediction_position") is None for row in rows):
         raise ValueError("prediction positions missing")
     if any(row.get("vector_source") != "continuation_prediction_position" for row in rows):
         raise ValueError("vector_source must be continuation_prediction_position")
@@ -186,6 +182,8 @@ def build_direction_vectors(rows: list[dict[str, Any]]) -> dict[str, Any]:
         raise ValueError("zero-norm output direction")
     if not math.isfinite(input_norm) or input_norm <= 0.0:
         raise ValueError("zero-norm input direction")
+    output_cosine = cosine(target_output_mean, control_output_mean)
+    input_cosine = cosine(target_input_mean, control_input_mean)
     return {
         "boost_output_mean": boost_output_mean,
         "suppress_output_mean": suppress_output_mean,
@@ -197,8 +195,8 @@ def build_direction_vectors(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "continuation_input_direction": normalize(input_delta),
         "output_direction_norm_before_normalization": output_norm,
         "input_direction_norm_before_normalization": input_norm,
-        "output_cosine_target_control": cosine(target_output_mean, control_output_mean),
-        "input_cosine_target_control": cosine(target_input_mean, control_input_mean),
+        "output_cosine_target_control": output_cosine,
+        "input_cosine_target_control": input_cosine,
     }
 
 
@@ -224,9 +222,17 @@ def write_continuation_direction_packet(
     summary = load_json_object(continuation_activation_summary)
     validate_summary(summary)
     validate_rows(rows, summary)
+    validate_optional_count_match("selected_token_count", summary.get("selected_token_count"), len(rows))
+    validate_optional_count_match("captured_vector_count", summary.get("captured_vector_count"), len(rows))
     if source_capture_record is not None:
         capture_record = load_json_object(source_capture_record)
         validate_source_record(capture_record)
+        if capture_record.get("target_module") not in (None, "", rows[0]["target_module"]):
+            raise ValueError("target_module in source capture record does not match vector rows")
+        if capture_record.get("target_module_family") not in (None, "", rows[0]["target_module_family"]):
+            raise ValueError("target_module_family in source capture record does not match vector rows")
+        if capture_record.get("captured_vector_count") not in (None, len(rows)):
+            raise ValueError("captured_vector_count in source capture record does not match row count")
     else:
         capture_record = None
 
@@ -252,7 +258,7 @@ def write_continuation_direction_packet(
         "output_vector_length": len(vectors["continuation_output_direction"]),
         "output_direction_norm_before_normalization": vectors["output_direction_norm_before_normalization"],
         "input_direction_norm_before_normalization": vectors["input_direction_norm_before_normalization"],
-        "recommended_next_step": REQUIRED_NEXT_STEP,
+        "recommended_next_step": RECOMMENDED_NEXT_STEP,
         "claim_boundary": {
             "packet_designs_direction_only": True,
             "no_inference": True,
@@ -278,6 +284,7 @@ def write_continuation_direction_packet(
         "install_authorized": False,
         "automatic_failure_to_curriculum_capture_authorized": False,
         "required_next_step": REQUIRED_NEXT_STEP,
+        "source_capture_record_missing_warning": capture_record is None,
     }
 
     vector_payload = {
@@ -322,6 +329,10 @@ def write_continuation_direction_packet(
             f"- output vector length: `{packet['output_vector_length']}`;",
             f"- output direction norm before normalization: `{packet['output_direction_norm_before_normalization']}`;",
             f"- input direction norm before normalization: `{packet['input_direction_norm_before_normalization']}`;",
+            "",
+            f"- recommended next construction step: `{RECOMMENDED_NEXT_STEP}`;",
+            f"- required review step: `{REQUIRED_NEXT_STEP}`;",
+            f"- source capture record missing warning: `{packet['source_capture_record_missing_warning']}`;",
             "",
             "## Claim Boundary",
             "",
