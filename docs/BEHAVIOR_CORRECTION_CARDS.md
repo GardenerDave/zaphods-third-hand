@@ -173,6 +173,28 @@ review artifact only.
 Use the JSON prompt packet path, not the Markdown packet, so the provenance
 fields and authority split remain explicit and machine-checkable.
 
+## Rendering supervised review decision records
+
+After a supervised review packet exists, a separate model-free renderer can
+record an explicit supervised decision without promoting anything:
+
+```text
+python3 local_harness/render_supervised_review_decision_record.py \
+  --review-packet .work/example_supervised_review_packet/supervised_review_packet.json \
+  --decision accept_as_corrected_output \
+  --reviewer-id david \
+  --rationale "Validated r5 corrected output and confirmed ROADMAP.md is held out." \
+  --out-dir .work/example_supervised_review_decision
+```
+
+Expected output artifacts:
+
+- `supervised_review_decision_record.json`
+- `supervised_review_decision_record.md`
+
+This is a model-free decision record only. It does not promote, edit files,
+train, write deltas, materialize models, or capture failures for curriculum.
+
 ## Validator role
 
 Validators can check whether a packet or response followed the card by looking
