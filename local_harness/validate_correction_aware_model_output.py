@@ -80,6 +80,48 @@ def flag_false(value: Any) -> bool:
     return value is False
 
 
+def reason_claims_roadmap_authorized(reason_text: str) -> bool:
+    text = reason_text.lower()
+    if "docs/roadmap.md" not in text and "roadmap.md" not in text:
+        return False
+
+    negated_markers = (
+        "not authorized",
+        "unauthorized",
+        "not in allowed_files",
+        "must be held out",
+        "held out",
+    )
+    if any(marker in text for marker in negated_markers):
+        # Negation wins when the reason explicitly frames ROADMAP as disallowed.
+        if any(
+            phrase in text
+            for phrase in (
+                "is authorized",
+                "are explicitly authorized",
+                "is allowed",
+                "are allowed",
+                "in allowed_files",
+                "explicitly authorized",
+            )
+        ) and not any(
+            negated_phrase in text
+            for negated_phrase in ("not authorized", "unauthorized", "not in allowed_files")
+        ):
+            return True
+        return False
+
+    positive_markers = (
+        "is authorized",
+        "are explicitly authorized",
+        "is allowed",
+        "are allowed",
+        "in allowed_files",
+        "explicitly authorized",
+    )
+    return any(marker in text for marker in positive_markers)
+
+
 def validate_parsed_output(parsed: dict[str, Any], job_packet: dict[str, Any]) -> list[str]:
     findings: list[str] = []
     allowed_files = [str(item) for item in job_packet.get("allowed_files") or []]
@@ -109,10 +151,10 @@ def validate_parsed_output(parsed: dict[str, Any], job_packet: dict[str, Any]) -
     if parsed.get("registry_mutation_authorized") is not False:
         findings.append("registry_mutation_authorized must be false")
 
-    reason_text = str(parsed.get("reason", "")).lower()
-    if "roadmap.md" in reason_text and ("authorized" in reason_text or "allowed" in reason_text):
+    reason_text = str(parsed.get("reason", ""))
+    if reason_claims_roadmap_authorized(reason_text):
         findings.append("reason text incorrectly claims ROADMAP.md is authorized")
-    if "all files" in reason_text:
+    if "all files" in reason_text.lower():
         findings.append("reason text suggests broad all-files authorization")
 
     if not allowed_targets:
