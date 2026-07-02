@@ -54,6 +54,16 @@ def make_review_packet(tmp_path: Path, validation_status: str = "validation_pass
             "supervised_acceptance_performed": False,
             "automatic_failure_curriculum_capture_authorized": False,
         },
+        "source_review_packet_authority_flags": {
+            "model_inference_performed": True,
+            "generation_performed": True,
+            "training_performed": False,
+            "delta_written": False,
+            "patched_model_materialized": False,
+            "promotion_authorized": False,
+            "supervised_acceptance_performed": False,
+            "automatic_failure_curriculum_capture_authorized": False,
+        },
         "source_model_attempt_authority_flags": {
             "model_inference_performed": True,
             "generation_performed": True,
@@ -124,9 +134,13 @@ def test_accept_renders_json_and_md(tmp_path: Path):
     assert payload["no_file_edits"] is True
     assert payload["packet_level_only"] is True
     assert payload["source_supervised_review_packet_sha256"]
+    assert payload["source_review_packet_authority_flags"]["model_inference_performed"] is False
+    assert payload["source_review_packet_authority_flags"]["supervised_acceptance_performed"] is False
+    assert payload["source_review_packet_authority_flags"] != payload["decision_record_authority_flags"]
     md = (out / "supervised_review_decision_record.md").read_text(encoding="utf-8")
     assert "accept_as_corrected_output" in md
     assert "Validated r5 corrected output" in md
+    assert "Source review packet authority flags" in md
 
 
 def test_reject_renders_json_and_md(tmp_path: Path):

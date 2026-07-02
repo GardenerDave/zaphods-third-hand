@@ -39,6 +39,10 @@ def sha256_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+def sha256_path(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def short_excerpt(text: str, limit: int = 320) -> str:
     return " ".join(text.split())[:limit]
 
@@ -66,12 +70,13 @@ def build_decision_record(
         "supervised_acceptance_performed": decision == "accept_as_corrected_output",
         "automatic_failure_curriculum_capture_authorized": False,
     }
+    source_review_packet_authority_flags = dict(
+        review_packet.get("review_packet_authority_flags") or decision_record_authority_flags
+    )
     record = {
         "report_type": REPORT_TYPE,
         "source_supervised_review_packet": str(review_packet_path),
-        "source_supervised_review_packet_sha256": sha256_text(
-            json.dumps(review_packet, sort_keys=True, separators=(",", ":"))
-        ),
+        "source_supervised_review_packet_sha256": sha256_path(review_packet_path),
         "source_validation_status": review_packet.get("validation_status"),
         "source_findings": review_packet.get("findings") or [],
         "source_parsed_output": review_packet.get("parsed_output"),
@@ -83,6 +88,7 @@ def build_decision_record(
         "packet_level_only": True,
         "decision_record_authority_flags": decision_record_authority_flags,
         "authority_flags": decision_record_authority_flags,
+        "source_review_packet_authority_flags": source_review_packet_authority_flags,
         "review_packet_summary": review_packet.get("review_packet_summary"),
         "review_packet_excerpt": short_excerpt(
             json.dumps(review_packet.get("parsed_output"), sort_keys=True, default=str)
@@ -138,7 +144,7 @@ def render_markdown(record: dict[str, Any]) -> str:
     for key, value in record["decision_record_authority_flags"].items():
         lines.append(f"- {key}: {value}")
     lines.extend(["", "### Source review packet authority flags"])
-    for key, value in record["authority_flags"].items():
+    for key, value in record["source_review_packet_authority_flags"].items():
         lines.append(f"- {key}: {value}")
     lines.extend(
         [
