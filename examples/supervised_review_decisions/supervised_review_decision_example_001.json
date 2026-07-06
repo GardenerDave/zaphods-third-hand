@@ -1,0 +1,40 @@
+{
+  "decision_id": "decision_example_001",
+  "attempt_id": "attempt_example_001",
+  "validation_id": "validation_example_001",
+  "triage_id": "triage_example_001",
+  "orchestration_id": "orch_example_001",
+  "prompt_packet_id": "prompt_packet_example_001",
+  "validation_status": "passed",
+  "decision": "accepted",
+  "decision_scope": "output_contract_only",
+  "decided_at": "2026-07-06T00:00:00Z",
+  "reviewer_metadata": {
+    "reviewer": "manual",
+    "review_required": true
+  },
+  "decision_reason": "Output satisfied the required output contract and is approved for bounded downstream supervised use.",
+  "allowed_downstream_use": [
+    "may_be_used_as_reviewed_input_for_next_supervised_step"
+  ],
+  "prohibited_downstream_use": [
+    "no_command_execution",
+    "no_direct_file_modification",
+    "no_automatic_patch_promotion",
+    "no_automatic_training",
+    "no_default_failure_to_curriculum_capture"
+  ],
+  "authority_boundaries": [
+    "Review decision is not command execution authority.",
+    "No direct file modification authority is granted.",
+    "No automatic patch promotion authority is granted.",
+    "No automatic training authority is granted.",
+    "No default failure-to-curriculum capture authority is granted.",
+    "Downstream use must remain supervised."
+  ],
+  "provenance": {
+    "source": "supervised_review_decision",
+    "input_attempt_id": "attempt_example_001",
+    "input_validation_id": "validation_example_001"
+  }
+}
