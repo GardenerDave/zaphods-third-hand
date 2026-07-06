@@ -1,0 +1,25 @@
+{
+  "patch_id": "scope_boundary_v1",
+  "title": "Scope boundary enforcement",
+  "status": "candidate",
+  "failure_signature": [
+    "model includes plausible but unauthorized targets",
+    "model treats related files as allowed files"
+  ],
+  "applies_to": {
+    "stage": ["target_selection"],
+    "task_type": ["repo_patch", "docs_update", "triage"],
+    "model_size": ["small", "mid", "any"]
+  },
+  "prompt_delta": "Only include targets explicitly listed in allowed_targets. Related or plausible files must go in held_targets.",
+  "required_output_fields": [
+    "allowed_targets",
+    "held_targets",
+    "scope_expansion_required",
+    "reason"
+  ],
+  "validator_expectations": [
+    "no held target may appear in allowed_targets",
+    "scope_expansion_required must be true when requested work requires held targets"
+  ]
+}

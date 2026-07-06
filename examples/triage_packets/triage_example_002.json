@@ -1,0 +1,40 @@
+{
+  "triage_id": "triage_example_002",
+  "messy_input": "There is a failing test in the review script, can you fix the bug?",
+  "normalized_intent": "User wants a bounded repo patch packet for one failing test in the review script.",
+  "task_type": "repo_patch",
+  "recommended_workflow": "repo_patch_packet",
+  "confidence": "medium",
+  "requires_clarification": false,
+  "bounded_outputs": [
+    "repo_patch_packet"
+  ],
+  "allowed_targets": [
+    "local_harness/",
+    "tests/"
+  ],
+  "held_targets": [
+    "production automation",
+    "automatic curriculum capture",
+    "automatic promotion",
+    "unrelated files"
+  ],
+  "risk_flags": [],
+  "recommended_prompt_patches": [
+    "scope_boundary_v1",
+    "reason_required_v1",
+    "stop_condition_quality_v1"
+  ],
+  "output_contract": {
+    "format": "json",
+    "requires_reason": true
+  },
+  "validation_hooks": [
+    "allowed_held_target_separation",
+    "required_reason",
+    "no_execution_authority"
+  ],
+  "provenance": {
+    "source": "example"
+  }
+}

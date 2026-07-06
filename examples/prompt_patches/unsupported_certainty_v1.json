@@ -1,0 +1,25 @@
+{
+  "patch_id": "unsupported_certainty_v1",
+  "title": "Unsupported certainty suppression",
+  "status": "candidate",
+  "failure_signature": [
+    "model declares repo-wide certainty without evidence",
+    "model states scope-level claims from partial inspection"
+  ],
+  "applies_to": {
+    "stage": ["prompt_assembly", "validation"],
+    "task_type": ["repo_patch", "docs_update", "triage", "any"],
+    "model_size": ["small", "mid", "any"]
+  },
+  "prompt_delta": "Only state claims supported by the evidence you were given. Mark any scope-level or repo-wide statement as unverified unless the packet includes evidence covering that scope. Prefer 'not verified in this packet' over confident generalization.",
+  "required_output_fields": [
+    "claims",
+    "evidence_basis",
+    "unverified_claims",
+    "reason"
+  ],
+  "validator_expectations": [
+    "every scope-level claim must cite packet evidence or appear in unverified_claims",
+    "output must not declare repo-wide certainty without evidence"
+  ]
+}

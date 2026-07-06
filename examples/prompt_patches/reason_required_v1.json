@@ -1,0 +1,23 @@
+{
+  "patch_id": "reason_required_v1",
+  "title": "Reason required for every recommendation",
+  "status": "candidate",
+  "failure_signature": [
+    "model recommends actions without stating why",
+    "model omits justification for held or rejected items"
+  ],
+  "applies_to": {
+    "stage": ["prompt_assembly", "output_contract"],
+    "task_type": ["repo_patch", "triage", "any"],
+    "model_size": ["small", "mid", "any"]
+  },
+  "prompt_delta": "Every recommendation, hold, or rejection must include a short reason tied to packet evidence. A missing reason makes the recommendation invalid for review.",
+  "required_output_fields": [
+    "recommendations",
+    "reason"
+  ],
+  "validator_expectations": [
+    "every recommendation must carry a non-empty reason",
+    "reasons must reference packet evidence, not external assumptions"
+  ]
+}

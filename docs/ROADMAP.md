@@ -457,6 +457,19 @@ Requirements:
 - No hidden hardware collection.
 - No deletion or rewriting of evidence by default.
 
+## Repo Audit Follow-Up (2026-07-06)
+
+- A recent repo audit identified general repo-health follow-ups (stray files,
+  packaging questions, one pre-existing unrelated test failure, historical
+  report cleanup).
+- This pass intentionally performs no broad cleanup and preserves existing
+  evidence and dogfood artifacts.
+- The next architecture work is the prompt patch library
+  (`docs/PROMPT_PATCH_LIBRARY.md`), the triage/router packet layer
+  (`docs/TRIAGE_ROUTER.md`), and the orchestration boundary between them.
+- General audit issues remain a separate track and are only addressed when a
+  library/router/orchestration change directly depends on them.
+
 ## Roadmap Discipline
 
 - Roadmap items must not be represented as implemented until code, docs, and tests exist.

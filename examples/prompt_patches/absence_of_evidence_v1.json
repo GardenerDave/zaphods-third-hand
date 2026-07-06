@@ -1,0 +1,26 @@
+{
+  "patch_id": "absence_of_evidence_v1",
+  "title": "Absence-of-evidence boundary",
+  "status": "candidate",
+  "failure_signature": [
+    "model treats a failed search as proof a file does not exist",
+    "model authorizes cleanup or overwrite from missing search results"
+  ],
+  "applies_to": {
+    "stage": ["prompt_assembly", "validation"],
+    "task_type": ["repo_patch", "triage", "any"],
+    "model_size": ["small", "mid", "any"]
+  },
+  "prompt_delta": "A failed search proves only that the item was not found in the searched scope. State the search scope explicitly. Do not conclude the item does not exist, and do not recommend cleanup, deletion, promotion, canonicalization, or overwrite from absence alone. Recommend targeted inspection or review instead.",
+  "required_output_fields": [
+    "search_scope",
+    "search_result",
+    "evidence_boundary_statement",
+    "reason"
+  ],
+  "validator_expectations": [
+    "output must state the searched scope",
+    "output must not claim the item does not exist",
+    "output must not authorize cleanup, deletion, promotion, canonicalization, or overwrite from absence"
+  ]
+}

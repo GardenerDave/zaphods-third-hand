@@ -1,0 +1,25 @@
+{
+  "patch_id": "stop_condition_quality_v1",
+  "title": "Stop condition quality",
+  "status": "candidate",
+  "failure_signature": [
+    "model continues past the requested scope",
+    "model declares completion without checking stop conditions",
+    "model invents follow-on work as if authorized"
+  ],
+  "applies_to": {
+    "stage": ["prompt_assembly", "review"],
+    "task_type": ["repo_patch", "triage", "any"],
+    "model_size": ["small", "mid", "any"]
+  },
+  "prompt_delta": "Stop when the bounded outputs are produced. State which stop condition was met. List follow-on ideas under suggested_next_steps without acting on them. Do not treat suggestions as authorized work.",
+  "required_output_fields": [
+    "stop_condition_met",
+    "suggested_next_steps",
+    "reason"
+  ],
+  "validator_expectations": [
+    "output must state which stop condition was met",
+    "suggested next steps must not be executed or claimed as done"
+  ]
+}

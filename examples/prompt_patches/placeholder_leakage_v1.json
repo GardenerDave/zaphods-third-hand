@@ -1,0 +1,24 @@
+{
+  "patch_id": "placeholder_leakage_v1",
+  "title": "Placeholder leakage prevention",
+  "status": "candidate",
+  "failure_signature": [
+    "model leaves template placeholders in final output",
+    "model emits lorem-ipsum or TODO stubs as finished content"
+  ],
+  "applies_to": {
+    "stage": ["output_contract", "validation"],
+    "task_type": ["docs_update", "presentation_outline", "any"],
+    "model_size": ["small", "mid", "any"]
+  },
+  "prompt_delta": "Replace every template placeholder with real content before finishing. If a value is unknown, write 'unknown' plus the reason it is unknown. Do not emit angle-bracket placeholders, TODO stubs, or lorem-ipsum text in the final output.",
+  "required_output_fields": [
+    "final_content",
+    "unresolved_items",
+    "reason"
+  ],
+  "validator_expectations": [
+    "final output must not contain template placeholder markers",
+    "unknown values must be listed in unresolved_items with reasons"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "patch_id": "output_contract_v1",
+  "title": "Output contract adherence",
+  "status": "candidate",
+  "failure_signature": [
+    "model returns prose when structured output was required",
+    "model omits required output fields",
+    "model wraps JSON in commentary or code fences inconsistently"
+  ],
+  "applies_to": {
+    "stage": ["output_contract"],
+    "task_type": ["repo_patch", "docs_update", "triage", "any"],
+    "model_size": ["small", "mid", "any"]
+  },
+  "prompt_delta": "Return exactly one output in the declared contract format. Include every required field, even when its value is empty or unknown. Do not add fields that grant authority. Do not wrap the structured output in commentary.",
+  "required_output_fields": [
+    "format",
+    "required_fields_present",
+    "reason"
+  ],
+  "validator_expectations": [
+    "output must parse in the declared contract format",
+    "every contract-required field must be present",
+    "output must not add authority-bearing fields"
+  ]
+}

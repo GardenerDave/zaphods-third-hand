@@ -1,0 +1,46 @@
+{
+  "triage_id": "triage_example_001",
+  "messy_input": "The LoRA stuff and prompt injection got messy. We need to tie it back together.",
+  "normalized_intent": "User wants an architecture plan connecting prompt patching, triage routing, LoRA, and supervised orchestration.",
+  "task_type": "architecture_planning",
+  "recommended_workflow": "design_packet",
+  "confidence": "medium",
+  "requires_clarification": false,
+  "bounded_outputs": [
+    "prompt_patch_library_spec",
+    "triage_router_spec"
+  ],
+  "allowed_targets": [
+    "docs/PROMPT_PATCH_LIBRARY.md",
+    "docs/TRIAGE_ROUTER.md",
+    "docs/ROADMAP.md"
+  ],
+  "held_targets": [
+    "training/",
+    "production automation",
+    "automatic curriculum capture"
+  ],
+  "risk_flags": [
+    "scope_creep",
+    "training_pipeline_ambiguity",
+    "prompt_injection_surface",
+    "unsafe_auto_curriculum_capture"
+  ],
+  "recommended_prompt_patches": [
+    "scope_boundary_v1",
+    "output_contract_v1",
+    "unsupported_certainty_v1"
+  ],
+  "output_contract": {
+    "format": "json",
+    "requires_reason": true
+  },
+  "validation_hooks": [
+    "allowed_held_target_separation",
+    "required_reason",
+    "no_execution_authority"
+  ],
+  "provenance": {
+    "source": "example"
+  }
+}
