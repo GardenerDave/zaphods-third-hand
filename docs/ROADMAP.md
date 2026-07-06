@@ -466,9 +466,10 @@ Requirements:
   evidence and dogfood artifacts.
 - The next architecture work is the prompt patch library
   (`docs/PROMPT_PATCH_LIBRARY.md`), the triage/router packet layer
-  (`docs/TRIAGE_ROUTER.md`), and the orchestration boundary between them
-  (`docs/ORCHESTRATION_BOUNDARY.md`) as the model-free bridge toward later
-  model-facing prompt packet rendering.
+  (`docs/TRIAGE_ROUTER.md`), the orchestration boundary
+  (`docs/ORCHESTRATION_BOUNDARY.md`), and the model prompt packet renderer
+  (`docs/MODEL_PROMPT_PACKET_RENDERER.md`) as the model-free bridge toward
+  later supervised model-facing calls.
 - General audit issues remain a separate track and are only addressed when a
   library/router/orchestration change directly depends on them.
 
