@@ -1,0 +1,43 @@
+{
+  "gate_id": "gate_example_001",
+  "decision_id": "decision_example_001",
+  "attempt_id": "attempt_example_001",
+  "validation_id": "validation_example_001",
+  "triage_id": "triage_example_001",
+  "orchestration_id": "orch_example_001",
+  "prompt_packet_id": "prompt_packet_example_001",
+  "review_decision": "accepted",
+  "requested_downstream_use": "next_supervised_step_input",
+  "gate_status": "allowed",
+  "gate_scope": "bounded_supervised_input_only",
+  "gated_at": "2026-07-06T00:00:00Z",
+  "operator_metadata": {
+    "operator": "manual",
+    "review_required": true
+  },
+  "gate_reason": "The reviewed output may be used as bounded input for the next supervised step.",
+  "allowed_downstream_use": [
+    "may_be_used_as_reviewed_input_for_next_supervised_step"
+  ],
+  "prohibited_downstream_use": [
+    "no_command_execution",
+    "no_direct_file_modification",
+    "no_patch_application",
+    "no_automatic_patch_promotion",
+    "no_automatic_training",
+    "no_default_failure_to_curriculum_capture"
+  ],
+  "authority_boundaries": [
+    "Downstream-use gate is not command execution authority.",
+    "Downstream-use gate is not file modification authority.",
+    "Downstream-use gate is not patch application authority.",
+    "No automatic patch promotion authority is granted.",
+    "No automatic training authority is granted.",
+    "No default failure-to-curriculum capture authority is granted.",
+    "Downstream use must remain supervised."
+  ],
+  "provenance": {
+    "source": "supervised_downstream_use_gate",
+    "input_decision_id": "decision_example_001"
+  }
+}

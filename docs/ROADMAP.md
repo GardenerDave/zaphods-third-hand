@@ -471,9 +471,10 @@ Requirements:
   (`docs/MODEL_PROMPT_PACKET_RENDERER.md`), supervised model attempt
   recording (`docs/SUPERVISED_MODEL_ATTEMPT_RECORDER.md`), supervised
   attempt output validation (`docs/SUPERVISED_ATTEMPT_OUTPUT_VALIDATION.md`),
-  and supervised review decision records
-  (`docs/SUPERVISED_REVIEW_DECISION_RECORD.md`) as a model-free chain toward
-  future supervised downstream-use layers.
+  supervised review decision records
+  (`docs/SUPERVISED_REVIEW_DECISION_RECORD.md`), and supervised downstream-use
+  gate records (`docs/SUPERVISED_DOWNSTREAM_USE_GATE.md`) as a model-free
+  chain toward future supervised handoff layers.
 - General audit issues remain a separate track and are only addressed when a
   library/router/orchestration change directly depends on them.
 
