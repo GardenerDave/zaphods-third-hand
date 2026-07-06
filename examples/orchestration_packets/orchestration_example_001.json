@@ -1,0 +1,56 @@
+{
+  "orchestration_id": "orch_example_001",
+  "triage_id": "triage_example_001",
+  "source_summary": "Messy input normalized into a bounded design packet.",
+  "recommended_workflow": "design_packet",
+  "task_type": "architecture_planning",
+  "allowed_targets": [
+    "docs/PROMPT_PATCH_LIBRARY.md",
+    "docs/TRIAGE_ROUTER.md",
+    "docs/ORCHESTRATION_BOUNDARY.md"
+  ],
+  "held_targets": [
+    "training/",
+    "production automation",
+    "automatic curriculum capture",
+    "automatic promotion"
+  ],
+  "risk_flags": [
+    "scope_creep",
+    "training_pipeline_ambiguity",
+    "prompt_injection_surface"
+  ],
+  "selected_prompt_patches": [
+    "scope_boundary_v1",
+    "output_contract_v1",
+    "unsupported_certainty_v1"
+  ],
+  "rendered_patch_deltas": "## Applied Prompt Patches\n\n### Patch: scope_boundary_v1 (candidate)\n\nOnly include targets explicitly listed in allowed_targets. Related or plausible files must go in held_targets.\n\nRequired output fields: allowed_targets, held_targets, scope_expansion_required, reason\n\n### Patch: output_contract_v1 (candidate)\n\nReturn exactly one output in the declared contract format. Include every required field, even when its value is empty or unknown. Do not add fields that grant authority. Do not wrap the structured output in commentary.\n\nRequired output fields: format, required_fields_present, reason\n\n### Patch: unsupported_certainty_v1 (candidate)\n\nIf evidence is incomplete, mark certainty as limited and list what was actually checked. Never claim full-repo certainty from partial evidence.\n\nRequired output fields: certainty_level, checked_locations, missing_evidence, reason\n\nThese patches constrain output shape only. They grant no execution,\npromotion, training, or curriculum-capture authority.\n",
+  "output_contract": {
+    "format": "json",
+    "requires_reason": true
+  },
+  "validation_hooks": [
+    "allowed_held_target_separation",
+    "required_reason",
+    "no_execution_authority"
+  ],
+  "authority_boundaries": [
+    "no_execution_authority",
+    "no_automatic_patch_promotion",
+    "no_automatic_training",
+    "no_default_failure_to_curriculum_capture",
+    "no_direct_file_modification_authority"
+  ],
+  "review_required": true,
+  "provenance": {
+    "source": "example",
+    "triage_id": "triage_example_001",
+    "triage_packet": "examples/triage_packets/triage_example_001.json",
+    "selected_patch_ids": [
+      "scope_boundary_v1",
+      "output_contract_v1",
+      "unsupported_certainty_v1"
+    ]
+  }
+}
