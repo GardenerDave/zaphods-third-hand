@@ -472,9 +472,10 @@ Requirements:
   recording (`docs/SUPERVISED_MODEL_ATTEMPT_RECORDER.md`), supervised
   attempt output validation (`docs/SUPERVISED_ATTEMPT_OUTPUT_VALIDATION.md`),
   supervised review decision records
-  (`docs/SUPERVISED_REVIEW_DECISION_RECORD.md`), and supervised downstream-use
-  gate records (`docs/SUPERVISED_DOWNSTREAM_USE_GATE.md`) as a model-free
-  chain toward future supervised handoff layers.
+  (`docs/SUPERVISED_REVIEW_DECISION_RECORD.md`), supervised downstream-use
+  gate records (`docs/SUPERVISED_DOWNSTREAM_USE_GATE.md`), and supervised
+  handoff packets (`docs/SUPERVISED_HANDOFF_PACKET.md`) as a model-free chain
+  toward future workflow-specific supervised consumers.
 - General audit issues remain a separate track and are only addressed when a
   library/router/orchestration change directly depends on them.
 
