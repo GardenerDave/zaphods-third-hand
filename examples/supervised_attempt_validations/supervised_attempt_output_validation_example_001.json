@@ -1,0 +1,52 @@
+{
+  "validation_id": "validation_example_001",
+  "attempt_id": "attempt_example_001",
+  "triage_id": "triage_example_001",
+  "orchestration_id": "orch_example_001",
+  "prompt_packet_id": "prompt_packet_example_001",
+  "validation_status": "passed",
+  "acceptance_status": "not_reviewed",
+  "validated_at": "2026-07-06T00:00:00Z",
+  "output_contract": {
+    "format": "json",
+    "requires_reason": true,
+    "required_fields": [
+      "allowed_targets",
+      "held_targets",
+      "reason"
+    ]
+  },
+  "checks": [
+    {
+      "check_id": "parse_json",
+      "status": "passed",
+      "message": "Raw model output parsed as JSON."
+    },
+    {
+      "check_id": "required_fields",
+      "status": "passed",
+      "message": "All required fields are present."
+    },
+    {
+      "check_id": "requires_reason",
+      "status": "passed",
+      "message": "Non-empty reason field is present."
+    }
+  ],
+  "diagnostics": [],
+  "raw_output_preserved": true,
+  "authority_boundaries": [
+    "Validation is evidence, not acceptance.",
+    "No command execution authority is granted.",
+    "No direct file modification authority is granted.",
+    "No automatic patch promotion authority is granted.",
+    "No automatic training authority is granted.",
+    "No default failure-to-curriculum capture authority is granted.",
+    "Human review is required before downstream use."
+  ],
+  "provenance": {
+    "source": "supervised_attempt_output_validation",
+    "input_attempt_id": "attempt_example_001"
+  },
+  "review_required": true
+}
