@@ -1,0 +1,74 @@
+# Supervised Chain Smoke Report
+
+## Smoke Status
+- smoke_id: supervised_chain_smoke_example_001
+- smoke_status: passed
+- completed_at: 2026-07-06T00:00:00Z
+
+## Chain IDs
+- triage_id: triage_example_001
+- orchestration_id: orch_example_001
+- prompt_packet_id: prompt_packet_example_001
+- attempt_id: attempt_example_001
+- validation_id: validation_example_001
+- decision_id: decision_example_001
+- gate_id: gate_example_001
+- handoff_id: handoff_example_001
+
+## Input Summary
+- started_from: messy_input_fixture
+- messy_input: The LoRA stuff and prompt injection got messy. We need to tie it back together.
+
+## Artifact Summary
+- triage_packet: recorded
+- orchestration_packet: recorded
+- model_prompt_packet: recorded
+- supervised_model_attempt: recorded
+- output_validation: recorded
+- review_decision: recorded
+- downstream_use_gate: recorded
+- handoff_packet: recorded
+
+## Checks
+- [passed] triage_id_preserved: triage_id is preserved through triage and orchestration artifacts.
+- [passed] orchestration_id_preserved: orchestration_id is preserved through attempt artifact.
+- [passed] prompt_packet_id_preserved: prompt_packet_id is preserved where applicable.
+- [passed] attempt_id_preserved: attempt_id is preserved from attempt through handoff.
+- [passed] validation_id_preserved: validation_id is preserved from validation through handoff.
+- [passed] decision_id_preserved: decision_id is preserved from review decision through handoff.
+- [passed] gate_id_preserved: gate_id is preserved into handoff.
+- [passed] handoff_prepared_requires_allowed_gate: handoff_status prepared occurs only when gate_status is allowed.
+- [passed] validation_is_evidence_not_acceptance: validation output remains evidence and does not imply acceptance.
+- [passed] review_decision_no_execution_authority: review decision record does not grant execution authority.
+- [passed] gate_no_execution_or_mutation_authority: downstream-use gate does not grant execution or mutation authority.
+- [passed] handoff_no_execution_mutation_patch_promotion_training_curriculum_authority: handoff does not grant execution/mutation/patch/promotion/training/curriculum authority.
+- [passed] review_required_persisted: review_required remains true across validation, decision, gate, and handoff.
+- [passed] no_forbidden_authority_language: no artifact contains forbidden authority language.
+- [passed] synthetic_fixture_output_provenance: raw model output provenance is synthetic_fixture_output.
+
+## Diagnostics
+- <none>
+
+## Authority Boundaries
+- Smoke test is not command execution authority.
+- Smoke test is not file modification authority.
+- Smoke test is not patch application authority.
+- No automatic patch promotion authority is granted.
+- No automatic training authority is granted.
+- No default failure-to-curriculum capture authority is granted.
+- All downstream use must remain supervised.
+
+## Provenance
+```json
+{
+  "fixture": "examples/supervised_chain_smoke/supervised_chain_smoke_example_001.json",
+  "source": "supervised_chain_smoke"
+}
+```
+
+## Review Requirement
+- This smoke report is evidence of deterministic chain integration.
+- Smoke evidence is not execution authority.
+- Smoke evidence is not file modification authority.
+- Smoke evidence is not patch application authority.
+- All downstream use remains supervised.
