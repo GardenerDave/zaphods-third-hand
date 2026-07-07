@@ -78,6 +78,18 @@ Smoke output is evidence, not authority.
 
 The renderer does not include execution instructions.
 
+## Operator runner
+
+Use the local operator wrapper to generate timestamped smoke artifacts under `.work/`:
+
+```bash
+python3 local_harness/run_supervised_chain_smoke.py \
+  --messy-input "The LoRA and prompt injection work got messy. Build a bounded design packet." \
+  --out-dir .work/supervised_chain_smoke
+```
+
+The runner uses synthetic fixture model output only, does not call a model, does not execute anything, and writes review artifacts for schema drift and authority leakage inspection.
+
 ## Purpose
 
 The purpose of this layer is integration assurance:
