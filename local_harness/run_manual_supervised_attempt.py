@@ -79,6 +79,45 @@ def _read_json(path: Path, *, kind: str) -> dict[str, Any]:
     return payload
 
 
+def _parse_field_list_from_text(text: str, prefix: str) -> list[str]:
+    if not text.startswith(prefix):
+        return []
+    return [field.strip() for field in text[len(prefix):].split(",") if field.strip()]
+
+
+def _derive_missing_required_fields(validation_payload: dict[str, Any]) -> list[str]:
+    missing_required_fields = validation_payload.get("missing_required_fields")
+    if isinstance(missing_required_fields, list):
+        return missing_required_fields
+
+    checks = validation_payload.get("checks")
+    if isinstance(checks, list):
+        for check in checks:
+            if not isinstance(check, dict):
+                continue
+            if check.get("check_id") != "required_fields" or check.get("status") != "failed":
+                continue
+            message = check.get("message")
+            if isinstance(message, str):
+                parsed = _parse_field_list_from_text(message, "Missing required fields: ")
+                if parsed:
+                    return parsed
+
+    diagnostics = validation_payload.get("diagnostics")
+    if isinstance(diagnostics, list):
+        for diagnostic in diagnostics:
+            if not isinstance(diagnostic, str):
+                continue
+            parsed = _parse_field_list_from_text(
+                diagnostic,
+                "Required fields missing from parsed output: ",
+            )
+            if parsed:
+                return parsed
+
+    return []
+
+
 def _ingest_command(run_dir: Path, raw_output_file: Path) -> str:
     return (
         "python3 local_harness/run_manual_supervised_attempt.py ingest "
@@ -149,6 +188,15 @@ def _extract_assistant_content(response_payload: dict[str, Any]) -> str:
     if not isinstance(content, str) or not content:
         raise ValueError("local endpoint response missing assistant content")
     return content
+
+
+def _resolve_run_file(run_dir: Path, path_value: str | Path, *, field: str) -> Path:
+    candidate = Path(path_value)
+    if not candidate.is_absolute():
+        candidate = run_dir / candidate
+    if not candidate.is_file():
+        raise ValueError(f"missing {field}: {candidate}")
+    return candidate
 
 
 def _prepare_run_dir(*, out_dir: Path, timestamp: str | None, overwrite: bool) -> tuple[str, Path]:
@@ -352,6 +400,122 @@ def run_call_local(
     }
 
 
+def run_export_pattern(
+    *,
+    run_dir: Path,
+    failure_raw: Path,
+    failure_validation: Path,
+    retry_prompt: Path,
+    success_raw: Path,
+    success_validation: Path,
+    out_dir: Path,
+    pattern_id: str,
+    overwrite: bool,
+) -> dict[str, Any]:
+    resolved_pattern_id = _require_nonempty(pattern_id, field="--pattern-id")
+    failure_raw_path = _resolve_run_file(run_dir, failure_raw, field="--failure-raw")
+    failure_validation_path = _resolve_run_file(run_dir, failure_validation, field="--failure-validation")
+    retry_prompt_path = _resolve_run_file(run_dir, retry_prompt, field="--retry-prompt")
+    success_raw_path = _resolve_run_file(run_dir, success_raw, field="--success-raw")
+    success_validation_path = _resolve_run_file(run_dir, success_validation, field="--success-validation")
+
+    review_decision_path = run_dir / "review_decision.json"
+    gate_path = run_dir / "downstream_use_gate.json"
+    handoff_path = run_dir / "handoff_packet.json"
+
+    failure_raw_text = failure_raw_path.read_text(encoding="utf-8")
+    retry_prompt_text = retry_prompt_path.read_text(encoding="utf-8")
+    success_raw_text = success_raw_path.read_text(encoding="utf-8")
+    failure_validation_payload = _read_json(failure_validation_path, kind="failure validation")
+    success_validation_payload = _read_json(success_validation_path, kind="success validation")
+
+    local_call_metadata_path = run_dir / "local_model_call.json"
+    local_call_metadata = _read_json(local_call_metadata_path, kind="local model call metadata") if local_call_metadata_path.is_file() else {}
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    pattern_path = out_dir / f"{resolved_pattern_id}.json"
+    if pattern_path.exists() and not overwrite:
+        raise ValueError(f"pattern already exists: {pattern_path}; use --overwrite to replace")
+
+    missing_required_fields = _derive_missing_required_fields(failure_validation_payload)
+    validator_diagnostics = failure_validation_payload.get("diagnostics")
+    if not isinstance(validator_diagnostics, list):
+        validator_diagnostics = failure_validation_payload.get("validator_diagnostics")
+    if not isinstance(validator_diagnostics, list):
+        validator_diagnostics = []
+
+    review_status = "review_required"
+    if review_decision_path.is_file():
+        review_payload = _read_json(review_decision_path, kind="review decision")
+        decision = review_payload.get("decision")
+        if isinstance(decision, str) and decision == "accepted":
+            review_status = "accepted_if_review_artifact_present"
+        elif isinstance(decision, str) and decision:
+            review_status = decision
+
+    export_payload: dict[str, Any] = {
+        "pattern_id": resolved_pattern_id,
+        "artifact_type": "supervised_failure_success_training_pattern_candidate",
+        "status": "candidate",
+        "source": "explicit_operator_export",
+        "not_training_data_until_reviewed": True,
+        "not_automatic_curriculum_capture": True,
+        "run_provenance": {
+            "run_dir": str(run_dir),
+            "model": local_call_metadata.get("model"),
+            "endpoint_kind": local_call_metadata.get("source"),
+            "temperature": local_call_metadata.get("temperature"),
+            "max_tokens": local_call_metadata.get("max_tokens"),
+        },
+        "failure": {
+            "failure_summary": "Model returned output that failed required contract validation.",
+            "raw_output": failure_raw_text,
+            "validation_status": failure_validation_payload.get("validation_status"),
+            "missing_required_fields": missing_required_fields,
+            "validator_diagnostics": validator_diagnostics,
+        },
+        "correction": {
+            "correction_strategy": "Apply explicit retry guidance from supervised correction prompt.",
+            "retry_prompt": retry_prompt_text,
+        },
+        "success": {
+            "raw_output": success_raw_text,
+            "validation_status": success_validation_payload.get("validation_status"),
+            "review_status": review_status,
+        },
+        "learning_signal": {
+            "failure_mode": "contract_validation_failure_recovered_by_explicit_retry_prompt",
+            "desired_behavior": "Return contract-complete output that passes validator checks after correction guidance.",
+            "useful_for": [
+                "SFT candidate review",
+                "LoRA curriculum candidate review",
+                "prompt-patch regression fixture",
+                "validator regression fixture",
+            ],
+        },
+        "authority_boundaries": [
+            "This artifact is evidence, not training authority.",
+            "This artifact is not automatically included in any curriculum.",
+            "No automatic training authority is granted.",
+            "No patch promotion authority is granted.",
+            "No command execution authority is granted.",
+            "No file modification authority is granted.",
+        ],
+    }
+
+    if gate_path.is_file():
+        export_payload["review_gate_status"] = _read_json(gate_path, kind="downstream gate").get("gate_status")
+    if handoff_path.is_file():
+        export_payload["handoff_status"] = _read_json(handoff_path, kind="handoff packet").get("handoff_status")
+
+    _write_json(pattern_path, export_payload)
+    return {
+        "pattern_path": pattern_path,
+        "pattern_id": resolved_pattern_id,
+        "run_dir": run_dir,
+    }
+
+
 def _resolve_manifest(run_dir: Path) -> tuple[dict[str, Any], Path]:
     manifest_path = run_dir / "run_manifest.json"
     manifest = _read_json(manifest_path, kind="run manifest")
@@ -542,6 +706,17 @@ def build_arg_parser() -> argparse.ArgumentParser:
     call_local.add_argument("--timeout-seconds", type=float, default=30)
     call_local.add_argument("--overwrite", action="store_true")
 
+    export_pattern = subparsers.add_parser("export-pattern")
+    export_pattern.add_argument("--run-dir", type=Path, required=True)
+    export_pattern.add_argument("--failure-raw", type=Path, required=True)
+    export_pattern.add_argument("--failure-validation", type=Path, required=True)
+    export_pattern.add_argument("--retry-prompt", type=Path, required=True)
+    export_pattern.add_argument("--success-raw", type=Path, required=True)
+    export_pattern.add_argument("--success-validation", type=Path, required=True)
+    export_pattern.add_argument("--out-dir", type=Path, required=True)
+    export_pattern.add_argument("--pattern-id", required=True)
+    export_pattern.add_argument("--overwrite", action="store_true")
+
     ingest = subparsers.add_parser("ingest")
     ingest.add_argument("--run-dir", type=Path, required=True)
     ingest.add_argument("--raw-output-file", type=Path, required=True)
@@ -624,6 +799,23 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"local_model_call_path: {result['local_model_call_path']}")
             print("next_ingest_command:")
             print(result["ingest_command"])
+            return 0
+
+        if args.mode == "export-pattern":
+            result = run_export_pattern(
+                run_dir=args.run_dir,
+                failure_raw=args.failure_raw,
+                failure_validation=args.failure_validation,
+                retry_prompt=args.retry_prompt,
+                success_raw=args.success_raw,
+                success_validation=args.success_validation,
+                out_dir=args.out_dir,
+                pattern_id=args.pattern_id,
+                overwrite=bool(args.overwrite),
+            )
+            print(f"run_dir: {result['run_dir']}")
+            print(f"pattern_id: {result['pattern_id']}")
+            print(f"pattern_path: {result['pattern_path']}")
             return 0
 
         if args.decision is not None and not (isinstance(args.decision_reason, str) and args.decision_reason.strip()):

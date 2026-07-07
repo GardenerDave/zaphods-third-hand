@@ -40,6 +40,7 @@ Modes:
 - `prepare`
 - `session`
 - `call-local`
+- `export-pattern`
 - `ingest`
 
 ### Prepare
@@ -132,6 +133,28 @@ Optional flags:
 
 This mode does not validate acceptance by itself. The operator must still run ingest.
 Review is still required. No execution, file mutation, patch application, promotion, training, or curriculum capture occurs.
+
+### Export training pattern candidate mode
+
+`export-pattern` is explicit opt-in evidence export from a supervised failure->correction->success run.
+It does not train anything and does not auto-capture curriculum.
+
+Example:
+
+```bash
+python3 local_harness/run_manual_supervised_attempt.py export-pattern \
+  --run-dir .work/manual_supervised_attempts/<timestamp> \
+  --failure-raw raw_model_output.failed_001.txt \
+  --failure-validation output_validation.failed_001.json \
+  --retry-prompt retry_prompt_to_paste_001.md \
+  --success-raw raw_model_output.success_001.txt \
+  --success-validation output_validation.success_001.json \
+  --out-dir examples/supervised_training_patterns \
+  --pattern-id zth_contract_missing_fields_retry_001
+```
+
+`export-pattern` writes one candidate JSON artifact and preserves failed/success raw outputs, correction prompt, and validation evidence exactly.
+It is marked as a candidate only (`not_training_data_until_reviewed: true`, `not_automatic_curriculum_capture: true`).
 
 ### Ingest
 

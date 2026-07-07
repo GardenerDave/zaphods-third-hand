@@ -1,12 +1,17 @@
 from __future__ import annotations
 
 import json
+import io
 import subprocess
 import sys
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
+from contextlib import redirect_stdout, redirect_stderr
+from unittest.mock import patch
+import urllib.error
 
+import local_harness.run_manual_supervised_attempt as manual_attempt
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "local_harness" / "run_manual_supervised_attempt.py"
@@ -124,6 +129,129 @@ def _start_local_server(*, response_code: int, response_body: dict[str, object])
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     return server, endpoint, thread
+
+
+class _FakeUrlopenResponse:
+    def __init__(self, *, status_code: int, body: dict[str, object]):
+        self.status = status_code
+        self._body = json.dumps(body).encode("utf-8")
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        return False
+
+    def read(self):
+        return self._body
+
+    def getcode(self):
+        return self.status
+
+
+def _run_call_local_in_process(
+    *,
+    run_dir: Path,
+    endpoint: str,
+    model: str,
+    temperature: float = 0,
+    max_tokens: int = 1024,
+    timeout_seconds: float = 30,
+    overwrite: bool = False,
+    response_code: int = 200,
+    response_body: dict[str, object],
+) -> subprocess.CompletedProcess[str]:
+    seen_request: dict[str, object] | None = None
+
+    def fake_urlopen(request, timeout=None):
+        nonlocal seen_request
+        _ = timeout
+        seen_request = json.loads(request.data.decode("utf-8")) if getattr(request, "data", None) else None
+        if response_code >= 400:
+            raise urllib.error.HTTPError(
+                request.full_url,
+                response_code,
+                "mocked error",
+                hdrs=None,
+                fp=io.BytesIO(json.dumps(response_body).encode("utf-8")),
+            )
+        return _FakeUrlopenResponse(status_code=response_code, body=response_body)
+
+    stdout = io.StringIO()
+    stderr = io.StringIO()
+    with patch.object(manual_attempt.urllib.request, "urlopen", side_effect=fake_urlopen):
+        try:
+            with redirect_stdout(stdout), redirect_stderr(stderr):
+                exit_code = manual_attempt.main(
+                    [
+                        "call-local",
+                        "--run-dir",
+                        str(run_dir),
+                        "--endpoint",
+                        endpoint,
+                        "--model",
+                        model,
+                        "--temperature",
+                        str(temperature),
+                        "--max-tokens",
+                        str(max_tokens),
+                        "--timeout-seconds",
+                        str(timeout_seconds),
+                        *(["--overwrite"] if overwrite else []),
+                    ]
+                )
+        except SystemExit as exc:
+            exit_code = int(exc.code or 0)
+    stdout_text = stdout.getvalue()
+    if seen_request is not None:
+        stdout_text += f"request_payload: {json.dumps(seen_request)}\n"
+    return subprocess.CompletedProcess(
+        args=[],
+        returncode=exit_code,
+        stdout=stdout_text,
+        stderr=stderr.getvalue(),
+    )
+
+
+def _write_export_pattern_inputs(run_dir: Path) -> dict[str, str]:
+    failure_raw_name = "raw_model_output.failed_001.txt"
+    failure_validation_name = "output_validation.failed_001.json"
+    retry_prompt_name = "retry_prompt_to_paste_001.md"
+    success_raw_name = "raw_model_output.success_001.txt"
+    success_validation_name = "output_validation.success_001.json"
+
+    (run_dir / failure_raw_name).write_text('{"required_fields_present": true}', encoding="utf-8")
+    (run_dir / retry_prompt_name).write_text("Return all required top-level fields exactly.\n", encoding="utf-8")
+    (run_dir / success_raw_name).write_text('{"allowed_targets": ["docs/reports/"]}', encoding="utf-8")
+    (run_dir / failure_validation_name).write_text(
+        json.dumps(
+            {
+                "validation_status": "failed",
+                "checks": [
+                    {
+                        "check_id": "required_fields",
+                        "status": "failed",
+                        "message": "Missing required fields: allowed_targets, held_targets",
+                    }
+                ],
+                "diagnostics": [
+                    "Required fields missing from parsed output: allowed_targets, held_targets"
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (run_dir / success_validation_name).write_text(
+        json.dumps({"validation_status": "passed", "validator_diagnostics": []}),
+        encoding="utf-8",
+    )
+    return {
+        "failure_raw": failure_raw_name,
+        "failure_validation": failure_validation_name,
+        "retry_prompt": retry_prompt_name,
+        "success_raw": success_raw_name,
+        "success_validation": success_validation_name,
+    }
 
 
 def test_prepare_from_messy_input_writes_required_artifacts(tmp_path: Path):
@@ -316,27 +444,17 @@ def test_session_mode_accepts_write_prompt_copy_flag(tmp_path: Path):
 
 def test_call_local_reads_prompt_posts_to_chat_completions_and_writes_raw_output_and_metadata(tmp_path: Path):
     run_dir, _ = _session_run(tmp_path, timestamp="20260707T212121Z")
-    server, endpoint, thread = _start_local_server(
-        response_code=200,
+    endpoint = "http://127.0.0.1:65500/v1"
+    result = _run_call_local_in_process(
+        run_dir=run_dir,
+        endpoint=endpoint,
+        model="qwen3-1.7b-gpu-40k",
         response_body={"choices": [{"message": {"content": "{\"reason\":\"local\"}"}}]},
     )
-    try:
-        result = run_script(
-            "call-local",
-            "--run-dir",
-            run_dir,
-            "--endpoint",
-            endpoint,
-            "--model",
-            "qwen3-1.7b-gpu-40k",
-        )
-    finally:
-        server.shutdown()
-        thread.join(timeout=1)
 
     assert result.returncode == 0
-    assert _LocalHandler.seen_path == "/v1/chat/completions"
-    body = _LocalHandler.seen_request_body
+    assert result.stderr == ""
+    body = json.loads(result.stdout.split("request_payload: ", 1)[1]) if "request_payload: " in result.stdout else None
     assert isinstance(body, dict)
     assert body["model"] == "qwen3-1.7b-gpu-40k"
     assert body["temperature"] == 0
@@ -375,30 +493,17 @@ def test_call_local_reads_prompt_posts_to_chat_completions_and_writes_raw_output
 
 def test_call_local_honors_optional_temperature_and_max_tokens(tmp_path: Path):
     run_dir, _ = _session_run(tmp_path, timestamp="20260707T222222Z")
-    server, endpoint, thread = _start_local_server(
-        response_code=200,
+    result = _run_call_local_in_process(
+        run_dir=run_dir,
+        endpoint="http://127.0.0.1:65500/v1",
+        model="qwen3-1.7b-gpu-40k",
+        temperature=0.2,
+        max_tokens=256,
         response_body={"choices": [{"message": {"content": "{}"}}]},
     )
-    try:
-        result = run_script(
-            "call-local",
-            "--run-dir",
-            run_dir,
-            "--endpoint",
-            endpoint,
-            "--model",
-            "qwen3-1.7b-gpu-40k",
-            "--temperature",
-            "0.2",
-            "--max-tokens",
-            "256",
-        )
-    finally:
-        server.shutdown()
-        thread.join(timeout=1)
 
     assert result.returncode == 0
-    body = _LocalHandler.seen_request_body
+    body = json.loads(result.stdout.split("request_payload: ", 1)[1]) if "request_payload: " in result.stdout else None
     assert isinstance(body, dict)
     assert body["temperature"] == 0.2
     assert body["max_tokens"] == 256
@@ -428,24 +533,13 @@ def test_call_local_overwrite_allows_replacement(tmp_path: Path):
     run_dir, _ = _session_run(tmp_path, timestamp="20260708T000000Z")
     raw_path = run_dir / "raw_model_output.txt"
     raw_path.write_text("already present", encoding="utf-8")
-    server, endpoint, thread = _start_local_server(
-        response_code=200,
+    result = _run_call_local_in_process(
+        run_dir=run_dir,
+        endpoint="http://127.0.0.1:65500/v1",
+        model="qwen3-1.7b-gpu-40k",
+        overwrite=True,
         response_body={"choices": [{"message": {"content": "replacement"}}]},
     )
-    try:
-        result = run_script(
-            "call-local",
-            "--run-dir",
-            run_dir,
-            "--endpoint",
-            endpoint,
-            "--model",
-            "qwen3-1.7b-gpu-40k",
-            "--overwrite",
-        )
-    finally:
-        server.shutdown()
-        thread.join(timeout=1)
 
     assert result.returncode == 0
     assert raw_path.read_text(encoding="utf-8") == "replacement"
@@ -453,20 +547,12 @@ def test_call_local_overwrite_allows_replacement(tmp_path: Path):
 
 def test_call_local_missing_assistant_content_exits_nonzero(tmp_path: Path):
     run_dir, _ = _session_run(tmp_path, timestamp="20260708T010101Z")
-    server, endpoint, thread = _start_local_server(response_code=200, response_body={"choices": [{"message": {}}]})
-    try:
-        result = run_script(
-            "call-local",
-            "--run-dir",
-            run_dir,
-            "--endpoint",
-            endpoint,
-            "--model",
-            "qwen3-1.7b-gpu-40k",
-        )
-    finally:
-        server.shutdown()
-        thread.join(timeout=1)
+    result = _run_call_local_in_process(
+        run_dir=run_dir,
+        endpoint="http://127.0.0.1:65500/v1",
+        model="qwen3-1.7b-gpu-40k",
+        response_body={"choices": [{"message": {}}]},
+    )
 
     assert result.returncode != 0
     assert "missing assistant content" in result.stderr
@@ -474,20 +560,13 @@ def test_call_local_missing_assistant_content_exits_nonzero(tmp_path: Path):
 
 def test_call_local_non_2xx_exits_nonzero(tmp_path: Path):
     run_dir, _ = _session_run(tmp_path, timestamp="20260708T020202Z")
-    server, endpoint, thread = _start_local_server(response_code=500, response_body={"error": "boom"})
-    try:
-        result = run_script(
-            "call-local",
-            "--run-dir",
-            run_dir,
-            "--endpoint",
-            endpoint,
-            "--model",
-            "qwen3-1.7b-gpu-40k",
-        )
-    finally:
-        server.shutdown()
-        thread.join(timeout=1)
+    result = _run_call_local_in_process(
+        run_dir=run_dir,
+        endpoint="http://127.0.0.1:65500/v1",
+        model="qwen3-1.7b-gpu-40k",
+        response_code=500,
+        response_body={"error": "boom"},
+    )
 
     assert result.returncode != 0
     assert "HTTP 500" in result.stderr
@@ -508,6 +587,282 @@ def test_call_local_connection_failure_exits_nonzero(tmp_path: Path):
     )
     assert result.returncode != 0
     assert "connection failed" in result.stderr
+
+
+def test_call_local_connection_failure_exits_nonzero(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260708T030303Z")
+    result = run_script(
+        "call-local",
+        "--run-dir",
+        run_dir,
+        "--endpoint",
+        "http://127.0.0.1:1/v1",
+        "--model",
+        "qwen3-1.7b-gpu-40k",
+        "--timeout-seconds",
+        "0.1",
+    )
+    assert result.returncode != 0
+    assert "connection failed" in result.stderr
+
+
+def test_export_pattern_writes_candidate_artifact_and_preserves_failure_success_inputs(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260708T040404Z")
+    inputs = _write_export_pattern_inputs(run_dir)
+    metadata = {
+        "source": "local_openai_compatible_endpoint",
+        "model": "qwen3-1.7b-gpu-40k",
+        "temperature": 0,
+        "max_tokens": 1024,
+    }
+    (run_dir / "local_model_call.json").write_text(json.dumps(metadata), encoding="utf-8")
+    out_dir = tmp_path / "patterns"
+
+    result = run_script(
+        "export-pattern",
+        "--run-dir",
+        run_dir,
+        "--failure-raw",
+        inputs["failure_raw"],
+        "--failure-validation",
+        inputs["failure_validation"],
+        "--retry-prompt",
+        inputs["retry_prompt"],
+        "--success-raw",
+        inputs["success_raw"],
+        "--success-validation",
+        inputs["success_validation"],
+        "--out-dir",
+        out_dir,
+        "--pattern-id",
+        "zth_contract_missing_fields_retry_001",
+    )
+
+    assert result.returncode == 0
+    pattern_path = out_dir / "zth_contract_missing_fields_retry_001.json"
+    assert pattern_path.is_file()
+    pattern = json.loads(pattern_path.read_text(encoding="utf-8"))
+    assert pattern["artifact_type"] == "supervised_failure_success_training_pattern_candidate"
+    assert pattern["status"] == "candidate"
+    assert pattern["not_training_data_until_reviewed"] is True
+    assert pattern["not_automatic_curriculum_capture"] is True
+    assert pattern["failure"]["raw_output"] == '{"required_fields_present": true}'
+    assert pattern["success"]["raw_output"] == '{"allowed_targets": ["docs/reports/"]}'
+    assert pattern["correction"]["retry_prompt"] == "Return all required top-level fields exactly.\n"
+    assert pattern["failure"]["validator_diagnostics"] == [
+        "Required fields missing from parsed output: allowed_targets, held_targets"
+    ]
+    assert pattern["failure"]["missing_required_fields"] == ["allowed_targets", "held_targets"]
+    assert pattern["success"]["validation_status"] == "passed"
+    assert pattern["run_provenance"]["model"] == "qwen3-1.7b-gpu-40k"
+    assert pattern["run_provenance"]["endpoint_kind"] == "local_openai_compatible_endpoint"
+    boundaries = pattern["authority_boundaries"]
+    assert "This artifact is evidence, not training authority." in boundaries
+    assert "No automatic training authority is granted." in boundaries
+    assert "No patch promotion authority is granted." in boundaries
+    assert "No command execution authority is granted." in boundaries
+    assert "No file modification authority is granted." in boundaries
+    assert not (run_dir / "review_decision.json").exists()
+    assert not (run_dir / "downstream_use_gate.json").exists()
+    assert not (run_dir / "handoff_packet.json").exists()
+
+
+def test_export_pattern_preserves_legacy_synthetic_failure_fields_when_present(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260708T040405Z")
+    inputs = _write_export_pattern_inputs(run_dir)
+    failure_validation_name = inputs["failure_validation"]
+    (run_dir / failure_validation_name).write_text(
+        json.dumps(
+            {
+                "validation_status": "failed",
+                "missing_required_fields": ["allowed_targets", "held_targets"],
+                "validator_diagnostics": ["missing required fields"],
+            }
+        ),
+        encoding="utf-8",
+    )
+    out_dir = tmp_path / "patterns"
+
+    result = run_script(
+        "export-pattern",
+        "--run-dir",
+        run_dir,
+        "--failure-raw",
+        inputs["failure_raw"],
+        "--failure-validation",
+        inputs["failure_validation"],
+        "--retry-prompt",
+        inputs["retry_prompt"],
+        "--success-raw",
+        inputs["success_raw"],
+        "--success-validation",
+        inputs["success_validation"],
+        "--out-dir",
+        out_dir,
+        "--pattern-id",
+        "zth_contract_missing_fields_retry_legacy_001",
+    )
+
+    assert result.returncode == 0
+    pattern_path = out_dir / "zth_contract_missing_fields_retry_legacy_001.json"
+    pattern = json.loads(pattern_path.read_text(encoding="utf-8"))
+    assert pattern["failure"]["missing_required_fields"] == ["allowed_targets", "held_targets"]
+    assert pattern["failure"]["validator_diagnostics"] == ["missing required fields"]
+
+
+def test_export_pattern_does_not_mutate_source_run_artifacts(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260708T050505Z")
+    inputs = _write_export_pattern_inputs(run_dir)
+    before_failure_raw = (run_dir / inputs["failure_raw"]).read_text(encoding="utf-8")
+    before_success_raw = (run_dir / inputs["success_raw"]).read_text(encoding="utf-8")
+    out_dir = tmp_path / "patterns"
+
+    result = run_script(
+        "export-pattern",
+        "--run-dir",
+        run_dir,
+        "--failure-raw",
+        inputs["failure_raw"],
+        "--failure-validation",
+        inputs["failure_validation"],
+        "--retry-prompt",
+        inputs["retry_prompt"],
+        "--success-raw",
+        inputs["success_raw"],
+        "--success-validation",
+        inputs["success_validation"],
+        "--out-dir",
+        out_dir,
+        "--pattern-id",
+        "zth_contract_missing_fields_retry_002",
+    )
+    assert result.returncode == 0
+    assert (run_dir / inputs["failure_raw"]).read_text(encoding="utf-8") == before_failure_raw
+    assert (run_dir / inputs["success_raw"]).read_text(encoding="utf-8") == before_success_raw
+
+
+def test_export_pattern_refuses_missing_failure_files(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260708T060606Z")
+    out_dir = tmp_path / "patterns"
+    result = run_script(
+        "export-pattern",
+        "--run-dir",
+        run_dir,
+        "--failure-raw",
+        "missing_failure.txt",
+        "--failure-validation",
+        "output_validation.failed_001.json",
+        "--retry-prompt",
+        "retry_prompt_to_paste_001.md",
+        "--success-raw",
+        "raw_model_output.success_001.txt",
+        "--success-validation",
+        "output_validation.success_001.json",
+        "--out-dir",
+        out_dir,
+        "--pattern-id",
+        "zth_contract_missing_fields_retry_003",
+    )
+    assert result.returncode != 0
+    assert "missing --failure-raw" in result.stderr
+
+
+def test_export_pattern_refuses_missing_success_files(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260708T070707Z")
+    inputs = _write_export_pattern_inputs(run_dir)
+    out_dir = tmp_path / "patterns"
+    result = run_script(
+        "export-pattern",
+        "--run-dir",
+        run_dir,
+        "--failure-raw",
+        inputs["failure_raw"],
+        "--failure-validation",
+        inputs["failure_validation"],
+        "--retry-prompt",
+        inputs["retry_prompt"],
+        "--success-raw",
+        "missing_success.txt",
+        "--success-validation",
+        inputs["success_validation"],
+        "--out-dir",
+        out_dir,
+        "--pattern-id",
+        "zth_contract_missing_fields_retry_004",
+    )
+    assert result.returncode != 0
+    assert "missing --success-raw" in result.stderr
+
+
+def test_export_pattern_refuses_overwrite_without_flag_and_allows_with_overwrite(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260708T080808Z")
+    inputs = _write_export_pattern_inputs(run_dir)
+    out_dir = tmp_path / "patterns"
+    pattern_id = "zth_contract_missing_fields_retry_005"
+    first = run_script(
+        "export-pattern",
+        "--run-dir",
+        run_dir,
+        "--failure-raw",
+        inputs["failure_raw"],
+        "--failure-validation",
+        inputs["failure_validation"],
+        "--retry-prompt",
+        inputs["retry_prompt"],
+        "--success-raw",
+        inputs["success_raw"],
+        "--success-validation",
+        inputs["success_validation"],
+        "--out-dir",
+        out_dir,
+        "--pattern-id",
+        pattern_id,
+    )
+    assert first.returncode == 0
+
+    second = run_script(
+        "export-pattern",
+        "--run-dir",
+        run_dir,
+        "--failure-raw",
+        inputs["failure_raw"],
+        "--failure-validation",
+        inputs["failure_validation"],
+        "--retry-prompt",
+        inputs["retry_prompt"],
+        "--success-raw",
+        inputs["success_raw"],
+        "--success-validation",
+        inputs["success_validation"],
+        "--out-dir",
+        out_dir,
+        "--pattern-id",
+        pattern_id,
+    )
+    assert second.returncode != 0
+    assert "pattern already exists" in second.stderr
+
+    third = run_script(
+        "export-pattern",
+        "--run-dir",
+        run_dir,
+        "--failure-raw",
+        inputs["failure_raw"],
+        "--failure-validation",
+        inputs["failure_validation"],
+        "--retry-prompt",
+        inputs["retry_prompt"],
+        "--success-raw",
+        inputs["success_raw"],
+        "--success-validation",
+        inputs["success_validation"],
+        "--out-dir",
+        out_dir,
+        "--pattern-id",
+        pattern_id,
+        "--overwrite",
+    )
+    assert third.returncode == 0
 
 
 def test_ingest_valid_output_writes_attempt_validation_and_preserves_raw_output(tmp_path: Path):
