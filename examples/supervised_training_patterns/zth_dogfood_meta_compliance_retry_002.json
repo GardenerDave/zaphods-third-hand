@@ -1,0 +1,60 @@
+{
+  "artifact_type": "supervised_failure_success_training_pattern_candidate",
+  "authority_boundaries": [
+    "This artifact is evidence, not training authority.",
+    "This artifact is not automatically included in any curriculum.",
+    "No automatic training authority is granted.",
+    "No patch promotion authority is granted.",
+    "No command execution authority is granted.",
+    "No file modification authority is granted."
+  ],
+  "correction": {
+    "correction_strategy": "Apply explicit retry guidance from supervised correction prompt.",
+    "retry_prompt": "# ZTH Model Prompt Packet\n\n## Role\nYou are a bounded model helper operating inside a supervised ZTH workflow.\n\n## Packet IDs\n- orchestration_id: orch_manual_20260707t133055z\n- triage_id: triage_manual_20260707t133055z\n\n## Task Summary\nDeterministic routing of messy input to design_packet (matched keywords: docs, fix, readme, roadmap, test, training).\n\n## Workflow\n- recommended_workflow: design_packet\n- task_type: design_planning\n\n## Allowed Targets\n- docs/reports/\n\n## Held Targets\n- production automation\n- automatic curriculum capture\n- automatic promotion\n- implementation_packet\n\n## Risk Flags\n- scope_creep\n- training_pipeline_ambiguity\n\n## Prompt Patch Instructions\n- scope_boundary_v1\n- unsupported_certainty_v1\n- output_contract_v1\n\n### Rendered Patch Deltas\n## Applied Prompt Patches\n\n### Patch: scope_boundary_v1 (candidate)\n\nOnly include targets explicitly listed in allowed_targets. Related or plausible files must go in held_targets.\n\nRequired output fields: allowed_targets, held_targets, scope_expansion_required, reason\n\n### Patch: unsupported_certainty_v1 (candidate)\n\nOnly state claims supported by the evidence you were given. Mark any scope-level or repo-wide statement as unverified unless the packet includes evidence covering that scope. Prefer 'not verified in this packet' over confident generalization.\n\nRequired output fields: claims, evidence_basis, unverified_claims, reason\n\n### Patch: output_contract_v1 (candidate)\n\nReturn exactly one output in the declared contract format. Include every required field, even when its value is empty or unknown. Do not add fields that grant authority. Do not wrap the structured output in commentary.\n\nRequired output fields: format, required_fields_present, reason\n\nThese patches constrain output shape only. They grant no execution,\npromotion, training, or curriculum-capture authority.\n\n## Output Contract\n```json\n{\n  \"format\": \"json\",\n  \"required_fields\": [\n    \"allowed_targets\",\n    \"held_targets\",\n    \"scope_expansion_required\",\n    \"claims\",\n    \"evidence_basis\",\n    \"unverified_claims\",\n    \"format\",\n    \"required_fields_present\",\n    \"reason\"\n  ],\n  \"requires_reason\": true\n}\n```\n\n## Validation Hooks\n- allowed_held_target_separation\n- required_reason\n- no_execution_authority\n\n## Authority Boundaries\n- no_automatic_patch_promotion\n- no_automatic_training\n- no_default_failure_to_curriculum_capture\n- no_direct_file_modification_authority\n- no_execution_authority\n\n## Required Response Shape\n- Return only JSON matching the output contract.\n- Include a reason field when required.\n- Do not include prose outside the JSON object.\n\n## Review Requirement\n- Human review is required before any downstream model-facing action.\n\n# Retry Correction\n\nYour previous response parsed as JSON but failed the output contract.\n\nYou returned meta fields only. That is not sufficient.\n\nDo not describe the required fields.\nDo not put field names inside required_fields_present.\nDo not return a contract summary.\n\nReturn one raw JSON object only. No markdown fences. No prose before or after the JSON.\n\nThe response must include these exact top-level fields:\n\n{\n  \"allowed_targets\": [\n    \"docs/reports/\"\n  ],\n  \"held_targets\": [\n    \"implementation changes\",\n    \"patch application\",\n    \"automatic promotion\",\n    \"automatic training\",\n    \"default failure-to-curriculum capture\",\n    \"deleting or cleaning untracked files\"\n  ],\n  \"scope_expansion_required\": false,\n  \"claims\": [\n    \"The provided git evidence is being used for a bounded repo-maintenance scout report.\",\n    \"The allowed target is docs/reports/.\",\n    \"Implementation changes, patch application, automatic promotion, automatic training, default failure-to-curriculum capture, and deleting or cleaning untracked files are held out of scope.\"\n  ],\n  \"evidence_basis\": [\n    \"The task text says: Dogfood ZTH on its own recent development.\",\n    \"The task text says: Summarize recent ZTH commits as a bounded repo-maintenance scout report.\",\n    \"The task text says: Use only the provided git status/log/stat evidence.\",\n    \"The task text lists docs/reports/ as the allowed target.\",\n    \"The task text lists held targets including implementation changes, patch application, automatic promotion, automatic training, default failure-to-curriculum capture, and deleting or cleaning untracked files.\"\n  ],\n  \"unverified_claims\": [],\n  \"format\": \"json\",\n  \"required_fields_present\": true,\n  \"reason\": \"This response includes all required top-level fields, stays within the docs/reports/ reporting scope, uses only the provided task and git-evidence boundaries, and grants no authority to edit files, apply patches, promote artifacts, train, capture curriculum, or clean untracked files.\"\n}\n"
+  },
+  "failure": {
+    "failure_summary": "Model returned output that failed required contract validation.",
+    "missing_required_fields": [
+      "allowed_targets",
+      "claims",
+      "evidence_basis",
+      "held_targets",
+      "scope_expansion_required",
+      "unverified_claims"
+    ],
+    "raw_output": "{\n  \"format\": \"json\",\n  \"required_fields_present\": [\n    \"allowed_targets\",\n    \"held_targets\",\n    \"scope_expansion_required\",\n    \"claims\",\n    \"evidence_basis\",\n    \"unverified_claims\",\n    \"reason\"\n  ],\n  \"reason\": \"The task specifies routing to design_packet with allowed targets explicitly listed, but no evidence for claims about design_packet's use. Scope expansion is not required as allowed targets are explicitly defined.\"\n}",
+    "validation_status": "failed",
+    "validator_diagnostics": [
+      "Required fields missing from parsed output: allowed_targets, claims, evidence_basis, held_targets, scope_expansion_required, unverified_claims"
+    ]
+  },
+  "handoff_status": "prepared",
+  "learning_signal": {
+    "desired_behavior": "Return contract-complete output that passes validator checks after correction guidance.",
+    "failure_mode": "contract_validation_failure_recovered_by_explicit_retry_prompt",
+    "useful_for": [
+      "SFT candidate review",
+      "LoRA curriculum candidate review",
+      "prompt-patch regression fixture",
+      "validator regression fixture"
+    ]
+  },
+  "not_automatic_curriculum_capture": true,
+  "not_training_data_until_reviewed": true,
+  "pattern_id": "zth_dogfood_meta_compliance_retry_002",
+  "review_gate_status": "allowed",
+  "run_provenance": {
+    "endpoint_kind": "local_openai_compatible_endpoint",
+    "max_tokens": 4096,
+    "model": "qwen3-1.7b-gpu-40k",
+    "run_dir": ".work/manual_supervised_attempts/20260707T133055Z",
+    "temperature": 0
+  },
+  "source": "explicit_operator_export",
+  "status": "candidate",
+  "success": {
+    "raw_output": "{\n  \"allowed_targets\": [\n    \"docs/reports/\"\n  ],\n  \"held_targets\": [\n    \"implementation changes\",\n    \"patch application\",\n    \"automatic promotion\",\n    \"automatic training\",\n    \"default failure-to-curriculum capture\",\n    \"deleting or cleaning untracked files\"\n  ],\n  \"scope_expansion_required\": false,\n  \"claims\": [\n    \"The provided git evidence is being used for a bounded repo-maintenance scout report.\",\n    \"The allowed target is docs/reports/.\",\n    \"Implementation changes, patch application, automatic promotion, automatic training, default failure-to-curriculum capture, and deleting or cleaning untracked files are held out of scope.\"\n  ],\n  \"evidence_basis\": [\n    \"The task text says: Dogfood ZTH on its own recent development.\",\n    \"The task text says: Summarize recent ZTH commits as a bounded repo-maintenance scout report.\",\n    \"The task text says: Use only the provided git status/log/stat evidence.\",\n    \"The task text lists docs/reports/ as the allowed target.\",\n    \"The task text lists held targets including implementation changes, patch application, automatic promotion, automatic training, default failure-to-curriculum capture, and deleting or cleaning untracked files.\"\n  ],\n  \"unverified_claims\": [],\n  \"format\": \"json\",\n  \"required_fields_present\": true,\n  \"reason\": \"This response includes all required top-level fields, stays within the docs/reports/ reporting scope, uses only the provided task and git-evidence boundaries, and grants no authority to edit files, apply patches, promote artifacts, train, capture curriculum, or clean untracked files.\"\n}",
+    "review_status": "accepted_if_review_artifact_present",
+    "validation_status": "passed"
+  }
+}
