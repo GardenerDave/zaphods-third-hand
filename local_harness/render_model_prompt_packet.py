@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from typing import Any
 
 from local_harness.orchestration_packet import validate_orchestration_packet
@@ -45,6 +46,47 @@ def _render_required_response_shape(output_contract: dict[str, Any]) -> list[str
     return lines
 
 
+def build_model_prompt_output_contract(
+    validated_packet: dict[str, Any],
+    prompt_patch_library: PromptPatchLibrary,
+) -> dict[str, Any]:
+    merged = deepcopy(validated_packet["output_contract"])
+
+    existing_required = merged.get("required_fields", [])
+    if existing_required is None:
+        existing_required = []
+    if not isinstance(existing_required, list) or not all(
+        isinstance(field, str) and field.strip() for field in existing_required
+    ):
+        raise ValueError("output_contract.required_fields must be a list of non-empty strings")
+
+    seen: set[str] = set()
+    ordered_required: list[str] = []
+
+    def add_field(field: str) -> None:
+        if field not in seen:
+            seen.add(field)
+            ordered_required.append(field)
+
+    for field in existing_required:
+        add_field(field)
+
+    for patch_id in validated_packet["selected_prompt_patches"]:
+        patch = prompt_patch_library.get(patch_id)
+        for field in patch["required_output_fields"]:
+            add_field(field)
+
+    if bool(merged.get("requires_reason")):
+        if "reason" in seen:
+            ordered_required = [field for field in ordered_required if field != "reason"]
+            ordered_required.append("reason")
+        else:
+            ordered_required.append("reason")
+
+    merged["required_fields"] = ordered_required
+    return merged
+
+
 def render_model_prompt_packet(
     packet: dict[str, Any],
     prompt_patch_library: PromptPatchLibrary,
@@ -56,6 +98,7 @@ def render_model_prompt_packet(
         prompt_patch_library,
         allow_deprecated_selected=allow_deprecated_selected,
     )
+    output_contract = build_model_prompt_output_contract(validated, prompt_patch_library)
 
     lines = [
         "# ZTH Model Prompt Packet",
@@ -84,13 +127,13 @@ def render_model_prompt_packet(
     lines.extend(["", "## Prompt Patch Instructions"])
     lines.extend(_render_list(validated["selected_prompt_patches"]))
     lines.extend(["", "### Rendered Patch Deltas", validated["rendered_patch_deltas"].rstrip(), ""])
-    lines.extend(["## Output Contract", f"```json\n{json.dumps(validated['output_contract'], indent=2, sort_keys=True)}\n```", ""])
+    lines.extend(["## Output Contract", f"```json\n{json.dumps(output_contract, indent=2, sort_keys=True)}\n```", ""])
     lines.append("## Validation Hooks")
     lines.extend(_render_list(validated["validation_hooks"]))
     lines.extend(["", "## Authority Boundaries"])
     lines.extend(_render_list(validated["authority_boundaries"]))
     lines.extend(["", "## Required Response Shape"])
-    lines.extend(_render_required_response_shape(validated["output_contract"]))
+    lines.extend(_render_required_response_shape(output_contract))
     lines.extend(["", "## Review Requirement", "- Human review is required before any downstream model-facing action."])
 
     rendered = "\n".join(lines).rstrip() + "\n"

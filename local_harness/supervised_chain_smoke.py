@@ -9,7 +9,10 @@ from typing import Any
 
 from local_harness.orchestration_packet import assemble_orchestration_packet, validate_orchestration_packet
 from local_harness.prompt_patch_library import PromptPatchLibrary
-from local_harness.render_model_prompt_packet import render_model_prompt_packet
+from local_harness.render_model_prompt_packet import (
+    build_model_prompt_output_contract,
+    render_model_prompt_packet,
+)
 from local_harness.supervised_attempt_output_validator import (
     validate_supervised_attempt_output_against_contract,
     validate_supervised_attempt_output_validation_record,
@@ -454,12 +457,30 @@ def run_supervised_chain_smoke(
     validate_orchestration_packet(orchestration_packet, patch_library)
 
     model_prompt_packet = render_model_prompt_packet(orchestration_packet, patch_library)
+    output_contract = build_model_prompt_output_contract(orchestration_packet, patch_library)
 
     synthetic_raw_model_output = json.dumps(
         {
-            "allowed_targets": ["docs/PROMPT_PATCH_LIBRARY.md"],
-            "held_targets": ["training/"],
-            "reason": "Only explicitly allowed documentation targets are included; training remains held.",
+            "allowed_targets": ["docs/reports/"],
+            "held_targets": [
+                "production automation",
+                "automatic curriculum capture",
+                "automatic promotion",
+                "implementation_packet",
+            ],
+            "scope_expansion_required": False,
+            "claims": [
+                "The request is a design-planning task involving LoRA and prompt injection.",
+                "docs/reports/ is the only allowed target in this packet.",
+            ],
+            "evidence_basis": [
+                "Task summary mentions matched keywords: lora, prompt injection.",
+                "Allowed Targets lists docs/reports/.",
+                "Held Targets lists production automation, automatic curriculum capture, automatic promotion, and implementation_packet.",
+            ],
+            "unverified_claims": [],
+            "required_fields_present": True,
+            "reason": "The output stays within the declared allowed target and keeps implementation, automation, promotion, training, and curriculum-capture work held.",
         },
         indent=2,
         sort_keys=True,
@@ -493,11 +514,7 @@ def run_supervised_chain_smoke(
 
     output_validation = validate_supervised_attempt_output_against_contract(
         attempt_record=attempt_record,
-        output_contract={
-            "format": "json",
-            "requires_reason": True,
-            "required_fields": ["allowed_targets", "held_targets", "reason"],
-        },
+        output_contract=output_contract,
         validation_id=validation_id,
         validated_at=completed_at,
     )
