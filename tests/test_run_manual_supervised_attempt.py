@@ -213,6 +213,12 @@ def _run_call_local_in_process(
     )
 
 
+def _read_json_if_exists(path: Path) -> dict[str, object] | None:
+    if not path.is_file():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def _write_export_pattern_inputs(run_dir: Path) -> dict[str, str]:
     failure_raw_name = "raw_model_output.failed_001.txt"
     failure_validation_name = "output_validation.failed_001.json"
@@ -469,6 +475,8 @@ def test_call_local_reads_prompt_posts_to_chat_completions_and_writes_raw_output
     assert raw == "{\"reason\":\"local\"}"
 
     metadata = json.loads((run_dir / "local_model_call.json").read_text(encoding="utf-8"))
+    assert not (run_dir / "local_model_call.failed.json").exists()
+    assert not (run_dir / "local_model_response.failed.json").exists()
     assert metadata["source"] == "local_openai_compatible_endpoint"
     assert metadata["endpoint"] == endpoint
     assert metadata["model"] == "qwen3-1.7b-gpu-40k"
@@ -556,6 +564,21 @@ def test_call_local_missing_assistant_content_exits_nonzero(tmp_path: Path):
 
     assert result.returncode != 0
     assert "missing assistant content" in result.stderr
+    failure_metadata = _read_json_if_exists(run_dir / "local_model_call.failed.json")
+    response_metadata = _read_json_if_exists(run_dir / "local_model_response.failed.json")
+    assert isinstance(failure_metadata, dict)
+    assert failure_metadata["call_status"] == "failed"
+    assert failure_metadata["failure_reason"] == "missing_assistant_content"
+    assert failure_metadata["response_status"] == 200
+    assert isinstance(failure_metadata["response_body_json"], dict)
+    assert failure_metadata["response_body_json"]["choices"][0]["message"] == {}
+    assert "No command execution authority is granted." in failure_metadata["authority_boundaries"]
+    assert "No file modification authority is granted." in failure_metadata["authority_boundaries"]
+    assert isinstance(response_metadata, dict)
+    assert response_metadata["failure_reason"] == "missing_assistant_content"
+    assert response_metadata["response_body_json"]["choices"][0]["message"] == {}
+    assert not (run_dir / "local_model_call.json").exists()
+    assert (run_dir / "raw_model_output.txt").read_text(encoding="utf-8") == ""
 
 
 def test_call_local_non_2xx_exits_nonzero(tmp_path: Path):
@@ -570,10 +593,81 @@ def test_call_local_non_2xx_exits_nonzero(tmp_path: Path):
 
     assert result.returncode != 0
     assert "HTTP 500" in result.stderr
+    failure_metadata = _read_json_if_exists(run_dir / "local_model_call.failed.json")
+    response_metadata = _read_json_if_exists(run_dir / "local_model_response.failed.json")
+    assert isinstance(failure_metadata, dict)
+    assert failure_metadata["failure_reason"] == "http_error"
+    assert failure_metadata["response_status"] == 500
+    assert failure_metadata["response_body_json"] == {"error": "boom"}
+    assert isinstance(response_metadata, dict)
+    assert response_metadata["response_status"] == 500
+    assert response_metadata["response_body_json"] == {"error": "boom"}
 
 
-def test_call_local_connection_failure_exits_nonzero(tmp_path: Path):
-    run_dir, _ = _session_run(tmp_path, timestamp="20260708T030303Z")
+def test_call_local_reasoning_content_only_fails_and_does_not_write_reasoning_text(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260708T020203Z")
+    result = _run_call_local_in_process(
+        run_dir=run_dir,
+        endpoint="http://127.0.0.1:65500/v1",
+        model="qwen3-1.7b-gpu-40k",
+        response_body={"choices": [{"message": {"content": "", "reasoning_content": "hidden chain"}}]},
+    )
+
+    assert result.returncode != 0
+    assert "missing assistant content" in result.stderr
+    assert (run_dir / "raw_model_output.txt").read_text(encoding="utf-8") == ""
+    failure_metadata = _read_json_if_exists(run_dir / "local_model_call.failed.json")
+    assert isinstance(failure_metadata, dict)
+    assert failure_metadata["failure_reason"] == "missing_assistant_content"
+    assert failure_metadata["response_body_json"]["choices"][0]["message"]["reasoning_content"] == "hidden chain"
+
+
+def test_call_local_malformed_response_json_writes_failure_metadata(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260708T020204Z")
+
+    def fake_urlopen(request, timeout=None):
+        _ = request
+        _ = timeout
+
+        class _Resp:
+            status = 200
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, tb):
+                return False
+
+            def read(self):
+                return b"not-json"
+
+            def getcode(self):
+                return 200
+
+        return _Resp()
+
+    with patch.object(manual_attempt.urllib.request, "urlopen", side_effect=fake_urlopen):
+        result = manual_attempt.main(
+            [
+                "call-local",
+                "--run-dir",
+                str(run_dir),
+                "--endpoint",
+                "http://127.0.0.1:65500/v1",
+                "--model",
+                "qwen3-1.7b-gpu-40k",
+            ]
+        )
+
+    assert result == 1
+    failure_metadata = _read_json_if_exists(run_dir / "local_model_call.failed.json")
+    assert isinstance(failure_metadata, dict)
+    assert failure_metadata["failure_reason"] == "malformed_response_json"
+    assert failure_metadata["response_body_text"] == "not-json"
+
+
+def test_call_local_connection_failure_writes_failure_metadata_without_body(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260708T020205Z")
     result = run_script(
         "call-local",
         "--run-dir",
@@ -586,7 +680,12 @@ def test_call_local_connection_failure_exits_nonzero(tmp_path: Path):
         "0.1",
     )
     assert result.returncode != 0
-    assert "connection failed" in result.stderr
+    failure_metadata = _read_json_if_exists(run_dir / "local_model_call.failed.json")
+    assert isinstance(failure_metadata, dict)
+    assert failure_metadata["failure_reason"] == "connection_failed"
+    assert "error_message" in failure_metadata
+    assert "response_body_json" not in failure_metadata
+    assert "response_body_text" not in failure_metadata
 
 
 def test_call_local_connection_failure_exits_nonzero(tmp_path: Path):

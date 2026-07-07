@@ -174,6 +174,71 @@ def _call_local_metadata_payload(
     }
 
 
+def _call_local_failure_authority_boundaries() -> list[str]:
+    return [
+        "Failed local model call is evidence, not acceptance.",
+        "No command execution authority is granted.",
+        "No file modification authority is granted.",
+        "No patch promotion authority is granted.",
+        "No automatic training authority is granted.",
+        "No default failure-to-curriculum capture authority is granted.",
+        "Ingest and explicit review are required before downstream use.",
+    ]
+
+
+def _write_call_local_failure_evidence(
+    *,
+    run_dir: Path,
+    endpoint: str,
+    model: str,
+    temperature: float,
+    max_tokens: int,
+    prompt_path: Path,
+    raw_output_path: Path,
+    failure_reason: str,
+    response_status: int | None = None,
+    response_body_json: dict[str, Any] | None = None,
+    response_body_text: str | None = None,
+    error_message: str | None = None,
+) -> None:
+    failure_payload: dict[str, Any] = {
+        "source": "local_openai_compatible_endpoint",
+        "call_status": "failed",
+        "failure_reason": failure_reason,
+        "endpoint": endpoint,
+        "model": model,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+        "prompt_path": prompt_path.name,
+        "raw_output_path": raw_output_path.name,
+        "review_required": True,
+        "authority_boundaries": _call_local_failure_authority_boundaries(),
+    }
+    if response_status is not None:
+        failure_payload["response_status"] = response_status
+    if error_message is not None:
+        failure_payload["error_message"] = error_message
+    if response_body_json is not None:
+        failure_payload["response_body_json"] = response_body_json
+    if response_body_text is not None:
+        failure_payload["response_body_text"] = response_body_text
+    _write_json(run_dir / "local_model_call.failed.json", failure_payload)
+
+    if response_body_json is not None or response_body_text is not None:
+        response_payload: dict[str, Any] = {
+            "source": "local_openai_compatible_endpoint",
+            "call_status": "failed",
+            "failure_reason": failure_reason,
+        }
+        if response_status is not None:
+            response_payload["response_status"] = response_status
+        if response_body_json is not None:
+            response_payload["response_body_json"] = response_body_json
+        if response_body_text is not None:
+            response_payload["response_body_text"] = response_body_text
+        _write_json(run_dir / "local_model_response.failed.json", response_payload)
+
+
 def _extract_assistant_content(response_payload: dict[str, Any]) -> str:
     choices = response_payload.get("choices")
     if not isinstance(choices, list) or not choices:
@@ -362,21 +427,107 @@ def run_call_local(
             body = response.read().decode("utf-8")
     except urllib.error.HTTPError as exc:
         error_body = exc.read().decode("utf-8", errors="replace")
+        try:
+            parsed_error_body = json.loads(error_body)
+        except json.JSONDecodeError:
+            parsed_error_body = None
+        if not isinstance(parsed_error_body, dict):
+            parsed_error_body = None
+        _write_call_local_failure_evidence(
+            run_dir=run_dir,
+            endpoint=endpoint,
+            model=model,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            prompt_path=prompt_path,
+            raw_output_path=raw_output_path,
+            failure_reason="http_error",
+            response_status=exc.code,
+            response_body_json=parsed_error_body,
+            response_body_text=error_body if parsed_error_body is None else None,
+            error_message=f"local endpoint returned HTTP {exc.code}: {error_body}",
+        )
         raise RuntimeError(f"local endpoint returned HTTP {exc.code}: {error_body}") from exc
     except urllib.error.URLError as exc:
+        _write_call_local_failure_evidence(
+            run_dir=run_dir,
+            endpoint=endpoint,
+            model=model,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            prompt_path=prompt_path,
+            raw_output_path=raw_output_path,
+            failure_reason="connection_failed",
+            error_message=f"local endpoint connection failed: {exc.reason}",
+        )
         raise RuntimeError(f"local endpoint connection failed: {exc.reason}") from exc
 
     if status_code < 200 or status_code >= 300:
+        _write_call_local_failure_evidence(
+            run_dir=run_dir,
+            endpoint=endpoint,
+            model=model,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            prompt_path=prompt_path,
+            raw_output_path=raw_output_path,
+            failure_reason="non_2xx_status",
+            response_status=status_code,
+            response_body_text=body,
+            error_message=f"local endpoint returned non-2xx status: {status_code}",
+        )
         raise RuntimeError(f"local endpoint returned non-2xx status: {status_code}")
 
     try:
         response_payload = json.loads(body)
     except json.JSONDecodeError as exc:
+        _write_call_local_failure_evidence(
+            run_dir=run_dir,
+            endpoint=endpoint,
+            model=model,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            prompt_path=prompt_path,
+            raw_output_path=raw_output_path,
+            failure_reason="malformed_response_json",
+            response_status=status_code,
+            response_body_text=body,
+            error_message="local endpoint returned malformed JSON",
+        )
         raise RuntimeError("local endpoint returned malformed JSON") from exc
     if not isinstance(response_payload, dict):
+        _write_call_local_failure_evidence(
+            run_dir=run_dir,
+            endpoint=endpoint,
+            model=model,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            prompt_path=prompt_path,
+            raw_output_path=raw_output_path,
+            failure_reason="response_not_json_object",
+            response_status=status_code,
+            response_body_text=body,
+            error_message="local endpoint response must be a JSON object",
+        )
         raise RuntimeError("local endpoint response must be a JSON object")
 
-    assistant_content = _extract_assistant_content(response_payload)
+    try:
+        assistant_content = _extract_assistant_content(response_payload)
+    except ValueError as exc:
+        _write_call_local_failure_evidence(
+            run_dir=run_dir,
+            endpoint=endpoint,
+            model=model,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            prompt_path=prompt_path,
+            raw_output_path=raw_output_path,
+            failure_reason="missing_assistant_content",
+            response_status=status_code,
+            response_body_json=response_payload,
+            error_message=str(exc),
+        )
+        raise RuntimeError(str(exc)) from exc
     raw_output_path.write_text(assistant_content, encoding="utf-8")
 
     metadata_path = run_dir / "local_model_call.json"
