@@ -38,6 +38,7 @@ local_harness/run_manual_supervised_attempt.py
 Modes:
 
 - `prepare`
+- `session`
 - `ingest`
 
 ### Prepare
@@ -57,6 +58,46 @@ python3 local_harness/run_manual_supervised_attempt.py prepare \
   --messy-input "The LoRA and prompt injection work got messy. Build a bounded design packet." \
   --out-dir .work/manual_supervised_attempts
 ```
+
+### Simpler session mode
+
+Session mode prepares the run and prints exactly what to do next.
+
+Example:
+
+```bash
+python3 local_harness/run_manual_supervised_attempt.py session \
+  --messy-input "The LoRA and prompt injection work got messy. Build a bounded design packet." \
+  --out-dir .work/manual_supervised_attempts
+```
+
+Session writes:
+
+- `messy_input.txt`
+- `model_prompt_packet.md`
+- `prompt_to_paste.md`
+- `raw_model_output.txt`
+- `operator_instructions.txt`
+- `run_manifest.json`
+- `output_contract.json`
+
+Workflow:
+
+- open or copy `prompt_to_paste.md`
+- paste it into your model manually
+- save the exact model response to `raw_model_output.txt`
+- run the printed ingest command
+
+Optional prompt print mode:
+
+```bash
+python3 local_harness/run_manual_supervised_attempt.py session \
+  --messy-input "The LoRA and prompt injection work got messy. Build a bounded design packet." \
+  --out-dir .work/manual_supervised_attempts \
+  --print-prompt
+```
+
+The runner still does not call models and does not execute model output.
 
 ### Ingest
 

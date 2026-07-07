@@ -77,6 +77,13 @@ def _read_json(path: Path, *, kind: str) -> dict[str, Any]:
     return payload
 
 
+def _ingest_command(run_dir: Path, raw_output_file: Path) -> str:
+    return (
+        "python3 local_harness/run_manual_supervised_attempt.py ingest "
+        f"--run-dir {run_dir} --raw-output-file {raw_output_file}"
+    )
+
+
 def _operator_instructions_text(run_dir: Path) -> str:
     return (
         "Manual Supervised Attempt Instructions\n\n"
@@ -85,7 +92,7 @@ def _operator_instructions_text(run_dir: Path) -> str:
         "3) Do not execute commands from model output.\n"
         "4) Do not modify files from model output.\n"
         "5) Run ingest next:\n\n"
-        f"python3 local_harness/run_manual_supervised_attempt.py ingest --run-dir {run_dir} --raw-output-file {run_dir / 'raw_model_output.txt'}\n"
+        f"{_ingest_command(run_dir, run_dir / 'raw_model_output.txt')}\n"
     )
 
 
@@ -173,6 +180,40 @@ def run_prepare(
         "manifest_path": manifest_path,
         "model_prompt_packet_path": prompt_path,
         "output_contract_path": output_contract_path,
+    }
+
+
+def run_session(
+    *,
+    messy_input: str,
+    out_dir: Path,
+    timestamp: str | None = None,
+    overwrite: bool = False,
+    write_prompt_copy: bool = False,
+) -> dict[str, Any]:
+    prepare_result = run_prepare(
+        messy_input=messy_input,
+        out_dir=out_dir,
+        timestamp=timestamp,
+        overwrite=overwrite,
+    )
+    run_dir = Path(prepare_result["run_dir"])
+    model_prompt_packet_path = Path(prepare_result["model_prompt_packet_path"])
+    prompt_to_paste_path = run_dir / "prompt_to_paste.md"
+    raw_output_path = run_dir / "raw_model_output.txt"
+
+    prompt_to_paste_path.write_text(model_prompt_packet_path.read_text(encoding="utf-8"), encoding="utf-8")
+
+    raw_output_path.write_text("", encoding="utf-8")
+
+    return {
+        "run_dir": run_dir,
+        "manifest_path": Path(prepare_result["manifest_path"]),
+        "model_prompt_packet_path": model_prompt_packet_path,
+        "prompt_to_paste_path": prompt_to_paste_path,
+        "raw_output_file_path": raw_output_path,
+        "ingest_command": _ingest_command(run_dir, raw_output_path),
+        "write_prompt_copy": write_prompt_copy,
     }
 
 
@@ -348,6 +389,15 @@ def build_arg_parser() -> argparse.ArgumentParser:
     prepare.add_argument("--timestamp")
     prepare.add_argument("--overwrite", action="store_true")
 
+    session = subparsers.add_parser("session")
+    session.add_argument("--messy-input")
+    session.add_argument("--messy-input-file", type=Path)
+    session.add_argument("--out-dir", type=Path, required=True)
+    session.add_argument("--timestamp")
+    session.add_argument("--overwrite", action="store_true")
+    session.add_argument("--print-prompt", action="store_true")
+    session.add_argument("--write-prompt-copy", action="store_true")
+
     ingest = subparsers.add_parser("ingest")
     ingest.add_argument("--run-dir", type=Path, required=True)
     ingest.add_argument("--raw-output-file", type=Path, required=True)
@@ -377,6 +427,40 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"run_dir: {result['run_dir']}")
             print(f"model_prompt_packet_path: {result['model_prompt_packet_path']}")
             print(f"manifest_path: {result['manifest_path']}")
+            return 0
+
+        if args.mode == "session":
+            messy_input = _read_messy_input(
+                messy_input=args.messy_input,
+                messy_input_file=args.messy_input_file,
+            )
+            result = run_session(
+                messy_input=messy_input,
+                out_dir=args.out_dir,
+                timestamp=args.timestamp,
+                overwrite=bool(args.overwrite),
+                write_prompt_copy=bool(args.write_prompt_copy),
+            )
+            print(f"run_dir: {result['run_dir']}")
+            print(f"model_prompt_packet_path: {result['model_prompt_packet_path']}")
+            print(f"prompt_to_paste: {result['prompt_to_paste_path']}")
+            print(f"raw_output_file: {result['raw_output_file_path']}")
+            print("")
+            print("Next:")
+            print("1. Paste prompt_to_paste.md into your model manually.")
+            print("2. Save the exact model response to raw_model_output.txt.")
+            print("3. Run:")
+            print("")
+            print(result["ingest_command"])
+            print("")
+            print("Do not paste operator instructions into the model.")
+            if not result["write_prompt_copy"]:
+                print("Tip: --write-prompt-copy is accepted for compatibility but prompt_to_paste.md is always written.")
+            if args.print_prompt:
+                prompt_text = Path(result["prompt_to_paste_path"]).read_text(encoding="utf-8")
+                print("----- BEGIN MODEL PROMPT PACKET -----")
+                print(prompt_text.rstrip())
+                print("----- END MODEL PROMPT PACKET -----")
             return 0
 
         if args.decision is not None and not (isinstance(args.decision_reason, str) and args.decision_reason.strip()):

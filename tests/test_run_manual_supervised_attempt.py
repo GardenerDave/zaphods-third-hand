@@ -62,6 +62,32 @@ def _prepare_run(tmp_path: Path, *, timestamp: str = "20260707T010101Z") -> Path
     return out_dir / timestamp
 
 
+def _session_run(
+    tmp_path: Path,
+    *,
+    timestamp: str = "20260707T010101Z",
+    print_prompt: bool = False,
+    write_prompt_copy: bool = False,
+) -> tuple[Path, subprocess.CompletedProcess[str]]:
+    out_dir = tmp_path / "runs"
+    command: list[str | Path] = [
+        "session",
+        "--messy-input",
+        "The LoRA and prompt injection work got messy. Build a bounded design packet.",
+        "--out-dir",
+        out_dir,
+        "--timestamp",
+        timestamp,
+    ]
+    if print_prompt:
+        command.append("--print-prompt")
+    if write_prompt_copy:
+        command.append("--write-prompt-copy")
+    result = run_script(*command)
+    assert result.returncode == 0
+    return out_dir / timestamp, result
+
+
 def test_prepare_from_messy_input_writes_required_artifacts(tmp_path: Path):
     out_dir = tmp_path / "runs"
     ts = "20260707T020202Z"
@@ -177,6 +203,77 @@ def test_prepare_rejects_both_messy_input_variants(tmp_path: Path):
     )
     assert result.returncode != 0
     assert "exactly one of --messy-input or --messy-input-file" in result.stderr
+
+
+def test_session_mode_writes_required_artifacts_and_prompt_copy(tmp_path: Path):
+    run_dir, result = _session_run(tmp_path, timestamp="20260707T171717Z")
+    assert run_dir.is_dir()
+    assert (run_dir / "messy_input.txt").is_file()
+    assert (run_dir / "model_prompt_packet.md").is_file()
+    assert (run_dir / "prompt_to_paste.md").is_file()
+    assert (run_dir / "raw_model_output.txt").is_file()
+    assert (run_dir / "operator_instructions.txt").is_file()
+    assert (run_dir / "run_manifest.json").is_file()
+    assert (run_dir / "output_contract.json").is_file()
+
+    prompt_packet = (run_dir / "model_prompt_packet.md").read_text(encoding="utf-8")
+    prompt_copy = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
+    assert prompt_copy == prompt_packet
+    assert "Manual Supervised Attempt Instructions" not in prompt_copy
+
+    assert f"run_dir: {run_dir}" in result.stdout
+    assert f"prompt_to_paste: {run_dir / 'prompt_to_paste.md'}" in result.stdout
+    assert f"raw_output_file: {run_dir / 'raw_model_output.txt'}" in result.stdout
+    assert (
+        f"python3 local_harness/run_manual_supervised_attempt.py ingest --run-dir {run_dir} "
+        f"--raw-output-file {run_dir / 'raw_model_output.txt'}"
+    ) in result.stdout
+
+
+def test_session_mode_print_prompt_uses_markers_and_excludes_operator_instructions(tmp_path: Path):
+    run_dir, result = _session_run(tmp_path, timestamp="20260707T181818Z", print_prompt=True)
+    assert "----- BEGIN MODEL PROMPT PACKET -----" in result.stdout
+    assert "----- END MODEL PROMPT PACKET -----" in result.stdout
+    begin = result.stdout.index("----- BEGIN MODEL PROMPT PACKET -----")
+    end = result.stdout.index("----- END MODEL PROMPT PACKET -----")
+    prompt_block = result.stdout[begin:end]
+    assert "# ZTH Model Prompt Packet" in prompt_block
+    assert "Manual Supervised Attempt Instructions" not in prompt_block
+    assert str(run_dir / "prompt_to_paste.md") in result.stdout
+
+
+def test_session_mode_supports_deterministic_timestamp(tmp_path: Path):
+    out_dir = tmp_path / "runs"
+    ts = "20260707T191919Z"
+    result = run_script(
+        "session",
+        "--messy-input",
+        "Bounded operator input.",
+        "--out-dir",
+        out_dir,
+        "--timestamp",
+        ts,
+    )
+    assert result.returncode == 0
+    assert f"run_dir: {out_dir / ts}" in result.stdout
+
+
+def test_session_mode_rejects_missing_messy_input(tmp_path: Path):
+    result = run_script(
+        "session",
+        "--out-dir",
+        tmp_path / "runs",
+    )
+    assert result.returncode != 0
+    assert "exactly one of --messy-input or --messy-input-file" in result.stderr
+
+
+def test_session_mode_accepts_write_prompt_copy_flag(tmp_path: Path):
+    run_dir, result = _session_run(tmp_path, timestamp="20260707T202020Z", write_prompt_copy=True)
+    assert result.returncode == 0
+    prompt_packet = (run_dir / "model_prompt_packet.md").read_text(encoding="utf-8")
+    prompt_copy = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
+    assert prompt_copy == prompt_packet
 
 
 def test_ingest_valid_output_writes_attempt_validation_and_preserves_raw_output(tmp_path: Path):
