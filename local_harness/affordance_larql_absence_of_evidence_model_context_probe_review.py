@@ -86,18 +86,22 @@ def score_prompt(prompt_text: str) -> dict[str, bool]:
                 "absence of evidence is not evidence of absence",
             )
         ),
-        "prompt_has_blocked_actions": all(
+        "prompt_has_blocked_actions": any(
             phrase in lowered
             for phrase in (
                 "do not claim a file, rule, test, artifact, path, branch, or record does not exist merely because it was not found",
-                "do not use missing search results as authority to delete",
-                "promote",
-                "canonicalize",
-                "overwrite",
-                "clean up",
+                "do not claim a file, rule, test, artifact, path, branch, or record nonexistence is unproven merely because it was not found",
+            )
+        ) and "do not use missing search results as authority to delete" in lowered and all(
+            phrase in lowered for phrase in ("promote", "canonicalize", "overwrite", "clean up")
+        ),
+        "prompt_has_distinction": any(
+            phrase in lowered
+            for phrase in (
+                "not found in searched scope from does not exist",
+                "not found in searched scope from nonexistence is unproven",
             )
         ),
-        "prompt_has_distinction": "not found in searched scope from does not exist" in lowered,
         "prompt_has_targeted_inspection": "targeted inspection or review" in lowered,
         "prompt_has_scenario": "docs/reports" in lowered and "legacy_failure_candidates.jsonl" in lowered,
     }

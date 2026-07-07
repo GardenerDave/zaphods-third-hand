@@ -148,7 +148,9 @@ def test_rejects_missing_prompt_rule_id(tmp_path):
 def test_rejects_missing_prompt_distinction(tmp_path):
     prompt = tmp_path / "prompt.md"
     prompt.write_text(
-        PROMPT_PATH.read_text(encoding="utf-8").replace("distinguish not found in searched scope from does not exist", ""),
+        PROMPT_PATH.read_text(encoding="utf-8")
+        .replace("distinguish not found in searched scope from does not exist", "")
+        .replace("distinguish not found in searched scope from nonexistence is unproven", ""),
         encoding="utf-8",
     )
     review = write_reports(PROBE_PATH, prompt, RESPONSE_PATH, tmp_path / "out")
