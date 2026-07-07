@@ -479,6 +479,7 @@ def run_supervised_chain_smoke(
                 "Held Targets lists production automation, automatic curriculum capture, automatic promotion, and implementation_packet.",
             ],
             "unverified_claims": [],
+            "format": "json",
             "required_fields_present": True,
             "reason": "The output stays within the declared allowed target and keeps implementation, automation, promotion, training, and curriculum-capture work held.",
         },

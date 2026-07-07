@@ -110,6 +110,7 @@ explicit supervised acceptance without promotion or downstream mutation.
   supervised workflow, not general intelligence; weak `stop_conditions` and
   broad “All board names” wording remain review caveats. See the
   [model-audition report guidance](reports/model_auditions/README.md#direct-supervised-patch-probe-milestone).
+- Manual supervised model-attempt runner added (`run_manual_supervised_attempt.py`), with prepare/ingest operator flow that keeps model use manual and supervised, records validation evidence, and requires explicit review metadata before downstream gate/handoff artifacts.
 
 ## Conversation-Derived Backlog
 

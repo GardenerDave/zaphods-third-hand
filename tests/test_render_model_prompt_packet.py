@@ -11,6 +11,11 @@ from local_harness.render_model_prompt_packet import build_model_prompt_output_c
 
 
 def make_patch(patch_id: str) -> dict:
+    required_by_patch = {
+        "scope_boundary_v1": ["allowed_targets", "held_targets", "scope_expansion_required"],
+        "output_contract_v1": ["required_fields_present", "format", "reason"],
+        "unsupported_certainty_v1": ["claims", "evidence_basis", "unverified_claims"],
+    }
     return {
         "patch_id": patch_id,
         "title": patch_id,
@@ -22,7 +27,7 @@ def make_patch(patch_id: str) -> dict:
             "model_size": ["any"],
         },
         "prompt_delta": f"delta for {patch_id}",
-        "required_output_fields": ["reason"],
+        "required_output_fields": required_by_patch[patch_id],
         "validator_expectations": ["reason required"],
     }
 
@@ -140,8 +145,10 @@ def test_merges_required_fields_from_selected_prompt_patches_with_reason_last():
     assert merged["required_fields"] == [
         "existing_first",
         "allowed_targets",
+        "held_targets",
         "scope_expansion_required",
         "required_fields_present",
+        "format",
         "claims",
         "evidence_basis",
         "unverified_claims",
