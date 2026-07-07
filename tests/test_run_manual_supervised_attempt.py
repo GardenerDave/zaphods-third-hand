@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
 
@@ -86,6 +88,42 @@ def _session_run(
     result = run_script(*command)
     assert result.returncode == 0
     return out_dir / timestamp, result
+
+
+class _LocalHandler(BaseHTTPRequestHandler):
+    response_code = 200
+    response_body = {"choices": [{"message": {"content": "{\"reason\": \"ok\"}"}}]}
+    seen_path = ""
+    seen_request_body: dict[str, object] | None = None
+
+    def do_POST(self):
+        body = self.rfile.read(int(self.headers.get("Content-Length", "0"))).decode("utf-8")
+        try:
+            _LocalHandler.seen_request_body = json.loads(body)
+        except json.JSONDecodeError:
+            _LocalHandler.seen_request_body = None
+        _LocalHandler.seen_path = self.path
+        payload = json.dumps(_LocalHandler.response_body).encode("utf-8")
+        self.send_response(_LocalHandler.response_code)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(payload)))
+        self.end_headers()
+        self.wfile.write(payload)
+
+    def log_message(self, format: str, *args):
+        return
+
+
+def _start_local_server(*, response_code: int, response_body: dict[str, object]) -> tuple[HTTPServer, str, threading.Thread]:
+    _LocalHandler.response_code = response_code
+    _LocalHandler.response_body = response_body
+    _LocalHandler.seen_path = ""
+    _LocalHandler.seen_request_body = None
+    server = HTTPServer(("127.0.0.1", 0), _LocalHandler)
+    endpoint = f"http://127.0.0.1:{server.server_port}/v1"
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    return server, endpoint, thread
 
 
 def test_prepare_from_messy_input_writes_required_artifacts(tmp_path: Path):
@@ -274,6 +312,202 @@ def test_session_mode_accepts_write_prompt_copy_flag(tmp_path: Path):
     prompt_packet = (run_dir / "model_prompt_packet.md").read_text(encoding="utf-8")
     prompt_copy = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
     assert prompt_copy == prompt_packet
+
+
+def test_call_local_reads_prompt_posts_to_chat_completions_and_writes_raw_output_and_metadata(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260707T212121Z")
+    server, endpoint, thread = _start_local_server(
+        response_code=200,
+        response_body={"choices": [{"message": {"content": "{\"reason\":\"local\"}"}}]},
+    )
+    try:
+        result = run_script(
+            "call-local",
+            "--run-dir",
+            run_dir,
+            "--endpoint",
+            endpoint,
+            "--model",
+            "qwen3-1.7b-gpu-40k",
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=1)
+
+    assert result.returncode == 0
+    assert _LocalHandler.seen_path == "/v1/chat/completions"
+    body = _LocalHandler.seen_request_body
+    assert isinstance(body, dict)
+    assert body["model"] == "qwen3-1.7b-gpu-40k"
+    assert body["temperature"] == 0
+    assert body["max_tokens"] == 1024
+    assert isinstance(body["messages"], list)
+    assert len(body["messages"]) == 1
+    assert body["messages"][0]["role"] == "user"
+    prompt = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
+    assert body["messages"][0]["content"] == prompt
+
+    raw = (run_dir / "raw_model_output.txt").read_text(encoding="utf-8")
+    assert raw == "{\"reason\":\"local\"}"
+
+    metadata = json.loads((run_dir / "local_model_call.json").read_text(encoding="utf-8"))
+    assert metadata["source"] == "local_openai_compatible_endpoint"
+    assert metadata["endpoint"] == endpoint
+    assert metadata["model"] == "qwen3-1.7b-gpu-40k"
+    assert metadata["temperature"] == 0
+    assert metadata["max_tokens"] == 1024
+    assert metadata["call_status"] == "completed"
+    assert metadata["review_required"] is True
+    boundaries = metadata["authority_boundaries"]
+    assert "Local model call is not command execution authority." in boundaries
+    assert "Local model call is not file modification authority." in boundaries
+    assert "No automatic patch promotion authority is granted." in boundaries
+    assert "No automatic training authority is granted." in boundaries
+    assert "No default failure-to-curriculum capture authority is granted." in boundaries
+    assert "Ingest and explicit review are required before downstream use." in boundaries
+
+    assert "next_ingest_command:" in result.stdout
+    assert "run_manual_supervised_attempt.py ingest" in result.stdout
+    assert not (run_dir / "review_decision.json").exists()
+    assert not (run_dir / "downstream_use_gate.json").exists()
+    assert not (run_dir / "handoff_packet.json").exists()
+
+
+def test_call_local_honors_optional_temperature_and_max_tokens(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260707T222222Z")
+    server, endpoint, thread = _start_local_server(
+        response_code=200,
+        response_body={"choices": [{"message": {"content": "{}"}}]},
+    )
+    try:
+        result = run_script(
+            "call-local",
+            "--run-dir",
+            run_dir,
+            "--endpoint",
+            endpoint,
+            "--model",
+            "qwen3-1.7b-gpu-40k",
+            "--temperature",
+            "0.2",
+            "--max-tokens",
+            "256",
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=1)
+
+    assert result.returncode == 0
+    body = _LocalHandler.seen_request_body
+    assert isinstance(body, dict)
+    assert body["temperature"] == 0.2
+    assert body["max_tokens"] == 256
+
+
+def test_call_local_refuses_overwrite_nonempty_raw_output_without_overwrite(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260707T232323Z")
+    raw_path = run_dir / "raw_model_output.txt"
+    raw_path.write_text("already present", encoding="utf-8")
+
+    result = run_script(
+        "call-local",
+        "--run-dir",
+        run_dir,
+        "--endpoint",
+        "http://127.0.0.1:65500/v1",
+        "--model",
+        "qwen3-1.7b-gpu-40k",
+    )
+
+    assert result.returncode != 0
+    assert "non-empty" in result.stderr
+    assert raw_path.read_text(encoding="utf-8") == "already present"
+
+
+def test_call_local_overwrite_allows_replacement(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260708T000000Z")
+    raw_path = run_dir / "raw_model_output.txt"
+    raw_path.write_text("already present", encoding="utf-8")
+    server, endpoint, thread = _start_local_server(
+        response_code=200,
+        response_body={"choices": [{"message": {"content": "replacement"}}]},
+    )
+    try:
+        result = run_script(
+            "call-local",
+            "--run-dir",
+            run_dir,
+            "--endpoint",
+            endpoint,
+            "--model",
+            "qwen3-1.7b-gpu-40k",
+            "--overwrite",
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=1)
+
+    assert result.returncode == 0
+    assert raw_path.read_text(encoding="utf-8") == "replacement"
+
+
+def test_call_local_missing_assistant_content_exits_nonzero(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260708T010101Z")
+    server, endpoint, thread = _start_local_server(response_code=200, response_body={"choices": [{"message": {}}]})
+    try:
+        result = run_script(
+            "call-local",
+            "--run-dir",
+            run_dir,
+            "--endpoint",
+            endpoint,
+            "--model",
+            "qwen3-1.7b-gpu-40k",
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=1)
+
+    assert result.returncode != 0
+    assert "missing assistant content" in result.stderr
+
+
+def test_call_local_non_2xx_exits_nonzero(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260708T020202Z")
+    server, endpoint, thread = _start_local_server(response_code=500, response_body={"error": "boom"})
+    try:
+        result = run_script(
+            "call-local",
+            "--run-dir",
+            run_dir,
+            "--endpoint",
+            endpoint,
+            "--model",
+            "qwen3-1.7b-gpu-40k",
+        )
+    finally:
+        server.shutdown()
+        thread.join(timeout=1)
+
+    assert result.returncode != 0
+    assert "HTTP 500" in result.stderr
+
+
+def test_call_local_connection_failure_exits_nonzero(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260708T030303Z")
+    result = run_script(
+        "call-local",
+        "--run-dir",
+        run_dir,
+        "--endpoint",
+        "http://127.0.0.1:1/v1",
+        "--model",
+        "qwen3-1.7b-gpu-40k",
+        "--timeout-seconds",
+        "0.1",
+    )
+    assert result.returncode != 0
+    assert "connection failed" in result.stderr
 
 
 def test_ingest_valid_output_writes_attempt_validation_and_preserves_raw_output(tmp_path: Path):

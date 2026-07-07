@@ -2,9 +2,9 @@
 
 This runner is the first practical operator loop for real model use under supervision.
 
-It is manual and model-free from the harness perspective:
+It is supervised with explicit authority boundaries:
 
-- no model calls are made by this runner
+- model calls are manual by default and endpoint calls occur only in explicit `call-local` mode
 - no endpoint calls are made by this runner
 - no command execution is performed from model output
 - no file modification is performed from model output
@@ -39,6 +39,7 @@ Modes:
 
 - `prepare`
 - `session`
+- `call-local`
 - `ingest`
 
 ### Prepare
@@ -98,6 +99,39 @@ python3 local_harness/run_manual_supervised_attempt.py session \
 ```
 
 The runner still does not call models and does not execute model output.
+
+### Local endpoint call mode
+
+`call-local` is explicit opt-in local model calling for OpenAI-compatible local servers.
+It calls only the endpoint supplied by the operator and writes raw model output for ingest.
+
+Example:
+
+```bash
+python3 local_harness/run_manual_supervised_attempt.py call-local \
+  --run-dir .work/manual_supervised_attempts/<timestamp> \
+  --endpoint http://192.168.1.11:1234/v1 \
+  --model qwen3-1.7b-gpu-40k
+```
+
+Behavior:
+
+- reads `prompt_to_paste.md`
+- posts to `<endpoint>/chat/completions` with a single user message containing the exact prompt packet
+- defaults to `temperature=0` and `max_tokens=1024`
+- writes assistant content exactly to `raw_model_output.txt`
+- writes call metadata to `local_model_call.json`
+- prints the next ingest command
+
+Optional flags:
+
+- `--temperature`
+- `--max-tokens`
+- `--timeout-seconds`
+- `--overwrite` to replace a non-empty `raw_model_output.txt`
+
+This mode does not validate acceptance by itself. The operator must still run ingest.
+Review is still required. No execution, file mutation, patch application, promotion, training, or curriculum capture occurs.
 
 ### Ingest
 

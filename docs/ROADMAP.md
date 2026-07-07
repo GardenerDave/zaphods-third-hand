@@ -111,6 +111,7 @@ explicit supervised acceptance without promotion or downstream mutation.
   broad “All board names” wording remain review caveats. See the
   [model-audition report guidance](reports/model_auditions/README.md#direct-supervised-patch-probe-milestone).
 - Manual supervised model-attempt runner added (`run_manual_supervised_attempt.py`), with prepare/ingest operator flow that keeps model use manual and supervised, records validation evidence, and requires explicit review metadata before downstream gate/handoff artifacts.
+- Explicit `call-local` mode added to the manual supervised attempt runner for operator-invoked OpenAI-compatible local endpoint calls that write raw output plus call metadata for the existing supervised ingest/review path without granting execution, mutation, promotion, training, or curriculum-capture authority.
 
 ## Conversation-Derived Backlog
 

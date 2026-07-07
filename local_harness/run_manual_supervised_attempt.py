@@ -6,6 +6,8 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import urllib.error
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Sequence
@@ -94,6 +96,59 @@ def _operator_instructions_text(run_dir: Path) -> str:
         "5) Run ingest next:\n\n"
         f"{_ingest_command(run_dir, run_dir / 'raw_model_output.txt')}\n"
     )
+
+
+def _call_local_url(endpoint: str) -> str:
+    base = endpoint.strip()
+    if not base:
+        raise ValueError("--endpoint must be a non-empty string")
+    return f"{base.rstrip('/')}/chat/completions"
+
+
+def _call_local_metadata_payload(
+    *,
+    endpoint: str,
+    model: str,
+    temperature: float,
+    max_tokens: int,
+    prompt_path: Path,
+    raw_output_path: Path,
+) -> dict[str, Any]:
+    return {
+        "source": "local_openai_compatible_endpoint",
+        "endpoint": endpoint,
+        "model": model,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+        "prompt_path": prompt_path.name,
+        "raw_output_path": raw_output_path.name,
+        "call_status": "completed",
+        "review_required": True,
+        "authority_boundaries": [
+            "Local model call is not command execution authority.",
+            "Local model call is not file modification authority.",
+            "No automatic patch promotion authority is granted.",
+            "No automatic training authority is granted.",
+            "No default failure-to-curriculum capture authority is granted.",
+            "Ingest and explicit review are required before downstream use.",
+        ],
+    }
+
+
+def _extract_assistant_content(response_payload: dict[str, Any]) -> str:
+    choices = response_payload.get("choices")
+    if not isinstance(choices, list) or not choices:
+        raise ValueError("local endpoint response missing choices")
+    first = choices[0]
+    if not isinstance(first, dict):
+        raise ValueError("local endpoint response choices[0] must be an object")
+    message = first.get("message")
+    if not isinstance(message, dict):
+        raise ValueError("local endpoint response choices[0].message must be an object")
+    content = message.get("content")
+    if not isinstance(content, str) or not content:
+        raise ValueError("local endpoint response missing assistant content")
+    return content
 
 
 def _prepare_run_dir(*, out_dir: Path, timestamp: str | None, overwrite: bool) -> tuple[str, Path]:
@@ -214,6 +269,86 @@ def run_session(
         "raw_output_file_path": raw_output_path,
         "ingest_command": _ingest_command(run_dir, raw_output_path),
         "write_prompt_copy": write_prompt_copy,
+    }
+
+
+def run_call_local(
+    *,
+    run_dir: Path,
+    endpoint: str,
+    model: str,
+    temperature: float,
+    max_tokens: int,
+    timeout_seconds: float,
+    overwrite: bool,
+) -> dict[str, Any]:
+    prompt_path = run_dir / "prompt_to_paste.md"
+    if not prompt_path.is_file():
+        raise ValueError(f"missing prompt_to_paste.md: {prompt_path}")
+    prompt_text = prompt_path.read_text(encoding="utf-8")
+    if not prompt_text.strip():
+        raise ValueError("prompt_to_paste.md must contain non-empty text")
+
+    raw_output_path = run_dir / "raw_model_output.txt"
+    if raw_output_path.exists() and raw_output_path.read_text(encoding="utf-8") and not overwrite:
+        raise ValueError("raw_model_output.txt is non-empty; use --overwrite to replace it")
+
+    request_url = _call_local_url(endpoint)
+    request_payload = {
+        "model": _require_nonempty(model, field="--model"),
+        "messages": [{"role": "user", "content": prompt_text}],
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+    }
+    request_bytes = json.dumps(request_payload).encode("utf-8")
+    request = urllib.request.Request(
+        request_url,
+        data=request_bytes,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+
+    try:
+        with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
+            status_code = getattr(response, "status", response.getcode())
+            body = response.read().decode("utf-8")
+    except urllib.error.HTTPError as exc:
+        error_body = exc.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"local endpoint returned HTTP {exc.code}: {error_body}") from exc
+    except urllib.error.URLError as exc:
+        raise RuntimeError(f"local endpoint connection failed: {exc.reason}") from exc
+
+    if status_code < 200 or status_code >= 300:
+        raise RuntimeError(f"local endpoint returned non-2xx status: {status_code}")
+
+    try:
+        response_payload = json.loads(body)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("local endpoint returned malformed JSON") from exc
+    if not isinstance(response_payload, dict):
+        raise RuntimeError("local endpoint response must be a JSON object")
+
+    assistant_content = _extract_assistant_content(response_payload)
+    raw_output_path.write_text(assistant_content, encoding="utf-8")
+
+    metadata_path = run_dir / "local_model_call.json"
+    metadata_payload = _call_local_metadata_payload(
+        endpoint=endpoint,
+        model=model,
+        temperature=temperature,
+        max_tokens=max_tokens,
+        prompt_path=prompt_path,
+        raw_output_path=raw_output_path,
+    )
+    _write_json(metadata_path, metadata_payload)
+
+    return {
+        "run_dir": run_dir,
+        "endpoint": endpoint,
+        "model": model,
+        "raw_output_path": raw_output_path,
+        "local_model_call_path": metadata_path,
+        "ingest_command": _ingest_command(run_dir, raw_output_path),
     }
 
 
@@ -398,6 +533,15 @@ def build_arg_parser() -> argparse.ArgumentParser:
     session.add_argument("--print-prompt", action="store_true")
     session.add_argument("--write-prompt-copy", action="store_true")
 
+    call_local = subparsers.add_parser("call-local")
+    call_local.add_argument("--run-dir", type=Path, required=True)
+    call_local.add_argument("--endpoint", required=True)
+    call_local.add_argument("--model", required=True)
+    call_local.add_argument("--temperature", type=float, default=0)
+    call_local.add_argument("--max-tokens", type=int, default=1024)
+    call_local.add_argument("--timeout-seconds", type=float, default=30)
+    call_local.add_argument("--overwrite", action="store_true")
+
     ingest = subparsers.add_parser("ingest")
     ingest.add_argument("--run-dir", type=Path, required=True)
     ingest.add_argument("--raw-output-file", type=Path, required=True)
@@ -461,6 +605,25 @@ def main(argv: Sequence[str] | None = None) -> int:
                 print("----- BEGIN MODEL PROMPT PACKET -----")
                 print(prompt_text.rstrip())
                 print("----- END MODEL PROMPT PACKET -----")
+            return 0
+
+        if args.mode == "call-local":
+            result = run_call_local(
+                run_dir=args.run_dir,
+                endpoint=args.endpoint,
+                model=args.model,
+                temperature=args.temperature,
+                max_tokens=args.max_tokens,
+                timeout_seconds=args.timeout_seconds,
+                overwrite=bool(args.overwrite),
+            )
+            print(f"run_dir: {result['run_dir']}")
+            print(f"endpoint: {result['endpoint']}")
+            print(f"model: {result['model']}")
+            print(f"raw_output_file: {result['raw_output_path']}")
+            print(f"local_model_call_path: {result['local_model_call_path']}")
+            print("next_ingest_command:")
+            print(result["ingest_command"])
             return 0
 
         if args.decision is not None and not (isinstance(args.decision_reason, str) and args.decision_reason.strip()):
