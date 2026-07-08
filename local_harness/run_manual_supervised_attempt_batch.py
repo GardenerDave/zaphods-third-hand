@@ -213,12 +213,22 @@ def run_batch(
                         )
                     except Exception as exc:
                         notes.append(f"retry call-local failed: {exc}")
-                    retry_ingest = manual_attempt.run_ingest(
-                        run_dir=attempt_dir,
-                        raw_output_file=attempt_dir / "raw_model_output.txt",
-                        operator=operator,
-                    )
-                    retry_validation_status = retry_ingest["validation_status"]
+                        call_failed = attempt_dir / "local_model_call.failed.json"
+                        response_failed = attempt_dir / "local_model_response.failed.json"
+                        if call_failed.exists() or response_failed.exists():
+                            timeout_evidence_preserved = call_failed.exists() or response_failed.exists()
+                            notes.append("retry call-local failure evidence preserved")
+                        retry_validation_status = "not_run"
+                    else:
+                        retry_ingest = manual_attempt.run_ingest(
+                            run_dir=attempt_dir,
+                            raw_output_file=attempt_dir / "raw_model_output.txt",
+                            operator=operator,
+                        )
+                        retry_validation_status = retry_ingest["validation_status"]
+                        validation_payload = json.loads(
+                            (attempt_dir / "output_validation.json").read_text(encoding="utf-8")
+                        )
         except Exception as exc:
             notes.append(f"task failed: {exc}")
             if validation_payload is None and (attempt_dir / "output_validation.json").is_file():

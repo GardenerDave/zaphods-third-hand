@@ -261,6 +261,135 @@ def test_retry_limit_one_invokes_retry_contract_and_records_preservation(tmp_pat
     assert record["retry_validation_status"] in {"failed", "passed"}
 
 
+def test_retry_validation_status_reflects_retry_validation_and_not_initial_validation(tmp_path: Path):
+    tasks_jsonl = _write_tasks_jsonl(tmp_path / "single.jsonl", [{"task_id": "task_a", "messy_input": "task a"}])
+    out_dir = tmp_path / "out"
+    attempt_dir = out_dir / "runs" / "task_a" / "attempt_1"
+
+    def fake_session(*args, **kwargs):
+        attempt_dir.mkdir(parents=True, exist_ok=True)
+        (attempt_dir / "prompt_to_paste.md").write_text("prompt", encoding="utf-8")
+        (attempt_dir / "raw_model_output.txt").write_text("raw", encoding="utf-8")
+        return {"run_dir": attempt_dir}
+
+    def fake_call_local(*args, **kwargs):
+        if kwargs.get("overwrite"):
+            (attempt_dir / "raw_model_output.txt").write_text("retry", encoding="utf-8")
+        (attempt_dir / "local_model_call.json").write_text("{}", encoding="utf-8")
+        return {"run_dir": attempt_dir}
+
+    initial_validation = {
+        "validation_status": "failed",
+        "checks": [
+            {"check_id": "target_authority", "status": "failed"},
+            {"check_id": "duplicate_json_keys", "status": "passed"},
+            {"check_id": "required_field_types", "status": "failed"},
+        ],
+    }
+    retry_validation = {
+        "validation_status": "passed",
+        "checks": [
+            {"check_id": "target_authority", "status": "passed"},
+            {"check_id": "duplicate_json_keys", "status": "passed"},
+            {"check_id": "required_field_types", "status": "passed"},
+        ],
+    }
+
+    def fake_ingest(*args, **kwargs):
+        if not (attempt_dir / "output_validation.json").exists():
+            (attempt_dir / "output_validation.json").write_text(json.dumps(initial_validation), encoding="utf-8")
+            (attempt_dir / "output_validation_report.txt").write_text("initial", encoding="utf-8")
+            return {"validation_status": "failed"}
+        (attempt_dir / "output_validation.json").write_text(json.dumps(retry_validation), encoding="utf-8")
+        (attempt_dir / "output_validation_report.txt").write_text("retry", encoding="utf-8")
+        return {"validation_status": "passed"}
+
+    def fake_retry_contract(*, run_dir: Path, retry_id: int):
+        for name in [
+            "raw_model_output.failed_1.txt",
+            "output_validation.failed_1.json",
+            "output_validation_report.failed_1.txt",
+            "retry_prompt_to_paste_1.md",
+            "prompt_to_paste.md",
+        ]:
+            (run_dir / name).write_text(name, encoding="utf-8")
+        return {"run_dir": run_dir, "retry_id": retry_id}
+
+    with patch.object(batch_runner.manual_attempt, "run_session", side_effect=fake_session), patch.object(
+        batch_runner.manual_attempt, "run_call_local", side_effect=fake_call_local
+    ), patch.object(batch_runner.manual_attempt, "run_ingest", side_effect=fake_ingest), patch.object(
+        batch_runner.manual_attempt, "_run_retry_contract", side_effect=fake_retry_contract
+    ):
+        result = batch_runner.run_batch(
+            tasks_jsonl=tasks_jsonl,
+            out_dir=out_dir,
+            endpoint="http://example.invalid/v1",
+            model="model-x",
+            retry_limit=1,
+        )
+
+    record = result["records"][0]
+    assert record["initial_validation_status"] == "failed"
+    assert record["retry_validation_status"] == "passed"
+    assert record["target_authority_status"] == "passed"
+    assert record["duplicate_json_keys_status"] == "passed"
+    assert record["required_field_types_status"] == "passed"
+
+
+def test_retry_call_local_failure_stops_retry_ingest_and_records_evidence(tmp_path: Path):
+    tasks_jsonl = _write_tasks_jsonl(tmp_path / "single.jsonl", [{"task_id": "task_a", "messy_input": "task a"}])
+    out_dir = tmp_path / "out"
+    attempt_dir = out_dir / "runs" / "task_a" / "attempt_1"
+
+    def fake_session(*args, **kwargs):
+        attempt_dir.mkdir(parents=True, exist_ok=True)
+        (attempt_dir / "prompt_to_paste.md").write_text("prompt", encoding="utf-8")
+        (attempt_dir / "raw_model_output.txt").write_text("raw", encoding="utf-8")
+        return {"run_dir": attempt_dir}
+
+    def fake_call_local(*args, **kwargs):
+        if not kwargs.get("overwrite"):
+            (attempt_dir / "local_model_call.json").write_text("{}", encoding="utf-8")
+            return {"run_dir": attempt_dir}
+        (attempt_dir / "local_model_call.failed.json").write_text(json.dumps({"failure_reason": "timeout"}), encoding="utf-8")
+        raise RuntimeError("timed out")
+
+    def fake_ingest(*args, **kwargs):
+        (attempt_dir / "output_validation.json").write_text(json.dumps({"validation_status": "failed", "checks": []}), encoding="utf-8")
+        (attempt_dir / "output_validation_report.txt").write_text("failed", encoding="utf-8")
+        return {"validation_status": "failed"}
+
+    def fake_retry_contract(*, run_dir: Path, retry_id: int):
+        for name in [
+            "raw_model_output.failed_1.txt",
+            "output_validation.failed_1.json",
+            "output_validation_report.failed_1.txt",
+            "retry_prompt_to_paste_1.md",
+            "prompt_to_paste.md",
+        ]:
+            (run_dir / name).write_text(name, encoding="utf-8")
+        return {"run_dir": run_dir, "retry_id": retry_id}
+
+    with patch.object(batch_runner.manual_attempt, "run_session", side_effect=fake_session), patch.object(
+        batch_runner.manual_attempt, "run_call_local", side_effect=fake_call_local
+    ), patch.object(batch_runner.manual_attempt, "run_ingest", side_effect=fake_ingest) as retry_ingest, patch.object(
+        batch_runner.manual_attempt, "_run_retry_contract", side_effect=fake_retry_contract
+    ):
+        result = batch_runner.run_batch(
+            tasks_jsonl=tasks_jsonl,
+            out_dir=out_dir,
+            endpoint="http://example.invalid/v1",
+            model="model-x",
+            retry_limit=1,
+        )
+
+    record = result["records"][0]
+    assert retry_ingest.call_count == 1
+    assert record["retry_validation_status"] == "not_run"
+    assert record["notes"].count("retry call-local failed") == 1
+    assert record["timeout_evidence_preserved"] is True
+
+
 def test_batch_runner_does_not_add_execution_or_promotion_behaviors(tmp_path: Path):
     tasks_jsonl = _make_tasks_file(tmp_path)
     out_dir = tmp_path / "out"
