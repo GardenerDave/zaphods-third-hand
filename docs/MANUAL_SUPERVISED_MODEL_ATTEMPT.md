@@ -133,6 +133,7 @@ Optional flags:
 
 This mode does not validate acceptance by itself. The operator must still run ingest.
 Review is still required. No execution, file mutation, patch application, promotion, training, or curriculum capture occurs.
+Timeout failures are preserved as failed-call evidence and do not authorize acceptance, promotion, training, model materialization, or automatic failure-to-curriculum capture.
 
 ### Supervised retry helper
 
@@ -156,6 +157,7 @@ python3 local_harness/run_manual_supervised_attempt.py call-local \
 ```
 
 The retry helper prepares a supervised retry prompt and snapshots failure evidence. It does not call a model, accept output, promote output, train, materialize adapters, or perform automatic failure-to-curriculum capture.
+It also warns the model not to return the output contract itself or merely describe the required fields.
 
 ### Export training pattern candidate mode
 

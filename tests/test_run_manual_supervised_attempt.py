@@ -5,6 +5,7 @@ import io
 import subprocess
 import sys
 import threading
+import socket
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from contextlib import redirect_stdout, redirect_stderr
@@ -159,7 +160,8 @@ def _run_call_local_in_process(
     timeout_seconds: float = 30,
     overwrite: bool = False,
     response_code: int = 200,
-    response_body: dict[str, object],
+    response_body: dict[str, object] | None = None,
+    urlopen_side_effect=None,
 ) -> subprocess.CompletedProcess[str]:
     seen_request: dict[str, object] | None = None
 
@@ -168,18 +170,20 @@ def _run_call_local_in_process(
         _ = timeout
         seen_request = json.loads(request.data.decode("utf-8")) if getattr(request, "data", None) else None
         if response_code >= 400:
+            body = response_body or {}
             raise urllib.error.HTTPError(
                 request.full_url,
                 response_code,
                 "mocked error",
                 hdrs=None,
-                fp=io.BytesIO(json.dumps(response_body).encode("utf-8")),
+                fp=io.BytesIO(json.dumps(body).encode("utf-8")),
             )
-        return _FakeUrlopenResponse(status_code=response_code, body=response_body)
+        return _FakeUrlopenResponse(status_code=response_code, body=response_body or {"choices": []})
 
     stdout = io.StringIO()
     stderr = io.StringIO()
-    with patch.object(manual_attempt.urllib.request, "urlopen", side_effect=fake_urlopen):
+    side_effect = urlopen_side_effect or fake_urlopen
+    with patch.object(manual_attempt.urllib.request, "urlopen", side_effect=side_effect):
         try:
             with redirect_stdout(stdout), redirect_stderr(stderr):
                 exit_code = manual_attempt.main(
@@ -520,6 +524,8 @@ def test_retry_contract_prompt_includes_validator_diagnostics_and_contract_field
     retry_prompt = (run_dir / "retry_prompt_to_paste_1.md").read_text(encoding="utf-8")
     assert "Validator diagnostics:" in retry_prompt
     assert "Required fields missing from parsed output: allowed_targets, held_targets" in retry_prompt
+    assert "Do not return the output contract itself." in retry_prompt
+    assert "Return the actual payload fields required by the contract." in retry_prompt
     assert '"required_fields": [' in retry_prompt
     assert '"requires_reason": true' in retry_prompt
 
@@ -809,6 +815,86 @@ def test_call_local_connection_failure_writes_failure_metadata_without_body(tmp_
     assert "error_message" in failure_metadata
     assert "response_body_json" not in failure_metadata
     assert "response_body_text" not in failure_metadata
+
+
+def test_call_local_timeout_exits_nonzero_and_writes_failure_metadata(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260708T020206Z")
+    raw_path = run_dir / "raw_model_output.txt"
+    raw_path.write_text("preserve-me", encoding="utf-8")
+
+    def timeout_urlopen(request, timeout=None):
+        _ = request
+        _ = timeout
+        raise TimeoutError("timed out waiting for response")
+
+    result = _run_call_local_in_process(
+        run_dir=run_dir,
+        endpoint="http://127.0.0.1:65500/v1",
+        model="qwen3-1.7b-gpu-40k",
+        timeout_seconds=480,
+        overwrite=True,
+        urlopen_side_effect=timeout_urlopen,
+    )
+
+    assert result.returncode != 0
+    assert "timed out" in result.stderr
+    failure_metadata = _read_json_if_exists(run_dir / "local_model_call.failed.json")
+    assert isinstance(failure_metadata, dict)
+    assert failure_metadata["failure_reason"] == "timeout"
+    assert failure_metadata["timeout_seconds"] == 480
+    assert failure_metadata["review_required"] is True
+    assert "Failed local model call is evidence, not acceptance." in failure_metadata["authority_boundaries"]
+    assert not (run_dir / "local_model_response.failed.json").exists()
+    assert raw_path.read_text(encoding="utf-8") == "preserve-me"
+    assert not (run_dir / "review_decision.json").exists()
+    assert not (run_dir / "downstream_use_gate.json").exists()
+    assert not (run_dir / "handoff_packet.json").exists()
+
+
+def test_call_local_timeout_from_urlerror_reason_writes_failure_metadata(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260708T020207Z")
+
+    def timeout_urlopen(request, timeout=None):
+        _ = request
+        _ = timeout
+        raise urllib.error.URLError("timed out")
+
+    result = _run_call_local_in_process(
+        run_dir=run_dir,
+        endpoint="http://127.0.0.1:65500/v1",
+        model="qwen3-1.7b-gpu-40k",
+        timeout_seconds=480,
+        urlopen_side_effect=timeout_urlopen,
+    )
+
+    assert result.returncode != 0
+    failure_metadata = _read_json_if_exists(run_dir / "local_model_call.failed.json")
+    assert isinstance(failure_metadata, dict)
+    assert failure_metadata["failure_reason"] == "timeout"
+    assert failure_metadata["timeout_seconds"] == 480
+
+
+def test_call_local_timeout_from_socket_timeout_writes_failure_metadata(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260708T020208Z")
+
+    def timeout_urlopen(request, timeout=None):
+        _ = request
+        _ = timeout
+        raise socket.timeout("timed out")
+
+    result = _run_call_local_in_process(
+        run_dir=run_dir,
+        endpoint="http://127.0.0.1:65500/v1",
+        model="qwen3-1.7b-gpu-40k",
+        timeout_seconds=480,
+        urlopen_side_effect=timeout_urlopen,
+    )
+
+    assert result.returncode != 0
+    failure_metadata = _read_json_if_exists(run_dir / "local_model_call.failed.json")
+    assert isinstance(failure_metadata, dict)
+    assert failure_metadata["failure_reason"] == "timeout"
+    assert failure_metadata["timeout_seconds"] == 480
 
 
 def test_call_local_connection_failure_exits_nonzero(tmp_path: Path):

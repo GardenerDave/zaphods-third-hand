@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import socket
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
@@ -193,6 +194,7 @@ def _write_call_local_failure_evidence(
     model: str,
     temperature: float,
     max_tokens: int,
+    timeout_seconds: float,
     prompt_path: Path,
     raw_output_path: Path,
     failure_reason: str,
@@ -209,6 +211,7 @@ def _write_call_local_failure_evidence(
         "model": model,
         "temperature": temperature,
         "max_tokens": max_tokens,
+        "timeout_seconds": timeout_seconds,
         "prompt_path": prompt_path.name,
         "raw_output_path": raw_output_path.name,
         "review_required": True,
@@ -237,6 +240,15 @@ def _write_call_local_failure_evidence(
         if response_body_text is not None:
             response_payload["response_body_text"] = response_body_text
         _write_json(run_dir / "local_model_response.failed.json", response_payload)
+
+
+def _is_timeout_reason(reason: object) -> bool:
+    if isinstance(reason, (socket.timeout, TimeoutError)):
+        return True
+    if isinstance(reason, str):
+        lowered = reason.lower()
+        return "timed out" in lowered or "timeout" in lowered
+    return False
 
 
 def _run_retry_contract(*, run_dir: Path, retry_id: int) -> dict[str, Any]:
@@ -309,6 +321,9 @@ def _run_retry_contract(*, run_dir: Path, retry_id: int) -> dict[str, Any]:
         [
             "",
             "Return raw JSON only.",
+            "Do not return the output contract itself.",
+            "Do not describe the required fields.",
+            "Return the actual payload fields required by the contract.",
             "Validation is evidence, not acceptance.",
             "No command execution, file modification, promotion, training, model materialization, or default failure-to-curriculum capture is authorized.",
         ]
@@ -515,6 +530,20 @@ def run_call_local(
         with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
             status_code = getattr(response, "status", response.getcode())
             body = response.read().decode("utf-8")
+    except (socket.timeout, TimeoutError) as exc:
+        _write_call_local_failure_evidence(
+            run_dir=run_dir,
+            endpoint=endpoint,
+            model=model,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            timeout_seconds=timeout_seconds,
+            prompt_path=prompt_path,
+            raw_output_path=raw_output_path,
+            failure_reason="timeout",
+            error_message=f"local endpoint timed out: {exc}",
+        )
+        raise RuntimeError(f"local endpoint timed out: {exc}") from exc
     except urllib.error.HTTPError as exc:
         error_body = exc.read().decode("utf-8", errors="replace")
         try:
@@ -529,6 +558,7 @@ def run_call_local(
             model=model,
             temperature=temperature,
             max_tokens=max_tokens,
+            timeout_seconds=timeout_seconds,
             prompt_path=prompt_path,
             raw_output_path=raw_output_path,
             failure_reason="http_error",
@@ -539,15 +569,17 @@ def run_call_local(
         )
         raise RuntimeError(f"local endpoint returned HTTP {exc.code}: {error_body}") from exc
     except urllib.error.URLError as exc:
+        failure_reason = "timeout" if _is_timeout_reason(getattr(exc, "reason", None)) else "connection_failed"
         _write_call_local_failure_evidence(
             run_dir=run_dir,
             endpoint=endpoint,
             model=model,
             temperature=temperature,
             max_tokens=max_tokens,
+            timeout_seconds=timeout_seconds,
             prompt_path=prompt_path,
             raw_output_path=raw_output_path,
-            failure_reason="connection_failed",
+            failure_reason=failure_reason,
             error_message=f"local endpoint connection failed: {exc.reason}",
         )
         raise RuntimeError(f"local endpoint connection failed: {exc.reason}") from exc
@@ -559,6 +591,7 @@ def run_call_local(
             model=model,
             temperature=temperature,
             max_tokens=max_tokens,
+            timeout_seconds=timeout_seconds,
             prompt_path=prompt_path,
             raw_output_path=raw_output_path,
             failure_reason="non_2xx_status",
@@ -577,6 +610,7 @@ def run_call_local(
             model=model,
             temperature=temperature,
             max_tokens=max_tokens,
+            timeout_seconds=timeout_seconds,
             prompt_path=prompt_path,
             raw_output_path=raw_output_path,
             failure_reason="malformed_response_json",
@@ -592,6 +626,7 @@ def run_call_local(
             model=model,
             temperature=temperature,
             max_tokens=max_tokens,
+            timeout_seconds=timeout_seconds,
             prompt_path=prompt_path,
             raw_output_path=raw_output_path,
             failure_reason="response_not_json_object",
@@ -610,6 +645,7 @@ def run_call_local(
             model=model,
             temperature=temperature,
             max_tokens=max_tokens,
+            timeout_seconds=timeout_seconds,
             prompt_path=prompt_path,
             raw_output_path=raw_output_path,
             failure_reason="missing_assistant_content",
