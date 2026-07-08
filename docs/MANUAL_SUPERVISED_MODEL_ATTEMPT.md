@@ -213,6 +213,7 @@ Without explicit review metadata, ingest stops after validation and reports that
 
 Ingest validates against the exact `output_contract.json` created during prepare.
 Validation checks required field presence and basic required field types, including that `required_fields_present` is boolean `true`.
+Validation also rejects duplicate JSON keys because they create provenance and contract ambiguity.
 
 Attempt provenance is recorded as manual operator-provided model output using:
 

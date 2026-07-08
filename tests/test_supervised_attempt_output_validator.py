@@ -214,6 +214,39 @@ def test_passes_valid_json_output_with_required_field_types():
     assert record["validation_status"] == "passed"
 
 
+def test_rejects_duplicate_json_keys():
+    attempt = make_attempt_record(
+        '{"allowed_targets": [], "held_targets": [], "scope_expansion_required": false, "claims": [], "evidence_basis": [], "unverified_claims": [], "format": "json", "required_fields_present": true, "reason": "bounded", "required_fields_present": false}'
+    )
+    output_contract = {"format": "json", "requires_reason": True, "required_fields": []}
+    record = validate_supervised_attempt_output_against_contract(
+        attempt_record=attempt,
+        output_contract=output_contract,
+        validation_id="validation_dup_keys",
+        validated_at="2026-07-06T00:00:00Z",
+    )
+    assert record["validation_status"] == "failed"
+    assert any(check["check_id"] == "duplicate_json_keys" and check["status"] == "failed" for check in record["checks"])
+    assert "Duplicate JSON key in raw model output: required_fields_present" in "\n".join(record["diagnostics"])
+
+
+def test_duplicate_required_fields_present_fails_even_if_last_value_is_valid():
+    attempt = make_attempt_record(
+        '{"allowed_targets": [], "held_targets": [], "scope_expansion_required": false, "claims": [], "evidence_basis": [], "unverified_claims": [], "format": "json", "required_fields_present": false, "reason": "bounded", "required_fields_present": true}'
+    )
+    output_contract = {"format": "json", "requires_reason": True, "required_fields": []}
+    record = validate_supervised_attempt_output_against_contract(
+        attempt_record=attempt,
+        output_contract=output_contract,
+        validation_id="validation_dup_required_fields_present",
+        validated_at="2026-07-06T00:00:00Z",
+    )
+    assert record["validation_status"] == "failed"
+    assert any(check["check_id"] == "duplicate_json_keys" and check["status"] == "failed" for check in record["checks"])
+    assert any(check["check_id"] == "required_field_types" and check["status"] == "passed" for check in record["checks"])
+    assert "Duplicate JSON key in raw model output: required_fields_present" in "\n".join(record["diagnostics"])
+
+
 @pytest.mark.parametrize(
     "payload, expected_message",
     [

@@ -260,6 +260,21 @@ def _check_required_field_types(payload: dict[str, Any]) -> tuple[list[str], dic
     }
 
 
+def _parse_json_with_duplicate_key_detection(raw_text: str) -> tuple[Any, list[str]]:
+    duplicate_keys: list[str] = []
+
+    def object_pairs_hook(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        obj: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in obj and key not in duplicate_keys:
+                duplicate_keys.append(key)
+            obj[key] = value
+        return obj
+
+    parsed = json.loads(raw_text, object_pairs_hook=object_pairs_hook)
+    return parsed, duplicate_keys
+
+
 def validate_supervised_attempt_output_against_contract(
     *,
     attempt_record: dict[str, Any],
@@ -287,12 +302,13 @@ def validate_supervised_attempt_output_against_contract(
     checks: list[dict[str, str]] = []
     diagnostics: list[str] = []
     parsed_output: Any = None
+    duplicate_keys: list[str] = []
 
     contract_format = str(output_contract.get("format", "")).strip().lower()
 
     if contract_format == "json":
         try:
-            parsed_output = json.loads(validated_attempt["raw_model_output"])
+            parsed_output, duplicate_keys = _parse_json_with_duplicate_key_detection(validated_attempt["raw_model_output"])
             checks.append(
                 {
                     "check_id": "parse_json",
@@ -300,6 +316,17 @@ def validate_supervised_attempt_output_against_contract(
                     "message": "Raw model output parsed as JSON.",
                 }
             )
+            if duplicate_keys:
+                checks.append(
+                    {
+                        "check_id": "duplicate_json_keys",
+                        "status": "failed",
+                        "message": "Duplicate JSON key in raw model output: " + ", ".join(sorted(duplicate_keys)),
+                    }
+                )
+                diagnostics.extend(
+                    [f"Duplicate JSON key in raw model output: {key}" for key in sorted(duplicate_keys)]
+                )
         except json.JSONDecodeError as exc:
             checks.append(
                 {
