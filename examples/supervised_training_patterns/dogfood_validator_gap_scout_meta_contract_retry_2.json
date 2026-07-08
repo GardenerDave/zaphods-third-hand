@@ -1,0 +1,61 @@
+{
+  "artifact_type": "supervised_failure_success_training_pattern_candidate",
+  "authority_boundaries": [
+    "This artifact is evidence, not training authority.",
+    "This artifact is not automatically included in any curriculum.",
+    "No automatic training authority is granted.",
+    "No patch promotion authority is granted.",
+    "No command execution authority is granted.",
+    "No file modification authority is granted."
+  ],
+  "correction": {
+    "correction_strategy": "Apply explicit retry guidance from supervised correction prompt.",
+    "retry_prompt": "You are correcting a failed supervised ZTH model output.\n\nYour previous response parsed as JSON but failed validation.\n\nYou returned the output contract itself:\n\n{\n  \"format\": \"json\",\n  \"required_fields\": [...],\n  \"reason\": \"...\"\n}\n\nThat is not enough.\n\nDo not describe the required fields.\nDo not return only \"required_fields\".\nDo not return a contract summary.\nReturn the actual task payload fields.\n\nReturn one raw JSON object only. No markdown fences. No prose before or after JSON.\n\nThe response must include these exact top-level fields:\n\n{\n  \"allowed_targets\": [\n    \"docs/reports/\"\n  ],\n  \"held_targets\": [\n    \"implementation changes\",\n    \"patch application\",\n    \"automatic training\",\n    \"default failure-to-curriculum capture\"\n  ],\n  \"scope_expansion_required\": false,\n  \"claims\": [\n    \"The latest dogfood validation failures show a repeated meta-contract failure pattern.\",\n    \"The local model returned contract-descriptive JSON instead of the required task payload.\",\n    \"A validator-hardening candidate is to add stronger type and semantic checks for required_fields_present and required task payload fields.\",\n    \"The output remains a bounded scout packet only and does not authorize implementation changes.\"\n  ],\n  \"evidence_basis\": [\n    \"The validation report says required_fields failed.\",\n    \"The validation diagnostics list missing fields: allowed_targets, claims, evidence_basis, held_targets, required_fields_present, scope_expansion_required, unverified_claims.\",\n    \"The raw model output included format, required_fields, and reason but omitted the task payload fields.\",\n    \"The task allows only docs/reports/ and holds implementation changes, patch application, automatic training, and default failure-to-curriculum capture out of scope.\"\n  ],\n  \"unverified_claims\": [],\n  \"format\": \"json\",\n  \"required_fields\": [\n    \"allowed_targets\",\n    \"held_targets\",\n    \"scope_expansion_required\",\n    \"claims\",\n    \"evidence_basis\",\n    \"unverified_claims\",\n    \"format\",\n    \"required_fields_present\",\n    \"reason\"\n  ],\n  \"required_fields_present\": true,\n  \"reason\": \"This response returns the actual bounded scout payload, not merely the output contract. It stays within docs/reports/ scope and does not authorize implementation changes, patch application, automatic training, or default failure-to-curriculum capture.\"\n}\n"
+  },
+  "failure": {
+    "failure_summary": "Model returned output that failed required contract validation.",
+    "missing_required_fields": [
+      "allowed_targets",
+      "claims",
+      "evidence_basis",
+      "held_targets",
+      "required_fields_present",
+      "scope_expansion_required",
+      "unverified_claims"
+    ],
+    "raw_output": "{\n  \"format\": \"json\",\n  \"required_fields\": [\n    \"allowed_targets\",\n    \"held_targets\",\n    \"scope_expansion_required\",\n    \"claims\",\n    \"evidence_basis\",\n    \"unverified_claims\",\n    \"format\",\n    \"required_fields_present\",\n    \"reason\"\n  ],\n  \"reason\": \"Allowed targets are explicitly listed, held targets are the non-allowed ones, scope expansion is not required, claims are about target routing, evidence is the task summary, unverified claims include training pipeline ambiguity.\"\n}",
+    "validation_status": "failed",
+    "validator_diagnostics": [
+      "Required fields missing from parsed output: allowed_targets, claims, evidence_basis, held_targets, required_fields_present, scope_expansion_required, unverified_claims"
+    ]
+  },
+  "handoff_status": "prepared",
+  "learning_signal": {
+    "desired_behavior": "Return contract-complete output that passes validator checks after correction guidance.",
+    "failure_mode": "contract_validation_failure_recovered_by_explicit_retry_prompt",
+    "useful_for": [
+      "SFT candidate review",
+      "LoRA curriculum candidate review",
+      "prompt-patch regression fixture",
+      "validator regression fixture"
+    ]
+  },
+  "not_automatic_curriculum_capture": true,
+  "not_training_data_until_reviewed": true,
+  "pattern_id": "dogfood_validator_gap_scout_meta_contract_retry_2",
+  "review_gate_status": "allowed",
+  "run_provenance": {
+    "endpoint_kind": "local_openai_compatible_endpoint",
+    "max_tokens": 4096,
+    "model": "qwen3-1.7b-gpu-40k",
+    "run_dir": ".work/zth_batch_dogfood/runs/dogfood_validator_gap_scout/attempt_1",
+    "temperature": 0
+  },
+  "source": "explicit_operator_export",
+  "status": "candidate",
+  "success": {
+    "raw_output": "{\n  \"allowed_targets\": [\n    \"docs/reports/\"\n  ],\n  \"held_targets\": [\n    \"implementation changes\",\n    \"patch application\",\n    \"automatic training\",\n    \"default failure-to-curriculum capture\"\n  ],\n  \"scope_expansion_required\": false,\n  \"claims\": [\n    \"The latest dogfood validation failures show a repeated meta-contract failure pattern.\",\n    \"The local model returned contract-descriptive JSON instead of the required task payload.\",\n    \"A validator-hardening candidate is to add stronger type and semantic checks for required_fields_present and required task payload fields.\",\n    \"The output remains a bounded scout packet only and does not authorize implementation changes.\"\n  ],\n  \"evidence_basis\": [\n    \"The validation report says required_fields failed.\",\n    \"The validation diagnostics list missing fields: allowed_targets, claims, evidence_basis, held_targets, required_fields_present, scope_expansion_required, unverified_claims.\",\n    \"The raw model output included format, required_fields, and reason but omitted the task payload fields.\",\n    \"The task allows only docs/reports/ and holds implementation changes, patch application, automatic training, and default failure-to-curriculum capture out of scope.\"\n  ],\n  \"unverified_claims\": [],\n  \"format\": \"json\",\n  \"required_fields\": [\n    \"allowed_targets\",\n    \"held_targets\",\n    \"scope_expansion_required\",\n    \"claims\",\n    \"evidence_basis\",\n    \"unverified_claims\",\n    \"format\",\n    \"required_fields_present\",\n    \"reason\"\n  ],\n  \"required_fields_present\": true,\n  \"reason\": \"This response returns the actual bounded scout payload, not merely the output contract. It stays within docs/reports/ scope and does not authorize implementation changes, patch application, automatic training, or default failure-to-curriculum capture.\"\n}",
+    "review_status": "accepted_if_review_artifact_present",
+    "validation_status": "passed"
+  }
+}
