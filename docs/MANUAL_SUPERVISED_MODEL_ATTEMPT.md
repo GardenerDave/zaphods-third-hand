@@ -111,7 +111,7 @@ Example:
 ```bash
 python3 local_harness/run_manual_supervised_attempt.py call-local \
   --run-dir .work/manual_supervised_attempts/<timestamp> \
-  --endpoint http://192.168.1.11:1234/v1 \
+  --endpoint http://<local-endpoint>/v1 \
   --model qwen3-1.7b-gpu-40k
 ```
 
@@ -133,6 +133,29 @@ Optional flags:
 
 This mode does not validate acceptance by itself. The operator must still run ingest.
 Review is still required. No execution, file mutation, patch application, promotion, training, or curriculum capture occurs.
+
+### Supervised retry helper
+
+When validation fails, use `retry-contract` to snapshot the failed attempt before any overwrite:
+
+```bash
+python3 local_harness/run_manual_supervised_attempt.py retry-contract \
+  --run-dir .work/manual_supervised_attempts/<run> \
+  --retry-id 1
+```
+
+Then run the next manual local retry:
+
+```bash
+python3 local_harness/run_manual_supervised_attempt.py call-local \
+  --run-dir .work/manual_supervised_attempts/<run> \
+  --endpoint http://<local-endpoint>/v1 \
+  --model qwen3-1.7b-gpu-40k \
+  --max-tokens 4096 \
+  --overwrite
+```
+
+The retry helper prepares a supervised retry prompt and snapshots failure evidence. It does not call a model, accept output, promote output, train, materialize adapters, or perform automatic failure-to-curriculum capture.
 
 ### Export training pattern candidate mode
 

@@ -239,6 +239,96 @@ def _write_call_local_failure_evidence(
         _write_json(run_dir / "local_model_response.failed.json", response_payload)
 
 
+def _run_retry_contract(*, run_dir: Path, retry_id: int) -> dict[str, Any]:
+    if retry_id < 1:
+        raise ValueError("--retry-id must be >= 1")
+    raw_output_path = run_dir / "raw_model_output.txt"
+    validation_path = run_dir / "output_validation.json"
+    validation_report_path = run_dir / "output_validation_report.txt"
+    prompt_path = run_dir / "model_prompt_packet.md"
+    output_contract_path = run_dir / "output_contract.json"
+    if not raw_output_path.is_file():
+        raise ValueError(f"missing raw_model_output.txt: {raw_output_path}")
+    if not validation_path.is_file():
+        raise ValueError(f"missing output_validation.json: {validation_path}")
+    if not validation_report_path.is_file():
+        raise ValueError(f"missing output_validation_report.txt: {validation_report_path}")
+    if not prompt_path.is_file():
+        raise ValueError(f"missing model_prompt_packet.md: {prompt_path}")
+    validation_payload = _read_json(validation_path, kind="output validation")
+    if validation_payload.get("validation_status") != "failed":
+        raise ValueError("retry-contract requires validation_status == 'failed'")
+    output_contract: dict[str, Any] | None = None
+    if output_contract_path.is_file():
+        output_contract = _read_json(output_contract_path, kind="output contract")
+
+    failure_raw_path = run_dir / f"raw_model_output.failed_{retry_id}.txt"
+    failure_validation_path = run_dir / f"output_validation.failed_{retry_id}.json"
+    failure_report_path = run_dir / f"output_validation_report.failed_{retry_id}.txt"
+    retry_prompt_path = run_dir / f"retry_prompt_to_paste_{retry_id}.md"
+
+    if failure_raw_path.exists() or failure_validation_path.exists() or failure_report_path.exists():
+        raise ValueError(f"failed_{retry_id} artifacts already exist")
+
+    failure_raw_path.write_text(raw_output_path.read_text(encoding="utf-8"), encoding="utf-8")
+    _write_json(failure_validation_path, validation_payload)
+    failure_report_path.write_text(validation_report_path.read_text(encoding="utf-8"), encoding="utf-8")
+
+    diagnostics = validation_payload.get("diagnostics")
+    if isinstance(diagnostics, list):
+        diagnostic_lines = [str(item) for item in diagnostics if str(item).strip()]
+    else:
+        diagnostic_lines = []
+    checks = validation_payload.get("checks")
+    check_lines: list[str] = []
+    if isinstance(checks, list):
+        for check in checks:
+            if not isinstance(check, dict):
+                continue
+            check_lines.append(
+                f"- {check.get('check_id')}: {check.get('status')} - {check.get('message', '')}".rstrip()
+            )
+
+    prompt_sections = [
+        "Supervised Retry Prompt",
+        "",
+        "Original model prompt packet:",
+        prompt_path.read_text(encoding="utf-8").rstrip(),
+        "",
+        "Validation failure summary:",
+        f"- validation_status: {validation_payload.get('validation_status')}",
+    ]
+    if check_lines:
+        prompt_sections.extend(["", "Validator checks:"] + check_lines)
+    if diagnostic_lines:
+        prompt_sections.extend(["", "Validator diagnostics:"] + [f"- {line}" for line in diagnostic_lines])
+    if output_contract is not None:
+        prompt_sections.extend(["", "Required output contract:"])
+        prompt_sections.append(json.dumps(output_contract, indent=2, sort_keys=True))
+    prompt_sections.extend(
+        [
+            "",
+            "Return raw JSON only.",
+            "Validation is evidence, not acceptance.",
+            "No command execution, file modification, promotion, training, model materialization, or default failure-to-curriculum capture is authorized.",
+        ]
+    )
+    retry_prompt_text = "\n".join(prompt_sections).rstrip() + "\n"
+    retry_prompt_path.write_text(retry_prompt_text, encoding="utf-8")
+    prompt_to_paste_path = run_dir / "prompt_to_paste.md"
+    prompt_to_paste_path.write_text(retry_prompt_text, encoding="utf-8")
+
+    return {
+        "run_dir": run_dir,
+        "retry_id": retry_id,
+        "retry_prompt_path": retry_prompt_path,
+        "prompt_path": prompt_to_paste_path,
+        "failure_raw_path": failure_raw_path,
+        "failure_validation_path": failure_validation_path,
+        "failure_report_path": failure_report_path,
+    }
+
+
 def _extract_assistant_content(response_payload: dict[str, Any]) -> str:
     choices = response_payload.get("choices")
     if not isinstance(choices, list) or not choices:
@@ -857,6 +947,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
     call_local.add_argument("--timeout-seconds", type=float, default=30)
     call_local.add_argument("--overwrite", action="store_true")
 
+    retry_contract = subparsers.add_parser("retry-contract")
+    retry_contract.add_argument("--run-dir", type=Path, required=True)
+    retry_contract.add_argument("--retry-id", type=int, required=True)
+
     export_pattern = subparsers.add_parser("export-pattern")
     export_pattern.add_argument("--run-dir", type=Path, required=True)
     export_pattern.add_argument("--failure-raw", type=Path, required=True)
@@ -950,6 +1044,17 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"local_model_call_path: {result['local_model_call_path']}")
             print("next_ingest_command:")
             print(result["ingest_command"])
+            return 0
+
+        if args.mode == "retry-contract":
+            result = _run_retry_contract(run_dir=args.run_dir, retry_id=args.retry_id)
+            print(f"run_dir: {result['run_dir']}")
+            print(f"retry_id: {result['retry_id']}")
+            print(f"retry_prompt_path: {result['retry_prompt_path']}")
+            print(f"prompt_path: {result['prompt_path']}")
+            print(f"failure_raw_path: {result['failure_raw_path']}")
+            print(f"failure_validation_path: {result['failure_validation_path']}")
+            print(f"failure_report_path: {result['failure_report_path']}")
             return 0
 
         if args.mode == "export-pattern":

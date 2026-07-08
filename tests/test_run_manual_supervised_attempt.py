@@ -260,6 +260,46 @@ def _write_export_pattern_inputs(run_dir: Path) -> dict[str, str]:
     }
 
 
+def _write_retry_contract_inputs(run_dir: Path, *, validation_status: str = "failed") -> None:
+    (run_dir / "raw_model_output.txt").write_text('{"allowed_targets": ["docs/reports/"]}', encoding="utf-8")
+    (run_dir / "output_validation.json").write_text(
+        json.dumps(
+            {
+                "validation_status": validation_status,
+                "checks": [
+                    {
+                        "check_id": "required_fields",
+                        "status": "failed",
+                        "message": "Missing required fields: allowed_targets, held_targets",
+                    }
+                ],
+                "diagnostics": [
+                    "Required fields missing from parsed output: allowed_targets, held_targets"
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (run_dir / "output_validation_report.txt").write_text(
+        "validation_status: failed\nvalidator diagnostics: missing required fields\n",
+        encoding="utf-8",
+    )
+    (run_dir / "model_prompt_packet.md").write_text(
+        "Original model prompt packet text.\n",
+        encoding="utf-8",
+    )
+    (run_dir / "output_contract.json").write_text(
+        json.dumps(
+            {
+                "format": "json",
+                "required_fields": ["allowed_targets", "held_targets", "reason"],
+                "requires_reason": True,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
 def test_prepare_from_messy_input_writes_required_artifacts(tmp_path: Path):
     out_dir = tmp_path / "runs"
     ts = "20260707T020202Z"
@@ -446,6 +486,89 @@ def test_session_mode_accepts_write_prompt_copy_flag(tmp_path: Path):
     prompt_packet = (run_dir / "model_prompt_packet.md").read_text(encoding="utf-8")
     prompt_copy = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
     assert prompt_copy == prompt_packet
+
+
+def test_retry_contract_help_includes_retry_contract():
+    result = run_script("--help")
+    assert result.returncode == 0
+    assert "retry-contract" in result.stdout
+
+
+def test_retry_contract_writes_failed_snapshots_and_updates_prompt(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260707T212122Z")
+    _write_retry_contract_inputs(run_dir)
+    result = run_script("retry-contract", "--run-dir", run_dir, "--retry-id", "1")
+    assert result.returncode == 0
+    assert (run_dir / "raw_model_output.failed_1.txt").read_text(encoding="utf-8") == (
+        run_dir / "raw_model_output.txt"
+    ).read_text(encoding="utf-8")
+    assert json.loads((run_dir / "output_validation.failed_1.json").read_text(encoding="utf-8"))["validation_status"] == "failed"
+    assert (run_dir / "output_validation_report.failed_1.txt").read_text(encoding="utf-8") == (
+        run_dir / "output_validation_report.txt"
+    ).read_text(encoding="utf-8")
+    retry_prompt = (run_dir / "retry_prompt_to_paste_1.md").read_text(encoding="utf-8")
+    assert "Original model prompt packet text." in retry_prompt
+    assert "Required output contract:" in retry_prompt
+    assert (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8") == retry_prompt
+
+
+def test_retry_contract_prompt_includes_validator_diagnostics_and_contract_fields(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260707T212123Z")
+    _write_retry_contract_inputs(run_dir)
+    result = run_script("retry-contract", "--run-dir", run_dir, "--retry-id", "1")
+    assert result.returncode == 0
+    retry_prompt = (run_dir / "retry_prompt_to_paste_1.md").read_text(encoding="utf-8")
+    assert "Validator diagnostics:" in retry_prompt
+    assert "Required fields missing from parsed output: allowed_targets, held_targets" in retry_prompt
+    assert '"required_fields": [' in retry_prompt
+    assert '"requires_reason": true' in retry_prompt
+
+
+def test_retry_contract_refuses_existing_failed_snapshots(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260707T212124Z")
+    _write_retry_contract_inputs(run_dir)
+    assert run_script("retry-contract", "--run-dir", run_dir, "--retry-id", "1").returncode == 0
+    result = run_script("retry-contract", "--run-dir", run_dir, "--retry-id", "1")
+    assert result.returncode != 0
+    assert "failed_1 artifacts already exist" in result.stderr
+
+
+def test_retry_contract_rejects_passed_validation(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260707T212125Z")
+    _write_retry_contract_inputs(run_dir, validation_status="passed")
+    result = run_script("retry-contract", "--run-dir", run_dir, "--retry-id", "1")
+    assert result.returncode != 0
+    assert "validation_status == 'failed'" in result.stderr
+
+
+def test_retry_contract_rejects_missing_raw_output(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260707T212126Z")
+    _write_retry_contract_inputs(run_dir)
+    (run_dir / "raw_model_output.txt").unlink()
+    result = run_script("retry-contract", "--run-dir", run_dir, "--retry-id", "1")
+    assert result.returncode != 0
+    assert "missing raw_model_output.txt" in result.stderr
+
+
+def test_retry_contract_creates_no_acceptance_artifacts(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260707T212127Z")
+    _write_retry_contract_inputs(run_dir)
+    result = run_script("retry-contract", "--run-dir", run_dir, "--retry-id", "1")
+    assert result.returncode == 0
+    assert not (run_dir / "review_decision.json").exists()
+    assert not (run_dir / "downstream_use_gate.json").exists()
+    assert not (run_dir / "handoff_packet.json").exists()
+
+
+def test_retry_contract_performs_no_model_or_export_side_effects(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260707T212128Z")
+    _write_retry_contract_inputs(run_dir)
+    result = run_script("retry-contract", "--run-dir", run_dir, "--retry-id", "1")
+    assert result.returncode == 0
+    assert not (run_dir / "local_model_call.json").exists()
+    assert not (run_dir / "local_model_call.failed.json").exists()
+    assert not (run_dir / "local_model_response.failed.json").exists()
+    assert not any(path.name.startswith("examples") for path in run_dir.iterdir())
 
 
 def test_call_local_reads_prompt_posts_to_chat_completions_and_writes_raw_output_and_metadata(tmp_path: Path):
