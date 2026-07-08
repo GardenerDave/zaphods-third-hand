@@ -216,6 +216,50 @@ def _check_required_fields(
     }
 
 
+def _check_required_field_types(payload: dict[str, Any]) -> tuple[list[str], dict[str, Any]]:
+    field_specs: list[tuple[str, str, Any]] = [
+        ("allowed_targets", "list", list),
+        ("held_targets", "list", list),
+        ("scope_expansion_required", "boolean", bool),
+        ("claims", "list", list),
+        ("evidence_basis", "list", list),
+        ("unverified_claims", "list", list),
+        ("format", 'exactly "json"', "json"),
+        ("required_fields_present", "boolean true", True),
+        ("reason", "non-empty string", str),
+    ]
+    problems: list[str] = []
+    for field, expected_label, expected_type in field_specs:
+        if field not in payload:
+            continue
+        value = payload[field]
+        if expected_type is list:
+            if not isinstance(value, list):
+                problems.append(f"{field} must be a list")
+            continue
+        if expected_type is bool:
+            if not isinstance(value, bool):
+                problems.append(f"{field} must be a boolean")
+            continue
+        if expected_type is str:
+            if not isinstance(value, str) or not value.strip():
+                problems.append(f"{field} must be a non-empty string")
+            continue
+        if value != expected_type:
+            problems.append(f"{field} must be {expected_label}")
+    if problems:
+        return problems, {
+            "check_id": "required_field_types",
+            "status": "failed",
+            "message": "Invalid required field types or values: " + "; ".join(problems),
+        }
+    return [], {
+        "check_id": "required_field_types",
+        "status": "passed",
+        "message": "Required fields have valid types and values.",
+    }
+
+
 def validate_supervised_attempt_output_against_contract(
     *,
     attempt_record: dict[str, Any],
@@ -308,6 +352,28 @@ def validate_supervised_attempt_output_against_contract(
                 }
             )
             diagnostics.append("Required fields check unavailable for non-JSON output format.")
+
+    if isinstance(parsed_output, dict):
+        invalid_types, type_check = _check_required_field_types(parsed_output)
+        checks.append(type_check)
+        if invalid_types:
+            diagnostics.extend(invalid_types)
+    elif contract_format == "json":
+        checks.append(
+            {
+                "check_id": "required_field_types",
+                "status": "failed",
+                "message": "Required field type checks could not run because JSON parsing failed.",
+            }
+        )
+    else:
+        checks.append(
+            {
+                "check_id": "required_field_types",
+                "status": "failed",
+                "message": "Required field type checks require structured output object.",
+            }
+        )
 
     requires_reason = bool(output_contract.get("requires_reason"))
     if requires_reason:

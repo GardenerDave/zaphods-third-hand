@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from local_harness.supervised_attempt_output_validator import (
@@ -186,6 +188,72 @@ def test_passes_valid_json_output_with_required_fields_and_reason():
     assert record["validation_status"] == "passed"
 
 
+def test_passes_valid_json_output_with_required_field_types():
+    attempt = make_attempt_record(
+        json.dumps(
+            {
+                "allowed_targets": [],
+                "held_targets": [],
+                "scope_expansion_required": False,
+                "claims": [],
+                "evidence_basis": [],
+                "unverified_claims": [],
+                "format": "json",
+                "required_fields_present": True,
+                "reason": "bounded",
+            }
+        )
+    )
+    output_contract = {"format": "json", "requires_reason": True, "required_fields": []}
+    record = validate_supervised_attempt_output_against_contract(
+        attempt_record=attempt,
+        output_contract=output_contract,
+        validation_id="validation_001_types",
+        validated_at="2026-07-06T00:00:00Z",
+    )
+    assert record["validation_status"] == "passed"
+
+
+@pytest.mark.parametrize(
+    "payload, expected_message",
+    [
+        ({"required_fields_present": ["true"]}, "required_fields_present must be boolean true"),
+        ({"required_fields_present": False}, "required_fields_present must be boolean true"),
+        ({"format": "yaml"}, 'format must be exactly "json"'),
+        ({"allowed_targets": "docs"}, "allowed_targets must be a list"),
+        ({"held_targets": "docs"}, "held_targets must be a list"),
+        ({"scope_expansion_required": "false"}, "scope_expansion_required must be a boolean"),
+        ({"claims": "claim"}, "claims must be a list"),
+        ({"evidence_basis": "evidence"}, "evidence_basis must be a list"),
+        ({"unverified_claims": "claim"}, "unverified_claims must be a list"),
+    ],
+)
+def test_rejects_invalid_required_field_types(payload, expected_message):
+    base = {
+        "allowed_targets": [],
+        "held_targets": [],
+        "scope_expansion_required": False,
+        "claims": [],
+        "evidence_basis": [],
+        "unverified_claims": [],
+        "format": "json",
+        "required_fields_present": True,
+        "reason": "bounded",
+    }
+    base.update(payload)
+    attempt = make_attempt_record(json.dumps(base))
+    output_contract = {"format": "json", "requires_reason": True, "required_fields": []}
+    record = validate_supervised_attempt_output_against_contract(
+        attempt_record=attempt,
+        output_contract=output_contract,
+        validation_id="validation_types_bad",
+        validated_at="2026-07-06T00:00:00Z",
+    )
+    assert record["validation_status"] == "failed"
+    assert any(check["check_id"] == "required_field_types" and check["status"] == "failed" for check in record["checks"])
+    assert expected_message in "\n".join(record["diagnostics"])
+
+
 def test_fails_malformed_json_output():
     attempt = make_attempt_record('{"allowed_targets": []')
     output_contract = {"format": "json", "requires_reason": False, "required_fields": []}
@@ -291,7 +359,8 @@ def test_does_not_require_semantic_correctness_beyond_output_contract():
         validation_id="validation_009",
         validated_at="2026-07-06T00:00:00Z",
     )
-    assert record["validation_status"] == "passed"
+    assert record["validation_status"] == "failed"
+    assert any(check["check_id"] == "required_field_types" and check["status"] == "failed" for check in record["checks"])
 
 
 def test_rejects_input_attempt_already_marked_accepted():

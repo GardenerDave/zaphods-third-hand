@@ -212,6 +212,7 @@ Without explicit review metadata, ingest stops after validation and reports that
 ## Contract source and provenance
 
 Ingest validates against the exact `output_contract.json` created during prepare.
+Validation checks required field presence and basic required field types, including that `required_fields_present` is boolean `true`.
 
 Attempt provenance is recorded as manual operator-provided model output using:
 
@@ -220,3 +221,4 @@ manual_operator_pasted_model_output
 ```
 
 This is not synthetic fixture output.
+Validation remains evidence, not acceptance, and does not authorize promotion, training, model materialization, or automatic failure-to-curriculum capture.
