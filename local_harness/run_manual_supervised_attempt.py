@@ -274,6 +274,32 @@ def _build_retry_payload_skeleton(output_contract: dict[str, Any]) -> dict[str, 
     return skeleton
 
 
+def _load_structured_authorized_targets_for_retry(run_dir: Path) -> list[str] | None:
+    manifest_path = run_dir / "run_manifest.json"
+    if manifest_path.is_file():
+        try:
+            manifest = _read_json(manifest_path, kind="run manifest")
+        except ValueError:
+            manifest = None
+        if isinstance(manifest, dict):
+            targets = _load_structured_authorized_targets(run_dir, manifest)
+            if targets:
+                return targets
+
+    for packet_name in ("triage_packet.json", "orchestration_packet.json"):
+        packet_path = run_dir / packet_name
+        if not packet_path.is_file():
+            continue
+        payload = _read_json(packet_path, kind="structured authority packet")
+        if isinstance(payload.get("allowed_targets"), list):
+            targets = [
+                target for target in payload["allowed_targets"] if isinstance(target, str) and target.strip()
+            ]
+            if targets:
+                return targets
+    return None
+
+
 def _trim_text(text: str, *, limit: int = 1200) -> str:
     stripped = text.strip()
     if len(stripped) <= limit:
@@ -334,9 +360,6 @@ def _run_retry_contract(*, run_dir: Path, retry_id: int) -> dict[str, Any]:
     prompt_sections = [
         "Supervised Retry Prompt",
         "",
-        "Original model prompt packet:",
-        prompt_path.read_text(encoding="utf-8").rstrip(),
-        "",
         "Validation failure summary:",
         f"- validation_status: {validation_payload.get('validation_status')}",
     ]
@@ -344,36 +367,6 @@ def _run_retry_contract(*, run_dir: Path, retry_id: int) -> dict[str, Any]:
         prompt_sections.extend(["", "Validator checks:"] + check_lines)
     if diagnostic_lines:
         prompt_sections.extend(["", "Validator diagnostics:"] + [f"- {line}" for line in diagnostic_lines])
-    if output_contract is not None:
-        prompt_sections.extend(["", "Required output contract:"])
-        prompt_sections.append(json.dumps(output_contract, indent=2, sort_keys=True))
-        skeleton = _build_retry_payload_skeleton(output_contract)
-        if skeleton:
-            prompt_sections.extend(
-                [
-                    "",
-                    "Payload repair instructions",
-                    "Do not return the output contract itself.",
-                    "Do not return required_fields as a substitute for the payload.",
-                    "Do not return `required_fields` as a substitute for the payload.",
-                    "Do not describe the required fields.",
-                    "Return the actual payload fields required by the contract.",
-                    "Use the required field names as top-level keys in your JSON object.",
-                    "The following JSON skeleton is the payload shape only; it is not permission to fabricate evidence:",
-                    json.dumps(skeleton, indent=2, sort_keys=True),
-                    "",
-                    "Field guidance:",
-                    "allowed_targets: list only the task-authorized targets.",
-                    "held_targets: list out-of-scope targets or prohibited actions.",
-                    "scope_expansion_required: true only if the task cannot be completed within allowed targets.",
-                    "claims: list claims supported by the provided task/evidence only.",
-                    "evidence_basis: list the evidence lines or task facts supporting the claims.",
-                    "unverified_claims: list claims that are not verified by the provided evidence.",
-                    'format: must be "json".',
-                    "required_fields_present: must be true only when all required top-level fields are present.",
-                    "reason: non-empty explanation of why the output stays within scope.",
-                ]
-            )
     prompt_sections.extend(
         [
             "",
@@ -381,6 +374,59 @@ def _run_retry_contract(*, run_dir: Path, retry_id: int) -> dict[str, Any]:
             _trim_text(raw_output_path.read_text(encoding="utf-8")),
         ]
     )
+    if output_contract is not None:
+        prompt_sections.extend(["", "Required output contract:"])
+        prompt_sections.append(json.dumps(output_contract, indent=2, sort_keys=True))
+    structured_authorized_targets = _load_structured_authorized_targets_for_retry(run_dir)
+    if structured_authorized_targets:
+        prompt_sections.extend(
+            [
+                "",
+                "Structured authorized targets available for this run:",
+                *[f"- {target}" for target in structured_authorized_targets],
+                "allowed_targets must be a subset of the structured authorized targets.",
+            ]
+        )
+    prompt_sections.extend(
+        [
+            "",
+            "Payload repair instructions",
+            "Do not return the output contract itself.",
+            "Do not return required_fields as a substitute for the payload.",
+            "Do not return `required_fields` as a substitute for the payload.",
+            "Do not describe the required fields.",
+            "Return the actual payload fields required by the contract.",
+            "Use the required field names as top-level keys in your JSON object.",
+            "The following JSON skeleton is the payload shape only; it is not permission to fabricate evidence:",
+        ]
+    )
+    skeleton = _build_retry_payload_skeleton(output_contract) if output_contract is not None else {}
+    if skeleton:
+        prompt_sections.append(json.dumps(skeleton, indent=2, sort_keys=True))
+    prompt_sections.extend(
+        [
+            "",
+            "Field guidance:",
+            "allowed_targets: list only the task-authorized targets.",
+            "held_targets: list out-of-scope targets or prohibited actions.",
+            "scope_expansion_required: true only if the task cannot be completed within allowed targets.",
+            "claims: list claims supported by the provided task/evidence only.",
+            "evidence_basis: list the evidence lines or task facts supporting the claims.",
+            "unverified_claims: list claims that are not verified by the provided evidence.",
+            'format: must be "json".',
+            "required_fields_present: must be true only when all required top-level fields are present.",
+            "reason: non-empty explanation of why the output stays within scope.",
+            "",
+            "Final required JSON payload skeleton",
+            "Return a JSON object with every top-level key shown in this skeleton.",
+            "Do not omit any skeleton key.",
+            "Replace placeholder values only when the task evidence supports a more specific value.",
+            "If a list has no supported entries, keep it as [].",
+            "The final answer must be this payload shape, not the previous failed output.",
+        ]
+    )
+    if skeleton:
+        prompt_sections.append(json.dumps(skeleton, indent=2, sort_keys=True))
     prompt_sections.extend(
         [
             "",

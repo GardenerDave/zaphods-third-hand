@@ -524,11 +524,13 @@ def test_retry_contract_writes_failed_snapshots_and_updates_prompt(tmp_path: Pat
         run_dir / "output_validation_report.txt"
     ).read_text(encoding="utf-8")
     retry_prompt = (run_dir / "retry_prompt_to_paste_1.md").read_text(encoding="utf-8")
-    assert "Original model prompt packet text." in retry_prompt
     assert "Required output contract:" in retry_prompt
     assert "Payload repair instructions" in retry_prompt
-    assert "Do not return required_fields as a substitute for the payload." in retry_prompt
     assert "Previous failed output" in retry_prompt
+    assert "Final required JSON payload skeleton" in retry_prompt
+    assert "Do not omit any skeleton key" in retry_prompt
+    assert "The final answer must be this payload shape, not the previous failed output" in retry_prompt
+    assert retry_prompt.index("Previous failed output") < retry_prompt.index("Final required JSON payload skeleton")
     assert (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8") == retry_prompt
 
 
@@ -541,6 +543,8 @@ def test_retry_contract_prompt_includes_validator_diagnostics_and_contract_field
     assert "Validator diagnostics:" in retry_prompt
     assert "Required fields missing from parsed output: allowed_targets, held_targets" in retry_prompt
     assert "Do not return the output contract itself." in retry_prompt
+    assert "Do not omit any skeleton key" in retry_prompt
+    assert "The final answer must be this payload shape, not the previous failed output" in retry_prompt
     assert "Return the actual payload fields required by the contract." in retry_prompt
     assert "allowed_targets: list only the task-authorized targets." in retry_prompt
     assert "claims: list claims supported by the provided task/evidence only." in retry_prompt
@@ -555,6 +559,22 @@ def test_retry_contract_prompt_includes_validator_diagnostics_and_contract_field
     assert '"unverified_claims": []' in retry_prompt
     assert '"scope_expansion_required": false' in retry_prompt
     assert "output contract metadata instead of payload" in retry_prompt
+    assert retry_prompt.index("Previous failed output") < retry_prompt.index("Final required JSON payload skeleton")
+
+
+def test_retry_contract_includes_direct_structured_authority_guidance(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260707T212129Z")
+    _write_retry_contract_inputs(run_dir)
+    (run_dir / "triage_packet.json").write_text(
+        json.dumps({"allowed_targets": ["docs/reports/"]}),
+        encoding="utf-8",
+    )
+    result = run_script("retry-contract", "--run-dir", run_dir, "--retry-id", "1")
+    assert result.returncode == 0
+    retry_prompt = (run_dir / "retry_prompt_to_paste_1.md").read_text(encoding="utf-8")
+    assert "Structured authorized targets available for this run:" in retry_prompt
+    assert "- docs/reports/" in retry_prompt
+    assert "allowed_targets must be a subset of the structured authorized targets." in retry_prompt
 
 
 def test_retry_contract_refuses_existing_failed_snapshots(tmp_path: Path):
