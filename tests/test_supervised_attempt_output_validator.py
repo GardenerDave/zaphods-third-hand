@@ -263,6 +263,67 @@ def test_passes_when_allowed_targets_are_within_authorized_targets():
     assert any(check["check_id"] == "target_authority" and check["status"] == "passed" for check in record["checks"])
 
 
+def test_passes_when_allowed_and_held_targets_do_not_overlap():
+    attempt = make_attempt_record(
+        '{"allowed_targets": ["docs/reports/"], "held_targets": ["production automation"], "scope_expansion_required": true, "claims": [], "evidence_basis": [], "unverified_claims": [], "format": "json", "required_fields_present": true, "reason": "bounded"}'
+    )
+    output_contract = {"format": "json", "requires_reason": True, "required_fields": []}
+    record = validate_supervised_attempt_output_against_contract(
+        attempt_record=attempt,
+        output_contract=output_contract,
+        validation_id="validation_sep_ok",
+        validated_at="2026-07-06T00:00:00Z",
+        authorized_targets=["docs/reports/"],
+    )
+    assert record["validation_status"] == "passed"
+    assert any(
+        check["check_id"] == "allowed_held_target_separation" and check["status"] == "passed"
+        for check in record["checks"]
+    )
+
+
+def test_rejects_allowed_and_held_target_overlap():
+    attempt = make_attempt_record(
+        '{"allowed_targets": ["docs/reports/"], "held_targets": ["docs/reports/"], "scope_expansion_required": true, "claims": [], "evidence_basis": [], "unverified_claims": [], "format": "json", "required_fields_present": true, "reason": "bounded"}'
+    )
+    output_contract = {"format": "json", "requires_reason": True, "required_fields": []}
+    record = validate_supervised_attempt_output_against_contract(
+        attempt_record=attempt,
+        output_contract=output_contract,
+        validation_id="validation_sep_bad",
+        validated_at="2026-07-06T00:00:00Z",
+        authorized_targets=["docs/reports/"],
+    )
+    assert record["validation_status"] == "failed"
+    assert any(
+        check["check_id"] == "allowed_held_target_separation" and check["status"] == "failed"
+        for check in record["checks"]
+    )
+    assert "Target cannot be both allowed and held: docs/reports/" in "\n".join(record["diagnostics"])
+
+
+def test_rejects_multiple_allowed_and_held_target_overlaps():
+    attempt = make_attempt_record(
+        '{"allowed_targets": ["docs/reports/", "design_packet"], "held_targets": ["docs/reports/", "design_packet"], "scope_expansion_required": true, "claims": [], "evidence_basis": [], "unverified_claims": [], "format": "json", "required_fields_present": true, "reason": "bounded"}'
+    )
+    output_contract = {"format": "json", "requires_reason": True, "required_fields": []}
+    record = validate_supervised_attempt_output_against_contract(
+        attempt_record=attempt,
+        output_contract=output_contract,
+        validation_id="validation_sep_multi_bad",
+        validated_at="2026-07-06T00:00:00Z",
+        authorized_targets=["docs/reports/", "design_packet"],
+    )
+    assert record["validation_status"] == "failed"
+    assert any(
+        check["check_id"] == "allowed_held_target_separation" and check["status"] == "failed"
+        for check in record["checks"]
+    )
+    diagnostics = "\n".join(record["diagnostics"])
+    assert "Target cannot be both allowed and held: design_packet" in diagnostics
+    assert "Target cannot be both allowed and held: docs/reports/" in diagnostics
+
+
 def test_rejects_unauthorized_allowed_targets():
     attempt = make_attempt_record(
         '{"allowed_targets": ["design_packet"], "held_targets": [], "scope_expansion_required": false, "claims": [], "evidence_basis": [], "unverified_claims": [], "format": "json", "required_fields_present": true, "reason": "bounded"}'

@@ -262,6 +262,40 @@ def _check_required_field_types(payload: dict[str, Any]) -> tuple[list[str], dic
     }
 
 
+def _check_allowed_held_target_separation(
+    payload: dict[str, Any],
+) -> tuple[list[str], dict[str, Any]]:
+    allowed_targets = payload.get("allowed_targets")
+    held_targets = payload.get("held_targets")
+    if not isinstance(allowed_targets, list) or not isinstance(held_targets, list):
+        return [], {
+            "check_id": "allowed_held_target_separation",
+            "status": "not_applicable",
+            "message": "Allowed/held target separation requires list-valued allowed_targets and held_targets.",
+        }
+
+    overlap = sorted(
+        {
+            target
+            for target in allowed_targets
+            if isinstance(target, str)
+            and target.strip()
+            and target in held_targets
+        }
+    )
+    if overlap:
+        return overlap, {
+            "check_id": "allowed_held_target_separation",
+            "status": "failed",
+            "message": "Target cannot be both allowed and held: " + ", ".join(overlap),
+        }
+    return [], {
+        "check_id": "allowed_held_target_separation",
+        "status": "passed",
+        "message": "Allowed and held targets are separated.",
+    }
+
+
 def _parse_json_with_duplicate_key_detection(raw_text: str) -> tuple[Any, list[str]]:
     duplicate_keys: list[str] = []
 
@@ -388,6 +422,12 @@ def validate_supervised_attempt_output_against_contract(
         checks.append(type_check)
         if invalid_types:
             diagnostics.extend(invalid_types)
+        overlap_targets, separation_check = _check_allowed_held_target_separation(parsed_output)
+        checks.append(separation_check)
+        if overlap_targets:
+            diagnostics.extend(
+                [f"Target cannot be both allowed and held: {target}" for target in overlap_targets]
+            )
     elif contract_format == "json":
         checks.append(
             {

@@ -220,6 +220,7 @@ Ingest validates against the exact `output_contract.json` created during prepare
 Validation checks required field presence and basic required field types, including that `required_fields_present` is boolean `true`.
 Validation also rejects duplicate JSON keys because they create provenance and contract ambiguity.
 When structured run artifacts provide authorized targets, validation can also reject `allowed_targets` values that exceed that authority.
+Validation also rejects targets that appear in both `allowed_targets` and `held_targets`, which prevents structurally valid but contradictory target-scope outputs.
 
 Attempt provenance is recorded as manual operator-provided model output using:
 
