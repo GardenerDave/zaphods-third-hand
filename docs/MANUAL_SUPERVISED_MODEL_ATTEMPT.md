@@ -156,8 +156,8 @@ python3 local_harness/run_manual_supervised_attempt.py call-local \
   --overwrite
 ```
 
-The retry helper prepares a supervised retry prompt and snapshots failure evidence. It does not call a model, accept output, promote output, train, materialize adapters, or perform automatic failure-to-curriculum capture.
-It also warns the model not to return the output contract itself or merely describe the required fields.
+The retry helper prepares a stronger supervised retry prompt and snapshots failure evidence. It includes a JSON skeleton derived from the output contract, the previous failed output, and validator diagnostics. The skeleton is a payload shape only and is not permission to fabricate evidence.
+It still does not call a model, accept output, promote output, train, materialize adapters, or perform automatic failure-to-curriculum capture.
 
 ### Export training pattern candidate mode
 

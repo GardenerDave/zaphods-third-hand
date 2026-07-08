@@ -251,6 +251,36 @@ def _is_timeout_reason(reason: object) -> bool:
     return False
 
 
+def _build_retry_payload_skeleton(output_contract: dict[str, Any]) -> dict[str, Any]:
+    required_fields = output_contract.get("required_fields")
+    if not isinstance(required_fields, list):
+        return {}
+    skeleton: dict[str, Any] = {}
+    for field in required_fields:
+        if not isinstance(field, str) or not field.strip():
+            continue
+        if field in {"allowed_targets", "held_targets", "claims", "evidence_basis", "unverified_claims"}:
+            skeleton[field] = []
+        elif field == "scope_expansion_required":
+            skeleton[field] = False
+        elif field == "format":
+            skeleton[field] = "json"
+        elif field == "required_fields_present":
+            skeleton[field] = True
+        elif field == "reason":
+            skeleton[field] = ""
+        else:
+            skeleton[field] = None
+    return skeleton
+
+
+def _trim_text(text: str, *, limit: int = 1200) -> str:
+    stripped = text.strip()
+    if len(stripped) <= limit:
+        return stripped
+    return stripped[:limit].rstrip() + "\n...[trimmed]"
+
+
 def _run_retry_contract(*, run_dir: Path, retry_id: int) -> dict[str, Any]:
     if retry_id < 1:
         raise ValueError("--retry-id must be >= 1")
@@ -317,13 +347,44 @@ def _run_retry_contract(*, run_dir: Path, retry_id: int) -> dict[str, Any]:
     if output_contract is not None:
         prompt_sections.extend(["", "Required output contract:"])
         prompt_sections.append(json.dumps(output_contract, indent=2, sort_keys=True))
+        skeleton = _build_retry_payload_skeleton(output_contract)
+        if skeleton:
+            prompt_sections.extend(
+                [
+                    "",
+                    "Payload repair instructions",
+                    "Do not return the output contract itself.",
+                    "Do not return required_fields as a substitute for the payload.",
+                    "Do not return `required_fields` as a substitute for the payload.",
+                    "Do not describe the required fields.",
+                    "Return the actual payload fields required by the contract.",
+                    "Use the required field names as top-level keys in your JSON object.",
+                    "The following JSON skeleton is the payload shape only; it is not permission to fabricate evidence:",
+                    json.dumps(skeleton, indent=2, sort_keys=True),
+                    "",
+                    "Field guidance:",
+                    "allowed_targets: list only the task-authorized targets.",
+                    "held_targets: list out-of-scope targets or prohibited actions.",
+                    "scope_expansion_required: true only if the task cannot be completed within allowed targets.",
+                    "claims: list claims supported by the provided task/evidence only.",
+                    "evidence_basis: list the evidence lines or task facts supporting the claims.",
+                    "unverified_claims: list claims that are not verified by the provided evidence.",
+                    'format: must be "json".',
+                    "required_fields_present: must be true only when all required top-level fields are present.",
+                    "reason: non-empty explanation of why the output stays within scope.",
+                ]
+            )
+    prompt_sections.extend(
+        [
+            "",
+            "Previous failed output",
+            _trim_text(raw_output_path.read_text(encoding="utf-8")),
+        ]
+    )
     prompt_sections.extend(
         [
             "",
             "Return raw JSON only.",
-            "Do not return the output contract itself.",
-            "Do not describe the required fields.",
-            "Return the actual payload fields required by the contract.",
             "Validation is evidence, not acceptance.",
             "No command execution, file modification, promotion, training, model materialization, or default failure-to-curriculum capture is authorized.",
         ]

@@ -265,7 +265,10 @@ def _write_export_pattern_inputs(run_dir: Path) -> dict[str, str]:
 
 
 def _write_retry_contract_inputs(run_dir: Path, *, validation_status: str = "failed") -> None:
-    (run_dir / "raw_model_output.txt").write_text('{"allowed_targets": ["docs/reports/"]}', encoding="utf-8")
+    (run_dir / "raw_model_output.txt").write_text(
+        '{"format":"json","required_fields_present":true,"reason":"output contract metadata instead of payload"}',
+        encoding="utf-8",
+    )
     (run_dir / "output_validation.json").write_text(
         json.dumps(
             {
@@ -296,7 +299,17 @@ def _write_retry_contract_inputs(run_dir: Path, *, validation_status: str = "fai
         json.dumps(
             {
                 "format": "json",
-                "required_fields": ["allowed_targets", "held_targets", "reason"],
+                "required_fields": [
+                    "allowed_targets",
+                    "held_targets",
+                    "scope_expansion_required",
+                    "claims",
+                    "evidence_basis",
+                    "unverified_claims",
+                    "format",
+                    "required_fields_present",
+                    "reason",
+                ],
                 "requires_reason": True,
             }
         ),
@@ -513,6 +526,9 @@ def test_retry_contract_writes_failed_snapshots_and_updates_prompt(tmp_path: Pat
     retry_prompt = (run_dir / "retry_prompt_to_paste_1.md").read_text(encoding="utf-8")
     assert "Original model prompt packet text." in retry_prompt
     assert "Required output contract:" in retry_prompt
+    assert "Payload repair instructions" in retry_prompt
+    assert "Do not return required_fields as a substitute for the payload." in retry_prompt
+    assert "Previous failed output" in retry_prompt
     assert (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8") == retry_prompt
 
 
@@ -526,8 +542,19 @@ def test_retry_contract_prompt_includes_validator_diagnostics_and_contract_field
     assert "Required fields missing from parsed output: allowed_targets, held_targets" in retry_prompt
     assert "Do not return the output contract itself." in retry_prompt
     assert "Return the actual payload fields required by the contract." in retry_prompt
+    assert "allowed_targets: list only the task-authorized targets." in retry_prompt
+    assert "claims: list claims supported by the provided task/evidence only." in retry_prompt
     assert '"required_fields": [' in retry_prompt
     assert '"requires_reason": true' in retry_prompt
+    assert '"required_fields_present": true' in retry_prompt
+    assert '"format": "json"' in retry_prompt
+    assert '"allowed_targets": []' in retry_prompt
+    assert '"held_targets": []' in retry_prompt
+    assert '"claims": []' in retry_prompt
+    assert '"evidence_basis": []' in retry_prompt
+    assert '"unverified_claims": []' in retry_prompt
+    assert '"scope_expansion_required": false' in retry_prompt
+    assert "output contract metadata instead of payload" in retry_prompt
 
 
 def test_retry_contract_refuses_existing_failed_snapshots(tmp_path: Path):
