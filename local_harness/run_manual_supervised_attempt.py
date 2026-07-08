@@ -866,19 +866,24 @@ def _resolve_manifest(run_dir: Path) -> tuple[dict[str, Any], Path]:
 
 
 def _load_structured_authorized_targets(run_dir: Path, manifest: dict[str, Any]) -> list[str] | None:
+    candidate_paths: list[Path] = []
     artifacts = manifest.get("artifacts")
-    if not isinstance(artifacts, dict):
-        return None
-    candidate_paths = [
-        artifacts.get("triage_packet"),
-        artifacts.get("orchestration_packet"),
-    ]
-    for candidate_path in candidate_paths:
-        if not isinstance(candidate_path, str) or not candidate_path.strip():
+    if isinstance(artifacts, dict):
+        for candidate_path in [artifacts.get("triage_packet"), artifacts.get("orchestration_packet")]:
+            if isinstance(candidate_path, str) and candidate_path.strip():
+                path = Path(candidate_path)
+                if not path.is_absolute():
+                    path = run_dir / path
+                candidate_paths.append(path)
+
+    manifest_packet_paths = [run_dir / "triage_packet.json", run_dir / "orchestration_packet.json"]
+    candidate_paths.extend(manifest_packet_paths)
+
+    seen_paths: set[Path] = set()
+    for path in candidate_paths:
+        if path in seen_paths:
             continue
-        path = Path(candidate_path)
-        if not path.is_absolute():
-            path = run_dir / path
+        seen_paths.add(path)
         if not path.is_file():
             continue
         payload = _read_json(path, kind="structured authority packet")

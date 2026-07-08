@@ -1247,6 +1247,50 @@ def test_ingest_rejects_unauthorized_allowed_targets(tmp_path: Path):
     assert "validation_status: failed" in result.stdout
 
 
+def test_load_structured_authorized_targets_prefers_direct_triage_packet(tmp_path: Path):
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    (run_dir / "triage_packet.json").write_text(
+        json.dumps({"allowed_targets": ["docs/reports/"]}),
+        encoding="utf-8",
+    )
+    manifest = {"artifacts": {}}
+    assert manual_attempt._load_structured_authorized_targets(run_dir, manifest) == ["docs/reports/"]
+
+
+def test_load_structured_authorized_targets_uses_direct_orchestration_packet_when_triage_missing(tmp_path: Path):
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    (run_dir / "orchestration_packet.json").write_text(
+        json.dumps({"allowed_targets": ["docs/reports/"]}),
+        encoding="utf-8",
+    )
+    manifest = {"artifacts": {}}
+    assert manual_attempt._load_structured_authorized_targets(run_dir, manifest) == ["docs/reports/"]
+
+
+def test_load_structured_authorized_targets_prefers_triage_over_orchestration(tmp_path: Path):
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    (run_dir / "triage_packet.json").write_text(
+        json.dumps({"allowed_targets": ["docs/reports/"]}),
+        encoding="utf-8",
+    )
+    (run_dir / "orchestration_packet.json").write_text(
+        json.dumps({"allowed_targets": ["design_packet"]}),
+        encoding="utf-8",
+    )
+    manifest = {"artifacts": {}}
+    assert manual_attempt._load_structured_authorized_targets(run_dir, manifest) == ["docs/reports/"]
+
+
+def test_load_structured_authorized_targets_returns_none_when_missing_structured_packets(tmp_path: Path):
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    manifest = {"artifacts": {}}
+    assert manual_attempt._load_structured_authorized_targets(run_dir, manifest) is None
+
+
 def test_ingest_without_review_keeps_not_reviewed_and_prints_review_required(tmp_path: Path):
     run_dir = _prepare_run(tmp_path, timestamp="20260707T080808Z")
     source_raw = tmp_path / "raw_model_output.txt"
