@@ -33,7 +33,7 @@ REQUIRED_VALIDATION_RECORD_KEYS = {
     "review_required",
 }
 VALIDATION_STATUSES = {"passed", "failed"}
-CHECK_STATUSES = {"passed", "failed"}
+CHECK_STATUSES = {"passed", "failed", "not_applicable"}
 REQUIRED_VALIDATION_AUTHORITY_BOUNDARIES = [
     "Validation is evidence, not acceptance.",
     *ATTEMPT_REQUIRED_AUTHORITY_BOUNDARIES,
@@ -183,7 +183,9 @@ def validate_supervised_attempt_output_validation_record(record: Any) -> dict[st
     if record.get("review_required") is not True:
         raise SupervisedAttemptOutputValidationError("review_required must be true")
 
-    if validation_status == "passed" and any(check["status"] != "passed" for check in checks):
+    if validation_status == "passed" and any(
+        check["status"] not in {"passed", "not_applicable"} for check in checks
+    ):
         raise SupervisedAttemptOutputValidationError(
             "validation_status cannot be 'passed' when any required check failed"
         )
@@ -281,6 +283,7 @@ def validate_supervised_attempt_output_against_contract(
     output_contract: dict[str, Any],
     validation_id: str,
     validated_at: str,
+    authorized_targets: list[str] | None = None,
 ) -> dict[str, Any]:
     try:
         validated_attempt = validate_supervised_model_attempt_record(attempt_record)
@@ -402,6 +405,63 @@ def validate_supervised_attempt_output_against_contract(
             }
         )
 
+    target_authority_status = "not_applicable"
+    if isinstance(parsed_output, dict):
+        allowed_targets = parsed_output.get("allowed_targets")
+        if authorized_targets is None:
+            target_authority_status = "not_applicable"
+            checks.append(
+                {
+                    "check_id": "target_authority",
+                    "status": "not_applicable",
+                    "message": "Structured authorized targets were not available for this run.",
+                }
+            )
+        elif isinstance(allowed_targets, list):
+            unauthorized_targets = [
+                target for target in allowed_targets if target not in authorized_targets
+            ]
+            if unauthorized_targets:
+                target_authority_status = "failed"
+                checks.append(
+                    {
+                        "check_id": "target_authority",
+                        "status": "failed",
+                        "message": "Unauthorized allowed target in raw model output: "
+                        + ", ".join(sorted(unauthorized_targets)),
+                    }
+                )
+                diagnostics.extend(
+                    [f"Unauthorized allowed target in raw model output: {target}" for target in sorted(unauthorized_targets)]
+                )
+            else:
+                target_authority_status = "passed"
+                checks.append(
+                    {
+                        "check_id": "target_authority",
+                        "status": "passed",
+                        "message": "Allowed targets stay within structured authorized targets.",
+                    }
+                )
+        else:
+            target_authority_status = "failed"
+            checks.append(
+                {
+                    "check_id": "target_authority",
+                    "status": "failed",
+                    "message": "allowed_targets must be a list to evaluate target authority.",
+                }
+            )
+            diagnostics.append("allowed_targets must be a list to evaluate target authority.")
+    else:
+        checks.append(
+            {
+                "check_id": "target_authority",
+                "status": "not_applicable",
+                "message": "Target authority check requires a parsed JSON object.",
+            }
+        )
+
     requires_reason = bool(output_contract.get("requires_reason"))
     if requires_reason:
         if isinstance(parsed_output, dict):
@@ -440,7 +500,11 @@ def validate_supervised_attempt_output_against_contract(
                 }
             )
 
-    validation_status = "passed" if all(check["status"] == "passed" for check in checks) else "failed"
+    validation_status = (
+        "passed"
+        if all(check["status"] in {"passed", "not_applicable"} for check in checks)
+        else "failed"
+    )
 
     validation_record = {
         "validation_id": validation_id,
@@ -461,6 +525,7 @@ def validate_supervised_attempt_output_against_contract(
             "input_attempt_id": validated_attempt["attempt_id"],
         },
         "review_required": True,
+        "target_authority_status": target_authority_status,
     }
 
     return validate_supervised_attempt_output_validation_record(validation_record)

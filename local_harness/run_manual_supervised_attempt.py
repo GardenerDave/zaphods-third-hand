@@ -865,6 +865,32 @@ def _resolve_manifest(run_dir: Path) -> tuple[dict[str, Any], Path]:
     return manifest, manifest_path
 
 
+def _load_structured_authorized_targets(run_dir: Path, manifest: dict[str, Any]) -> list[str] | None:
+    artifacts = manifest.get("artifacts")
+    if not isinstance(artifacts, dict):
+        return None
+    candidate_paths = [
+        artifacts.get("triage_packet"),
+        artifacts.get("orchestration_packet"),
+    ]
+    for candidate_path in candidate_paths:
+        if not isinstance(candidate_path, str) or not candidate_path.strip():
+            continue
+        path = Path(candidate_path)
+        if not path.is_absolute():
+            path = run_dir / path
+        if not path.is_file():
+            continue
+        payload = _read_json(path, kind="structured authority packet")
+        if isinstance(payload.get("allowed_targets"), list):
+            allowed_targets = [
+                target for target in payload["allowed_targets"] if isinstance(target, str) and target.strip()
+            ]
+            if allowed_targets:
+                return allowed_targets
+    return None
+
+
 def _require_nonempty(value: str | None, *, field: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"{field} must be a non-empty string")
@@ -887,6 +913,7 @@ def run_ingest(
         _require_nonempty(artifacts.get("model_prompt_packet"), field="artifacts.model_prompt_packet")
     )
     output_contract = _read_json(output_contract_path, kind="output contract")
+    authorized_targets = _load_structured_authorized_targets(run_dir, manifest)
 
     if not raw_output_file.is_file():
         raise ValueError(f"--raw-output-file does not exist: {raw_output_file}")
@@ -925,6 +952,7 @@ def run_ingest(
         output_contract=output_contract,
         validation_id=f"manual_validation_{ts}",
         validated_at=_utc_iso(),
+        authorized_targets=authorized_targets,
     )
 
     attempt_path = run_dir / "supervised_model_attempt.json"

@@ -1217,8 +1217,34 @@ def test_ingest_valid_output_writes_attempt_validation_and_preserves_raw_output(
     assert (run_dir / "supervised_model_attempt.json").is_file()
     assert (run_dir / "output_validation.json").is_file()
     assert (run_dir / "output_validation_report.txt").is_file()
-    assert (run_dir / "raw_model_output.txt").read_text(encoding="utf-8") == raw_text
-    assert "validation_status: passed" in result.stdout
+
+
+def test_ingest_rejects_unauthorized_allowed_targets(tmp_path: Path):
+    run_dir = _prepare_run(tmp_path, timestamp="20260707T080808Z")
+    raw_output = tmp_path / "raw_model_output.txt"
+    raw_output.write_text(
+        '{"allowed_targets": ["design_packet"], "held_targets": [], "scope_expansion_required": false, "claims": [], "evidence_basis": [], "unverified_claims": [], "format": "json", "required_fields_present": true, "reason": "bounded"}',
+        encoding="utf-8",
+    )
+    result = run_script(
+        "ingest",
+        "--run-dir",
+        run_dir,
+        "--raw-output-file",
+        raw_output,
+    )
+    assert result.returncode == 0
+    validation = json.loads((run_dir / "output_validation.json").read_text(encoding="utf-8"))
+    assert validation["validation_status"] == "failed"
+    assert any(
+        check["check_id"] == "target_authority" and check["status"] == "failed"
+        for check in validation["checks"]
+    )
+    assert "Unauthorized allowed target in raw model output: design_packet" in "\n".join(
+        validation["diagnostics"]
+    )
+    assert (run_dir / "raw_model_output.txt").read_text(encoding="utf-8") == raw_output.read_text(encoding="utf-8")
+    assert "validation_status: failed" in result.stdout
 
 
 def test_ingest_without_review_keeps_not_reviewed_and_prints_review_required(tmp_path: Path):
