@@ -181,6 +181,11 @@ python3 local_harness/run_manual_supervised_attempt.py export-pattern \
 `export-pattern` writes one candidate JSON artifact and preserves failed/success raw outputs, correction prompt, and validation evidence exactly.
 It is marked as a candidate only (`not_training_data_until_reviewed: true`, `not_automatic_curriculum_capture: true`).
 
+### Mini-batch runner
+
+`run_manual_supervised_attempt_batch.py` orchestrates existing `session -> call-local -> ingest` commands for a bounded task list and writes batch ledger and summary artifacts.
+It does not accept outputs automatically, export patterns automatically, execute or apply model output, train, promote, materialize adapters, or add automatic failure-to-curriculum capture.
+
 ### Ingest
 
 Ingest reads operator-provided raw model output and writes:
