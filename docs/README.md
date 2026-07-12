@@ -65,6 +65,9 @@ approve their own outputs or move lifecycle state.
 - [`VOGON_PRINTER.md`](VOGON_PRINTER.md) — navigation for the model-free
   Agent Task Session, Tool Maker, Change Closeout, scaffold validation, repo
   health, and Git sync/cleanup advisor family.
+- [`LOCAL_SUBAGENT_CAPABILITY_LADDER.md`](LOCAL_SUBAGENT_CAPABILITY_LADDER.md)
+  — current supervised capability ladder for model calls, advisory subagents,
+  patch drafting, tool-using implementation, and independent coding claims.
 
 ## Tool Maker
 
