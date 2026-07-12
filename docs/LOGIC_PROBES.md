@@ -131,6 +131,8 @@ Raw files preserve the prompt, request payload, endpoint, elapsed duration,
 complete endpoint response, extracted response text, and any error. Scored
 files contain per-probe status, score, failures, warnings, matched checks,
 machine-readable `failure_mode_tags`, and available response diagnostics.
+The scorer accepts `duration_seconds` and the legacy `elapsed_seconds` raw
+field when aggregating duration diagnostics.
 
 The Markdown summary separates each model's evidence into Strengths,
 Mixed / Warnings, Failures, and Errors. It also reports endpoint and timeout

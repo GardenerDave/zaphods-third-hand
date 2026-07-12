@@ -651,6 +651,8 @@ def _load_raw_response(
         )
 
     duration = record.get("duration_seconds")
+    if not isinstance(duration, (int, float)) or isinstance(duration, bool):
+        duration = record.get("elapsed_seconds")
     response = record.get("response")
     if (
         (not isinstance(duration, (int, float)) or isinstance(duration, bool))

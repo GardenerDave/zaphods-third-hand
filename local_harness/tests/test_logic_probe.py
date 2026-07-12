@@ -46,6 +46,7 @@ def write_raw(
     response_text=None,
     error=None,
     duration_seconds=None,
+    elapsed_seconds=None,
     finish_reason=None,
     response=None,
 ):
@@ -67,6 +68,8 @@ def write_raw(
     }
     if duration_seconds is not None:
         record["duration_seconds"] = duration_seconds
+    if elapsed_seconds is not None:
+        record["elapsed_seconds"] = elapsed_seconds
     if response is not None:
         record["response"] = response
     path.write_text(json.dumps(record), encoding="utf-8")
@@ -397,6 +400,35 @@ def test_summary_includes_finish_reason_and_duration_diagnostics(tmp_path):
     assert "1.500s" in summary
     assert "2.000s" in summary
     assert "Output-budget warning: finish_reason `length` occurred 1 time(s)" in summary
+
+
+def test_summary_accepts_elapsed_seconds_alias_in_raw_evidence(tmp_path):
+    document = fixture(
+        probe({"must_include": ["human review"]}, probe_id="first"),
+        probe({"must_include": ["human review"]}, probe_id="second"),
+    )
+    responses = tmp_path / "run" / "raw"
+    out_dir = tmp_path / "run"
+    write_raw(
+        responses / "test-model" / "first.json",
+        model_id="test-model",
+        probe_id="first",
+        response_text="Human review remains required.",
+        elapsed_seconds=2.0,
+    )
+    write_raw(
+        responses / "test-model" / "second.json",
+        model_id="test-model",
+        probe_id="second",
+        response_text="Human review remains required.",
+        elapsed_seconds=4.0,
+    )
+
+    score_response_directory(document, responses, out_dir)
+    summary = (out_dir / "LOGIC_PROBE_SUMMARY.md").read_text(encoding="utf-8")
+
+    assert "3.000s" in summary
+    assert "4.000s" in summary
 
 
 def test_score_command_writes_deterministic_scored_evidence(tmp_path, capsys):
