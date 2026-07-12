@@ -119,6 +119,9 @@ The accepted artifact retains review caveats:
 - `SMALL_MODEL_AUDITION_2026-06-19.md` — exploratory small-model GGUF, endpoint, and prompt observations.
 - `CODING_DELEGATION_DOGFOOD_2026-07-02.md` — blocked coding-delegation evidence showing the local 1.7B path was unavailable in this environment.
 - `QWEN3_CODER_SUPERVISED_DOGFOOD_2026-07-11.md` — preserved logic-probe progression, fixture correction, and duration-diagnostic repair evidence.
+- `QWEN3_CODER_TRIAGE_ROUTER_REVIEW_2026-07-12.md` — branch review of the
+  reusable endpoint logic-probe workflow and authority scoring fix on
+  `triage-router-supervised-attempts`.
 
 ## Safety Reminder
 
