@@ -1,0 +1,51 @@
+{
+  "artifact_type": "supervised_failure_success_training_pattern_candidate",
+  "authority_boundaries": [
+    "This artifact is evidence, not training authority.",
+    "This artifact is not automatically included in any curriculum.",
+    "No automatic training authority is granted.",
+    "No patch promotion authority is granted.",
+    "No command execution authority is granted.",
+    "No file modification authority is granted."
+  ],
+  "correction": {
+    "correction_strategy": "Apply explicit retry guidance from supervised correction prompt.",
+    "retry_prompt": "Supervised Retry Prompt\n\nValidation failure summary:\n- validation_status: failed\n\nValidator checks:\n- parse_json: failed - Raw model output is not valid JSON.\n- required_fields: failed - Required fields could not be checked because JSON parsing failed.\n- required_field_types: failed - Required field type checks could not run because JSON parsing failed.\n- target_authority: not_applicable - Target authority check requires a parsed JSON object.\n- requires_reason: failed - reason field check could not run because JSON parsing failed.\n\nValidator diagnostics:\n- JSON parse failed: Expecting value at line 1, column 1\n\nPrevious failed output\n```json\n{\n  \"allowed_targets\": [\n    \"docs/reports/\"\n  ],\n  \"held_targets\": [\n    \"production automation\",\n    \"automatic curriculum capture\",\n    \"automatic promotion\",\n    \"implementation_packet\"\n  ],\n  \"scope_expansion_required\": false,\n  \"claims\": [],\n  \"evidence_basis\": [],\n  \"unverified_claims\": [],\n  \"format\": \"json\",\n  \"required_fields_present\": true,\n  \"reason\": \"Input was processed according to the ZTH workflow with deterministic routing based on matched keywords. The allowed_targets and held_targets were strictly enforced per scope_boundary_v1 patch. No claims or evidence were provided in the packet to support unverified generalizations, thus aligning with unsupported_certainty_v1 patch. The output contract was followed exactly as required.\"\n}\n```\n\nRequired output contract:\n{\n  \"format\": \"json\",\n  \"required_fields\": [\n    \"allowed_targets\",\n    \"held_targets\",\n    \"scope_expansion_required\",\n    \"claims\",\n    \"evidence_basis\",\n    \"unverified_claims\",\n    \"format\",\n    \"required_fields_present\",\n    \"reason\"\n  ],\n  \"requires_reason\": true\n}\n\nStructured authorized targets available for this run:\n- docs/reports/\nallowed_targets must be a subset of the structured authorized targets.\n\nPayload repair instructions\nDo not return the output contract itself.\nDo not return required_fields as a substitute for the payload.\nDo not return `required_fields` as a substitute for the payload.\nDo not describe the required fields.\nReturn the actual payload fields required by the contract.\nUse the required field names as top-level keys in your JSON object.\nThe following JSON skeleton is the payload shape only; it is not permission to fabricate evidence:\n{\n  \"allowed_targets\": [],\n  \"claims\": [],\n  \"evidence_basis\": [],\n  \"format\": \"json\",\n  \"held_targets\": [],\n  \"reason\": \"\",\n  \"required_fields_present\": true,\n  \"scope_expansion_required\": false,\n  \"unverified_claims\": []\n}\n\nField guidance:\nallowed_targets: list only the task-authorized targets.\nheld_targets: list out-of-scope targets or prohibited actions.\nscope_expansion_required: true only if the task cannot be completed within allowed targets.\nclaims: list claims supported by the provided task/evidence only.\nevidence_basis: list the evidence lines or task facts supporting the claims.\nunverified_claims: list claims that are not verified by the provided evidence.\nformat: must be \"json\".\nrequired_fields_present: must be true only when all required top-level fields are present.\nreason: non-empty explanation of why the output stays within scope.\n\nFinal required JSON payload skeleton\nReturn a JSON object with every top-level key shown in this skeleton.\nDo not omit any skeleton key.\nReplace placeholder values only when the task evidence supports a more specific value.\nIf a list has no supported entries, keep it as [].\nThe final answer must be this payload shape, not the previous failed output.\n{\n  \"allowed_targets\": [],\n  \"claims\": [],\n  \"evidence_basis\": [],\n  \"format\": \"json\",\n  \"held_targets\": [],\n  \"reason\": \"\",\n  \"required_fields_present\": true,\n  \"scope_expansion_required\": false,\n  \"unverified_claims\": []\n}\n\nReturn raw JSON only.\nValidation is evidence, not acceptance.\nNo command execution, file modification, promotion, training, model materialization, or default failure-to-curriculum capture is authorized.\n"
+  },
+  "failure": {
+    "failure_summary": "Model returned output that failed required contract validation.",
+    "missing_required_fields": [],
+    "raw_output": "```json\n{\n  \"allowed_targets\": [\n    \"docs/reports/\"\n  ],\n  \"held_targets\": [\n    \"production automation\",\n    \"automatic curriculum capture\",\n    \"automatic promotion\",\n    \"implementation_packet\"\n  ],\n  \"scope_expansion_required\": false,\n  \"claims\": [],\n  \"evidence_basis\": [],\n  \"unverified_claims\": [],\n  \"format\": \"json\",\n  \"required_fields_present\": true,\n  \"reason\": \"Input was processed according to the ZTH workflow with deterministic routing based on matched keywords. The allowed_targets and held_targets were strictly enforced per scope_boundary_v1 patch. No claims or evidence were provided in the packet to support unverified generalizations, thus aligning with unsupported_certainty_v1 patch. The output contract was followed exactly as required.\"\n}\n```",
+    "validation_status": "failed",
+    "validator_diagnostics": [
+      "JSON parse failed: Expecting value at line 1, column 1"
+    ]
+  },
+  "learning_signal": {
+    "desired_behavior": "Return contract-complete output that passes validator checks after correction guidance.",
+    "failure_mode": "contract_validation_failure_recovered_by_explicit_retry_prompt",
+    "useful_for": [
+      "SFT candidate review",
+      "LoRA curriculum candidate review",
+      "prompt-patch regression fixture",
+      "validator regression fixture"
+    ]
+  },
+  "not_automatic_curriculum_capture": true,
+  "not_training_data_until_reviewed": true,
+  "pattern_id": "q5_scope_ambiguity_json_parse_retry_20260712",
+  "run_provenance": {
+    "endpoint_kind": "local_openai_compatible_endpoint",
+    "max_tokens": 1200,
+    "model": "qwen3-coder-30b-a3b",
+    "run_dir": ".work/supervised_runs/overnight_qwen_continuation_20260711_235900/q5_batch/runs/q5_scope_ambiguity/attempt_1",
+    "temperature": 0
+  },
+  "source": "explicit_operator_export",
+  "status": "candidate",
+  "success": {
+    "raw_output": "{\n  \"allowed_targets\": [\n    \"docs/reports/\"\n  ],\n  \"claims\": [],\n  \"evidence_basis\": [],\n  \"format\": \"json\",\n  \"held_targets\": [\n    \"production automation\",\n    \"automatic curriculum capture\",\n    \"automatic promotion\",\n    \"implementation_packet\"\n  ],\n  \"reason\": \"Input was processed according to the ZTH workflow with deterministic routing based on matched keywords. The allowed_targets and held_targets were strictly enforced per scope_boundary_v1 patch. No claims or evidence were provided in the packet to support unverified generalizations, thus aligning with unsupported_certainty_v1 patch. The output contract was followed exactly as required.\",\n  \"required_fields_present\": true,\n  \"scope_expansion_required\": false,\n  \"unverified_claims\": []\n}",
+    "review_status": "review_required",
+    "validation_status": "passed"
+  }
+}
