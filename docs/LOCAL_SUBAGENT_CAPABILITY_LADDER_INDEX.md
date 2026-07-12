@@ -1,3 +1,0 @@
-# Local-Subagent Capability Ladder Index
-
-- [`LOCAL_SUBAGENT_CAPABILITY_LADDER.md`](LOCAL_SUBAGENT_CAPABILITY_LADDER.md)

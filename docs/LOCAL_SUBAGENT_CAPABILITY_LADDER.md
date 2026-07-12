@@ -18,7 +18,7 @@ The ladder is intentionally conservative:
 
 Across every layer below:
 
-- Codex remains the supervising implementation authority.
+- The supervising implementation authority remains external to the model.
 - The local model is an inference worker and candidate subagent only.
 - The model may inspect evidence that Codex provides through approved tools or
   prompts.
@@ -325,7 +325,7 @@ Prohibited actions:
 Required validators:
 
 - stronger than the current supervised workflow has demonstrated;
-- must include human-supervised evidence and independent verification.
+- must include supervised evidence and independent verification.
 
 Required supervisor review:
 
