@@ -134,6 +134,18 @@ machine-readable `failure_mode_tags`, and available response diagnostics.
 The scorer accepts `duration_seconds` and the legacy `elapsed_seconds` raw
 field when aggregating duration diagnostics.
 
+When reviewing a run:
+
+- endpoint success means the server answered the request;
+- behavioral scoring success means the raw answer satisfied the fixture's
+  mechanical checks;
+- raw evidence lives under `.work/` until a human decides whether to preserve
+  a summary in `docs/reports/`;
+- failed raw evidence should not be overwritten because it is part of the
+  review record;
+- probe results do not grant implementation, commit, merge, push, promotion,
+  release, or training authority.
+
 The Markdown summary separates each model's evidence into Strengths,
 Mixed / Warnings, Failures, and Errors. It also reports endpoint and timeout
 counts, finish-reason counts, and average and maximum observed durations when

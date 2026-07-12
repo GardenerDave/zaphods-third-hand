@@ -79,6 +79,27 @@ scored JSON, and produces `LOGIC_PROBE_SUMMARY.md`. Endpoint errors become
 reviewable error evidence instead of stopping the full run. The runner does
 not start model servers or add authentication headers.
 
+The reusable endpoint workflow keeps three separate questions apart:
+
+- Did the endpoint respond?
+- Did the fixture scorer accept the response?
+- Did the recorded raw evidence include usable duration diagnostics?
+
+Those answers can differ. A raw run may succeed at transport but still fail
+the behavioral checks, and a preserved raw directory can be rescored later
+without another model call when only the scorer or summary changed.
+
+For reviewer discipline:
+
+- VM/Git host authority stays with the local machine running the tools;
+- the endpoint is inference-only and does not grant execution authority;
+- prompt patch v1 is behavioral guidance, while prompt patch v2 may be an
+  exact-contract compatibility repair;
+- `.work/` holds transient evidence, while `docs/reports/` holds selected
+  durable summaries;
+- failed evidence should remain intact so later scoring or review can compare
+  before and after results.
+
 Probe results diagnose bounded ZTH behaviors; they do not rank models
 generally or grant implementation, cleanup, role-assignment, promotion,
 release, or lifecycle authority. See
