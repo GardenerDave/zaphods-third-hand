@@ -1,6 +1,10 @@
 import tempfile
 import unittest
 from pathlib import Path
+import os
+import sys
+
+sys.path.insert(0, os.fspath(Path(__file__).resolve().parents[1]))
 
 import validate_agent_run
 
