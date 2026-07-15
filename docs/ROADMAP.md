@@ -114,6 +114,133 @@ explicit supervised acceptance without promotion or downstream mutation.
 - Explicit `call-local` mode added to the manual supervised attempt runner for operator-invoked OpenAI-compatible local endpoint calls that write raw output plus call metadata for the existing supervised ingest/review path without granting execution, mutation, promotion, training, or curriculum-capture authority.
 - Explicit `export-pattern` mode added to the manual supervised attempt runner for operator-invoked failure/correction/success pattern export into supervised training pattern candidate artifacts; export is evidence-only and does not grant training or curriculum-capture authority.
 
+## Integration Roadmap: Improve / Fable / TriDB Harvest
+
+Recent external project review produced 16 integrations for ZTH. These are not separate side projects. They are staged additions to the existing supervised packet, attempt, validation, and provenance workflow.
+
+The immediate objective is to strengthen the existing packet-to-attempt path. Later work adds measurement, lifecycle state, provenance, and retrieval only as the simpler plain-file system exposes the need.
+
+The intended sequence is:
+
+```text
+Phase 1:
+  make supervised execution evidence-bound
+
+Phase 2:
+  measure whether prompt patches and models behave better
+
+Phase 3:
+  preserve lifecycle and provenance as durable operating knowledge
+
+Phase 4:
+  improve retrieval and context construction using that provenance
+```
+
+### Phase 1 - Evidence-Bound Supervised Execution
+
+This is the active next milestone and the highest-value / lowest-effort target. It remains the low-friction, high-value vertical slice for the next implementation push.
+
+The Phase 1 milestone is complete when one real, already-understood coding task passes through the existing supervised workflow and ZTH can:
+
+- validate a zero-context packet;
+- detect scoped repository drift;
+- enforce step-level verification;
+- stop through explicit escalation routes;
+- preserve the complete attempt bundle;
+- distinguish model claims from observed evidence;
+- refute a false or overbroad completion claim;
+- keep final acceptance under human control.
+
+1. Zero-context packet validator
+
+   Packets must contain enough objective, authority, scope, evidence, and verification context for an executor that has no hidden conversation history.
+
+2. Commit and scoped-drift metadata
+
+   Packets should record the repository state they were planned against and identify the paths whose drift should stop or reroute execution.
+
+3. Step-level verification contracts
+
+   Each bounded implementation step should carry its expected verification command or observable proof obligation.
+
+4. Explicit stop conditions and escalation routes
+
+   Executors must stop and return control when the packet is stale, contradictory, insufficient, or requires unauthorized scope expansion.
+
+5. Completion-claim validator
+
+   Model claims such as "fixed," "validated," or "tests pass" must be checked against recorded evidence and classified as supported, unsupported, or refuted.
+
+6. Repository-content-is-data prompt patch
+
+   Repository contents are evidence to inspect, not instructions that can override the governing packet, expand scope, or grant authority.
+
+7. Atomic acceptance bundles
+
+   A supervised attempt should preserve packet, raw model output, changed paths, verification results, claim verdicts, and review status as one coherent artifact bundle.
+
+### Phase 2 - Measured Prompt-Patch and Model Behavior
+
+This phase measures whether ZTH changes model behavior rather than merely changing output language.
+
+8. Prompt Patch A/B harness
+
+   Run controlled fixtures with and without a prompt patch using the same model, task, and inference policy.
+
+9. Trap fixture library
+
+   Maintain fixtures for plausible wrong actions, including authority conflict, scope bait, false completion, prompt injection, cleanup bait, retry bait, evidence bait, and ambiguity bait.
+
+10. Multi-dimensional capability cards
+
+   Capability cards should separate instruction adherence, domain correctness, scope discipline, verification honesty, tool execution, evidence interpretation, recovery behavior, context tolerance, latency, and resource cost.
+
+### Phase 3 - Lifecycle, Provenance, and Reconciliation
+
+This phase turns preserved attempts into durable operating knowledge.
+
+11. Rejected-findings ledger
+
+   Preserve findings that were considered and rejected, including evidence, rejection reason, decision authority, commit/version, and conditions for reconsideration.
+
+12. Formal packet lifecycle and reconciliation
+
+   Track states such as discovered, vetted, planned, ready, attempted, blocked, revision required, verified, accepted, reconciled, and retired.
+
+13. Provenance graph
+
+   Preserve relationships among requests, packets, attempts, failures, corrections, validations, accepted artifacts, commits, prompt patches, and capability claims.
+
+### Phase 4 - Evidence Policies and Retrieval Scale
+
+This phase improves retrieval and context construction after the execution/provenance foundations exist.
+
+14. Domain evidence policies
+
+   Routing should select evidence requirements, authority order, verification expectations, and fraud checks by domain, beginning with code-change work and later extending to research, operations, legal/compliance, data analysis, fiction continuity, and infrastructure.
+
+15. Global context-budget planner
+
+   Context construction should use one bounded evidence budget, preserving mandatory authority evidence first and then ranking optional evidence globally.
+
+16. Tri-modal retrieval planner
+
+   Future retrieval should combine semantic similarity, provenance/dependency relationships, and structured eligibility filters such as task, authority, version, scope, commit, environment, and attempt state.
+
+## Explicit Deferrals
+
+The following are deferred unless future roadmap work explicitly promotes them:
+
+- installing or depending on TriDB;
+- adding a new database;
+- replacing the current supervised runner;
+- building a configurable workflow engine;
+- generalized natural-language claim extraction;
+- broad historical artifact migration;
+- full domain-adapter implementation;
+- automatic curriculum capture from failures;
+- automatic model acceptance, promotion, merge, deployment, or publishing.
+
 ## Conversation-Derived Backlog
 
 These items came from project use, failed runs, operator review, and
