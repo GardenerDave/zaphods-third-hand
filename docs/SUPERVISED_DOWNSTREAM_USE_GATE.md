@@ -32,6 +32,10 @@ The builder consumes:
 - explicit operator metadata
 - explicit gate reason
 
+This gate is one of the supervised attempt consolidation outputs selected from
+the cron dogfood report. It keeps the next step bounded and does not expand
+authority beyond review-approved input use.
+
 And produces a deterministic gate record with:
 
 - linked IDs (`decision_id`, `attempt_id`, `validation_id`, `triage_id`, `orchestration_id`)
@@ -39,6 +43,8 @@ And produces a deterministic gate record with:
 - explicit gate scope and reason
 - bounded allowed downstream use entries
 - explicit prohibited downstream-use entries
+- explicit completion-claim status when the upstream record carries one
+  (`supported`, `unsupported`, or `refuted`)
 - explicit authority boundaries
 - provenance linkage to the input decision ID
 
@@ -85,6 +91,7 @@ This layer does not:
 - promote patches
 - train adapters
 - capture failures into curriculum by default
+- infer cleanup authority
 
 It prepares future supervised handoff layers while keeping reviewed output and
 executable authority distinct.

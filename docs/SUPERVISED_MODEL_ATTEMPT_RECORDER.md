@@ -49,6 +49,10 @@ The builder and validator enforce:
   - no default failure-to-curriculum capture authority
   - human review required before downstream use
 
+The recorder is a provenance artifact, not an implementation claim. It does not
+assert that a validation layer, review record, downstream-use gate, or handoff
+packet already exists in code beyond what the documented pipeline describes.
+
 The record is a supervised evidence artifact. It is not an acceptance decision.
 
 ## Renderer behavior
@@ -66,6 +70,10 @@ artifact with sections:
 - Authority Boundaries
 - Provenance
 - Review Requirement
+
+The rendered review view is intentionally bounded. It keeps the original raw
+output, operator metadata, and provenance visible without promoting the attempt
+into acceptance, downstream use, or cleanup authority.
 
 The renderer validates the record before rendering and preserves
 `raw_model_output` exactly as text.

@@ -35,6 +35,10 @@ The builder consumes:
 - explicit operator metadata
 - explicit handoff reason
 
+This handoff layer is the final bounded packaging step in the supervised
+attempt path selected from the cron dogfood consolidation report. It packages
+reviewed input for the next supervised consumer, not for unattended execution.
+
 And produces a deterministic handoff packet with:
 
 - linked IDs (`gate_id`, `decision_id`, `attempt_id`, `validation_id`, `triage_id`, `orchestration_id`)
@@ -42,6 +46,8 @@ And produces a deterministic handoff packet with:
 - explicit handoff scope, next-step metadata, and reason
 - bounded allowed downstream use entries
 - explicit prohibited downstream-use entries
+- explicit completion-claim status when present (`supported`, `unsupported`, or
+  `refuted`)
 - explicit authority boundaries
 - provenance linkage back to the input gate ID
 
@@ -86,6 +92,7 @@ This layer does not:
 - promote patches
 - train adapters
 - capture failures into curriculum by default
+- infer cleanup authority
 
 It prepares future workflow-specific supervised consumers while preserving the
 distinction between input preparation and executable authority.

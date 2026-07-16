@@ -32,12 +32,18 @@ The builder consumes:
 - explicit decision (`accepted`, `rejected`, `revision_requested`)
 - explicit decision reason
 
+The review decision record is the human/operator decision layer for the
+supervised attempt path selected in the cron dogfood consolidation report. It
+captures the review boundary but does not imply downstream execution.
+
 And produces a deterministic decision record with:
 
 - linked IDs (`attempt_id`, `validation_id`, `triage_id`, `orchestration_id`)
 - preserved `validation_status` as evidence
 - explicit decision scope and reason
 - allowed/prohibited downstream use lists
+- explicit completion-claim status when present (`supported`, `unsupported`, or
+  `refuted`)
 - explicit authority boundaries
 - provenance linkage to both input artifacts
 

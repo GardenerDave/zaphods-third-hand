@@ -34,6 +34,10 @@ emits one output-validation record with:
 - explicit authority boundaries
 - provenance and review requirement
 
+This documentation slice was selected from the cron dogfood consolidation
+report at `.work/dogfood/reviews/dogfood_packet_consolidation_20260716_0200.md`
+to tighten the repo-grounded supervised attempt path.
+
 ### Contract checks
 
 For `output_contract.format == "json"`:
@@ -42,6 +46,10 @@ For `output_contract.format == "json"`:
 - fail gracefully with diagnostics if parsing fails
 - enforce `required_fields` when present
 - enforce non-empty `reason` when `requires_reason: true`
+- classify completion claims as `supported`, `unsupported`, or `refuted` when
+  the reviewed record includes a claim verdict field or equivalent contract
+  field
+- require objective evidence and provenance linkage for any claim verdict
 
 Validation passes only when all required checks pass.
 
@@ -58,6 +66,7 @@ This layer enforces:
 - no automatic training authority
 - no default failure-to-curriculum capture authority
 - human review required before downstream use
+- no automatic promotion, merge, deployment, or cleanup authority
 
 It rejects records or content that claim acceptance authority.
 
@@ -72,6 +81,7 @@ This layer does not:
 - promote patches
 - train adapters
 - capture failures into curriculum by default
+- infer downstream-use eligibility
 
 It preserves raw output as evidence and does not transform model output into
 approved actions.
