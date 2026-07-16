@@ -42,6 +42,31 @@ state_rows() {
   awk -F '\t' 'NF >= 4 { print }' "$STATE"
 }
 
+order_mismatch_report() {
+  local queue_tmp state_tmp mismatch
+  queue_tmp="$(mktemp)"
+  state_tmp="$(mktemp)"
+  trap 'rm -f "$queue_tmp" "$state_tmp"' RETURN
+
+  queue_rows > "$queue_tmp"
+  state_rows > "$state_tmp"
+
+  if [ ! -s "$queue_tmp" ] || [ ! -s "$state_tmp" ]; then
+    printf 'no\n'
+    return 0
+  fi
+
+  mismatch="$(
+    awk -F '\t' '
+      NR==FNR { queue[++n] = $2; next }
+      { if (queue[FNR] != $2) mismatch = 1 }
+      END { print mismatch ? "yes" : "no" }
+    ' "$queue_tmp" "$state_tmp"
+  )"
+
+  printf '%s\n' "$mismatch"
+}
+
 status_report() {
   local total completed remaining latest order_mismatch duplicate_count exhaustion_visible
   total="$(queue_rows | wc -l | tr -d ' ')"
@@ -49,11 +74,7 @@ status_report() {
   remaining="$((total - completed))"
   latest="$(state_rows | tail -n 1 | awk -F '\t' '{ print $2 }')"
   duplicate_count="$(state_rows | awk -F '\t' '{ count[$2]++ } END { d=0; for (k in count) if (count[k] > 1) d++; print d+0 }')"
-  order_mismatch="$(awk -F '\t' '
-    NR==FNR { queue[++n]=$2; next }
-    { if (queue[FNR] != $2) mismatch=1 }
-    END { print mismatch ? "yes" : "no" }
-  ' "$QUEUE" <(state_rows))"
+  order_mismatch="$(order_mismatch_report)"
   exhaustion_visible="no"
   if [ -f "$WORK/stage.log" ] && grep -q "No remaining dogfood stages\." "$WORK/stage.log"; then
     exhaustion_visible="yes"
