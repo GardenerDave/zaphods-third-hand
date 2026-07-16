@@ -52,6 +52,7 @@ The tracked `known_failure_modes_v1.json` fixture pack is a small deterministic 
 ## Live supervised A/B evidence producer
 
 `run_prompt_patch_ab_live.py` is the operator-invoked live evidence producer for this branch. It makes one baseline call and one patched call under identical runtime settings, writes a harness-compatible case file, and leaves scoring to the deterministic harness.
+It performs an explicit endpoint preflight first and fails closed before the A/B calls when the endpoint is unreachable.
 
 Example usage:
 

@@ -104,6 +104,29 @@ def _call_live_endpoint(
     return response_payload, response_text
 
 
+def _preflight_endpoint(*, base_url: str, timeout_seconds: float) -> None:
+    request = urllib.request.Request(
+        f"{base_url.rstrip('/')}/models",
+        method="GET",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
+            response_text = response.read().decode("utf-8")
+    except (socket.timeout, TimeoutError, urllib.error.URLError, urllib.error.HTTPError) as exc:
+        raise PromptPatchABLiveError(
+            f"endpoint preflight failed: {exc.__class__.__name__}"
+        ) from exc
+
+    try:
+        response_payload = json.loads(response_text)
+    except json.JSONDecodeError as exc:
+        raise PromptPatchABLiveError(
+            f"endpoint preflight failed: invalid JSON ({exc.msg})"
+        ) from exc
+    if not isinstance(response_payload, dict):
+        raise PromptPatchABLiveError("endpoint preflight failed: response must be a JSON object")
+
+
 def _extract_assistant_content(response_payload: dict[str, Any]) -> str:
     choices = response_payload.get("choices")
     if not isinstance(choices, list) or not choices:
@@ -228,6 +251,13 @@ def run_prompt_patch_ab_live(
     patched_response_payload: dict[str, Any] | None = None
     baseline_content: dict[str, Any] | None = None
     patched_content: dict[str, Any] | None = None
+
+    try:
+        _preflight_endpoint(base_url=base_url, timeout_seconds=timeout_seconds)
+    except Exception as exc:
+        live_record["diagnostics"].append(str(exc))
+        _write_json(live_record_path, live_record)
+        return live_record
 
     try:
         baseline_response_payload, baseline_response_text = _call_live_endpoint(

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import urllib.error
 from pathlib import Path
 import pytest
 
@@ -91,11 +92,15 @@ def test_builds_identical_runtime_settings_payloads(monkeypatch, tmp_path: Path)
     _write_json(expected_contract, _expected_contract())
 
     seen_payloads: list[dict] = []
+    seen_methods: list[str] = []
+    post_responses = iter(_baseline_and_patched_outputs())
 
     def fake_urlopen(request, timeout):
+        seen_methods.append(request.get_method())
+        if request.get_method() == "GET":
+            return _make_json_response(json.dumps({"data": []}))
         seen_payloads.append(json.loads(request.data.decode("utf-8")))
-        content = _baseline_and_patched_outputs()[len(seen_payloads) - 1]
-        return _make_json_response(content)
+        return _make_json_response(next(post_responses))
 
     monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
 
@@ -112,6 +117,7 @@ def test_builds_identical_runtime_settings_payloads(monkeypatch, tmp_path: Path)
         out_dir=out_dir,
     )
 
+    assert seen_methods == ["GET", "POST", "POST"]
     assert len(seen_payloads) == 2
     assert seen_payloads[0]["temperature"] == seen_payloads[1]["temperature"]
     assert seen_payloads[0]["max_tokens"] == seen_payloads[1]["max_tokens"]
@@ -125,8 +131,12 @@ def test_writes_prompt_patch_ab_cases_json_and_scores_as_improved(monkeypatch, t
     _write_json(expected_contract, _expected_contract())
 
     responses = iter(_baseline_and_patched_outputs())
+    seen_methods: list[str] = []
 
     def fake_urlopen(request, timeout):
+        seen_methods.append(request.get_method())
+        if request.get_method() == "GET":
+            return _make_json_response(json.dumps({"data": []}))
         return _make_json_response(next(responses))
 
     monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
@@ -146,6 +156,7 @@ def test_writes_prompt_patch_ab_cases_json_and_scores_as_improved(monkeypatch, t
 
     cases_path = out_dir / "prompt_patch_ab_cases.json"
     assert cases_path.is_file()
+    assert seen_methods == ["GET", "POST", "POST"]
     result = run_prompt_patch_ab_harness(cases_path)
     assert result["cases_total"] == 1
     assert result["improved_total"] == 1
@@ -206,8 +217,12 @@ def test_invalid_assistant_json_exits_nonzero_and_preserves_raw_evidence(monkeyp
             ),
         ]
     )
+    seen_methods: list[str] = []
 
     def fake_urlopen(request, timeout):
+        seen_methods.append(request.get_method())
+        if request.get_method() == "GET":
+            return _make_json_response(json.dumps({"data": []}))
         return next(responses)
 
     monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
@@ -226,6 +241,7 @@ def test_invalid_assistant_json_exits_nonzero_and_preserves_raw_evidence(monkeyp
     )
 
     assert record["diagnostics"]
+    assert seen_methods == ["GET", "POST", "POST"]
     assert (out_dir / "baseline_response.raw.json").is_file()
     assert (out_dir / "patched_response.raw.json").is_file()
     assert not (out_dir / "prompt_patch_ab_cases.json").exists()
@@ -238,8 +254,12 @@ def test_live_record_includes_review_required_boundary_and_hides_base_url(monkey
     _write_json(expected_contract, _expected_contract())
 
     responses = iter(_baseline_and_patched_outputs())
+    seen_methods: list[str] = []
 
     def fake_urlopen(request, timeout):
+        seen_methods.append(request.get_method())
+        if request.get_method() == "GET":
+            return _make_json_response(json.dumps({"data": []}))
         return _make_json_response(next(responses))
 
     monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
@@ -262,6 +282,7 @@ def test_live_record_includes_review_required_boundary_and_hides_base_url(monkey
     assert "no_auto_promotion" in record["authority_boundary"]
     assert record["base_url_present"] is True
     assert "secret.internal.example" not in json.dumps(record)
+    assert seen_methods == ["GET", "POST", "POST"]
     payload = json.loads((out_dir / "prompt_patch_ab_live_record.json").read_text(encoding="utf-8"))
     assert payload["review_required"] is True
     assert payload["base_url_present"] is True
@@ -291,8 +312,12 @@ def test_main_returns_nonzero_for_invalid_assistant_json_and_preserves_raw_evide
             ),
         ]
     )
+    seen_methods: list[str] = []
 
     def fake_urlopen(request, timeout):
+        seen_methods.append(request.get_method())
+        if request.get_method() == "GET":
+            return _make_json_response(json.dumps({"data": []}))
         return next(responses)
 
     monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
@@ -326,6 +351,7 @@ def test_main_returns_nonzero_for_invalid_assistant_json_and_preserves_raw_evide
     assert exit_code == 1
     assert "secret.internal.example" not in captured.out
     assert "secret.internal.example" not in captured.err
+    assert seen_methods == ["GET", "POST", "POST"]
     assert (out_dir / "baseline_response.raw.json").is_file()
     assert (out_dir / "patched_response.raw.json").is_file()
     assert (out_dir / "prompt_patch_ab_live_record.json").is_file()
@@ -378,3 +404,59 @@ def test_main_returns_nonzero_for_malformed_expected_contract_before_calls(
     assert exit_code == 1
     assert called is False
     assert "invalid JSON in expected contract" in captured.err
+
+
+def test_preflight_failure_exits_before_a_b_calls_and_records_diagnostics(
+    monkeypatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    baseline_prompt, patched_prompt, expected_contract, out_dir = _prompt_paths(tmp_path)
+    _write_text(baseline_prompt, "baseline prompt\n")
+    _write_text(patched_prompt, "patched prompt\n")
+    _write_json(expected_contract, _expected_contract())
+
+    seen_methods: list[str] = []
+
+    def fake_urlopen(request, timeout):
+        seen_methods.append(request.get_method())
+        if request.get_method() == "GET":
+            raise urllib.error.URLError("unreachable")
+        raise AssertionError("A/B calls should not be made after preflight failure")
+
+    monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
+
+    exit_code = main(
+        [
+            "--case-id",
+            "case_001",
+            "--failure-mode",
+            "scope_boundary",
+            "--prompt-patch-id",
+            "scope_boundary_v1",
+            "--task-summary",
+            "Keep allowed and held targets separated.",
+            "--expected-contract",
+            str(expected_contract),
+            "--baseline-prompt",
+            str(baseline_prompt),
+            "--patched-prompt",
+            str(patched_prompt),
+            "--base-url",
+            "http://secret.internal.example/v1",
+            "--model",
+            "test-model",
+            "--out-dir",
+            str(out_dir),
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    assert seen_methods == ["GET"]
+    assert "secret.internal.example" not in captured.out
+    assert "secret.internal.example" not in captured.err
+    assert "endpoint preflight failed: URLError" in captured.out
+    assert (out_dir / "baseline_prompt.txt").is_file()
+    assert (out_dir / "patched_prompt.txt").is_file()
+    assert (out_dir / "expected_contract.json").is_file()
+    assert (out_dir / "prompt_patch_ab_live_record.json").is_file()
+    assert not (out_dir / "prompt_patch_ab_cases.json").exists()
