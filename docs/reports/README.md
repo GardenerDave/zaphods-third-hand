@@ -165,6 +165,10 @@ does not establish production readiness.
   documents the chain from explicit behavior correction through scoped model
   output, model-free validation, supervised review, and explicit acceptance
   of the corrected output only without promotion or downstream mutation.
+- `model_auditions/DOGFOOD_CRON_CLOSEOUT_2026-07-16.md` for the completed
+  cron/watchdog dogfood closeout covering the local Qwen bounded packet
+  generator, the nine-stage queue run, preserved `.work/dogfood/` evidence,
+  and the downstream docs-tightening commit.
 - `behavior_correction_cards/` — model-free correction-card scaffolds and
   dogfood evidence for explicit packet-level correction assignment,
   correction-aware prompt packet composition, prompt-facts tightening
