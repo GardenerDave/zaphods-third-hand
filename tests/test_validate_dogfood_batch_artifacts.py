@@ -1,0 +1,250 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from local_harness.validate_dogfood_batch_artifacts import (
+    validate_dogfood_batch_artifacts,
+)
+
+
+def _write_queue(path: Path, rows: list[tuple[str, str, str]]) -> None:
+    lines = ["# priority\tslug\tdescription"]
+    lines.extend("\t".join(row) for row in rows)
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def _write_state(path: Path, rows: list[tuple[str, str, str, str]]) -> None:
+    lines = ["# timestamp\tslug\tstatus\trun_dir"]
+    lines.extend("\t".join(row) for row in rows)
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def _write_run(run_dir: Path, *, raw_output: object = None, content: object = None) -> None:
+    run_dir.mkdir(parents=True, exist_ok=True)
+    (run_dir / "stage_packet.md").write_text("# packet\n", encoding="utf-8")
+    (run_dir / "model_output.redacted.json").write_text('{"redacted": true}\n', encoding="utf-8")
+    if raw_output is None:
+        raw_output = {"allowed_targets": [], "held_targets": [], "reason": "ok"}
+    if content is None:
+        content = {"allowed_targets": [], "held_targets": [], "reason": "ok"}
+    (run_dir / "model_output.raw.json").write_text(json.dumps(raw_output) + "\n", encoding="utf-8")
+    (run_dir / "model_content.json").write_text(json.dumps(content) + "\n", encoding="utf-8")
+
+
+def _make_paths(tmp_path: Path) -> tuple[Path, Path, Path, Path]:
+    queue = tmp_path / "roadmap_queue.tsv"
+    state = tmp_path / "state.tsv"
+    runs_dir = tmp_path / "runs"
+    stage_log = tmp_path / "stage.log"
+    return queue, state, runs_dir, stage_log
+
+
+def test_valid_completed_prefix(tmp_path: Path) -> None:
+    queue, state, runs_dir, stage_log = _make_paths(tmp_path)
+    _write_queue(
+        queue,
+        [
+            ("1", "alpha", "A"),
+            ("2", "beta", "B"),
+            ("3", "gamma", "C"),
+        ],
+    )
+    _write_state(
+        state,
+        [
+            ("2026-07-16T00:00:00Z", "alpha", "packet_generated", "alpha"),
+            ("2026-07-16T00:01:00Z", "beta", "packet_generated", "beta"),
+        ],
+    )
+    _write_run(runs_dir / "alpha")
+    _write_run(runs_dir / "beta")
+
+    result = validate_dogfood_batch_artifacts(
+        queue_path=queue,
+        state_path=state,
+        runs_dir=runs_dir,
+        stage_log_path=stage_log,
+    )
+
+    assert result["validation_status"] == "passed"
+    assert result["queue_total"] == 3
+    assert result["completed_total"] == 2
+    assert result["remaining_total"] == 1
+    assert result["duplicate_state_slugs"] == []
+    assert result["order_mismatches"] == []
+    assert result["missing_artifacts"] == []
+    assert result["json_errors"] == []
+    assert result["exhaustion_visible"] is False
+
+
+def test_full_valid_completion_with_exhaustion_visible(tmp_path: Path) -> None:
+    queue, state, runs_dir, stage_log = _make_paths(tmp_path)
+    _write_queue(queue, [("1", "alpha", "A"), ("2", "beta", "B")])
+    _write_state(
+        state,
+        [
+            ("2026-07-16T00:00:00Z", "alpha", "packet_generated", "alpha"),
+            ("2026-07-16T00:01:00Z", "beta", "packet_generated", "beta"),
+        ],
+    )
+    _write_run(runs_dir / "alpha")
+    _write_run(runs_dir / "beta")
+    stage_log.write_text("No remaining dogfood stages.\n", encoding="utf-8")
+
+    result = validate_dogfood_batch_artifacts(
+        queue_path=queue,
+        state_path=state,
+        runs_dir=runs_dir,
+        stage_log_path=stage_log,
+    )
+
+    assert result["validation_status"] == "passed"
+    assert result["exhaustion_visible"] is True
+
+
+def test_duplicate_state_slug(tmp_path: Path) -> None:
+    queue, state, runs_dir, stage_log = _make_paths(tmp_path)
+    _write_queue(queue, [("1", "alpha", "A"), ("2", "beta", "B")])
+    _write_state(
+        state,
+        [
+            ("2026-07-16T00:00:00Z", "alpha", "packet_generated", "alpha"),
+            ("2026-07-16T00:01:00Z", "alpha", "packet_generated", "alpha_dup"),
+        ],
+    )
+    _write_run(runs_dir / "alpha")
+    _write_run(runs_dir / "alpha_dup")
+
+    result = validate_dogfood_batch_artifacts(
+        queue_path=queue,
+        state_path=state,
+        runs_dir=runs_dir,
+        stage_log_path=stage_log,
+    )
+
+    assert result["validation_status"] == "failed"
+    assert result["duplicate_state_slugs"] == ["alpha"]
+
+
+def test_queue_state_order_mismatch(tmp_path: Path) -> None:
+    queue, state, runs_dir, stage_log = _make_paths(tmp_path)
+    _write_queue(queue, [("1", "alpha", "A"), ("2", "beta", "B")])
+    _write_state(
+        state,
+        [
+            ("2026-07-16T00:00:00Z", "beta", "packet_generated", "beta"),
+            ("2026-07-16T00:01:00Z", "alpha", "packet_generated", "alpha"),
+        ],
+    )
+    _write_run(runs_dir / "alpha")
+    _write_run(runs_dir / "beta")
+
+    result = validate_dogfood_batch_artifacts(
+        queue_path=queue,
+        state_path=state,
+        runs_dir=runs_dir,
+        stage_log_path=stage_log,
+    )
+
+    assert result["validation_status"] == "failed"
+    assert result["order_mismatches"]
+    assert result["order_mismatches"][0]["expected_slug"] == "alpha"
+    assert result["order_mismatches"][0]["actual_slug"] == "beta"
+
+
+def test_missing_artifact(tmp_path: Path) -> None:
+    queue, state, runs_dir, stage_log = _make_paths(tmp_path)
+    _write_queue(queue, [("1", "alpha", "A")])
+    _write_state(state, [("2026-07-16T00:00:00Z", "alpha", "packet_generated", "alpha")])
+    run_dir = runs_dir / "alpha"
+    run_dir.mkdir(parents=True, exist_ok=True)
+    (run_dir / "stage_packet.md").write_text("# packet\n", encoding="utf-8")
+    (run_dir / "model_output.raw.json").write_text('{"allowed_targets": []}\n', encoding="utf-8")
+    (run_dir / "model_output.redacted.json").write_text('{"redacted": true}\n', encoding="utf-8")
+
+    result = validate_dogfood_batch_artifacts(
+        queue_path=queue,
+        state_path=state,
+        runs_dir=runs_dir,
+        stage_log_path=stage_log,
+    )
+
+    assert result["validation_status"] == "failed"
+    assert result["missing_artifacts"]
+    assert result["missing_artifacts"][0]["missing"] == ["model_content.json"]
+
+
+def test_rejects_non_packet_generated_status(tmp_path: Path) -> None:
+    queue, state, runs_dir, stage_log = _make_paths(tmp_path)
+    _write_queue(queue, [("1", "alpha", "A")])
+    _write_state(state, [("2026-07-16T00:00:00Z", "alpha", "attempted", "alpha")])
+    _write_run(runs_dir / "alpha")
+
+    result = validate_dogfood_batch_artifacts(
+        queue_path=queue,
+        state_path=state,
+        runs_dir=runs_dir,
+        stage_log_path=stage_log,
+    )
+
+    assert result["validation_status"] == "failed"
+    assert result["missing_artifacts"][0]["missing"] == ["packet_generated_status"]
+
+
+def test_malformed_json(tmp_path: Path) -> None:
+    queue, state, runs_dir, stage_log = _make_paths(tmp_path)
+    _write_queue(queue, [("1", "alpha", "A")])
+    _write_state(state, [("2026-07-16T00:00:00Z", "alpha", "packet_generated", "alpha")])
+    run_dir = runs_dir / "alpha"
+    _write_run(run_dir)
+    (run_dir / "model_output.raw.json").write_text('{"allowed_targets": [}\n', encoding="utf-8")
+
+    result = validate_dogfood_batch_artifacts(
+        queue_path=queue,
+        state_path=state,
+        runs_dir=runs_dir,
+        stage_log_path=stage_log,
+    )
+
+    assert result["validation_status"] == "failed"
+    assert result["json_errors"]
+    assert result["json_errors"][0]["path"].endswith("model_output.raw.json")
+
+
+def test_missing_queue_or_state_handled_cleanly(tmp_path: Path) -> None:
+    queue, state, runs_dir, stage_log = _make_paths(tmp_path)
+    result = validate_dogfood_batch_artifacts(
+        queue_path=queue,
+        state_path=state,
+        runs_dir=runs_dir,
+        stage_log_path=stage_log,
+    )
+    assert result["validation_status"] == "failed"
+    assert result["diagnostics"]
+    assert "queue file does not exist" in result["diagnostics"][0]
+
+
+def test_stage_log_exhaustion_visible_for_full_completion(tmp_path: Path) -> None:
+    queue, state, runs_dir, stage_log = _make_paths(tmp_path)
+    _write_queue(queue, [("1", "alpha", "A"), ("2", "beta", "B")])
+    _write_state(
+        state,
+        [
+            ("2026-07-16T00:00:00Z", "alpha", "packet_generated", "alpha"),
+            ("2026-07-16T00:01:00Z", "beta", "packet_generated", "beta"),
+        ],
+    )
+    _write_run(runs_dir / "alpha")
+    _write_run(runs_dir / "beta")
+    stage_log.write_text("Some line\nNo remaining dogfood stages.\n", encoding="utf-8")
+
+    result = validate_dogfood_batch_artifacts(
+        queue_path=queue,
+        state_path=state,
+        runs_dir=runs_dir,
+        stage_log_path=stage_log,
+    )
+
+    assert result["validation_status"] == "passed"
+    assert result["exhaustion_visible"] is True

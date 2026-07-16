@@ -118,6 +118,18 @@ sed -n '1,40p' .work/dogfood/state.tsv
 tmux ls | grep zth-dogfood-run
 ```
 
+For a deterministic structural check of the batch evidence only, run:
+
+```bash
+python3 local_harness/validate_dogfood_batch_artifacts.py \
+  --queue .work/dogfood/roadmap_queue.tsv \
+  --state .work/dogfood/state.tsv \
+  --runs-dir .work/dogfood/runs \
+  --stage-log .work/dogfood/stage.log
+```
+
+This validator checks queue/state/run artifact structure and JSON validity. It does not grant acceptance, promotion, or any other downstream-use authority.
+
 ### Disable
 
 Remove or comment out the cron entry. If a run is active, let it finish or stop it explicitly with tmux before removing the schedule:
