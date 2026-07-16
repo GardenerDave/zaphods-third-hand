@@ -27,8 +27,8 @@ def test_valid_fixture_writes_bundle(tmp_path: Path) -> None:
     assert payload["review_status"] == "not_reviewed"
     assert payload["prompt_patch_promotion_status"] == "not_promoted"
     assert payload["downstream_use_status"] == "prohibited_until_review"
-    assert payload["harness_result"]["cases_total"] == 4
-    assert payload["harness_result"]["improved_total"] == 4
+    assert payload["harness_result"]["cases_total"] == 5
+    assert payload["harness_result"]["improved_total"] == 5
 
 
 def test_bundle_includes_case_file_hash() -> None:

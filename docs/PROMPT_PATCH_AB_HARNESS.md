@@ -73,6 +73,10 @@ python3 local_harness/run_prompt_patch_ab_live.py \
 
 The live producer is evidence-only and review-required. It does not promote patches, does not authorize downstream use, and does not replace the deterministic harness for scoring.
 
+## Fixture candidate exporter
+
+`export_prompt_patch_ab_fixture_candidate.py` converts supervised live run evidence into a reviewable fixture candidate draft. It does not import the candidate, does not promote patches, and does not authorize downstream use. A reviewer must still manually copy or accept any candidate into the tracked fixture pack.
+
 ## Relationship to the library
 
 Prompt patches are still defined in [`docs/PROMPT_PATCH_LIBRARY.md`](PROMPT_PATCH_LIBRARY.md). This harness only compares stored outputs against a simple deterministic contract. It does not select patches, render prompts, or call models.
