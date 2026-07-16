@@ -16,6 +16,9 @@ from local_harness.run_prompt_patch_ab_harness import (
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "local_harness" / "run_prompt_patch_ab_harness.py"
 FIXTURE = ROOT / "local_harness" / "fixtures" / "prompt_patch_ab" / "scope_boundary_example.json"
+KNOWN_FAILURES_FIXTURE = (
+    ROOT / "local_harness" / "fixtures" / "prompt_patch_ab" / "known_failure_modes_v1.json"
+)
 
 
 def _write_cases(path: Path, cases: list[dict]) -> None:
@@ -222,3 +225,11 @@ def test_tracked_scope_boundary_fixture_scores_as_improved() -> None:
     assert result["cases_total"] == 1
     assert result["improved_total"] == 1
     assert result["regressed_total"] == 0
+
+
+def test_tracked_known_failure_modes_fixture_pack_scores_as_improved() -> None:
+    result = run_prompt_patch_ab_harness(KNOWN_FAILURES_FIXTURE)
+    assert result["cases_total"] == 4
+    assert result["improved_total"] == 4
+    assert result["regressed_total"] == 0
+    assert all(item["result"] == "improved" for item in result["results"])
