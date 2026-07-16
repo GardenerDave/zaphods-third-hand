@@ -124,6 +124,7 @@ The accepted artifact retains review caveats:
   `triage-router-supervised-attempts`.
 - `DOGFOOD_AND_PROMPT_PATCH_AB_CLOSEOUT_2026-07-16.md` — concise closeout covering the dogfood evidence chain and the fixture-based prompt patch A/B harness chain.
 - `LIVE_PROMPT_PATCH_AB_SMOKE_CLOSED_LOOP_2026-07-16.md` — closeout for the first successful supervised live prompt patch A/B smoke trial.
+- `LIVE_PROMPT_PATCH_AB_IMPROVED_CHALLENGE_2026-07-16.md` — closeout for the first improved supervised live prompt patch A/B challenge.
 
 ## Safety Reminder
 
