@@ -46,6 +46,7 @@ The case file must contain:
 The tracked `scope_boundary_example.json` fixture is illustrative and model-free. A pass on this fixture shows the stored patched output fits the expected contract better than the baseline output. It is not a prompt-patch promotion decision.
 
 The tracked `known_failure_modes_v1.json` fixture pack is a small deterministic regression suite for known failure modes. It exercises multiple stored baseline/patched pairs and confirms the harness can score expected improvements without calling a model. Passing the pack is still not a prompt-patch promotion decision and does not authorize downstream use.
+The tracked pack also includes a combined scope-boundary/output-contract case derived from supervised live evidence. Passing it still is not promotion and does not authorize downstream use.
 
 `render_prompt_patch_ab_review_bundle.py` packages a fixture run into a review artifact with hashes and explicit authority boundaries. It is review-only evidence, not a patch promotion mechanism and not downstream-use authorization.
 

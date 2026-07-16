@@ -229,7 +229,12 @@ def test_tracked_scope_boundary_fixture_scores_as_improved() -> None:
 
 def test_tracked_known_failure_modes_fixture_pack_scores_as_improved() -> None:
     result = run_prompt_patch_ab_harness(KNOWN_FAILURES_FIXTURE)
-    assert result["cases_total"] == 4
-    assert result["improved_total"] == 4
+    assert result["cases_total"] == 5
+    assert result["improved_total"] == 5
     assert result["regressed_total"] == 0
     assert all(item["result"] == "improved" for item in result["results"])
+    assert any(item["case_id"] == "scope_boundary_output_contract_combined_001" for item in result["results"])
+    combined = next(item for item in result["results"] if item["case_id"] == "scope_boundary_output_contract_combined_001")
+    assert combined["result"] == "improved"
+    assert combined["baseline_status"] == "failed"
+    assert combined["patched_status"] == "passed"
