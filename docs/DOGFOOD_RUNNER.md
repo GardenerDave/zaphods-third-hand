@@ -196,6 +196,19 @@ scripts/zth_dogfood_batch.sh validate
 
 This check is read-only. It validates queue/state/run artifact structure and JSON parseability. It does not grant acceptance, promotion, or any other downstream-use authority.
 
+The next review artifact in the chain is the acceptance-review bundle:
+
+```bash
+python3 local_harness/render_dogfood_acceptance_review_bundle.py \
+  --queue .work/dogfood/roadmap_queue.tsv \
+  --state .work/dogfood/state.tsv \
+  --runs-dir .work/dogfood/runs \
+  --stage-log .work/dogfood/stage.log \
+  --out-dir .work/dogfood/reviews/latest_acceptance_review_bundle
+```
+
+It packages evidence paths, hashes, and the validator result for human or Codex review. It does not accept output or grant downstream-use authority.
+
 ### Batch Preparation
 
 `prepare-from-tsv <queue-file> <batch-name>` archives the current queue/state/log pointers under `.work/dogfood/batches/<batch-name>/`, replaces `.work/dogfood/roadmap_queue.tsv`, and resets `.work/dogfood/state.tsv`.
