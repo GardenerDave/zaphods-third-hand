@@ -77,6 +77,10 @@ The live producer is evidence-only and review-required. It does not promote patc
 
 `export_prompt_patch_ab_fixture_candidate.py` converts supervised live run evidence into a reviewable fixture candidate draft. It does not import the candidate, does not promote patches, and does not authorize downstream use. A reviewer must still manually copy or accept any candidate into the tracked fixture pack.
 
+## Fixture candidate review
+
+`review_prompt_patch_ab_fixture_candidate.py` validates a candidate draft and renders a checklist for human review. It does not import candidates, does not promote patches, and does not authorize downstream use. Accepted candidates still require manual tracked fixture, test, and docs edits.
+
 ## Relationship to the library
 
 Prompt patches are still defined in [`docs/PROMPT_PATCH_LIBRARY.md`](PROMPT_PATCH_LIBRARY.md). This harness only compares stored outputs against a simple deterministic contract. It does not select patches, render prompts, or call models.
