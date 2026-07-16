@@ -14,6 +14,7 @@ usage() {
   cat <<'EOF'
 Usage:
   scripts/zth_dogfood_batch.sh status
+  scripts/zth_dogfood_batch.sh validate
   scripts/zth_dogfood_batch.sh prepare-from-tsv <queue-file> <batch-name> [--allow-cron-active]
   scripts/zth_dogfood_batch.sh archive-current <batch-name>
   scripts/zth_dogfood_batch.sh check-cron
@@ -127,6 +128,14 @@ EOF
   fi
 }
 
+validate_batch() {
+  python3 "$REPO/local_harness/validate_dogfood_batch_artifacts.py" \
+    --queue "$QUEUE" \
+    --state "$STATE" \
+    --runs-dir "$WORK/runs" \
+    --stage-log "$WORK/stage.log"
+}
+
 archive_current() {
   local batch_name="$1"
   local batch_dir="$BATCH_ROOT/$batch_name"
@@ -182,6 +191,9 @@ main() {
   case "${1:-}" in
     status)
       status_report
+      ;;
+    validate)
+      validate_batch
       ;;
     prepare-from-tsv)
       shift

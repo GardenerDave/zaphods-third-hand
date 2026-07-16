@@ -167,6 +167,7 @@ Disabling cron does not delete evidence. The `.work/dogfood/` artifacts remain l
 
 ```bash
 scripts/zth_dogfood_batch.sh status
+scripts/zth_dogfood_batch.sh validate
 scripts/zth_dogfood_batch.sh check-cron
 scripts/zth_dogfood_batch.sh archive-current rest-20260716
 scripts/zth_dogfood_batch.sh prepare-from-tsv /tmp/rest_queue.tsv rest-20260716
@@ -184,6 +185,16 @@ The `status` subcommand reports:
 - queue/state order mismatch
 - latest completed slug
 - whether exhaustion is visible in `stage.log`
+
+### Validate Evidence
+
+`scripts/zth_dogfood_batch.sh validate` runs the deterministic batch artifact validator against the current `.work/dogfood/` evidence:
+
+```bash
+scripts/zth_dogfood_batch.sh validate
+```
+
+This check is read-only. It validates queue/state/run artifact structure and JSON parseability. It does not grant acceptance, promotion, or any other downstream-use authority.
 
 ### Batch Preparation
 
