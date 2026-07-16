@@ -16,6 +16,10 @@ from typing import Any, Sequence
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from local_harness.run_prompt_patch_ab_harness import (  # noqa: E402
+    PromptPatchABHarnessError,
+    run_prompt_patch_ab_harness,
+)
 
 SCHEMA_NAME = "prompt_patch_ab_cases_v1"
 LIVE_RECORD_SCHEMA = "prompt_patch_ab_live_record_v1"
@@ -181,6 +185,18 @@ def _build_case(
     }
 
 
+def _validate_generated_case(cases_path: Path) -> dict[str, Any]:
+    try:
+        harness_result = run_prompt_patch_ab_harness(cases_path)
+    except PromptPatchABHarnessError as exc:
+        raise PromptPatchABLiveError(f"generated case failed harness validation: {exc}") from exc
+
+    if harness_result["regressed_total"] > 0:
+        raise PromptPatchABLiveError("generated case contains regression")
+
+    return harness_result
+
+
 def run_prompt_patch_ab_live(
     *,
     case_id: str,
@@ -302,6 +318,20 @@ def run_prompt_patch_ab_live(
         cases_payload = {"harness_schema": SCHEMA_NAME, "cases": [case]}
         _write_json(cases_path, cases_payload)
         live_record["generated_cases_path"] = str(cases_path)
+        try:
+            harness_result = _validate_generated_case(cases_path)
+        except PromptPatchABLiveError as exc:
+            live_record["generated_case_status"] = "harness_invalid"
+            live_record["diagnostics"].append(str(exc))
+        else:
+            live_record["generated_case_status"] = "harness_valid"
+            live_record["harness_result_summary"] = {
+                "cases_total": harness_result["cases_total"],
+                "improved_total": harness_result["improved_total"],
+                "unchanged_pass_total": harness_result["unchanged_pass_total"],
+                "unchanged_fail_total": harness_result["unchanged_fail_total"],
+                "regressed_total": harness_result["regressed_total"],
+            }
     else:
         live_record["diagnostics"].append("harness-compatible case file not written because one or more responses were invalid")
 

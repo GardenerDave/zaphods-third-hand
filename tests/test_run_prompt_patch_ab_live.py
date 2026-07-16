@@ -85,6 +85,22 @@ def _baseline_and_patched_outputs() -> tuple[str, str]:
     return json.dumps(baseline), json.dumps(patched)
 
 
+def _invalid_generated_case_outputs() -> tuple[str, str]:
+    baseline = {
+        "allowed_targets": [""],
+        "held_targets": ["training/"],
+        "scope_expansion_required": False,
+        "reason": "still working",
+    }
+    patched = {
+        "allowed_targets": ["docs/"],
+        "held_targets": ["training/"],
+        "scope_expansion_required": False,
+        "reason": "bounded",
+    }
+    return json.dumps(baseline), json.dumps(patched)
+
+
 def test_builds_identical_runtime_settings_payloads(monkeypatch, tmp_path: Path) -> None:
     baseline_prompt, patched_prompt, expected_contract, out_dir = _prompt_paths(tmp_path)
     _write_text(baseline_prompt, "baseline prompt\n")
@@ -162,6 +178,53 @@ def test_writes_prompt_patch_ab_cases_json_and_scores_as_improved(monkeypatch, t
     assert result["improved_total"] == 1
     assert result["regressed_total"] == 0
     assert live_record["generated_cases_path"] == str(cases_path)
+    assert live_record["generated_case_status"] == "harness_valid"
+    assert live_record["harness_result_summary"] == {
+        "cases_total": 1,
+        "improved_total": 1,
+        "unchanged_pass_total": 0,
+        "unchanged_fail_total": 0,
+        "regressed_total": 0,
+    }
+
+
+def test_generated_invalid_case_records_harness_invalid_and_keeps_case_file(
+    monkeypatch, tmp_path: Path
+) -> None:
+    baseline_prompt, patched_prompt, expected_contract, out_dir = _prompt_paths(tmp_path)
+    _write_text(baseline_prompt, "baseline prompt\n")
+    _write_text(patched_prompt, "patched prompt\n")
+    _write_json(expected_contract, _expected_contract())
+
+    responses = iter(_invalid_generated_case_outputs())
+    seen_methods: list[str] = []
+
+    def fake_urlopen(request, timeout):
+        seen_methods.append(request.get_method())
+        if request.get_method() == "GET":
+            return _make_json_response(json.dumps({"data": []}))
+        return _make_json_response(next(responses))
+
+    monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
+
+    record = run_prompt_patch_ab_live(
+        case_id="case_001",
+        failure_mode="scope_boundary",
+        prompt_patch_id="scope_boundary_v1",
+        task_summary="Keep allowed and held targets separated.",
+        expected_contract_path=expected_contract,
+        baseline_prompt_path=baseline_prompt,
+        patched_prompt_path=patched_prompt,
+        base_url="http://example.invalid/v1",
+        model="test-model",
+        out_dir=out_dir,
+    )
+
+    assert seen_methods == ["GET", "POST", "POST"]
+    assert record["generated_case_status"] == "harness_invalid"
+    assert "generated case failed harness validation:" in record["diagnostics"][-1]
+    assert (out_dir / "prompt_patch_ab_cases.json").is_file()
+    assert "generated_case_status" in json.loads((out_dir / "prompt_patch_ab_live_record.json").read_text(encoding="utf-8"))
 
 
 def test_expected_contract_malformed_exits_before_any_live_call(monkeypatch, tmp_path: Path) -> None:
