@@ -168,6 +168,7 @@ Disabling cron does not delete evidence. The `.work/dogfood/` artifacts remain l
 ```bash
 scripts/zth_dogfood_batch.sh status
 scripts/zth_dogfood_batch.sh validate
+scripts/zth_dogfood_batch.sh bundle
 scripts/zth_dogfood_batch.sh check-cron
 scripts/zth_dogfood_batch.sh archive-current rest-20260716
 scripts/zth_dogfood_batch.sh prepare-from-tsv /tmp/rest_queue.tsv rest-20260716
@@ -208,6 +209,8 @@ python3 local_harness/render_dogfood_acceptance_review_bundle.py \
 ```
 
 It packages evidence paths, hashes, and the validator result for human or Codex review. It does not accept output or grant downstream-use authority.
+
+`scripts/zth_dogfood_batch.sh bundle` is the wrapper form of the same review-only render. It writes the bundle under `.work/dogfood/reviews/latest_acceptance_review_bundle/` by default and remains evidence-only and review-required.
 
 ### Batch Preparation
 

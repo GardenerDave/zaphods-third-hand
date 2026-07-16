@@ -15,6 +15,7 @@ usage() {
 Usage:
   scripts/zth_dogfood_batch.sh status
   scripts/zth_dogfood_batch.sh validate
+  scripts/zth_dogfood_batch.sh bundle [out-dir]
   scripts/zth_dogfood_batch.sh prepare-from-tsv <queue-file> <batch-name> [--allow-cron-active]
   scripts/zth_dogfood_batch.sh archive-current <batch-name>
   scripts/zth_dogfood_batch.sh check-cron
@@ -136,6 +137,16 @@ validate_batch() {
     --stage-log "$WORK/stage.log"
 }
 
+bundle_batch() {
+  local out_dir="${1:-$WORK/reviews/latest_acceptance_review_bundle}"
+  python3 "$REPO/local_harness/render_dogfood_acceptance_review_bundle.py" \
+    --queue "$QUEUE" \
+    --state "$STATE" \
+    --runs-dir "$WORK/runs" \
+    --stage-log "$WORK/stage.log" \
+    --out-dir "$out_dir"
+}
+
 archive_current() {
   local batch_name="$1"
   local batch_dir="$BATCH_ROOT/$batch_name"
@@ -194,6 +205,14 @@ main() {
       ;;
     validate)
       validate_batch
+      ;;
+    bundle)
+      shift
+      if [ "${#}" -gt 1 ]; then
+        usage >&2
+        exit 1
+      fi
+      bundle_batch "${1:-}"
       ;;
     prepare-from-tsv)
       shift
