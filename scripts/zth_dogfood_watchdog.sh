@@ -7,6 +7,7 @@ WORK="$REPO/.work/dogfood"
 LOCK="$WORK/watchdog.lock"
 LEASE="$WORK/active_stage.lease"
 LOG="$WORK/watchdog.log"
+STAGE_LOG="$WORK/stage.log"
 SESSION="${ZTH_DOGFOOD_SESSION:-zth-dogfood-run}"
 
 mkdir -p "$WORK"
@@ -29,6 +30,7 @@ redact_ips() {
 
   if [ -f "$REPO/.env.local" ]; then
     set -a
+    # shellcheck disable=SC1091
     source "$REPO/.env.local"
     set +a
   fi
@@ -61,24 +63,38 @@ redact_ips() {
     exit 0
   fi
 
+  q_repo="$(printf '%q' "$REPO")"
+  q_lease="$(printf '%q' "$LEASE")"
+  q_stage_log="$(printf '%q' "$STAGE_LOG")"
+  q_model_id="$(printf '%q' "$ZTH_MODEL_ID")"
+
   echo "starting dogfood runner in tmux session: $SESSION"
 
-  tmux new-session -d -s "$SESSION" "
-    cd '$REPO' ;
+  tmux new-session -d -s "$SESSION" "bash -lc '
+    set -o pipefail
+    cd $q_repo
     {
-      echo '---- runner wrapper start '"\$(date -Is)"' ----' ;
-      set -a ;
-      [ -f .env.local ] && source .env.local ;
-      set +a ;
-      export ZTH_MODEL_ID='$ZTH_MODEL_ID' ;
-      touch '$LEASE' ;
-      bash scripts/zth_run_next_dogfood_stage.sh ;
-      status=\$? ;
-      echo '---- runner wrapper exit status='\$status' '"\$(date -Is)"' ----' ;
-      rm -f '$LEASE' ;
-      exit \$status ;
-    } 2>&1 | tee -a '$WORK/stage.log'
-  "
+      echo \"---- runner wrapper start \$(date -Is) ----\"
+
+      if [ -f .env.local ]; then
+        set -a
+        source .env.local
+        set +a
+      fi
+
+      export ZTH_MODEL_ID=$q_model_id
+
+      touch $q_lease
+
+      bash scripts/zth_run_next_dogfood_stage.sh
+      status=\$?
+
+      echo \"---- runner wrapper exit status=\$status \$(date -Is) ----\"
+
+      rm -f $q_lease
+      exit \$status
+    } 2>&1 | tee -a $q_stage_log
+  '"
 
   echo "started: $SESSION"
 } 2>&1 | redact_ips >> "$LOG"
