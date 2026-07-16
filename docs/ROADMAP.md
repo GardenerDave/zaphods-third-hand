@@ -120,6 +120,14 @@ Recent external project review produced 16 integrations for ZTH. These are not s
 
 The immediate objective is to strengthen the existing packet-to-attempt path. Later work adds measurement, lifecycle state, provenance, and retrieval only as the simpler plain-file system exposes the need.
 
+The completed supervised local-worker evidence loop now closes that path end to end:
+
+- the local model acts as a worker and evidence producer, not the orchestrator;
+- deterministic repo tools validate and score the generated evidence;
+- review bundles preserve authority boundaries in plain files;
+- candidate exporter and reviewer tools produce reviewable drafts only;
+- human review remains required before fixture import, promotion, or downstream use.
+
 The intended sequence is:
 
 ```text
@@ -226,6 +234,26 @@ This phase improves retrieval and context construction after the execution/prove
 16. Tri-modal retrieval planner
 
    Future retrieval should combine semantic similarity, provenance/dependency relationships, and structured eligibility filters such as task, authority, version, scope, commit, environment, and attempt state.
+
+### Next Phase - 120+ Task Supervised Dogfood
+
+The next high-scale dogfood phase should extend the supervised cron/watchdog batch while keeping the local worker model as a bounded evidence producer and keeping every authority-bearing decision under human review.
+
+This next phase remains supervised and local-first:
+
+- the cron/watchdog batch may trigger bounded worker runs, but it does not become an orchestrator for promotion or repository mutation;
+- the local worker model produces bounded evidence only;
+- no automatic repo edits, fixture imports, training capture, promotion, or downstream-use authority are granted;
+- deterministic validation and review bundles are required for each completed stage;
+- candidate export and candidate review remain review-only drafts, not import or promotion actions.
+
+Recommended acceptance criteria for the 120+ run:
+
+- queue and state files validate cleanly;
+- every completed task has the required evidence artifacts preserved;
+- failure cases are retained as evidence, not cleaned up;
+- candidate exports and reviews are produced only where the evidence path justifies them;
+- the final closeout report summarizes queue counts, failures, reviewable candidates, and the non-authority boundary explicitly.
 
 ## Explicit Deferrals
 
