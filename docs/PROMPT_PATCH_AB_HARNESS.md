@@ -49,6 +49,28 @@ The tracked `known_failure_modes_v1.json` fixture pack is a small deterministic 
 
 `render_prompt_patch_ab_review_bundle.py` packages a fixture run into a review artifact with hashes and explicit authority boundaries. It is review-only evidence, not a patch promotion mechanism and not downstream-use authorization.
 
+## Live supervised A/B evidence producer
+
+`run_prompt_patch_ab_live.py` is the operator-invoked live evidence producer for this branch. It makes one baseline call and one patched call under identical runtime settings, writes a harness-compatible case file, and leaves scoring to the deterministic harness.
+
+Example usage:
+
+```bash
+python3 local_harness/run_prompt_patch_ab_live.py \
+  --case-id case_001 \
+  --failure-mode scope_boundary \
+  --prompt-patch-id scope_boundary_v1 \
+  --task-summary "Keep allowed and held targets separated." \
+  --expected-contract path/to/expected_contract.json \
+  --baseline-prompt path/to/baseline_prompt.txt \
+  --patched-prompt path/to/patched_prompt.txt \
+  --base-url http://127.0.0.1:8080/v1 \
+  --model test-model \
+  --out-dir /tmp/prompt_patch_ab_live_case
+```
+
+The live producer is evidence-only and review-required. It does not promote patches, does not authorize downstream use, and does not replace the deterministic harness for scoring.
+
 ## Relationship to the library
 
 Prompt patches are still defined in [`docs/PROMPT_PATCH_LIBRARY.md`](PROMPT_PATCH_LIBRARY.md). This harness only compares stored outputs against a simple deterministic contract. It does not select patches, render prompts, or call models.
