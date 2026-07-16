@@ -83,3 +83,48 @@ runs/ stores per-stage packets, raw model output, redacted output, validation no
 ## Operator rule
 
 Cron or the watchdog may restart the harness, but it must only resume bounded work. Acceptance, promotion, training capture, deployment, and cleanup remain explicit operator decisions.
+
+## Watchdog Cron
+
+The watchdog is safe to run every 5 minutes. It only starts a bounded stage when the queue has work, the endpoint is reachable, and no active session or fresh lease is present.
+
+### Install
+
+Add a user crontab entry that runs from the repo root:
+
+```cron
+*/5 * * * * cd /home/navigator/agent-workspace/zaphods-third-hand && bash scripts/zth_dogfood_watchdog.sh
+```
+
+If the repo path changes, update the `cd` target. Keep the command rooted in the repository so the watchdog resolves `.env.local`, `.work/`, and the tracked scripts consistently.
+
+### Inspect Progress
+
+Check the supervised artifacts under `.work/dogfood/`:
+
+- `watchdog.log` records watchdog decisions with private IPs redacted.
+- `watchdog.status.log` records endpoint-unavailable and runner-exit status lines.
+- `stage.log` records the tmux runner wrapper and stage output.
+- `active_stage.lease` shows whether a stage is currently active.
+- `state.tsv` records completed or attempted bounded stages.
+- `runs/` stores the per-stage packet and model artifacts.
+
+Useful operator checks:
+
+```bash
+tail -n 50 .work/dogfood/watchdog.log
+tail -n 50 .work/dogfood/watchdog.status.log
+sed -n '1,40p' .work/dogfood/state.tsv
+tmux ls | grep zth-dogfood-run
+```
+
+### Disable
+
+Remove or comment out the cron entry. If a run is active, let it finish or stop it explicitly with tmux before removing the schedule:
+
+```bash
+tmux kill-session -t zth-dogfood-run
+rm -f .work/dogfood/active_stage.lease
+```
+
+Disabling cron does not delete evidence. The `.work/dogfood/` artifacts remain local and ignored until the operator removes them.
