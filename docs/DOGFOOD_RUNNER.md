@@ -128,3 +128,63 @@ rm -f .work/dogfood/active_stage.lease
 ```
 
 Disabling cron does not delete evidence. The `.work/dogfood/` artifacts remain local and ignored until the operator removes them.
+
+## Batch Wrapper
+
+`scripts/zth_dogfood_batch.sh` is a small operator wrapper for preparing, inspecting, and archiving supervised dogfood batches. It does not run the watchdog or call a model endpoint.
+
+### Safe Lifecycle
+
+1. Prepare the next batch from a TSV queue file.
+2. Verify cron is off before enabling anything intentionally.
+3. Enable cron only when the operator is ready to supervise the run.
+4. Monitor status through the batch wrapper and the `.work/dogfood/` logs.
+5. Stop cron when the queue is exhausted.
+6. Validate and consolidate the completed batch with Codex.
+7. Implement only reviewed, repo-grounded slices.
+8. Track a closeout note in `docs/reports/`.
+
+### Evidence Boundary
+
+- `.work/` is ignored local evidence.
+- `state.tsv`, `roadmap_queue.tsv`, `stage.log`, `watchdog.log`, and `watchdog.status.log` are evidence, not authority.
+- Raw model output is evidence, not authority.
+- The wrapper does not grant unattended execution, auto-promotion, automatic training capture, cleanup authority, merge authority, or deployment authority.
+
+### Wrapper Commands
+
+```bash
+scripts/zth_dogfood_batch.sh status
+scripts/zth_dogfood_batch.sh check-cron
+scripts/zth_dogfood_batch.sh archive-current rest-20260716
+scripts/zth_dogfood_batch.sh prepare-from-tsv /tmp/rest_queue.tsv rest-20260716
+scripts/zth_dogfood_batch.sh print-disable-cron-command
+```
+
+### Status Fields
+
+The `status` subcommand reports:
+
+- total queue rows
+- completed rows
+- remaining rows
+- duplicate state slugs
+- queue/state order mismatch
+- latest completed slug
+- whether exhaustion is visible in `stage.log`
+
+### Batch Preparation
+
+`prepare-from-tsv <queue-file> <batch-name>` archives the current queue/state/log pointers under `.work/dogfood/batches/<batch-name>/`, replaces `.work/dogfood/roadmap_queue.tsv`, and resets `.work/dogfood/state.tsv`.
+
+If cron appears active, preparation refuses to continue unless `--allow-cron-active` is supplied explicitly.
+
+### Batch Archiving
+
+`archive-current <batch-name>` copies the current queue, state, and available log pointers into `.work/dogfood/batches/<batch-name>/` without deleting the originals.
+
+### Cron Checks
+
+`check-cron` reports whether the watchdog cron line appears in the current crontab.
+
+`print-disable-cron-command` prints a one-line removal command for the watchdog cron entry.
