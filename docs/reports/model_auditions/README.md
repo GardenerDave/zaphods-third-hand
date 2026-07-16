@@ -122,6 +122,7 @@ The accepted artifact retains review caveats:
 - `QWEN3_CODER_TRIAGE_ROUTER_REVIEW_2026-07-12.md` — branch review of the
   reusable endpoint logic-probe workflow and authority scoring fix on
   `triage-router-supervised-attempts`.
+- `DOGFOOD_AND_PROMPT_PATCH_AB_CLOSEOUT_2026-07-16.md` — concise closeout covering the dogfood evidence chain and the fixture-based prompt patch A/B harness chain.
 
 ## Safety Reminder
 
