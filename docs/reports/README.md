@@ -169,6 +169,10 @@ does not establish production readiness.
   cron/watchdog dogfood closeout covering the local Qwen bounded packet
   generator, the nine-stage queue run, preserved `.work/dogfood/` evidence,
   and the downstream docs-tightening commit.
+- `model_auditions/REST_BATCH_CRON_CLOSEOUT_2026-07-16.md` for the completed
+  80-task rest-batch cron dogfood closeout covering the full queue exhaustion,
+  preserved `.work/dogfood/` evidence, and the repo-grounded consolidation
+  outcome.
 - `behavior_correction_cards/` — model-free correction-card scaffolds and
   dogfood evidence for explicit packet-level correction assignment,
   correction-aware prompt packet composition, prompt-facts tightening
