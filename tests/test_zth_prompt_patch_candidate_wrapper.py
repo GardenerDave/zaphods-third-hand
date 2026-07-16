@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import json
 import subprocess
 from pathlib import Path
@@ -106,16 +107,21 @@ def _make_run_dir(root: Path, *, result: str = "improved") -> Path:
 
 def test_wrapper_creates_default_out_dir_and_prints_summary(tmp_path: Path) -> None:
     run_dir = _make_run_dir(tmp_path, result="improved")
+    repo_root = tmp_path / "repo"
+    repo_root.mkdir()
+    (repo_root / "scripts").symlink_to(ROOT / "scripts", target_is_directory=True)
+    (repo_root / "local_harness").symlink_to(ROOT / "local_harness", target_is_directory=True)
     result = subprocess.run(
         ["/bin/bash", str(SCRIPT), str(run_dir), "scope_boundary_output_contract_combined_candidate_001"],
-        cwd=ROOT,
+        cwd=repo_root,
+        env={**os.environ, "ZTH_REPO": str(repo_root)},
         text=True,
         capture_output=True,
         check=False,
     )
 
     assert result.returncode == 0
-    default_out = ROOT / ".work" / "prompt_patch_ab_candidates" / run_dir.name
+    default_out = repo_root / ".work" / "prompt_patch_ab_candidates" / run_dir.name
     assert (default_out / "prompt_patch_ab_fixture_candidate.json").is_file()
     assert (default_out / "prompt_patch_ab_fixture_candidate_review.json").is_file()
     assert "candidate_path:" in result.stdout
