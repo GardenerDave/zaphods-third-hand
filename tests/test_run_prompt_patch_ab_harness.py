@@ -15,6 +15,7 @@ from local_harness.run_prompt_patch_ab_harness import (
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "local_harness" / "run_prompt_patch_ab_harness.py"
+FIXTURE = ROOT / "local_harness" / "fixtures" / "prompt_patch_ab" / "scope_boundary_example.json"
 
 
 def _write_cases(path: Path, cases: list[dict]) -> None:
@@ -214,3 +215,10 @@ def test_cli_exits_nonzero_for_malformed_case_file(tmp_path: Path) -> None:
     assert result.returncode != 0
     payload = json.loads(result.stdout)
     assert payload["diagnostics"]
+
+
+def test_tracked_scope_boundary_fixture_scores_as_improved() -> None:
+    result = run_prompt_patch_ab_harness(FIXTURE)
+    assert result["cases_total"] == 1
+    assert result["improved_total"] == 1
+    assert result["regressed_total"] == 0

@@ -31,12 +31,15 @@ The harness reports whether the patched output improved, stayed unchanged, or re
 ```bash
 python3 local_harness/run_prompt_patch_ab_harness.py --cases path/to/cases.json
 python3 local_harness/run_prompt_patch_ab_harness.py --cases path/to/cases.json --output path/to/result.json
+python3 local_harness/run_prompt_patch_ab_harness.py --cases local_harness/fixtures/prompt_patch_ab/scope_boundary_example.json
 ```
 
 The case file must contain:
 
 - `harness_schema: "prompt_patch_ab_cases_v1"`
 - `cases`: a list of case objects with `case_id`, `failure_mode`, `prompt_patch_id`, `task_summary`, `expected_contract`, `baseline_output`, and `patched_output`
+
+The tracked `scope_boundary_example.json` fixture is illustrative and model-free. A pass on this fixture shows the stored patched output fits the expected contract better than the baseline output. It is not a prompt-patch promotion decision.
 
 ## Relationship to the library
 
