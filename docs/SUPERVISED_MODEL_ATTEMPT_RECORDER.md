@@ -31,6 +31,11 @@ The builder records one supervised attempt from:
 - raw model output text
 - provenance
 
+For the rest-batch consolidation slice, the recorded packet is expected to
+carry enough context for later validation to inspect objective, authority
+boundary, allowed targets, held targets, evidence, provenance, verification
+commands or observable proof, stop conditions, and completion-claim status.
+
 The builder and validator enforce:
 
 - required IDs (`attempt_id`, `triage_id`, `orchestration_id`)

@@ -38,6 +38,18 @@ This documentation slice was selected from the cron dogfood consolidation
 report at `.work/dogfood/reviews/dogfood_packet_consolidation_20260716_0200.md`
 to tighten the repo-grounded supervised attempt path.
 
+Zero-context packet requirements for this slice:
+
+- objective
+- authority boundary
+- allowed targets
+- held targets
+- evidence and provenance
+- verification commands or observable proof
+- stop conditions
+- completion-claim status (`supported`, `unsupported`, or `refuted`)
+- downstream-use gate
+
 ### Contract checks
 
 For `output_contract.format == "json"`:
@@ -50,6 +62,7 @@ For `output_contract.format == "json"`:
   the reviewed record includes a claim verdict field or equivalent contract
   field
 - require objective evidence and provenance linkage for any claim verdict
+- preserve the original supervised packet fields as evidence, not authority
 
 Validation passes only when all required checks pass.
 
@@ -82,6 +95,7 @@ This layer does not:
 - train adapters
 - capture failures into curriculum by default
 - infer downstream-use eligibility
+- infer cleanup authority
 
 It preserves raw output as evidence and does not transform model output into
 approved actions.
