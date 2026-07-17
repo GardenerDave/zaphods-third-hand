@@ -70,6 +70,20 @@ def _artifact_hashes(run_path: Path) -> dict[str, str]:
     return hashes
 
 
+def _validation_diagnostics(validation_result: dict[str, Any]) -> list[str]:
+    diagnostics = [str(item) for item in validation_result.get("diagnostics", []) if str(item).strip()]
+    for item in validation_result.get("missing_artifacts", []) or []:
+        slug = item.get("slug", "(unknown)")
+        missing = item.get("missing", [])
+        diagnostics.append(f"{slug}: missing artifacts: {', '.join(map(str, missing))}")
+    for item in validation_result.get("json_errors", []) or []:
+        slug = item.get("slug", "(unknown)")
+        path = item.get("path", "(unknown path)")
+        error = item.get("error", "(unknown error)")
+        diagnostics.append(f"{slug}: {path}: {error}")
+    return diagnostics
+
+
 def render_dogfood_acceptance_review_bundle(
     *,
     queue_path: Path,
@@ -127,7 +141,7 @@ def render_dogfood_acceptance_review_bundle(
         },
         "validation_result": validation_result,
         "completed_stages": completed_stages,
-        "diagnostics": list(validation_result.get("diagnostics", [])),
+        "diagnostics": _validation_diagnostics(validation_result),
     }
 
     out_dir.mkdir(parents=True, exist_ok=True)

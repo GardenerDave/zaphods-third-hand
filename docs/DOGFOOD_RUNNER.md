@@ -197,6 +197,8 @@ scripts/zth_dogfood_batch.sh validate
 
 This check is read-only. It validates queue/state/run artifact structure and JSON parseability. It does not grant acceptance, promotion, or any other downstream-use authority.
 
+The validator also treats `model_content.json` as a packet contract: missing required fields or a non-object payload fail closed and appear in the diagnostics rather than being cleaned up.
+
 The next review artifact in the chain is the acceptance-review bundle:
 
 ```bash

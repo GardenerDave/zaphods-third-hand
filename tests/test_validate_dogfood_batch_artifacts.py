@@ -27,8 +27,27 @@ def _write_run(run_dir: Path, *, raw_output: object = None, content: object = No
     if raw_output is None:
         raw_output = {"allowed_targets": [], "held_targets": [], "reason": "ok"}
     if content is None:
-        content = {"allowed_targets": [], "held_targets": [], "reason": "ok"}
+        content = {
+            "task_summary": "ok",
+            "repo_observations": [],
+            "allowed_targets": [],
+            "held_targets": [],
+            "proposed_next_action": "ok",
+            "validation_plan": [],
+            "reason": "ok",
+        }
     (run_dir / "model_output.raw.json").write_text(json.dumps(raw_output) + "\n", encoding="utf-8")
+    (run_dir / "model_content.json").write_text(json.dumps(content) + "\n", encoding="utf-8")
+
+
+def _write_partial_content_run(run_dir: Path, *, content: object) -> None:
+    run_dir.mkdir(parents=True, exist_ok=True)
+    (run_dir / "stage_packet.md").write_text("# packet\n", encoding="utf-8")
+    (run_dir / "model_output.raw.json").write_text(
+        '{"allowed_targets": [], "held_targets": [], "reason": "ok"}\n',
+        encoding="utf-8",
+    )
+    (run_dir / "model_output.redacted.json").write_text('{"redacted": true}\n', encoding="utf-8")
     (run_dir / "model_content.json").write_text(json.dumps(content) + "\n", encoding="utf-8")
 
 
@@ -175,6 +194,36 @@ def test_missing_artifact(tmp_path: Path) -> None:
     assert result["missing_artifacts"][0]["missing"] == ["model_content.json"]
 
 
+def test_missing_raw_or_redacted_artifact(tmp_path: Path) -> None:
+    queue, state, runs_dir, stage_log = _make_paths(tmp_path)
+    _write_queue(queue, [("1", "alpha", "A"), ("2", "beta", "B")])
+    _write_state(
+        state,
+        [
+            ("2026-07-16T00:00:00Z", "alpha", "packet_generated", "alpha"),
+            ("2026-07-16T00:01:00Z", "beta", "packet_generated", "beta"),
+        ],
+    )
+    alpha = runs_dir / "alpha"
+    beta = runs_dir / "beta"
+    _write_run(alpha)
+    _write_run(beta)
+    (alpha / "model_output.redacted.json").unlink()
+    (beta / "model_output.raw.json").unlink()
+
+    result = validate_dogfood_batch_artifacts(
+        queue_path=queue,
+        state_path=state,
+        runs_dir=runs_dir,
+        stage_log_path=stage_log,
+    )
+
+    assert result["validation_status"] == "failed"
+    assert len(result["missing_artifacts"]) == 2
+    assert any(item["missing"] == ["model_output.redacted.json"] for item in result["missing_artifacts"])
+    assert any(item["missing"] == ["model_output.raw.json"] for item in result["missing_artifacts"])
+
+
 def test_rejects_non_packet_generated_status(tmp_path: Path) -> None:
     queue, state, runs_dir, stage_log = _make_paths(tmp_path)
     _write_queue(queue, [("1", "alpha", "A")])
@@ -210,6 +259,54 @@ def test_malformed_json(tmp_path: Path) -> None:
     assert result["validation_status"] == "failed"
     assert result["json_errors"]
     assert result["json_errors"][0]["path"].endswith("model_output.raw.json")
+
+
+def test_incomplete_model_content_missing_required_fields(tmp_path: Path) -> None:
+    queue, state, runs_dir, stage_log = _make_paths(tmp_path)
+    _write_queue(queue, [("1", "alpha", "A")])
+    _write_state(state, [("2026-07-16T00:00:00Z", "alpha", "packet_generated", "alpha")])
+    _write_partial_content_run(
+        runs_dir / "alpha",
+        content={
+            "allowed_targets": [],
+            "held_targets": [],
+            "reason": "ok",
+        },
+    )
+
+    result = validate_dogfood_batch_artifacts(
+        queue_path=queue,
+        state_path=state,
+        runs_dir=runs_dir,
+        stage_log_path=stage_log,
+    )
+
+    assert result["validation_status"] == "failed"
+    assert result["json_errors"]
+    assert "missing required fields" in result["json_errors"][0]["error"]
+
+
+def test_model_content_must_be_json_object(tmp_path: Path) -> None:
+    queue, state, runs_dir, stage_log = _make_paths(tmp_path)
+    _write_queue(queue, [("1", "alpha", "A")])
+    _write_state(state, [("2026-07-16T00:00:00Z", "alpha", "packet_generated", "alpha")])
+    run_dir = runs_dir / "alpha"
+    run_dir.mkdir(parents=True, exist_ok=True)
+    (run_dir / "stage_packet.md").write_text("# packet\n", encoding="utf-8")
+    (run_dir / "model_output.raw.json").write_text('{"allowed_targets": [], "held_targets": [], "reason": "ok"}\n', encoding="utf-8")
+    (run_dir / "model_output.redacted.json").write_text('{"redacted": true}\n', encoding="utf-8")
+    (run_dir / "model_content.json").write_text('[]\n', encoding="utf-8")
+
+    result = validate_dogfood_batch_artifacts(
+        queue_path=queue,
+        state_path=state,
+        runs_dir=runs_dir,
+        stage_log_path=stage_log,
+    )
+
+    assert result["validation_status"] == "failed"
+    assert result["json_errors"]
+    assert result["json_errors"][0]["error"].endswith("expected a JSON object")
 
 
 def test_missing_queue_or_state_handled_cleanly(tmp_path: Path) -> None:

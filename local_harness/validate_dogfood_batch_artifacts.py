@@ -92,6 +92,16 @@ def _json_or_error(path: Path) -> str | None:
     return None
 
 
+def _json_object_or_error(path: Path) -> tuple[dict[str, Any] | None, str | None]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        return None, f"{path.name}: {exc.msg}"
+    if not isinstance(payload, dict):
+        return None, f"{path.name}: expected a JSON object"
+    return payload, None
+
+
 def validate_dogfood_batch_artifacts(
     *,
     queue_path: Path,
@@ -205,7 +215,7 @@ def validate_dogfood_batch_artifacts(
             )
             continue
 
-        for json_name in ["model_output.raw.json", "model_content.json"]:
+        for json_name in ["model_output.raw.json"]:
             json_error = _json_or_error(run_path / json_name)
             if json_error:
                 json_errors.append(
@@ -215,6 +225,36 @@ def validate_dogfood_batch_artifacts(
                         "error": json_error,
                     }
                 )
+
+        model_content_path = run_path / "model_content.json"
+        model_content, content_error = _json_object_or_error(model_content_path)
+        if content_error:
+            json_errors.append(
+                {
+                    "slug": state_row.slug,
+                    "path": str(model_content_path),
+                    "error": content_error,
+                }
+            )
+            continue
+
+        required_content_fields = [
+            "task_summary",
+            "repo_observations",
+            "allowed_targets",
+            "held_targets",
+            "proposed_next_action",
+            "validation_plan",
+        ]
+        missing_fields = [field for field in required_content_fields if field not in model_content]
+        if missing_fields:
+            json_errors.append(
+                {
+                    "slug": state_row.slug,
+                    "path": str(model_content_path),
+                    "error": "model_content.json missing required fields: " + ", ".join(missing_fields),
+                }
+            )
 
     exhaustion_visible = False
     if stage_log_path is not None and stage_log_path.is_file():

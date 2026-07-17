@@ -26,7 +26,15 @@ def _write_run(run_dir: Path, raw_payload: object = None, content_payload: objec
     (run_dir / "stage_packet.md").write_text("# packet\n", encoding="utf-8")
     raw_payload = {"allowed_targets": [], "held_targets": [], "reason": "ok"} if raw_payload is None else raw_payload
     content_payload = (
-        {"allowed_targets": [], "held_targets": [], "reason": "ok"}
+        {
+            "task_summary": "ok",
+            "repo_observations": [],
+            "allowed_targets": [],
+            "held_targets": [],
+            "proposed_next_action": "ok",
+            "validation_plan": [],
+            "reason": "ok",
+        }
         if content_payload is None
         else content_payload
     )
@@ -173,3 +181,31 @@ def test_no_raw_model_output_contents_embedded(tmp_path: Path) -> None:
     text = json.dumps(bundle, sort_keys=True)
     assert "do not embed" not in text
     assert "secret" not in text
+
+
+def test_bundle_preserves_validator_diagnostics_for_incomplete_content(tmp_path: Path) -> None:
+    queue, state, runs_dir, stage_log = _paths(tmp_path)
+    out_dir = tmp_path / "bundle"
+    _write_queue(queue, [("1", "alpha", "A")])
+    _write_state(state, [("2026-07-16T00:00:00Z", "alpha", "packet_generated", "alpha")])
+    _write_run(
+        runs_dir / "alpha",
+        content_payload={
+            "allowed_targets": [],
+            "held_targets": [],
+            "reason": "ok",
+        },
+    )
+    stage_log.write_text("No remaining dogfood stages.\n", encoding="utf-8")
+
+    bundle = render_dogfood_acceptance_review_bundle(
+        queue_path=queue,
+        state_path=state,
+        runs_dir=runs_dir,
+        out_dir=out_dir,
+        stage_log_path=stage_log,
+    )
+
+    assert bundle["evidence_validation_status"] == "failed"
+    assert bundle["diagnostics"]
+    assert any("missing required fields" in item["error"] for item in bundle["validation_result"]["json_errors"])
