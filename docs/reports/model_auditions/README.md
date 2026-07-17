@@ -128,6 +128,7 @@ The accepted artifact retains review caveats:
 - `FULL_LIVE_TO_CANDIDATE_PROMPT_PATCH_AB_LOOP_2026-07-16.md` — closeout for the successful live-to-candidate prompt patch A/B loop.
 - `FULL_LIVE_TO_CANDIDATE_PROMPT_PATCH_AB_LOOP_2026-07-16.md` and the roadmap entry together mark the completed supervised local-worker evidence loop that feeds the next high-scale dogfood phase.
 - `SUPERVISED_WORKER_LOOP_120_TASK_DOGFOOD_CLOSEOUT_2026-07-17.md` — closeout for the completed 120-task supervised dogfood batch, including queue/state validation and the preserved review bundle.
+- `SUPERVISED_WORKER_LOOP_120_TASK_SYNTHESIS_2026-07-17.md` — compact decision synthesis for the completed 120-task supervised dogfood batch.
 
 ## Safety Reminder
 
