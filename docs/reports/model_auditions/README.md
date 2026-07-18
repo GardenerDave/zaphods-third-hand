@@ -150,6 +150,7 @@ The accepted artifact retains review caveats:
 - `QUEUE_HANDOFF_REVIEW_VALIDATOR_2026-07-17.md` — fail-closed validator for queue-handoff review artifacts; it checks the design-only review boundary without writing a queue.
 - `QUEUE_HANDOFF_REVIEW_FIXTURES_2026-07-17.md` — tracked fixture pack for queue-handoff review validation; it covers pass cases and fail-closed unsafe/malformed cases.
 - `QUEUE_HANDOFF_REVIEW_CALIBRATION_SYNTHESIS_2026-07-17.md` — calibration synthesis after the validator and tracked pass/blocked fixtures; it records what is proven and what remains unimplemented.
+- `LONG_DURATION_DOGFOOD_CRON_2026-07-18.md` — supervised long-duration dogfood cron design and usage notes; it generates review artifacts without auto-commit, push, or queue writing.
 
 ## Safety Reminder
 
