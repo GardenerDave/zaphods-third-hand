@@ -54,6 +54,70 @@ The validator rejects any packet that attempts to smuggle in authority:
   `training_execution`, `auto_curriculum`.
 * `allowed_targets` and `held_targets` overlap.
 
+## Messy Input Triage Packet v1
+
+`local_harness/validate_messy_input_triage_packet.py` validates a smaller,
+front-door packet for messy user or project input before any later packet
+assembly work. This packet validates scope and evidence needs only; it does
+not authorize execution, mutation, promotion, training capture, deployment,
+or downstream use.
+
+Required fields:
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `packet_schema` | str | Must be `messy_input_triage_packet_v1`. |
+| `task_summary` | str | Non-empty summary of the messy input. |
+| `request_type` | str | Non-empty request label. |
+| `allowed_targets` | list[str] | Paths or areas that may be considered. |
+| `held_targets` | list[str] | Paths or areas explicitly withheld. |
+| `evidence_needed` | list[str] | Bounded evidence the reviewer or worker should gather. |
+| `authority_boundary` | list[str] | Must include `no_unattended_execution`, `no_repo_mutation_without_review`, `no_training_capture`, `no_promotion`, `no_deployment`, and `no_downstream_use_authority`. |
+| `proposed_next_action` | str | Must not claim completion, promotion, deployment, training, cleanup, or automatic import authority. |
+| `validation_plan` | list[str] | Deterministic checks or review steps. |
+| `stop_conditions` | list[str] | Conditions that require stopping and returning control. |
+| `review_required` | bool | Must be `true`. |
+
+Optional fields:
+
+* `provenance_notes`
+* `risk_notes`
+* `ambiguity_notes`
+* `routing_label`
+* `confidence`
+
+Example:
+
+```json
+{
+  "packet_schema": "messy_input_triage_packet_v1",
+  "task_summary": "Turn a messy request into a bounded triage packet.",
+  "request_type": "triage_request",
+  "allowed_targets": ["docs/"],
+  "held_targets": ["training/"],
+  "evidence_needed": ["repo context", "validation command"],
+  "authority_boundary": [
+    "no_unattended_execution",
+    "no_repo_mutation_without_review",
+    "no_training_capture",
+    "no_promotion",
+    "no_deployment",
+    "no_downstream_use_authority"
+  ],
+  "proposed_next_action": "Draft the triage packet for human review.",
+  "validation_plan": ["check required fields", "check authority boundary"],
+  "stop_conditions": ["scope is unclear", "authorization is missing"],
+  "review_required": true
+}
+```
+
+Validate a packet:
+
+```bash
+python3 local_harness/validate_messy_input_triage_packet.py \
+  --packet examples/triage_packets/triage_example_001.json
+```
+
 ### Risk-flag requirements
 
 `required_risk_flags_for_input(messy_input)` computes the minimum risk flags

@@ -113,6 +113,7 @@ explicit supervised acceptance without promotion or downstream mutation.
 - Manual supervised model-attempt runner added (`run_manual_supervised_attempt.py`), with prepare/ingest operator flow that keeps model use manual and supervised, records validation evidence, and requires explicit review metadata before downstream gate/handoff artifacts.
 - Explicit `call-local` mode added to the manual supervised attempt runner for operator-invoked OpenAI-compatible local endpoint calls that write raw output plus call metadata for the existing supervised ingest/review path without granting execution, mutation, promotion, training, or curriculum-capture authority.
 - Explicit `export-pattern` mode added to the manual supervised attempt runner for operator-invoked failure/correction/success pattern export into supervised training pattern candidate artifacts; export is evidence-only and does not grant training or curriculum-capture authority.
+- Messy Input Triage Packet v1 validator for the supervised front door that turns messy input into a bounded, review-required triage packet before later packet assembly.
 
 ## Integration Roadmap: Improve / Fable / TriDB Harvest
 
@@ -627,7 +628,9 @@ Requirements:
 - The next architecture work is the prompt patch library
   (`docs/PROMPT_PATCH_LIBRARY.md`), the triage/router packet layer
   (`docs/TRIAGE_ROUTER.md`), the orchestration boundary
-  (`docs/ORCHESTRATION_BOUNDARY.md`), the model prompt packet renderer
+  (`docs/ORCHESTRATION_BOUNDARY.md`), the messy input triage front door
+  (`local_harness/validate_messy_input_triage_packet.py` and
+  `docs/TRIAGE_ROUTER.md`), the model prompt packet renderer
   (`docs/MODEL_PROMPT_PACKET_RENDERER.md`), supervised model attempt
   recording (`docs/SUPERVISED_MODEL_ATTEMPT_RECORDER.md`), supervised
   attempt output validation (`docs/SUPERVISED_ATTEMPT_OUTPUT_VALIDATION.md`),
