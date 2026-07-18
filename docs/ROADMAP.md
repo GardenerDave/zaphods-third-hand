@@ -137,6 +137,7 @@ explicit supervised acceptance without promotion or downstream mutation.
 - Long-duration dogfood cron script tests added; the loop remains review-artifact-only and non-authoritative.
 - Long-duration dogfood recommender now avoids repeating completed script-test work and can point to the next bounded validator-oriented target.
 - Long-duration dogfood recommender now avoids repeating the completed queue approval scaffold and points to calibration synthesis.
+- Queue approval path calibration synthesis recorded; approval remains review-only and queue insertion, queue writing, queue running, and automatic handoff remain unimplemented.
 
 ## Integration Roadmap: Improve / Fable / TriDB Harvest
 
