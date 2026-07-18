@@ -132,6 +132,7 @@ explicit supervised acceptance without promotion or downstream mutation.
 - Queue-handoff review validator added; queue writing remains unimplemented and blocked behind fixtures, explicit approval, and separate review.
 - Queue-handoff review fixtures added; queue writing remains unimplemented and blocked behind explicit approval and separate review.
 - Queue-handoff review calibration synthesis recorded; queue writing remains unimplemented and blocked behind separate approval-path design, validator, fixtures, and review.
+- Queue approval path validator scaffold added; it validates review-only manual queue insertion candidates while queue writing, queue insertion, queue running, and automatic handoff remain unimplemented.
 - Long-duration dogfood cron added for supervised review artifact generation; it does not auto-commit, push, queue-write, or mutate main unattended.
 - Long-duration dogfood cron script tests added; the loop remains review-artifact-only and non-authoritative.
 - Long-duration dogfood recommender now avoids repeating completed script-test work and can point to the next bounded validator-oriented target.

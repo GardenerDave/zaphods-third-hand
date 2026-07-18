@@ -1,0 +1,11 @@
+{
+  "case_id": "unapproved_source_status_001",
+  "expected_validation_status": "failed",
+  "expected_exit_code": "nonzero",
+  "expected_diagnostic_substrings": [
+    "source_queue_handoff_review_status"
+  ],
+  "expected_diagnostic_codes": [
+    "SOURCE_STATUS_NOT_APPROVED"
+  ]
+}

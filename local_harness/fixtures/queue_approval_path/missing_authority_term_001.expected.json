@@ -1,0 +1,11 @@
+{
+  "case_id": "missing_authority_term_001",
+  "expected_validation_status": "failed",
+  "expected_exit_code": "nonzero",
+  "expected_diagnostic_substrings": [
+    "missing required authority boundary terms"
+  ],
+  "expected_diagnostic_codes": [
+    "MISSING_AUTHORITY_TERMS"
+  ]
+}

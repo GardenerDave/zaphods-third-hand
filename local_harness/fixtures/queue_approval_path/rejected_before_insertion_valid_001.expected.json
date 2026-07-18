@@ -1,0 +1,7 @@
+{
+  "case_id": "rejected_before_insertion_valid_001",
+  "expected_validation_status": "passed",
+  "expected_exit_code": "zero",
+  "expected_diagnostic_substrings": [],
+  "expected_diagnostic_codes": []
+}
