@@ -126,6 +126,7 @@ explicit supervised acceptance without promotion or downstream mutation.
 - Diverse front-door chain fixtures added; future work remains scoring calibration and supervised queue-handoff review.
 - Front-door fixture expansion synthesis recorded; future work shifts to blocked-case calibration and supervised queue-handoff review.
 - Blocked front-door chain fixtures added; future work remains blocked/pass calibration and supervised queue-handoff review.
+- Front-door calibration synthesis recorded; future work may consider supervised queue-handoff review design, not implementation.
 
 ## Integration Roadmap: Improve / Fable / TriDB Harvest
 
