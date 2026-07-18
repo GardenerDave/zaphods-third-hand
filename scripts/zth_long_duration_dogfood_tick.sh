@@ -104,7 +104,7 @@ start_run() {
   RUN_ID="$(date +%Y%m%d_%H%M%S)"
   RUN_DIR="$RUNS_DIR/$RUN_ID"
   mkdir -p "$RUN_DIR"
-  exec > >(tee -a "$RUN_DIR/tick.log") 2>&1
+  exec >"$RUN_DIR/tick.log" 2>&1
 }
 
 record_file() {
