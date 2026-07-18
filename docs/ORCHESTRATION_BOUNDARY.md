@@ -147,3 +147,49 @@ downstream use.
 The deterministic bridge fixture suite at
 `local_harness/fixtures/triage_to_bounded_task_bridge/` exercises this draft
 shape against both passing and fail-closed cases.
+
+## Bounded Task Review Packet Drafts
+
+`local_harness/validate_bounded_task_review_packet.py` validates the review
+packet that follows a validated bounded task draft. This review packet is
+review-required evidence only; it does not authorize queue insertion, repo
+mutation, fixture import, training capture, promotion, deployment, or
+downstream use.
+
+Required fields include:
+
+- `packet_schema: "bounded_task_review_packet_v1"`
+- `source_packet_schema: "bounded_task_packet_draft_v1"`
+- `source_packet_path`
+- `source_validation_status: "passed"`
+- `review_status: "review_required"`
+- `downstream_use_status: "prohibited_until_review"`
+- `automation_status: "not_automated"`
+- `queue_handoff_status: "not_inserted"`
+- `repo_mutation_status: "not_authorized"`
+- `task_summary`
+- `reviewed_artifacts`
+- `required_checks`
+- `authority_boundary`
+- `diagnostics`
+- `recommended_next_step`
+
+The authority boundary must include:
+
+- `no_unattended_execution`
+- `no_repo_mutation_without_review`
+- `no_training_capture`
+- `no_promotion`
+- `no_deployment`
+- `no_downstream_use_authority`
+
+Example validation command:
+
+```bash
+python3 local_harness/validate_bounded_task_review_packet.py \
+  --packet local_harness/fixtures/bounded_task_review_packet/valid_review_packet_001.json
+```
+
+The deterministic bridge fixture suite at
+`local_harness/fixtures/bounded_task_review_packet/` exercises this review
+shape against pass and fail-closed cases.
