@@ -247,6 +247,8 @@ This next phase remains supervised and local-first:
 - deterministic validation and review bundles are required for each completed stage;
 - candidate export and candidate review remain review-only drafts, not import or promotion actions.
 
+The completed supervised local-worker loop, the completed 120-task dogfood batch, and the malformed/partial packet plus review-bundle completeness regression coverage are now recorded in docs and tests. Remaining work is docs/index hygiene, roadmap maintenance, and future targeted regression coverage only.
+
 Recommended acceptance criteria for the 120+ run:
 
 - queue and state files validate cleanly;
