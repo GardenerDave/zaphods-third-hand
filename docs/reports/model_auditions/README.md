@@ -152,6 +152,7 @@ The accepted artifact retains review caveats:
 - `QUEUE_HANDOFF_REVIEW_CALIBRATION_SYNTHESIS_2026-07-17.md` — calibration synthesis after the validator and tracked pass/blocked fixtures; it records what is proven and what remains unimplemented.
 - `QUEUE_APPROVAL_PATH_VALIDATOR_2026-07-18.md` — review-only validator scaffold for the future queue approval path; it validates manual queue-insertion candidates without queue writing.
 - `QUEUE_APPROVAL_PATH_CALIBRATION_SYNTHESIS_2026-07-18.md` — calibration synthesis after the queue approval validator, fixtures, and regression tests; it records what is proven and what remains unimplemented.
+- `QUEUE_APPROVAL_REVIEW_COMMAND_2026-07-18.md` — read-only queue approval review command; it wraps validation and emits explicit review output only.
 - `LONG_DURATION_DOGFOOD_CRON_2026-07-18.md` — supervised long-duration dogfood cron design and usage notes; it generates review artifacts without auto-commit, push, or queue writing.
 
 ## Safety Reminder
