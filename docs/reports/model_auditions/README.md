@@ -130,6 +130,7 @@ The accepted artifact retains review caveats:
 - `SUPERVISED_WORKER_LOOP_120_TASK_DOGFOOD_CLOSEOUT_2026-07-17.md` — closeout for the completed 120-task supervised dogfood batch, including queue/state validation and the preserved review bundle.
 - `SUPERVISED_WORKER_LOOP_120_TASK_SYNTHESIS_2026-07-17.md` — compact decision synthesis for the completed 120-task supervised dogfood batch.
 - `MESSY_INPUT_TRIAGE_PACKET_FIRST_DOGFOOD_2026-07-17.md` — first manual dogfood sample for the messy-input front door, including the validated packet and authority boundary.
+- `MESSY_INPUT_TRIAGE_PACKET_WORKER_AUDITION_2026-07-17.md` — blocked local-worker audition attempt for the messy-input front door; endpoint missing, so no packet was produced.
 
 ## Safety Reminder
 
