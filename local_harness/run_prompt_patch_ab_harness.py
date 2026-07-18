@@ -19,6 +19,9 @@ SUPPORTED_EXPECTED_CONTRACT_KEYS = {
     "required_json_fields",
     "forbidden_completion_claim",
     "requires_scope_expansion_flag",
+    "required_packet_schema",
+    "required_authority_boundary_terms",
+    "required_review_required",
 }
 
 
@@ -109,6 +112,18 @@ def _validate_case(case: Any, *, index: int) -> dict[str, Any]:
             raise PromptPatchABHarnessError(
                 f"cases[{index}].expected_contract.requires_scope_expansion_flag must be boolean"
             )
+    if "required_packet_schema" in expected_contract:
+        _require_str(expected_contract["required_packet_schema"], context=f"cases[{index}].expected_contract.required_packet_schema")
+    if "required_authority_boundary_terms" in expected_contract:
+        _normalize_string_list(
+            expected_contract["required_authority_boundary_terms"],
+            context=f"cases[{index}].expected_contract.required_authority_boundary_terms",
+        )
+    if "required_review_required" in expected_contract:
+        if not isinstance(expected_contract["required_review_required"], bool):
+            raise PromptPatchABHarnessError(
+                f"cases[{index}].expected_contract.required_review_required must be boolean"
+            )
 
     baseline_output = _require_object(payload["baseline_output"], context=f"cases[{index}].baseline_output")
     patched_output = _require_object(payload["patched_output"], context=f"cases[{index}].patched_output")
@@ -171,6 +186,32 @@ def _evaluate_output(output: dict[str, Any], contract: dict[str, Any]) -> list[s
         if actual is not required_flag:
             failures.append(
                 f"scope_expansion_required must be {str(required_flag).lower()}"
+            )
+    if "required_packet_schema" in contract:
+        required_schema = _require_str(contract["required_packet_schema"], context="expected_contract.required_packet_schema")
+        actual_schema = output.get("packet_schema")
+        if actual_schema != required_schema:
+            failures.append(f"packet_schema must be {required_schema}")
+    if "required_authority_boundary_terms" in contract:
+        required_terms = _normalize_string_list(
+            contract["required_authority_boundary_terms"],
+            context="expected_contract.required_authority_boundary_terms",
+        )
+        authority_boundary = output.get("authority_boundary")
+        if not isinstance(authority_boundary, list) or any(
+            not isinstance(item, str) or not item.strip() for item in authority_boundary
+        ):
+            failures.append("authority_boundary must be a list of strings")
+        else:
+            for term in required_terms:
+                if term not in authority_boundary:
+                    failures.append(f"missing required authority boundary term: {term}")
+    if "required_review_required" in contract:
+        required_review_required = contract["required_review_required"]
+        actual_review_required = output.get("review_required")
+        if actual_review_required is not required_review_required:
+            failures.append(
+                f"review_required must be {str(required_review_required).lower()}"
             )
 
     return failures

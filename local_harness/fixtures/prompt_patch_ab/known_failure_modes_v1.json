@@ -202,6 +202,88 @@
       },
       "prompt_patch_id": "scope_boundary_v1+output_contract_v1",
       "task_summary": "Keep the docs target allowed, keep training held, and return the required JSON fields."
+    },
+    {
+      "baseline_output": {
+        "message": "Identify the next bounded supervised follow-up.",
+        "status": "draft"
+      },
+      "case_id": "messy_input_triage_packet_contract_type_001",
+      "expected_contract": {
+        "forbidden_completion_claim": true,
+        "required_authority_boundary_terms": [
+          "no_unattended_execution",
+          "no_repo_mutation_without_review",
+          "no_training_capture",
+          "no_promotion",
+          "no_deployment",
+          "no_downstream_use_authority"
+        ],
+        "required_json_fields": [
+          "packet_schema",
+          "task_summary",
+          "request_type",
+          "allowed_targets",
+          "held_targets",
+          "evidence_needed",
+          "authority_boundary",
+          "proposed_next_action",
+          "validation_plan",
+          "stop_conditions",
+          "review_required"
+        ],
+        "required_packet_schema": "messy_input_triage_packet_v1",
+        "required_review_required": true
+      },
+      "failure_mode": "messy_input_triage_packet_contract_shape",
+      "patched_output": {
+        "allowed_targets": [
+          "docs/ROADMAP.md",
+          "docs/TRIAGE_ROUTER.md",
+          "docs/reports/model_auditions/",
+          "local_harness/validate_messy_input_triage_packet.py",
+          "tests/test_validate_messy_input_triage_packet.py"
+        ],
+        "authority_boundary": [
+          "no_unattended_execution",
+          "no_repo_mutation_without_review",
+          "no_training_capture",
+          "no_promotion",
+          "no_deployment",
+          "no_downstream_use_authority"
+        ],
+        "evidence_needed": [
+          "recent commits",
+          "roadmap notes",
+          "triage validator docs",
+          "prior dogfood closeout and synthesis reports"
+        ],
+        "held_targets": [
+          "training/",
+          "deployment",
+          "fixture import",
+          "prompt patch promotion",
+          "unattended execution"
+        ],
+        "packet_schema": "messy_input_triage_packet_v1",
+        "proposed_next_action": "Produce a human-reviewed bounded follow-up recommendation from the triage packet.",
+        "request_type": "roadmap_triage",
+        "review_required": true,
+        "stop_conditions": [
+          "missing repo context",
+          "ambiguous allowed targets",
+          "request implies execution authority",
+          "packet fails validation"
+        ],
+        "task_summary": "Synthesize the current SDLC harness coverage and propose the next bounded integration slice.",
+        "validation_plan": [
+          "validate required fields and authority boundary",
+          "review evidence-backed roadmap follow-up",
+          "confirm the next step stays review-required"
+        ]
+      },
+      "prompt_patch_id": "messy_input_triage_packet_contract_v1",
+      "task_summary": "Produce a valid messy-input triage packet for the next bounded supervised follow-up."
     }
   ],
   "harness_schema": "prompt_patch_ab_cases_v1"
