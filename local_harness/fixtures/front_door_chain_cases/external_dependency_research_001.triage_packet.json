@@ -1,0 +1,40 @@
+{
+  "allowed_targets": [
+    "docs/ROADMAP.md",
+    "docs/reports/model_auditions/",
+    "docs/TRIAGE_ROUTER.md"
+  ],
+  "authority_boundary": [
+    "no_unattended_execution",
+    "no_repo_mutation_without_review",
+    "no_training_capture",
+    "no_promotion",
+    "no_deployment",
+    "no_downstream_use_authority"
+  ],
+  "evidence_needed": [
+    "dependency status summary",
+    "research uncertainty notes",
+    "review-only next action"
+  ],
+  "held_targets": [
+    "deployment/",
+    "training/",
+    "fixture import/"
+  ],
+  "packet_schema": "messy_input_triage_packet_v1",
+  "proposed_next_action": "Summarize the dependency research as review-only evidence and keep implementation decisions under human review.",
+  "request_type": "research_triage",
+  "review_required": true,
+  "stop_conditions": [
+    "dependency changes are implied",
+    "deployment is requested",
+    "review requirement is removed"
+  ],
+  "task_summary": "Turn an external dependency research request into a bounded review-required triage packet.",
+  "validation_plan": [
+    "verify research scope remains bounded",
+    "confirm held targets remain non-authoritative",
+    "check authority boundary terms"
+  ]
+}

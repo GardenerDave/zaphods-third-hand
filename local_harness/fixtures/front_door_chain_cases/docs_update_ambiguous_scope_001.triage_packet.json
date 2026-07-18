@@ -1,0 +1,41 @@
+{
+  "allowed_targets": [
+    "docs/ROADMAP.md",
+    "docs/TRIAGE_ROUTER.md",
+    "docs/reports/model_auditions/README.md"
+  ],
+  "authority_boundary": [
+    "no_unattended_execution",
+    "no_repo_mutation_without_review",
+    "no_training_capture",
+    "no_promotion",
+    "no_deployment",
+    "no_downstream_use_authority"
+  ],
+  "evidence_needed": [
+    "current roadmap wording",
+    "report index consistency",
+    "triage/front-door boundary language"
+  ],
+  "held_targets": [
+    "training/",
+    "deployment/",
+    "fixture import/"
+  ],
+  "packet_schema": "messy_input_triage_packet_v1",
+  "proposed_next_action": "Review the docs-only scope and draft a bounded triage packet for human review.",
+  "request_type": "docs_triage_review",
+  "review_required": true,
+  "stop_conditions": [
+    "scope expands beyond docs",
+    "authority boundaries become unclear",
+    "review cannot remain required"
+  ],
+  "task_summary": "Turn an ambiguous docs request into a bounded review-required triage packet.",
+  "validation_plan": [
+    "confirm allowed and held targets stay separated",
+    "revalidate the packet schema",
+    "confirm non-authoritative lifecycle terms remain explicit"
+  ]
+}
+

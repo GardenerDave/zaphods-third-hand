@@ -1,0 +1,40 @@
+{
+  "allowed_targets": [
+    "docs/ROADMAP.md",
+    "docs/reports/model_auditions/README.md",
+    "docs/ORCHESTRATION_BOUNDARY.md"
+  ],
+  "authority_boundary": [
+    "no_unattended_execution",
+    "no_repo_mutation_without_review",
+    "no_training_capture",
+    "no_promotion",
+    "no_deployment",
+    "no_downstream_use_authority"
+  ],
+  "evidence_needed": [
+    "roadmap wording",
+    "priority conflict summary",
+    "review-only next action"
+  ],
+  "held_targets": [
+    "promotion/",
+    "deployment/",
+    "queue insertion/"
+  ],
+  "packet_schema": "messy_input_triage_packet_v1",
+  "proposed_next_action": "Document the priority conflict as review-only evidence and keep follow-up choices under human review.",
+  "request_type": "roadmap_triage",
+  "review_required": true,
+  "stop_conditions": [
+    "a single path is promoted automatically",
+    "queue insertion is implied",
+    "review requirement is removed"
+  ],
+  "task_summary": "Turn a roadmap priority conflict into a bounded review-required triage packet.",
+  "validation_plan": [
+    "verify roadmap targets stay bounded",
+    "confirm held targets remain non-authoritative",
+    "check authority boundary terms"
+  ]
+}

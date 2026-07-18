@@ -1,0 +1,2 @@
+This feature request sounds like it might belong in docs or tests, but training capture and promotion should stay out of scope.
+

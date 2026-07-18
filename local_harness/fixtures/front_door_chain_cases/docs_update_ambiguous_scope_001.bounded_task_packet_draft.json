@@ -1,0 +1,45 @@
+{
+  "allowed_targets": [
+    "docs/ROADMAP.md",
+    "docs/TRIAGE_ROUTER.md",
+    "docs/reports/model_auditions/README.md"
+  ],
+  "authority_boundary": [
+    "no_unattended_execution",
+    "no_repo_mutation_without_review",
+    "no_training_capture",
+    "no_promotion",
+    "no_deployment",
+    "no_downstream_use_authority"
+  ],
+  "automation_status": "not_automated",
+  "downstream_use_status": "prohibited_until_review",
+  "evidence_needed": [
+    "current roadmap wording",
+    "report index consistency",
+    "triage/front-door boundary language"
+  ],
+  "held_targets": [
+    "training/",
+    "deployment/",
+    "fixture import/"
+  ],
+  "packet_schema": "bounded_task_packet_draft_v1",
+  "proposed_action": "Draft fixture coverage for bounded docs review and keep routing decisions under human review.",
+  "queue_handoff_status": "not_inserted",
+  "review_required": true,
+  "source_packet_path": "local_harness/fixtures/front_door_chain_cases/docs_update_ambiguous_scope_001.triage_packet.json",
+  "source_packet_schema": "messy_input_triage_packet_v1",
+  "stop_conditions": [
+    "scope expands beyond docs",
+    "authority boundaries become unclear",
+    "review cannot remain required"
+  ],
+  "task_summary": "Turn an ambiguous docs request into a bounded review-required triage packet.",
+  "validation_plan": [
+    "confirm allowed and held targets stay separated",
+    "revalidate the packet schema",
+    "confirm non-authoritative lifecycle terms remain explicit"
+  ]
+}
+

@@ -1,0 +1,2 @@
+I need external dependency research, but the result should stay review-only and should not authorize deployment, repo mutation, or downstream use.
+

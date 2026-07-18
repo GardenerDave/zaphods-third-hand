@@ -1,0 +1,44 @@
+{
+  "allowed_targets": [
+    "docs/ROADMAP.md",
+    "docs/reports/model_auditions/",
+    "docs/TRIAGE_ROUTER.md"
+  ],
+  "authority_boundary": [
+    "no_unattended_execution",
+    "no_repo_mutation_without_review",
+    "no_training_capture",
+    "no_promotion",
+    "no_deployment",
+    "no_downstream_use_authority"
+  ],
+  "automation_status": "not_automated",
+  "downstream_use_status": "prohibited_until_review",
+  "evidence_needed": [
+    "dependency status summary",
+    "research uncertainty notes",
+    "review-only next action"
+  ],
+  "held_targets": [
+    "deployment/",
+    "training/",
+    "fixture import/"
+  ],
+  "packet_schema": "bounded_task_packet_draft_v1",
+  "proposed_action": "Draft fixture coverage for dependency-research review and keep implementation decisions under human review.",
+  "queue_handoff_status": "not_inserted",
+  "review_required": true,
+  "source_packet_path": "local_harness/fixtures/front_door_chain_cases/external_dependency_research_001.triage_packet.json",
+  "source_packet_schema": "messy_input_triage_packet_v1",
+  "stop_conditions": [
+    "dependency changes are implied",
+    "deployment is requested",
+    "review requirement is removed"
+  ],
+  "task_summary": "Turn an external dependency research request into a bounded review-required triage packet.",
+  "validation_plan": [
+    "verify research scope remains bounded",
+    "confirm held targets remain non-authoritative",
+    "check authority boundary terms"
+  ]
+}

@@ -142,6 +142,7 @@ The accepted artifact retains review caveats:
 - `FRONT_DOOR_CHAIN_SCORECARD_2026-07-17.md` — read-only scorecard for the full front-door chain validator result; it classifies review readiness without granting queue handoff or downstream use.
 - `FRONT_DOOR_CHAIN_REVIEW_COMMAND_2026-07-17.md` — read-only wrapper that validates and scores the full front-door chain in one command; it remains review-only and non-automated.
 - `FRONT_DOOR_LANE_SYNTHESIS_2026-07-17.md` — synthesis of the completed supervised front-door lane from messy input to review-ready bounded work; it records what is proven and what remains unproven.
+- `FRONT_DOOR_CHAIN_DIVERSE_FIXTURES_2026-07-17.md` — diverse messy-input fixture pack for the front-door lane; it broadens coverage without granting queue handoff or downstream use.
 
 ## Safety Reminder
 

@@ -1,0 +1,2 @@
+There is a roadmap priority conflict between docs hygiene, queue validation, and front-door scoring. Keep it review-only and avoid promoting any one path automatically.
+
