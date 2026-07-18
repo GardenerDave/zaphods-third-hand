@@ -138,6 +138,7 @@ The accepted artifact retains review caveats:
 - `VALIDATED_MESSY_INPUT_TRIAGE_TO_BOUNDED_TASK_BRIDGE_2026-07-17.md` — deterministic bridge from validated messy-input triage evidence into a validated bounded task packet draft; queue handoff and router automation remain unproven.
 - `TRIAGE_TO_BOUNDED_TASK_BRIDGE_FIXTURES_2026-07-17.md` — deterministic fixture suite for the validated bridge, covering pass cases and fail-closed queue/unsafe-action cases.
 - `BOUNDED_TASK_REVIEW_PACKET_FIXTURES_2026-07-17.md` — deterministic fixture suite for the bounded-task-review packet, covering pass cases and fail-closed queue/repo-mutation/unsafe-next-step cases.
+- `FRONT_DOOR_CHAIN_VALIDATOR_2026-07-17.md` — read-only deterministic validator for the full front-door chain; queue handoff and router automation remain unproven.
 
 ## Safety Reminder
 

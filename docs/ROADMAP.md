@@ -119,6 +119,7 @@ explicit supervised acceptance without promotion or downstream mutation.
 - Bounded task packet draft validator for the manual triage-to-bounded-task bridge, keeping queue handoff review-required and non-automated.
 - Deterministic fixtures now cover the validated triage-to-bounded-task bridge; future work remains fixture expansion, scoring, and supervised queue-handoff review.
 - Bounded task review packet fixtures now cover the next review-only bridge; future work remains fixture expansion, scoring, and supervised queue-handoff review.
+- Full front-door chain now has a read-only deterministic validator; future work remains scoring and supervised queue-handoff review.
 
 ## Integration Roadmap: Improve / Fable / TriDB Harvest
 

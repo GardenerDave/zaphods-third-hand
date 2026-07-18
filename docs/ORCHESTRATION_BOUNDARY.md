@@ -193,3 +193,20 @@ python3 local_harness/validate_bounded_task_review_packet.py \
 The deterministic bridge fixture suite at
 `local_harness/fixtures/bounded_task_review_packet/` exercises this review
 shape against pass and fail-closed cases.
+
+## Front Door Chain Validator
+
+`local_harness/validate_front_door_chain.py` checks the full read-only front
+door chain: messy-input triage packet, bounded task draft, and bounded task
+review packet. It is a consistency checker only and does not route, insert
+queues, mutate the repo, import fixtures, train, promote, deploy, or grant
+downstream use.
+
+Example validation command:
+
+```bash
+python3 local_harness/validate_front_door_chain.py \
+  --triage-packet local_harness/fixtures/triage_to_bounded_task_bridge/valid_bridge_001.source_triage_packet.json \
+  --bounded-task-packet local_harness/fixtures/triage_to_bounded_task_bridge/valid_bridge_001.bounded_task_packet_draft.json \
+  --review-packet local_harness/fixtures/bounded_task_review_packet/valid_review_packet_001.json
+```
