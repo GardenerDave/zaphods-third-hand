@@ -148,3 +148,8 @@ Before any implementation:
 This spec is design-only and does not authorize routing, queue insertion, repo
 mutation, fixture import, training capture, promotion, deployment, or
 downstream use.
+
+The read-only validator for future review artifacts is
+`local_harness/validate_queue_handoff_review.py`. It checks the shape and
+authority boundary of `queue_handoff_review_v1` artifacts without writing a
+queue.

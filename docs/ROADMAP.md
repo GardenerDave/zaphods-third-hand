@@ -129,6 +129,7 @@ explicit supervised acceptance without promotion or downstream mutation.
 - Front-door calibration synthesis recorded; future work may consider supervised queue-handoff review design, not implementation.
 - Review terminology spec added; front-door status language now uses `ready_for_review`, with historical `ready_for_human_review` retained only in older evidence.
 - Queue-handoff review design added as spec-only; implementation remains blocked until a fail-closed validator, fixtures, and explicit approval path exist.
+- Queue-handoff review validator added; queue writing remains unimplemented and blocked behind fixtures, explicit approval, and separate review.
 
 ## Integration Roadmap: Improve / Fable / TriDB Harvest
 
