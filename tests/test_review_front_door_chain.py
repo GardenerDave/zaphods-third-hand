@@ -34,7 +34,7 @@ def run_review(*, triage: Path, bounded: Path, review: Path) -> subprocess.Compl
     )
 
 
-def test_valid_tracked_fixture_chain_returns_ready_for_human_review():
+def test_valid_tracked_fixture_chain_returns_ready_for_review():
     result = run_review(
         triage=TRIAGE_FIXTURE,
         bounded=BOUNDED_FIXTURE,
@@ -43,7 +43,7 @@ def test_valid_tracked_fixture_chain_returns_ready_for_human_review():
     assert result.returncode == 0
     payload = json.loads(result.stdout)
     assert payload["review_schema"] == "front_door_chain_review_v1"
-    assert payload["review_status"] == "ready_for_human_review"
+    assert payload["review_status"] == "ready_for_review"
     assert payload["automation_status"] == "not_automated"
     assert payload["queue_handoff_status"] == "not_inserted"
     assert payload["downstream_use_status"] == "prohibited_until_review"

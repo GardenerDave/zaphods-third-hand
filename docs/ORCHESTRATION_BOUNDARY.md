@@ -195,8 +195,8 @@ The deterministic bridge fixture suite at
 shape against pass and fail-closed cases.
 
 See [Review Terminology](REVIEW_TERMINOLOGY.md) for the preferred
-review-neutral status language and the bounded migration path away from the
-legacy `ready_for_human_review` label.
+review-neutral status language and the historical `ready_for_human_review`
+label.
 
 ## Front Door Chain Validator
 

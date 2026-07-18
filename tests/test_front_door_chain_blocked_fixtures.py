@@ -83,7 +83,7 @@ def test_blocked_fixture_cases_fail_closed():
         for substring in expected["expected_diagnostic_substrings"]:
             assert any(substring in item for item in diagnostics), (case_id, substring, diagnostics)
 
-        assert payload["review_status"] != "ready_for_human_review"
+        assert payload["review_status"] != "ready_for_review"
 
 
 def test_blocked_fixture_files_do_not_reference_work_tree():

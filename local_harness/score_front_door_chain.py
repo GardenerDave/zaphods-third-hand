@@ -149,7 +149,7 @@ def score_front_door_chain(chain_result: Any, *, chain_result_path: Path) -> dic
     if all_passed and not diagnostics_list:
         return {
             "scorecard_schema": SCORECARD_SCHEMA,
-            "scorecard_status": "ready_for_human_review",
+            "scorecard_status": "ready_for_review",
             "chain_result_path": str(chain_result_path),
             "chain_validation_status": validation_status,
             "readiness_level": "review_ready",
@@ -244,7 +244,7 @@ def main(argv: list[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
     scorecard = build_scorecard(args.chain_result)
     print(json.dumps(scorecard, indent=2, sort_keys=True))
-    return 0 if scorecard["scorecard_status"] == "ready_for_human_review" else 1
+    return 0 if scorecard["scorecard_status"] == "ready_for_review" else 1
 
 
 if __name__ == "__main__":

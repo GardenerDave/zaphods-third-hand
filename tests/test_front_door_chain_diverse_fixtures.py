@@ -83,13 +83,13 @@ def test_valid_diverse_cases_pass_front_door_chain():
         review_chain = run_review(triage, bounded, review)
         assert review_chain.returncode == 0, review_chain.stdout + review_chain.stderr
         payload = json.loads(review_chain.stdout)
-        assert payload["review_status"] == "ready_for_human_review"
+        assert payload["review_status"] == "ready_for_review"
         assert payload["automation_status"] == "not_automated"
         assert payload["queue_handoff_status"] == "not_inserted"
         assert payload["downstream_use_status"] == "prohibited_until_review"
         assert payload["repo_mutation_status"] == "not_authorized"
         assert payload["chain_validation"]["validation_status"] == "passed"
-        assert payload["scorecard"]["scorecard_status"] == "ready_for_human_review"
+        assert payload["scorecard"]["scorecard_status"] == "ready_for_review"
 
 
 def test_fixture_packets_do_not_reference_work_tree():

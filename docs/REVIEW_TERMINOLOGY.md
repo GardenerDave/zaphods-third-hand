@@ -43,14 +43,15 @@ authority.
 
 ## Current Legacy Usage
 
-`ready_for_human_review` remains the current legacy status label in the
-front-door chain scorecard, review wrapper, fixtures, and tests until a
-separate migration changes code and tracked evidence. This document does not
-claim that the migration has already happened.
+`ready_for_review` is the current preferred status label in the front-door
+chain scorecard, review wrapper, fixtures, and tests. `ready_for_human_review`
+was the prior legacy label and remains part of the historical record until all
+older evidence is separately migrated or retired. This document does not claim
+the historical label was retroactively changed.
 
 ## Future Migration Plan
 
-A bounded migration can move ZTH from `ready_for_human_review` to
+A bounded migration could have moved ZTH from `ready_for_human_review` to
 `ready_for_review` in a separate commit sequence:
 
 1. Update scorecard output.

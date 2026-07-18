@@ -120,14 +120,14 @@ explicit supervised acceptance without promotion or downstream mutation.
 - Deterministic fixtures now cover the validated triage-to-bounded-task bridge; future work remains fixture expansion, scoring, and supervised queue-handoff review.
 - Bounded task review packet fixtures now cover the next review-only bridge; future work remains fixture expansion, scoring, and supervised queue-handoff review.
 - Full front-door chain now has a read-only deterministic validator; future work remains scoring and supervised queue-handoff review.
-- Full front-door chain now has a read-only scorecard for human-review readiness; future work remains scoring calibration and supervised queue-handoff review.
+- Full front-door chain now has a read-only scorecard for review readiness; future work remains scoring calibration and supervised queue-handoff review.
 - Full front-door chain now has a read-only review command that validates and scores in one step; future work remains scoring calibration and supervised queue-handoff review.
 - Front-door lane synthesis recorded; future work shifts from building the lane to fixture expansion, scoring calibration, and supervised queue-handoff review.
 - Diverse front-door chain fixtures added; future work remains scoring calibration and supervised queue-handoff review.
 - Front-door fixture expansion synthesis recorded; future work shifts to blocked-case calibration and supervised queue-handoff review.
 - Blocked front-door chain fixtures added; future work remains blocked/pass calibration and supervised queue-handoff review.
 - Front-door calibration synthesis recorded; future work may consider supervised queue-handoff review design, not implementation.
-- Review terminology spec added; future work may migrate legacy `ready_for_human_review` status to `ready_for_review` in a separate bounded change.
+- Review terminology spec added; front-door status language now uses `ready_for_review`, with historical `ready_for_human_review` retained only in older evidence.
 
 ## Integration Roadmap: Improve / Fable / TriDB Harvest
 

@@ -54,13 +54,13 @@ def score(chain_result: Path) -> subprocess.CompletedProcess[str]:
     )
 
 
-def test_ready_chain_scores_ready_for_human_review(tmp_path):
+def test_ready_chain_scores_ready_for_review(tmp_path):
     chain_result = run_chain(tmp_path)
     result = score(chain_result)
     assert result.returncode == 0
     payload = json.loads(result.stdout)
     assert payload["scorecard_schema"] == "front_door_chain_scorecard_v1"
-    assert payload["scorecard_status"] == "ready_for_human_review"
+    assert payload["scorecard_status"] == "ready_for_review"
     assert payload["readiness_level"] == "review_ready"
     assert payload["chain_validation_status"] == "passed"
     assert payload["diagnostics"] == []
@@ -176,4 +176,3 @@ def test_scorecard_never_grants_authority(tmp_path):
     assert payload["queue_handoff_status"] == "not_inserted"
     assert payload["downstream_use_status"] == "prohibited_until_review"
     assert payload["repo_mutation_status"] == "not_authorized"
-

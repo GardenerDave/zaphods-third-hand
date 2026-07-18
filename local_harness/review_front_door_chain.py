@@ -40,7 +40,7 @@ def review_front_door_chain(
     diagnostics = list(chain_validation.get("diagnostics", []))
     diagnostics.extend(str(item) for item in scorecard.get("diagnostics", []))
     review_status = scorecard.get("scorecard_status", "invalid")
-    if review_status not in {"ready_for_human_review", "blocked", "invalid"}:
+    if review_status not in {"ready_for_review", "blocked", "invalid"}:
         review_status = "invalid"
     return {
         "review_schema": REVIEW_SCHEMA,
@@ -74,7 +74,7 @@ def main(argv: list[str] | None = None) -> int:
         review_packet_path=args.review_packet,
     )
     print(json.dumps(payload, indent=2, sort_keys=True))
-    return 0 if payload["review_status"] == "ready_for_human_review" else 1
+    return 0 if payload["review_status"] == "ready_for_review" else 1
 
 
 if __name__ == "__main__":
