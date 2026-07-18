@@ -131,6 +131,7 @@ explicit supervised acceptance without promotion or downstream mutation.
 - Queue-handoff review design added as spec-only; implementation remains blocked until a fail-closed validator, fixtures, and explicit approval path exist.
 - Queue-handoff review validator added; queue writing remains unimplemented and blocked behind fixtures, explicit approval, and separate review.
 - Queue-handoff review fixtures added; queue writing remains unimplemented and blocked behind explicit approval and separate review.
+- Queue-handoff review calibration synthesis recorded; queue writing remains unimplemented and blocked behind separate approval-path design, validator, fixtures, and review.
 
 ## Integration Roadmap: Improve / Fable / TriDB Harvest
 

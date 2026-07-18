@@ -149,6 +149,7 @@ The accepted artifact retains review caveats:
 - `QUEUE_HANDOFF_REVIEW_DESIGN_2026-07-17.md` — spec-only queue-handoff review design; it defines the boundary for a future queue-candidate step without authorizing queue insertion.
 - `QUEUE_HANDOFF_REVIEW_VALIDATOR_2026-07-17.md` — fail-closed validator for queue-handoff review artifacts; it checks the design-only review boundary without writing a queue.
 - `QUEUE_HANDOFF_REVIEW_FIXTURES_2026-07-17.md` — tracked fixture pack for queue-handoff review validation; it covers pass cases and fail-closed unsafe/malformed cases.
+- `QUEUE_HANDOFF_REVIEW_CALIBRATION_SYNTHESIS_2026-07-17.md` — calibration synthesis after the validator and tracked pass/blocked fixtures; it records what is proven and what remains unimplemented.
 
 ## Safety Reminder
 
