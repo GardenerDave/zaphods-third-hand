@@ -210,3 +210,17 @@ python3 local_harness/validate_front_door_chain.py \
   --bounded-task-packet local_harness/fixtures/triage_to_bounded_task_bridge/valid_bridge_001.bounded_task_packet_draft.json \
   --review-packet local_harness/fixtures/bounded_task_review_packet/valid_review_packet_001.json
 ```
+
+## Front Door Chain Scorecard
+
+`local_harness/score_front_door_chain.py` reads the JSON output from the
+front-door chain validator and classifies it for human review. It is a
+decision aid only and does not route, insert into queues, mutate the repo,
+import fixtures, train, promote, deploy, or grant downstream use.
+
+Example scorecard command:
+
+```bash
+python3 local_harness/score_front_door_chain.py \
+  --chain-result /tmp/front_door_chain_result.json
+```
