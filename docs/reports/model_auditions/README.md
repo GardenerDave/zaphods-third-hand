@@ -146,6 +146,7 @@ The accepted artifact retains review caveats:
 - `FRONT_DOOR_FIXTURE_EXPANSION_SYNTHESIS_2026-07-17.md` — synthesis of the diverse fixture expansion; it records the conservative validator behavior it exposed and what remains unproven.
 - `FRONT_DOOR_CHAIN_BLOCKED_FIXTURES_2026-07-17.md` — blocked-case fixture pack for front-door calibration; it confirms the review wrapper fails closed on invalid or unsafe chains.
 - `FRONT_DOOR_CALIBRATION_SYNTHESIS_2026-07-17.md` — calibration synthesis after both the passing and blocked front-door fixture packs; it records covered failure modes and what remains unproven.
+- `QUEUE_HANDOFF_REVIEW_DESIGN_2026-07-17.md` — spec-only queue-handoff review design; it defines the boundary for a future queue-candidate step without authorizing queue insertion.
 
 ## Safety Reminder
 

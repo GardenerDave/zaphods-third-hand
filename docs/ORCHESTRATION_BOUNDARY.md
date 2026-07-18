@@ -198,6 +198,10 @@ See [Review Terminology](REVIEW_TERMINOLOGY.md) for the preferred
 review-neutral status language and the historical `ready_for_human_review`
 label.
 
+See [Queue Handoff Review](QUEUE_HANDOFF_REVIEW.md) for the spec-only
+boundary that could consider a `ready_for_review` result as a queue candidate
+without authorizing queue insertion.
+
 ## Front Door Chain Validator
 
 `local_harness/validate_front_door_chain.py` checks the full read-only front
