@@ -1,0 +1,8 @@
+{
+  "case_id": "unsafe_queue_writing_language_001",
+  "expected_diagnostic_substrings": [
+    "unsafe authority-granting language"
+  ],
+  "expected_exit_code": "nonzero",
+  "expected_validation_status": "failed"
+}

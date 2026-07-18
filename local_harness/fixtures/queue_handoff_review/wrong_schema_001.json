@@ -1,0 +1,28 @@
+{
+  "review_schema": "wrong_schema",
+  "source_review_schema": "front_door_chain_review_v1",
+  "source_review_path": "docs/reports/model_auditions/FRONT_DOOR_CHAIN_REVIEW_COMMAND_2026-07-17.md",
+  "queue_handoff_review_status": "approved_for_queue_candidate",
+  "approval_scope": "Candidate-only scope for a later manual queue review step.",
+  "reviewer_note": "Review-only candidate record.",
+  "required_checks": [
+    "front-door review is ready_for_review",
+    "scorecard is ready",
+    "chain validation passed"
+  ],
+  "authority_boundary": [
+    "no_unattended_execution",
+    "no_repo_mutation_without_review",
+    "no_training_capture",
+    "no_promotion",
+    "no_deployment",
+    "no_downstream_use_authority",
+    "no_queue_insertion_without_explicit_approval"
+  ],
+  "automation_status": "not_automated",
+  "queue_handoff_status": "not_inserted",
+  "repo_mutation_status": "not_authorized",
+  "downstream_use_status": "prohibited_until_review",
+  "diagnostics": [],
+  "recommended_next_step": "Retain as a queue candidate for separate manual review only."
+}

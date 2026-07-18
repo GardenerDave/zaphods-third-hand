@@ -148,6 +148,7 @@ The accepted artifact retains review caveats:
 - `FRONT_DOOR_CALIBRATION_SYNTHESIS_2026-07-17.md` — calibration synthesis after both the passing and blocked front-door fixture packs; it records covered failure modes and what remains unproven.
 - `QUEUE_HANDOFF_REVIEW_DESIGN_2026-07-17.md` — spec-only queue-handoff review design; it defines the boundary for a future queue-candidate step without authorizing queue insertion.
 - `QUEUE_HANDOFF_REVIEW_VALIDATOR_2026-07-17.md` — fail-closed validator for queue-handoff review artifacts; it checks the design-only review boundary without writing a queue.
+- `QUEUE_HANDOFF_REVIEW_FIXTURES_2026-07-17.md` — tracked fixture pack for queue-handoff review validation; it covers pass cases and fail-closed unsafe/malformed cases.
 
 ## Safety Reminder
 

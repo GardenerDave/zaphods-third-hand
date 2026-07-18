@@ -1,0 +1,9 @@
+{
+  "case_id": "rejected_valid_001",
+  "expected_diagnostic_substrings": [
+    "front-door review not ready",
+    "queue candidate rejected"
+  ],
+  "expected_exit_code": "zero",
+  "expected_validation_status": "passed"
+}

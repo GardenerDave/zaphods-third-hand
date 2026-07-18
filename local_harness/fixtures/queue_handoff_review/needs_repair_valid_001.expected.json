@@ -1,0 +1,9 @@
+{
+  "case_id": "needs_repair_valid_001",
+  "expected_diagnostic_substrings": [
+    "validation plan is too shallow",
+    "repair before queue-handoff review"
+  ],
+  "expected_exit_code": "zero",
+  "expected_validation_status": "passed"
+}

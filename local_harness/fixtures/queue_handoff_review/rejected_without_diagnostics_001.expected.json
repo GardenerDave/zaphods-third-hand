@@ -1,0 +1,8 @@
+{
+  "case_id": "rejected_without_diagnostics_001",
+  "expected_diagnostic_substrings": [
+    "must include diagnostics"
+  ],
+  "expected_exit_code": "nonzero",
+  "expected_validation_status": "failed"
+}
