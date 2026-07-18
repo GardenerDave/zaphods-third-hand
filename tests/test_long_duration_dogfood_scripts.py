@@ -188,10 +188,23 @@ def test_tick_moves_past_completed_script_tests(tmp_path):
 
     run_dir = _latest_run_dir(snapshot)
     summary = _read_json(run_dir / "tick_summary.json")
-    assert summary["next_task_category"] == "code_or_validator"
-    assert summary["next_task_title"] == "Add queue approval path validator design scaffold."
-    assert "Add deterministic tests for scripts/zth_long_duration_dogfood_tick.sh" not in summary["implementation_prompt"]
-    assert "review-artifact-only validator scaffold for a future queue approval path" in summary["implementation_prompt"]
+    assert summary["next_task_category"] == "tests_or_fixtures"
+    assert summary["next_task_title"] == "Add queue approval path calibration synthesis."
+    assert "Add queue approval path validator design scaffold." not in summary["implementation_prompt"]
+    assert "queue approval path calibration synthesis report" in summary["implementation_prompt"]
+
+
+def test_tick_moves_past_completed_queue_approval_scaffold(tmp_path):
+    snapshot = _make_snapshot(tmp_path)
+    result = _run([str(TICK), "--once"], cwd=snapshot, env={"ZTH_REPO": str(snapshot)})
+    assert result.returncode == 0, result.stderr
+
+    run_dir = _latest_run_dir(snapshot)
+    summary = _read_json(run_dir / "tick_summary.json")
+    assert summary["next_task_category"] == "tests_or_fixtures"
+    assert summary["next_task_title"] == "Add queue approval path calibration synthesis."
+    assert "Add queue approval path validator design scaffold." not in summary["implementation_prompt"]
+    assert "queue approval path calibration synthesis report" in summary["implementation_prompt"]
 
 
 def test_tick_expired_control_window_blocks_useful_work(tmp_path):

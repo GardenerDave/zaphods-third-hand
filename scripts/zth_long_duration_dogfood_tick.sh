@@ -277,11 +277,16 @@ PY
         next_task_category="tests_or_fixtures"
         next_task_title="Add bounded tests for the long-duration dogfood tick control window and cron tag handling."
         next_prompt=$'Add deterministic tests for scripts/zth_long_duration_dogfood_tick.sh, scripts/zth_install_long_duration_cron.sh, and scripts/zth_uninstall_long_duration_cron.sh. Cover lock contention, expired control-window skipping, cron tagging, and clean uninstall behavior. Preserve the authority boundary: no queue writing, no router automation, no unattended execution, no repo mutation without review.'
-      else
+      elif [ ! -f "$REPO/local_harness/validate_queue_approval_path.py" ] || [ ! -f "$REPO/tests/test_validate_queue_approval_path.py" ] || [ ! -f "$REPO/tests/test_queue_approval_path_fixtures.py" ]; then
         classification="code_or_validator"
         next_task_category="code_or_validator"
         next_task_title="Add queue approval path validator design scaffold."
         next_prompt=$'Add a review-artifact-only validator scaffold for a future queue approval path. It must not write queues, insert queues, run queues, automate handoff, mutate repositories, train, promote, deploy, or grant downstream-use authority. Start with schema/validator/test fixtures only if the existing queue-handoff review artifacts provide enough evidence; otherwise produce a blocked review note explaining what design information is missing.'
+      else
+        classification="tests_or_fixtures"
+        next_task_category="tests_or_fixtures"
+        next_task_title="Add queue approval path calibration synthesis."
+        next_prompt=$'Add a queue approval path calibration synthesis report after the validator, pass fixtures, blocked fixtures, and regression tests. Record what the queue_approval_path_v1 validator proves, what remains unimplemented, and the authority boundary. Do not add queue writing, queue insertion, queue running, automatic handoff, router automation, repo mutation, training capture, promotion, deployment, or downstream-use authority.'
       fi
     elif [ "$diff_rc" -ne 0 ]; then
       classification="blocked_needs_review"

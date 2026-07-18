@@ -96,6 +96,16 @@ that work again. When the script-test coverage is present, the tick moves to
 the next bounded validator-oriented target instead of repeating completed
 script-test work.
 
+## Queue Approval Scaffold Stale Guard
+
+The tick recommender now also checks whether the queue approval scaffold is
+already present. When
+`local_harness/validate_queue_approval_path.py`,
+`tests/test_validate_queue_approval_path.py`, and
+`tests/test_queue_approval_path_fixtures.py` already exist, the tick does not
+repeat `Add queue approval path validator design scaffold.` It advances to
+`Add queue approval path calibration synthesis.` instead.
+
 ## Authority Boundary
 
 This cron loop is supervised and review-oriented. It does not authorize queue
