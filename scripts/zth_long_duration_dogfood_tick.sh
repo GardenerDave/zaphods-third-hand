@@ -287,11 +287,16 @@ PY
         next_task_category="tests_or_fixtures"
         next_task_title="Add queue approval path calibration synthesis."
         next_prompt=$'Add a queue approval path calibration synthesis report after the validator, pass fixtures, blocked fixtures, and regression tests. Record what the queue_approval_path_v1 validator proves, what remains unimplemented, and the authority boundary. Do not add queue writing, queue insertion, queue running, automatic handoff, router automation, repo mutation, training capture, promotion, deployment, or downstream-use authority.'
-      else
+      elif [ ! -f "$REPO/local_harness/review_queue_approval_path.py" ] || [ ! -f "$REPO/tests/test_review_queue_approval_path.py" ] || [ ! -f "$REPO/docs/reports/model_auditions/QUEUE_APPROVAL_REVIEW_COMMAND_2026-07-18.md" ]; then
         classification="code_or_validator"
         next_task_category="code_or_validator"
         next_task_title="Add read-only queue approval review command."
         next_prompt=$'Add a read-only queue approval review command that wraps queue_approval_path_v1 validation and emits a review/report artifact only. It must not write queues, insert queues, run queues, automate handoff, mutate repositories, import fixtures, train, promote, deploy, or grant downstream-use authority. Follow the existing front-door/queue-handoff review command pattern if present. If the existing command pattern is insufficient, produce a blocked review note explaining what design information is missing.'
+      else
+        classification="tests_or_fixtures"
+        next_task_category="tests_or_fixtures"
+        next_task_title="Add queue approval review command calibration synthesis."
+        next_prompt=$'Add a queue approval review command calibration synthesis report after the read-only command, direct tests, smoke output, and regression slices. Record what queue_approval_path_review_v1 proves, what remains unimplemented, output-path safety behavior, exit-status behavior, and the authority boundary. Do not add queue writing, queue insertion, queue running, automatic handoff, router automation, repo mutation, fixture import, training capture, promotion, deployment, or downstream-use authority.'
       fi
     elif [ "$diff_rc" -ne 0 ]; then
       classification="blocked_needs_review"

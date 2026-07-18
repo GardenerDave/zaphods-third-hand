@@ -188,10 +188,11 @@ def test_tick_moves_past_completed_script_tests(tmp_path):
 
     run_dir = _latest_run_dir(snapshot)
     summary = _read_json(run_dir / "tick_summary.json")
-    assert summary["next_task_category"] == "code_or_validator"
-    assert summary["next_task_title"] == "Add read-only queue approval review command."
+    assert summary["next_task_category"] == "tests_or_fixtures"
+    assert summary["next_task_title"] == "Add queue approval review command calibration synthesis."
     assert "Add queue approval path calibration synthesis." not in summary["implementation_prompt"]
-    assert "read-only queue approval review command" in summary["implementation_prompt"]
+    assert "Add read-only queue approval review command." not in summary["implementation_prompt"]
+    assert "queue approval review command calibration synthesis" in summary["implementation_prompt"]
 
 
 def test_tick_moves_past_completed_queue_approval_calibration(tmp_path):
@@ -201,10 +202,24 @@ def test_tick_moves_past_completed_queue_approval_calibration(tmp_path):
 
     run_dir = _latest_run_dir(snapshot)
     summary = _read_json(run_dir / "tick_summary.json")
-    assert summary["next_task_category"] == "code_or_validator"
-    assert summary["next_task_title"] == "Add read-only queue approval review command."
+    assert summary["next_task_category"] == "tests_or_fixtures"
+    assert summary["next_task_title"] == "Add queue approval review command calibration synthesis."
     assert "Add queue approval path calibration synthesis." not in summary["implementation_prompt"]
-    assert "read-only queue approval review command" in summary["implementation_prompt"]
+    assert "Add read-only queue approval review command." not in summary["implementation_prompt"]
+    assert "queue approval review command calibration synthesis" in summary["implementation_prompt"]
+
+
+def test_tick_moves_past_completed_queue_approval_review_command(tmp_path):
+    snapshot = _make_snapshot(tmp_path)
+    result = _run([str(TICK), "--once"], cwd=snapshot, env={"ZTH_REPO": str(snapshot)})
+    assert result.returncode == 0, result.stderr
+
+    run_dir = _latest_run_dir(snapshot)
+    summary = _read_json(run_dir / "tick_summary.json")
+    assert summary["next_task_category"] == "tests_or_fixtures"
+    assert summary["next_task_title"] == "Add queue approval review command calibration synthesis."
+    assert "Add read-only queue approval review command." not in summary["implementation_prompt"]
+    assert "queue approval review command calibration synthesis" in summary["implementation_prompt"]
 
 
 def test_tick_expired_control_window_blocks_useful_work(tmp_path):

@@ -114,6 +114,16 @@ already exists. When it does, the tick does not repeat `Add queue approval
 path calibration synthesis.` It advances to `Add read-only queue approval
 review command.` instead.
 
+## Queue Approval Review Command Stale Guard
+
+The tick recommender now checks whether
+`local_harness/review_queue_approval_path.py`,
+`tests/test_review_queue_approval_path.py`, and
+`docs/reports/model_auditions/QUEUE_APPROVAL_REVIEW_COMMAND_2026-07-18.md`
+already exist. When they do, the tick does not repeat `Add read-only queue
+approval review command.` It advances to `Add queue approval review command
+calibration synthesis.` instead.
+
 ## Authority Boundary
 
 This cron loop is supervised and review-oriented. It does not authorize queue
