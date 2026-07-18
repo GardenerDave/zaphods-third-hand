@@ -127,6 +127,7 @@ explicit supervised acceptance without promotion or downstream mutation.
 - Front-door fixture expansion synthesis recorded; future work shifts to blocked-case calibration and supervised queue-handoff review.
 - Blocked front-door chain fixtures added; future work remains blocked/pass calibration and supervised queue-handoff review.
 - Front-door calibration synthesis recorded; future work may consider supervised queue-handoff review design, not implementation.
+- Review terminology spec added; future work may migrate legacy `ready_for_human_review` status to `ready_for_review` in a separate bounded change.
 
 ## Integration Roadmap: Improve / Fable / TriDB Harvest
 

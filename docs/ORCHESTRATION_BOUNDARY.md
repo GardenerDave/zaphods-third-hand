@@ -194,6 +194,10 @@ The deterministic bridge fixture suite at
 `local_harness/fixtures/bounded_task_review_packet/` exercises this review
 shape against pass and fail-closed cases.
 
+See [Review Terminology](REVIEW_TERMINOLOGY.md) for the preferred
+review-neutral status language and the bounded migration path away from the
+legacy `ready_for_human_review` label.
+
 ## Front Door Chain Validator
 
 `local_harness/validate_front_door_chain.py` checks the full read-only front
