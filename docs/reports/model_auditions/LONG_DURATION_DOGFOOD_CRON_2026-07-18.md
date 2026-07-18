@@ -124,6 +124,15 @@ already exist. When they do, the tick does not repeat `Add read-only queue
 approval review command.` It advances to `Add queue approval review command
 calibration synthesis.` instead.
 
+## Declarative Milestone Map
+
+The recommender now selects from an ordered milestone map instead of adding
+more nested one-off stale guards. Each milestone lists the required evidence
+files and the prompt to use when that evidence is missing. Completed
+milestones are skipped automatically, which prevents repeated stale
+recommendation patches. The map is recommendation-only and does not run
+queues or grant authority.
+
 ## Authority Boundary
 
 This cron loop is supervised and review-oriented. It does not authorize queue

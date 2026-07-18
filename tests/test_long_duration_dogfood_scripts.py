@@ -47,7 +47,12 @@ def _overlay_snapshot(snapshot: Path) -> None:
     shutil.copy2(ROOT / "tests" / "test_long_duration_dogfood_scripts.py", tests_dir / "test_long_duration_dogfood_scripts.py")
 
 
-def _make_snapshot(tmp_path: Path, *, commit: bool = True) -> Path:
+def _make_snapshot(
+    tmp_path: Path,
+    *,
+    commit: bool = True,
+    remove_paths: list[str] | None = None,
+) -> Path:
     snapshot = tmp_path / "snapshot"
     subprocess.run(
         ["git", "clone", "--local", "--no-hardlinks", str(ROOT), str(snapshot)],
@@ -59,22 +64,16 @@ def _make_snapshot(tmp_path: Path, *, commit: bool = True) -> Path:
     _overlay_snapshot(snapshot)
     subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=snapshot, check=True)
     subprocess.run(["git", "config", "user.name", "Test User"], cwd=snapshot, check=True)
-    if commit:
+    for relative_path in remove_paths or []:
         subprocess.run(
-            [
-                "git",
-                "add",
-                str(TICK.relative_to(ROOT)),
-                str(INSTALL.relative_to(ROOT)),
-                str(UNINSTALL.relative_to(ROOT)),
-                str(LONG_DURATION_DOC.relative_to(ROOT)),
-                str(ROADMAP.relative_to(ROOT)),
-                str(README.relative_to(ROOT)),
-                str(Path("tests") / "test_long_duration_dogfood_scripts.py"),
-            ],
+            ["git", "rm", "-f", "-q", "--", relative_path],
             cwd=snapshot,
             check=True,
+            text=True,
+            capture_output=True,
         )
+    if commit:
+        subprocess.run(["git", "add", "-A"], cwd=snapshot, check=True)
         diff_cached = subprocess.run(
             ["git", "diff", "--cached", "--quiet"],
             cwd=snapshot,
@@ -98,6 +97,13 @@ def _make_snapshot(tmp_path: Path, *, commit: bool = True) -> Path:
                 f"returncode={diff_cached.returncode} stderr={diff_cached.stderr}"
             )
     return snapshot
+
+
+def _remove_snapshot_paths(snapshot: Path, *relative_paths: str) -> None:
+    for relative_path in relative_paths:
+        path = snapshot / relative_path
+        if path.is_file():
+            path.unlink()
 
 
 def _latest_run_dir(repo: Path) -> Path:
@@ -181,45 +187,111 @@ def test_tick_once_creates_run_dir_and_summary(tmp_path):
     assert (run_dir / "git_log_oneline_20.txt").is_file()
 
 
-def test_tick_moves_past_completed_script_tests(tmp_path):
+@pytest.mark.parametrize(
+    ("missing_paths", "expected_category", "expected_title", "unexpected_phrases", "prompt_substring"),
+    [
+        (
+            ["tests/test_long_duration_dogfood_scripts.py"],
+            "tests_or_fixtures",
+            "Add long-duration dogfood script tests.",
+            [],
+            "Add deterministic tests for scripts/zth_long_duration_dogfood_tick.sh",
+        ),
+        (
+            [
+                "local_harness/validate_queue_approval_path.py",
+                "tests/test_validate_queue_approval_path.py",
+                "tests/test_queue_approval_path_fixtures.py",
+            ],
+            "code_or_validator",
+            "Add queue approval path validator design scaffold.",
+            ["Add long-duration dogfood script tests."],
+            "Add a review-artifact-only validator scaffold for a future queue approval path.",
+        ),
+        (
+            ["docs/reports/model_auditions/QUEUE_APPROVAL_PATH_CALIBRATION_SYNTHESIS_2026-07-18.md"],
+            "tests_or_fixtures",
+            "Add queue approval path calibration synthesis.",
+            ["Add long-duration dogfood script tests.", "Add queue approval path validator design scaffold."],
+            "Add a queue approval path calibration synthesis report after the validator, pass fixtures, blocked fixtures, and regression tests.",
+        ),
+        (
+            [
+                "local_harness/review_queue_approval_path.py",
+                "tests/test_review_queue_approval_path.py",
+                "docs/reports/model_auditions/QUEUE_APPROVAL_REVIEW_COMMAND_2026-07-18.md",
+            ],
+            "code_or_validator",
+            "Add read-only queue approval review command.",
+            [
+                "Add long-duration dogfood script tests.",
+                "Add queue approval path validator design scaffold.",
+                "Add queue approval path calibration synthesis.",
+            ],
+            "Add a read-only queue approval review command that wraps queue_approval_path_v1 validation and emits a review/report artifact only.",
+        ),
+        (
+            ["docs/reports/model_auditions/QUEUE_APPROVAL_REVIEW_COMMAND_CALIBRATION_SYNTHESIS_2026-07-18.md"],
+            "tests_or_fixtures",
+            "Add queue approval review command calibration synthesis.",
+            [
+                "Add long-duration dogfood script tests.",
+                "Add queue approval path validator design scaffold.",
+                "Add queue approval path calibration synthesis.",
+                "Add read-only queue approval review command.",
+            ],
+            "Add a queue approval review command calibration synthesis report after the read-only command, direct tests, smoke output, and regression slices.",
+        ),
+    ],
+)
+def test_tick_recommends_the_first_incomplete_milestone(
+    tmp_path,
+    missing_paths,
+    expected_category,
+    expected_title,
+    unexpected_phrases,
+    prompt_substring,
+):
+    snapshot = _make_snapshot(tmp_path, remove_paths=missing_paths)
+    result = _run([str(TICK), "--once"], cwd=snapshot, env={"ZTH_REPO": str(snapshot)})
+    assert result.returncode == 0, result.stderr
+
+    run_dir = _latest_run_dir(snapshot)
+    summary = _read_json(run_dir / "tick_summary.json")
+    assert summary["next_task_category"] == expected_category
+    assert summary["next_task_title"] == expected_title
+    for phrase in unexpected_phrases:
+        assert phrase not in summary["implementation_prompt"]
+    assert prompt_substring in summary["implementation_prompt"]
+
+
+def test_tick_moves_past_completed_milestones(tmp_path):
     snapshot = _make_snapshot(tmp_path)
     result = _run([str(TICK), "--once"], cwd=snapshot, env={"ZTH_REPO": str(snapshot)})
     assert result.returncode == 0, result.stderr
 
     run_dir = _latest_run_dir(snapshot)
     summary = _read_json(run_dir / "tick_summary.json")
-    assert summary["next_task_category"] == "tests_or_fixtures"
-    assert summary["next_task_title"] == "Add queue approval review command calibration synthesis."
+    assert summary["next_task_category"] == "code_or_validator"
+    assert summary["next_task_title"] == "Add declarative milestone map calibration synthesis."
+    assert "Add long-duration dogfood script tests." not in summary["implementation_prompt"]
+    assert "Add queue approval path validator design scaffold." not in summary["implementation_prompt"]
     assert "Add queue approval path calibration synthesis." not in summary["implementation_prompt"]
     assert "Add read-only queue approval review command." not in summary["implementation_prompt"]
-    assert "queue approval review command calibration synthesis" in summary["implementation_prompt"]
+    assert "Add queue approval review command calibration synthesis." not in summary["implementation_prompt"]
+    assert "declarative long-duration dogfood milestone map" in summary["implementation_prompt"]
 
 
-def test_tick_moves_past_completed_queue_approval_calibration(tmp_path):
+def test_tick_moves_to_declarative_milestone_map_when_all_milestones_complete(tmp_path):
     snapshot = _make_snapshot(tmp_path)
     result = _run([str(TICK), "--once"], cwd=snapshot, env={"ZTH_REPO": str(snapshot)})
     assert result.returncode == 0, result.stderr
 
     run_dir = _latest_run_dir(snapshot)
     summary = _read_json(run_dir / "tick_summary.json")
-    assert summary["next_task_category"] == "tests_or_fixtures"
-    assert summary["next_task_title"] == "Add queue approval review command calibration synthesis."
-    assert "Add queue approval path calibration synthesis." not in summary["implementation_prompt"]
-    assert "Add read-only queue approval review command." not in summary["implementation_prompt"]
-    assert "queue approval review command calibration synthesis" in summary["implementation_prompt"]
-
-
-def test_tick_moves_past_completed_queue_approval_review_command(tmp_path):
-    snapshot = _make_snapshot(tmp_path)
-    result = _run([str(TICK), "--once"], cwd=snapshot, env={"ZTH_REPO": str(snapshot)})
-    assert result.returncode == 0, result.stderr
-
-    run_dir = _latest_run_dir(snapshot)
-    summary = _read_json(run_dir / "tick_summary.json")
-    assert summary["next_task_category"] == "tests_or_fixtures"
-    assert summary["next_task_title"] == "Add queue approval review command calibration synthesis."
-    assert "Add read-only queue approval review command." not in summary["implementation_prompt"]
-    assert "queue approval review command calibration synthesis" in summary["implementation_prompt"]
+    assert summary["next_task_category"] == "code_or_validator"
+    assert summary["next_task_title"] == "Add declarative milestone map calibration synthesis."
+    assert summary["implementation_prompt"].startswith("Add a calibration synthesis report for the declarative long-duration dogfood milestone map.")
 
 
 def test_tick_expired_control_window_blocks_useful_work(tmp_path):

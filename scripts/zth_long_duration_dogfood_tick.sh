@@ -113,6 +113,43 @@ record_file() {
   "$@" > "$path"
 }
 
+milestone_map() {
+  cat <<'EOF'
+tests_or_fixtures	Add long-duration dogfood script tests.	tests/test_long_duration_dogfood_scripts.py	Add deterministic tests for scripts/zth_long_duration_dogfood_tick.sh, scripts/zth_install_long_duration_cron.sh, and scripts/zth_uninstall_long_duration_cron.sh. Cover lock contention, expired control-window skipping, cron tagging, and clean uninstall behavior. Preserve the authority boundary: no queue writing, no router automation, no unattended execution, no repo mutation without review.
+code_or_validator	Add queue approval path validator design scaffold.	local_harness/validate_queue_approval_path.py,tests/test_validate_queue_approval_path.py,tests/test_queue_approval_path_fixtures.py	Add a review-artifact-only validator scaffold for a future queue approval path. It must not write queues, insert queues, run queues, automate handoff, mutate repositories, train, promote, deploy, or grant downstream-use authority. Start with schema/validator/test fixtures only if the existing queue-handoff review artifacts provide enough evidence; otherwise produce a blocked review note explaining what design information is missing.
+tests_or_fixtures	Add queue approval path calibration synthesis.	docs/reports/model_auditions/QUEUE_APPROVAL_PATH_CALIBRATION_SYNTHESIS_2026-07-18.md	Add a queue approval path calibration synthesis report after the validator, pass fixtures, blocked fixtures, and regression tests. Record what the queue_approval_path_v1 validator proves, what remains unimplemented, and the authority boundary. Do not add queue writing, queue insertion, queue running, automatic handoff, router automation, repo mutation, training capture, promotion, deployment, or downstream-use authority.
+code_or_validator	Add read-only queue approval review command.	local_harness/review_queue_approval_path.py,tests/test_review_queue_approval_path.py,docs/reports/model_auditions/QUEUE_APPROVAL_REVIEW_COMMAND_2026-07-18.md	Add a read-only queue approval review command that wraps queue_approval_path_v1 validation and emits a review/report artifact only. It must not write queues, insert queues, run queues, automate handoff, mutate repositories, import fixtures, train, promote, deploy, or grant downstream-use authority. Follow the existing front-door/queue-handoff review command pattern if present. If the existing command pattern is insufficient, produce a blocked review note explaining what design information is missing.
+tests_or_fixtures	Add queue approval review command calibration synthesis.	docs/reports/model_auditions/QUEUE_APPROVAL_REVIEW_COMMAND_CALIBRATION_SYNTHESIS_2026-07-18.md	Add a queue approval review command calibration synthesis report after the read-only command, direct tests, smoke output, and regression slices. Record what queue_approval_path_review_v1 proves, what remains unimplemented, output-path safety behavior, exit-status behavior, and the authority boundary. Do not add queue writing, queue insertion, queue running, automatic handoff, router automation, repo mutation, fixture import, training capture, promotion, deployment, or downstream-use authority.
+EOF
+}
+
+recommend_next_milestone() {
+  local category title files_csv prompt
+  while IFS=$'\t' read -r category title files_csv prompt; do
+    [ -n "${category:-}" ] || continue
+    local missing=0
+    local file
+    IFS=',' read -r -a required_files <<< "$files_csv"
+    for file in "${required_files[@]}"; do
+      if [ ! -f "$REPO/$file" ]; then
+        missing=1
+        break
+      fi
+    done
+    if [ "$missing" -eq 1 ]; then
+      printf '%s\n%s\n%s\n' "$category" "$title" "$prompt"
+      return 0
+    fi
+  done <<EOF
+$(milestone_map)
+EOF
+
+  printf '%s\n%s\n%s\n' \
+    "code_or_validator" \
+    "Add declarative milestone map calibration synthesis." \
+    $'Add a calibration synthesis report for the declarative long-duration dogfood milestone map. Record how milestone evidence files drive recommendation selection, what stale-recommendation behavior is prevented, what remains unimplemented, and the authority boundary. Do not add queue writing, queue insertion, queue running, automatic handoff, router automation, repo mutation, fixture import, training capture, promotion, deployment, or downstream-use authority.'
+}
+
 run_command() {
   local name="$1"
   shift
@@ -272,32 +309,11 @@ PY
     front_rc="$(cat "$RUN_DIR/pytest_front_door.exitcode")"
 
     if [ "$diff_rc" -eq 0 ] && [ "$queue_rc" -eq 0 ] && [ "$front_rc" -eq 0 ]; then
-      if [ ! -f "$REPO/tests/test_long_duration_dogfood_scripts.py" ]; then
-        classification="tests_or_fixtures"
-        next_task_category="tests_or_fixtures"
-        next_task_title="Add bounded tests for the long-duration dogfood tick control window and cron tag handling."
-        next_prompt=$'Add deterministic tests for scripts/zth_long_duration_dogfood_tick.sh, scripts/zth_install_long_duration_cron.sh, and scripts/zth_uninstall_long_duration_cron.sh. Cover lock contention, expired control-window skipping, cron tagging, and clean uninstall behavior. Preserve the authority boundary: no queue writing, no router automation, no unattended execution, no repo mutation without review.'
-      elif [ ! -f "$REPO/local_harness/validate_queue_approval_path.py" ] || [ ! -f "$REPO/tests/test_validate_queue_approval_path.py" ] || [ ! -f "$REPO/tests/test_queue_approval_path_fixtures.py" ]; then
-        classification="code_or_validator"
-        next_task_category="code_or_validator"
-        next_task_title="Add queue approval path validator design scaffold."
-        next_prompt=$'Add a review-artifact-only validator scaffold for a future queue approval path. It must not write queues, insert queues, run queues, automate handoff, mutate repositories, train, promote, deploy, or grant downstream-use authority. Start with schema/validator/test fixtures only if the existing queue-handoff review artifacts provide enough evidence; otherwise produce a blocked review note explaining what design information is missing.'
-      elif [ ! -f "$REPO/docs/reports/model_auditions/QUEUE_APPROVAL_PATH_CALIBRATION_SYNTHESIS_2026-07-18.md" ]; then
-        classification="tests_or_fixtures"
-        next_task_category="tests_or_fixtures"
-        next_task_title="Add queue approval path calibration synthesis."
-        next_prompt=$'Add a queue approval path calibration synthesis report after the validator, pass fixtures, blocked fixtures, and regression tests. Record what the queue_approval_path_v1 validator proves, what remains unimplemented, and the authority boundary. Do not add queue writing, queue insertion, queue running, automatic handoff, router automation, repo mutation, training capture, promotion, deployment, or downstream-use authority.'
-      elif [ ! -f "$REPO/local_harness/review_queue_approval_path.py" ] || [ ! -f "$REPO/tests/test_review_queue_approval_path.py" ] || [ ! -f "$REPO/docs/reports/model_auditions/QUEUE_APPROVAL_REVIEW_COMMAND_2026-07-18.md" ]; then
-        classification="code_or_validator"
-        next_task_category="code_or_validator"
-        next_task_title="Add read-only queue approval review command."
-        next_prompt=$'Add a read-only queue approval review command that wraps queue_approval_path_v1 validation and emits a review/report artifact only. It must not write queues, insert queues, run queues, automate handoff, mutate repositories, import fixtures, train, promote, deploy, or grant downstream-use authority. Follow the existing front-door/queue-handoff review command pattern if present. If the existing command pattern is insufficient, produce a blocked review note explaining what design information is missing.'
-      else
-        classification="tests_or_fixtures"
-        next_task_category="tests_or_fixtures"
-        next_task_title="Add queue approval review command calibration synthesis."
-        next_prompt=$'Add a queue approval review command calibration synthesis report after the read-only command, direct tests, smoke output, and regression slices. Record what queue_approval_path_review_v1 proves, what remains unimplemented, output-path safety behavior, exit-status behavior, and the authority boundary. Do not add queue writing, queue insertion, queue running, automatic handoff, router automation, repo mutation, fixture import, training capture, promotion, deployment, or downstream-use authority.'
-      fi
+      mapfile -t milestone_fields < <(recommend_next_milestone)
+      next_task_category="${milestone_fields[0]}"
+      next_task_title="${milestone_fields[1]}"
+      next_prompt="${milestone_fields[2]}"
+      classification="$next_task_category"
     elif [ "$diff_rc" -ne 0 ]; then
       classification="blocked_needs_review"
       next_task_category="code_or_validator"
