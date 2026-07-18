@@ -282,11 +282,16 @@ PY
         next_task_category="code_or_validator"
         next_task_title="Add queue approval path validator design scaffold."
         next_prompt=$'Add a review-artifact-only validator scaffold for a future queue approval path. It must not write queues, insert queues, run queues, automate handoff, mutate repositories, train, promote, deploy, or grant downstream-use authority. Start with schema/validator/test fixtures only if the existing queue-handoff review artifacts provide enough evidence; otherwise produce a blocked review note explaining what design information is missing.'
-      else
+      elif [ ! -f "$REPO/docs/reports/model_auditions/QUEUE_APPROVAL_PATH_CALIBRATION_SYNTHESIS_2026-07-18.md" ]; then
         classification="tests_or_fixtures"
         next_task_category="tests_or_fixtures"
         next_task_title="Add queue approval path calibration synthesis."
         next_prompt=$'Add a queue approval path calibration synthesis report after the validator, pass fixtures, blocked fixtures, and regression tests. Record what the queue_approval_path_v1 validator proves, what remains unimplemented, and the authority boundary. Do not add queue writing, queue insertion, queue running, automatic handoff, router automation, repo mutation, training capture, promotion, deployment, or downstream-use authority.'
+      else
+        classification="code_or_validator"
+        next_task_category="code_or_validator"
+        next_task_title="Add read-only queue approval review command."
+        next_prompt=$'Add a read-only queue approval review command that wraps queue_approval_path_v1 validation and emits a review/report artifact only. It must not write queues, insert queues, run queues, automate handoff, mutate repositories, import fixtures, train, promote, deploy, or grant downstream-use authority. Follow the existing front-door/queue-handoff review command pattern if present. If the existing command pattern is insufficient, produce a blocked review note explaining what design information is missing.'
       fi
     elif [ "$diff_rc" -ne 0 ]; then
       classification="blocked_needs_review"

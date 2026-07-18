@@ -106,6 +106,14 @@ already present. When
 repeat `Add queue approval path validator design scaffold.` It advances to
 `Add queue approval path calibration synthesis.` instead.
 
+## Queue Approval Calibration Stale Guard
+
+The tick recommender now checks whether
+`docs/reports/model_auditions/QUEUE_APPROVAL_PATH_CALIBRATION_SYNTHESIS_2026-07-18.md`
+already exists. When it does, the tick does not repeat `Add queue approval
+path calibration synthesis.` It advances to `Add read-only queue approval
+review command.` instead.
+
 ## Authority Boundary
 
 This cron loop is supervised and review-oriented. It does not authorize queue
