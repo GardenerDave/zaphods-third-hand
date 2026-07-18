@@ -144,6 +144,7 @@ The accepted artifact retains review caveats:
 - `FRONT_DOOR_LANE_SYNTHESIS_2026-07-17.md` — synthesis of the completed supervised front-door lane from messy input to review-ready bounded work; it records what is proven and what remains unproven.
 - `FRONT_DOOR_CHAIN_DIVERSE_FIXTURES_2026-07-17.md` — diverse messy-input fixture pack for the front-door lane; it broadens coverage without granting queue handoff or downstream use.
 - `FRONT_DOOR_FIXTURE_EXPANSION_SYNTHESIS_2026-07-17.md` — synthesis of the diverse fixture expansion; it records the conservative validator behavior it exposed and what remains unproven.
+- `FRONT_DOOR_CHAIN_BLOCKED_FIXTURES_2026-07-17.md` — blocked-case fixture pack for front-door calibration; it confirms the review wrapper fails closed on invalid or unsafe chains.
 
 ## Safety Reminder
 

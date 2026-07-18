@@ -1,0 +1,37 @@
+{
+  "allowed_targets": [
+    "docs/reports/model_auditions/"
+  ],
+  "authority_boundary": [
+    "no_unattended_execution",
+    "no_repo_mutation_without_review",
+    "no_training_capture",
+    "no_promotion",
+    "no_deployment",
+    "no_downstream_use_authority"
+  ],
+  "evidence_needed": [
+    "malformed review handling",
+    "review-only next action"
+  ],
+  "held_targets": [
+    "training/",
+    "deployment/"
+  ],
+  "packet_schema": "messy_input_triage_packet_v1",
+  "proposed_next_action": "Draft a review-only packet and keep malformed-review handling under human review.",
+  "request_type": "review_malformed_block",
+  "review_required": true,
+  "stop_conditions": [
+    "review packet is malformed",
+    "review is not required",
+    "authority boundaries are unclear"
+  ],
+  "task_summary": "Create a triage packet that exercises malformed-review handling.",
+  "validation_plan": [
+    "confirm triage remains valid",
+    "verify malformed review fails closed",
+    "check authority boundary terms"
+  ]
+}
+

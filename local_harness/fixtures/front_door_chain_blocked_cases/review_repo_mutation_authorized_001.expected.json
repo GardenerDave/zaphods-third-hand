@@ -1,0 +1,16 @@
+{
+  "authority_expectation": {
+    "automation_status": "not_automated",
+    "downstream_use_status": "prohibited_until_review",
+    "queue_handoff_status": "not_inserted",
+    "repo_mutation_status": "not_authorized"
+  },
+  "case_id": "review_repo_mutation_authorized_001",
+  "expected_diagnostic_substrings": [
+    "repo_mutation_status",
+    "authorized"
+  ],
+  "expected_exit_code": "nonzero",
+  "expected_review_status": "blocked"
+}
+

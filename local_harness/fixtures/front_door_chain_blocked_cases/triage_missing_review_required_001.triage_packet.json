@@ -1,0 +1,37 @@
+{
+  "allowed_targets": [
+    "docs/ROADMAP.md",
+    "docs/TRIAGE_ROUTER.md"
+  ],
+  "authority_boundary": [
+    "no_unattended_execution",
+    "no_repo_mutation_without_review",
+    "no_training_capture",
+    "no_promotion",
+    "no_deployment",
+    "no_downstream_use_authority"
+  ],
+  "evidence_needed": [
+    "current roadmap wording",
+    "triage boundary confirmation"
+  ],
+  "held_targets": [
+    "training/",
+    "deployment/"
+  ],
+  "packet_schema": "messy_input_triage_packet_v1",
+  "proposed_next_action": "Draft the triage packet for human review.",
+  "request_type": "triage_review",
+  "stop_conditions": [
+    "scope expands beyond docs",
+    "review is not required",
+    "authority boundaries are unclear"
+  ],
+  "task_summary": "Create a triage packet for a bounded docs request.",
+  "validation_plan": [
+    "confirm review_required is present",
+    "check authority boundary terms",
+    "verify allowed and held targets remain separated"
+  ]
+}
+

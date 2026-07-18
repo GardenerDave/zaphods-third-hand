@@ -1,0 +1,32 @@
+{
+  "authority_boundary": [
+    "no_unattended_execution",
+    "no_repo_mutation_without_review",
+    "no_training_capture",
+    "no_promotion",
+    "no_deployment",
+    "no_downstream_use_authority"
+  ],
+  "automation_status": "not_automated",
+  "diagnostics": [],
+  "downstream_use_status": "prohibited_until_review",
+  "packet_schema": "bounded_task_review_packet_v1",
+  "queue_handoff_status": "not_inserted",
+  "recommended_next_step": "Keep the draft as evidence only and defer follow-up decisions to human review.",
+  "repo_mutation_status": "not_authorized",
+  "required_checks": [
+    "source triage validation passed",
+    "bounded task validation passed",
+    "review requirement preserved"
+  ],
+  "review_status": "review_required",
+  "reviewed_artifacts": [
+    "local_harness/fixtures/front_door_chain_blocked_cases/triage_missing_review_required_001.triage_packet.json",
+    "local_harness/fixtures/front_door_chain_blocked_cases/triage_missing_review_required_001.bounded_task_packet_draft.json"
+  ],
+  "source_packet_path": "local_harness/fixtures/front_door_chain_blocked_cases/triage_missing_review_required_001.bounded_task_packet_draft.json",
+  "source_packet_schema": "bounded_task_packet_draft_v1",
+  "source_validation_status": "passed",
+  "task_summary": "Review the draft as evidence only and keep queue handoff non-automated."
+}
+

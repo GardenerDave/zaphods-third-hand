@@ -1,0 +1,2 @@
+This is a blocked-case sample where the review packet itself is malformed and should fail closed.
+
