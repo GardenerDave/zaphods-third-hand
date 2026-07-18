@@ -131,6 +131,7 @@ The accepted artifact retains review caveats:
 - `SUPERVISED_WORKER_LOOP_120_TASK_SYNTHESIS_2026-07-17.md` — compact decision synthesis for the completed 120-task supervised dogfood batch.
 - `MESSY_INPUT_TRIAGE_PACKET_FIRST_DOGFOOD_2026-07-17.md` — first manual dogfood sample for the messy-input front door, including the validated packet and authority boundary.
 - `MESSY_INPUT_TRIAGE_PACKET_WORKER_AUDITION_2026-07-17.md` — blocked local-worker audition attempt for the messy-input front door; endpoint missing, so no packet was produced.
+- `MESSY_INPUT_TRIAGE_PACKET_WORKER_AUDITION_ATTEMPT_002_2026-07-17.md` — supervised local-worker audition attempt after the endpoint became available; both outputs parsed but failed the validator, so no packet was accepted.
 
 ## Safety Reminder
 
