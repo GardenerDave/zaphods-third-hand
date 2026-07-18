@@ -133,6 +133,7 @@ explicit supervised acceptance without promotion or downstream mutation.
 - Queue-handoff review fixtures added; queue writing remains unimplemented and blocked behind explicit approval and separate review.
 - Queue-handoff review calibration synthesis recorded; queue writing remains unimplemented and blocked behind separate approval-path design, validator, fixtures, and review.
 - Long-duration dogfood cron added for supervised review artifact generation; it does not auto-commit, push, queue-write, or mutate main unattended.
+- Long-duration dogfood cron script tests added; the loop remains review-artifact-only and non-authoritative.
 
 ## Integration Roadmap: Improve / Fable / TriDB Harvest
 

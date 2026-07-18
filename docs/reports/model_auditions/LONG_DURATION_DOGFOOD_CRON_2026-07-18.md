@@ -72,6 +72,22 @@ Then inspect:
 - Remove the cron entry with `scripts/zth_uninstall_long_duration_cron.sh`
 - The uninstall helper only removes lines tagged `ZTH_LONG_DURATION_DOGFOOD`
 
+## Deterministic Script Tests
+
+- `tests/test_long_duration_dogfood_scripts.py`
+
+The tests cover:
+
+- `bash -n` for all three scripts
+- bounded tick output and summary fields
+- expired-control-window behavior
+- dirty tracked-tree refusal
+- lock contention handling
+- cron install and uninstall behavior through a stubbed `crontab`
+
+The tests preserve the authority boundary: no auto-commit, no auto-push, no
+queue-write, and no mutate-main-unattended behavior is authorized.
+
 ## Authority Boundary
 
 This cron loop is supervised and review-oriented. It does not authorize queue
