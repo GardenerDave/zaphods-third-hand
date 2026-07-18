@@ -88,6 +88,14 @@ The tests cover:
 The tests preserve the authority boundary: no auto-commit, no auto-push, no
 queue-write, and no mutate-main-unattended behavior is authorized.
 
+## Stale Recommendation Guard
+
+The tick recommender now checks whether
+`tests/test_long_duration_dogfood_scripts.py` already exists before suggesting
+that work again. When the script-test coverage is present, the tick moves to
+the next bounded validator-oriented target instead of repeating completed
+script-test work.
+
 ## Authority Boundary
 
 This cron loop is supervised and review-oriented. It does not authorize queue

@@ -42,6 +42,9 @@ def _overlay_snapshot(snapshot: Path) -> None:
         dest = snapshot / src.relative_to(ROOT)
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src, dest)
+    tests_dir = snapshot / "tests"
+    tests_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(ROOT / "tests" / "test_long_duration_dogfood_scripts.py", tests_dir / "test_long_duration_dogfood_scripts.py")
 
 
 def _make_snapshot(tmp_path: Path, *, commit: bool = True) -> Path:
@@ -67,6 +70,7 @@ def _make_snapshot(tmp_path: Path, *, commit: bool = True) -> Path:
                 str(LONG_DURATION_DOC.relative_to(ROOT)),
                 str(ROADMAP.relative_to(ROOT)),
                 str(README.relative_to(ROOT)),
+                str(Path("tests") / "test_long_duration_dogfood_scripts.py"),
             ],
             cwd=snapshot,
             check=True,
@@ -153,6 +157,19 @@ def test_tick_once_creates_run_dir_and_summary(tmp_path):
     assert (run_dir / "implementation_prompt.md").is_file()
     assert (run_dir / "git_status_short.txt").is_file()
     assert (run_dir / "git_log_oneline_20.txt").is_file()
+
+
+def test_tick_moves_past_completed_script_tests(tmp_path):
+    snapshot = _make_snapshot(tmp_path)
+    result = _run([str(TICK), "--once"], cwd=snapshot, env={"ZTH_REPO": str(snapshot)})
+    assert result.returncode == 0, result.stderr
+
+    run_dir = _latest_run_dir(snapshot)
+    summary = _read_json(run_dir / "tick_summary.json")
+    assert summary["next_task_category"] == "code_or_validator"
+    assert summary["next_task_title"] == "Add queue approval path validator design scaffold."
+    assert "Add deterministic tests for scripts/zth_long_duration_dogfood_tick.sh" not in summary["implementation_prompt"]
+    assert "review-artifact-only validator scaffold for a future queue approval path" in summary["implementation_prompt"]
 
 
 def test_tick_expired_control_window_blocks_useful_work(tmp_path):

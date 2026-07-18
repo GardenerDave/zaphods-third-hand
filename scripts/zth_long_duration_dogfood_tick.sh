@@ -272,10 +272,17 @@ PY
     front_rc="$(cat "$RUN_DIR/pytest_front_door.exitcode")"
 
     if [ "$diff_rc" -eq 0 ] && [ "$queue_rc" -eq 0 ] && [ "$front_rc" -eq 0 ]; then
-      classification="tests_or_fixtures"
-      next_task_category="tests_or_fixtures"
-      next_task_title="Add bounded tests for the long-duration dogfood tick control window and cron tag handling."
-      next_prompt=$'Add deterministic tests for scripts/zth_long_duration_dogfood_tick.sh, scripts/zth_install_long_duration_cron.sh, and scripts/zth_uninstall_long_duration_cron.sh. Cover lock contention, expired control-window skipping, cron tagging, and clean uninstall behavior. Preserve the authority boundary: no queue writing, no router automation, no unattended execution, no repo mutation without review.'
+      if [ ! -f "$REPO/tests/test_long_duration_dogfood_scripts.py" ]; then
+        classification="tests_or_fixtures"
+        next_task_category="tests_or_fixtures"
+        next_task_title="Add bounded tests for the long-duration dogfood tick control window and cron tag handling."
+        next_prompt=$'Add deterministic tests for scripts/zth_long_duration_dogfood_tick.sh, scripts/zth_install_long_duration_cron.sh, and scripts/zth_uninstall_long_duration_cron.sh. Cover lock contention, expired control-window skipping, cron tagging, and clean uninstall behavior. Preserve the authority boundary: no queue writing, no router automation, no unattended execution, no repo mutation without review.'
+      else
+        classification="code_or_validator"
+        next_task_category="code_or_validator"
+        next_task_title="Add queue approval path validator design scaffold."
+        next_prompt=$'Add a review-artifact-only validator scaffold for a future queue approval path. It must not write queues, insert queues, run queues, automate handoff, mutate repositories, train, promote, deploy, or grant downstream-use authority. Start with schema/validator/test fixtures only if the existing queue-handoff review artifacts provide enough evidence; otherwise produce a blocked review note explaining what design information is missing.'
+      fi
     elif [ "$diff_rc" -ne 0 ]; then
       classification="blocked_needs_review"
       next_task_category="code_or_validator"
