@@ -140,6 +140,7 @@ The accepted artifact retains review caveats:
 - `BOUNDED_TASK_REVIEW_PACKET_FIXTURES_2026-07-17.md` — deterministic fixture suite for the bounded-task-review packet, covering pass cases and fail-closed queue/repo-mutation/unsafe-next-step cases.
 - `FRONT_DOOR_CHAIN_VALIDATOR_2026-07-17.md` — read-only deterministic validator for the full front-door chain; queue handoff and router automation remain unproven.
 - `FRONT_DOOR_CHAIN_SCORECARD_2026-07-17.md` — read-only scorecard for the full front-door chain validator result; it classifies review readiness without granting queue handoff or downstream use.
+- `FRONT_DOOR_CHAIN_REVIEW_COMMAND_2026-07-17.md` — read-only wrapper that validates and scores the full front-door chain in one command; it remains review-only and non-automated.
 
 ## Safety Reminder
 

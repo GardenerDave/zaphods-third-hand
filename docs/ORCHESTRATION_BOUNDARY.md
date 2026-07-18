@@ -224,3 +224,19 @@ Example scorecard command:
 python3 local_harness/score_front_door_chain.py \
   --chain-result /tmp/front_door_chain_result.json
 ```
+
+## Front Door Chain Review Command
+
+`local_harness/review_front_door_chain.py` is a read-only wrapper that runs
+the full front-door chain validator and scorecard in one command. It produces
+one review JSON object and does not route, insert queues, mutate the repo,
+train, promote, deploy, or grant downstream use.
+
+Example review command:
+
+```bash
+python3 local_harness/review_front_door_chain.py \
+  --triage-packet local_harness/fixtures/triage_to_bounded_task_bridge/valid_bridge_001.source_triage_packet.json \
+  --bounded-task-packet local_harness/fixtures/triage_to_bounded_task_bridge/valid_bridge_001.bounded_task_packet_draft.json \
+  --review-packet local_harness/fixtures/bounded_task_review_packet/valid_review_packet_001.json
+```

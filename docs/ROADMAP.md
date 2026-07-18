@@ -121,6 +121,7 @@ explicit supervised acceptance without promotion or downstream mutation.
 - Bounded task review packet fixtures now cover the next review-only bridge; future work remains fixture expansion, scoring, and supervised queue-handoff review.
 - Full front-door chain now has a read-only deterministic validator; future work remains scoring and supervised queue-handoff review.
 - Full front-door chain now has a read-only scorecard for human-review readiness; future work remains scoring calibration and supervised queue-handoff review.
+- Full front-door chain now has a read-only review command that validates and scores in one step; future work remains scoring calibration and supervised queue-handoff review.
 
 ## Integration Roadmap: Improve / Fable / TriDB Harvest
 
