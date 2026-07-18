@@ -75,13 +75,28 @@ def _make_snapshot(tmp_path: Path, *, commit: bool = True) -> Path:
             cwd=snapshot,
             check=True,
         )
-        subprocess.run(
-            ["git", "commit", "-m", "snapshot for long duration dogfood script tests"],
+        diff_cached = subprocess.run(
+            ["git", "diff", "--cached", "--quiet"],
             cwd=snapshot,
             text=True,
             capture_output=True,
-            check=True,
+            check=False,
         )
+        if diff_cached.returncode == 0:
+            pass
+        elif diff_cached.returncode == 1:
+            subprocess.run(
+                ["git", "commit", "-m", "snapshot for long duration dogfood script tests"],
+                cwd=snapshot,
+                text=True,
+                capture_output=True,
+                check=True,
+            )
+        else:
+            raise AssertionError(
+                "git diff --cached --quiet failed: "
+                f"returncode={diff_cached.returncode} stderr={diff_cached.stderr}"
+            )
     return snapshot
 
 
@@ -131,6 +146,13 @@ def test_bash_n_passes_for_all_three_scripts():
     for script in [TICK, INSTALL, UNINSTALL]:
         result = _bash_n(script)
         assert result.returncode == 0, result.stderr
+
+
+def test_make_snapshot_tolerates_clean_clone(tmp_path):
+    snapshot = _make_snapshot(tmp_path)
+    status = _run(["git", "status", "--short", "--untracked-files=no"], cwd=snapshot)
+    assert status.stdout == ""
+    assert (snapshot / "tests" / "test_long_duration_dogfood_scripts.py").is_file()
 
 
 def test_tick_once_creates_run_dir_and_summary(tmp_path):
