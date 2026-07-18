@@ -114,6 +114,7 @@ explicit supervised acceptance without promotion or downstream mutation.
 - Explicit `call-local` mode added to the manual supervised attempt runner for operator-invoked OpenAI-compatible local endpoint calls that write raw output plus call metadata for the existing supervised ingest/review path without granting execution, mutation, promotion, training, or curriculum-capture authority.
 - Explicit `export-pattern` mode added to the manual supervised attempt runner for operator-invoked failure/correction/success pattern export into supervised training pattern candidate artifacts; export is evidence-only and does not grant training or curriculum-capture authority.
 - Messy Input Triage Packet v1 validator for the supervised front door that turns messy input into a bounded, review-required triage packet before later packet assembly.
+- First manual dogfood sample validates messy project input into a review-required triage packet; future work remains model production, scoring, routing, and handoff into bounded task queues.
 
 ## Integration Roadmap: Improve / Fable / TriDB Harvest
 
