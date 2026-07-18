@@ -134,6 +134,7 @@ The accepted artifact retains review caveats:
 - `MESSY_INPUT_TRIAGE_PACKET_WORKER_AUDITION_ATTEMPT_002_2026-07-17.md` — supervised local-worker audition attempt after the endpoint became available; both outputs parsed but failed the validator, so no packet was accepted.
 - `MESSY_INPUT_TRIAGE_PACKET_WORKER_AUDITION_ATTEMPT_003_2026-07-17.md` — supervised local-worker audition attempt with the patched contract prompt; the parsed packet validated successfully, but router automation remains unproven.
 - `MESSY_INPUT_TRIAGE_TO_BOUNDED_TASK_BRIDGE_2026-07-17.md` — manual bridge from validated messy-input triage evidence into a review-required bounded task draft; queue handoff and router automation remain unproven.
+- `BOUNDED_TASK_PACKET_DRAFT_VALIDATOR_2026-07-17.md` — deterministic validator for the review-required bounded task draft bridge artifact; queue handoff and router automation remain unproven.
 
 ## Safety Reminder
 

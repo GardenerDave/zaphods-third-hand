@@ -116,6 +116,7 @@ explicit supervised acceptance without promotion or downstream mutation.
 - Messy Input Triage Packet v1 validator for the supervised front door that turns messy input into a bounded, review-required triage packet before later packet assembly.
 - First manual dogfood sample validates messy project input into a review-required triage packet; future work remains model production, scoring, routing, and handoff into bounded task queues.
 - A supervised local-worker audition with a patched contract prompt validated a messy-input triage packet, but router automation and bounded queue handoff remain future work.
+- Bounded task packet draft validator for the manual triage-to-bounded-task bridge, keeping queue handoff review-required and non-automated.
 
 ## Integration Roadmap: Improve / Fable / TriDB Harvest
 

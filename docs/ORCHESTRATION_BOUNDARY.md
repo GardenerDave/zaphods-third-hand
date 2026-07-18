@@ -97,3 +97,49 @@ This layer does not:
   records and deterministic patch-delta rendering.
 - This orchestration boundary combines both into one inspectable packet that is
   review-ready and provenance-preserving.
+
+## Bounded Task Packet Drafts
+
+`local_harness/validate_bounded_task_packet_draft.py` validates the manual
+bridge artifact used after a validated messy-input triage packet. The draft is a
+review-required handoff shape, not a router, queue inserter, or authority
+grant.
+
+Required fields include:
+
+- `packet_schema: "bounded_task_packet_draft_v1"`
+- `source_packet_schema: "messy_input_triage_packet_v1"`
+- `source_packet_path`
+- `task_summary`
+- `allowed_targets`
+- `held_targets`
+- `evidence_needed`
+- `proposed_action`
+- `validation_plan`
+- `stop_conditions`
+- `authority_boundary`
+- `review_required: true`
+- `downstream_use_status: "prohibited_until_review"`
+- `automation_status: "not_automated"`
+- `queue_handoff_status: "not_inserted"`
+
+The authority boundary must include:
+
+- `no_unattended_execution`
+- `no_repo_mutation_without_review`
+- `no_training_capture`
+- `no_promotion`
+- `no_deployment`
+- `no_downstream_use_authority`
+
+Example validation command:
+
+```bash
+python3 local_harness/validate_bounded_task_packet_draft.py \
+  --packet .work/messy_input_triage_bridge/20260717_triage_to_bounded_task_001/bounded_task_packet_draft.json
+```
+
+This validator is deterministic and model-free. It checks packet shape and
+authority boundaries only; it does not authorize execution, repo mutation,
+queue insertion, fixture import, training capture, promotion, deployment, or
+downstream use.
