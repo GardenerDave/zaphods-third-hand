@@ -1,0 +1,34 @@
+{
+  "packet_schema": "messy_input_triage_packet_v1",
+  "task_summary": "Create fixture coverage for validated triage-packet-to-bounded-task handoff without automating routing or queue insertion.",
+  "request_type": "triage_packet_followup",
+  "allowed_targets": [],
+  "held_targets": [],
+  "evidence_needed": [
+    "validation of current messy-input triage packet contract",
+    "manual dogfood sample verification",
+    "bounded supervised follow-up criteria definition"
+  ],
+  "authority_boundary": [
+    "no_unattended_execution",
+    "no_repo_mutation_without_review",
+    "no_training_capture",
+    "no_promotion",
+    "no_deployment",
+    "no_downstream_use_authority"
+  ],
+  "proposed_next_action": "Review the current messy-input triage packet contract and manual dogfood sample to establish the baseline for the next bounded supervised follow-up.",
+  "validation_plan": [
+    "revalidate the source messy-input triage packet",
+    "inspect the bounded-task draft for required structure",
+    "verify review_required is true",
+    "verify authority boundaries remain non-authoritative"
+  ],
+  "stop_conditions": [
+    "contract validation complete",
+    "dogfood sample verified",
+    "follow-up scope defined",
+    "local-worker parameters established"
+  ],
+  "review_required": true
+}

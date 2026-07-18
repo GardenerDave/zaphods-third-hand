@@ -1,0 +1,30 @@
+{
+  "packet_schema": "bounded_task_packet_draft_v1",
+  "source_packet_schema": "messy_input_triage_packet_v1",
+  "source_packet_path": "local_harness/fixtures/triage_to_bounded_task_bridge/valid_bridge_001.source_triage_packet.json",
+  "task_summary": "Create fixture coverage for validated triage-packet-to-bounded-task handoff without automating routing or queue insertion.",
+  "allowed_targets": [],
+  "held_targets": [],
+  "evidence_needed": [
+    "validation of current messy-input triage packet contract"
+  ],
+  "proposed_action": "Complete the handoff and insert into queue for automated downstream review.",
+  "validation_plan": [
+    "revalidate the source messy-input triage packet"
+  ],
+  "stop_conditions": [
+    "contract validation complete"
+  ],
+  "authority_boundary": [
+    "no_unattended_execution",
+    "no_repo_mutation_without_review",
+    "no_training_capture",
+    "no_promotion",
+    "no_deployment",
+    "no_downstream_use_authority"
+  ],
+  "review_required": true,
+  "downstream_use_status": "prohibited_until_review",
+  "automation_status": "not_automated",
+  "queue_handoff_status": "not_inserted"
+}

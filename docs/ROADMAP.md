@@ -117,6 +117,7 @@ explicit supervised acceptance without promotion or downstream mutation.
 - First manual dogfood sample validates messy project input into a review-required triage packet; future work remains model production, scoring, routing, and handoff into bounded task queues.
 - A supervised local-worker audition with a patched contract prompt validated a messy-input triage packet, but router automation and bounded queue handoff remain future work.
 - Bounded task packet draft validator for the manual triage-to-bounded-task bridge, keeping queue handoff review-required and non-automated.
+- Deterministic fixtures now cover the validated triage-to-bounded-task bridge; future work remains fixture expansion, scoring, and supervised queue-handoff review.
 
 ## Integration Roadmap: Improve / Fable / TriDB Harvest
 

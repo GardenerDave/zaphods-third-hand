@@ -143,3 +143,7 @@ This validator is deterministic and model-free. It checks packet shape and
 authority boundaries only; it does not authorize execution, repo mutation,
 queue insertion, fixture import, training capture, promotion, deployment, or
 downstream use.
+
+The deterministic bridge fixture suite at
+`local_harness/fixtures/triage_to_bounded_task_bridge/` exercises this draft
+shape against both passing and fail-closed cases.
