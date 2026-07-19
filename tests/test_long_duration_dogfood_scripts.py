@@ -14,6 +14,10 @@ ROOT = Path(__file__).resolve().parents[1]
 TICK = ROOT / "scripts" / "zth_long_duration_dogfood_tick.sh"
 INSTALL = ROOT / "scripts" / "zth_install_long_duration_cron.sh"
 UNINSTALL = ROOT / "scripts" / "zth_uninstall_long_duration_cron.sh"
+OVERNIGHT_CONTROLLER = ROOT / "scripts" / "zth_overnight_dogfood_controller.sh"
+OVERNIGHT_STATUS = ROOT / "scripts" / "zth_overnight_dogfood_status.sh"
+OVERNIGHT_INSTALL = ROOT / "scripts" / "zth_install_overnight_dogfood_cron.sh"
+OVERNIGHT_UNINSTALL = ROOT / "scripts" / "zth_uninstall_overnight_dogfood_cron.sh"
 LONG_DURATION_DOC = ROOT / "docs" / "reports" / "model_auditions" / "LONG_DURATION_DOGFOOD_CRON_2026-07-18.md"
 MILESTONE_MAP_SYNTHESIS = ROOT / "docs" / "reports" / "model_auditions" / "DECLARATIVE_LONG_DURATION_MILESTONE_MAP_CALIBRATION_SYNTHESIS_2026-07-18.md"
 LONG_DURATION_CLOSEOUT = ROOT / "docs" / "reports" / "model_auditions" / "LONG_DURATION_DOGFOOD_CLOSEOUT_2026-07-18.md"
@@ -40,7 +44,7 @@ def _bash_n(script: Path) -> subprocess.CompletedProcess[str]:
 
 
 def _overlay_snapshot(snapshot: Path) -> None:
-    for src in [TICK, INSTALL, UNINSTALL, LONG_DURATION_DOC, MILESTONE_MAP_SYNTHESIS, LONG_DURATION_CLOSEOUT, ROADMAP, README]:
+    for src in [TICK, INSTALL, UNINSTALL, OVERNIGHT_CONTROLLER, OVERNIGHT_STATUS, OVERNIGHT_INSTALL, OVERNIGHT_UNINSTALL, LONG_DURATION_DOC, MILESTONE_MAP_SYNTHESIS, LONG_DURATION_CLOSEOUT, ROADMAP, README]:
         dest = snapshot / src.relative_to(ROOT)
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src, dest)
@@ -147,7 +151,7 @@ cp "$1" "$STATE"
 
 
 def test_bash_n_passes_for_all_three_scripts():
-    for script in [TICK, INSTALL, UNINSTALL]:
+    for script in [TICK, INSTALL, UNINSTALL, OVERNIGHT_CONTROLLER, OVERNIGHT_STATUS, OVERNIGHT_INSTALL, OVERNIGHT_UNINSTALL]:
         result = _bash_n(script)
         assert result.returncode == 0, result.stderr
 
@@ -171,7 +175,7 @@ def test_tick_once_creates_run_dir_and_summary(tmp_path):
     run_dir = _latest_run_dir(snapshot)
     summary = _read_json(run_dir / "tick_summary.json")
     assert summary["summary_schema"] == "long_duration_dogfood_tick_v1"
-    assert summary["branch"] == "main"
+    assert summary["branch"] == "dogfood/overnight-20260718"
     assert len(summary["head_commit"]) == 40
     assert summary["next_task_category"] in {"tests_or_fixtures", "code_or_validator", "blocked_needs_review"}
     assert isinstance(summary["implementation_prompt"], str) and summary["implementation_prompt"].strip()
@@ -471,6 +475,51 @@ def test_uninstall_helper_with_stubbed_crontab(tmp_path):
     assert "ZTH_LONG_DURATION_DOGFOOD" not in payload
     assert "echo unrelated # keep-me" in payload
     assert "remaining tagged cron lines:" in result.stdout
+
+
+def test_overnight_status_reports_deadline_and_queue(tmp_path):
+    snapshot = _make_snapshot(tmp_path)
+    result = _run([str(OVERNIGHT_STATUS)], cwd=snapshot, env={"ZTH_REPO": str(snapshot)})
+    assert result.returncode == 0, result.stderr
+    payload = _read_json(snapshot / ".work" / "dogfood" / "overnight" / "status.json")
+    assert payload["deadline_local"].startswith("2026-07-19T08:00:00")
+    assert payload["queue_path"].endswith(".work/dogfood/roadmap_queue.tsv")
+    assert payload["state_path"].endswith(".work/dogfood/overnight/state.tsv")
+
+
+def test_overnight_install_and_uninstall_helpers_with_stubbed_crontab(tmp_path):
+    snapshot = _make_snapshot(tmp_path)
+    bindir, state = _make_crontab_stub(tmp_path)
+    env = {
+        "ZTH_REPO": str(snapshot),
+        "PATH": f"{bindir}:{os.environ['PATH']}",
+        "CRONTAB_STATE_FILE": str(state),
+    }
+
+    result = _run([str(OVERNIGHT_INSTALL)], cwd=snapshot, env=env)
+    assert result.returncode == 0, result.stderr
+    payload = state.read_text(encoding="utf-8")
+    assert "ZTH_OVERNIGHT_DOGFOOD_20260718" in payload
+    assert "*/5 * * * *" in payload
+    assert "zth_overnight_dogfood_controller.sh" in payload
+
+    result = _run([str(OVERNIGHT_UNINSTALL)], cwd=snapshot, env=env)
+    assert result.returncode == 0, result.stderr
+    assert "ZTH_OVERNIGHT_DOGFOOD_20260718" not in state.read_text(encoding="utf-8")
+
+
+def test_overnight_dry_run_does_not_modify_state(tmp_path):
+    snapshot = _make_snapshot(tmp_path)
+    queue_src = ROOT / ".work" / "dogfood" / "roadmap_queue.tsv"
+    queue_dest = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
+    queue_dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(queue_src, queue_dest)
+    before = _run(["git", "status", "--short", "--untracked-files=no"], cwd=snapshot)
+    result = _run([str(OVERNIGHT_CONTROLLER), "--dry-run"], cwd=snapshot, env={"ZTH_REPO": str(snapshot)})
+    assert result.returncode == 0, result.stderr
+    after = _run(["git", "status", "--short", "--untracked-files=no"], cwd=snapshot)
+    assert before.stdout == after.stdout
+    assert "dry-run" in result.stdout
 
 
 def test_authority_boundary_text_remains_present():
