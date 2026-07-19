@@ -155,6 +155,7 @@ The accepted artifact retains review caveats:
 - `QUEUE_APPROVAL_REVIEW_COMMAND_2026-07-18.md` — read-only queue approval review command; it wraps validation and emits explicit review output only.
 - `QUEUE_APPROVAL_REVIEW_COMMAND_CALIBRATION_SYNTHESIS_2026-07-18.md` — calibration synthesis after the read-only queue approval review command; it records output-path safety, exit-status behavior, and what remains unimplemented.
 - `DECLARATIVE_LONG_DURATION_MILESTONE_MAP_CALIBRATION_SYNTHESIS_2026-07-18.md` — calibration synthesis for the declarative long-duration dogfood milestone map; it records evidence-driven selection and the terminal closeout target.
+- `LONG_DURATION_DOGFOOD_CLOSEOUT_2026-07-18.md` — closeout for the supervised long-duration dogfood run; it records the completed evidence trail and the operator review stop point.
 - `LONG_DURATION_DOGFOOD_CRON_2026-07-18.md` — supervised long-duration dogfood cron design and usage notes; it generates review artifacts without auto-commit, push, or queue writing.
 
 ## Safety Reminder

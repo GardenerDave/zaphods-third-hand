@@ -144,6 +144,7 @@ explicit supervised acceptance without promotion or downstream mutation.
 - Read-only queue approval review command added; it emits explicit review output artifacts while queue insertion, queue writing, queue running, automatic handoff, and downstream-use authority remain unimplemented.
 - Long-duration dogfood recommender now uses a declarative milestone map so completed evidence-backed milestones are skipped automatically before recommending the next bounded target.
 - Declarative long-duration milestone map calibration synthesis recorded; recommender selection is evidence-driven while queue writing, queue insertion, queue running, automatic handoff, and downstream-use authority remain unimplemented.
+- Long-duration dogfood closeout recorded; the milestone map now advances to an operator review point while queue writing, queue insertion, queue running, automatic handoff, and downstream-use authority remain unimplemented.
 
 ## Integration Roadmap: Improve / Fable / TriDB Harvest
 

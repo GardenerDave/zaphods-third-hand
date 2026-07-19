@@ -139,7 +139,9 @@ The declarative milestone map now treats
 `docs/reports/model_auditions/DECLARATIVE_LONG_DURATION_MILESTONE_MAP_CALIBRATION_SYNTHESIS_2026-07-18.md`
 as an evidence-backed milestone. When that report exists, the recommender
 advances to the long-duration dogfood closeout report instead of repeating the
-calibration synthesis target.
+calibration synthesis target. When the closeout report also exists, the
+recommender advances to the operator review stop point instead of repeating the
+closeout target.
 
 ## Authority Boundary
 
