@@ -120,6 +120,7 @@ code_or_validator	Add queue approval path validator design scaffold.	local_harne
 tests_or_fixtures	Add queue approval path calibration synthesis.	docs/reports/model_auditions/QUEUE_APPROVAL_PATH_CALIBRATION_SYNTHESIS_2026-07-18.md	Add a queue approval path calibration synthesis report after the validator, pass fixtures, blocked fixtures, and regression tests. Record what the queue_approval_path_v1 validator proves, what remains unimplemented, and the authority boundary. Do not add queue writing, queue insertion, queue running, automatic handoff, router automation, repo mutation, training capture, promotion, deployment, or downstream-use authority.
 code_or_validator	Add read-only queue approval review command.	local_harness/review_queue_approval_path.py,tests/test_review_queue_approval_path.py,docs/reports/model_auditions/QUEUE_APPROVAL_REVIEW_COMMAND_2026-07-18.md	Add a read-only queue approval review command that wraps queue_approval_path_v1 validation and emits a review/report artifact only. It must not write queues, insert queues, run queues, automate handoff, mutate repositories, import fixtures, train, promote, deploy, or grant downstream-use authority. Follow the existing front-door/queue-handoff review command pattern if present. If the existing command pattern is insufficient, produce a blocked review note explaining what design information is missing.
 tests_or_fixtures	Add queue approval review command calibration synthesis.	docs/reports/model_auditions/QUEUE_APPROVAL_REVIEW_COMMAND_CALIBRATION_SYNTHESIS_2026-07-18.md	Add a queue approval review command calibration synthesis report after the read-only command, direct tests, smoke output, and regression slices. Record what queue_approval_path_review_v1 proves, what remains unimplemented, output-path safety behavior, exit-status behavior, and the authority boundary. Do not add queue writing, queue insertion, queue running, automatic handoff, router automation, repo mutation, fixture import, training capture, promotion, deployment, or downstream-use authority.
+tests_or_fixtures	Add declarative milestone map calibration synthesis.	docs/reports/model_auditions/DECLARATIVE_LONG_DURATION_MILESTONE_MAP_CALIBRATION_SYNTHESIS_2026-07-18.md	Add a calibration synthesis report for the declarative long-duration dogfood milestone map. Record how milestone evidence files drive recommendation selection, what stale-recommendation behavior is prevented, what remains unimplemented, and the authority boundary. Do not add queue writing, queue insertion, queue running, automatic handoff, router automation, repo mutation, fixture import, training capture, promotion, deployment, or downstream-use authority.
 EOF
 }
 
@@ -145,9 +146,9 @@ $(milestone_map)
 EOF
 
   printf '%s\n%s\n%s\n' \
-    "code_or_validator" \
-    "Add declarative milestone map calibration synthesis." \
-    $'Add a calibration synthesis report for the declarative long-duration dogfood milestone map. Record how milestone evidence files drive recommendation selection, what stale-recommendation behavior is prevented, what remains unimplemented, and the authority boundary. Do not add queue writing, queue insertion, queue running, automatic handoff, router automation, repo mutation, fixture import, training capture, promotion, deployment, or downstream-use authority.'
+    "tests_or_fixtures" \
+    "Add long-duration dogfood closeout report." \
+    $'Add a long-duration dogfood closeout report summarizing the supervised cron/tick loop, completed evidence-backed milestones, stale-recommendation fixes, declarative milestone map, validation coverage, remaining unimplemented authority, and recommended stop/next-decision point. Do not add queue writing, queue insertion, queue running, automatic handoff, router automation, repo mutation, fixture import, training capture, promotion, deployment, or downstream-use authority.'
 }
 
 run_command() {

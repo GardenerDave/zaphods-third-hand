@@ -15,6 +15,7 @@ TICK = ROOT / "scripts" / "zth_long_duration_dogfood_tick.sh"
 INSTALL = ROOT / "scripts" / "zth_install_long_duration_cron.sh"
 UNINSTALL = ROOT / "scripts" / "zth_uninstall_long_duration_cron.sh"
 LONG_DURATION_DOC = ROOT / "docs" / "reports" / "model_auditions" / "LONG_DURATION_DOGFOOD_CRON_2026-07-18.md"
+MILESTONE_MAP_SYNTHESIS = ROOT / "docs" / "reports" / "model_auditions" / "DECLARATIVE_LONG_DURATION_MILESTONE_MAP_CALIBRATION_SYNTHESIS_2026-07-18.md"
 ROADMAP = ROOT / "docs" / "ROADMAP.md"
 README = ROOT / "docs" / "reports" / "model_auditions" / "README.md"
 
@@ -38,7 +39,7 @@ def _bash_n(script: Path) -> subprocess.CompletedProcess[str]:
 
 
 def _overlay_snapshot(snapshot: Path) -> None:
-    for src in [TICK, INSTALL, UNINSTALL, LONG_DURATION_DOC, ROADMAP, README]:
+    for src in [TICK, INSTALL, UNINSTALL, LONG_DURATION_DOC, MILESTONE_MAP_SYNTHESIS, ROADMAP, README]:
         dest = snapshot / src.relative_to(ROOT)
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src, dest)
@@ -65,13 +66,9 @@ def _make_snapshot(
     subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=snapshot, check=True)
     subprocess.run(["git", "config", "user.name", "Test User"], cwd=snapshot, check=True)
     for relative_path in remove_paths or []:
-        subprocess.run(
-            ["git", "rm", "-f", "-q", "--", relative_path],
-            cwd=snapshot,
-            check=True,
-            text=True,
-            capture_output=True,
-        )
+        path = snapshot / relative_path
+        if path.exists():
+            path.unlink()
     if commit:
         subprocess.run(["git", "add", "-A"], cwd=snapshot, check=True)
         diff_cached = subprocess.run(
@@ -242,6 +239,19 @@ def test_tick_once_creates_run_dir_and_summary(tmp_path):
             ],
             "Add a queue approval review command calibration synthesis report after the read-only command, direct tests, smoke output, and regression slices.",
         ),
+        (
+            ["docs/reports/model_auditions/DECLARATIVE_LONG_DURATION_MILESTONE_MAP_CALIBRATION_SYNTHESIS_2026-07-18.md"],
+            "tests_or_fixtures",
+            "Add declarative milestone map calibration synthesis.",
+            [
+                "Add long-duration dogfood script tests.",
+                "Add queue approval path validator design scaffold.",
+                "Add queue approval path calibration synthesis.",
+                "Add read-only queue approval review command.",
+                "Add queue approval review command calibration synthesis.",
+            ],
+            "Add a calibration synthesis report for the declarative long-duration dogfood milestone map.",
+        ),
     ],
 )
 def test_tick_recommends_the_first_incomplete_milestone(
@@ -272,26 +282,47 @@ def test_tick_moves_past_completed_milestones(tmp_path):
 
     run_dir = _latest_run_dir(snapshot)
     summary = _read_json(run_dir / "tick_summary.json")
-    assert summary["next_task_category"] == "code_or_validator"
-    assert summary["next_task_title"] == "Add declarative milestone map calibration synthesis."
+    assert summary["next_task_category"] == "tests_or_fixtures"
+    assert summary["next_task_title"] == "Add long-duration dogfood closeout report."
     assert "Add long-duration dogfood script tests." not in summary["implementation_prompt"]
     assert "Add queue approval path validator design scaffold." not in summary["implementation_prompt"]
     assert "Add queue approval path calibration synthesis." not in summary["implementation_prompt"]
     assert "Add read-only queue approval review command." not in summary["implementation_prompt"]
     assert "Add queue approval review command calibration synthesis." not in summary["implementation_prompt"]
-    assert "declarative long-duration dogfood milestone map" in summary["implementation_prompt"]
+    assert "Add declarative milestone map calibration synthesis." not in summary["implementation_prompt"]
+    assert "tests/test_validate_queue_approval_path.py|" not in summary["implementation_prompt"]
+    assert "tests/test_queue_approval_path_fixtures.py|" not in summary["implementation_prompt"]
+    assert "tests/test_review_queue_approval_path.py|" not in summary["implementation_prompt"]
+    assert "docs/reports/model_auditions/QUEUE_APPROVAL_REVIEW_COMMAND_CALIBRATION_SYNTHESIS_2026-07-18.md|" not in summary["implementation_prompt"]
+    assert summary["implementation_prompt"].startswith("Add a long-duration dogfood closeout report summarizing the supervised cron/tick loop")
 
 
-def test_tick_moves_to_declarative_milestone_map_when_all_milestones_complete(tmp_path):
+def test_tick_moves_to_long_duration_dogfood_closeout_when_all_milestones_complete(tmp_path):
     snapshot = _make_snapshot(tmp_path)
     result = _run([str(TICK), "--once"], cwd=snapshot, env={"ZTH_REPO": str(snapshot)})
     assert result.returncode == 0, result.stderr
 
     run_dir = _latest_run_dir(snapshot)
     summary = _read_json(run_dir / "tick_summary.json")
-    assert summary["next_task_category"] == "code_or_validator"
+    assert summary["next_task_category"] == "tests_or_fixtures"
+    assert summary["next_task_title"] == "Add long-duration dogfood closeout report."
+    assert summary["implementation_prompt"].startswith("Add a long-duration dogfood closeout report summarizing the supervised cron/tick loop")
+    assert "Add declarative milestone map calibration synthesis." not in summary["implementation_prompt"]
+
+
+def test_tick_recommends_declarative_milestone_map_synthesis_when_report_missing(tmp_path):
+    snapshot = _make_snapshot(tmp_path, remove_paths=[
+        "docs/reports/model_auditions/DECLARATIVE_LONG_DURATION_MILESTONE_MAP_CALIBRATION_SYNTHESIS_2026-07-18.md",
+    ])
+    result = _run([str(TICK), "--once"], cwd=snapshot, env={"ZTH_REPO": str(snapshot)})
+    assert result.returncode == 0, result.stderr
+
+    run_dir = _latest_run_dir(snapshot)
+    summary = _read_json(run_dir / "tick_summary.json")
+    assert summary["next_task_category"] == "tests_or_fixtures"
     assert summary["next_task_title"] == "Add declarative milestone map calibration synthesis."
-    assert summary["implementation_prompt"].startswith("Add a calibration synthesis report for the declarative long-duration dogfood milestone map.")
+    assert "DECLARATIVE_LONG_DURATION_MILESTONE_MAP_CALIBRATION_SYNTHESIS_2026-07-18.md|" not in summary["implementation_prompt"]
+    assert "Add a calibration synthesis report for the declarative long-duration dogfood milestone map." in summary["implementation_prompt"]
 
 
 def test_tick_expired_control_window_blocks_useful_work(tmp_path):
