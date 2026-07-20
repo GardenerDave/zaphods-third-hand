@@ -9,7 +9,6 @@ import subprocess
 import sys
 import time
 import urllib.error
-import urllib.error
 import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
@@ -23,7 +22,7 @@ STATUS_FILE = WORK / "status.json"
 LOCK = WORK / "controller.lock"
 TERMINAL_STATE = WORK / "terminal_state.json"
 TERMINAL_LOCK = WORK / "terminal.lock"
-CLOSEOUT_MANIFEST = WORK / "manifests" / "overnight_run_manifest.json"
+CLOSEOUT_MANIFEST = WORK / "manifests" / "overnight_closeout_manifest.json"
 RUNS_DIR = WORK / "runs"
 LOG_DIR = WORK / "logs"
 MANIFEST_DIR = WORK / "manifests"
@@ -93,15 +92,37 @@ def is_terminal() -> bool:
     return TERMINAL_STATE.exists()
 
 
+def terminal_stage_states() -> set[str]:
+    return {"ready_for_review", "blocked"}
+
+
+def unresolved_stage_states() -> set[str]:
+    return {"started", "model_call_attempted", "model_output_captured", "structure_valid", "semantic_validation_passed"}
+
+
+def queue_stage_state(stage: str) -> str | None:
+    entry = latest_stage_states().get(stage)
+    if not entry:
+        return None
+    state = entry["state"]
+    if state in terminal_stage_states():
+        return "terminal"
+    if state in unresolved_stage_states():
+        return "unresolved"
+    return "unknown"
+
+
 def next_queue_stage() -> tuple[str, str, str] | None:
     if is_terminal():
         return None
-    done = set(latest_stage_states())
+    latest = latest_stage_states()
     with QUEUE.open(encoding="utf-8") as fh:
         for row in csv.reader(fh, delimiter="\t"):
             if not row or row[0].startswith("#") or len(row) < 3:
                 continue
-            if row[1] not in done:
+            if row[1] not in latest:
+                return row[0], row[1], row[2]
+            if queue_stage_state(row[1]) == "unresolved":
                 return row[0], row[1], row[2]
     return None
 
@@ -170,7 +191,7 @@ def _transport_diag(exc: BaseException, *, attempt: int, retryable: bool, body: 
     return diag
 
 
-def call_model(packet_path: Path, out_path: Path) -> dict:
+def call_model(packet_path: Path, out_path: Path, *, attempt: int) -> dict:
     fixture = os.environ.get("ZTH_OVERNIGHT_MODEL_RESPONSE_FILE")
     if fixture:
         data = json.loads(Path(fixture).read_text(encoding="utf-8"))
@@ -199,6 +220,25 @@ def call_model(packet_path: Path, out_path: Path) -> dict:
     return data
 
 
+def classify_retryability(exc: Exception) -> tuple[bool, str, int | None, str | None]:
+    status = getattr(exc, "code", None)
+    body = None
+    if isinstance(exc, urllib.error.HTTPError):
+        try:
+            body = exc.read().decode("utf-8", errors="replace")
+        except Exception:
+            body = None
+    if isinstance(exc, TimeoutError):
+        return True, "timeout", None, body
+    if isinstance(exc, urllib.error.HTTPError):
+        if status in {408, 429} or (status is not None and 500 <= status < 600):
+            return True, "retryable_http_status", status, body
+        return False, "nonretryable_http_status", status, body
+    if isinstance(exc, urllib.error.URLError):
+        return True, "url_error", status, body
+    return False, "unexpected_exception", status, body
+
+
 def classify_output(content_path: Path, deadline_reached: bool, allow_paths: list[str]) -> tuple[str, list[str], dict]:
     validator = REPO / "scripts" / "zth_validate_overnight_review_output.py"
     proc = subprocess.run(
@@ -222,6 +262,26 @@ def queue_allowlist() -> list[str]:
                     continue
                 allow.append(f".work/dogfood/overnight/runs/{row[0]}-{row[1]}")
     return allow
+
+
+def stage_manifest_path(slug: str) -> Path:
+    return stage_dir(slug) / "stage_manifest.json"
+
+
+def write_stage_manifest(slug: str, title: str, desc: str, allow_paths: list[str]) -> None:
+    manifest = {
+        "stage_slug": slug,
+        "title": title,
+        "objective": desc,
+        "allow_paths": allow_paths,
+        "controller_facts": {"deadline_reached": now() >= deadline()},
+    }
+    _write_json(stage_manifest_path(slug), manifest)
+
+
+def existing_stage_state(slug: str) -> str | None:
+    entry = latest_stage_states().get(slug)
+    return entry["state"] if entry else None
 
 
 def write_terminal_marker_once() -> None:
@@ -262,31 +322,30 @@ def run_stage(slug: str, title: str, desc: str, dry_run: bool) -> int:
         return 0
     d = stage_dir(slug)
     d.mkdir(parents=True, exist_ok=True)
+    allow_paths = queue_allowlist()
+    write_stage_manifest(slug, title, desc, allow_paths)
     packet = packet_for_stage(slug, title, desc, deadline_reached=now() >= deadline())
     packet_path = d / "stage_packet.md"
     packet_path.write_text(packet, encoding="utf-8")
+    prior_state = existing_stage_state(slug)
+    if prior_state in unresolved_stage_states():
+        record([RUN_ID, slug, "interrupted_recovered", str(d), "interrupted_recovered", now().isoformat()])
     record([RUN_ID, slug, "started", str(d), "started", now().isoformat()])
     for attempt in range(1, MAX_MODEL_ATTEMPTS + 1):
         record([RUN_ID, slug, "model_call_attempted", str(d), "model_call_attempted", now().isoformat()])
         raw = d / f"model_output.raw.{attempt}.json"
         err = d / f"model_call.{attempt}.error"
         try:
-            response = call_model(packet_path, raw)
+            response = call_model(packet_path, raw, attempt=attempt)
             if isinstance(response, dict):
                 record([RUN_ID, slug, "model_output_captured", str(d), "model_output_captured", now().isoformat()])
             else:
                 raise ValueError("unexpected model response envelope")
-        except urllib.error.HTTPError as exc:
-            err.write_text(json.dumps(_transport_diag(exc, attempt=attempt, retryable=True, body=exc.read().decode("utf-8", errors="replace") if hasattr(exc, "read") else None), indent=2) + "\n", encoding="utf-8")
-            continue
-        except urllib.error.URLError as exc:
-            err.write_text(json.dumps(_transport_diag(exc, attempt=attempt, retryable=True), indent=2) + "\n", encoding="utf-8")
-            continue
-        except TimeoutError as exc:
-            err.write_text(json.dumps(_transport_diag(exc, attempt=attempt, retryable=True), indent=2) + "\n", encoding="utf-8")
-            continue
         except Exception as exc:
-            err.write_text(json.dumps(_transport_diag(exc, attempt=attempt, retryable=False), indent=2) + "\n", encoding="utf-8")
+            retryable, reason, status, body = classify_retryability(exc)
+            _write_json(err, _transport_diag(exc, attempt=attempt, retryable=retryable, body=body, http_status=status))
+            if not retryable:
+                break
             continue
         try:
             content = json.loads(raw.read_text(encoding="utf-8"))["choices"][0]["message"]["content"]
@@ -303,8 +362,13 @@ def run_stage(slug: str, title: str, desc: str, dry_run: bool) -> int:
             record([RUN_ID, slug, "structure_validation_failed", str(d), "structure_validation_failed", now().isoformat()])
             continue
         record([RUN_ID, slug, "structure_valid", str(d), "structure_valid", now().isoformat()])
-        state, errors, validation = classify_output(content_path, deadline_reached=now() >= deadline(), allow_paths=queue_allowlist())
+        stage_manifest = json.loads(stage_manifest_path(slug).read_text(encoding="utf-8"))
+        state, errors, validation = classify_output(content_path, deadline_reached=now() >= deadline(), allow_paths=stage_manifest.get("allow_paths", allow_paths))
         _write_json(d / f"validation.{attempt}.json", {"state": state, "errors": errors, "validation": validation})
+        if state == "incomplete":
+            record([RUN_ID, slug, "semantic_validation_passed", str(d), "incomplete", now().isoformat()])
+            record([RUN_ID, slug, "incomplete", str(d), "incomplete", now().isoformat()])
+            return 0
         if state == "semantic_validation_failed":
             record([RUN_ID, slug, "semantic_validation_failed", str(d), "semantic_validation_failed", now().isoformat()])
         if state == "ready_for_review":
@@ -332,10 +396,13 @@ def status_payload() -> dict:
     completed = sum(1 for s in attempted if latest[s]["state"] == "ready_for_review")
     blocked = sum(1 for s in attempted if latest[s]["state"] == "blocked")
     semantic_failed = sum(1 for s in attempted if latest[s]["state"] == "semantic_validation_failed")
+    incomplete = sum(1 for s in attempted if latest[s]["state"] == "incomplete")
+    unresolved = sum(1 for s in attempted if latest[s]["state"] in unresolved_stage_states())
     ready = completed
     terminal = TERMINAL_STATE.exists()
     queue_total = len(queue_ids)
-    queue_remaining = max(queue_total - len(attempted), 0)
+    queue_remaining = sum(1 for s in queue_ids if s not in attempted or latest.get(s, {}).get("state") in unresolved_stage_states())
+    terminal_state_consistent = not terminal or queue_remaining == 0
     payload = {
         "deadline_local": deadline().isoformat(),
         "attempted_unique_stages": len(attempted),
@@ -344,18 +411,20 @@ def status_payload() -> dict:
         "queue_stages_ready_for_review": ready,
         "queue_stages_failed_semantic_validation": semantic_failed,
         "queue_stages_blocked": blocked,
-        "queue_stages_unresolved": sum(1 for s in attempted if latest[s]["state"] not in {"ready_for_review", "blocked", "semantic_validation_failed"}),
+        "queue_stages_unresolved": unresolved + incomplete,
         "queue_path": str(QUEUE),
         "state_path": str(STATE),
         "completed_stages": completed,
         "blocked_stages": blocked,
         "semantic_validation_failures": semantic_failed,
         "ready_for_review_count": ready,
-        "unresolved_count": sum(1 for s in attempted if latest[s]["state"] not in {"ready_for_review", "blocked", "semantic_validation_failed"}),
-        "queue_remaining": 0 if terminal else queue_remaining,
+        "incomplete_count": incomplete,
+        "unresolved_count": unresolved + incomplete,
+        "queue_remaining": queue_remaining,
         "queue_exhausted": terminal,
         "deadline_reached": now() >= deadline(),
         "terminal_run_state": json.loads(TERMINAL_STATE.read_text(encoding="utf-8"))["terminal_state"] if terminal else None,
+        "terminal_state_consistent": terminal_state_consistent,
         "latest_stage": rows[-1][1] if rows else None,
         "latest_transition_time": rows[-1][-1] if rows else None,
         "working_tree_state": subprocess.run(["git", "status", "--short", "--untracked-files=all"], cwd=REPO, text=True, capture_output=True).stdout.strip() or "clean",

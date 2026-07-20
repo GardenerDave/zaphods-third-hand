@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -9,6 +10,10 @@ from pathlib import Path
 ALLOWED_VERDICTS = {"pass", "fail", "incomplete"}
 ALLOWED_REVIEW_STATES = {"complete", "incomplete"}
 ALLOWED_VERIFICATION = {"pass", "fail", "not_applicable", "not_run"}
+
+
+def _load_repo_relative(path: str, allow_paths: list[str]) -> bool:
+    return any(path == p or path.startswith(p.rstrip("/") + "/") for p in allow_paths)
 
 
 def load(path: Path) -> dict:
@@ -46,6 +51,22 @@ def validate(payload: dict, *, deadline_reached: bool, allow_paths: list[str]) -
         if allow_paths and not any(path == p or path.startswith(p.rstrip("/") + "/") for p in allow_paths):
             errors.append("changed_paths_allowlist")
             break
+    repo_root = Path(os.environ.get("ZTH_REPO", Path.cwd()))
+    for item in payload.get("evidence", []):
+        if not isinstance(item, dict) or set(item) != {"path", "observation"}:
+            errors.append("evidence_keys")
+            break
+        path = item["path"]
+        observation = item["observation"]
+        if not isinstance(path, str) or path.startswith("/") or ".." in path:
+            errors.append("evidence_path")
+            break
+        if not isinstance(observation, str) or not observation.strip():
+            errors.append("evidence_observation")
+            break
+        if not (repo_root / path).exists() and not path.startswith(".work/dogfood/overnight/"):
+            errors.append("evidence_path_missing")
+            break
     notes = payload.get("notes", "")
     normalized = notes.lower()
     if deadline_reached:
@@ -58,13 +79,13 @@ def validate(payload: dict, *, deadline_reached: bool, allow_paths: list[str]) -
         errors.append("placeholder_notes")
     if not errors and payload["review_state"] == "complete" and payload["verdict"] in {"pass", "fail"}:
         result = "ready_for_review"
-    elif payload["review_state"] == "incomplete" and payload["verdict"] == "incomplete" and not errors:
-        result = "semantic_validation_failed"
+    elif not errors and payload["review_state"] == "incomplete" and payload["verdict"] == "incomplete":
+        result = "incomplete"
     elif "deadline_contradiction" in errors:
         result = "semantic_validation_failed"
     elif "evidence_required" in errors or "notes_required" in errors:
         result = "semantic_validation_failed"
-    elif "exact_keys" in errors or "verification_keys" in errors or "verdict_enum" in errors or "review_state_enum" in errors:
+    elif "exact_keys" in errors or "verification_keys" in errors or "verdict_enum" in errors or "review_state_enum" in errors or "evidence_keys" in errors:
         result = "structure_valid"
     else:
         result = "semantic_validation_failed"
