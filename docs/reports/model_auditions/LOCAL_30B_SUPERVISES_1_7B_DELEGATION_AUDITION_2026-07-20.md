@@ -1,106 +1,121 @@
 # Local 30B Supervises 1.7B Delegation Audition
 
-This report records a bounded review-only delegation attempt. It did not reach a live model call because both configured endpoints refused `/v1/models` discovery in this environment.
+Date: 2026-07-20
+
+Status: failed
+
+Branch: `feature/context-distiller-focused-passes-v1`
 
 ## Scope
 
-Audition question:
+Question: do the manifest chunk controls in `local_harness/context_distiller_manifest.py` actually affect the text written to `selected_input.txt` and sent to focused model passes?
 
-> Do the manifest chunk controls in `local_harness/context_distiller_manifest.py` actually affect the text written to `selected_input.txt` and sent to focused model passes?
+Authority: review-only.
 
-Authority boundary:
+Tracked report note: this file was added during the corrected rerun. No implementation, canonical context, curriculum, or tracked prompt-library content was modified.
 
-- review-only
-- no canonical context changes
-- no curriculum capture
-- no prompt-patch promotion
+## Preflight History
 
-## Repository State
+The earlier endpoint-configuration run was an infrastructure preflight failure. It made no model calls and does not count as evidence against the model hierarchy or Aider readiness.
 
-- Branch inspected: `feature/context-distiller-focused-passes-v1`
-- Commit inspected: `9d5d783887f7065efc82244c3bcbec35e7060c17`
-- Working tree at inspection time: clean
+Aider readiness for that blocked attempt: not evaluated.
 
-## Model IDs
+## Live Model IDs
 
-These are the configured model IDs recorded in the repository environment and model-audition fixtures.
-Live `/v1/models` discovery did not succeed, so the audit could not verify them against a reachable server.
+- Supervisor: `Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf`
+- Worker: `Qwen_Qwen3-1.7B-Q4_K_M.gguf`
 
-- Supervisor model ID: `Qwen/Qwen3-32B-GGUF:Q4_K_M`
-- Worker model ID: `Qwen_Qwen3-1.7B-Q4_K_M.gguf`
+Both were resolved from live `/models` responses on the configured supervisor and worker endpoints. Endpoint aliases in this report are `supervisor` and `worker`; no private addresses are recorded.
 
-## Delegation Plan Summary
+## Delegation Plan
 
-The supervisor plan was to split the question into two narrow evidence tasks:
+The live supervisor retry produced a validated plan under:
 
-1. inspect how `selected_input.txt` is built from manifest controls;
-2. inspect how focused pass prompts are assembled and whether the same controls flow into the worker prompt.
+- `.work/model_delegation_audition/20260720_101004/supervisor_plan/attempt_002/model_content.json`
+- `.work/model_delegation_audition/20260720_101004/supervisor_plan/validated_plan.json`
 
-The plan and source manifest were written under:
+The validated plan contained three subtasks:
 
-- `.work/model_delegation_audition/20260720_094951/supervisor_plan/plan.json`
-- `.work/model_delegation_audition/20260720_094951/source_manifest.json`
+1. `analyze_manifest_chunk_controls`
+2. `examine_chunker_integration`
+3. `verify_workflow_documentation`
 
-## Endpoint Discovery
+The earlier supervisor-plan attempt remained preserved as a failed structural attempt, with an audition-local prompt-patch candidate recorded under:
 
-Endpoint discovery failed for both the supervisor and worker endpoints.
+- `.work/model_delegation_audition/20260720_101004/prompt_patch_candidates/attempt_001/`
 
-No supervisor or worker model call was executed.
+## Worker Calls
 
-- Supervisor discovery result: connection refused
-- Worker discovery result: connection refused
+All three worker calls were live, independent, and structurally valid.
 
-## Evidence-Based Findings
+- `.work/model_delegation_audition/20260720_101004/worker_calls/analyze_manifest_chunk_controls/attempt_001/`
+- `.work/model_delegation_audition/20260720_101004/worker_calls/examine_chunker_integration/attempt_001/`
+- `.work/model_delegation_audition/20260720_101004/worker_calls/verify_workflow_documentation/attempt_001/`
 
-Repository evidence supports the following:
+Worker validation results:
 
-- `selected_input.txt` is written from selected source text derived from the manifest selection path in `local_harness/context_distiller_manifest.py`.
-- Focused pass prompts are built from the selected input plus explicitly named prior-pass inputs.
-- The manifest chunk controls are validated and recorded, but the visible execution path does not show chunk helper-driven prompt rewriting for the focused-pass flow.
+- `analyze_manifest_chunk_controls`: passed
+- `examine_chunker_integration`: passed
+- `verify_workflow_documentation`: passed
 
-Relevant evidence files:
+Summary of the worker findings:
 
-- [`local_harness/context_distiller_manifest.py`](/home/navigator/agent-workspace/zaphods-third-hand/local_harness/context_distiller_manifest.py)
-- [`local_harness/context_chunker.py`](/home/navigator/agent-workspace/zaphods-third-hand/local_harness/context_chunker.py)
-- [`local_harness/tests/test_context_distiller_manifest.py`](/home/navigator/agent-workspace/zaphods-third-hand/local_harness/tests/test_context_distiller_manifest.py)
-- [`docs/CONTEXT_DISTILLER_WORKFLOW.md`](/home/navigator/agent-workspace/zaphods-third-hand/docs/CONTEXT_DISTILLER_WORKFLOW.md)
+- The manifest runner writes `selected_input.txt` from source selection and line-range filtering in `local_harness/context_distiller_manifest.py`.
+- `local_harness/context_chunker.py` contains chunk-planning helpers, but the manifest execution path does not invoke them directly.
+- The workflow documentation describes manifest-mode chunk controls as part of the broader distiller workflow, but documentation is not the execution path.
 
-## Run Outcome
+## Supervisor Review
 
-- Supervisor calls: `0`
-- Worker calls: `0`
-- Retry count: `0`
-- Prompt-patch candidates: `0`
-- Final verdict: `incomplete`
+The first live supervisor review attempt was structurally invalid. It returned a different schema than requested.
 
-The 1.7B worker did not add new evidence because no worker call could be made.
-The 30B supervisor did not integrate worker findings because no worker findings existed.
+- `.work/model_delegation_audition/20260720_101004/supervisor_review/attempt_001/`
 
-## Hierarchy Assessment
+I used the one permitted structural retry. The retry was also malformed JSON and did not normalize to the required exact contract.
 
-The hierarchy is not yet justified for an Aider-backed audition in this environment because the configured model endpoints were unreachable.
+- `.work/model_delegation_audition/20260720_101004/supervisor_review/attempt_002/`
 
-The repository code path itself is inspectable and reviewable, but this run did not validate live delegation behavior.
+Because the live supervisor review did not produce the required exact JSON contract, the delegation audition did not complete successfully.
 
-## Runtime Evidence
+## Final Classification
 
-Preserved runtime evidence:
+failed
 
-- `.work/model_delegation_audition/20260720_094951/run_manifest.json`
-- `.work/model_delegation_audition/20260720_094951/source_manifest.json`
-- `.work/model_delegation_audition/20260720_094951/endpoint_discovery.json`
-- `.work/model_delegation_audition/20260720_094951/status.json`
-- `.work/model_delegation_audition/20260720_094951/closeout_validation.json`
-- `.work/model_delegation_audition/20260720_094951/supervisor_plan/plan.json`
-- `.work/model_delegation_audition/20260720_094951/supervisor_review/review.json`
+The worker phase produced useful evidence, but the 30B integration/review step did not satisfy the required schema and could not be treated as a valid terminal review.
 
-## Remaining Limitations
+## Aider Readiness
 
-- No live supervisor call was possible.
-- No live worker call was possible.
-- No prompt-patch retry was possible.
-- The question remains answered only by repository inspection, not by a successful delegation execution.
+Not justified.
 
-## Review-Only Authority Statement
+This run does not establish Aider-backed readiness because the final supervisor review remained structurally invalid.
 
-This audition remained review-only. It did not modify tracked repository content, canonical context, training curriculum, prompt patches, or deployment state.
+## What the Evidence Shows
+
+Repository evidence points to a distinction between declared manifest controls and the actual execution path:
+
+- `local_harness/context_distiller_manifest.py` writes `selected_input.txt` from selected sources and filtered source text.
+- `local_harness/context_chunker.py` provides chunk helpers, but the manifest runner does not route `selected_input.txt` through those helpers.
+- `docs/CONTEXT_DISTILLER_WORKFLOW.md` describes manifest mode, chunk controls, focused passes, and review boundaries, but it does not by itself prove the chunk helpers are invoked by the execution path.
+
+The live worker and supervisor evidence therefore supports a narrow conclusion: the manifest controls are recorded and documented, while the execution path for `selected_input.txt` is driven by source selection and line-range filtering rather than by the chunker helpers.
+
+## Run Artifacts
+
+- Run root: `.work/model_delegation_audition/20260720_101004/`
+- Supervisor plan validation: `.work/model_delegation_audition/20260720_101004/supervisor_plan/attempt_002/validation.json`
+- Worker summary: `.work/model_delegation_audition/20260720_101004/worker_calls/worker_summary.json`
+- Supervisor review attempt 1: `.work/model_delegation_audition/20260720_101004/supervisor_review/attempt_001/model_output.raw.json`
+- Supervisor review attempt 2: `.work/model_delegation_audition/20260720_101004/supervisor_review/attempt_002/model_output.raw.json`
+
+## Final Counts
+
+- Supervisor plan attempts: 2
+- Supervisor review attempts: 2
+- Worker calls: 3
+- Worker retries: 0
+- Prompt-patch candidates: 1
+
+## Notes
+
+- The prior blocked attempt remains preserved as infrastructure preflight evidence.
+- The live endpoints were reachable and the exact live model IDs were discovered from the endpoints themselves.
+- No canonical context files were modified during this audition.
