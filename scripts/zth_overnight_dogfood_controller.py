@@ -14,6 +14,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.overnight_queue_authority import AuthorityValidationError, validate_allowed_targets
+
 REPO = Path(os.environ.get("ZTH_REPO", Path(__file__).resolve().parents[1]))
 WORK = REPO / ".work" / "dogfood" / "overnight"
 QUEUE = REPO / ".work" / "dogfood" / "roadmap_queue.tsv"
@@ -133,13 +139,16 @@ def queue_stage_authority(row: list[str]) -> list[str] | None:
         allowed = json.loads(row[3])
     except json.JSONDecodeError:
         return None
-    if not isinstance(allowed, list) or not allowed or not all(isinstance(item, str) and item for item in allowed):
+    try:
+        allowed = validate_allowed_targets(allowed)
+    except AuthorityValidationError:
         return None
     return allowed
 
 
 def queue_authority_diagnostic(*, line_number: int, row: list[str], reason: str) -> Path:
-    path = stage_dir("queue-authority") / "missing_or_malformed_authority.json"
+    slug = row[1] if len(row) > 1 else "unknown"
+    path = stage_dir(slug) / f"queue_authority_error.line-{line_number:05d}.{slug}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     _write_json(
         path,
@@ -149,6 +158,24 @@ def queue_authority_diagnostic(*, line_number: int, row: list[str], reason: str)
             "line_number": line_number,
             "raw_row": row,
             "reason": reason,
+            "timestamp": now().isoformat(),
+        },
+    )
+    return path
+
+
+def queue_schema_diagnostic(*, observed: int | None, reason: str) -> Path:
+    path = stage_dir("queue-authority") / "queue_schema_error.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    _write_json(
+        path,
+        {
+            "error": "queue_schema_error",
+            "queue_path": str(QUEUE.relative_to(REPO)),
+            "line_number": None,
+            "raw_row": None,
+            "reason": reason,
+            "schema_version_observed": observed,
             "timestamp": now().isoformat(),
         },
     )
@@ -178,7 +205,7 @@ def next_queue_stage(attempted_this_tick: set[str]) -> dict[str, object] | None:
             "slug": "",
             "title": "",
             "allow_paths": None,
-            "malformed_authority": str(queue_authority_diagnostic(line_number=1, row=["# zth-roadmap-queue-schema: missing"], reason=f"unsupported_or_missing_schema_version: {schema_version}")),
+            "malformed_authority": str(queue_schema_diagnostic(observed=schema_version, reason=f"unsupported_or_missing_schema_version: {schema_version}")),
             "queue_schema_error": f"unsupported schema version: {schema_version}",
         }
     with QUEUE.open(encoding="utf-8") as fh:
@@ -602,11 +629,14 @@ def main(argv: list[str]) -> int:
                 if not queue_has_unresolved_work():
                     write_terminal_marker_once()
                 break
+            if nxt.get("queue_schema_error"):
+                record([RUN_ID, "queue_schema_error", "blocked", str(WORK), "blocked", str(nxt.get("malformed_authority")), now().isoformat()])
+                break
             slug = str(nxt["slug"])
             title = str(nxt["title"])
             allow_paths = nxt.get("allow_paths")
             if allow_paths is None:
-                record([RUN_ID, slug, "blocked", str(stage_dir(slug)), "blocked", "missing_or_malformed_authority", now().isoformat()])
+                record([RUN_ID, slug, "blocked", str(stage_dir(slug)), "blocked", str(nxt.get("malformed_authority")), now().isoformat()])
                 attempted_this_tick.add(slug)
                 continue
             attempted_this_tick.add(slug)

@@ -47,7 +47,7 @@ def _bash_n(script: Path) -> subprocess.CompletedProcess[str]:
 
 
 def _overlay_snapshot(snapshot: Path) -> None:
-    for src in [TICK, INSTALL, UNINSTALL, OVERNIGHT_CONTROLLER, OVERNIGHT_CONTROLLER_PY, OVERNIGHT_STATUS, OVERNIGHT_INSTALL, OVERNIGHT_UNINSTALL, OVERNIGHT_VALIDATOR, LONG_DURATION_DOC, MILESTONE_MAP_SYNTHESIS, LONG_DURATION_CLOSEOUT, ROADMAP, README]:
+    for src in [TICK, INSTALL, UNINSTALL, OVERNIGHT_CONTROLLER, OVERNIGHT_CONTROLLER_PY, OVERNIGHT_STATUS, OVERNIGHT_INSTALL, OVERNIGHT_UNINSTALL, OVERNIGHT_VALIDATOR, LONG_DURATION_DOC, MILESTONE_MAP_SYNTHESIS, LONG_DURATION_CLOSEOUT, ROADMAP, README, ROOT / "scripts" / "overnight_queue_authority.py", ROOT / "scripts" / "zth_validate_overnight_queue.py", ROOT / "scripts" / "zth_generate_overnight_queue_template.py", ROOT / "scripts" / "validate_dogfood_batch_artifacts.py"]:
         dest = snapshot / src.relative_to(ROOT)
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src, dest)
@@ -731,14 +731,21 @@ def test_overnight_packet_and_validator_share_schema_contract(tmp_path):
 
 
 def test_overnight_tracked_queue_template_and_registry_are_versioned(tmp_path):
+    from scripts.overnight_queue_authority import load_registry, load_stage_definitions, render_queue_template
+
     template = ROOT / "docs" / "reports" / "model_auditions" / "OVERNIGHT_QUEUE_TEMPLATE.tsv"
     registry = ROOT / "docs" / "reports" / "model_auditions" / "OVERNIGHT_QUEUE_AUTHORITY_REGISTRY.json"
+    stage_defs = ROOT / "docs" / "reports" / "model_auditions" / "OVERNIGHT_QUEUE_STAGE_DEFINITIONS.json"
     assert template.is_file()
     assert registry.is_file()
     registry_payload = json.loads(registry.read_text(encoding="utf-8"))
     assert registry_payload["schema"] == 2
     assert len(registry_payload["families"]) == 12
-    lines = [line for line in template.read_text(encoding="utf-8").splitlines() if line and not line.startswith("#")]
+    stage_defs_payload = load_stage_definitions(stage_defs)
+    regenerated = render_queue_template(stage_defs_payload, load_registry(registry))
+    committed = template.read_text(encoding="utf-8")
+    assert regenerated == committed
+    lines = [line for line in committed.splitlines() if line and not line.startswith("#")]
     assert len(lines) == 12
     for line in lines:
         parts = line.split("\t")
@@ -747,8 +754,12 @@ def test_overnight_tracked_queue_template_and_registry_are_versioned(tmp_path):
         assert isinstance(allowed, list) and allowed
         assert all(isinstance(item, str) and item for item in allowed)
     queue = tmp_path / "roadmap_queue.tsv"
-    queue.write_text(template.read_text(encoding="utf-8"), encoding="utf-8")
+    queue.write_text(committed, encoding="utf-8")
     assert "# zth-roadmap-queue-schema: 2" in queue.read_text(encoding="utf-8")
+    mutated = dict(json.loads(registry.read_text(encoding="utf-8")))
+    mutated["families"] = dict(mutated["families"])
+    mutated["families"]["roadmap-grounding"] = ["docs/ROADMAP.md", "docs/reports/model_auditions/README.md"]
+    assert render_queue_template(stage_defs_payload, mutated["families"]) != committed
 
 
 def test_overnight_stage_manifests_keep_distinct_allow_targets(tmp_path):
@@ -998,7 +1009,7 @@ def test_overnight_queue_authority_must_exist_and_parse(tmp_path):
     assert result.returncode == 0, result.stderr
     assert not (snapshot / "model_call_count.txt").exists()
     rows = (snapshot / ".work" / "dogfood" / "overnight" / "state.tsv").read_text(encoding="utf-8").splitlines()
-    assert any("missing_or_malformed_authority" in row for row in rows)
+    assert any("queue_authority_error.line-" in row for row in rows)
 
 
 def test_overnight_queue_malformed_authority_json_blocks_before_model_call(tmp_path):
@@ -1029,7 +1040,7 @@ def test_overnight_queue_malformed_authority_json_blocks_before_model_call(tmp_p
     assert result.returncode == 0, result.stderr
     assert not (snapshot / "model_call_count.txt").exists()
     rows = (snapshot / ".work" / "dogfood" / "overnight" / "state.tsv").read_text(encoding="utf-8").splitlines()
-    assert any("missing_or_malformed_authority" in row for row in rows)
+    assert any("queue_authority_error.line-" in row for row in rows)
 
 
 def test_overnight_failed_call_does_not_write_model_output_captured(tmp_path):

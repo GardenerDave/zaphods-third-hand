@@ -10,6 +10,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Sequence
 
+from scripts.overnight_queue_authority import AuthorityValidationError, validate_allowed_targets
+
 
 class DogfoodBatchArtifactValidationError(ValueError):
     """Raised when dogfood batch evidence is missing or malformed."""
@@ -20,6 +22,7 @@ class QueueRow:
     priority: str
     slug: str
     description: str
+    allowed_targets: list[str] | None
     line_no: int
 
 
@@ -45,16 +48,45 @@ def _read_queue(queue_path: Path) -> tuple[list[QueueRow], list[str]]:
         raise DogfoodBatchArtifactValidationError(f"queue file does not exist: {queue_path}")
     rows: list[QueueRow] = []
     diagnostics: list[str] = []
+    schema_version: int | None = None
     for line_no, line in enumerate(queue_path.read_text(encoding="utf-8").splitlines(), start=1):
         if not line.strip() or line.lstrip().startswith("#"):
+            if line.strip() == "# zth-roadmap-queue-schema: 2":
+                schema_version = 2
             continue
-        parts = _parse_tsv_row(line.split("\t"), expected=3, line_no=line_no, source=queue_path)
-        priority, slug, description = (item.strip() for item in parts)
+        parts = line.split("\t")
+        if len(parts) == 3:
+            if schema_version == 2:
+                raise DogfoodBatchArtifactValidationError(
+                    f"{queue_path} line {line_no}: schema 2 queue rows must contain priority, slug, description, and allowed_targets_json"
+                )
+            priority, slug, description = (item.strip() for item in parts)
+            if not priority or not slug or not description:
+                raise DogfoodBatchArtifactValidationError(
+                    f"{queue_path} line {line_no}: queue rows must contain priority, slug, and description"
+                )
+            rows.append(QueueRow(priority=priority, slug=slug, description=description, allowed_targets=None, line_no=line_no))
+            continue
+        if len(parts) != 4:
+            raise DogfoodBatchArtifactValidationError(
+                f"{queue_path} line {line_no}: expected 3 fields for schema 1 or 4 fields for schema 2"
+            )
+        if schema_version != 2:
+            raise DogfoodBatchArtifactValidationError(
+                f"{queue_path} line {line_no}: schema 2 queue rows require the '# zth-roadmap-queue-schema: 2' marker"
+            )
+        priority, slug, description, raw_targets = (item.strip() for item in parts)
         if not priority or not slug or not description:
             raise DogfoodBatchArtifactValidationError(
-                f"{queue_path} line {line_no}: queue rows must contain priority, slug, and description"
+                f"{queue_path} line {line_no}: queue rows must contain priority, slug, description, and allowed targets"
             )
-        rows.append(QueueRow(priority=priority, slug=slug, description=description, line_no=line_no))
+        try:
+            allowed_targets = validate_allowed_targets(json.loads(raw_targets))
+        except (json.JSONDecodeError, AuthorityValidationError) as exc:
+            raise DogfoodBatchArtifactValidationError(
+                f"{queue_path} line {line_no}: invalid allowed_targets_json: {exc}"
+            ) from exc
+        rows.append(QueueRow(priority=priority, slug=slug, description=description, allowed_targets=allowed_targets, line_no=line_no))
     return rows, diagnostics
 
 

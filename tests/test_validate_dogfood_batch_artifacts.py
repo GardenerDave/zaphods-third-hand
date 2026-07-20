@@ -3,14 +3,21 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from local_harness.validate_dogfood_batch_artifacts import (
-    validate_dogfood_batch_artifacts,
-)
+import pytest
+
+from local_harness.validate_dogfood_batch_artifacts import validate_dogfood_batch_artifacts
+from scripts.overnight_queue_authority import AuthorityValidationError, load_registry, load_stage_definitions, render_queue_template, validate_allowed_targets
 
 
 def _write_queue(path: Path, rows: list[tuple[str, str, str]]) -> None:
     lines = ["# priority\tslug\tdescription"]
     lines.extend("\t".join(row) for row in rows)
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def _write_queue_v2(path: Path, rows: list[tuple[str, str, str, list[str]]]) -> None:
+    lines = ["# zth-roadmap-queue-schema: 2"]
+    lines.extend("\t".join((priority, slug, description, json.dumps(targets))) for priority, slug, description, targets in rows)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -78,6 +85,7 @@ def test_valid_completed_prefix(tmp_path: Path) -> None:
     )
     _write_run(runs_dir / "alpha")
     _write_run(runs_dir / "beta")
+    stage_log.write_text("No remaining dogfood stages.\n", encoding="utf-8")
 
     result = validate_dogfood_batch_artifacts(
         queue_path=queue,
@@ -94,7 +102,7 @@ def test_valid_completed_prefix(tmp_path: Path) -> None:
     assert result["order_mismatches"] == []
     assert result["missing_artifacts"] == []
     assert result["json_errors"] == []
-    assert result["exhaustion_visible"] is False
+    assert result["exhaustion_visible"] is True
 
 
 def test_full_valid_completion_with_exhaustion_visible(tmp_path: Path) -> None:
@@ -120,6 +128,62 @@ def test_full_valid_completion_with_exhaustion_visible(tmp_path: Path) -> None:
 
     assert result["validation_status"] == "passed"
     assert result["exhaustion_visible"] is True
+
+
+def test_schema_2_queue_is_accepted(tmp_path: Path) -> None:
+    queue, state, runs_dir, stage_log = _make_paths(tmp_path)
+    _write_queue_v2(
+        queue,
+        [
+            ("1", "alpha", "A", ["docs/ROADMAP.md"]),
+            ("2", "beta", "B", ["docs/reports/model_auditions/README.md"]),
+        ],
+    )
+    _write_state(
+        state,
+        [
+            ("2026-07-16T00:00:00Z", "alpha", "packet_generated", "alpha"),
+            ("2026-07-16T00:01:00Z", "beta", "packet_generated", "beta"),
+        ],
+    )
+    _write_run(runs_dir / "alpha")
+    _write_run(runs_dir / "beta")
+    stage_log.write_text("No remaining dogfood stages.\n", encoding="utf-8")
+    result = validate_dogfood_batch_artifacts(queue_path=queue, state_path=state, runs_dir=runs_dir, stage_log_path=stage_log)
+    assert result["validation_status"] == "passed"
+    assert result["queue_total"] == 2
+
+
+def test_schema_1_and_schema_2_are_distinct(tmp_path: Path) -> None:
+    queue, state, runs_dir, stage_log = _make_paths(tmp_path)
+    _write_queue(queue, [("1", "alpha", "A")])
+    _write_state(state, [("2026-07-16T00:00:00Z", "alpha", "packet_generated", "alpha")])
+    _write_run(runs_dir / "alpha")
+    stage_log.write_text("No remaining dogfood stages.\n", encoding="utf-8")
+    legacy = validate_dogfood_batch_artifacts(queue_path=queue, state_path=state, runs_dir=runs_dir, stage_log_path=stage_log)
+    assert legacy["validation_status"] == "passed"
+    _write_queue_v2(queue, [("1", "alpha", "A", ["docs/ROADMAP.md"])])
+    schema2 = validate_dogfood_batch_artifacts(queue_path=queue, state_path=state, runs_dir=runs_dir, stage_log_path=stage_log)
+    assert schema2["validation_status"] == "passed"
+
+
+@pytest.mark.parametrize(
+    "value, error",
+    [
+        ({"not": "a list"}, "authority_not_array"),
+        ([], "empty_authority"),
+        ([""], "empty_or_whitespace_target"),
+        (["   "], "empty_or_whitespace_target"),
+        (["/abs/path"], "absolute_target"),
+        (["../escape"], "traversal_target"),
+        (["docs/ROADMAP.md", "docs/ROADMAP.md"], "duplicate_target"),
+        ([1], "authority_not_string"),
+    ],
+)
+def test_validate_allowed_targets_rejects_invalid_values(value, error):
+    with pytest.raises(AuthorityValidationError) as excinfo:
+        validate_allowed_targets(value)
+    assert error in str(excinfo.value)
 
 
 def test_duplicate_state_slug(tmp_path: Path) -> None:

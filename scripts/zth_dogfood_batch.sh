@@ -131,7 +131,7 @@ EOF
 }
 
 validate_batch() {
-  python3 "$REPO/local_harness/validate_dogfood_batch_artifacts.py" \
+  python3 "$REPO/scripts/validate_dogfood_batch_artifacts.py" \
     --queue "$QUEUE" \
     --state "$STATE" \
     --runs-dir "$WORK/runs" \
@@ -182,20 +182,13 @@ prepare_from_tsv() {
     exit 1
   fi
 
-  mkdir -p "$batch_dir"
-  archive_current "$batch_name" >/dev/null
-
-  if ! awk -F '\t' '
-    BEGIN { ok = 1 }
-    /^#/ { next }
-    NF == 0 { next }
-    NF != 4 { ok = 0 }
-    END { exit ok ? 0 : 1 }
-  ' "$queue_file"; then
-    printf 'queue file must contain comment lines or tab-separated rows with exactly 4 fields\n' >&2
+  if ! python3 "$REPO/scripts/zth_validate_overnight_queue.py" "$queue_file"; then
+    printf 'queue file failed overnight queue validation\n' >&2
     exit 1
   fi
 
+  mkdir -p "$batch_dir"
+  archive_current "$batch_name" >/dev/null
   cp -a "$queue_file" "$QUEUE"
   : > "$STATE"
   printf 'prepared batch: %s\n' "$batch_dir"
