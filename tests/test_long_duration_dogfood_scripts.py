@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -15,9 +16,11 @@ TICK = ROOT / "scripts" / "zth_long_duration_dogfood_tick.sh"
 INSTALL = ROOT / "scripts" / "zth_install_long_duration_cron.sh"
 UNINSTALL = ROOT / "scripts" / "zth_uninstall_long_duration_cron.sh"
 OVERNIGHT_CONTROLLER = ROOT / "scripts" / "zth_overnight_dogfood_controller.sh"
+OVERNIGHT_CONTROLLER_PY = ROOT / "scripts" / "zth_overnight_dogfood_controller.py"
 OVERNIGHT_STATUS = ROOT / "scripts" / "zth_overnight_dogfood_status.sh"
 OVERNIGHT_INSTALL = ROOT / "scripts" / "zth_install_overnight_dogfood_cron.sh"
 OVERNIGHT_UNINSTALL = ROOT / "scripts" / "zth_uninstall_overnight_dogfood_cron.sh"
+OVERNIGHT_VALIDATOR = ROOT / "scripts" / "zth_validate_overnight_review_output.py"
 LONG_DURATION_DOC = ROOT / "docs" / "reports" / "model_auditions" / "LONG_DURATION_DOGFOOD_CRON_2026-07-18.md"
 MILESTONE_MAP_SYNTHESIS = ROOT / "docs" / "reports" / "model_auditions" / "DECLARATIVE_LONG_DURATION_MILESTONE_MAP_CALIBRATION_SYNTHESIS_2026-07-18.md"
 LONG_DURATION_CLOSEOUT = ROOT / "docs" / "reports" / "model_auditions" / "LONG_DURATION_DOGFOOD_CLOSEOUT_2026-07-18.md"
@@ -44,7 +47,7 @@ def _bash_n(script: Path) -> subprocess.CompletedProcess[str]:
 
 
 def _overlay_snapshot(snapshot: Path) -> None:
-    for src in [TICK, INSTALL, UNINSTALL, OVERNIGHT_CONTROLLER, OVERNIGHT_STATUS, OVERNIGHT_INSTALL, OVERNIGHT_UNINSTALL, LONG_DURATION_DOC, MILESTONE_MAP_SYNTHESIS, LONG_DURATION_CLOSEOUT, ROADMAP, README]:
+    for src in [TICK, INSTALL, UNINSTALL, OVERNIGHT_CONTROLLER, OVERNIGHT_CONTROLLER_PY, OVERNIGHT_STATUS, OVERNIGHT_INSTALL, OVERNIGHT_UNINSTALL, OVERNIGHT_VALIDATOR, LONG_DURATION_DOC, MILESTONE_MAP_SYNTHESIS, LONG_DURATION_CLOSEOUT, ROADMAP, README]:
         dest = snapshot / src.relative_to(ROOT)
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src, dest)
@@ -154,6 +157,7 @@ def test_bash_n_passes_for_all_three_scripts():
     for script in [TICK, INSTALL, UNINSTALL, OVERNIGHT_CONTROLLER, OVERNIGHT_STATUS, OVERNIGHT_INSTALL, OVERNIGHT_UNINSTALL]:
         result = _bash_n(script)
         assert result.returncode == 0, result.stderr
+    assert subprocess.run([sys.executable, "-m", "py_compile", str(OVERNIGHT_CONTROLLER_PY), str(OVERNIGHT_VALIDATOR)], cwd=ROOT, text=True, capture_output=True).returncode == 0
 
 
 def test_make_snapshot_tolerates_clean_clone(tmp_path):
@@ -479,12 +483,69 @@ def test_uninstall_helper_with_stubbed_crontab(tmp_path):
 
 def test_overnight_status_reports_deadline_and_queue(tmp_path):
     snapshot = _make_snapshot(tmp_path)
-    result = _run([str(OVERNIGHT_STATUS)], cwd=snapshot, env={"ZTH_REPO": str(snapshot)})
+    result = _run([str(OVERNIGHT_STATUS)], cwd=snapshot, env={"ZTH_REPO": str(snapshot), "ZTH_OVERNIGHT_DEADLINE": "2099-01-01T08:00:00-05:00"})
     assert result.returncode == 0, result.stderr
     payload = _read_json(snapshot / ".work" / "dogfood" / "overnight" / "status.json")
-    assert payload["deadline_local"].startswith("2026-07-19T08:00:00")
+    assert payload["deadline_local"].startswith("2099-01-01T08:00:00")
     assert payload["queue_path"].endswith(".work/dogfood/roadmap_queue.tsv")
     assert payload["state_path"].endswith(".work/dogfood/overnight/state.tsv")
+    assert payload["attempted_unique_stages"] == 0
+    assert payload["queue_exhausted"] is False
+    assert payload["terminal_run_state"] is None
+
+
+def test_overnight_validator_rejects_invalid_schema_and_deadline_contradiction(tmp_path):
+    sample = tmp_path / "sample.json"
+    sample.write_text(
+        json.dumps(
+            {
+                "verdict": "pass",
+                "review_state": "complete",
+                "changed_paths": [],
+                "verification": {
+                    "raw_output_structure": "pass",
+                    "changed_files_against_allowlist": "pass",
+                    "narrowest_relevant_local_checks": "pass",
+                },
+                "evidence": [{"path": "docs/ROADMAP.md", "observation": "evidence"}],
+                "notes": "deadline reached and complete",
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    result = _run([str(OVERNIGHT_VALIDATOR), str(sample), "false", ".work/dogfood/overnight"], cwd=ROOT)
+    assert result.returncode != 0
+    payload = json.loads(result.stdout)
+    assert payload["state"] == "semantic_validation_failed"
+    assert "deadline_contradiction" in payload["errors"]
+
+
+def test_overnight_validator_rejects_pending_schema_and_invented_keys(tmp_path):
+    sample = tmp_path / "sample.json"
+    sample.write_text(
+        json.dumps(
+            {
+                "verdict": "incomplete",
+                "review_state": "incomplete",
+                "changed_paths": [".work/dogfood/overnight/ok.json"],
+                "verification": {
+                    "raw_output_structure": "pass",
+                    "changed_files_against_allowlist": "pass",
+                    "narrowest_relevant_local_checks": "not_run",
+                    "invented": "nope",
+                },
+                "evidence": [{"path": "docs/ROADMAP.md", "observation": "evidence"}],
+                "notes": "pending work",
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    result = _run([str(OVERNIGHT_VALIDATOR), str(sample), "false", ".work/dogfood/overnight"], cwd=ROOT)
+    assert result.returncode != 0
+    payload = json.loads(result.stdout)
+    assert payload["state"] == "structure_valid"
 
 
 def test_overnight_install_and_uninstall_helpers_with_stubbed_crontab(tmp_path):
@@ -508,6 +569,66 @@ def test_overnight_install_and_uninstall_helpers_with_stubbed_crontab(tmp_path):
     assert "ZTH_OVERNIGHT_DOGFOOD_20260718" not in state.read_text(encoding="utf-8")
 
 
+def test_overnight_queue_exhaustion_is_terminal_and_idempotent(tmp_path):
+    snapshot = _make_snapshot(tmp_path, remove_paths=[
+        "docs/reports/model_auditions/QUEUE_APPROVAL_REVIEW_COMMAND_CALIBRATION_SYNTHESIS_2026-07-18.md",
+        "docs/reports/model_auditions/DECLARATIVE_LONG_DURATION_MILESTONE_MAP_CALIBRATION_SYNTHESIS_2026-07-18.md",
+        "docs/reports/model_auditions/LONG_DURATION_DOGFOOD_CLOSEOUT_2026-07-18.md",
+    ])
+    queue = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
+    queue.parent.mkdir(parents=True, exist_ok=True)
+    queue.write_text("1\tone-stage\tOne stage\n", encoding="utf-8")
+    response = snapshot / "model_response.json"
+    response.write_text(
+        json.dumps(
+            {
+                "choices": [
+                    {
+                        "message": {
+                            "content": json.dumps(
+                                {
+                                    "verdict": "pass",
+                                    "review_state": "complete",
+                                    "changed_paths": [],
+                                    "verification": {
+                                        "raw_output_structure": "pass",
+                                        "changed_files_against_allowlist": "not_applicable",
+                                        "narrowest_relevant_local_checks": "not_run",
+                                    },
+                                    "evidence": [{"path": "docs/ROADMAP.md", "observation": "ok"}],
+                                    "notes": "evidence-based review",
+                                }
+                            )
+                        }
+                    }
+                ]
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    env = {
+        "ZTH_REPO": str(snapshot),
+        "ZTH_OVERNIGHT_MODEL_RESPONSE_FILE": str(response),
+        "ZTH_PUBLIC_HOST_ALIAS": "LOCAL_STUB",
+        "ZTH_OVERNIGHT_DEADLINE": "2099-01-01T08:00:00-05:00",
+    }
+
+    try:
+        first = _run([str(OVERNIGHT_CONTROLLER), "--tick"], cwd=snapshot, env=env)
+        assert first.returncode == 0, first.stderr
+        runs = sorted((snapshot / ".work" / "dogfood" / "overnight" / "runs").glob("*"))
+        assert len(runs) == 1
+        terminal = snapshot / ".work" / "dogfood" / "overnight" / "terminal_state.json"
+        assert terminal.is_file()
+        second = _run([str(OVERNIGHT_CONTROLLER), "--tick"], cwd=snapshot, env=env)
+        assert second.returncode == 0, second.stderr
+        runs_after = sorted((snapshot / ".work" / "dogfood" / "overnight" / "runs").glob("*"))
+        assert runs_after == runs
+    finally:
+        pass
+
+
 def test_overnight_dry_run_does_not_modify_state(tmp_path):
     snapshot = _make_snapshot(tmp_path)
     queue_src = ROOT / ".work" / "dogfood" / "roadmap_queue.tsv"
@@ -515,11 +636,33 @@ def test_overnight_dry_run_does_not_modify_state(tmp_path):
     queue_dest.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(queue_src, queue_dest)
     before = _run(["git", "status", "--short", "--untracked-files=no"], cwd=snapshot)
-    result = _run([str(OVERNIGHT_CONTROLLER), "--dry-run"], cwd=snapshot, env={"ZTH_REPO": str(snapshot)})
+    result = _run([str(OVERNIGHT_CONTROLLER), "--dry-run"], cwd=snapshot, env={"ZTH_REPO": str(snapshot), "ZTH_OVERNIGHT_DEADLINE": "2099-01-01T08:00:00-05:00"})
     assert result.returncode == 0, result.stderr
     after = _run(["git", "status", "--short", "--untracked-files=no"], cwd=snapshot)
     assert before.stdout == after.stdout
-    assert "dry-run" in result.stdout
+    json_start = result.stdout.index("{")
+    payload = json.loads(result.stdout[json_start:])
+    assert payload["attempted_unique_stages"] == 0
+
+
+def test_no_private_address_literals_in_tracked_overnight_artifacts():
+    paths = [
+        ROOT / "docs" / "reports" / "model_auditions" / "OVERNIGHT_DOGFOOD_RUN_2026-07-19.md",
+        ROOT / "docs" / "reports" / "model_auditions" / "OVERNIGHT_DOGFOOD_CALIBRATION_2026-07-20.md",
+        ROOT / "scripts" / "zth_overnight_dogfood_controller.py",
+        ROOT / "scripts" / "zth_validate_overnight_review_output.py",
+    ]
+    text = "\n".join(path.read_text(encoding="utf-8") for path in paths if path.exists())
+    patterns = [
+        r"\b192\.168\.\d{1,3}\.\d{1,3}\b",
+        r"\b10\.\d{1,3}\.\d{1,3}\.\d{1,3}\b",
+        r"\b172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}\b",
+        r"\b127\.0\.0\.1\b",
+    ]
+    for pattern in patterns:
+        assert not re.search(pattern, text)
+    assert "http://" not in text
+    assert "https://" not in text
 
 
 def test_authority_boundary_text_remains_present():
