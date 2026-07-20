@@ -707,6 +707,86 @@ def test_overnight_install_and_uninstall_helpers_with_stubbed_crontab(tmp_path):
     assert "ZTH_OVERNIGHT_DOGFOOD_20260718" not in state.read_text(encoding="utf-8")
 
 
+def test_overnight_packet_and_validator_share_schema_contract(tmp_path):
+    from scripts.zth_overnight_dogfood_controller import packet_for_stage
+
+    packet = packet_for_stage("one-stage", "Title", "Objective", False)
+    assert "verdict, review_state, changed_paths, verification, evidence, notes" in packet
+    assert "pass | fail | incomplete" in packet
+    assert "raw_output_structure, changed_files_against_allowlist, narrowest_relevant_local_checks" in packet
+    assert "path, observation, existence" in packet
+    validator_text = (ROOT / "scripts" / "zth_validate_overnight_review_output.py").read_text(encoding="utf-8")
+    for token in [
+        "pass",
+        "fail",
+        "incomplete",
+        "complete",
+        "not_run",
+        "not_applicable",
+    ]:
+        assert token in packet
+        assert token in validator_text
+
+
+def test_overnight_stage_manifests_keep_distinct_allow_targets(tmp_path):
+    snapshot = _make_snapshot(tmp_path, remove_paths=[
+        "docs/reports/model_auditions/QUEUE_APPROVAL_REVIEW_COMMAND_CALIBRATION_SYNTHESIS_2026-07-18.md",
+        "docs/reports/model_auditions/DECLARATIVE_LONG_DURATION_MILESTONE_MAP_CALIBRATION_SYNTHESIS_2026-07-18.md",
+        "docs/reports/model_auditions/LONG_DURATION_DOGFOOD_CLOSEOUT_2026-07-18.md",
+    ])
+    queue = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
+    queue.parent.mkdir(parents=True, exist_ok=True)
+    queue.write_text(
+        "1\tone-stage\tOne stage\n2\ttwo-stage\tTwo stage\n",
+        encoding="utf-8",
+    )
+    response = snapshot / "model_response.json"
+    response.write_text(
+        json.dumps(
+            {
+                "choices": [
+                    {
+                        "message": {
+                            "content": json.dumps(
+                                {
+                                    "verdict": "pass",
+                                    "review_state": "complete",
+                                    "changed_paths": ["docs/ROADMAP.md"],
+                                    "verification": {
+                                        "raw_output_structure": "pass",
+                                        "changed_files_against_allowlist": "not_applicable",
+                                        "narrowest_relevant_local_checks": "not_run",
+                                    },
+                                    "evidence": [{"path": "docs/ROADMAP.md", "observation": "ok", "existence": "present"}],
+                                    "notes": "deadline not reached; review complete",
+                                }
+                            )
+                        }
+                    }
+                ]
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    env = {
+        "ZTH_REPO": str(snapshot),
+        "ZTH_OVERNIGHT_MODEL_RESPONSE_FILE": str(response),
+        "ZTH_PUBLIC_HOST_ALIAS": "LOCAL_STUB",
+        "ZTH_OVERNIGHT_DEADLINE": "2099-01-01T08:00:00-05:00",
+    }
+    result = _run([str(OVERNIGHT_CONTROLLER), "--tick"], cwd=snapshot, env=env)
+    assert result.returncode == 0, result.stderr
+    runs = sorted((snapshot / ".work" / "dogfood" / "overnight" / "runs").glob("*"))
+    assert len(runs) == 2
+    manifests = [json.loads((run / "stage_manifest.json").read_text(encoding="utf-8")) for run in runs]
+    assert manifests[0]["allow_paths"] != manifests[1]["allow_paths"]
+    assert manifests[0]["allow_paths"] == ["docs/ROADMAP.md"]
+    assert manifests[1]["allow_paths"] == ["docs/reports/model_auditions/README.md"]
+    assert "docs/reports/model_auditions/README.md" not in manifests[0]["allow_paths"]
+    assert "docs/ROADMAP.md" not in manifests[1]["allow_paths"]
+
+
 def test_overnight_queue_exhaustion_is_terminal_and_idempotent(tmp_path):
     snapshot = _make_snapshot(tmp_path, remove_paths=[
         "docs/reports/model_auditions/QUEUE_APPROVAL_REVIEW_COMMAND_CALIBRATION_SYNTHESIS_2026-07-18.md",
@@ -832,6 +912,9 @@ def test_overnight_incomplete_stage_remains_unresolved_and_prevents_closeout(tmp
     assert second.returncode == 0, second.stderr
     rows = (snapshot / ".work" / "dogfood" / "overnight" / "state.tsv").read_text(encoding="utf-8").splitlines()
     assert any("\tincomplete\t" in row for row in rows)
+    attempts = sorted((snapshot / ".work" / "dogfood" / "overnight" / "runs").glob("*"))
+    assert len(attempts) == 2
+    assert attempts[0] != attempts[1]
 
 
 def test_overnight_failed_call_does_not_write_model_output_captured(tmp_path):
@@ -944,6 +1027,7 @@ def test_overnight_recovery_manifest_links_prior_evidence(tmp_path):
     recovery = _read_json(latest_run / "recovery_manifest.json")
     assert recovery["prior_directory"] == str(prior)
     assert recovery["prior_lifecycle_state"] == "started"
+    assert (prior / "model_output.raw.1.json").read_text(encoding="utf-8") == "{}"
 
 
 @pytest.mark.parametrize("intermediate_state", [

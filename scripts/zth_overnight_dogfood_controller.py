@@ -29,7 +29,7 @@ MANIFEST_DIR = WORK / "manifests"
 DEFAULT_DEADLINE = dt.datetime(2026, 7, 19, 8, 0, tzinfo=ZoneInfo("America/New_York"))
 MAX_STAGES = 3
 MAX_MODEL_ATTEMPTS = 3
-RUN_ID = dt.datetime.now(tz=ZoneInfo("America/New_York")).strftime("%Y%m%d_%H%M%S")
+RUN_ID = dt.datetime.now(tz=ZoneInfo("America/New_York")).strftime("%Y%m%d_%H%M%S_%f")
 
 
 def load_env() -> None:
@@ -96,10 +96,6 @@ def terminal_stage_states() -> set[str]:
     return {"ready_for_review", "blocked"}
 
 
-def unresolved_stage_states() -> set[str]:
-    return {"started", "model_call_attempted", "model_output_captured", "structure_valid", "semantic_validation_passed", "incomplete"}
-
-
 def queue_stage_state(stage: str) -> str | None:
     entry = latest_stage_states().get(stage)
     if not entry:
@@ -107,9 +103,7 @@ def queue_stage_state(stage: str) -> str | None:
     state = entry["state"]
     if state in terminal_stage_states():
         return "terminal"
-    if state in unresolved_stage_states():
-        return "unresolved"
-    return "unknown"
+    return "unresolved"
 
 
 def latest_stage_transition(stage: str) -> str | None:
@@ -163,10 +157,15 @@ def packet_for_stage(slug: str, title: str, desc: str, deadline_reached: bool) -
             "",
             "## Verification Contract",
             "",
-            "- Return exact JSON.",
-            "- Use the fixed schema.",
+            "- Return exact JSON with keys verdict, review_state, changed_paths, verification, evidence, notes.",
+            "- verdict must be one of pass | fail | incomplete.",
+            "- review_state must be one of complete | incomplete.",
+            "- verification keys must be raw_output_structure, changed_files_against_allowlist, narrowest_relevant_local_checks.",
+            "- verification values must be pass | fail | not_applicable | not_run.",
+            "- evidence entries must contain path, observation, existence.",
+            "- evidence existence must be present | absent.",
             "",
-            "Return strict JSON with keys: verdict, review_state, changed_paths, verification, evidence, notes.",
+            "Return strict JSON matching the nested schema described above.",
         ]
     )
 
@@ -259,8 +258,12 @@ def classify_output(content_path: Path, deadline_reached: bool, allow_paths: lis
     return state, payload.get("errors", []), {"stdout": proc.stdout, "stderr": proc.stderr, "returncode": proc.returncode}
 
 
-def queue_allowlist() -> list[str]:
-    return ["docs/ROADMAP.md"]
+def stage_allow_targets(slug: str) -> list[str]:
+    stage_targets = {
+        "one-stage": ["docs/ROADMAP.md"],
+        "two-stage": ["docs/reports/model_auditions/README.md"],
+    }
+    return stage_targets.get(slug, ["docs/ROADMAP.md"])
 
 
 def stage_manifest_path(slug: str) -> Path:
@@ -316,8 +319,8 @@ def write_terminal_marker_once() -> None:
         queue_total = len(queue_ids)
         terminal_queue = sum(1 for s in queue_ids if latest.get(s, {}).get("state") in terminal_stage_states())
         incomplete_queue = sum(1 for s in queue_ids if latest.get(s, {}).get("state") == "incomplete")
-        unresolved_queue = sum(1 for s in queue_ids if latest.get(s, {}).get("state") in unresolved_stage_states())
-        queue_remaining = sum(1 for s in queue_ids if latest.get(s, {}).get("state") in unresolved_stage_states() or s not in latest or latest.get(s, {}).get("state") == "incomplete")
+        unresolved_queue = sum(1 for s in queue_ids if latest.get(s, {}).get("state") not in terminal_stage_states())
+        queue_remaining = sum(1 for s in queue_ids if latest.get(s, {}).get("state") not in terminal_stage_states())
         if queue_remaining:
             return
         summary = {
@@ -347,14 +350,14 @@ def run_stage(slug: str, title: str, desc: str, dry_run: bool) -> int:
         return 0
     d = stage_dir(slug)
     d.mkdir(parents=True, exist_ok=True)
-    allow_paths = queue_allowlist()
+    allow_paths = stage_allow_targets(slug)
     write_stage_manifest(slug, title, desc, allow_paths)
     packet = packet_for_stage(slug, title, desc, deadline_reached=now() >= deadline())
     packet_path = d / "stage_packet.md"
     packet_path.write_text(packet, encoding="utf-8")
     prior_state = existing_stage_state(slug)
     prior_dir = latest_attempt_dir(slug, exclude=d)
-    if prior_state in unresolved_stage_states():
+    if prior_state and prior_state not in terminal_stage_states():
         next_attempt = 1
         if prior_dir:
             existing_attempts = sorted(prior_dir.glob("model_output.raw.*.json"))
@@ -435,11 +438,11 @@ def status_payload() -> dict:
     blocked = sum(1 for s in attempted if latest[s]["state"] == "blocked")
     semantic_failed = sum(1 for s in attempted if latest[s]["state"] == "semantic_validation_failed")
     incomplete = sum(1 for s in attempted if latest[s]["state"] == "incomplete")
-    unresolved = sum(1 for s in attempted if latest[s]["state"] in unresolved_stage_states())
+    unresolved = sum(1 for s in attempted if latest[s]["state"] not in terminal_stage_states())
     ready = completed
     terminal = TERMINAL_STATE.exists()
     queue_total = len(queue_ids)
-    queue_remaining = sum(1 for s in queue_ids if s not in attempted or latest.get(s, {}).get("state") in unresolved_stage_states())
+    queue_remaining = sum(1 for s in queue_ids if s not in attempted or latest.get(s, {}).get("state") not in terminal_stage_states())
     terminal_state_consistent = not terminal or queue_remaining == 0
     payload = {
         "deadline_local": deadline().isoformat(),
