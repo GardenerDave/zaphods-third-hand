@@ -1,0 +1,17 @@
+{
+  "schema": 2,
+  "families": {
+    "roadmap-grounding": ["docs/ROADMAP.md"],
+    "docs-index-consistency": ["docs/reports/model_auditions/README.md"],
+    "dogfood-artifact-validation": ["docs/ROADMAP.md"],
+    "prompt-patch-fixture-review": ["docs/reports/model_auditions/README.md"],
+    "candidate-export-rehearsal": ["docs/ROADMAP.md"],
+    "authority-boundary-wording": ["docs/ROADMAP.md"],
+    "evidence-retention": ["docs/ROADMAP.md"],
+    "queue-state-consistency": ["docs/ROADMAP.md"],
+    "closeout-skeleton": ["docs/reports/model_auditions/README.md"],
+    "failure-preservation": ["docs/ROADMAP.md"],
+    "evidence-packet-sanity": ["docs/ROADMAP.md"],
+    "review-bundle-completeness": ["docs/reports/model_auditions/README.md"]
+  }
+}

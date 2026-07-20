@@ -17,6 +17,7 @@ from zoneinfo import ZoneInfo
 REPO = Path(os.environ.get("ZTH_REPO", Path(__file__).resolve().parents[1]))
 WORK = REPO / ".work" / "dogfood" / "overnight"
 QUEUE = REPO / ".work" / "dogfood" / "roadmap_queue.tsv"
+QUEUE_SCHEMA_VERSION = 2
 STATE = WORK / "state.tsv"
 STATUS_FILE = WORK / "status.json"
 LOCK = WORK / "controller.lock"
@@ -106,6 +107,25 @@ def queue_stage_state(stage: str) -> str | None:
     return "unresolved"
 
 
+def _queue_schema_version() -> int | None:
+    if not QUEUE.exists():
+        return None
+    with QUEUE.open(encoding="utf-8") as fh:
+        for line in fh:
+            stripped = line.strip()
+            if not stripped:
+                continue
+            if stripped.startswith("# zth-roadmap-queue-schema:"):
+                try:
+                    return int(stripped.split(":", 1)[1].strip())
+                except Exception:
+                    return None
+            if stripped.startswith("#"):
+                continue
+            break
+    return None
+
+
 def queue_stage_authority(row: list[str]) -> list[str] | None:
     if len(row) < 4:
         return None
@@ -116,6 +136,23 @@ def queue_stage_authority(row: list[str]) -> list[str] | None:
     if not isinstance(allowed, list) or not allowed or not all(isinstance(item, str) and item for item in allowed):
         return None
     return allowed
+
+
+def queue_authority_diagnostic(*, line_number: int, row: list[str], reason: str) -> Path:
+    path = stage_dir("queue-authority") / "missing_or_malformed_authority.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    _write_json(
+        path,
+        {
+            "error": "missing_or_malformed_authority",
+            "queue_path": str(QUEUE.relative_to(REPO)),
+            "line_number": line_number,
+            "raw_row": row,
+            "reason": reason,
+            "timestamp": now().isoformat(),
+        },
+    )
+    return path
 
 
 def queue_has_unresolved_work() -> bool:
@@ -134,19 +171,37 @@ def queue_has_unresolved_work() -> bool:
 def next_queue_stage(attempted_this_tick: set[str]) -> dict[str, object] | None:
     if is_terminal():
         return None
+    schema_version = _queue_schema_version()
+    if schema_version != QUEUE_SCHEMA_VERSION:
+        return {
+            "priority": "",
+            "slug": "",
+            "title": "",
+            "allow_paths": None,
+            "malformed_authority": str(queue_authority_diagnostic(line_number=1, row=["# zth-roadmap-queue-schema: missing"], reason=f"unsupported_or_missing_schema_version: {schema_version}")),
+            "queue_schema_error": f"unsupported schema version: {schema_version}",
+        }
     with QUEUE.open(encoding="utf-8") as fh:
-        for row in csv.reader(fh, delimiter="\t"):
+        for line_number, row in enumerate(csv.reader(fh, delimiter="\t"), start=1):
             if not row or row[0].startswith("#") or len(row) < 2:
                 continue
             if row[1] in attempted_this_tick:
                 continue
+            if schema_version == QUEUE_SCHEMA_VERSION and len(row) != 4:
+                return {
+                    "priority": row[0],
+                    "slug": row[1],
+                    "title": row[2] if len(row) > 2 else "",
+                    "allow_paths": None,
+                    "malformed_authority": str(queue_authority_diagnostic(line_number=line_number, row=row, reason="missing_or_wrong_field_count")),
+                }
             if len(row) < 4:
                 return {
                     "priority": row[0],
                     "slug": row[1],
                     "title": row[2] if len(row) > 2 else "",
                     "allow_paths": None,
-                    "malformed_authority": None,
+                    "malformed_authority": str(queue_authority_diagnostic(line_number=line_number, row=row, reason="missing_authority_field")),
                 }
             allow_paths = queue_stage_authority(row)
             if allow_paths is None:
@@ -155,7 +210,7 @@ def next_queue_stage(attempted_this_tick: set[str]) -> dict[str, object] | None:
                     "slug": row[1],
                     "title": row[2],
                     "allow_paths": None,
-                    "malformed_authority": row[3] if len(row) > 3 else None,
+                    "malformed_authority": str(queue_authority_diagnostic(line_number=line_number, row=row, reason="malformed_authority_value")),
                 }
             state = queue_stage_state(row[1])
             if state is None:

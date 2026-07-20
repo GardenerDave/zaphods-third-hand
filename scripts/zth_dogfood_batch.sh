@@ -9,6 +9,7 @@ QUEUE="$WORK/roadmap_queue.tsv"
 STATE="$WORK/state.tsv"
 WATCHDOG_SCRIPT="$REPO/scripts/zth_dogfood_watchdog.sh"
 SESSION="${ZTH_DOGFOOD_SESSION:-zth-dogfood-run}"
+QUEUE_SCHEMA_MARKER="# zth-roadmap-queue-schema: 2"
 
 usage() {
   cat <<'EOF'
@@ -34,7 +35,7 @@ queue_rows() {
   if [ ! -f "$QUEUE" ]; then
     return 0
   fi
-  awk -F '\t' '!/^#/ && NF >= 3 { print }' "$QUEUE"
+  awk -F '\t' '!/^#/ && NF >= 4 { print }' "$QUEUE"
 }
 
 state_rows() {
@@ -171,6 +172,11 @@ prepare_from_tsv() {
     exit 1
   fi
 
+  if ! grep -qF "$QUEUE_SCHEMA_MARKER" "$queue_file"; then
+    printf 'queue file must declare schema version 2\n' >&2
+    exit 1
+  fi
+
   if [ "${allow_cron}" != "--allow-cron-active" ] && cron_active; then
     printf 'cron appears active; refuse prepare without --allow-cron-active\n' >&2
     exit 1
@@ -183,10 +189,10 @@ prepare_from_tsv() {
     BEGIN { ok = 1 }
     /^#/ { next }
     NF == 0 { next }
-    NF < 3 { ok = 0 }
+    NF != 4 { ok = 0 }
     END { exit ok ? 0 : 1 }
   ' "$queue_file"; then
-    printf 'queue file must contain comment lines or tab-separated rows with at least 3 fields\n' >&2
+    printf 'queue file must contain comment lines or tab-separated rows with exactly 4 fields\n' >&2
     exit 1
   fi
 

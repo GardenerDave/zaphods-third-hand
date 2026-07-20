@@ -730,6 +730,27 @@ def test_overnight_packet_and_validator_share_schema_contract(tmp_path):
         assert token in validator_text
 
 
+def test_overnight_tracked_queue_template_and_registry_are_versioned(tmp_path):
+    template = ROOT / "docs" / "reports" / "model_auditions" / "OVERNIGHT_QUEUE_TEMPLATE.tsv"
+    registry = ROOT / "docs" / "reports" / "model_auditions" / "OVERNIGHT_QUEUE_AUTHORITY_REGISTRY.json"
+    assert template.is_file()
+    assert registry.is_file()
+    registry_payload = json.loads(registry.read_text(encoding="utf-8"))
+    assert registry_payload["schema"] == 2
+    assert len(registry_payload["families"]) == 12
+    lines = [line for line in template.read_text(encoding="utf-8").splitlines() if line and not line.startswith("#")]
+    assert len(lines) == 12
+    for line in lines:
+        parts = line.split("\t")
+        assert len(parts) == 4
+        allowed = json.loads(parts[3])
+        assert isinstance(allowed, list) and allowed
+        assert all(isinstance(item, str) and item for item in allowed)
+    queue = tmp_path / "roadmap_queue.tsv"
+    queue.write_text(template.read_text(encoding="utf-8"), encoding="utf-8")
+    assert "# zth-roadmap-queue-schema: 2" in queue.read_text(encoding="utf-8")
+
+
 def test_overnight_stage_manifests_keep_distinct_allow_targets(tmp_path):
     snapshot = _make_snapshot(tmp_path, remove_paths=[
         "docs/reports/model_auditions/QUEUE_APPROVAL_REVIEW_COMMAND_CALIBRATION_SYNTHESIS_2026-07-18.md",
@@ -741,6 +762,7 @@ def test_overnight_stage_manifests_keep_distinct_allow_targets(tmp_path):
     queue.write_text(
         "\n".join(
             [
+                "# zth-roadmap-queue-schema: 2",
                 '1\tworker-loop-001-roadmap-grounding-01\tOne stage\t["docs/ROADMAP.md"]',
                 '2\tworker-loop-011-docs-index-consistency-01\tTwo stage\t["docs/reports/model_auditions/README.md"]',
             ]
@@ -808,7 +830,7 @@ def test_overnight_queue_exhaustion_is_terminal_and_idempotent(tmp_path):
     ])
     queue = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
     queue.parent.mkdir(parents=True, exist_ok=True)
-    queue.write_text('1\tworker-loop-001-roadmap-grounding-01\tOne stage\t["docs/ROADMAP.md"]\n', encoding="utf-8")
+    queue.write_text('# zth-roadmap-queue-schema: 2\n1\tworker-loop-001-roadmap-grounding-01\tOne stage\t["docs/ROADMAP.md"]\n', encoding="utf-8")
     response = snapshot / "model_response.json"
     response.write_text(
         json.dumps(
@@ -882,7 +904,7 @@ def test_overnight_incomplete_stage_remains_unresolved_and_prevents_closeout(tmp
     ])
     queue = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
     queue.parent.mkdir(parents=True, exist_ok=True)
-    queue.write_text('1\tworker-loop-001-roadmap-grounding-01\tOne stage\t["docs/ROADMAP.md"]\n', encoding="utf-8")
+    queue.write_text('# zth-roadmap-queue-schema: 2\n1\tworker-loop-001-roadmap-grounding-01\tOne stage\t["docs/ROADMAP.md"]\n', encoding="utf-8")
     response = snapshot / "model_response.json"
     response.write_text(
         json.dumps(
@@ -952,7 +974,8 @@ def test_overnight_queue_authority_must_exist_and_parse(tmp_path):
     queue.write_text(
         "\n".join(
             [
-                "1\tworker-loop-001-roadmap-grounding-01\tOne stage",
+                "# zth-roadmap-queue-schema: 2",
+                "1\tworker-loop-001-roadmap-grounding-01\tOne stage\t",
                 '2\tworker-loop-011-docs-index-consistency-01\tTwo stage\t{"not": "a list"}',
             ]
         )
@@ -987,7 +1010,7 @@ def test_overnight_queue_malformed_authority_json_blocks_before_model_call(tmp_p
     queue = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
     queue.parent.mkdir(parents=True, exist_ok=True)
     queue.write_text(
-        '1\tworker-loop-001-roadmap-grounding-01\tOne stage\t{"not": "a list"}\n',
+        '# zth-roadmap-queue-schema: 2\n1\tworker-loop-001-roadmap-grounding-01\tOne stage\t{"not": "a list"}\n',
         encoding="utf-8",
     )
     response = snapshot / "model_response.json"
@@ -1017,7 +1040,7 @@ def test_overnight_failed_call_does_not_write_model_output_captured(tmp_path):
     ])
     queue = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
     queue.parent.mkdir(parents=True, exist_ok=True)
-    queue.write_text('1\tone-stage\tOne stage\t["docs/ROADMAP.md"]\n', encoding="utf-8")
+    queue.write_text('# zth-roadmap-queue-schema: 2\n1\tone-stage\tOne stage\t["docs/ROADMAP.md"]\n', encoding="utf-8")
     bad_response = snapshot / "bad_response.json"
     bad_response.write_text("{not json}", encoding="utf-8")
     env = {
@@ -1068,7 +1091,7 @@ def test_overnight_recovery_manifest_links_prior_evidence(tmp_path):
     ])
     queue = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
     queue.parent.mkdir(parents=True, exist_ok=True)
-    queue.write_text('1\tone-stage\tOne stage\t["docs/ROADMAP.md"]\n', encoding="utf-8")
+    queue.write_text('# zth-roadmap-queue-schema: 2\n1\tone-stage\tOne stage\t["docs/ROADMAP.md"]\n', encoding="utf-8")
     prior = snapshot / ".work" / "dogfood" / "overnight" / "runs" / "20260719_000001-one-stage"
     prior.mkdir(parents=True, exist_ok=True)
     (prior / "model_output.raw.1.json").write_text("{}", encoding="utf-8")
@@ -1137,7 +1160,7 @@ def test_overnight_reboots_resume_intermediate_stages(tmp_path, intermediate_sta
     ])
     queue = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
     queue.parent.mkdir(parents=True, exist_ok=True)
-    queue.write_text('1\tone-stage\tOne stage\t["docs/ROADMAP.md"]\n', encoding="utf-8")
+    queue.write_text('# zth-roadmap-queue-schema: 2\n1\tone-stage\tOne stage\t["docs/ROADMAP.md"]\n', encoding="utf-8")
     state = snapshot / ".work" / "dogfood" / "overnight" / "state.tsv"
     state.parent.mkdir(parents=True, exist_ok=True)
     state.write_text(
@@ -1190,7 +1213,7 @@ def test_overnight_status_joins_queue_stats_and_untracked_files(tmp_path):
     queue = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
     queue.parent.mkdir(parents=True, exist_ok=True)
     queue.write_text(
-        '1\tone-stage\tOne stage\t["docs/ROADMAP.md"]\n2\ttwo-stage\tTwo stage\t["docs/reports/model_auditions/README.md"]\n',
+        '# zth-roadmap-queue-schema: 2\n1\tone-stage\tOne stage\t["docs/ROADMAP.md"]\n2\ttwo-stage\tTwo stage\t["docs/reports/model_auditions/README.md"]\n',
         encoding="utf-8",
     )
     state = snapshot / ".work" / "dogfood" / "overnight" / "state.tsv"

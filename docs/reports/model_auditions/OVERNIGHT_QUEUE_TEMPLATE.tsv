@@ -1,0 +1,13 @@
+# zth-roadmap-queue-schema: 2
+1	worker-loop-001-roadmap-grounding-01	Roadmap grounding packet 01: Ground a roadmap statement against already-implemented evidence and identify the smallest bounded follow-up packet.	["docs/ROADMAP.md"]
+2	worker-loop-011-docs-index-consistency-01	Docs index packet 01: Check docs/report index consistency for the supervised worker and prompt-patch evidence chain without changing tracked files.	["docs/reports/model_auditions/README.md"]
+3	worker-loop-021-dogfood-artifact-validation-01	Artifact validation packet 01: Validate a dogfood artifact condition, preserving any failure evidence and describing the deterministic check only.	["docs/ROADMAP.md"]
+4	worker-loop-031-prompt-patch-fixture-review-01	Prompt patch fixture review packet 01: Review a prompt patch fixture candidate or pack for structural soundness without importing it into tracked fixtures.	["docs/reports/model_auditions/README.md"]
+5	worker-loop-041-candidate-export-rehearsal-01	Candidate export rehearsal packet 01: Rehearse candidate export from a supervised live run or candidate draft path while keeping the export review-only.	["docs/ROADMAP.md"]
+6	worker-loop-051-authority-boundary-wording-01	Authority boundary wording packet 01: Audit wording that defines evidence-only behavior, no auto-promotion, and no authority expansion.	["docs/ROADMAP.md"]
+7	worker-loop-061-evidence-retention-01	Evidence retention packet 01: Preserve failures, diagnostics, and rejected artifacts without normalizing them away.	["docs/ROADMAP.md"]
+8	worker-loop-071-queue-state-consistency-01	Queue/state consistency packet 01: Check queue and state alignment for a supervised dogfood batch without repair.	["docs/ROADMAP.md"]
+9	worker-loop-081-closeout-skeleton-01	Closeout skeleton packet 01: Draft a closeout skeleton for a completed supervised evidence loop using only local evidence paths and status fields.	["docs/reports/model_auditions/README.md"]
+10	worker-loop-091-failure-preservation-01	Failure preservation packet 01: Record how a failure case should remain as evidence instead of being normalized or removed from the batch trail.	["docs/ROADMAP.md"]
+11	worker-loop-101-evidence-packet-sanity-01	Evidence packet sanity packet 01: Inspect whether a bounded evidence packet has the minimum fields needed for later validation and review.	["docs/ROADMAP.md"]
+12	worker-loop-111-review-bundle-completeness-01	Review bundle completeness packet 01: Verify that a review bundle contains the expected hashes, authority boundaries, and result summaries for human review.	["docs/reports/model_auditions/README.md"]
