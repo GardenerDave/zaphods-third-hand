@@ -106,28 +106,66 @@ def queue_stage_state(stage: str) -> str | None:
     return "unresolved"
 
 
-def latest_stage_transition(stage: str) -> str | None:
-    entry = latest_stage_states().get(stage)
-    return entry["timestamp"] if entry else None
-
-
-def next_queue_stage() -> tuple[str, str, str] | None:
-    if is_terminal():
+def queue_stage_authority(row: list[str]) -> list[str] | None:
+    if len(row) < 4:
         return None
+    try:
+        allowed = json.loads(row[3])
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(allowed, list) or not allowed or not all(isinstance(item, str) and item for item in allowed):
+        return None
+    return allowed
+
+
+def queue_has_unresolved_work() -> bool:
     latest = latest_stage_states()
+    if not QUEUE.exists():
+        return False
     with QUEUE.open(encoding="utf-8") as fh:
         for row in csv.reader(fh, delimiter="\t"):
-            if not row or row[0].startswith("#") or len(row) < 3:
+            if not row or row[0].startswith("#") or len(row) < 2:
                 continue
+            if latest.get(row[1], {}).get("state") not in terminal_stage_states():
+                return True
+    return False
+
+
+def next_queue_stage(attempted_this_tick: set[str]) -> dict[str, object] | None:
+    if is_terminal():
+        return None
+    with QUEUE.open(encoding="utf-8") as fh:
+        for row in csv.reader(fh, delimiter="\t"):
+            if not row or row[0].startswith("#") or len(row) < 2:
+                continue
+            if row[1] in attempted_this_tick:
+                continue
+            if len(row) < 4:
+                return {
+                    "priority": row[0],
+                    "slug": row[1],
+                    "title": row[2] if len(row) > 2 else "",
+                    "allow_paths": None,
+                    "malformed_authority": None,
+                }
+            allow_paths = queue_stage_authority(row)
+            if allow_paths is None:
+                return {
+                    "priority": row[0],
+                    "slug": row[1],
+                    "title": row[2],
+                    "allow_paths": None,
+                    "malformed_authority": row[3] if len(row) > 3 else None,
+                }
             state = queue_stage_state(row[1])
             if state is None:
-                return row[0], row[1], row[2]
+                return {"priority": row[0], "slug": row[1], "title": row[2], "allow_paths": allow_paths}
             if state == "unresolved":
-                return row[0], row[1], row[2]
+                return {"priority": row[0], "slug": row[1], "title": row[2], "allow_paths": allow_paths}
     return None
 
 
-def packet_for_stage(slug: str, title: str, desc: str, deadline_reached: bool) -> str:
+def packet_for_stage(slug: str, title: str, desc: str, deadline_reached: bool, allow_paths: list[str]) -> str:
     return "\n".join(
         [
             "# ZTH Overnight Dogfood Packet",
@@ -152,18 +190,17 @@ def packet_for_stage(slug: str, title: str, desc: str, deadline_reached: bool) -
             "",
             "## Allowed Targets",
             "",
-            "- Existing repository files only.",
-            "- Stage-local evidence under .work/dogfood/overnight/.",
+            json.dumps(allow_paths),
             "",
             "## Verification Contract",
             "",
             "- Return exact JSON with keys verdict, review_state, changed_paths, verification, evidence, notes.",
-            "- verdict must be one of pass | fail | incomplete.",
-            "- review_state must be one of complete | incomplete.",
+            '- verdict must be one of "pass", "fail", or "incomplete".',
+            '- review_state must be one of "complete" or "incomplete".',
             "- verification keys must be raw_output_structure, changed_files_against_allowlist, narrowest_relevant_local_checks.",
-            "- verification values must be pass | fail | not_applicable | not_run.",
+            '- verification values must be one of "pass", "fail", "not_applicable", or "not_run".',
             "- evidence entries must contain path, observation, existence.",
-            "- evidence existence must be present | absent.",
+            '- evidence existence must be one of "present" or "absent".',
             "",
             "Return strict JSON matching the nested schema described above.",
         ]
@@ -199,6 +236,16 @@ def _transport_diag(exc: BaseException, *, attempt: int, retryable: bool, body: 
 def call_model(packet_path: Path, out_path: Path, *, attempt: int) -> dict:
     fixture = os.environ.get("ZTH_OVERNIGHT_MODEL_RESPONSE_FILE")
     if fixture:
+        counter = os.environ.get("ZTH_OVERNIGHT_MODEL_CALL_COUNT_FILE")
+        if counter:
+            counter_path = Path(counter)
+            current = 0
+            if counter_path.exists():
+                try:
+                    current = int(counter_path.read_text(encoding="utf-8").strip() or "0")
+                except Exception:
+                    current = 0
+            counter_path.write_text(f"{current + 1}\n", encoding="utf-8")
         data = json.loads(Path(fixture).read_text(encoding="utf-8"))
         out_path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
         return data
@@ -258,14 +305,6 @@ def classify_output(content_path: Path, deadline_reached: bool, allow_paths: lis
     return state, payload.get("errors", []), {"stdout": proc.stdout, "stderr": proc.stderr, "returncode": proc.returncode}
 
 
-def stage_allow_targets(slug: str) -> list[str]:
-    stage_targets = {
-        "one-stage": ["docs/ROADMAP.md"],
-        "two-stage": ["docs/reports/model_auditions/README.md"],
-    }
-    return stage_targets.get(slug, ["docs/ROADMAP.md"])
-
-
 def stage_manifest_path(slug: str) -> Path:
     return stage_dir(slug) / "stage_manifest.json"
 
@@ -320,7 +359,7 @@ def write_terminal_marker_once() -> None:
         terminal_queue = sum(1 for s in queue_ids if latest.get(s, {}).get("state") in terminal_stage_states())
         incomplete_queue = sum(1 for s in queue_ids if latest.get(s, {}).get("state") == "incomplete")
         unresolved_queue = sum(1 for s in queue_ids if latest.get(s, {}).get("state") not in terminal_stage_states())
-        queue_remaining = sum(1 for s in queue_ids if latest.get(s, {}).get("state") not in terminal_stage_states())
+        queue_remaining = unresolved_queue
         if queue_remaining:
             return
         summary = {
@@ -344,15 +383,14 @@ def write_terminal_marker_once() -> None:
         record([RUN_ID, "queue_exhausted", "terminal", str(WORK), "queue_exhausted", summary["closed_at"]])
 
 
-def run_stage(slug: str, title: str, desc: str, dry_run: bool) -> int:
+def run_stage(slug: str, title: str, desc: str, allow_paths: list[str], dry_run: bool) -> int:
     if dry_run:
         print(f"{slug}\t{title}\tdry-run")
         return 0
     d = stage_dir(slug)
     d.mkdir(parents=True, exist_ok=True)
-    allow_paths = stage_allow_targets(slug)
     write_stage_manifest(slug, title, desc, allow_paths)
-    packet = packet_for_stage(slug, title, desc, deadline_reached=now() >= deadline())
+    packet = packet_for_stage(slug, title, desc, deadline_reached=now() >= deadline(), allow_paths=allow_paths)
     packet_path = d / "stage_packet.md"
     packet_path.write_text(packet, encoding="utf-8")
     prior_state = existing_stage_state(slug)
@@ -408,6 +446,7 @@ def run_stage(slug: str, title: str, desc: str, dry_run: bool) -> int:
         state, errors, validation = classify_output(content_path, deadline_reached=now() >= deadline(), allow_paths=stage_manifest.get("allow_paths", allow_paths))
         _write_json(d / f"validation.{attempt}.json", {"state": state, "errors": errors, "validation": validation})
         if state == "incomplete":
+            record([RUN_ID, slug, "semantic_validation_passed", str(d), "semantic_validation_passed", now().isoformat()])
             record([RUN_ID, slug, "incomplete", str(d), "incomplete", now().isoformat()])
             return 0
         if state == "semantic_validation_failed":
@@ -442,7 +481,7 @@ def status_payload() -> dict:
     ready = completed
     terminal = TERMINAL_STATE.exists()
     queue_total = len(queue_ids)
-    queue_remaining = sum(1 for s in queue_ids if s not in attempted or latest.get(s, {}).get("state") not in terminal_stage_states())
+    queue_remaining = sum(1 for s in queue_ids if latest.get(s, {}).get("state") not in terminal_stage_states())
     terminal_state_consistent = not terminal or queue_remaining == 0
     payload = {
         "deadline_local": deadline().isoformat(),
@@ -499,15 +538,24 @@ def main(argv: list[str]) -> int:
         if is_terminal():
             print(json.dumps(status_payload(), indent=2))
             return 0
+        attempted_this_tick: set[str] = set()
         for _ in range(MAX_STAGES):
             if now() >= deadline():
                 break
-            nxt = next_queue_stage()
+            nxt = next_queue_stage(attempted_this_tick)
             if nxt is None:
-                write_terminal_marker_once()
+                if not queue_has_unresolved_work():
+                    write_terminal_marker_once()
                 break
-            _, slug, title = nxt
-            rc = run_stage(slug, title, title, dry_run=(mode == "--dry-run"))
+            slug = str(nxt["slug"])
+            title = str(nxt["title"])
+            allow_paths = nxt.get("allow_paths")
+            if allow_paths is None:
+                record([RUN_ID, slug, "blocked", str(stage_dir(slug)), "blocked", "missing_or_malformed_authority", now().isoformat()])
+                attempted_this_tick.add(slug)
+                continue
+            attempted_this_tick.add(slug)
+            rc = run_stage(slug, title, title, allow_paths, dry_run=(mode == "--dry-run"))
             if rc != 0:
                 continue
         print(json.dumps(status_payload(), indent=2))

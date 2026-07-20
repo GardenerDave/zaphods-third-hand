@@ -710,11 +710,13 @@ def test_overnight_install_and_uninstall_helpers_with_stubbed_crontab(tmp_path):
 def test_overnight_packet_and_validator_share_schema_contract(tmp_path):
     from scripts.zth_overnight_dogfood_controller import packet_for_stage
 
-    packet = packet_for_stage("one-stage", "Title", "Objective", False)
+    packet = packet_for_stage("one-stage", "Title", "Objective", False, ["docs/ROADMAP.md"])
     assert "verdict, review_state, changed_paths, verification, evidence, notes" in packet
-    assert "pass | fail | incomplete" in packet
+    assert '"pass", "fail", or "incomplete"' in packet
+    assert '"complete" or "incomplete"' in packet
     assert "raw_output_structure, changed_files_against_allowlist, narrowest_relevant_local_checks" in packet
     assert "path, observation, existence" in packet
+    assert '["docs/ROADMAP.md"]' in packet
     validator_text = (ROOT / "scripts" / "zth_validate_overnight_review_output.py").read_text(encoding="utf-8")
     for token in [
         "pass",
@@ -737,7 +739,13 @@ def test_overnight_stage_manifests_keep_distinct_allow_targets(tmp_path):
     queue = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
     queue.parent.mkdir(parents=True, exist_ok=True)
     queue.write_text(
-        "1\tone-stage\tOne stage\n2\ttwo-stage\tTwo stage\n",
+        "\n".join(
+            [
+                '1\tworker-loop-001-roadmap-grounding-01\tOne stage\t["docs/ROADMAP.md"]',
+                '2\tworker-loop-011-docs-index-consistency-01\tTwo stage\t["docs/reports/model_auditions/README.md"]',
+            ]
+        )
+        + "\n",
         encoding="utf-8",
     )
     response = snapshot / "model_response.json"
@@ -772,6 +780,7 @@ def test_overnight_stage_manifests_keep_distinct_allow_targets(tmp_path):
     env = {
         "ZTH_REPO": str(snapshot),
         "ZTH_OVERNIGHT_MODEL_RESPONSE_FILE": str(response),
+        "ZTH_OVERNIGHT_MODEL_CALL_COUNT_FILE": str(snapshot / "model_call_count.txt"),
         "ZTH_PUBLIC_HOST_ALIAS": "LOCAL_STUB",
         "ZTH_OVERNIGHT_DEADLINE": "2099-01-01T08:00:00-05:00",
     }
@@ -785,6 +794,10 @@ def test_overnight_stage_manifests_keep_distinct_allow_targets(tmp_path):
     assert manifests[1]["allow_paths"] == ["docs/reports/model_auditions/README.md"]
     assert "docs/reports/model_auditions/README.md" not in manifests[0]["allow_paths"]
     assert "docs/ROADMAP.md" not in manifests[1]["allow_paths"]
+    assert (snapshot / "model_call_count.txt").read_text(encoding="utf-8").strip() == "4"
+    packets = [run.joinpath("stage_packet.md").read_text(encoding="utf-8") for run in runs]
+    assert '["docs/ROADMAP.md"]' in packets[0]
+    assert '["docs/reports/model_auditions/README.md"]' in packets[1]
 
 
 def test_overnight_queue_exhaustion_is_terminal_and_idempotent(tmp_path):
@@ -795,7 +808,7 @@ def test_overnight_queue_exhaustion_is_terminal_and_idempotent(tmp_path):
     ])
     queue = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
     queue.parent.mkdir(parents=True, exist_ok=True)
-    queue.write_text("1\tone-stage\tOne stage\n", encoding="utf-8")
+    queue.write_text('1\tworker-loop-001-roadmap-grounding-01\tOne stage\t["docs/ROADMAP.md"]\n', encoding="utf-8")
     response = snapshot / "model_response.json"
     response.write_text(
         json.dumps(
@@ -828,6 +841,7 @@ def test_overnight_queue_exhaustion_is_terminal_and_idempotent(tmp_path):
     env = {
         "ZTH_REPO": str(snapshot),
         "ZTH_OVERNIGHT_MODEL_RESPONSE_FILE": str(response),
+        "ZTH_OVERNIGHT_MODEL_CALL_COUNT_FILE": str(snapshot / "model_call_count.txt"),
         "ZTH_PUBLIC_HOST_ALIAS": "LOCAL_STUB",
         "ZTH_OVERNIGHT_DEADLINE": "2099-01-01T08:00:00-05:00",
     }
@@ -837,6 +851,7 @@ def test_overnight_queue_exhaustion_is_terminal_and_idempotent(tmp_path):
         assert first.returncode == 0, first.stderr
         runs = sorted((snapshot / ".work" / "dogfood" / "overnight" / "runs").glob("*"))
         assert len(runs) == 1
+        assert (snapshot / "model_call_count.txt").read_text(encoding="utf-8").strip() == "1"
         terminal = snapshot / ".work" / "dogfood" / "overnight" / "terminal_state.json"
         closeout_manifest = snapshot / ".work" / "dogfood" / "overnight" / "manifests" / "overnight_closeout_manifest.json"
         run_manifest = snapshot / ".work" / "dogfood" / "overnight" / "manifests" / "overnight_run_manifest.json"
@@ -848,6 +863,7 @@ def test_overnight_queue_exhaustion_is_terminal_and_idempotent(tmp_path):
         original_closeout_manifest = closeout_manifest.read_bytes()
         second = _run([str(OVERNIGHT_CONTROLLER), "--tick"], cwd=snapshot, env=env)
         assert second.returncode == 0, second.stderr
+        assert (snapshot / "model_call_count.txt").read_text(encoding="utf-8").strip() == "1"
         runs_after = sorted((snapshot / ".work" / "dogfood" / "overnight" / "runs").glob("*"))
         assert runs_after == runs
         assert run_manifest.read_bytes() == original_run_manifest
@@ -866,7 +882,7 @@ def test_overnight_incomplete_stage_remains_unresolved_and_prevents_closeout(tmp
     ])
     queue = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
     queue.parent.mkdir(parents=True, exist_ok=True)
-    queue.write_text("1\tone-stage\tOne stage\n", encoding="utf-8")
+    queue.write_text('1\tworker-loop-001-roadmap-grounding-01\tOne stage\t["docs/ROADMAP.md"]\n', encoding="utf-8")
     response = snapshot / "model_response.json"
     response.write_text(
         json.dumps(
@@ -899,22 +915,98 @@ def test_overnight_incomplete_stage_remains_unresolved_and_prevents_closeout(tmp
     env = {
         "ZTH_REPO": str(snapshot),
         "ZTH_OVERNIGHT_MODEL_RESPONSE_FILE": str(response),
+        "ZTH_OVERNIGHT_MODEL_CALL_COUNT_FILE": str(snapshot / "model_call_count.txt"),
         "ZTH_PUBLIC_HOST_ALIAS": "LOCAL_STUB",
         "ZTH_OVERNIGHT_DEADLINE": "2099-01-01T08:00:00-05:00",
     }
     result = _run([str(OVERNIGHT_CONTROLLER), "--tick"], cwd=snapshot, env=env)
     assert result.returncode == 0, result.stderr
+    assert (snapshot / "model_call_count.txt").read_text(encoding="utf-8").strip() == "1"
     status = _read_json(snapshot / ".work" / "dogfood" / "overnight" / "status.json")
     assert status["incomplete_count"] == 1
     assert status["queue_remaining"] == 1
     assert not (snapshot / ".work" / "dogfood" / "overnight" / "terminal_state.json").exists()
+    first_run = sorted((snapshot / ".work" / "dogfood" / "overnight" / "runs").glob("*"))[0]
     second = _run([str(OVERNIGHT_CONTROLLER), "--tick"], cwd=snapshot, env=env)
     assert second.returncode == 0, second.stderr
+    assert (snapshot / "model_call_count.txt").read_text(encoding="utf-8").strip() == "2"
     rows = (snapshot / ".work" / "dogfood" / "overnight" / "state.tsv").read_text(encoding="utf-8").splitlines()
     assert any("\tincomplete\t" in row for row in rows)
     attempts = sorted((snapshot / ".work" / "dogfood" / "overnight" / "runs").glob("*"))
     assert len(attempts) == 2
     assert attempts[0] != attempts[1]
+    assert not (snapshot / ".work" / "dogfood" / "overnight" / "terminal_state.json").exists()
+    recovery = _read_json(attempts[1] / "recovery_manifest.json")
+    assert recovery["prior_directory"] == str(first_run)
+    assert recovery["prior_lifecycle_state"] == "incomplete"
+
+
+def test_overnight_queue_authority_must_exist_and_parse(tmp_path):
+    snapshot = _make_snapshot(tmp_path, remove_paths=[
+        "docs/reports/model_auditions/QUEUE_APPROVAL_REVIEW_COMMAND_CALIBRATION_SYNTHESIS_2026-07-18.md",
+        "docs/reports/model_auditions/DECLARATIVE_LONG_DURATION_MILESTONE_MAP_CALIBRATION_SYNTHESIS_2026-07-18.md",
+        "docs/reports/model_auditions/LONG_DURATION_DOGFOOD_CLOSEOUT_2026-07-18.md",
+    ])
+    queue = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
+    queue.parent.mkdir(parents=True, exist_ok=True)
+    queue.write_text(
+        "\n".join(
+            [
+                "1\tworker-loop-001-roadmap-grounding-01\tOne stage",
+                '2\tworker-loop-011-docs-index-consistency-01\tTwo stage\t{"not": "a list"}',
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    response = snapshot / "model_response.json"
+    response.write_text(
+        json.dumps({"choices": [{"message": {"content": "{}"}}]}, indent=2),
+        encoding="utf-8",
+    )
+    env = {
+        "ZTH_REPO": str(snapshot),
+        "ZTH_OVERNIGHT_MODEL_RESPONSE_FILE": str(response),
+        "ZTH_OVERNIGHT_MODEL_CALL_COUNT_FILE": str(snapshot / "model_call_count.txt"),
+        "ZTH_PUBLIC_HOST_ALIAS": "LOCAL_STUB",
+        "ZTH_OVERNIGHT_DEADLINE": "2099-01-01T08:00:00-05:00",
+    }
+    result = _run([str(OVERNIGHT_CONTROLLER), "--tick"], cwd=snapshot, env=env)
+    assert result.returncode == 0, result.stderr
+    assert not (snapshot / "model_call_count.txt").exists()
+    rows = (snapshot / ".work" / "dogfood" / "overnight" / "state.tsv").read_text(encoding="utf-8").splitlines()
+    assert any("missing_or_malformed_authority" in row for row in rows)
+
+
+def test_overnight_queue_malformed_authority_json_blocks_before_model_call(tmp_path):
+    snapshot = _make_snapshot(tmp_path, remove_paths=[
+        "docs/reports/model_auditions/QUEUE_APPROVAL_REVIEW_COMMAND_CALIBRATION_SYNTHESIS_2026-07-18.md",
+        "docs/reports/model_auditions/DECLARATIVE_LONG_DURATION_MILESTONE_MAP_CALIBRATION_SYNTHESIS_2026-07-18.md",
+        "docs/reports/model_auditions/LONG_DURATION_DOGFOOD_CLOSEOUT_2026-07-18.md",
+    ])
+    queue = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
+    queue.parent.mkdir(parents=True, exist_ok=True)
+    queue.write_text(
+        '1\tworker-loop-001-roadmap-grounding-01\tOne stage\t{"not": "a list"}\n',
+        encoding="utf-8",
+    )
+    response = snapshot / "model_response.json"
+    response.write_text(
+        json.dumps({"choices": [{"message": {"content": "{}"}}]}, indent=2),
+        encoding="utf-8",
+    )
+    env = {
+        "ZTH_REPO": str(snapshot),
+        "ZTH_OVERNIGHT_MODEL_RESPONSE_FILE": str(response),
+        "ZTH_OVERNIGHT_MODEL_CALL_COUNT_FILE": str(snapshot / "model_call_count.txt"),
+        "ZTH_PUBLIC_HOST_ALIAS": "LOCAL_STUB",
+        "ZTH_OVERNIGHT_DEADLINE": "2099-01-01T08:00:00-05:00",
+    }
+    result = _run([str(OVERNIGHT_CONTROLLER), "--tick"], cwd=snapshot, env=env)
+    assert result.returncode == 0, result.stderr
+    assert not (snapshot / "model_call_count.txt").exists()
+    rows = (snapshot / ".work" / "dogfood" / "overnight" / "state.tsv").read_text(encoding="utf-8").splitlines()
+    assert any("missing_or_malformed_authority" in row for row in rows)
 
 
 def test_overnight_failed_call_does_not_write_model_output_captured(tmp_path):
@@ -925,7 +1017,7 @@ def test_overnight_failed_call_does_not_write_model_output_captured(tmp_path):
     ])
     queue = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
     queue.parent.mkdir(parents=True, exist_ok=True)
-    queue.write_text("1\tone-stage\tOne stage\n", encoding="utf-8")
+    queue.write_text('1\tone-stage\tOne stage\t["docs/ROADMAP.md"]\n', encoding="utf-8")
     bad_response = snapshot / "bad_response.json"
     bad_response.write_text("{not json}", encoding="utf-8")
     env = {
@@ -976,7 +1068,7 @@ def test_overnight_recovery_manifest_links_prior_evidence(tmp_path):
     ])
     queue = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
     queue.parent.mkdir(parents=True, exist_ok=True)
-    queue.write_text("1\tone-stage\tOne stage\n", encoding="utf-8")
+    queue.write_text('1\tone-stage\tOne stage\t["docs/ROADMAP.md"]\n', encoding="utf-8")
     prior = snapshot / ".work" / "dogfood" / "overnight" / "runs" / "20260719_000001-one-stage"
     prior.mkdir(parents=True, exist_ok=True)
     (prior / "model_output.raw.1.json").write_text("{}", encoding="utf-8")
@@ -1045,7 +1137,7 @@ def test_overnight_reboots_resume_intermediate_stages(tmp_path, intermediate_sta
     ])
     queue = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
     queue.parent.mkdir(parents=True, exist_ok=True)
-    queue.write_text("1\tone-stage\tOne stage\n", encoding="utf-8")
+    queue.write_text('1\tone-stage\tOne stage\t["docs/ROADMAP.md"]\n', encoding="utf-8")
     state = snapshot / ".work" / "dogfood" / "overnight" / "state.tsv"
     state.parent.mkdir(parents=True, exist_ok=True)
     state.write_text(
@@ -1097,7 +1189,10 @@ def test_overnight_status_joins_queue_stats_and_untracked_files(tmp_path):
     snapshot = _make_snapshot(tmp_path)
     queue = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
     queue.parent.mkdir(parents=True, exist_ok=True)
-    queue.write_text("1\tone-stage\tOne stage\n2\ttwo-stage\tTwo stage\n", encoding="utf-8")
+    queue.write_text(
+        '1\tone-stage\tOne stage\t["docs/ROADMAP.md"]\n2\ttwo-stage\tTwo stage\t["docs/reports/model_auditions/README.md"]\n',
+        encoding="utf-8",
+    )
     state = snapshot / ".work" / "dogfood" / "overnight" / "state.tsv"
     state.parent.mkdir(parents=True, exist_ok=True)
     state.write_text(
