@@ -25,7 +25,7 @@ The first three stages were blocked because the local model path failed:
 - `worker-loop-002-roadmap-grounding-02`
 - `worker-loop-003-roadmap-grounding-03`
 
-After endpoint recovery, the controller progressed through 120 queued worker stages and then repeatedly selected the closeout stage `Create overnight status and evidence manifest.` instead of treating queue exhaustion as terminal.
+After endpoint recovery, the controller progressed through the 120 queued worker stages and then repeatedly selected the synthetic closeout stage `Create overnight status and evidence manifest.` instead of treating queue exhaustion as terminal.
 
 That repeated closeout stage was the failure mechanism:
 
@@ -36,15 +36,21 @@ That repeated closeout stage was the failure mechanism:
 
 ## Final Run Facts
 
-- 120 queued worker stages completed after recovery
-- 174 total run directories
-- 171 saved raw model outputs
+- 120 queued worker stages were queued
+- 117 worker stages produced model outputs under the old lifecycle semantics
+- 3 worker stages remained blocked
+- 54 repeated synthetic closeout executions occurred after queue exhaustion
+- 171 model outputs = 117 worker outputs + 54 closeout outputs
+- 174 run directories = 120 worker directories + 54 closeout directories
 - 68 deadline mentions in the preserved evidence set
 - Final authoritative stage distribution:
   - `ready_for_review`: 118
   - `review`: 3
 - Final queue state: exhausted, but not terminal in the preserved launch artifact
+- Final recorded transition: `2026-07-19T07:55:37-04:00`
 - Final lifecycle weakness: semantic review was still being treated as successfully reviewed output even when the content was only structurally acceptable
+
+The historical `118 ready_for_review` unique-stage count is therefore `117` worker stages plus the synthetic closeout stage under the old coarse semantics.
 
 ## Schema Drift And Changed-Path Findings
 
@@ -103,4 +109,3 @@ The repeated closeout defect is now treated as a terminal-state bug rather than 
 - `.work/dogfood/overnight/runs/20260719_001012-worker-loop-001-roadmap-grounding-01/`
 - `.work/dogfood/overnight/runs/20260719_001018-worker-loop-002-roadmap-grounding-02/`
 - `.work/dogfood/overnight/runs/20260719_001034-worker-loop-003-roadmap-grounding-03/`
-

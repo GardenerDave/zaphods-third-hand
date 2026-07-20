@@ -47,13 +47,19 @@ def validate(payload: dict, *, deadline_reached: bool, allow_paths: list[str]) -
             errors.append("changed_paths_allowlist")
             break
     notes = payload.get("notes", "")
-    if re.search(r"\bdeadline\b", notes, re.I) and not deadline_reached:
-        errors.append("deadline_contradiction")
-    if any(token in notes.lower() for token in ["waiting", "pending processing", "will review"]):
+    normalized = notes.lower()
+    if deadline_reached:
+        if "deadline not reached" in normalized:
+            errors.append("deadline_contradiction")
+    else:
+        if "deadline reached" in normalized and "deadline not reached" not in normalized:
+            errors.append("deadline_contradiction")
+    if any(token in normalized for token in ["waiting", "pending processing", "will review"]):
         errors.append("placeholder_notes")
-    semantic_ok = not errors
-    if semantic_ok and payload["review_state"] == "complete" and payload["verdict"] == "pass":
+    if not errors and payload["review_state"] == "complete" and payload["verdict"] in {"pass", "fail"}:
         result = "ready_for_review"
+    elif payload["review_state"] == "incomplete" and payload["verdict"] == "incomplete" and not errors:
+        result = "semantic_validation_failed"
     elif "deadline_contradiction" in errors:
         result = "semantic_validation_failed"
     elif "evidence_required" in errors or "notes_required" in errors:

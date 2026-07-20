@@ -1,0 +1,19 @@
+{
+  "verdict": "fail",
+  "review_state": "complete",
+  "changed_paths": [
+    "docs/ROADMAP.md"
+  ],
+  "verification": {
+    "raw_output_structure": "pass",
+    "changed_files_against_allowlist": "pass",
+    "narrowest_relevant_local_checks": "pass"
+  },
+  "evidence": [
+    {
+      "path": "docs/ROADMAP.md",
+      "observation": "failure evidence retained"
+    }
+  ],
+  "notes": "deadline not reached; negative review complete"
+}

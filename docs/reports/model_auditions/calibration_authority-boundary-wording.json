@@ -1,0 +1,19 @@
+{
+  "verdict": "pass",
+  "review_state": "complete",
+  "changed_paths": [
+    "docs/ROADMAP.md"
+  ],
+  "verification": {
+    "raw_output_structure": "pass",
+    "changed_files_against_allowlist": "pass",
+    "narrowest_relevant_local_checks": "pass"
+  },
+  "evidence": [
+    {
+      "path": "docs/ROADMAP.md",
+      "observation": "authority boundary wording verified"
+    }
+  ],
+  "notes": "deadline not reached; review complete"
+}

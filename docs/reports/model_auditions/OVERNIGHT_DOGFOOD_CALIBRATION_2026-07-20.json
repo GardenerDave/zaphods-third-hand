@@ -1,0 +1,136 @@
+{
+  "schema": "overnight_dogfood_calibration_v1",
+  "endpoint_check": {
+    "performed": false,
+    "reason": "live calibration skipped; deterministic fixture calibration used"
+  },
+  "records": [
+    {
+      "family": "roadmap-grounding",
+      "fixture_path": "docs/reports/model_auditions/calibration_roadmap-grounding.json",
+      "label": "complete-pass",
+      "expected_classification": "ready_for_review",
+      "validator_result": "ready_for_review",
+      "errors": [],
+      "ready_for_review": true
+    },
+    {
+      "family": "docs-index-consistency",
+      "fixture_path": "docs/reports/model_auditions/calibration_docs-index-consistency.json",
+      "label": "complete-fail",
+      "expected_classification": "ready_for_review",
+      "validator_result": "ready_for_review",
+      "errors": [],
+      "ready_for_review": true
+    },
+    {
+      "family": "dogfood-artifact-validation",
+      "fixture_path": "docs/reports/model_auditions/calibration_dogfood-artifact-validation.json",
+      "label": "incomplete-incomplete",
+      "expected_classification": "semantic_validation_failed",
+      "validator_result": "semantic_validation_failed",
+      "errors": [],
+      "ready_for_review": false
+    },
+    {
+      "family": "prompt-patch-fixture-review",
+      "fixture_path": "docs/reports/model_auditions/calibration_prompt-patch-fixture-review.json",
+      "label": "malformed",
+      "expected_classification": "structure_valid",
+      "validator_result": "structure_valid",
+      "errors": [
+        "verification_keys",
+        "narrowest_relevant_local_checks_enum"
+      ],
+      "ready_for_review": false
+    },
+    {
+      "family": "candidate-export-rehearsal",
+      "fixture_path": "docs/reports/model_auditions/calibration_candidate-export-rehearsal.json",
+      "label": "contradictory",
+      "expected_classification": "semantic_validation_failed",
+      "validator_result": "semantic_validation_failed",
+      "errors": [
+        "deadline_contradiction"
+      ],
+      "ready_for_review": false
+    },
+    {
+      "family": "authority-boundary-wording",
+      "fixture_path": "docs/reports/model_auditions/calibration_authority-boundary-wording.json",
+      "label": "structure-valid-pass",
+      "expected_classification": "ready_for_review",
+      "validator_result": "semantic_validation_failed",
+      "errors": [
+        "changed_paths_allowlist"
+      ],
+      "ready_for_review": false
+    },
+    {
+      "family": "evidence-retention",
+      "fixture_path": "docs/reports/model_auditions/calibration_evidence-retention.json",
+      "label": "structure-valid-fail",
+      "expected_classification": "ready_for_review",
+      "validator_result": "semantic_validation_failed",
+      "errors": [
+        "changed_paths_allowlist"
+      ],
+      "ready_for_review": false
+    },
+    {
+      "family": "queue-state-consistency",
+      "fixture_path": "docs/reports/model_auditions/calibration_queue-state-consistency.json",
+      "label": "allowlist-fail",
+      "expected_classification": "semantic_validation_failed",
+      "validator_result": "semantic_validation_failed",
+      "errors": [
+        "changed_paths_repo_relative"
+      ],
+      "ready_for_review": false
+    },
+    {
+      "family": "closeout-skeleton",
+      "fixture_path": "docs/reports/model_auditions/calibration_closeout-skeleton.json",
+      "label": "evidence-empty",
+      "expected_classification": "semantic_validation_failed",
+      "validator_result": "semantic_validation_failed",
+      "errors": [
+        "evidence_required"
+      ],
+      "ready_for_review": false
+    },
+    {
+      "family": "failure-preservation",
+      "fixture_path": "docs/reports/model_auditions/calibration_failure-preservation.json",
+      "label": "placeholder-notes",
+      "expected_classification": "semantic_validation_failed",
+      "validator_result": "semantic_validation_failed",
+      "errors": [
+        "placeholder_notes"
+      ],
+      "ready_for_review": false
+    },
+    {
+      "family": "evidence-packet-sanity",
+      "fixture_path": "docs/reports/model_auditions/calibration_evidence-packet-sanity.json",
+      "label": "deadline-true-contradiction",
+      "expected_classification": "semantic_validation_failed",
+      "validator_result": "semantic_validation_failed",
+      "errors": [
+        "deadline_contradiction"
+      ],
+      "ready_for_review": false
+    },
+    {
+      "family": "review-bundle-completeness",
+      "fixture_path": "docs/reports/model_auditions/calibration_review-bundle-completeness.json",
+      "label": "unsupported-changed-path",
+      "expected_classification": "semantic_validation_failed",
+      "validator_result": "semantic_validation_failed",
+      "errors": [
+        "changed_paths_allowlist"
+      ],
+      "ready_for_review": false
+    }
+  ]
+}

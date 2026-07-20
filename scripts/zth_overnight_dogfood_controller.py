@@ -9,7 +9,9 @@ import subprocess
 import sys
 import time
 import urllib.error
+import urllib.error
 import urllib.request
+from dataclasses import dataclass
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -25,10 +27,10 @@ CLOSEOUT_MANIFEST = WORK / "manifests" / "overnight_run_manifest.json"
 RUNS_DIR = WORK / "runs"
 LOG_DIR = WORK / "logs"
 MANIFEST_DIR = WORK / "manifests"
-RUN_ID = dt.datetime.now().strftime("%Y%m%d_%H%M%S")
 DEFAULT_DEADLINE = dt.datetime(2026, 7, 19, 8, 0, tzinfo=ZoneInfo("America/New_York"))
 MAX_STAGES = 3
 MAX_MODEL_ATTEMPTS = 3
+RUN_ID = dt.datetime.now(tz=ZoneInfo("America/New_York")).strftime("%Y%m%d_%H%M%S")
 
 
 def load_env() -> None:
@@ -146,6 +148,28 @@ def stage_dir(slug: str) -> Path:
     return RUNS_DIR / f"{RUN_ID}-{slug}"
 
 
+def _write_json(path: Path, payload: dict) -> None:
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def _transport_diag(exc: BaseException, *, attempt: int, retryable: bool, body: str | None = None, http_status: int | None = None) -> dict:
+    diag = {
+        "attempt": attempt,
+        "exception_type": type(exc).__name__,
+        "http_status": http_status,
+        "response_excerpt": body[:512] if body else None,
+        "stderr": str(getattr(exc, "reason", exc)),
+        "timestamp": now().isoformat(),
+        "endpoint_alias": os.environ.get("ZTH_PUBLIC_HOST_ALIAS", "JARVIS_LOCAL"),
+        "retryable": retryable,
+        "retryable_reason": "transport" if retryable else "non_retryable",
+    }
+    if isinstance(exc, urllib.error.HTTPError):
+        diag["http_status"] = exc.code
+        diag["stderr"] = str(exc.reason)
+    return diag
+
+
 def call_model(packet_path: Path, out_path: Path) -> dict:
     fixture = os.environ.get("ZTH_OVERNIGHT_MODEL_RESPONSE_FILE")
     if fixture:
@@ -175,10 +199,10 @@ def call_model(packet_path: Path, out_path: Path) -> dict:
     return data
 
 
-def classify_output(content_path: Path, deadline_reached: bool) -> tuple[str, list[str], dict]:
+def classify_output(content_path: Path, deadline_reached: bool, allow_paths: list[str]) -> tuple[str, list[str], dict]:
     validator = REPO / "scripts" / "zth_validate_overnight_review_output.py"
     proc = subprocess.run(
-        [sys.executable, str(validator), str(content_path), "true" if deadline_reached else "false", ".work/dogfood/overnight"],
+        [sys.executable, str(validator), str(content_path), "true" if deadline_reached else "false", *allow_paths],
         cwd=REPO,
         text=True,
         capture_output=True,
@@ -187,6 +211,17 @@ def classify_output(content_path: Path, deadline_reached: bool) -> tuple[str, li
     payload = json.loads(proc.stdout or "{}")
     state = payload.get("state", "semantic_validation_failed")
     return state, payload.get("errors", []), {"stdout": proc.stdout, "stderr": proc.stderr, "returncode": proc.returncode}
+
+
+def queue_allowlist() -> list[str]:
+    allow = []
+    if QUEUE.exists():
+        with QUEUE.open(encoding="utf-8") as fh:
+            for row in csv.reader(fh, delimiter="\t"):
+                if not row or row[0].startswith("#") or len(row) < 3:
+                    continue
+                allow.append(f".work/dogfood/overnight/runs/{row[0]}-{row[1]}")
+    return allow
 
 
 def write_terminal_marker_once() -> None:
@@ -215,8 +250,9 @@ def write_terminal_marker_once() -> None:
             "deadline_reached": now() >= deadline(),
             "latest_stage": latest[1] if latest else None,
         }
-        TERMINAL_STATE.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
-        CLOSEOUT_MANIFEST.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+        _write_json(TERMINAL_STATE, summary)
+        if not CLOSEOUT_MANIFEST.exists():
+            _write_json(CLOSEOUT_MANIFEST, summary)
         record([RUN_ID, "queue_exhausted", "terminal", str(WORK), "queue_exhausted", summary["closed_at"]])
 
 
@@ -229,43 +265,56 @@ def run_stage(slug: str, title: str, desc: str, dry_run: bool) -> int:
     packet = packet_for_stage(slug, title, desc, deadline_reached=now() >= deadline())
     packet_path = d / "stage_packet.md"
     packet_path.write_text(packet, encoding="utf-8")
-    record([RUN_ID, slug, "started", str(d), "model_output_captured", now().isoformat()])
+    record([RUN_ID, slug, "started", str(d), "started", now().isoformat()])
     for attempt in range(1, MAX_MODEL_ATTEMPTS + 1):
+        record([RUN_ID, slug, "model_call_attempted", str(d), "model_call_attempted", now().isoformat()])
         raw = d / f"model_output.raw.{attempt}.json"
         err = d / f"model_call.{attempt}.error"
         try:
-            call_model(packet_path, raw)
-        except Exception as exc:
-            diag = {
-                "attempt": attempt,
-                "exit_code": 1,
-                "http_status": None,
-                "client_exit_code": 1,
-                "stderr": str(exc),
-                "response_excerpt": None,
-                "timestamp": now().isoformat(),
-                "endpoint_alias": os.environ.get("ZTH_PUBLIC_HOST_ALIAS", "JARVIS_LOCAL"),
-                "retryable": True,
-            }
-            err.write_text(json.dumps(diag, indent=2) + "\n", encoding="utf-8")
+            response = call_model(packet_path, raw)
+            if isinstance(response, dict):
+                record([RUN_ID, slug, "model_output_captured", str(d), "model_output_captured", now().isoformat()])
+            else:
+                raise ValueError("unexpected model response envelope")
+        except urllib.error.HTTPError as exc:
+            err.write_text(json.dumps(_transport_diag(exc, attempt=attempt, retryable=True, body=exc.read().decode("utf-8", errors="replace") if hasattr(exc, "read") else None), indent=2) + "\n", encoding="utf-8")
             continue
-        content = json.loads(raw.read_text(encoding="utf-8"))["choices"][0]["message"]["content"]
+        except urllib.error.URLError as exc:
+            err.write_text(json.dumps(_transport_diag(exc, attempt=attempt, retryable=True), indent=2) + "\n", encoding="utf-8")
+            continue
+        except TimeoutError as exc:
+            err.write_text(json.dumps(_transport_diag(exc, attempt=attempt, retryable=True), indent=2) + "\n", encoding="utf-8")
+            continue
+        except Exception as exc:
+            err.write_text(json.dumps(_transport_diag(exc, attempt=attempt, retryable=False), indent=2) + "\n", encoding="utf-8")
+            continue
+        try:
+            content = json.loads(raw.read_text(encoding="utf-8"))["choices"][0]["message"]["content"]
+        except Exception as exc:
+            err.write_text(json.dumps(_transport_diag(exc, attempt=attempt, retryable=False), indent=2) + "\n", encoding="utf-8")
+            record([RUN_ID, slug, "structure_validation_failed", str(d), "structure_validation_failed", now().isoformat()])
+            continue
         content_path = d / f"model_content.{attempt}.json"
         content_path.write_text(content, encoding="utf-8")
         try:
             json.loads(content)
         except json.JSONDecodeError as exc:
-            err.write_text(json.dumps({"attempt": attempt, "stderr": str(exc)}, indent=2) + "\n", encoding="utf-8")
-            record([RUN_ID, slug, "structure_valid", str(d), "semantic_validation_failed", now().isoformat()])
+            err.write_text(json.dumps(_transport_diag(exc, attempt=attempt, retryable=False), indent=2) + "\n", encoding="utf-8")
+            record([RUN_ID, slug, "structure_validation_failed", str(d), "structure_validation_failed", now().isoformat()])
             continue
-        state, errors, validation = classify_output(content_path, deadline_reached=now() >= deadline())
-        (d / f"validation.{attempt}.json").write_text(json.dumps({"state": state, "errors": errors, "validation": validation}, indent=2) + "\n", encoding="utf-8")
+        record([RUN_ID, slug, "structure_valid", str(d), "structure_valid", now().isoformat()])
+        state, errors, validation = classify_output(content_path, deadline_reached=now() >= deadline(), allow_paths=queue_allowlist())
+        _write_json(d / f"validation.{attempt}.json", {"state": state, "errors": errors, "validation": validation})
+        if state == "semantic_validation_failed":
+            record([RUN_ID, slug, "semantic_validation_failed", str(d), "semantic_validation_failed", now().isoformat()])
         if state == "ready_for_review":
             (d / "model_output.raw.json").write_text(raw.read_text(encoding="utf-8"), encoding="utf-8")
             (d / "model_content.json").write_text(content, encoding="utf-8")
-            record([RUN_ID, slug, "completed", str(d), "ready_for_review", now().isoformat()])
+            record([RUN_ID, slug, "semantic_validation_passed", str(d), "semantic_validation_passed", now().isoformat()])
+            record([RUN_ID, slug, "ready_for_review", str(d), "ready_for_review", now().isoformat()])
             return 0
-        record([RUN_ID, slug, "semantic_validation_failed", str(d), state, now().isoformat()])
+        if state == "structure_valid":
+            record([RUN_ID, slug, "structure_validation_failed", str(d), "structure_validation_failed", now().isoformat()])
     record([RUN_ID, slug, "blocked", str(d), "blocked", now().isoformat()])
     return 1
 
@@ -273,36 +322,46 @@ def run_stage(slug: str, title: str, desc: str, dry_run: bool) -> int:
 def status_payload() -> dict:
     rows = read_rows()
     latest = latest_stage_states()
-    unique = latest
-    completed = sum(1 for v in unique.values() if v["state"] == "ready_for_review")
-    blocked = sum(1 for v in unique.values() if v["state"] == "blocked")
-    semantic_failed = sum(1 for v in unique.values() if v["state"] == "semantic_validation_failed")
-    ready = sum(1 for v in unique.values() if v["state"] == "ready_for_review")
-    terminal = TERMINAL_STATE.exists()
+    queue_ids = []
     if QUEUE.exists():
-        queue_total = sum(1 for row in csv.reader(QUEUE.open(encoding="utf-8"), delimiter="\t") if row and not row[0].startswith("#"))
-    else:
-        queue_total = 0
+        with QUEUE.open(encoding="utf-8") as fh:
+            for row in csv.reader(fh, delimiter="\t"):
+                if row and not row[0].startswith("#") and len(row) >= 2:
+                    queue_ids.append(row[1])
+    attempted = {stage for stage in latest if stage in queue_ids}
+    completed = sum(1 for s in attempted if latest[s]["state"] == "ready_for_review")
+    blocked = sum(1 for s in attempted if latest[s]["state"] == "blocked")
+    semantic_failed = sum(1 for s in attempted if latest[s]["state"] == "semantic_validation_failed")
+    ready = completed
+    terminal = TERMINAL_STATE.exists()
+    queue_total = len(queue_ids)
+    queue_remaining = max(queue_total - len(attempted), 0)
     payload = {
         "deadline_local": deadline().isoformat(),
-        "attempted_unique_stages": len(unique),
+        "attempted_unique_stages": len(attempted),
+        "queue_stage_total": queue_total,
+        "queue_stages_attempted": len(attempted),
+        "queue_stages_ready_for_review": ready,
+        "queue_stages_failed_semantic_validation": semantic_failed,
+        "queue_stages_blocked": blocked,
+        "queue_stages_unresolved": sum(1 for s in attempted if latest[s]["state"] not in {"ready_for_review", "blocked", "semantic_validation_failed"}),
         "queue_path": str(QUEUE),
         "state_path": str(STATE),
         "completed_stages": completed,
         "blocked_stages": blocked,
         "semantic_validation_failures": semantic_failed,
         "ready_for_review_count": ready,
-        "unresolved_count": sum(1 for v in unique.values() if v["state"] not in {"ready_for_review", "blocked", "semantic_validation_failed"}),
-        "queue_remaining": 0 if terminal else max(queue_total - len(unique), 0),
+        "unresolved_count": sum(1 for s in attempted if latest[s]["state"] not in {"ready_for_review", "blocked", "semantic_validation_failed"}),
+        "queue_remaining": 0 if terminal else queue_remaining,
         "queue_exhausted": terminal,
         "deadline_reached": now() >= deadline(),
         "terminal_run_state": json.loads(TERMINAL_STATE.read_text(encoding="utf-8"))["terminal_state"] if terminal else None,
         "latest_stage": rows[-1][1] if rows else None,
         "latest_transition_time": rows[-1][-1] if rows else None,
-        "working_tree_state": subprocess.run(["git", "status", "--short", "--untracked-files=no"], cwd=REPO, text=True, capture_output=True).stdout.strip() or "clean",
+        "working_tree_state": subprocess.run(["git", "status", "--short", "--untracked-files=all"], cwd=REPO, text=True, capture_output=True).stdout.strip() or "clean",
         "closeout_path": str(CLOSEOUT_MANIFEST) if CLOSEOUT_MANIFEST.exists() else None,
     }
-    STATUS_FILE.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    _write_json(STATUS_FILE, payload)
     return payload
 
 

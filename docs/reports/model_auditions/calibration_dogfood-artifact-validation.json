@@ -1,0 +1,17 @@
+{
+  "verdict": "incomplete",
+  "review_state": "incomplete",
+  "changed_paths": [],
+  "verification": {
+    "raw_output_structure": "not_applicable",
+    "changed_files_against_allowlist": "not_applicable",
+    "narrowest_relevant_local_checks": "not_run"
+  },
+  "evidence": [
+    {
+      "path": "docs/ROADMAP.md",
+      "observation": "partial evidence retained"
+    }
+  ],
+  "notes": "deadline not reached; incomplete"
+}

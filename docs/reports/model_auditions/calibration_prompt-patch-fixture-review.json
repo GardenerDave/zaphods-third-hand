@@ -1,0 +1,16 @@
+{
+  "verdict": "pass",
+  "review_state": "complete",
+  "changed_paths": [],
+  "verification": {
+    "raw_output_structure": "pass",
+    "changed_files_against_allowlist": "pass"
+  },
+  "evidence": [
+    {
+      "path": "docs/ROADMAP.md",
+      "observation": "x"
+    }
+  ],
+  "notes": "deadline not reached; review complete"
+}
