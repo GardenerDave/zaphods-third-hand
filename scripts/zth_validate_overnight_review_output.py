@@ -12,7 +12,11 @@ ALLOWED_REVIEW_STATES = {"complete", "incomplete"}
 ALLOWED_VERIFICATION = {"pass", "fail", "not_applicable", "not_run"}
 
 
-def _load_repo_relative(path: str, allow_paths: list[str]) -> bool:
+def _is_repo_relative(path: str) -> bool:
+    return not path.startswith("/") and ".." not in path
+
+
+def _path_allowed(path: str, allow_paths: list[str]) -> bool:
     return any(path == p or path.startswith(p.rstrip("/") + "/") for p in allow_paths)
 
 
@@ -45,27 +49,41 @@ def validate(payload: dict, *, deadline_reached: bool, allow_paths: list[str]) -
             if payload["verification"].get(key) not in ALLOWED_VERIFICATION:
                 errors.append(f"{key}_enum")
     for path in payload.get("changed_paths", []):
-        if not isinstance(path, str) or path.startswith("/") or ".." in path:
+        if not isinstance(path, str) or not _is_repo_relative(path):
             errors.append("changed_paths_repo_relative")
             break
-        if allow_paths and not any(path == p or path.startswith(p.rstrip("/") + "/") for p in allow_paths):
+        if allow_paths and not _path_allowed(path, allow_paths):
             errors.append("changed_paths_allowlist")
             break
     repo_root = Path(os.environ.get("ZTH_REPO", Path.cwd()))
     for item in payload.get("evidence", []):
-        if not isinstance(item, dict) or set(item) != {"path", "observation"}:
+        if not isinstance(item, dict):
             errors.append("evidence_keys")
             break
         path = item["path"]
         observation = item["observation"]
-        if not isinstance(path, str) or path.startswith("/") or ".." in path:
+        existence = item.get("existence")
+        if set(item) != {"path", "observation", "existence"}:
+            errors.append("evidence_keys")
+            break
+        if not isinstance(path, str) or not _is_repo_relative(path):
             errors.append("evidence_path")
             break
         if not isinstance(observation, str) or not observation.strip():
             errors.append("evidence_observation")
             break
-        if not (repo_root / path).exists() and not path.startswith(".work/dogfood/overnight/"):
+        if existence not in {"present", "absent"}:
+            errors.append("evidence_existence")
+            break
+        exists = (repo_root / path).exists()
+        if existence == "present" and not exists:
             errors.append("evidence_path_missing")
+            break
+        if existence == "absent" and exists:
+            errors.append("evidence_path_present")
+            break
+        if not _path_allowed(path, allow_paths):
+            errors.append("evidence_allowlist")
             break
     notes = payload.get("notes", "")
     normalized = notes.lower()

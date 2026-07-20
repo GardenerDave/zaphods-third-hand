@@ -507,7 +507,7 @@ def test_overnight_validator_rejects_invalid_schema_and_deadline_contradiction(t
                     "changed_files_against_allowlist": "pass",
                     "narrowest_relevant_local_checks": "pass",
                 },
-                "evidence": [{"path": "docs/ROADMAP.md", "observation": "evidence"}],
+                "evidence": [{"path": "docs/ROADMAP.md", "observation": "evidence", "existence": "present"}],
                 "notes": "deadline reached and complete",
             },
             indent=2,
@@ -534,7 +534,7 @@ def test_overnight_validator_rejects_invalid_schema_and_deadline_contradiction(t
                     "changed_files_against_allowlist": "not_applicable",
                     "narrowest_relevant_local_checks": "not_run",
                 },
-                "evidence": [{"path": "docs/ROADMAP.md", "observation": "evidence"}],
+                "evidence": [{"path": "docs/ROADMAP.md", "observation": "evidence", "existence": "present"}],
                 "notes": "deadline not reached; review complete",
             },
             False,
@@ -550,7 +550,7 @@ def test_overnight_validator_rejects_invalid_schema_and_deadline_contradiction(t
                     "changed_files_against_allowlist": "not_applicable",
                     "narrowest_relevant_local_checks": "not_run",
                 },
-                "evidence": [{"path": "docs/ROADMAP.md", "observation": "negative evidence"}],
+                "evidence": [{"path": "docs/ROADMAP.md", "observation": "negative evidence", "existence": "present"}],
                 "notes": "deadline not reached; validation failure recorded",
             },
             False,
@@ -566,7 +566,7 @@ def test_overnight_validator_rejects_invalid_schema_and_deadline_contradiction(t
                     "changed_files_against_allowlist": "not_applicable",
                     "narrowest_relevant_local_checks": "not_run",
                 },
-                "evidence": [{"path": "docs/ROADMAP.md", "observation": "partial evidence"}],
+                "evidence": [{"path": "docs/ROADMAP.md", "observation": "partial evidence", "existence": "present"}],
                 "notes": "deadline not reached; incomplete",
             },
             False,
@@ -583,7 +583,7 @@ def test_overnight_validator_rejects_invalid_schema_and_deadline_contradiction(t
                     "narrowest_relevant_local_checks": "pass",
                     "invented": "nope",
                 },
-                "evidence": [{"path": "docs/ROADMAP.md", "observation": "evidence"}],
+                "evidence": [{"path": "docs/ROADMAP.md", "observation": "evidence", "existence": "present"}],
                 "notes": "deadline not reached; review complete",
             },
             False,
@@ -594,7 +594,7 @@ def test_overnight_validator_rejects_invalid_schema_and_deadline_contradiction(t
 def test_overnight_validator_classifies_complete_incomplete_and_schema_cases(tmp_path, payload, deadline_reached, expected_state):
     sample = tmp_path / "sample.json"
     sample.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-    result = _run([str(OVERNIGHT_VALIDATOR), str(sample), "true" if deadline_reached else "false", ".work/dogfood/overnight"], cwd=ROOT)
+    result = _run([str(OVERNIGHT_VALIDATOR), str(sample), "true" if deadline_reached else "false", "docs/ROADMAP.md"], cwd=ROOT)
     if expected_state in {"ready_for_review", "semantic_validation_failed", "incomplete"}:
         assert result.returncode == 0
     else:
@@ -616,18 +616,74 @@ def test_overnight_validator_rejects_semantically_contradictory_deadline(tmp_pat
                     "changed_files_against_allowlist": "pass",
                     "narrowest_relevant_local_checks": "not_run",
                 },
-                "evidence": [{"path": "docs/ROADMAP.md", "observation": "evidence"}],
+                "evidence": [{"path": "docs/ROADMAP.md", "observation": "evidence", "existence": "present"}],
                 "notes": "deadline reached and complete",
             },
             indent=2,
         ),
         encoding="utf-8",
     )
-    result = _run([str(OVERNIGHT_VALIDATOR), str(sample), "false", ".work/dogfood/overnight"], cwd=ROOT)
+    result = _run([str(OVERNIGHT_VALIDATOR), str(sample), "false", "docs/ROADMAP.md"], cwd=ROOT)
     assert result.returncode != 0
     payload = json.loads(result.stdout)
     assert payload["state"] == "semantic_validation_failed"
     assert "deadline_contradiction" in payload["errors"]
+
+
+def test_overnight_validator_requires_stage_specific_allowlist(tmp_path):
+    sample = tmp_path / "sample.json"
+    sample.write_text(
+        json.dumps(
+            {
+                "verdict": "pass",
+                "review_state": "complete",
+                "changed_paths": ["docs/ROADMAP.md"],
+                "verification": {
+                    "raw_output_structure": "pass",
+                    "changed_files_against_allowlist": "pass",
+                    "narrowest_relevant_local_checks": "pass",
+                },
+                "evidence": [{"path": "docs/ROADMAP.md", "observation": "evidence", "existence": "present"}],
+                "notes": "deadline not reached; review complete",
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    stage_a = ["docs/ROADMAP.md"]
+    stage_b = ["docs/reports/model_auditions/README.md"]
+    result_a = _run([str(OVERNIGHT_VALIDATOR), str(sample), "false", *stage_a], cwd=ROOT)
+    result_b = _run([str(OVERNIGHT_VALIDATOR), str(sample), "false", *stage_b], cwd=ROOT)
+    assert json.loads(result_a.stdout)["state"] == "ready_for_review"
+    assert json.loads(result_b.stdout)["state"] == "semantic_validation_failed"
+    assert "changed_paths_allowlist" in json.loads(result_b.stdout)["errors"] or "evidence_allowlist" in json.loads(result_b.stdout)["errors"]
+
+
+def test_overnight_validator_rejects_invalid_evidence_shapes(tmp_path):
+    sample = tmp_path / "sample.json"
+    sample.write_text(
+        json.dumps(
+            {
+                "verdict": "pass",
+                "review_state": "complete",
+                "changed_paths": [],
+                "verification": {
+                    "raw_output_structure": "pass",
+                    "changed_files_against_allowlist": "not_applicable",
+                    "narrowest_relevant_local_checks": "not_run",
+                },
+                "evidence": [{"path": "/tmp/x", "observation": "", "existence": "present"}],
+                "notes": "deadline not reached; review complete",
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    result = _run([str(OVERNIGHT_VALIDATOR), str(sample), "false", "docs/ROADMAP.md"], cwd=ROOT)
+    assert result.returncode != 0
+    payload = json.loads(result.stdout)
+    assert payload["state"] == "semantic_validation_failed"
+    assert "evidence_path" in payload["errors"] or "evidence_observation" in payload["errors"]
 
 
 def test_overnight_install_and_uninstall_helpers_with_stubbed_crontab(tmp_path):
@@ -677,7 +733,7 @@ def test_overnight_queue_exhaustion_is_terminal_and_idempotent(tmp_path):
                                         "changed_files_against_allowlist": "not_applicable",
                                         "narrowest_relevant_local_checks": "not_run",
                                     },
-                                    "evidence": [{"path": "docs/ROADMAP.md", "observation": "ok"}],
+                                    "evidence": [{"path": "docs/ROADMAP.md", "observation": "ok", "existence": "present"}],
                                     "notes": "evidence-based review",
                                 }
                             )
@@ -720,6 +776,62 @@ def test_overnight_queue_exhaustion_is_terminal_and_idempotent(tmp_path):
         assert status["closeout_path"].endswith("overnight_closeout_manifest.json")
     finally:
         pass
+
+
+def test_overnight_incomplete_stage_remains_unresolved_and_prevents_closeout(tmp_path):
+    snapshot = _make_snapshot(tmp_path, remove_paths=[
+        "docs/reports/model_auditions/QUEUE_APPROVAL_REVIEW_COMMAND_CALIBRATION_SYNTHESIS_2026-07-18.md",
+        "docs/reports/model_auditions/DECLARATIVE_LONG_DURATION_MILESTONE_MAP_CALIBRATION_SYNTHESIS_2026-07-18.md",
+        "docs/reports/model_auditions/LONG_DURATION_DOGFOOD_CLOSEOUT_2026-07-18.md",
+    ])
+    queue = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
+    queue.parent.mkdir(parents=True, exist_ok=True)
+    queue.write_text("1\tone-stage\tOne stage\n", encoding="utf-8")
+    response = snapshot / "model_response.json"
+    response.write_text(
+        json.dumps(
+            {
+                "choices": [
+                    {
+                        "message": {
+                            "content": json.dumps(
+                                {
+                                    "verdict": "incomplete",
+                                    "review_state": "incomplete",
+                                    "changed_paths": [],
+                                    "verification": {
+                                        "raw_output_structure": "not_applicable",
+                                        "changed_files_against_allowlist": "not_applicable",
+                                        "narrowest_relevant_local_checks": "not_run",
+                                    },
+                                    "evidence": [{"path": "docs/ROADMAP.md", "observation": "partial", "existence": "present"}],
+                                    "notes": "deadline not reached; incomplete",
+                                }
+                            )
+                        }
+                    }
+                ]
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    env = {
+        "ZTH_REPO": str(snapshot),
+        "ZTH_OVERNIGHT_MODEL_RESPONSE_FILE": str(response),
+        "ZTH_PUBLIC_HOST_ALIAS": "LOCAL_STUB",
+        "ZTH_OVERNIGHT_DEADLINE": "2099-01-01T08:00:00-05:00",
+    }
+    result = _run([str(OVERNIGHT_CONTROLLER), "--tick"], cwd=snapshot, env=env)
+    assert result.returncode == 0, result.stderr
+    status = _read_json(snapshot / ".work" / "dogfood" / "overnight" / "status.json")
+    assert status["incomplete_count"] == 1
+    assert status["queue_remaining"] == 1
+    assert not (snapshot / ".work" / "dogfood" / "overnight" / "terminal_state.json").exists()
+    second = _run([str(OVERNIGHT_CONTROLLER), "--tick"], cwd=snapshot, env=env)
+    assert second.returncode == 0, second.stderr
+    rows = (snapshot / ".work" / "dogfood" / "overnight" / "state.tsv").read_text(encoding="utf-8").splitlines()
+    assert any("\tincomplete\t" in row for row in rows)
 
 
 def test_overnight_failed_call_does_not_write_model_output_captured(tmp_path):
@@ -773,6 +885,67 @@ def test_overnight_retryability_distinguishes_transport_failures(tmp_path):
     assert excerpt == "nope"
 
 
+def test_overnight_recovery_manifest_links_prior_evidence(tmp_path):
+    snapshot = _make_snapshot(tmp_path, remove_paths=[
+        "docs/reports/model_auditions/QUEUE_APPROVAL_REVIEW_COMMAND_CALIBRATION_SYNTHESIS_2026-07-18.md",
+        "docs/reports/model_auditions/DECLARATIVE_LONG_DURATION_MILESTONE_MAP_CALIBRATION_SYNTHESIS_2026-07-18.md",
+        "docs/reports/model_auditions/LONG_DURATION_DOGFOOD_CLOSEOUT_2026-07-18.md",
+    ])
+    queue = snapshot / ".work" / "dogfood" / "roadmap_queue.tsv"
+    queue.parent.mkdir(parents=True, exist_ok=True)
+    queue.write_text("1\tone-stage\tOne stage\n", encoding="utf-8")
+    prior = snapshot / ".work" / "dogfood" / "overnight" / "runs" / "20260719_000001-one-stage"
+    prior.mkdir(parents=True, exist_ok=True)
+    (prior / "model_output.raw.1.json").write_text("{}", encoding="utf-8")
+    state = snapshot / ".work" / "dogfood" / "overnight" / "state.tsv"
+    state.parent.mkdir(parents=True, exist_ok=True)
+    state.write_text(
+        "r1\tone-stage\tstarted\t" + str(prior) + "\tstarted\t2026-07-19T00:00:01-04:00\n",
+        encoding="utf-8",
+    )
+    response = snapshot / "model_response.json"
+    response.write_text(
+        json.dumps(
+            {
+                "choices": [
+                    {
+                        "message": {
+                            "content": json.dumps(
+                                {
+                                    "verdict": "pass",
+                                    "review_state": "complete",
+                                    "changed_paths": [],
+                                    "verification": {
+                                        "raw_output_structure": "pass",
+                                        "changed_files_against_allowlist": "not_applicable",
+                                        "narrowest_relevant_local_checks": "not_run",
+                                    },
+                                    "evidence": [{"path": "docs/ROADMAP.md", "observation": "ok", "existence": "present"}],
+                                    "notes": "deadline not reached; review complete",
+                                }
+                            )
+                        }
+                    }
+                ]
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    env = {
+        "ZTH_REPO": str(snapshot),
+        "ZTH_OVERNIGHT_MODEL_RESPONSE_FILE": str(response),
+        "ZTH_PUBLIC_HOST_ALIAS": "LOCAL_STUB",
+        "ZTH_OVERNIGHT_DEADLINE": "2099-01-01T08:00:00-05:00",
+    }
+    result = _run([str(OVERNIGHT_CONTROLLER), "--tick"], cwd=snapshot, env=env)
+    assert result.returncode == 0, result.stderr
+    latest_run = sorted((snapshot / ".work" / "dogfood" / "overnight" / "runs").glob("*"))[-1]
+    recovery = _read_json(latest_run / "recovery_manifest.json")
+    assert recovery["prior_directory"] == str(prior)
+    assert recovery["prior_lifecycle_state"] == "started"
+
+
 @pytest.mark.parametrize("intermediate_state", [
     "started",
     "model_call_attempted",
@@ -817,7 +990,7 @@ def test_overnight_reboots_resume_intermediate_stages(tmp_path, intermediate_sta
                                         "changed_files_against_allowlist": "not_applicable",
                                         "narrowest_relevant_local_checks": "not_run",
                                     },
-                                    "evidence": [{"path": "docs/ROADMAP.md", "observation": "ok"}],
+                                    "evidence": [{"path": "docs/ROADMAP.md", "observation": "ok", "existence": "present"}],
                                     "notes": "deadline not reached; review complete",
                                 }
                             )

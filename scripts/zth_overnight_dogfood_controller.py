@@ -97,7 +97,7 @@ def terminal_stage_states() -> set[str]:
 
 
 def unresolved_stage_states() -> set[str]:
-    return {"started", "model_call_attempted", "model_output_captured", "structure_valid", "semantic_validation_passed"}
+    return {"started", "model_call_attempted", "model_output_captured", "structure_valid", "semantic_validation_passed", "incomplete"}
 
 
 def queue_stage_state(stage: str) -> str | None:
@@ -112,6 +112,11 @@ def queue_stage_state(stage: str) -> str | None:
     return "unknown"
 
 
+def latest_stage_transition(stage: str) -> str | None:
+    entry = latest_stage_states().get(stage)
+    return entry["timestamp"] if entry else None
+
+
 def next_queue_stage() -> tuple[str, str, str] | None:
     if is_terminal():
         return None
@@ -120,9 +125,10 @@ def next_queue_stage() -> tuple[str, str, str] | None:
         for row in csv.reader(fh, delimiter="\t"):
             if not row or row[0].startswith("#") or len(row) < 3:
                 continue
-            if row[1] not in latest:
+            state = queue_stage_state(row[1])
+            if state is None:
                 return row[0], row[1], row[2]
-            if queue_stage_state(row[1]) == "unresolved":
+            if state == "unresolved":
                 return row[0], row[1], row[2]
     return None
 
@@ -254,14 +260,7 @@ def classify_output(content_path: Path, deadline_reached: bool, allow_paths: lis
 
 
 def queue_allowlist() -> list[str]:
-    allow = []
-    if QUEUE.exists():
-        with QUEUE.open(encoding="utf-8") as fh:
-            for row in csv.reader(fh, delimiter="\t"):
-                if not row or row[0].startswith("#") or len(row) < 3:
-                    continue
-                allow.append(f".work/dogfood/overnight/runs/{row[0]}-{row[1]}")
-    return allow
+    return ["docs/ROADMAP.md"]
 
 
 def stage_manifest_path(slug: str) -> Path:
@@ -284,6 +283,15 @@ def existing_stage_state(slug: str) -> str | None:
     return entry["state"] if entry else None
 
 
+def recovery_manifest_path(slug: str) -> Path:
+    return stage_dir(slug) / "recovery_manifest.json"
+
+
+def latest_attempt_dir(slug: str, *, exclude: Path | None = None) -> Path | None:
+    candidates = sorted(p for p in RUNS_DIR.glob(f"*-{slug}") if p != exclude)
+    return candidates[-1] if candidates else None
+
+
 def write_terminal_marker_once() -> None:
     with open(TERMINAL_LOCK, "w", encoding="utf-8") as lock:
         try:
@@ -298,17 +306,34 @@ def write_terminal_marker_once() -> None:
         for row in rows:
             if len(row) >= 5:
                 unique[row[1]] = row
-        latest = rows[-1] if rows else []
+        latest = latest_stage_states()
+        queue_ids = []
+        if QUEUE.exists():
+            with QUEUE.open(encoding="utf-8") as fh:
+                for row in csv.reader(fh, delimiter="\t"):
+                    if row and not row[0].startswith("#") and len(row) >= 2:
+                        queue_ids.append(row[1])
+        queue_total = len(queue_ids)
+        terminal_queue = sum(1 for s in queue_ids if latest.get(s, {}).get("state") in terminal_stage_states())
+        incomplete_queue = sum(1 for s in queue_ids if latest.get(s, {}).get("state") == "incomplete")
+        unresolved_queue = sum(1 for s in queue_ids if latest.get(s, {}).get("state") in unresolved_stage_states())
+        queue_remaining = sum(1 for s in queue_ids if latest.get(s, {}).get("state") in unresolved_stage_states() or s not in latest or latest.get(s, {}).get("state") == "incomplete")
+        if queue_remaining:
+            return
         summary = {
             "terminal_state": "queue_exhausted",
             "closed_at": now().isoformat(),
             "attempted_unique_stages": len(unique),
             "completed_stages": sum(1 for row in unique.values() if len(row) >= 5 and row[4] == "ready_for_review"),
             "blocked_stages": sum(1 for row in unique.values() if len(row) >= 5 and row[4] == "blocked"),
-            "queue_remaining": 0,
+            "queue_total": queue_total,
+            "terminal_queue_stages": terminal_queue,
+            "incomplete_queue_stages": incomplete_queue,
+            "other_unresolved_queue_stages": max(unresolved_queue - incomplete_queue, 0),
+            "queue_remaining": queue_remaining,
             "queue_exhausted": True,
             "deadline_reached": now() >= deadline(),
-            "latest_stage": latest[1] if latest else None,
+            "latest_stage": rows[-1][1] if rows else None,
         }
         _write_json(TERMINAL_STATE, summary)
         if not CLOSEOUT_MANIFEST.exists():
@@ -328,8 +353,22 @@ def run_stage(slug: str, title: str, desc: str, dry_run: bool) -> int:
     packet_path = d / "stage_packet.md"
     packet_path.write_text(packet, encoding="utf-8")
     prior_state = existing_stage_state(slug)
+    prior_dir = latest_attempt_dir(slug, exclude=d)
     if prior_state in unresolved_stage_states():
-        record([RUN_ID, slug, "interrupted_recovered", str(d), "interrupted_recovered", now().isoformat()])
+        next_attempt = 1
+        if prior_dir:
+            existing_attempts = sorted(prior_dir.glob("model_output.raw.*.json"))
+            next_attempt = len(existing_attempts) + 1 if existing_attempts else 1
+        recovery = {
+            "stage_slug": slug,
+            "prior_directory": str(prior_dir) if prior_dir else None,
+            "prior_lifecycle_state": prior_state,
+            "recovery_timestamp": now().isoformat(),
+            "current_directory": str(d),
+            "next_attempt_number": next_attempt,
+        }
+        _write_json(recovery_manifest_path(slug), recovery)
+        record([RUN_ID, slug, "interrupted_recovered", str(d), "interrupted_recovered", str(recovery_manifest_path(slug)), now().isoformat()])
     record([RUN_ID, slug, "started", str(d), "started", now().isoformat()])
     for attempt in range(1, MAX_MODEL_ATTEMPTS + 1):
         record([RUN_ID, slug, "model_call_attempted", str(d), "model_call_attempted", now().isoformat()])
@@ -366,7 +405,6 @@ def run_stage(slug: str, title: str, desc: str, dry_run: bool) -> int:
         state, errors, validation = classify_output(content_path, deadline_reached=now() >= deadline(), allow_paths=stage_manifest.get("allow_paths", allow_paths))
         _write_json(d / f"validation.{attempt}.json", {"state": state, "errors": errors, "validation": validation})
         if state == "incomplete":
-            record([RUN_ID, slug, "semantic_validation_passed", str(d), "incomplete", now().isoformat()])
             record([RUN_ID, slug, "incomplete", str(d), "incomplete", now().isoformat()])
             return 0
         if state == "semantic_validation_failed":
@@ -411,7 +449,7 @@ def status_payload() -> dict:
         "queue_stages_ready_for_review": ready,
         "queue_stages_failed_semantic_validation": semantic_failed,
         "queue_stages_blocked": blocked,
-        "queue_stages_unresolved": unresolved + incomplete,
+        "queue_stages_unresolved": unresolved,
         "queue_path": str(QUEUE),
         "state_path": str(STATE),
         "completed_stages": completed,
@@ -419,7 +457,7 @@ def status_payload() -> dict:
         "semantic_validation_failures": semantic_failed,
         "ready_for_review_count": ready,
         "incomplete_count": incomplete,
-        "unresolved_count": unresolved + incomplete,
+        "unresolved_count": unresolved,
         "queue_remaining": queue_remaining,
         "queue_exhausted": terminal,
         "deadline_reached": now() >= deadline(),
