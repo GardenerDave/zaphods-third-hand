@@ -97,6 +97,9 @@ explicit supervised acceptance without promotion or downstream mutation.
 - Preflight regression comparison from canonical capability manifests.
 - Direct audition preflight gate through `run_model_audition.py`.
 - Board audition preflight gate through `run_model_audition_board.py`.
+- Manifest-driven Context Distiller focused passes with explicit input/output
+  controls, tracked focus profiles, plan-only rendering, synthesis-only review
+  bundles, and legacy comprehensive compatibility.
 - Human-review boundary: a preflight pass permits an audition to run; it does not promote, approve, rank, or assign a model.
 - Agent Task Session packets with deterministic IDs, path allowlists, required checks, validation, JSON handoff, and optional closeout guidance.
 - Model-free operator planner for reviewable import → manifest → gated suite or

@@ -48,8 +48,8 @@ approve their own outputs or move lifecycle state.
 ## Context Distiller
 
 - [`CONTEXT_DISTILLER_WORKFLOW.md`](CONTEXT_DISTILLER_WORKFLOW.md) —
-  endpoint-backed compact/chunked distillation, review patches, metrics, and
-  human acceptance.
+  endpoint-backed compact/chunked distillation, manifest-driven focused
+  passes, review patches, metrics, and human acceptance.
 - [`OPERATOR_NOTES.md`](OPERATOR_NOTES.md) — operational findings and current
   local-harness caveats.
 

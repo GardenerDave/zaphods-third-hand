@@ -314,3 +314,158 @@ After generation:
 3. Read the review patch.
 4. Decide Accepted, Rejected, Superseded, or Needs Rework.
 5. Create a separate packet for any canonical update.
+
+## Manifest Mode Addendum
+
+Manifest mode adds a review-only, multi-pass workflow on top of the existing Context Distiller. It does not replace the legacy compact/chunked flow, and it does not auto-merge into canonical context.
+
+### Legacy Comprehensive Mode
+
+The legacy positional invocation remains supported for simple runs:
+
+```bash
+./scripts/run_context_distiller.sh <SOURCE_ID> <SOURCE_FILE> <SHORT_TITLE>
+```
+
+The compatibility wrapper constructs a default `comprehensive` manifest and routes through the same manifest-driven implementation.
+
+### Manifest Mode
+
+Use a manifest when you need deterministic input selection, independent focused passes, and optional synthesis:
+
+```bash
+./scripts/run_context_distiller.sh --manifest path/to/distiller_pass_manifest.json --plan-only
+```
+
+Remove `--plan-only` to execute the validated pass plan with the configured model-call abstraction.
+
+The source-controlled focus profile registry lives at:
+
+```text
+docs/reports/model_auditions/CONTEXT_DISTILLER_FOCUS_PROFILES_v1.json
+```
+
+### Input Selection
+
+Supported selectors are explicit and model-free:
+
+```json
+{
+  "sources": ["repo-relative/source.txt"],
+  "include_globs": [],
+  "exclude_globs": [],
+  "line_ranges": [],
+  "chunk_indices": []
+}
+```
+
+- source paths must be repository-relative;
+- absolute paths and traversal are rejected;
+- empty optional selectors mean no additional restriction;
+- selected source hashes are recorded;
+- excluded selector values are preserved.
+
+### Chunk Controls
+
+Manifest mode exposes the current effective chunk settings:
+
+```json
+{
+  "target_chars": 12000,
+  "overlap": 1,
+  "offset": 1,
+  "start_chunk": null,
+  "end_chunk": null
+}
+```
+
+### Passes and Synthesis
+
+Each pass declares its own profile, input dependencies, and output filename. Passes do not automatically see one another.
+
+An optional synthesis stage consumes only validated prior pass artifacts and emits a review-only bundle.
+
+### Artifact Provenance
+
+Each pass writes its own namespaced attempt directory containing:
+
+- `pass_manifest.json`
+- `source_manifest.json`
+- `selected_input.txt`
+- `prompt.md`
+- `model_output.raw.json`
+- `model_metadata.json`
+- `model_content.json`
+- `validation.json`
+- `metrics.json`
+- `provenance.json`
+
+Retries create new linked attempt directories rather than overwriting evidence. The top-level job directory contains `job_manifest.json`, `plan.json`, `status.json`, and `review_bundle/`.
+
+### Review Boundary
+
+Raw source text, validated pass outputs, and synthesis outputs are evidence. None of them become canonical context automatically.
+
+### Example Manifest
+
+```json
+{
+  "schema": 1,
+  "source_id": "demo-001",
+  "inputs": {
+    "sources": ["docs/CONTEXT_DISTILLER_WORKFLOW.md"],
+    "include_globs": [],
+    "exclude_globs": [],
+    "line_ranges": [[1, 40]],
+    "chunk_indices": []
+  },
+  "chunking": {
+    "target_chars": 12000,
+    "overlap": 1,
+    "offset": 1,
+    "start_chunk": null,
+    "end_chunk": null
+  },
+  "passes": [
+    {
+      "id": "architecture",
+      "profile": "architecture",
+      "questions": [],
+      "inputs_from_passes": [],
+      "output": {
+        "artifact_type": "focused_distillation",
+        "filename": "architecture.md"
+      }
+    },
+    {
+      "id": "decisions",
+      "profile": "decisions",
+      "questions": [],
+      "inputs_from_passes": [],
+      "output": {
+        "artifact_type": "focused_distillation",
+        "filename": "decisions.md"
+      }
+    },
+    {
+      "id": "failures",
+      "profile": "failures-and-corrections",
+      "questions": [],
+      "inputs_from_passes": [],
+      "output": {
+        "artifact_type": "focused_distillation",
+        "filename": "failures.md"
+      }
+    }
+  ],
+  "synthesis": {
+    "enabled": true,
+    "input_passes": ["architecture", "decisions", "failures"],
+    "profile": "synthesis",
+    "output": {
+      "artifact_type": "review_bundle",
+      "filename": "synthesis.md"
+    }
+  }
+}
+```

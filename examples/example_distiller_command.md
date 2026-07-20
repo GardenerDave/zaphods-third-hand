@@ -17,7 +17,7 @@ Run compact plus chunked mode:
 
 ```bash
 cd <REPO_ROOT>/zaphods-third-hand
-./scripts/run_context_distiller_head.sh <SOURCE_ID> <SOURCE_FILE> <SHORT_TITLE> --compact --chunked
+./scripts/run_context_distiller.sh <SOURCE_ID> <SOURCE_FILE> <SHORT_TITLE>
 ```
 
 For a slow model server or a quick smoke test, lower output budgets first:
@@ -30,6 +30,7 @@ export ZTH_DISTILLER_TIMEOUT="600"
 ```
 
 See `docs/CONTEXT_DISTILLER_WORKFLOW.md` for smoke, normal compact, and chunked profile guidance.
+For manifest-driven focused passes, see the manifest addendum in that document.
 
 Review the generated files under:
 

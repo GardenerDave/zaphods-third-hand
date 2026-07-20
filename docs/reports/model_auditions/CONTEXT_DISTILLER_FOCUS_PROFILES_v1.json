@@ -1,0 +1,144 @@
+{
+  "schema": 1,
+  "profiles": {
+    "architecture": {
+      "id": "architecture",
+      "objective": "Extract architecture-level organization, subsystem boundaries, interfaces, and structural decisions.",
+      "evidence_to_extract": "Subsystem names, file groupings, dependency boundaries, control-flow structure, and architectural tradeoffs.",
+      "ignore": "Incidental chatter, raw transcripts, redundant restatements, and unresolved implementation detail unless it changes architecture.",
+      "required_output": {
+        "sections": [
+          "architecture_summary",
+          "boundaries",
+          "interfaces",
+          "tradeoffs",
+          "open_questions"
+        ]
+      },
+      "uncertainty_handling": "Prefer explicit uncertainty over inference; mark architecture claims unsupported when the source does not show them.",
+      "contradiction_handling": "Preserve conflicting evidence and identify the competing interpretations without collapsing them.",
+      "maximum_authority": "review-only; no canonical context changes; no patch acceptance; no execution authority",
+      "review_boundary": "review-only"
+    },
+    "comprehensive": {
+      "id": "comprehensive",
+      "objective": "Preserve the broad legacy Context Distiller behavior while remaining review-only.",
+      "evidence_to_extract": "Durable facts, decisions, open questions, bugs, rules, preferences, files, and next actions.",
+      "ignore": "Nothing material, but do not reproduce raw transcripts unless needed as evidence.",
+      "required_output": {
+        "sections": [
+          "source",
+          "executive_summary",
+          "durable_facts",
+          "decisions_made",
+          "open_questions",
+          "bugs_or_issues_identified",
+          "rules_added",
+          "user_preferences",
+          "files_or_artifacts_mentioned",
+          "next_actions",
+          "compression_notes"
+        ]
+      },
+      "uncertainty_handling": "Summarize only what the source and selected evidence support.",
+      "contradiction_handling": "Report contradictions explicitly and keep unsupported claims separate.",
+      "maximum_authority": "review-only; no canonical context changes; no patch acceptance; no execution authority",
+      "review_boundary": "review-only"
+    },
+    "decisions": {
+      "id": "decisions",
+      "objective": "Extract decisions, commitments, constraints, and durable policy statements.",
+      "evidence_to_extract": "Decision language, acceptance criteria, policy choices, and explicit commitments.",
+      "ignore": "Narrative detail that does not affect decisions or obligations.",
+      "required_output": {
+        "sections": [
+          "decisions",
+          "constraints",
+          "follow_ups",
+          "confidence",
+          "contradictions"
+        ]
+      },
+      "uncertainty_handling": "Separate confirmed decisions from tentative ideas and missing context.",
+      "contradiction_handling": "Surface conflicting decision statements side by side.",
+      "maximum_authority": "review-only; no canonical context changes; no patch acceptance; no execution authority",
+      "review_boundary": "review-only"
+    },
+    "failures-and-corrections": {
+      "id": "failures-and-corrections",
+      "objective": "Extract failures, repairs, retries, corrections, and the evidence that supports them.",
+      "evidence_to_extract": "Error symptoms, validator failures, retry attempts, fixes, and correction rationale.",
+      "ignore": "Successful repetition that adds no new failure or correction evidence.",
+      "required_output": {
+        "sections": [
+          "failure_summary",
+          "corrections",
+          "retry_history",
+          "validator_results",
+          "remaining_risks"
+        ]
+      },
+      "uncertainty_handling": "Keep failure evidence separate from guesses about root cause.",
+      "contradiction_handling": "Retain contradictory diagnostics and identify the unresolved gap.",
+      "maximum_authority": "review-only; no canonical context changes; no patch acceptance; no execution authority",
+      "review_boundary": "review-only"
+    },
+    "roadmap-and-open-work": {
+      "id": "roadmap-and-open-work",
+      "objective": "Extract roadmap items, follow-up tasks, and open work that should remain reviewable.",
+      "evidence_to_extract": "Roadmap statements, queued tasks, deferred items, and explicitly open questions.",
+      "ignore": "Completed work unless needed to contextualize remaining work.",
+      "required_output": {
+        "sections": [
+          "roadmap_items",
+          "open_work",
+          "dependencies",
+          "stoppers",
+          "recommended_next_steps"
+        ]
+      },
+      "uncertainty_handling": "Mark roadmap claims as provisional unless directly supported by source evidence.",
+      "contradiction_handling": "Record contradictions instead of normalizing them into a single next step.",
+      "maximum_authority": "review-only; no canonical context changes; no patch acceptance; no execution authority",
+      "review_boundary": "review-only"
+    },
+    "authority-and-workflow-rules": {
+      "id": "authority-and-workflow-rules",
+      "objective": "Extract authority boundaries, workflow constraints, and review gates.",
+      "evidence_to_extract": "Authority limits, review-only rules, stop conditions, and state transition constraints.",
+      "ignore": "Operational filler that does not change authority or workflow.",
+      "required_output": {
+        "sections": [
+          "authority_boundaries",
+          "workflow_rules",
+          "state_transitions",
+          "stop_conditions",
+          "review_boundary"
+        ]
+      },
+      "uncertainty_handling": "Prefer conservative interpretations of authority when the source is ambiguous.",
+      "contradiction_handling": "Retain the competing rule statements and note which one is stronger evidence.",
+      "maximum_authority": "review-only; no canonical context changes; no patch acceptance; no execution authority",
+      "review_boundary": "review-only"
+    },
+    "synthesis": {
+      "id": "synthesis",
+      "objective": "Combine validated pass artifacts into a review-only synthesis artifact.",
+      "evidence_to_extract": "Validated pass outputs, their hashes, their dependencies, and the cross-pass conclusions they support.",
+      "ignore": "Raw source rereads unless required to cite provenance already validated in a prior pass.",
+      "required_output": {
+        "sections": [
+          "synthesis_summary",
+          "validated_inputs",
+          "conflicts",
+          "confidence",
+          "review_only_notes"
+        ]
+      },
+      "uncertainty_handling": "Summarize only what the validated pass artifacts support.",
+      "contradiction_handling": "Keep pass disagreements visible rather than resolving them silently.",
+      "maximum_authority": "review-only; no canonical context changes; no patch acceptance; no execution authority",
+      "review_boundary": "review-only"
+    }
+  }
+}

@@ -1,0 +1,341 @@
+{
+  "schema": 1,
+  "title": "Context Distiller Focused Pass Task Batch v1",
+  "tasks": [
+    {
+      "priority": 1,
+      "slug": "context-distiller-inventory",
+      "objective": "Inventory the current Context Distiller runner, chunk planner, prompts, profiles, and artifact chain.",
+      "input_artifacts": [
+        "scripts/run_context_distiller.sh",
+        "scripts/run_context_distiller_head.sh",
+        "local_harness/context_distiller_manifest.py",
+        "local_harness/context_chunker.py",
+        "docs/CONTEXT_DISTILLER_WORKFLOW.md"
+      ],
+      "input_selectors": {
+        "sources": [
+          "scripts/run_context_distiller.sh",
+          "scripts/run_context_distiller_head.sh",
+          "local_harness/context_distiller_manifest.py",
+          "local_harness/context_chunker.py",
+          "docs/CONTEXT_DISTILLER_WORKFLOW.md"
+        ],
+        "include_globs": [],
+        "exclude_globs": [],
+        "line_ranges": [],
+        "chunk_indices": []
+      },
+      "focus_profile": "comprehensive",
+      "allowed_targets": [
+        "docs/reports/model_auditions/"
+      ],
+      "expected_output_artifacts": [
+        "docs/reports/model_auditions/context_distiller_inventory.md"
+      ],
+      "validation_command": "python3 -m pytest local_harness/tests/test_context_distiller_manifest.py -q",
+      "stop_condition": "Stop after documenting the current implementation surface and provenance."
+    },
+    {
+      "priority": 2,
+      "slug": "context-distiller-pass-manifest",
+      "objective": "Define the manifest schema for focused distiller passes and synthesis.",
+      "input_artifacts": [
+        "docs/CONTEXT_DISTILLER_WORKFLOW.md",
+        "docs/reports/model_auditions/CONTEXT_DISTILLER_FOCUS_PROFILES_v1.json"
+      ],
+      "input_selectors": {
+        "sources": [
+          "docs/CONTEXT_DISTILLER_WORKFLOW.md",
+          "docs/reports/model_auditions/CONTEXT_DISTILLER_FOCUS_PROFILES_v1.json"
+        ],
+        "include_globs": [],
+        "exclude_globs": [],
+        "line_ranges": [],
+        "chunk_indices": []
+      },
+      "focus_profile": "authority-and-workflow-rules",
+      "allowed_targets": [
+        "docs/reports/model_auditions/",
+        "docs/CONTEXT_DISTILLER_WORKFLOW.md"
+      ],
+      "expected_output_artifacts": [
+        "docs/reports/model_auditions/distiller_pass_manifest_v1.md"
+      ],
+      "validation_command": "python3 -m pytest local_harness/tests/test_context_distiller_manifest.py -q",
+      "stop_condition": "Stop once the schema and review boundary are explicit and reviewable."
+    },
+    {
+      "priority": 3,
+      "slug": "context-distiller-input-selectors",
+      "objective": "Specify deterministic input selectors for source files, globs, line ranges, and chunk indices.",
+      "input_artifacts": [
+        "docs/CONTEXT_DISTILLER_WORKFLOW.md",
+        "local_harness/context_distiller_manifest.py"
+      ],
+      "input_selectors": {
+        "sources": [
+          "docs/CONTEXT_DISTILLER_WORKFLOW.md",
+          "local_harness/context_distiller_manifest.py"
+        ],
+        "include_globs": [],
+        "exclude_globs": [],
+        "line_ranges": [],
+        "chunk_indices": []
+      },
+      "focus_profile": "roadmap-and-open-work",
+      "allowed_targets": [
+        "docs/reports/model_auditions/"
+      ],
+      "expected_output_artifacts": [
+        "docs/reports/model_auditions/context_distiller_input_selectors.md"
+      ],
+      "validation_command": "python3 -m pytest local_harness/tests/test_context_distiller_manifest.py -q",
+      "stop_condition": "Stop after documenting selector rules and invalid selector handling."
+    },
+    {
+      "priority": 4,
+      "slug": "context-distiller-chunk-controls",
+      "objective": "Document effective chunk controls and validation rules for manifest-driven runs.",
+      "input_artifacts": [
+        "local_harness/context_chunker.py",
+        "local_harness/context_distiller_manifest.py"
+      ],
+      "input_selectors": {
+        "sources": [
+          "local_harness/context_chunker.py",
+          "local_harness/context_distiller_manifest.py"
+        ],
+        "include_globs": [],
+        "exclude_globs": [],
+        "line_ranges": [],
+        "chunk_indices": []
+      },
+      "focus_profile": "architecture",
+      "allowed_targets": [
+        "docs/reports/model_auditions/"
+      ],
+      "expected_output_artifacts": [
+        "docs/reports/model_auditions/context_distiller_chunk_controls.md"
+      ],
+      "validation_command": "python3 -m pytest local_harness/tests/test_context_distiller_manifest.py -q",
+      "stop_condition": "Stop after the effective chunk settings are precisely documented."
+    },
+    {
+      "priority": 5,
+      "slug": "context-distiller-focus-profiles",
+      "objective": "Record the tracked focus profiles and their review-only authority boundaries.",
+      "input_artifacts": [
+        "docs/reports/model_auditions/CONTEXT_DISTILLER_FOCUS_PROFILES_v1.json"
+      ],
+      "input_selectors": {
+        "sources": [
+          "docs/reports/model_auditions/CONTEXT_DISTILLER_FOCUS_PROFILES_v1.json"
+        ],
+        "include_globs": [],
+        "exclude_globs": [],
+        "line_ranges": [],
+        "chunk_indices": []
+      },
+      "focus_profile": "authority-and-workflow-rules",
+      "allowed_targets": [
+        "docs/reports/model_auditions/"
+      ],
+      "expected_output_artifacts": [
+        "docs/reports/model_auditions/context_distiller_focus_profiles.md"
+      ],
+      "validation_command": "python3 -m pytest local_harness/tests/test_context_distiller_manifest.py -q",
+      "stop_condition": "Stop after the profiles are versioned and review-only."
+    },
+    {
+      "priority": 6,
+      "slug": "context-distiller-output-contracts",
+      "objective": "Define the per-pass output contract, evidence schema, and review-only notes shape.",
+      "input_artifacts": [
+        "local_harness/context_distiller_manifest.py",
+        "docs/CONTEXT_DISTILLER_WORKFLOW.md"
+      ],
+      "input_selectors": {
+        "sources": [
+          "local_harness/context_distiller_manifest.py",
+          "docs/CONTEXT_DISTILLER_WORKFLOW.md"
+        ],
+        "include_globs": [],
+        "exclude_globs": [],
+        "line_ranges": [],
+        "chunk_indices": []
+      },
+      "focus_profile": "decisions",
+      "allowed_targets": [
+        "docs/reports/model_auditions/"
+      ],
+      "expected_output_artifacts": [
+        "docs/reports/model_auditions/context_distiller_output_contracts.md"
+      ],
+      "validation_command": "python3 -m pytest local_harness/tests/test_context_distiller_manifest.py -q",
+      "stop_condition": "Stop after the structural contract is frozen."
+    },
+    {
+      "priority": 7,
+      "slug": "context-distiller-pass-planner",
+      "objective": "Render the complete pass plan without calling a model.",
+      "input_artifacts": [
+        "local_harness/context_distiller_manifest.py",
+        "scripts/run_context_distiller.sh"
+      ],
+      "input_selectors": {
+        "sources": [
+          "local_harness/context_distiller_manifest.py",
+          "scripts/run_context_distiller.sh"
+        ],
+        "include_globs": [],
+        "exclude_globs": [],
+        "line_ranges": [],
+        "chunk_indices": []
+      },
+      "focus_profile": "architecture",
+      "allowed_targets": [
+        "docs/reports/model_auditions/"
+      ],
+      "expected_output_artifacts": [
+        "docs/reports/model_auditions/context_distiller_plan_artifact.json"
+      ],
+      "validation_command": "python3 -m pytest local_harness/tests/test_context_distiller_manifest.py -q",
+      "stop_condition": "Stop after plan-only mode is deterministic and model-free."
+    },
+    {
+      "priority": 8,
+      "slug": "context-distiller-multi-pass-execution",
+      "objective": "Execute independent focused passes with isolated attempt artifacts and explicit dependencies.",
+      "input_artifacts": [
+        "local_harness/context_distiller_manifest.py"
+      ],
+      "input_selectors": {
+        "sources": [
+          "local_harness/context_distiller_manifest.py"
+        ],
+        "include_globs": [],
+        "exclude_globs": [],
+        "line_ranges": [],
+        "chunk_indices": []
+      },
+      "focus_profile": "architecture",
+      "allowed_targets": [
+        "docs/reports/model_auditions/"
+      ],
+      "expected_output_artifacts": [
+        "docs/reports/model_auditions/context_distiller_multi_pass_audition.md"
+      ],
+      "validation_command": "python3 -m pytest local_harness/tests/test_context_distiller_manifest.py -q",
+      "stop_condition": "Stop after each pass writes a distinct attempt directory and no canonical context changes occur."
+    },
+    {
+      "priority": 9,
+      "slug": "context-distiller-synthesis",
+      "objective": "Implement the synthesis stage as a review-only consumer of validated pass artifacts.",
+      "input_artifacts": [
+        "local_harness/context_distiller_manifest.py"
+      ],
+      "input_selectors": {
+        "sources": [
+          "local_harness/context_distiller_manifest.py"
+        ],
+        "include_globs": [],
+        "exclude_globs": [],
+        "line_ranges": [],
+        "chunk_indices": []
+      },
+      "focus_profile": "synthesis",
+      "allowed_targets": [
+        "docs/reports/model_auditions/"
+      ],
+      "expected_output_artifacts": [
+        "docs/reports/model_auditions/context_distiller_synthesis.md"
+      ],
+      "validation_command": "python3 -m pytest local_harness/tests/test_context_distiller_manifest.py -q",
+      "stop_condition": "Stop after synthesis is clearly review-only and provenance-preserving."
+    },
+    {
+      "priority": 10,
+      "slug": "context-distiller-structural-validation",
+      "objective": "Add model-free validation for manifest structure, path safety, dependency cycles, and artifact integrity.",
+      "input_artifacts": [
+        "local_harness/context_distiller_manifest.py",
+        "local_harness/tests/test_context_distiller_manifest.py"
+      ],
+      "input_selectors": {
+        "sources": [
+          "local_harness/context_distiller_manifest.py",
+          "local_harness/tests/test_context_distiller_manifest.py"
+        ],
+        "include_globs": [],
+        "exclude_globs": [],
+        "line_ranges": [],
+        "chunk_indices": []
+      },
+      "focus_profile": "failures-and-corrections",
+      "allowed_targets": [
+        "docs/reports/model_auditions/"
+      ],
+      "expected_output_artifacts": [
+        "docs/reports/model_auditions/context_distiller_validation.md"
+      ],
+      "validation_command": "python3 -m pytest local_harness/tests/test_context_distiller_manifest.py -q",
+      "stop_condition": "Stop after invalid manifests fail closed and preserved artifacts remain intact."
+    },
+    {
+      "priority": 11,
+      "slug": "context-distiller-legacy-compatibility",
+      "objective": "Keep the legacy simple runner invocation working through the new manifest-driven implementation.",
+      "input_artifacts": [
+        "scripts/run_context_distiller.sh",
+        "scripts/run_context_distiller_head.sh"
+      ],
+      "input_selectors": {
+        "sources": [
+          "scripts/run_context_distiller.sh",
+          "scripts/run_context_distiller_head.sh"
+        ],
+        "include_globs": [],
+        "exclude_globs": [],
+        "line_ranges": [],
+        "chunk_indices": []
+      },
+      "focus_profile": "comprehensive",
+      "allowed_targets": [
+        "docs/reports/model_auditions/"
+      ],
+      "expected_output_artifacts": [
+        "docs/reports/model_auditions/context_distiller_legacy_compatibility.md"
+      ],
+      "validation_command": "python3 -m pytest local_harness/tests/test_context_distiller_manifest.py -q",
+      "stop_condition": "Stop after the legacy path and explicit-manifest path agree on planning facts."
+    },
+    {
+      "priority": 12,
+      "slug": "context-distiller-fixture-audition",
+      "objective": "Run a deterministic fixture audition with three focused passes and one synthesis pass.",
+      "input_artifacts": [
+        "local_harness/tests/test_context_distiller_manifest.py"
+      ],
+      "input_selectors": {
+        "sources": [
+          "local_harness/tests/test_context_distiller_manifest.py"
+        ],
+        "include_globs": [],
+        "exclude_globs": [],
+        "line_ranges": [],
+        "chunk_indices": []
+      },
+      "focus_profile": "architecture",
+      "allowed_targets": [
+        "docs/reports/model_auditions/"
+      ],
+      "expected_output_artifacts": [
+        "docs/reports/model_auditions/context_distiller_fixture_audition.md"
+      ],
+      "validation_command": "python3 -m pytest local_harness/tests/test_context_distiller_manifest.py -q",
+      "stop_condition": "Stop after the fixture audition proves isolated prompts, isolated artifacts, and a review-only final bundle."
+    }
+  ]
+}
