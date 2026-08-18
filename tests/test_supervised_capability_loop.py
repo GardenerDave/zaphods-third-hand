@@ -259,6 +259,35 @@ def test_scorecard_attributes_sources_and_curriculum_evidence(tmp_path: Path):
     assert "candidate_curriculum_examples" in scorecard
 
 
+def test_scorecard_aggregates_summary_success_fields_and_unresolved_source(tmp_path: Path):
+    rows = [
+        {"task_id": "baseline", "task_family": "family-a", "worker_model": "small", "pass": True, "first_attempt_pass": True, "pass_after_existing_patch": False, "pass_after_local_teacher_intervention": False, "pass_after_external_teacher_intervention": False, "successful_intervention_source": "none", "intervention_attempts": {"none": True, "existing_patch": False, "local_teacher": False, "external_teacher": False}, "unresolved": False, "external_escalation_count": 0, "intervention_outcome": "no-effect"},
+        {"task_id": "local", "task_family": "family-a", "worker_model": "small", "pass": True, "first_attempt_pass": False, "pass_after_existing_patch": False, "pass_after_local_teacher_intervention": True, "pass_after_external_teacher_intervention": False, "successful_intervention_source": "local_teacher", "intervention_attempts": {"none": True, "existing_patch": False, "local_teacher": True, "external_teacher": False}, "unresolved": False, "external_escalation_count": 0, "intervention_outcome": "helped"},
+        {"task_id": "external", "task_family": "family-b", "worker_model": "small", "pass": True, "first_attempt_pass": False, "pass_after_existing_patch": False, "pass_after_local_teacher_intervention": False, "pass_after_external_teacher_intervention": True, "successful_intervention_source": "external_teacher", "intervention_attempts": {"none": True, "existing_patch": False, "local_teacher": True, "external_teacher": True}, "unresolved": False, "external_escalation_count": 1, "intervention_outcome": "helped"},
+        {"task_id": "unresolved", "task_family": "family-b", "worker_model": "small", "pass": False, "first_attempt_pass": False, "pass_after_existing_patch": False, "pass_after_local_teacher_intervention": False, "pass_after_external_teacher_intervention": False, "successful_intervention_source": "none", "intervention_attempts": {"none": True, "existing_patch": False, "local_teacher": True, "external_teacher": True}, "unresolved": True, "external_escalation_count": 1, "intervention_outcome": "no-effect"},
+    ]
+    trajectories = []
+    for row in rows:
+        task_dir = tmp_path / row["task_id"]
+        task_dir.mkdir()
+        (task_dir / "trajectory.jsonl").write_text("{}\n")
+        (task_dir / "trajectory_summary.json").write_text(json.dumps(row))
+        trajectories.append(task_dir / "trajectory.jsonl")
+
+    scorecard = aggregate_scorecard(trajectories)
+    assert scorecard["passes"] == 3
+    assert scorecard["first_attempt_passes"] == 1
+    assert scorecard["passes_after_existing_patch"] == 0
+    assert scorecard["passes_after_local_teacher_intervention"] == 1
+    assert scorecard["passes_after_external_teacher_intervention"] == 1
+    assert scorecard["successful_intervention_source_counts"] == {"none": 1, "existing_patch": 0, "local_teacher": 1, "external_teacher": 1}
+    assert scorecard["unresolved_count"] == 1
+    assert scorecard["external_escalation_count"] == 2
+    assert scorecard["groups"]["small::family-a"]["passes_after_local_teacher_intervention"] == 1
+    assert scorecard["groups"]["small::family-b"]["passes_after_external_teacher_intervention"] == 1
+    assert scorecard["groups"]["small::family-b"]["unresolved"] == 1
+
+
 def test_scorecard_counts_only_durable_worker_intervention_sources(tmp_path: Path):
     patch = {"patch_id": "p1", "title": "patch", "status": "active", "failure_signature": ["wrong"], "applies_to": {"stage": ["validation"], "task_type": ["json-fixture"], "model_size": ["small"]}, "prompt_delta": "Be exact.", "required_output_fields": ["answer"], "validator_expectations": ["exact"]}
     library = PromptPatchLibrary(); library.add_patch(patch)

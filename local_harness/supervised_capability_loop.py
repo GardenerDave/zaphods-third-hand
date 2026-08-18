@@ -474,6 +474,12 @@ def run_capability_loop(
 def aggregate_scorecard(trajectory_paths: list[Path]) -> dict[str, Any]:
     summaries = [json.loads((p.parent / "trajectory_summary.json").read_text(encoding="utf-8")) for p in trajectory_paths if (p.parent / "trajectory_summary.json").exists()]
     source_counts = {source: {"trials": 0, "passes": 0} for source in ("none", "existing_patch", "local_teacher", "external_teacher")}
+    success_fields = {
+        "passes_after_existing_patch": "pass_after_existing_patch",
+        "passes_after_local_teacher_intervention": "pass_after_local_teacher_intervention",
+        "passes_after_external_teacher_intervention": "pass_after_external_teacher_intervention",
+    }
+    global_counts = {"passes": 0, "first_attempt_passes": 0, **{field: 0 for field in success_fields}}
     groups: dict[str, dict[str, Any]] = {}
     for row in summaries:
         observed = row.get("intervention_attempts", {row.get("successful_intervention_source", "none"): True})
@@ -481,21 +487,25 @@ def aggregate_scorecard(trajectory_paths: list[Path]) -> dict[str, Any]:
             if attempted:
                 source_counts.setdefault(source, {"trials": 0, "passes": 0})
                 source_counts[source]["trials"] += 1
-                source_counts[source]["passes"] += int(row.get("successful_intervention_source") == source)
+                source_counts[source]["passes"] += int(row.get("pass", False) and row.get("successful_intervention_source") == source)
         key = f"{row.get('worker_model')}::{row.get('task_family')}"
         group = groups.setdefault(key, {"trials": 0, "passes": 0, "first_attempt_passes": 0, "passes_after_existing_patch": 0, "passes_after_local_teacher_intervention": 0, "passes_after_external_teacher_intervention": 0, "external_escalations": 0, "intervention_helped": 0, "intervention_hurt": 0, "intervention_no_effect": 0, "unresolved": 0})
         group["trials"] += 1
         group["passes"] += int(row.get("pass", False))
         group["first_attempt_passes"] += int(row.get("first_attempt_pass", False))
-        for field in ("passes_after_existing_patch", "passes_after_local_teacher_intervention", "passes_after_external_teacher_intervention"):
-            group[field] += int(row.get(field, False))
+        global_counts["passes"] += int(row.get("pass", False))
+        global_counts["first_attempt_passes"] += int(row.get("first_attempt_pass", False))
+        for field, summary_field in success_fields.items():
+            group[field] += int(row.get(summary_field, False))
+            global_counts[field] += int(row.get(summary_field, False))
         group["external_escalations"] += int(row.get("external_escalation_count", 0) > 0)
         group[f"intervention_{row.get('intervention_outcome', 'no-effect').replace('-', '_')}"] += 1
         group["unresolved"] += int(row.get("unresolved", False))
     for group in groups.values():
         group["pass_rate"] = group["passes"] / group["trials"] if group["trials"] else 0.0
         group["first_attempt_pass_rate"] = group["first_attempt_passes"] / group["trials"] if group["trials"] else 0.0
-    return {"schema": "supervised_capability_scorecard_v2", "trials": len(summaries), "pass_rate": sum(int(s.get("pass", False)) for s in summaries) / len(summaries) if summaries else 0.0, "groups": groups, "by_intervention_source": source_counts, "external_escalation_count": sum(int(s.get("external_escalation_count", 0)) for s in summaries), "external_teacher_call_count": sum(int(s.get("external_teacher_call_count", 0)) for s in summaries), "unresolved_count": sum(int(s.get("unresolved", False)) for s in summaries), "intervention_helped": sum(int(s.get("intervention_outcome") == "helped") for s in summaries), "intervention_hurt": sum(int(s.get("intervention_outcome") == "hurt") for s in summaries), "intervention_no_effect": sum(int(s.get("intervention_outcome") == "no-effect") for s in summaries), "candidate_prompt_patches": [p for s in summaries for p in s.get("candidate_prompt_patches", [])], "candidate_curriculum_examples": [e for s in summaries for e in s.get("candidate_curriculum_examples", [])]}
+    unresolved_count = sum(int(s.get("unresolved", False)) for s in summaries)
+    return {"schema": "supervised_capability_scorecard_v2", "trials": len(summaries), "pass_rate": global_counts["passes"] / len(summaries) if summaries else 0.0, **global_counts, "groups": groups, "by_intervention_source": source_counts, "successful_intervention_source_counts": {source: counts["passes"] for source, counts in source_counts.items()}, "external_escalation_count": sum(int(s.get("external_escalation_count", 0)) for s in summaries), "external_teacher_call_count": sum(int(s.get("external_teacher_call_count", 0)) for s in summaries), "unresolved_count": unresolved_count, "intervention_helped": sum(int(s.get("intervention_outcome") == "helped") for s in summaries), "intervention_hurt": sum(int(s.get("intervention_outcome") == "hurt") for s in summaries), "intervention_no_effect": sum(int(s.get("intervention_outcome") == "no-effect") for s in summaries), "candidate_prompt_patches": [p for s in summaries for p in s.get("candidate_prompt_patches", [])], "candidate_curriculum_examples": [e for s in summaries for e in s.get("candidate_curriculum_examples", [])]}
 
 
 def main(argv: list[str] | None = None) -> int:
