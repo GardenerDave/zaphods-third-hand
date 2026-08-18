@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -125,6 +126,26 @@ def _build_payload(spec: WorkerSpec, prompt: str, model: str | None, max_tokens:
     raise ValueError(f"Unsupported worker API: {spec.api}")
 
 
+def _request_provenance(spec: WorkerSpec, prompt: str, max_tokens: int) -> dict[str, Any]:
+    actual_prompt = maybe_append_no_think(prompt, spec.append_no_think)
+    system = SYSTEM_PROMPT if spec.api == OPENAI_CHAT else NATIVE_SYSTEM_PROMPT if spec.api == NATIVE_COMPLETION else None
+    return {
+        "prompt_sha256": hashlib.sha256(actual_prompt.encode("utf-8")).hexdigest(),
+        "prompt_length": len(actual_prompt),
+        "api": spec.api,
+        "message_structure": ["system", "user"] if spec.api == OPENAI_CHAT else ["prompt"],
+        "system_message_sha256": hashlib.sha256(system.encode("utf-8")).hexdigest() if system else None,
+        "model": spec.model,
+        "configured_model": spec.configured_model,
+        "max_tokens": max_tokens,
+        "temperature": 0.2,
+        "top_p": None,
+        "seed": None,
+        "stop": None,
+        "endpoint_alias": os.environ.get("ZTH_PUBLIC_HOST_ALIAS", "JARVIS_LOCAL"),
+    }
+
+
 def _content_from_response(spec: WorkerSpec, result: Any) -> tuple[str, str, str | None]:
     if spec.api == NATIVE_COMPLETION:
         if isinstance(result, dict):
@@ -162,6 +183,8 @@ def call_worker(
 
     model, resolution_attempted, resolution_error = _resolve_model_alias(spec, timeout)
     request_url = completion_url(spec)
+    request_provenance = _request_provenance(spec, prompt, max_tokens)
+    request_provenance["resolved_model"] = model
     payload = _build_payload(spec, prompt, model, max_tokens)
     data = json.dumps(payload).encode("utf-8")
     request = urllib.request.Request(
@@ -188,6 +211,7 @@ def call_worker(
             error=body,
             model_resolution_attempted=resolution_attempted,
             model_resolution_error=resolution_error,
+            request_provenance=request_provenance,
         )
     except Exception as exc:
         return WorkerResponse(
@@ -203,6 +227,7 @@ def call_worker(
             error=str(exc),
             model_resolution_attempted=resolution_attempted,
             model_resolution_error=resolution_error,
+            request_provenance=request_provenance,
         )
 
     try:
@@ -222,6 +247,7 @@ def call_worker(
             raw_response=result,
             model_resolution_attempted=resolution_attempted,
             model_resolution_error=resolution_error,
+            request_provenance=request_provenance,
         )
     except Exception as exc:
         return WorkerResponse(
@@ -237,6 +263,7 @@ def call_worker(
             error=str(exc),
             model_resolution_attempted=resolution_attempted,
             model_resolution_error=resolution_error,
+            request_provenance=request_provenance,
         )
 
 

@@ -1,18 +1,24 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from pathlib import Path
 
 import pytest
 
 import local_harness.supervised_capability_loop as loop
-from local_harness.icm_spec import WorkerResponse
+from local_harness.icm_call import _request_provenance
+from local_harness.icm_spec import WorkerResponse, resolve_worker_spec
 from local_harness.prompt_patch_library import PromptPatchLibrary
 from local_harness.supervised_capability_loop import aggregate_scorecard, run_capability_loop
 
 
 def response(content: str, model: str) -> WorkerResponse:
     return WorkerResponse("ok", content, "http://fixture/v1/chat/completions", model, model, "stop", {"completion_tokens": 5}, {"total_ms": 1}, {})
+
+
+def transport_response(status: str, error: str) -> WorkerResponse:
+    return WorkerResponse(status, f"[{status}]", "http://fixture/v1/chat/completions", None, "small-1.7b", None, None, None, None, error=error)
 
 
 def task() -> dict:
@@ -100,6 +106,145 @@ def test_external_teacher_unavailable_fails_closed(tmp_path: Path):
     result = run_capability_loop(task(), out_dir=tmp_path, worker=lambda p: response('{"answer":"wrong"}', "small-1.7b"), max_worker_attempts=1, max_teacher_passes=0, external_teacher=lambda p: (_ for _ in ()).throw(RuntimeError("not configured")))
     assert result["disposition"] == "unresolved"
     assert any(r.get("transition") == "external_teacher_unavailable" for r in records(tmp_path / "trajectory.jsonl"))
+
+
+@pytest.mark.parametrize(
+    ("status", "error", "classification"),
+    [
+        ("request_error", "Operation not permitted", "transport_request_error"),
+        ("http_error", "server unavailable", "transport_http_error"),
+        ("request_error", "request timed out", "transport_timeout"),
+    ],
+)
+def test_transport_failure_never_enters_validator_or_capability_verdict(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, status: str, error: str, classification: str):
+    def validator_must_not_run(*args, **kwargs):
+        raise AssertionError("transport failures must not be validated")
+
+    monkeypatch.setattr(loop, "_validator_result", validator_must_not_run)
+    result = run_capability_loop(
+        task(),
+        out_dir=tmp_path,
+        worker=lambda prompt: transport_response(status, error),
+        max_worker_attempts=1,
+        max_teacher_passes=0,
+        external_teacher=lambda prompt: (_ for _ in ()).throw(AssertionError("transport failure must not escalate")),
+    )
+    assert result["capability_verdict_available"] is False
+    assert result["model_attempt_count"] == 0
+    assert result["infrastructure_error_count"] == 1
+    assert result["unresolved"] is False
+    assert not (tmp_path / "attempt-1.validation.json").exists()
+    attempt = next(row for row in records(tmp_path / "trajectory.jsonl") if row.get("record_type") == "worker_attempt")
+    assert attempt["transport_classification"] == classification
+    assert attempt["transport_valid"] is False
+    assert attempt["validation"] is None
+    assert "request error" not in json.dumps(attempt["validation"] or {}).lower()
+    scorecard = aggregate_scorecard([tmp_path / "trajectory.jsonl"])
+    assert scorecard["trials"] == 0
+    assert scorecard["infrastructure_attempts_excluded"] == 1
+    assert scorecard["infrastructure_error_count"] == 1
+
+
+def test_valid_retry_after_transport_failure_is_scored_normally(tmp_path: Path):
+    outputs = iter([transport_response("request_error", "Operation not permitted"), response('{"answer":"ok"}', "small-1.7b")])
+    result = run_capability_loop(
+        task(),
+        out_dir=tmp_path,
+        worker=lambda prompt: next(outputs),
+        max_worker_attempts=2,
+        max_teacher_passes=0,
+        external_teacher=lambda prompt: (_ for _ in ()).throw(AssertionError("teacher must not be called")),
+    )
+    assert result["pass"] is True
+    assert result["capability_verdict_available"] is True
+    assert result["model_attempt_count"] == 1
+    assert result["infrastructure_error_count"] == 1
+    assert result["first_attempt_pass"] is False
+    validations = list(tmp_path.glob("attempt-*.validation.json"))
+    assert [path.name for path in validations] == ["attempt-2.validation.json"]
+    scorecard = aggregate_scorecard([tmp_path / "trajectory.jsonl"])
+    assert scorecard["trials"] == 1
+    assert scorecard["passes"] == 1
+    assert scorecard["first_attempt_passes"] == 0
+
+
+def test_transport_raw_evidence_is_durable_and_content_is_not_capability_failure(tmp_path: Path):
+    run_capability_loop(
+        task(),
+        out_dir=tmp_path,
+        worker=lambda prompt: transport_response("request_error", "Operation not permitted"),
+        max_worker_attempts=1,
+        max_teacher_passes=0,
+    )
+    raw = json.loads((tmp_path / "attempt-1.raw.json").read_text())
+    metadata = json.loads((tmp_path / "attempt-1.metadata.json").read_text())
+    assert raw["content"] == "[request_error]"
+    assert raw["metadata"]["status"] == "request_error"
+    assert metadata["transport_classification"] == "transport_request_error"
+    assert not (tmp_path / "attempt-1.validation.json").exists()
+
+
+def test_worker_request_provenance_contains_replay_fingerprint_without_private_url():
+    spec = resolve_worker_spec("router", base_url="http://endpoint.invalid/v1", model="small-1.7b")
+    provenance = _request_provenance(spec, "Return JSON.", 128)
+    assert provenance["prompt_sha256"]
+    assert provenance["message_structure"] == ["system", "user"]
+    assert provenance["model"] == "small-1.7b"
+    assert provenance["configured_model"] == "small-1.7b"
+    assert provenance["max_tokens"] == 128
+    assert provenance["temperature"] == 0.2
+    assert provenance["top_p"] is None
+    assert provenance["seed"] is None
+    assert provenance["stop"] is None
+    assert "endpoint.invalid" not in json.dumps(provenance)
+
+
+def test_optional_context_complete_retry_is_default_off_and_fail_closed(tmp_path: Path):
+    prompts: list[str] = []
+    patch = {"candidate_patch_id": "experimental", "prompt_delta": "Use the declared contract and evidence."}
+    patch_path = tmp_path / "patch.json"
+    patch_path.write_text(json.dumps(patch), encoding="utf-8")
+    patch_hash = hashlib.sha256(patch_path.read_bytes()).hexdigest()
+    outputs = iter(['{"answer":"wrong"}', '{"answer":"ok"}'])
+    result = run_capability_loop(
+        task(),
+        out_dir=tmp_path / "enabled",
+        worker=lambda prompt: (prompts.append(prompt) or response(next(outputs), "small-1.7b")),
+        max_worker_attempts=1,
+        max_teacher_passes=0,
+        deterministic_patch_retry={"patch_id": "experimental", "patch_path": str(patch_path), "patch_sha256": patch_hash},
+        external_teacher=lambda prompt: (_ for _ in ()).throw(AssertionError("teacher must not be called")),
+    )
+    assert result["patch_retry_attempted"] is True
+    assert result["patch_retry_passed"] is True
+    assert result["successful_intervention_source"] == "deterministic_patch_retry"
+    assert result["teacher_escalation_avoided"] is True
+    assert len(prompts) == 2
+    assert '"declared_output_contract"' in prompts[1]
+    assert '"bounded_reference_facts"' in prompts[1]
+    assert "Use the declared contract and evidence." in prompts[1]
+    retry = [row for row in records(tmp_path / "enabled" / "trajectory.jsonl") if row.get("record_type") == "worker_attempt" and row.get("intervention_source") == "deterministic_patch_retry"][0]
+    assert retry["intervention_id"] == "deterministic_patch_retry:1"
+    assert retry["deterministic_patch_hash"] == patch_hash
+
+    default_outputs = iter(['{"answer":"wrong"}', '{"answer":"wrong"}'])
+    default = run_capability_loop(
+        task(),
+        out_dir=tmp_path / "default",
+        worker=lambda prompt: response(next(default_outputs), "small-1.7b"),
+        max_worker_attempts=1,
+        max_teacher_passes=0,
+        external_teacher=lambda prompt: (_ for _ in ()).throw(RuntimeError("off")),
+    )
+    assert default["patch_retry_attempted"] is False
+    assert default["successful_intervention_source"] == "none"
+
+
+def test_optional_context_complete_retry_rejects_hash_mismatch(tmp_path: Path):
+    patch_path = tmp_path / "patch.json"
+    patch_path.write_text(json.dumps({"candidate_patch_id": "experimental", "prompt_delta": "Do it."}), encoding="utf-8")
+    with pytest.raises(ValueError, match="hash mismatch"):
+        run_capability_loop(task(), out_dir=tmp_path / "bad", worker=lambda prompt: response('{"answer":"ok"}', "small"), deterministic_patch_retry={"patch_id": "experimental", "patch_path": str(patch_path), "patch_sha256": "0" * 64})
 
 
 def test_existing_patch_is_retrieved_applied_and_hashed(tmp_path: Path):
@@ -280,7 +425,7 @@ def test_scorecard_aggregates_summary_success_fields_and_unresolved_source(tmp_p
     assert scorecard["passes_after_existing_patch"] == 0
     assert scorecard["passes_after_local_teacher_intervention"] == 1
     assert scorecard["passes_after_external_teacher_intervention"] == 1
-    assert scorecard["successful_intervention_source_counts"] == {"none": 1, "existing_patch": 0, "local_teacher": 1, "external_teacher": 1}
+    assert scorecard["successful_intervention_source_counts"] == {"none": 1, "existing_patch": 0, "deterministic_patch_retry": 0, "local_teacher": 1, "external_teacher": 1}
     assert scorecard["unresolved_count"] == 1
     assert scorecard["external_escalation_count"] == 2
     assert scorecard["groups"]["small::family-a"]["passes_after_local_teacher_intervention"] == 1
@@ -292,7 +437,7 @@ def test_scorecard_counts_only_durable_worker_intervention_sources(tmp_path: Pat
     patch = {"patch_id": "p1", "title": "patch", "status": "active", "failure_signature": ["wrong"], "applies_to": {"stage": ["validation"], "task_type": ["json-fixture"], "model_size": ["small"]}, "prompt_delta": "Be exact.", "required_output_fields": ["answer"], "validator_expectations": ["exact"]}
     library = PromptPatchLibrary(); library.add_patch(patch)
     result = run_capability_loop(task(), out_dir=tmp_path / "baseline", patch_library=library, existing_patch_ids=["p1"], worker=lambda p: response('{"answer":"ok"}', "small"), max_worker_attempts=1, max_teacher_passes=1)
-    assert result["intervention_attempts"] == {"none": True, "existing_patch": False, "local_teacher": False, "external_teacher": False}
+    assert result["intervention_attempts"] == {"none": True, "existing_patch": False, "deterministic_patch_retry": False, "local_teacher": False, "external_teacher": False}
 
     outputs = iter(['{"answer":"wrong"}', '{"answer":"wrong"}'])
     result = run_capability_loop(
@@ -304,7 +449,7 @@ def test_scorecard_counts_only_durable_worker_intervention_sources(tmp_path: Pat
         max_worker_attempts=1,
         max_teacher_passes=1,
     )
-    assert result["intervention_attempts"] == {"none": True, "existing_patch": False, "local_teacher": True, "external_teacher": False}
+    assert result["intervention_attempts"] == {"none": True, "existing_patch": False, "deterministic_patch_retry": False, "local_teacher": True, "external_teacher": False}
     assert result["external_escalation_count"] == 1
     assert result["external_teacher_call_count"] == 1
 

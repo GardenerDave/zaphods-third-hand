@@ -195,6 +195,106 @@ The formal preregistered `generation_variability_evidence` label is true because
 
 The strongest current conclusion is therefore not that packet topology was irrelevant, but that historical teacher-assisted success is not replayably causal from the durable artifacts under fresh calls. The apparent teacher contribution remains unresolved between semantic reasoning, omitted historical retry inputs, packet organization, and generation/inference-condition differences. No packet redesign or new intervention was made. Replay artifacts, reconstructed prompt hashes, the exact field/category audit, and per-call validations are review-only under `.work/capability_batch_reviewed_v1/historical_retry_replay/`.
 
+## Exact positive-control reproducibility
+
+The five context-complete distilled retry prompts were preserved as exact `retry_prompt.json` artifacts. Their task IDs and saved-file SHA256 hashes are:
+
+| Task | Prompt SHA256 |
+| --- | --- |
+| `capability-reviewed-frontdoor-dependency-uncertainty-001` | `bc72bd5dc7aef7cace7f358f2b8c6c6e76156ec8c75b0cd9d6931b7ffe572987` |
+| `capability-reviewed-frontdoor-docs-scope-001` | `0854cee87d7a19f67c77ae483f23b381cce9f55da71869908f9ee25eca40a675` |
+| `capability-reviewed-logic-contradiction-001` | `05735dce1770b71772daaca3f067506f98545c8c602dcb6e39bcec02daea8e0e` |
+| `capability-reviewed-patch-triage-contract-shape-001` | `d654f86571269b11a301fc63aa37d3611f78dc1d9bb0156d6b91f4f5ef9fac03` |
+| `capability-reviewed-patch-unsupported-certainty-001` | `54704b3de75d261ef0a03357128676c42d6a252e595191d2bd16d1fdd352f75f` |
+
+The source revision was `0f2ae813e3b1b8ff9f2d6a86a71d39d3ceae3624`. The tracked renderer, request construction, model resolution, response extraction, and validator paths are byte-identical to current HEAD. Historical outputs identify the same 1.7B model, but historical max tokens, temperature, top-p, seed, stop fields, and context size were not preserved. Current requests use the same model identity, the client default of 768 max tokens, temperature 0.2, and no top-p/seed/stop fields.
+
+The exact prompt replay used the saved prompt text unchanged, with three fresh calls per task. The first sandbox attempt produced only transport errors before reaching the endpoint; those were not counted as model calls and were replaced through the approved reachable worker path.
+
+| Metric | Result |
+| --- | ---: |
+| exact-prompt calls | 15 |
+| passes | 15/15 |
+| tasks with at least one pass | 5/5 |
+| repeatably reproducible tasks | 5/5 |
+| strong environment reproducibility | met |
+| environment-drift evidence | not met |
+| structural movement vs historical success | 0 fixed / 0 regressed |
+| semantic movement vs historical success | 0 fixed / 0 regressed |
+
+Every exact prompt passed on all three calls. The unchanged original prompt canary `capability-reviewed-logic-structured-output-001` also passed 3/3. This establishes a stable current worker control: previously successful exact prompts remain reproducible. It argues against general worker-environment drift as the explanation for the failed reconstructed teacher replay. The remaining confound is specific to the historical teacher tasks and the absence of their exact worker prompts or complete generation metadata, not a demonstrated global worker failure.
+
+Positive-control manifests, forensic source/request audit, per-call artifacts, canary artifacts, and environment provenance are review-only under `.work/capability_batch_reviewed_v1/exact_positive_control_replay/`.
+
+## Transport-validity correction and holdout repair
+
+The original negative experiments contained an experimental accounting failure. Raw response artifacts show that every purported worker call was a `request_error` with `Operation not permitted` before reaching the configured endpoint:
+
+| Experiment | Intended calls | Valid model calls | Transport errors | Interpretable result |
+| --- | ---: | ---: | ---: | --- |
+| Original holdout | 20 | 0 | 20 | invalid |
+| Ingredient ablation | 17 | 0 | 17 | invalid |
+| Historical H/R replay | 36 | 0 | 36 | invalid |
+
+Despite this, the runners passed the error text into the normal deterministic validator, producing `parse_json`, `required_fields`, `required_field_types`, and semantic failures. Those validation artifacts are preserved historical evidence, but they are not model-capability results. The original conclusions are therefore unsupported due to transport failure: holdout `0/10`, ingredient ablation `0/17`, historical H `0/18`, and historical R `0/18` all require re-evaluation. No original artifacts were overwritten.
+
+The holdout was repaired as the same preregistered experiment, not a new selection. The repair preserves the original manifest SHA256, selected ten tasks, frozen candidate/hash, renderer commit, thresholds, and original transport-artifact hashes under `.work/capability_batch_reviewed_v1/holdout_distilled_strict_contract_network_replay/`.
+
+| Repaired metric | Result |
+| --- | ---: |
+| tasks | 10 |
+| valid baseline model calls | 10 |
+| baseline passes | 0/10 |
+| retry opportunities | 10 |
+| valid retry model calls | 10 |
+| retry passes | 8/10 |
+| teacher-free rescues | 8 |
+| unresolved | 2 |
+| rescue rate | 80% (8/10) |
+| final pass rate | 80% (8/10) |
+| failed checks before / after | 50 / 5 |
+| structural checks fixed / regressed | 29 / 0 |
+| semantic checks fixed / regressed | 17 / 0 |
+
+The original preregistered thresholds, applied only to transport-valid model calls, produce:
+
+- `evidence_of_generalization`: met
+- `strong_generalization`: met
+- `no_task_level_generalization`: not met
+
+By historical disposition, repaired rescue rates were 3/3 for prior local-teacher cases, 1/3 for prior external-teacher cases, and 4/4 for prior unresolved cases. The two remaining failures were `capability-reviewed-logic-scope-allowlist-001` and `capability-reviewed-patch-repository-content-data-001`; their exact remaining failed checks are preserved in the repair summary.
+
+Structural movement was `parse_json`: 10, `required_fields`: 10, and `required_field_types`: 9. Semantic movement included diagnostic/review checks (4 each), queue handoff (3), review schema (2), plus must-include, must-preserve, repo-mutation, and unsafe-cleanup checks. No regressions occurred.
+
+The minimum permanent safeguard should be a transport-aware attempt boundary: classify raw responses before validation; only `status=ok` (or an explicitly documented model-response status) with no transport error may enter deterministic capability validation. `request_error`, `http_error`, timeout, and equivalent failures should create durable infrastructure-error artifacts, remain reviewable/retryable, and never receive a worker capability verdict or count toward pass/fail metrics. This safeguard is proposed only; it was not implemented in this correction.
+
+Ingredient ablation and historical H/R replay remain invalid and were not rerun. Their future repair must wait for review of this corrected holdout result.
+
+## Historical teacher-retry forensic reconstruction
+
+The six historical successes are preserved as follows:
+
+| Task | Successful attempt / intervention | Historical prompt tokens | Cached tokens | Completion tokens |
+| --- | --- | ---: | ---: | ---: |
+| `capability-reviewed-blocked-missing-review-required-001` | 3 / `local_teacher:1` | 285 | 50 | 77 |
+| `capability-reviewed-blocked-queue-inserted-001` | 3 / `local_teacher:1` | 304 | 48 | 52 |
+| `capability-reviewed-blocked-repo-mutation-001` | 4 / `local_teacher:2` | 414 | 53 | 69 |
+| `capability-reviewed-frontdoor-unsafe-cleanup-001` | 5 / `external_teacher:1` | 411 | 51 | 147 |
+| `capability-reviewed-logic-scope-allowlist-001` | 5 / `external_teacher:1` | 290 | 61 | 57 |
+| `capability-reviewed-patch-repository-content-data-001` | 5 / `external_teacher:1` | 265 | 48 | 62 |
+
+All six historical responses identify `Qwen_Qwen3-1.7B-Q4_K_M.gguf`, finish with `stop`, and preserve usage/timing metadata. Durable provenance retains `JARVIS_LOCAL`; request URLs are redacted/null. Applied patch IDs and hashes are empty for all six. The exact raw, metadata, validation, teacher, and trajectory artifacts are linked in `.work/capability_batch_reviewed_v1/historical_retry_forensic_audit/forensic_audit.json`.
+
+No exact historical prompt bytes or HTTP request payloads were preserved. The reconstructed H artifacts have no model-call token metadata because their earlier replay attempts were transport errors. Accordingly, all six token-fingerprint classifications are `token_fingerprint_unknown`—none can be called a match or mismatch. Historical prompt-token and cached-token values above remain preserved exactly as request fingerprints.
+
+The source trace is consistent across the historical capability-loop lineage beginning at `2cebcb9`, with semantic validation added at `0f98c50` and scorecard correction at `9485202`. The worker retry construction is: task prompt → selected existing patches (none in these six) → two newlines plus the current teacher heading → `json.dumps(parsed_teacher, sort_keys=True)`. Local and external retries use only the immediately preceding parsed teacher intervention. Earlier failed worker outputs and prior teacher records are retained for constructing later teacher packets, but are not appended to the subsequent worker retry. The worker boundary is an OpenAI-chat request with one fixed system message and one user message; historical/current tracked request construction is unchanged.
+
+Generation settings are recoverable from code as temperature `0.2`, absent top-p/seed/stop fields, and `stream: false`. Max tokens are code-default `768` but remain environment-dependent because historical overrides were not recorded. Context size and server-side chat-template accounting remain unknown.
+
+One concrete difference is confirmed in the prior unexecuted H reconstruction: its saved prompt files added a trailing newline, while the historical production concatenation did not. Since those replay attempts never reached the model, this difference has not been tested. The smallest possible next replay would remove only that trailing newline and preserve all other reconstructed content and settings; it is not being run now.
+
+The forensic conclusion is therefore not a confirmed historical request difference explaining the failed H replay. The necessary historical prompt bytes and complete request metadata were simply not preserved. No further behavioral experiment is justified until this audit is reviewed.
+
 ## Files
 
 - `synthesis/run_1_synthesis.json`
@@ -203,3 +303,53 @@ The strongest current conclusion is therefore not that packet topology was irrel
 - `synthesis/candidate_curriculum.json`
 - `synthesis/unresolved_hard_cases.json`
 - `synthesis/teacher_gap_analysis.json`
+
+## Corrected scientific record and transport hardening
+
+The original negative holdout, ingredient-ablation, and historical H/R replay
+results are retained above as historical artifacts, but are superseded for
+capability claims because their calls were transport request errors and never
+reached the worker. The exact positive control remains valid at 15/15 replay
+passes, with the unaided canary at 3/3. The transport-valid repair of the same
+preregistered holdout is the authoritative holdout result: 10/10 valid
+baselines failed, 10/10 valid deterministic retries ran, and 8/10 passed.
+
+The authoritative historical-disposition mapping for the ten repaired tasks is:
+
+| Historical disposition | Task IDs | Repaired rescues |
+| --- | --- | ---: |
+| local_teacher | `capability-reviewed-blocked-missing-review-required-001`, `capability-reviewed-blocked-queue-inserted-001`, `capability-reviewed-blocked-repo-mutation-001` | 3/3 |
+| external_teacher | `capability-reviewed-frontdoor-unsafe-cleanup-001`, `capability-reviewed-logic-scope-allowlist-001`, `capability-reviewed-patch-repository-content-data-001` | 1/3 |
+| unresolved | `capability-reviewed-blocked-missing-authority-term-001`, `capability-reviewed-logic-authority-boundary-001`, `capability-reviewed-queue-approved-candidate-001`, `capability-reviewed-queue-needs-repair-001` | 4/4 |
+
+This reconciliation supersedes the earlier holdout disposition labels without
+changing any trajectory or model outcome. The two unrepaired tasks are
+`capability-reviewed-logic-scope-allowlist-001` and
+`capability-reviewed-patch-repository-content-data-001`.
+
+The loop now classifies each worker response before validation. Only a confirmed
+`model_response` enters deterministic capability validation. Request errors,
+HTTP errors, timeouts, empty responses, and other infrastructure outcomes are
+durable infrastructure evidence with no capability verdict; they do not become
+parse/semantic failures, scorecard trials, intervention outcomes, or curriculum
+examples. Valid later attempts remain independently scoreable. Each attempt
+also preserves its exact rendered prompt artifact/hash, public endpoint alias,
+request/message provenance, model identity, generation settings, intervention
+identity, patch hashes, response usage/timings, finish reason, and transport
+classification.
+
+The optional `deterministic_patch_retry` rung is default-off and explicitly
+configured by patch path, ID, and SHA256. It resolves and verifies the reviewed
+experimental artifact, then runs:
+
+`worker baseline -> deterministic context-complete retry -> local teacher -> external teacher`
+
+only when the baseline produced a valid deterministic failure. It records patch
+attempt/pass/failure and teacher-escalation-avoided metrics separately. No patch
+promotion, training, queue insertion, or model-declared acceptance is enabled.
+
+Run 1 therefore proves teacher-assisted recovery, exact-prompt reproducibility,
+and 8/10 teacher-free holdout rescue within the selected Run 1 distribution. It
+does not prove arbitrary out-of-distribution generalization, weight-level
+learning, permanent capability change, optimal routing, or universal patch
+applicability.

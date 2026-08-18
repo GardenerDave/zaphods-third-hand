@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Any, Callable, Mapping
 
 from local_harness.icm_call import call_worker
-from local_harness.icm_spec import WorkerResponse, resolve_worker_spec
+from local_harness.icm_spec import WorkerResponse, classify_worker_response, resolve_worker_spec
 from local_harness.prompt_patch_library import (
     PromptPatchError,
     PromptPatchLibrary,
@@ -31,6 +31,7 @@ from local_harness.supervised_attempt_output_validator import (
 )
 from local_harness.supervised_model_attempt import build_supervised_model_attempt_record
 from local_harness.supervised_reference_fact_validator import validate_reference_facts
+from local_harness.distilled_retry_packet import render_distilled_retry_prompt
 
 
 TERMINAL_DISPOSITIONS = {"ready_for_review", "unresolved"}
@@ -188,6 +189,28 @@ def _validator_result(raw_output: str, task: Mapping[str, Any], *, attempt_id: s
     return record
 
 
+def _resolve_deterministic_retry_patch(config: Mapping[str, Any]) -> tuple[str, str, str]:
+    """Resolve an explicitly configured experimental patch, fail closed."""
+    patch_id = config.get("patch_id")
+    patch_path = config.get("patch_path")
+    expected_hash = config.get("patch_sha256")
+    if not all(isinstance(value, str) and value.strip() for value in (patch_id, patch_path, expected_hash)):
+        raise ValueError("deterministic patch retry requires patch_id, patch_path, and patch_sha256")
+    path = Path(patch_path)
+    if not path.exists():
+        raise ValueError(f"deterministic retry patch is unavailable: {patch_id}")
+    actual_hash = hashlib.sha256(path.read_bytes()).hexdigest()
+    if actual_hash != expected_hash:
+        raise ValueError(f"deterministic retry patch hash mismatch: {patch_id}")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if payload.get("candidate_patch_id", payload.get("patch_id")) != patch_id:
+        raise ValueError(f"deterministic retry patch id mismatch: {patch_id}")
+    prompt_delta = payload.get("prompt_delta")
+    if not isinstance(prompt_delta, str) or not prompt_delta.strip():
+        raise ValueError(f"deterministic retry patch has no prompt_delta: {patch_id}")
+    return patch_id, actual_hash, prompt_delta
+
+
 def _teacher_prompt(
     task: Mapping[str, Any],
     *,
@@ -297,6 +320,7 @@ def run_capability_loop(
     max_teacher_passes: int = 2,
     existing_patch_ids: list[str] | None = None,
     patch_library: PromptPatchLibrary | None = None,
+    deterministic_patch_retry: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     if max_worker_attempts < 1 or max_teacher_passes < 0:
         raise ValueError("retry ceilings must be non-negative and worker attempts must be positive")
@@ -315,6 +339,7 @@ def run_capability_loop(
     library = patch_library or PromptPatchLibrary()
     selected_patches = resolve_existing_patches(task, list(existing_patch_ids or []), library)
     patch_records = [{"patch_id": p["patch_id"], "patch_hash": sha256_text(json.dumps(p, sort_keys=True))} for p in selected_patches]
+    deterministic_patch = _resolve_deterministic_retry_patch(deterministic_patch_retry) if deterministic_patch_retry else None
     unpatched_prompt = task["prompt"]
     patched_prompt = unpatched_prompt + ("\n\n" + render_prompt_deltas(selected_patches) if selected_patches else "")
     if worker is None:
@@ -324,6 +349,9 @@ def run_capability_loop(
         spec = resolve_worker_spec(os.environ.get("ZTH_CAPABILITY_TEACHER_NAME", "deep"), base_url=os.environ.get("ZTH_CAPABILITY_TEACHER_BASE_URL"), model=os.environ.get("ZTH_CAPABILITY_TEACHER_MODEL"))
         local_teacher = lambda p, teacher_spec=spec: call_worker(teacher_spec, p, int(os.environ.get("ZTH_CAPABILITY_TEACHER_MAX_TOKENS", "1200")), timeout=int(os.environ.get("ZTH_CAPABILITY_TEACHER_TIMEOUT", "900")))
     external_teacher = external_teacher or _external_teacher
+    patch_retry_attempted = False
+    patch_retry_passed = False
+    patch_retry_failed = False
 
     # Durable artifact scan turns an interruption between a write and a JSONL
     # append into a recoverable transition instead of a repeated model call.
@@ -335,71 +363,99 @@ def run_capability_loop(
         raw_path = out_dir / f"attempt-{n}.raw.json"
         validation_path = out_dir / f"attempt-{n}.validation.json"
         metadata_path = out_dir / f"attempt-{n}.metadata.json"
-        if raw_path.exists() and validation_path.exists():
+        if raw_path.exists():
             raw = json.loads(raw_path.read_text(encoding="utf-8"))
-            validation = json.loads(validation_path.read_text(encoding="utf-8"))
+            validation = json.loads(validation_path.read_text(encoding="utf-8")) if validation_path.exists() else None
             metadata = json.loads(metadata_path.read_text(encoding="utf-8")) if metadata_path.exists() else {"attempt": n, "intervention_source": "none", "intervention_id": "none:1", "escalation_level": 0, "applied_patch_ids": [], "applied_patch_hashes": {}}
-            attempts.append({"record_type": "worker_attempt", **metadata, "raw_output": raw["content"], "validation": validation, "artifact_refs": {"raw": raw_path.name, "validation": validation_path.name, "metadata": metadata_path.name}, "artifact_hashes": {"raw": sha256_text(raw_path.read_text()), "validation": sha256_text(validation_path.read_text()), "metadata": sha256_text(metadata_path.read_text()) if metadata_path.exists() else None}, "worker_model": raw.get("metadata", {}).get("model") or "unknown"})
+            attempts.append({"record_type": "worker_attempt", **metadata, "raw_output": raw["content"], "validation": validation, "artifact_refs": {"raw": raw_path.name, **({"validation": validation_path.name} if validation else {}), "metadata": metadata_path.name}, "artifact_hashes": {"raw": sha256_text(raw_path.read_text()), **({"validation": sha256_text(validation_path.read_text())} if validation else {}), "metadata": sha256_text(metadata_path.read_text()) if metadata_path.exists() else None}, "worker_model": raw.get("metadata", {}).get("model") or "unknown", "transport_valid": bool(metadata.get("transport_valid", validation is not None))})
     for teacher_path in sorted(out_dir.glob("local-teacher-*.json")):
         payload = json.loads(teacher_path.read_text(encoding="utf-8"))
         parsed = payload.get("parsed", {})
         pass_number = int(teacher_path.stem.split("-")[-1])
         teacher_records.append({"record_type": "local_teacher", "attempt": pass_number, "intervention_id": f"local_teacher:{pass_number}", "local_teacher_model": payload.get("raw", {}).get("metadata", {}).get("model"), "teacher_evidence": payload, "failure_classification": parsed.get("failure_classification"), "teacher_diagnosis": parsed.get("teacher_diagnosis"), "corrected_reference_output": parsed.get("corrected_reference_output"), "candidate_prompt_patch": parsed.get("candidate_prompt_patch"), "subsequent_worker_result": "not_run", "review_state": "ready_for_review"})
-    def worker_attempt(prompt: str, source: str, escalation_level: int, intervention_id: str) -> bool:
+    def worker_attempt(prompt: str, source: str, escalation_level: int, intervention_id: str, *, patch_record: dict[str, str] | None = None) -> bool:
         n = len(attempts) + 1
         raw_path = out_dir / f"attempt-{n}.raw.json"
         validation_path = out_dir / f"attempt-{n}.validation.json"
         metadata_path = out_dir / f"attempt-{n}.metadata.json"
+        prompt_path = out_dir / f"attempt-{n}.prompt.txt"
+        if not prompt_path.exists():
+            prompt_path.write_text(prompt, encoding="utf-8")
         if raw_path.exists():
             raw_payload = json.loads(raw_path.read_text(encoding="utf-8"))
         else:
-            _transition(trajectory, transition="worker_call_started", task_id=task_id, attempt=n, source=source, intervention_id=intervention_id)
+            _transition(trajectory, transition="worker_call_started", task_id=task_id, attempt=n, source=source, intervention_id=intervention_id, prompt_artifact=prompt_path.name, prompt_sha256=sha256_text(prompt))
             response = worker(prompt)
             raw_payload = _response_payload(response)
             _json_write(raw_path, raw_payload)
             _transition(trajectory, transition="worker_output_captured", task_id=task_id, attempt=n, source=source, intervention_id=intervention_id, artifact_ref=raw_path.name, artifact_hash=sha256_text(raw_path.read_text()))
-        validation = json.loads(validation_path.read_text(encoding="utf-8")) if validation_path.exists() else _validator_result(raw_payload["content"], task, attempt_id=f"attempt-{n}")
-        metadata = {"attempt": n, "intervention_source": source, "intervention_id": intervention_id, "escalation_level": escalation_level, "applied_patch_ids": [p["patch_id"] for p in selected_patches] if source == "existing_patch" else [], "applied_patch_hashes": {p["patch_id"]: p["patch_hash"] for p in patch_records} if source == "existing_patch" else {}, "validation_status": validation.get("validation_status")}
+        transport_classification = raw_payload.get("metadata", {}).get("transport_classification") or classify_worker_response(raw_payload.get("status", ""), raw_payload.get("metadata", {}).get("error"))
+        transport_valid = transport_classification == "model_response"
+        validation = None
+        if transport_valid:
+            validation = json.loads(validation_path.read_text(encoding="utf-8")) if validation_path.exists() else _validator_result(raw_payload["content"], task, attempt_id=f"attempt-{n}")
+        request_provenance = raw_payload.get("metadata", {}).get("request_provenance") or {
+            "prompt_sha256": sha256_text(prompt),
+            "message_structure": ["user"],
+            "model": raw_payload.get("metadata", {}).get("model"),
+            "configured_model": raw_payload.get("metadata", {}).get("configured_model"),
+            "max_tokens": None,
+            "temperature": None,
+            "top_p": None,
+            "seed": None,
+            "stop": None,
+            "settings_status": "unknown",
+        }
+        metadata = {"attempt": n, "intervention_source": source, "intervention_id": intervention_id, "escalation_level": escalation_level, "applied_patch_ids": [p["patch_id"] for p in selected_patches] if source == "existing_patch" else [], "applied_patch_hashes": {p["patch_id"]: p["patch_hash"] for p in patch_records} if source == "existing_patch" else {}, "deterministic_patch_id": patch_record["patch_id"] if patch_record else None, "deterministic_patch_hash": patch_record["patch_hash"] if patch_record else None, "transport_valid": transport_valid, "transport_classification": transport_classification, "validation_status": validation.get("validation_status") if validation else None, "endpoint_alias": raw_payload.get("metadata", {}).get("endpoint_alias", PUBLIC_ENDPOINT_ALIAS), "request_provenance": request_provenance, "prompt_artifact": prompt_path.name, "prompt_sha256": sha256_text(prompt)}
         if not metadata_path.exists():
             _json_write(metadata_path, metadata)
-        if not validation_path.exists():
+        if transport_valid and not validation_path.exists():
             _json_write(validation_path, validation)
             _transition(trajectory, transition="worker_output_validated", task_id=task_id, attempt=n, source=source, intervention_id=intervention_id, validation=validation, artifact_ref=validation_path.name, artifact_hash=sha256_text(validation_path.read_text()))
-        record = {"record_type": "worker_attempt", **metadata, "endpoint_alias": raw_payload.get("metadata", {}).get("endpoint_alias", PUBLIC_ENDPOINT_ALIAS), "raw_output": raw_payload["content"], "validation": validation, "artifact_refs": {"raw": raw_path.name, "validation": validation_path.name, "metadata": metadata_path.name}, "artifact_hashes": {"raw": sha256_text(raw_path.read_text()), "validation": sha256_text(validation_path.read_text()), "metadata": sha256_text(metadata_path.read_text())}, "worker_model": raw_payload.get("metadata", {}).get("model") or "unknown", "review_state": "ready_for_review" if validation.get("validation_status") == "passed" else "unresolved"}
+        record = {"record_type": "worker_attempt", **metadata, "raw_output": raw_payload["content"], "validation": validation, "transport_error": raw_payload.get("metadata", {}).get("error") if not transport_valid else None, "artifact_refs": {"raw": raw_path.name, "prompt": prompt_path.name, "metadata": metadata_path.name, **({"validation": validation_path.name} if transport_valid else {})}, "artifact_hashes": {"raw": sha256_text(raw_path.read_text()), "prompt": sha256_text(prompt_path.read_text()), "metadata": sha256_text(metadata_path.read_text()), **({"validation": sha256_text(validation_path.read_text())} if transport_valid else {})}, "worker_model": raw_payload.get("metadata", {}).get("model") or "unknown", "review_state": "ready_for_review" if validation and validation.get("validation_status") == "passed" else "infrastructure_error" if not transport_valid else "unresolved"}
         if not any(r.get("record_type") == "worker_attempt" and r.get("attempt") == n for r in _records(trajectory)):
             _append_jsonl(trajectory, record)
         attempts.append(record)
-        return validation.get("validation_status") == "passed"
+        return bool(validation and validation.get("validation_status") == "passed")
 
     external_path = out_dir / "external-teacher.json"
     baseline_pass = False
     if not attempts:
         baseline_pass = worker_attempt(unpatched_prompt, "none", 0, "none:1")
     else:
-        baseline_pass = any(a.get("intervention_id", "").startswith("none:") and a["validation"].get("validation_status") == "passed" for a in attempts)
+        baseline_pass = any(a.get("intervention_id", "").startswith("none:") and a.get("validation", {}).get("validation_status") == "passed" for a in attempts)
     baseline_count = sum(a.get("intervention_source") == "none" for a in attempts)
     if not baseline_pass and not selected_patches and baseline_count < max_worker_attempts:
         for retry_number in range(baseline_count + 1, max_worker_attempts + 1):
             if worker_attempt(unpatched_prompt, "none", 0, f"none:{retry_number}"):
                 baseline_pass = True
                 break
+    model_failure = any(a.get("transport_valid") and a.get("validation", {}).get("validation_status") == "failed" for a in attempts)
+    if not baseline_pass and model_failure and deterministic_patch:
+        deterministic_patch_id, deterministic_patch_hash, deterministic_prompt_delta = deterministic_patch
+        baseline_attempt = next(a for a in reversed(attempts) if a.get("intervention_source") == "none" and a.get("transport_valid") and a.get("validation", {}).get("validation_status") == "failed")
+        retry_prompt = render_distilled_retry_prompt(task, baseline_attempt["validation"], deterministic_prompt_delta)
+        patch_retry_attempted = True
+        patch_retry_passed = worker_attempt(retry_prompt, "deterministic_patch_retry", 0, "deterministic_patch_retry:1", patch_record={"patch_id": deterministic_patch_id, "patch_hash": deterministic_patch_hash})
+        patch_retry_failed = not patch_retry_passed
+        model_failure = model_failure or any(a.get("transport_valid") and a.get("validation", {}).get("validation_status") == "failed" for a in attempts)
     existing_pass = False
-    if selected_patches:
-        existing_pass = any(a.get("intervention_id") == "existing_patch:1" and a["validation"].get("validation_status") == "passed" for a in attempts)
+    if model_failure and selected_patches:
+        existing_pass = any(a.get("intervention_id") == "existing_patch:1" and a.get("validation", {}).get("validation_status") == "passed" for a in attempts)
     existing_attempt = any(a.get("intervention_id") == "existing_patch:1" for a in attempts)
-    if not baseline_pass and not existing_pass and selected_patches and not existing_attempt:
+    if model_failure and not baseline_pass and not existing_pass and selected_patches and not existing_attempt:
         existing_pass = worker_attempt(patched_prompt, "existing_patch", 0, "existing_patch:1")
-    local_pass = any(a.get("intervention_id", "").startswith("local_teacher:") and a["validation"].get("validation_status") == "passed" for a in attempts)
+    local_pass = any(a.get("intervention_id", "").startswith("local_teacher:") and a.get("validation", {}).get("validation_status") == "passed" for a in attempts)
     for teacher_pass in range(1, max_teacher_passes + 1):
-        if baseline_pass or existing_pass or local_pass:
+        if baseline_pass or existing_pass or patch_retry_passed or local_pass or not model_failure:
             break
         intervention_id = f"local_teacher:{teacher_pass}"
         prior_retry = next((a for a in attempts if a.get("intervention_id") == intervention_id), None)
         if prior_retry is not None:
             if teacher_pass <= len(teacher_records):
-                teacher_records[teacher_pass - 1]["subsequent_worker_result"] = "passed" if prior_retry["validation"].get("validation_status") == "passed" else "failed"
+                teacher_records[teacher_pass - 1]["subsequent_worker_result"] = "passed" if prior_retry.get("validation", {}).get("validation_status") == "passed" else "failed"
             continue
-        failed = [a for a in attempts if a["validation"].get("validation_status") != "passed"]
+        failed = [a for a in attempts if a.get("transport_valid") and a.get("validation", {}).get("validation_status") != "passed"]
         teacher_path = out_dir / f"local-teacher-{teacher_pass}.json"
         if teacher_path.exists():
             teacher_payload = json.loads(teacher_path.read_text(encoding="utf-8"))
@@ -418,13 +474,13 @@ def run_capability_loop(
         local_pass = worker_attempt(patched_prompt + "\n\n## Local teacher intervention\n" + intervention, "local_teacher", 1, intervention_id)
         teacher_record["subsequent_worker_result"] = "passed" if local_pass else "failed"
         _transition(trajectory, transition="local_teacher_retry_completed", task_id=task_id, attempt=teacher_pass, source="local_teacher", validation=attempts[-1]["validation"], worker_attempt=attempts[-1]["attempt"])
-    external_pass = any(a.get("intervention_id") == "external_teacher:1" and a["validation"].get("validation_status") == "passed" for a in attempts)
+    external_pass = any(a.get("intervention_id") == "external_teacher:1" and a.get("validation", {}).get("validation_status") == "passed" for a in attempts)
     external_used = False
     external_record: dict[str, Any] | None = None
     external_teacher_call_count = sum(
         1 for record in _records(trajectory) if record.get("transition") == "external_teacher_started"
     )
-    if not baseline_pass and not existing_pass and not local_pass:
+    if model_failure and not baseline_pass and not existing_pass and not patch_retry_passed and not local_pass:
         external_used = True
         external_path = out_dir / "external-teacher.json"
         if external_path.exists():
@@ -447,13 +503,15 @@ def run_capability_loop(
             external_record = {"record_type": "external_teacher", "attempt": 1, "intervention_id": "external_teacher:1", "external_teacher": external_payload.get("identity"), "corrected_reference_output": external_payload["parsed"].get("corrected_reference_output"), "candidate_prompt_patch": external_payload["parsed"].get("candidate_prompt_patch"), "subsequent_worker_result": "passed" if external_pass else "failed", "review_state": "ready_for_review"}
             _transition(trajectory, transition="external_teacher_retry_completed", task_id=task_id, attempt=1, source="external_teacher", validation=attempts[-1]["validation"], worker_attempt=attempts[-1]["attempt"])
 
-    final_pass = baseline_pass or existing_pass or local_pass or external_pass
-    source = "none" if baseline_pass else "existing_patch" if existing_pass else "local_teacher" if local_pass else "external_teacher" if external_pass else "none"
+    final_pass = baseline_pass or existing_pass or patch_retry_passed or local_pass or external_pass
+    source = "none" if baseline_pass else "existing_patch" if existing_pass else "deterministic_patch_retry" if patch_retry_passed else "local_teacher" if local_pass else "external_teacher" if external_pass else "none"
     intervention_attempts = {
         source_name: any(a.get("intervention_source") == source_name for a in attempts)
-        for source_name in ("none", "existing_patch", "local_teacher", "external_teacher")
+        for source_name in ("none", "existing_patch", "deterministic_patch_retry", "local_teacher", "external_teacher")
     }
-    intervention_outcome = "no-effect"
+    capability_verdict_available = any(a.get("transport_valid") for a in attempts)
+    infrastructure_error_count = sum(not a.get("transport_valid") for a in attempts)
+    intervention_outcome = "no-effect" if capability_verdict_available else "not-applicable"
     if source != "none":
         intervention_outcome = "helped" if final_pass else "no-effect"
     candidate_examples = []
@@ -465,7 +523,7 @@ def run_capability_loop(
     if not any(r.get("transition") in {"ready_for_review", "unresolved"} for r in _records(trajectory)):
         _transition(trajectory, transition="ready_for_review" if final_pass else "unresolved", task_id=task_id, source=source, disposition="ready_for_review" if final_pass else "unresolved", successful_intervention_source=source)
     summary = {
-        "schema": "supervised_capability_trajectory_v2", "task_id": task_id, "task_family": task["task_family"], "endpoint_alias": os.environ.get("ZTH_PUBLIC_HOST_ALIAS", PUBLIC_ENDPOINT_ALIAS), "worker_model": attempts[0]["worker_model"] if attempts else None, "local_teacher_model": teacher_records[0].get("local_teacher_model") if teacher_records else None, "external_escalation_count": int(external_used), "external_teacher_call_count": external_teacher_call_count, "trials": 1, "pass": final_pass, "first_attempt_pass": bool(attempts and attempts[0]["validation"].get("validation_status") == "passed"), "pass_after_existing_patch": existing_pass, "pass_after_local_teacher_intervention": local_pass, "pass_after_external_teacher_intervention": external_pass, "successful_intervention_source": source, "intervention_attempts": intervention_attempts, "intervention_outcome": intervention_outcome, "candidate_prompt_patches": candidate_patches, "candidate_curriculum_examples": candidate_examples, "unresolved": not final_pass, "disposition": "ready_for_review" if final_pass else "unresolved", "attempt_count": len(attempts), "teacher_pass_count": len(teacher_records), "authority_boundaries": REQUIRED_AUTHORITY, "review_state": "ready_for_review" if final_pass else "unresolved", "trajectory_artifact": str(trajectory), "generated_at": utc_now()
+        "schema": "supervised_capability_trajectory_v2", "task_id": task_id, "task_family": task["task_family"], "endpoint_alias": os.environ.get("ZTH_PUBLIC_HOST_ALIAS", PUBLIC_ENDPOINT_ALIAS), "worker_model": attempts[0]["worker_model"] if attempts else None, "local_teacher_model": teacher_records[0].get("local_teacher_model") if teacher_records else None, "external_escalation_count": int(external_used), "external_teacher_call_count": external_teacher_call_count, "trials": 1, "capability_verdict_available": capability_verdict_available, "model_attempt_count": sum(bool(a.get("transport_valid")) for a in attempts), "infrastructure_error_count": infrastructure_error_count, "pass": final_pass, "first_attempt_pass": bool(attempts and (attempts[0].get("validation") or {}).get("validation_status") == "passed"), "pass_after_existing_patch": existing_pass, "patch_retry_attempted": patch_retry_attempted, "patch_retry_passed": patch_retry_passed, "patch_retry_failed": patch_retry_failed, "teacher_escalation_avoided": patch_retry_passed and not teacher_records and not external_record, "pass_after_local_teacher_intervention": local_pass, "pass_after_external_teacher_intervention": external_pass, "successful_intervention_source": source, "intervention_attempts": intervention_attempts, "intervention_outcome": intervention_outcome, "candidate_prompt_patches": candidate_patches, "candidate_curriculum_examples": candidate_examples, "unresolved": not final_pass if capability_verdict_available else False, "disposition": "ready_for_review" if final_pass else "unresolved", "attempt_count": len(attempts), "teacher_pass_count": len(teacher_records), "authority_boundaries": REQUIRED_AUTHORITY, "review_state": "ready_for_review" if final_pass else "unresolved", "trajectory_artifact": str(trajectory), "generated_at": utc_now()
     }
     _json_write(summary_path, summary)
     return summary
@@ -473,7 +531,8 @@ def run_capability_loop(
 
 def aggregate_scorecard(trajectory_paths: list[Path]) -> dict[str, Any]:
     summaries = [json.loads((p.parent / "trajectory_summary.json").read_text(encoding="utf-8")) for p in trajectory_paths if (p.parent / "trajectory_summary.json").exists()]
-    source_counts = {source: {"trials": 0, "passes": 0} for source in ("none", "existing_patch", "local_teacher", "external_teacher")}
+    capability_summaries = [row for row in summaries if row.get("capability_verdict_available", True)]
+    source_counts = {source: {"trials": 0, "passes": 0} for source in ("none", "existing_patch", "deterministic_patch_retry", "local_teacher", "external_teacher")}
     success_fields = {
         "passes_after_existing_patch": "pass_after_existing_patch",
         "passes_after_local_teacher_intervention": "pass_after_local_teacher_intervention",
@@ -481,7 +540,7 @@ def aggregate_scorecard(trajectory_paths: list[Path]) -> dict[str, Any]:
     }
     global_counts = {"passes": 0, "first_attempt_passes": 0, **{field: 0 for field in success_fields}}
     groups: dict[str, dict[str, Any]] = {}
-    for row in summaries:
+    for row in capability_summaries:
         observed = row.get("intervention_attempts", {row.get("successful_intervention_source", "none"): True})
         for source, attempted in observed.items():
             if attempted:
@@ -489,7 +548,7 @@ def aggregate_scorecard(trajectory_paths: list[Path]) -> dict[str, Any]:
                 source_counts[source]["trials"] += 1
                 source_counts[source]["passes"] += int(row.get("pass", False) and row.get("successful_intervention_source") == source)
         key = f"{row.get('worker_model')}::{row.get('task_family')}"
-        group = groups.setdefault(key, {"trials": 0, "passes": 0, "first_attempt_passes": 0, "passes_after_existing_patch": 0, "passes_after_local_teacher_intervention": 0, "passes_after_external_teacher_intervention": 0, "external_escalations": 0, "intervention_helped": 0, "intervention_hurt": 0, "intervention_no_effect": 0, "unresolved": 0})
+        group = groups.setdefault(key, {"trials": 0, "passes": 0, "first_attempt_passes": 0, "passes_after_existing_patch": 0, "deterministic_patch_retry_attempts": 0, "deterministic_patch_retry_passes": 0, "passes_after_local_teacher_intervention": 0, "passes_after_external_teacher_intervention": 0, "external_escalations": 0, "intervention_helped": 0, "intervention_hurt": 0, "intervention_no_effect": 0, "intervention_not_applicable": 0, "unresolved": 0})
         group["trials"] += 1
         group["passes"] += int(row.get("pass", False))
         group["first_attempt_passes"] += int(row.get("first_attempt_pass", False))
@@ -498,14 +557,18 @@ def aggregate_scorecard(trajectory_paths: list[Path]) -> dict[str, Any]:
         for field, summary_field in success_fields.items():
             group[field] += int(row.get(summary_field, False))
             global_counts[field] += int(row.get(summary_field, False))
+        group["deterministic_patch_retry_attempts"] += int(row.get("patch_retry_attempted", False))
+        group["deterministic_patch_retry_passes"] += int(row.get("patch_retry_passed", False))
         group["external_escalations"] += int(row.get("external_escalation_count", 0) > 0)
         group[f"intervention_{row.get('intervention_outcome', 'no-effect').replace('-', '_')}"] += 1
         group["unresolved"] += int(row.get("unresolved", False))
     for group in groups.values():
         group["pass_rate"] = group["passes"] / group["trials"] if group["trials"] else 0.0
         group["first_attempt_pass_rate"] = group["first_attempt_passes"] / group["trials"] if group["trials"] else 0.0
-    unresolved_count = sum(int(s.get("unresolved", False)) for s in summaries)
-    return {"schema": "supervised_capability_scorecard_v2", "trials": len(summaries), "pass_rate": global_counts["passes"] / len(summaries) if summaries else 0.0, **global_counts, "groups": groups, "by_intervention_source": source_counts, "successful_intervention_source_counts": {source: counts["passes"] for source, counts in source_counts.items()}, "external_escalation_count": sum(int(s.get("external_escalation_count", 0)) for s in summaries), "external_teacher_call_count": sum(int(s.get("external_teacher_call_count", 0)) for s in summaries), "unresolved_count": unresolved_count, "intervention_helped": sum(int(s.get("intervention_outcome") == "helped") for s in summaries), "intervention_hurt": sum(int(s.get("intervention_outcome") == "hurt") for s in summaries), "intervention_no_effect": sum(int(s.get("intervention_outcome") == "no-effect") for s in summaries), "candidate_prompt_patches": [p for s in summaries for p in s.get("candidate_prompt_patches", [])], "candidate_curriculum_examples": [e for s in summaries for e in s.get("candidate_curriculum_examples", [])]}
+    unresolved_count = sum(int(s.get("unresolved", False)) for s in capability_summaries)
+    patch_attempts = sum(int(s.get("patch_retry_attempted", False)) for s in capability_summaries)
+    patch_passes = sum(int(s.get("patch_retry_passed", False)) for s in capability_summaries)
+    return {"schema": "supervised_capability_scorecard_v2", "trials": len(capability_summaries), "infrastructure_attempts_excluded": len(summaries) - len(capability_summaries), "pass_rate": global_counts["passes"] / len(capability_summaries) if capability_summaries else 0.0, **global_counts, "baseline_worker_passes": sum(int(s.get("first_attempt_pass", False)) for s in capability_summaries), "deterministic_patch_retry_attempts": patch_attempts, "deterministic_patch_retry_passes": patch_passes, "deterministic_patch_retry_rescue_rate": patch_passes / patch_attempts if patch_attempts else 0.0, "teacher_escalations_avoided": sum(int(s.get("teacher_escalation_avoided", False)) for s in capability_summaries), "groups": groups, "by_intervention_source": source_counts, "successful_intervention_source_counts": {source: counts["passes"] for source, counts in source_counts.items()}, "external_escalation_count": sum(int(s.get("external_escalation_count", 0)) for s in capability_summaries), "external_teacher_call_count": sum(int(s.get("external_teacher_call_count", 0)) for s in capability_summaries), "unresolved_count": unresolved_count, "intervention_helped": sum(int(s.get("intervention_outcome") == "helped") for s in capability_summaries), "intervention_hurt": sum(int(s.get("intervention_outcome") == "hurt") for s in capability_summaries), "intervention_no_effect": sum(int(s.get("intervention_outcome") == "no-effect") for s in capability_summaries), "intervention_not_applicable": sum(int(s.get("intervention_outcome") == "not-applicable") for s in summaries), "infrastructure_error_count": sum(int(s.get("infrastructure_error_count", 0)) for s in summaries), "candidate_prompt_patches": [p for s in capability_summaries for p in s.get("candidate_prompt_patches", [])], "candidate_curriculum_examples": [e for s in capability_summaries for e in s.get("candidate_curriculum_examples", [])]}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -516,8 +579,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--existing-patch-id", action="append", default=[])
     parser.add_argument("--max-worker-attempts", type=int, default=2)
     parser.add_argument("--max-teacher-passes", type=int, default=2)
+    parser.add_argument("--deterministic-patch-path")
+    parser.add_argument("--deterministic-patch-id")
+    parser.add_argument("--deterministic-patch-sha256")
     args = parser.parse_args(argv)
-    summary = run_capability_loop(load_task_fixture(args.fixture), out_dir=args.out_dir, max_worker_attempts=args.max_worker_attempts, max_teacher_passes=args.max_teacher_passes, existing_patch_ids=args.existing_patch_id, patch_library=load_patch_library(args.patch_dir))
+    deterministic_patch_retry = None
+    if any(value is not None for value in (args.deterministic_patch_path, args.deterministic_patch_id, args.deterministic_patch_sha256)):
+        deterministic_patch_retry = {"patch_path": args.deterministic_patch_path, "patch_id": args.deterministic_patch_id, "patch_sha256": args.deterministic_patch_sha256}
+    summary = run_capability_loop(load_task_fixture(args.fixture), out_dir=args.out_dir, max_worker_attempts=args.max_worker_attempts, max_teacher_passes=args.max_teacher_passes, existing_patch_ids=args.existing_patch_id, patch_library=load_patch_library(args.patch_dir), deterministic_patch_retry=deterministic_patch_retry)
     print(json.dumps(summary, indent=2, sort_keys=True))
     return 0 if summary["disposition"] == "ready_for_review" else 1
 

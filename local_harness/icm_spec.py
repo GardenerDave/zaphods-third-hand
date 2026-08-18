@@ -71,6 +71,7 @@ class WorkerResponse:
     error: str | None = None
     model_resolution_attempted: bool = False
     model_resolution_error: str | None = None
+    request_provenance: Mapping[str, Any] | None = None
 
     def metadata(self) -> dict[str, Any]:
         return {
@@ -85,7 +86,27 @@ class WorkerResponse:
             "error": self.error,
             "model_resolution_attempted": self.model_resolution_attempted,
             "model_resolution_error": self.model_resolution_error,
+            "request_provenance": self.request_provenance,
+            "transport_classification": classify_worker_response(self.status, self.error),
         }
+
+
+def classify_worker_response(status: str, error: str | None = None) -> str:
+    """Classify transport/model outcomes before any capability validation."""
+    if status == "ok":
+        return "model_response"
+    if status == "empty_content":
+        return "empty_model_response"
+    if status == "reasoning_only":
+        return "model_response"
+    if status in {"timeout", "request_timeout"}:
+        return "transport_timeout"
+    if status == "request_error":
+        text = (error or "").lower()
+        return "transport_timeout" if "timed out" in text or "timeout" in text else "transport_request_error"
+    if status == "http_error":
+        return "transport_http_error"
+    return "other_infrastructure_error"
 
 
 def normalize_base_url(base_url: str) -> str:
