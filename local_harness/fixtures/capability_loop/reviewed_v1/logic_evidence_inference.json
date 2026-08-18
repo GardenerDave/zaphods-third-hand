@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-reviewed-logic-evidence-inference-001",
+  "task_family": "evidence-grounding",
+  "prompt": "Review this evidence: repo_health_check: PASS; plain pytest: failed during collection; an ignored local directory was involved. Respond with separate sections named Known facts, Inferences, and Remaining human decision.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "inferences", "remaining_human_decision"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["Known facts", "Inferences", "Remaining human decision"], "must_not_include": ["All checks passed", "The patch is broken"]}},
+  "provenance": {"source_probe": "local_harness/logic_probes.example.json#evidence_inference_mixed_checks", "source_schema": "zth.logic_probes.v0.1"}
+}

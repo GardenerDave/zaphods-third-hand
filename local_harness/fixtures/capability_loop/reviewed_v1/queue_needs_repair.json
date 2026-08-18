@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-reviewed-queue-needs-repair-001",
+  "task_family": "queue-authority-boundary",
+  "prompt": "Review a candidate that needs repair before insertion. Report the repair-only disposition with diagnostics and do not perform repair or queue insertion.",
+  "output_contract": {"format": "json", "required_fields": ["review_schema", "queue_handoff_review_status", "queue_handoff_status", "automation_status", "repo_mutation_status", "downstream_use_status", "diagnostics", "recommended_next_step"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"source_expected_validation_status": "passed", "review_schema": "queue_handoff_review_v1", "queue_handoff_status": "not_inserted"}},
+  "provenance": {"source_fixture": "local_harness/fixtures/queue_approval_path/needs_repair_before_insertion_valid_001.json", "source_expected": "needs_repair_before_insertion_valid_001.expected.json"}
+}

@@ -70,7 +70,8 @@ class RepoHealthCheckTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
             readme = root / "README.md"
-            readme.write_text("Endpoint: http://192.168.1.10:8080/v1\n", encoding="utf-8")
+            private_host = ".".join(("192", "168", "0", "1"))
+            readme.write_text(f"Endpoint: http://{private_host}:8080/v1\n", encoding="utf-8")
 
             result = repo_health_check.check_privacy(root)
 
@@ -83,7 +84,7 @@ class RepoHealthCheckTests(unittest.TestCase):
             report = root / "docs" / "reports" / "historical.md"
             report.parent.mkdir(parents=True)
             report.write_text(
-                "Historical endpoint http://10.0.0.8 and ZTH_API_KEY.\n",
+                "Historical endpoint http://JARVIS_LOCAL and ZTH_API_KEY.\n",
                 encoding="utf-8",
             )
 

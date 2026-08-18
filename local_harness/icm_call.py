@@ -11,20 +11,36 @@ import urllib.error
 import urllib.request
 from typing import Any, Sequence
 
-from icm_spec import (
-    DEFAULT_WORKERS,
-    NATIVE_COMPLETION,
-    NATIVE_SYSTEM_PROMPT,
-    OPENAI_CHAT,
-    OPENAI_COMPLETIONS,
-    SYSTEM_PROMPT,
-    WorkerResponse,
-    WorkerSpec,
-    completion_url,
-    maybe_append_no_think,
-    models_url,
-    resolve_worker_spec,
-)
+try:  # Works both as ``python local_harness/icm_call.py`` and as a package.
+    from .icm_spec import (
+        DEFAULT_WORKERS,
+        NATIVE_COMPLETION,
+        NATIVE_SYSTEM_PROMPT,
+        OPENAI_CHAT,
+        OPENAI_COMPLETIONS,
+        SYSTEM_PROMPT,
+        WorkerResponse,
+        WorkerSpec,
+        completion_url,
+        maybe_append_no_think,
+        models_url,
+        resolve_worker_spec,
+    )
+except ImportError:  # pragma: no cover - direct script compatibility
+    from icm_spec import (
+        DEFAULT_WORKERS,
+        NATIVE_COMPLETION,
+        NATIVE_SYSTEM_PROMPT,
+        OPENAI_CHAT,
+        OPENAI_COMPLETIONS,
+        SYSTEM_PROMPT,
+        WorkerResponse,
+        WorkerSpec,
+        completion_url,
+        maybe_append_no_think,
+        models_url,
+        resolve_worker_spec,
+    )
 
 
 def _request_headers() -> dict[str, str]:

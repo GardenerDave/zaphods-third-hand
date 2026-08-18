@@ -13,7 +13,7 @@ Chosen task:
 
 ## Model endpoint and model
 
-- Endpoint: `http://192.168.1.11:1234/v1`
+- Endpoint: `http://JARVIS_LOCAL:1234/v1`
 - Model: `Qwen_Qwen3-1.7B-Q4_K_M.gguf`
 
 ## Packet paths

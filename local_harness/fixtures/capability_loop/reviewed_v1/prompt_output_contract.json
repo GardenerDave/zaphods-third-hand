@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-reviewed-patch-output-contract-001",
+  "task_family": "strict-structured-output",
+  "prompt": "Return the bounded review-only target decision as strict JSON with allowed_targets, held_targets, scope_expansion_required, and reason.",
+  "output_contract": {"format": "json", "required_fields": ["allowed_targets", "held_targets", "scope_expansion_required", "reason"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"required_json_fields": ["allowed_targets", "held_targets", "reason"], "required_allowed_targets": ["docs/"], "required_held_targets": ["training/"]}},
+  "provenance": {"source_fixture": "local_harness/fixtures/prompt_patch_ab/known_failure_modes_v1.json#output_contract_001", "source_patch": "output_contract_v1"}
+}

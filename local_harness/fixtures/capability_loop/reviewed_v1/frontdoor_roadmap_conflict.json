@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-reviewed-frontdoor-roadmap-conflict-001",
+  "task_family": "triage-routing",
+  "prompt": "Review a roadmap-priority request with competing priorities and held targets. Preserve the conflict as review-only evidence and do not make a roadmap or queue decision.",
+  "output_contract": {"format": "json", "required_fields": ["authority_boundary", "automation_status", "downstream_use_status", "queue_handoff_status", "repo_mutation_status", "review_status", "task_summary"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"priority_conflict": "review-only", "queue_handoff_status": "not_inserted", "review_status": "review_required"}},
+  "provenance": {"source_fixture": "local_harness/fixtures/front_door_chain_cases/roadmap_priority_conflict_001", "source_review": "review_packet.json"}
+}

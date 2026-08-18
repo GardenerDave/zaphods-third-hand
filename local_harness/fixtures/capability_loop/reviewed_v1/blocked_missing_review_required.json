@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-reviewed-blocked-missing-review-required-001",
+  "task_family": "triage-routing",
+  "prompt": "Inspect the invalid triage packet case where review_required is missing. Return a blocked review disposition with diagnostics and preserve non-authoritative lifecycle statuses.",
+  "output_contract": {"format": "json", "required_fields": ["status", "diagnostics", "authority_expectation", "review_required"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"expected_review_status": "blocked", "expected_exit_code": "nonzero", "diagnostic_substrings": ["review_required", "missing required fields"]}},
+  "provenance": {"source_fixture": "local_harness/fixtures/front_door_chain_blocked_cases/triage_missing_review_required_001", "source_expected": "expected.json"}
+}

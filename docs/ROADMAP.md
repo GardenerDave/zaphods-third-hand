@@ -148,6 +148,7 @@ explicit supervised acceptance without promotion or downstream mutation.
 - Long-duration dogfood recommender now uses a declarative milestone map so completed evidence-backed milestones are skipped automatically before recommending the next bounded target.
 - Declarative long-duration milestone map calibration synthesis recorded; recommender selection is evidence-driven while queue writing, queue insertion, queue running, automatic handoff, and downstream-use authority remain unimplemented.
 - Long-duration dogfood closeout recorded; the milestone map now advances to an operator review point while queue writing, queue insertion, queue running, automatic handoff, and downstream-use authority remain unimplemented.
+- Bounded supervised capability-mining ladder added: deterministic worker validation, existing-patch rendering, bounded local-teacher intervention, explicit fail-closed external-teacher adapter, durable linked trajectories, and review-only scorecard aggregation. Automatic patch promotion, training, queue insertion, and acceptance remain unimplemented.
 - v0.4.0 release notes and presentation notes added for the evidence-backed long-duration dogfood loop; the project remains review-only with queue writing, queue insertion, queue running, automatic handoff, and downstream-use authority unimplemented.
 
 ## Integration Roadmap: Improve / Fable / TriDB Harvest

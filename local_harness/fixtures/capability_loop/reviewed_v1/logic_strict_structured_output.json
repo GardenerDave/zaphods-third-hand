@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-reviewed-logic-structured-output-001",
+  "task_family": "strict-structured-output",
+  "prompt": "Return only strict JSON with keys status, known_facts, inferences, risks, and recommended_next_step. Do not use Markdown fences or comments.",
+  "output_contract": {"format": "json", "required_fields": ["status", "known_facts", "inferences", "risks", "recommended_next_step"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"require_json": true, "required_json_keys": ["status", "known_facts", "inferences", "risks", "recommended_next_step"]}},
+  "provenance": {"source_probe": "local_harness/logic_probes.example.json#structured_output_strict_json", "source_schema": "zth.logic_probes.v0.1"}
+}

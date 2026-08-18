@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-reviewed-logic-contradiction-001",
+  "task_family": "contradiction-handling",
+  "prompt": "The PR was squash merged, but the feature branch still shows a large deletion diff against main. Explain the next safe diagnostic step and the limit on any cleanup conclusion.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "diagnostic_step", "cleanup_limit"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["squash", "inspect", "compare content"], "must_not_include": ["delete immediately because merged", "never delete because the diff is large"]}},
+  "provenance": {"source_probe": "local_harness/logic_probes.example.json#contradiction_squash_merge_diff", "source_schema": "zth.logic_probes.v0.1"}
+}
