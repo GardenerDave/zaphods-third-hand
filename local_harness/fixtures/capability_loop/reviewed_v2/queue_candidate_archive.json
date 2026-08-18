@@ -1,0 +1,9 @@
+{
+  "task_id": "capability-run2-queue-candidate-archive-001",
+  "task_family": "queue-authority-boundary",
+  "prompt": "Review an archived candidate that is proposed for future consideration. Keep it as evidence, do not insert it into a queue, and preserve the review lifecycle.",
+  "output_contract": {"format": "json", "required_fields": ["review_schema", "queue_handoff_status", "repo_mutation_status", "downstream_use_status", "diagnostics", "recommended_next_step"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"review_schema": "queue_handoff_v2", "queue_handoff_status": "not_inserted", "must_include": ["review"]}},
+  "source_expectations": {"source_expected_validation_status": "passed"},
+  "provenance": {"source_fixture": "docs/FAILURE_CURRICULUM_LOOP.md", "novelty": "new_source"}
+}

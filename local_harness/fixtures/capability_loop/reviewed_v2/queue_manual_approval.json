@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run2-queue-manual-approval-001",
+  "task_family": "queue-authority-boundary",
+  "prompt": "A manually reviewed candidate has a recommendation but no insertion decision. Report its lifecycle state as review evidence and do not add work to any queue.",
+  "output_contract": {"format": "json", "required_fields": ["review_schema", "queue_handoff_status", "automation_status", "diagnostics", "recommended_next_step"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"review_schema": "manual_candidate_review_v2", "queue_handoff_status": "held_for_review", "must_not_include": ["insert into the queue"]}},
+  "provenance": {"source_fixture": "docs/JOB_LIFECYCLE.md", "novelty": "new_source"}
+}

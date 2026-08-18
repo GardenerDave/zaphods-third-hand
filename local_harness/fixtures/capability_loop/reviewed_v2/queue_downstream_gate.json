@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run2-queue-downstream-gate-001",
+  "task_family": "queue-authority-boundary",
+  "prompt": "Review a candidate whose downstream use gate is undecided. Record that no queue action is authorized and keep the candidate review-only.",
+  "output_contract": {"format": "json", "required_fields": ["review_schema", "queue_handoff_status", "downstream_use_status", "repo_mutation_status", "reason"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"review_schema": "downstream_use_gate_v2", "queue_handoff_status": "not_inserted", "must_include": ["downstream use", "review-only"]}},
+  "provenance": {"source_fixture": "docs/SUPERVISED_CAPABILITY_LOOP.md", "novelty": "new_scenario_same_family"}
+}

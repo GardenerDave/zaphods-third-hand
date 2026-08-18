@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run2-contradiction-contract-versions-001",
+  "task_family": "contradiction-handling",
+  "prompt": "Two reviewed documents disagree about the output schema version. Identify the contradiction, preserve both claims as evidence, and state the safe next inspection step.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "diagnostic_step", "safe_limit"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["contradiction", "inspect", "do not assume"], "must_not_include": ["silently choose the newer schema"]}},
+  "provenance": {"source_fixture": "docs/MODEL_PROMPT_PACKET_RENDERER.md", "novelty": "new_source"}
+}

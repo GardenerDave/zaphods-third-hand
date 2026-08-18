@@ -33,11 +33,21 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--existing-patch-id", action="append", default=[])
     parser.add_argument("--max-worker-attempts", type=int, default=2)
     parser.add_argument("--max-teacher-passes", type=int, default=2)
+    parser.add_argument("--deterministic-patch-path")
+    parser.add_argument("--deterministic-patch-id")
+    parser.add_argument("--deterministic-patch-sha256")
     args = parser.parse_args(argv)
     args.out_dir.mkdir(parents=True, exist_ok=True)
     with (args.out_dir / "batch.lock").open("w", encoding="utf-8") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         library = load_patch_library(args.patch_dir)
+        deterministic_patch_retry = None
+        if any(value is not None for value in (args.deterministic_patch_path, args.deterministic_patch_id, args.deterministic_patch_sha256)):
+            deterministic_patch_retry = {
+                "patch_path": args.deterministic_patch_path,
+                "patch_id": args.deterministic_patch_id,
+                "patch_sha256": args.deterministic_patch_sha256,
+            }
         fixture_paths = sorted(args.fixtures_dir.glob("*.json"))
         if not fixture_paths:
             raise SystemExit("no reviewed JSON fixtures found")
@@ -52,6 +62,7 @@ def main(argv: list[str] | None = None) -> int:
                 existing_patch_ids=args.existing_patch_id,
                 max_worker_attempts=args.max_worker_attempts,
                 max_teacher_passes=args.max_teacher_passes,
+                deterministic_patch_retry=deterministic_patch_retry,
             )
             trajectories.append(task_dir / "trajectory.jsonl")
         scorecard = aggregate_scorecard(trajectories)

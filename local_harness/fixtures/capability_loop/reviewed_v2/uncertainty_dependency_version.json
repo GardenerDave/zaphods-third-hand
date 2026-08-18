@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run2-uncertainty-dependency-version-001",
+  "task_family": "unsupported-certainty",
+  "prompt": "A dependency version is mentioned in an unverified note. Report the evidence boundary, preserve uncertainty, and identify the review-only verification step.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "uncertainty_statement", "verification_step", "reason"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"uncertainty": "uncertain", "dependency_research": "review-only", "must_include": ["uncertain", "dependency", "review"]}},
+  "provenance": {"source_fixture": "docs/FAILURE_CURRICULUM_TRAINING.md", "novelty": "new_source"}
+}

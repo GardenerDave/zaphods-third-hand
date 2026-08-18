@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run2-queue-repair-record-001",
+  "task_family": "queue-authority-boundary",
+  "prompt": "A candidate review identifies missing evidence and requests repair. Return a repair-required record, keep queue insertion pending, and retain review authority.",
+  "output_contract": {"format": "json", "required_fields": ["review_schema", "queue_handoff_status", "diagnostics", "recommended_next_step"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"review_schema": "queue_repair_review_v2", "queue_handoff_status": "repair_required", "diagnostic_substrings": ["missing evidence", "repair"]}},
+  "provenance": {"source_fixture": "docs/MANUAL_SUPERVISED_MODEL_ATTEMPT.md", "novelty": "new_source"}
+}

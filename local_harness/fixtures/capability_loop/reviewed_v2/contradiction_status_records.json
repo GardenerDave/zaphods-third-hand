@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run2-contradiction-status-records-001",
+  "task_family": "contradiction-handling",
+  "prompt": "A summary says ready_for_review but a transition record says unresolved. Explain how to preserve the contradiction and what must be reviewed before relying on the summary.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "diagnostic_step", "safe_limit"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["ready_for_review", "unresolved", "review"], "must_not_include": ["ignore the transition record"]}},
+  "provenance": {"source_fixture": "docs/FAILURE_CURRICULUM_LOOP.md", "novelty": "new_scenario_same_family"}
+}

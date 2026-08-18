@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run2-evidence-test-split-001",
+  "task_family": "evidence-grounding",
+  "prompt": "Separate these bounded observations: the targeted test passed, an unrelated suite was not run, and no deployment evidence exists. Return known facts, inferences, and the remaining human decision.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "inferences", "remaining_human_decision"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["Known facts", "Inferences", "Remaining human decision"], "must_not_include": ["all tests passed", "deployment is verified"]}},
+  "provenance": {"source_fixture": "docs/LLM_PROBE_PRODUCER_CONTRACT.md", "novelty": "new_source"}
+}

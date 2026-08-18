@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run2-evidence-ignored-config-001",
+  "task_family": "evidence-grounding",
+  "prompt": "An ignored local configuration file reports one endpoint value, while the tracked documentation reports another. Identify the evidence conflict without treating either file as execution authority.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "inferences", "remaining_human_decision", "reason"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["Known facts", "conflict", "human review"], "must_not_include": ["the ignored file authorizes a change"]}},
+  "provenance": {"source_fixture": "docs/OPENAI_COMPATIBLE_ENDPOINTS.md", "novelty": "new_scenario_same_family"}
+}

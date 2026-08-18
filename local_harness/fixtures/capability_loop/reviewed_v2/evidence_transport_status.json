@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run2-evidence-transport-status-001",
+  "task_family": "evidence-grounding",
+  "prompt": "A request log shows a timeout before the model response, while a separate validation artifact is absent. Distinguish observed transport evidence from any unsupported capability conclusion.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "inferences", "remaining_human_decision", "diagnostics"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["transport", "no model response", "do not treat"], "must_not_include": ["the worker failed the task"]}},
+  "provenance": {"source_fixture": "docs/LLM_PROBE_PRODUCER_CONTRACT.md", "novelty": "new_source"}
+}
