@@ -129,6 +129,33 @@ Checks fixed across the five retries were `parse_json` (5), `required_field_type
 
 The retry packet contained the same information categories represented in the successful teacher packets: contract shape, exact field names/types, reference values/constraints, diagnostics, and authority boundaries. This is the first evidence in Run 1 of teacher-free task-level reusable capability compression: baseline failure → deterministic diagnostics plus task facts plus unchanged distilled candidate → worker success. The candidate remains experimental and unpromoted.
 
+## Preregistered holdout generalization
+
+The holdout experiment was preregistered before the first worker call as `run1-distilled-strict-contract-holdout-001`. The frozen candidate was `run1-experimental-distilled-strict-contract-v1`, with canonical content hash `3231d72ed9805aef9c16ced7b6eded50bcf35a6ef665338c0cb2640117470459`, and the context-complete renderer was frozen at commit `0f2ae813e3b1b8ff9f2d6a86a71d39d3ceae3624`. The five derivation tasks were excluded. Selection used baseline-only structural and semantic failure evidence; historical teacher artifacts were not inspected until all holdout calls were complete.
+
+The selected 10-task holdout contained 3 historically unresolved tasks, 3 historically rescued by the local teacher, and 4 historically rescued by the external teacher. Every fresh baseline failed, so every task received exactly one deterministic retry. There were 20 worker calls total, with no teacher or external-teacher calls, no existing patches, and no additional retries.
+
+| Metric | Result |
+| --- | ---: |
+| holdout tasks | 10 |
+| fresh baseline passes | 0/10 |
+| retry opportunities | 10 |
+| retry passes | 0/10 |
+| teacher-free rescues | 0 |
+| unresolved after retry | 10 |
+| teacher-free holdout rescue rate | 0% (0/10) |
+| final pass rate | 0/10 |
+| task regressions | 0 |
+| failed checks before / after | 50 / 50 |
+| structural checks fixed / regressed | 0 / 0 |
+| semantic checks fixed / regressed | 0 / 0 |
+
+By historical disposition, rescue rates were 0/3 for local-teacher cases, 0/4 for external-teacher cases, and 0/3 for unresolved cases. Thus the preregistered result is `no_task_level_generalization`; neither `evidence_of_generalization` nor `strong_generalization` was met. This is evidence about holdout tasks within the Run 1 distribution, not a claim about arbitrary out-of-distribution behavior.
+
+Every task retained the same five or six failed checks after retry as before it: the retry did not produce a parseable contract-compliant object, and no structural or semantic check moved. The per-task artifacts and exact before/after diagnostics are in `.work/capability_batch_reviewed_v1/holdout_distilled_strict_contract/holdout_summary.json` and its task directories.
+
+Post-hoc comparison began only after the holdout results were frozen. The deterministic retry contained task facts, the declared output contract, bounded reference facts, fresh validator diagnostics, and authority boundaries. Historical teacher packets additionally contained teacher diagnosis/retry guidance and, in most successful external cases, corrected-reference examples. Since there were no holdout rescues, no information category can be credited as sufficient. The strongest evidence-supported remaining gap is teacher-generated diagnosis/guidance and/or corrected-reference/example effect; worker instruction-following or generation variability cannot be separated from those factors in this zero-rescue result. The comparison record, including teacher artifact hashes, is review-only at `holdout_distilled_strict_contract/posthoc_teacher_comparison.json`.
+
 ## Files
 
 - `synthesis/run_1_synthesis.json`
