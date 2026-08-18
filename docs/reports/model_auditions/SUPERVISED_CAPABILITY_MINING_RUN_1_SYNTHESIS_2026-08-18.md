@@ -156,6 +156,45 @@ Every task retained the same five or six failed checks after retry as before it:
 
 Post-hoc comparison began only after the holdout results were frozen. The deterministic retry contained task facts, the declared output contract, bounded reference facts, fresh validator diagnostics, and authority boundaries. Historical teacher packets additionally contained teacher diagnosis/retry guidance and, in most successful external cases, corrected-reference examples. Since there were no holdout rescues, no information category can be credited as sufficient. The strongest evidence-supported remaining gap is teacher-generated diagnosis/guidance and/or corrected-reference/example effect; worker instruction-following or generation variability cannot be separated from those factors in this zero-rescue result. The comparison record, including teacher artifact hashes, is review-only at `holdout_distilled_strict_contract/posthoc_teacher_comparison.json`.
 
+## Teacher-ingredient ablation
+
+The recorded holdout contains six, rather than seven, tasks satisfying both requested selection criteria: fresh baseline failure and durable historical success after a teacher. The qualifying set was the three local-teacher rescues and three external-teacher rescues. The fourth external-tier holdout candidate, `capability-reviewed-queue-needs-repair-001`, is unresolved in its durable summary and was not padded into this experiment.
+
+The directly preceding successful teacher artifacts were used without rewriting. Five contained a corrected-reference output; `capability-reviewed-blocked-queue-inserted-001` did not, so Arm B was unavailable for that task. The unchanged distilled patch and context-complete packet remained present in all available arms.
+
+| Arm | Available tasks | Passes/rescues | Rescue rate | Structural fixed/regressed | Semantic fixed/regressed |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| A: diagnosis + retry guidance | 6 | 0/6 | 0% | 0/0 | 0/0 |
+| B: corrected-reference example | 5 | 0/5 | 0% | 0/0 | 0/0 |
+| C: diagnosis + example | 6 | 0/6 | 0% | 0/0 | 0/0 |
+
+All 17 available treatment calls failed the deterministic validator. No task-level regression or failed-check movement occurred relative to the frozen failed baselines. Every selected task is classified `teacher_artifact_insufficient`; no task is `diagnosis_sufficient`, `example_sufficient`, `either_sufficient`, or `combination_required`.
+
+The result does not support diagnosis/retry guidance alone, corrected-reference examples alone, or their combination as sufficient causal explanations of the historical teacher successes. The observed historical teacher contribution remains unidentified at this worker budget and prompt arrangement; possible factors include teacher-generated semantic reasoning, teacher packet organization, or generation/instruction-following variability. The selected local and external cases showed the same zero-rescue result, so this ablation does not support a tier-specific ingredient difference.
+
+Leakage review classified the five available corrected-reference examples as `mixed`: they use declared contract fields and bounded task/reference values, but also package diagnostic and authority-boundary prose not present as exact reference-fact values. No example was classified as a pure deterministic reformat or as proven teacher-generated inference in isolation. The missing-example case is recorded as `not_available`. Structured ablation results, source hashes, exact ingredients, and leakage classifications are review-only under `.work/capability_batch_reviewed_v1/teacher_ingredient_ablation/`.
+
+## Historical retry-packet replay
+
+No exact historical worker prompt artifact was preserved for the six qualifying tasks. The production path was reconstructed from the durable task prompt, the directly preceding successful teacher artifact, and the recorded intervention identity. The reconstructed H prompt is the original task prompt followed by `## Local teacher intervention` or `## External teacher intervention` and the parsed teacher JSON. It contained no selected existing patch. The current R arm was the prior combined ingredient packet: a structured JSON envelope containing task context, declared contract, bounded facts, baseline diagnostics, authority boundaries, the unchanged distilled patch, and nested teacher evidence.
+
+The primary topology difference is that H places the teacher JSON directly after the task prompt, while R places the teacher material inside a later evidence section after explicit deterministic context and the distilled instruction. H does not separately render output-contract, reference-fact, diagnostic, or authority sections; R does. H also does not expose the distilled patch as a separate prompt section.
+
+Historical request metadata preserved the 1.7B model identity and `finish_reason=stop`, but did not preserve max tokens, temperature, top-p, seed, stop fields, or context size. Current replay used the configured 1.7B worker, current max-token configuration, temperature 0.2, and no top-p/seed/stop fields. These unknowns prevent a claim of generation-condition parity.
+
+Three fresh calls per arm/task were preregistered because historical generation was not explicitly deterministic: 36 calls total, with no teachers or adaptive retries.
+
+| Arm | Calls | Passes | Pass rate | Tasks with a pass | Repeatable tasks |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| H: reconstructed historical retry packet | 18 | 0 | 0% | 0/6 | 0/6 |
+| R: reconstructed combined ingredient packet | 18 | 0 | 0% | 0/6 | 0/6 |
+
+All six tasks remained at their frozen baseline failed checks in every call. Structural movement was 0 fixed / 0 regressed and semantic movement was 0 fixed / 0 regressed for both arms. There were no H-only successes, no R successes, and no tasks where both succeeded.
+
+The formal preregistered `generation_variability_evidence` label is true because H did not reliably reproduce historical success, but this is weak evidence: missing historical sampling settings and the fact that H is reconstructed rather than exact leave prompt reconstruction and generation variability confounded. `packet_topology_evidence` and `repeatable_packet_topology_evidence` were not met.
+
+The strongest current conclusion is therefore not that packet topology was irrelevant, but that historical teacher-assisted success is not replayably causal from the durable artifacts under fresh calls. The apparent teacher contribution remains unresolved between semantic reasoning, omitted historical retry inputs, packet organization, and generation/inference-condition differences. No packet redesign or new intervention was made. Replay artifacts, reconstructed prompt hashes, the exact field/category audit, and per-call validations are review-only under `.work/capability_batch_reviewed_v1/historical_retry_replay/`.
+
 ## Files
 
 - `synthesis/run_1_synthesis.json`
