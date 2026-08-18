@@ -125,11 +125,46 @@ def test_inapplicable_existing_patch_is_rejected(tmp_path: Path):
 
 
 def test_zth_validator_adapter_is_explicit_and_not_model_selected(tmp_path: Path):
-    fixture = {**task(), "validator": {"kind": "zth_output_contract", "authorized_targets": [], "reference_facts": {"scope": "bounded"}}, "triage_id": "triage-1", "orchestration_id": "orch-1", "prompt_packet_id": "prompt-1"}
+    fixture = {**task(), "validator": {"kind": "zth_output_contract", "authorized_targets": [], "reference_facts": {}}, "triage_id": "triage-1", "orchestration_id": "orch-1", "prompt_packet_id": "prompt-1"}
     result = run_capability_loop(fixture, out_dir=tmp_path, worker=lambda p: response('{"allowed_targets": [], "held_targets": [], "reason": "ok"}', "small"), max_worker_attempts=1)
     assert result["disposition"] == "ready_for_review"
     validation = json.loads((tmp_path / "attempt-1.validation.json").read_text())
     assert validation["validator"] if "validator" in validation else validation["validation_status"] == "passed"
+
+
+@pytest.mark.parametrize(
+    ("reference_facts", "output"),
+    [
+        ({"required_allowed_targets": ["docs/"], "forbidden_allowed_targets": ["training/"]}, {"allowed_targets": ["training/"], "held_targets": [], "reason": "review"}),
+        ({"required_held_targets": ["training/"]}, {"allowed_targets": ["docs/"], "held_targets": [], "reason": "review"}),
+        ({"forbidden_completion_claim": True}, {"allowed_targets": ["docs/"], "held_targets": ["training/"], "reason": "I will mark the task complete"}),
+        ({"must_include": ["human review"]}, {"allowed_targets": ["docs/"], "held_targets": ["training/"], "reason": "bounded"}),
+        ({"must_not_include": ["proceed with implementation"]}, {"allowed_targets": ["docs/"], "held_targets": ["training/"], "reason": "proceed with implementation"}),
+        ({"queue_handoff_status": "not_inserted"}, {"allowed_targets": ["docs/"], "held_targets": ["training/"], "reason": "review", "queue_handoff_status": "inserted"}),
+    ],
+)
+def test_structurally_valid_output_fails_reference_semantics(reference_facts, output):
+    fixture = {
+        **task(),
+        "validator": {"kind": "zth_output_contract", "reference_facts": reference_facts},
+        "output_contract": {"format": "json", "required_fields": ["allowed_targets", "held_targets", "reason"]},
+    }
+    result = loop._validator_result(json.dumps(output), fixture, attempt_id="adversarial")
+    assert result["structural_checks"]
+    assert result["semantic_checks"]
+    assert result["validation_status"] == "failed"
+    assert any(check["status"] == "failed" for check in result["semantic_checks"])
+
+
+def test_unknown_reference_fact_fails_closed():
+    fixture = {
+        **task(),
+        "validator": {"kind": "zth_output_contract", "reference_facts": {"future_unregistered_check": True}},
+        "output_contract": {"format": "json", "required_fields": ["answer"]},
+    }
+    result = loop._validator_result('{"answer":"ok"}', fixture, attempt_id="unknown-reference")
+    assert result["validation_status"] == "failed"
+    assert "Unknown semantic reference fact" in " ".join(result["diagnostics"])
 
 
 def test_retry_ceiling_and_no_self_acceptance(tmp_path: Path):

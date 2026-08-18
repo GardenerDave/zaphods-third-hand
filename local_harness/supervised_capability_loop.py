@@ -30,6 +30,7 @@ from local_harness.supervised_attempt_output_validator import (
     validate_supervised_attempt_output_against_contract,
 )
 from local_harness.supervised_model_attempt import build_supervised_model_attempt_record
+from local_harness.supervised_reference_fact_validator import validate_reference_facts
 
 
 TERMINAL_DISPOSITIONS = {"ready_for_review", "unresolved"}
@@ -142,10 +143,13 @@ def _validator_result(raw_output: str, task: Mapping[str, Any], *, attempt_id: s
         exact = parse == "passed" and parsed == task["expected_output"]
         if not exact:
             diagnostics.append("Output does not equal the deterministic fixture reference output.")
+        checks = [{"check_id": "json_parse", "status": parse}, {"check_id": "reference_output_exact_match", "status": "passed" if exact else "failed"}]
         return {
             "validation_status": "passed" if exact else "failed",
             "validator": "deterministic_fixture_exact_match_v1",
-            "checks": [{"check_id": "json_parse", "status": parse}, {"check_id": "reference_output_exact_match", "status": "passed" if exact else "failed"}],
+            "checks": checks,
+            "structural_checks": checks,
+            "semantic_checks": [],
             "diagnostics": diagnostics,
             "reference_facts": {"expected_output": task["expected_output"]},
             "acceptance_status": "not_reviewed",
@@ -172,6 +176,14 @@ def _validator_result(raw_output: str, task: Mapping[str, Any], *, attempt_id: s
         validated_at=utc_now(),
         authorized_targets=validator.get("authorized_targets"),
     )
+    reference_result = validate_reference_facts(raw_output, validator.get("reference_facts", {}))
+    structural_checks = list(record["checks"])
+    semantic_checks = reference_result["checks"]
+    record["structural_checks"] = structural_checks
+    record["semantic_checks"] = semantic_checks
+    record["checks"] = [*structural_checks, *semantic_checks]
+    record["diagnostics"] = [*record.get("diagnostics", []), *reference_result["diagnostics"]]
+    record["validation_status"] = "passed" if record["validation_status"] == "passed" and reference_result["validation_status"] == "passed" else "failed"
     record["reference_facts"] = validator.get("reference_facts", {})
     return record
 

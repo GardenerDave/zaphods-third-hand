@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 from local_harness.supervised_capability_loop import load_task_fixture
+from local_harness.supervised_reference_fact_validator import REFERENCE_FACT_EVALUATORS
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,3 +23,10 @@ def test_reviewed_capability_pack_is_bounded_and_loadable():
     assert "automatic patch promotion authority granted" not in serialized
     assert "automatic training authority granted" not in serialized
     assert "execution authority granted" not in serialized
+
+
+def test_reviewed_pack_reference_facts_are_all_registered():
+    tasks = [load_task_fixture(path) for path in sorted(PACK.glob("*.json"))]
+    keys = {key for task in tasks for key in task["validator"].get("reference_facts", {})}
+    assert keys
+    assert keys <= set(REFERENCE_FACT_EVALUATORS)
