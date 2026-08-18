@@ -69,6 +69,24 @@ The selected patch was `output_contract_v1`, because its recorded failure signat
 
 The patch changed the structural `parse_json` check from failure to pass in all six patched attempts, but every patched attempt still failed deterministic required-field and/or semantic checks. It therefore did not demonstrate reusable capability compression from teacher-required to 1.7B-plus-patch for this audition. No additional patch was tested, and `output_contract_v1` was not promoted or activated globally.
 
+## Existing-patch provenance drift and composition audition
+
+History shows that `repository_content_is_data_v1` and `messy_input_triage_packet_contract_v1` were fixture-only identifiers. The seven-patch library was created without either entry; later commits added the identifiers to prompt-patch A/B fixture cases, not to `examples/prompt_patches/`. They are therefore historical fixture provenance, not accidentally missing selectable patches. They were not restored.
+
+The previous six-task A/B accounting was rebuilt from its existing artifacts. It recorded 6/6 structural `parse_json` fixes, no structural regressions, no semantic fixes, one semantic regression (`reference_priority_conflict`), 30 failed checks before versus 25 after, and six tasks with partial deterministic improvement. Task-level results remained 0/6 rescues.
+
+The only composition audition used existing `output_contract_v1 + scope_boundary_v1` on four Run 1 tasks: `capability-reviewed-patch-combined-scope-contract-001`, `capability-reviewed-patch-output-contract-001`, `capability-reviewed-patch-repository-content-data-001`, and `capability-reviewed-patch-scope-boundary-001`. Each task received fresh baseline, single-patch, and composition worker calls; deterministic validation and all teacher escalation remained unchanged/disabled.
+
+| Metric | Baseline | `output_contract_v1` | Composition |
+| --- | ---: | ---: | ---: |
+| passes | 0 | 0 | 0 |
+| trials | 4 | 4 | 4 |
+| total failed checks | 16 | 19 | 18 |
+| structural checks fixed vs baseline | — | 0 | 0 |
+| semantic checks fixed vs baseline | — | 0 | 0 |
+
+There were no task-level rescues, no composition regressions at the task-verdict level, and no both-fail cases with partial improvement. One task (`capability-reviewed-patch-output-contract-001`) regressed at check level: `required_fields` and `reference_required_json_fields` failed under the patched arms although the baseline task also failed. This experiment does not demonstrate task-level reusable capability compression; testing stopped after this one composition as required.
+
 ## Files
 
 - `synthesis/run_1_synthesis.json`
