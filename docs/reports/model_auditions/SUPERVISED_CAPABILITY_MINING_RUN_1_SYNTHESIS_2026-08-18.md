@@ -87,6 +87,26 @@ The only composition audition used existing `output_contract_v1 + scope_boundary
 
 There were no task-level rescues, no composition regressions at the task-verdict level, and no both-fail cases with partial improvement. One task (`capability-reviewed-patch-output-contract-001`) regressed at check level: `required_fields` and `reference_required_json_fields` failed under the patched arms although the baseline task also failed. This experiment does not demonstrate task-level reusable capability compression; testing stopped after this one composition as required.
 
+## Direct teacher-pattern distillation audition
+
+The selected cluster was `strict_json_plus_complete_fixture_specific_field_value_compliance`, supported by five external-teacher rescues: `capability-reviewed-frontdoor-dependency-uncertainty-001`, `capability-reviewed-frontdoor-docs-scope-001`, `capability-reviewed-logic-contradiction-001`, `capability-reviewed-patch-triage-contract-shape-001`, and `capability-reviewed-patch-unsupported-certainty-001`. The experimental candidate is recorded at `synthesis/run1_distilled_candidate_patch.json`; it was not added to the library.
+
+The distilled instruction retained only: exact JSON-only serialization, every declared field/type, deterministic diagnostics as a checklist, exact values/phrases from dynamically supplied reference facts, no invented fields, and review-only authority. Teacher narratives and corrected answer literals were excluded.
+
+| Metric | Baseline | Distilled candidate |
+| --- | ---: | ---: |
+| trials | 5 | 5 |
+| passes | 0 | 0 |
+| rescued by patch | 0 | — |
+| regressions | 0 | 0 task-level |
+| total failed checks | 24 | 18 |
+| structural checks fixed | — | `parse_json`: 4; `required_field_types`: 4 |
+| semantic checks fixed | — | 0 |
+
+All five tasks historically passed after teacher intervention, but none passed with the distilled candidate alone. Four patched outputs became parseable and better typed, yet they still failed required fields and semantic checks. The outputs also repeatedly invented an `output_contract` schema because the fresh audition prompt supplied the distilled instruction without the fixture’s actual output contract/reference facts. One task additionally regressed on `duplicate_json_keys` and `reference_uncertainty`.
+
+The evidence therefore points to task-specific contract/reference visibility—not corrected-reference hard-coding—as the missing ingredient. Teacher reasoning may still matter for difficult semantic cases, but this experiment cannot distinguish that from absent reference facts. No candidate enlargement, promotion, or second cluster test was performed.
+
 ## Files
 
 - `synthesis/run_1_synthesis.json`
