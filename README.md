@@ -59,6 +59,30 @@ For the public explanation of the workflow, start with
 For the proof report, see
 [`docs/reports/behavior_correction_cards/CORRECTION_AWARE_SUPERVISED_LOOP_DOGFOOD_2026-07-02.md`](docs/reports/behavior_correction_cards/CORRECTION_AWARE_SUPERVISED_LOOP_DOGFOOD_2026-07-02.md).
 
+## Capability mining / model stewardship
+
+ZTH also runs a supervised, local-first capability-mining ladder:
+
+`cheap worker -> deterministic validation -> context-complete deterministic retry -> local teacher -> external teacher -> review/unresolved`
+
+The deterministic validator remains authoritative; models cannot accept their
+own output, and patches, training, queue insertion, and repository mutation are
+never automatic. The purpose is to test whether an expensive teacher
+intervention can be converted into a reusable, cheaper worker intervention.
+
+The strongest current result is fresh-task evidence from Run 2: the frozen
+deterministic retry rescued 9/20 tasks that the 1.7B worker failed unaided,
+avoiding nine teacher escalations. Run 1 reached 8/10 on its repaired holdout;
+Run 2 replicated teacher-free generalization at 45%, below Run 1's observed
+strength. These are bounded experimental results, not evidence of weight
+learning, permanent capability change, arbitrary out-of-distribution
+generalization, or universal patch applicability.
+
+Read the detailed records:
+
+- [`Run 1 synthesis`](docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_1_SYNTHESIS_2026-08-18.md)
+- [`Run 2 results`](docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_2_2026-08-18.md)
+
 ## What You Can Do Today
 
 - Run a model-free smoke test to confirm the repo works.

@@ -150,6 +150,7 @@ explicit supervised acceptance without promotion or downstream mutation.
 - Long-duration dogfood closeout recorded; the milestone map now advances to an operator review point while queue writing, queue insertion, queue running, automatic handoff, and downstream-use authority remain unimplemented.
 - Bounded supervised capability-mining ladder added: deterministic worker validation, existing-patch rendering, bounded local-teacher intervention, explicit fail-closed external-teacher adapter, durable linked trajectories, and review-only scorecard aggregation. Automatic patch promotion, training, queue insertion, and acceptance remain unimplemented.
 - Transport-aware capability attempts and an opt-in deterministic context-complete retry rung are available; transport failures remain infrastructure evidence and cannot enter capability validation or scorecards.
+- Capability-mining Runs 1 and 2 are closed: Run 1's repaired holdout reached 8/10 deterministic retries, while Run 2's 20 fresh tasks reached 9/20. Teacher-free generalization replicated at lower strength; weight learning, permanent capability change, arbitrary out-of-distribution generalization, and universal patch applicability remain unproven.
 - v0.4.0 release notes and presentation notes added for the evidence-backed long-duration dogfood loop; the project remains review-only with queue writing, queue insertion, queue running, automatic handoff, and downstream-use authority unimplemented.
 
 ## Integration Roadmap: Improve / Fable / TriDB Harvest
