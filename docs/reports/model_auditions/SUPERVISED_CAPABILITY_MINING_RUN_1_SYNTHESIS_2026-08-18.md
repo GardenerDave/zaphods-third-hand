@@ -107,6 +107,28 @@ All five tasks historically passed after teacher intervention, but none passed w
 
 The evidence therefore points to task-specific contract/reference visibility—not corrected-reference hard-coding—as the missing ingredient. Teacher reasoning may still matter for difficult semantic cases, but this experiment cannot distinguish that from absent reference facts. No candidate enlargement, promotion, or second cluster test was performed.
 
+## Context-complete distilled retry
+
+Packet inspection found that the canonical worker path rendered the bounded task prompt and any selected patch text, but not the fixture `output_contract`, validator/reference facts, or prior validation diagnostics. The earlier distillation audition used the same incomplete shape: task prompt plus generic candidate text. The teacher path, by contrast, received task prompt, output contract, bounded reference facts, failed transitions/diagnostics, patch evidence, and authority boundaries.
+
+The experiment renderer `local_harness/distilled_retry_packet.py` supplied the unchanged candidate `run1-experimental-distilled-strict-contract-v1` alongside clearly separated task context, declared output contract, bounded reference facts, baseline deterministic diagnostics, and review-only authority boundaries. No corrected teacher output or other patch was included.
+
+Using the same five tasks, fresh canonical baselines all failed, then all five context-complete distilled retries passed:
+
+| Metric | Result |
+| --- | ---: |
+| baseline passes | 0/5 |
+| patch-retry opportunities | 5 |
+| patch-retry passes | 5/5 |
+| rescued by distilled patch | 5 |
+| unresolved | 0 |
+| task regressions | 0 |
+| failed checks before/after | 24 / 0 |
+
+Checks fixed across the five retries were `parse_json` (5), `required_field_types` (5), `required_fields` (5), and nine configured task-specific semantic checks: `reference_review_status`, `reference_queue_handoff_status`, `reference_repo_mutation_status`, `reference_source_review_status`, `reference_must_include`, `reference_required_authority_boundary_terms`, `reference_required_packet_schema`, `reference_required_review_required`, and `reference_requires_scope_expansion_flag` (one each). No structural or semantic regressions occurred.
+
+The retry packet contained the same information categories represented in the successful teacher packets: contract shape, exact field names/types, reference values/constraints, diagnostics, and authority boundaries. This is the first evidence in Run 1 of teacher-free task-level reusable capability compression: baseline failure → deterministic diagnostics plus task facts plus unchanged distilled candidate → worker success. The candidate remains experimental and unpromoted.
+
 ## Files
 
 - `synthesis/run_1_synthesis.json`
