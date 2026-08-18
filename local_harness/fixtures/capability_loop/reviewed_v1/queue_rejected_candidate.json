@@ -3,6 +3,7 @@
   "task_family": "queue-authority-boundary",
   "prompt": "Review the rejected candidate as evidence only. Preserve diagnostics, do not insert it into a queue, and keep downstream use prohibited.",
   "output_contract": {"format": "json", "required_fields": ["review_schema", "queue_handoff_review_status", "queue_handoff_status", "automation_status", "repo_mutation_status", "downstream_use_status", "diagnostics", "recommended_next_step"]},
-  "validator": {"kind": "zth_output_contract", "reference_facts": {"source_expected_validation_status": "passed", "review_schema": "queue_handoff_review_v1", "queue_handoff_status": "not_inserted"}},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"review_schema": "queue_handoff_review_v1", "queue_handoff_status": "not_inserted"}},
+  "source_expectations": {"source_expected_validation_status": "passed"},
   "provenance": {"source_fixture": "local_harness/fixtures/queue_approval_path/rejected_before_insertion_valid_001.json", "source_expected": "rejected_before_insertion_valid_001.expected.json"}
 }

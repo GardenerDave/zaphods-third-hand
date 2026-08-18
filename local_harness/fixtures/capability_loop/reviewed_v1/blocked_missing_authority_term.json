@@ -3,6 +3,7 @@
   "task_family": "scope-authority-boundary",
   "prompt": "Inspect the invalid review packet missing the required no_downstream_use_authority boundary term. Return a blocked review disposition with diagnostics.",
   "output_contract": {"format": "json", "required_fields": ["status", "diagnostics", "authority_expectation", "review_required"]},
-  "validator": {"kind": "zth_output_contract", "reference_facts": {"expected_review_status": "blocked", "expected_exit_code": "nonzero", "diagnostic_substrings": ["missing required authority boundary terms", "no_downstream_use_authority"]}},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"expected_review_status": "blocked", "diagnostic_substrings": ["missing required authority boundary terms", "no_downstream_use_authority"]}},
+  "source_expectations": {"expected_exit_code": "nonzero"},
   "provenance": {"source_fixture": "local_harness/fixtures/front_door_chain_blocked_cases/missing_authority_boundary_term_001", "source_expected": "expected.json"}
 }
