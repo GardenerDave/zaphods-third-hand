@@ -1,8 +1,10 @@
 {
   "schema": "zth_run3b_execution_harness_freeze_v1",
-  "source_commit": "8592ed7504cd20bf904742c403c9ca9313cff18a",
+  "source_commit": "305285d978aa3a28b2e479c9e7824d20bdf27221",
   "driver_path": "scripts/zth_run3_routing_experiment.py",
-  "driver_sha256": "2b99de18f2bf843dbb22b6b5c5df12b7860d33f26f8ea8624933b6a46676dcd7",
+  "driver_sha256": "f9860cee729ff3185e7cf3821ce74072d4703b24a2b5df1240fb52d89d7e8d0a",
+  "durable_launcher_path": "scripts/zth_run3_durable_launch.py",
+  "durable_launcher_sha256": "793495c6022ffba4c2eed89b91daa4289f8fde1c3bd32ae711cc486126e9f9c5",
   "preregistration_interface": "--preregistration; fixture_pack schema; seed and arm_order are preregistration-derived",
   "external_teacher_timeout_seconds": 120,
   "external_teacher_identity": "codex-cli-0.146.0",
@@ -18,6 +20,8 @@
   "routing_policy_sha256": "cf6728e51e5b5e1ce5ed24539f83bbacd4f9a07dd818f26106c333cc7e543fe8",
   "capability_evidence_bundle_sha256": "383274a27c89345b3a8bcede75123420973a7a3e53318224e6460c0d05b47fc1",
   "status": "ready_for_run3b_execution",
+  "external_failure_artifact_schema": "zth_external_teacher_infrastructure_failure_v1",
+  "started_without_response_fails_closed": true,
   "model_capability_scoring_performed": false,
   "run3b_fixtures_used": false
 }

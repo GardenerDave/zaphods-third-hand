@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -43,6 +44,58 @@ def test_worker_success_without_escalation(tmp_path: Path):
     assert result["successful_intervention_source"] == "none"
     assert result["intervention_outcome"] == "no-effect"
     assert len(calls) == 1
+
+
+@pytest.mark.parametrize(
+    ("error", "classification"),
+    [
+        (subprocess.TimeoutExpired("fake", 1), "external_teacher_timeout"),
+        (RuntimeError("external teacher command failed with exit code 7"), "external_teacher_nonzero_exit"),
+        (OSError("launch denied"), "external_teacher_launch_failure"),
+        (RuntimeError("external teacher returned an empty response"), "external_teacher_empty_response"),
+    ],
+)
+def test_external_infrastructure_failure_is_durable_and_not_capability_failure(tmp_path: Path, error, classification):
+    outputs = iter(['{"answer":"wrong"}', '{"answer":"wrong"}'])
+
+    def worker(_prompt):
+        return response(next(outputs), "small-1.7b")
+
+    def teacher(_prompt):
+        return response(teacher_payload(False), "large-30b")
+
+    def external(_prompt):
+        raise error
+
+    result = run_capability_loop(task(), out_dir=tmp_path, worker=worker, local_teacher=teacher, external_teacher=external, max_worker_attempts=1, max_teacher_passes=1)
+    artifact = json.loads((tmp_path / "external-teacher.infrastructure.json").read_text())
+    assert artifact["classification"] == classification
+    assert artifact["response_present"] is False
+    assert artifact["capability_verdict_available"] is False
+    assert result["capability_verdict_available"] is False
+    assert result["unresolved"] is False
+    rows = records(tmp_path / "trajectory.jsonl")
+    assert any(r.get("transition") == "external_teacher_infrastructure_failed" for r in rows)
+    assert not (tmp_path / "external-teacher.json").exists()
+
+
+def test_completed_external_response_is_reused_without_another_call(tmp_path: Path):
+    outputs = iter(['{"answer":"wrong"}', '{"answer":"ok"}'])
+    external_calls = []
+
+    def worker(_prompt):
+        return response(next(outputs), "small-1.7b")
+
+    def external(_prompt):
+        external_calls.append(1)
+        return "codex-cli-0.146.0", teacher_payload(False)
+
+    first = run_capability_loop(task(), out_dir=tmp_path, worker=worker, local_teacher=lambda _p: pytest.fail("local teacher called"), external_teacher=external, max_worker_attempts=1, max_teacher_passes=0)
+    assert first["successful_intervention_source"] == "external_teacher"
+    assert len(external_calls) == 1
+    second = run_capability_loop(task(), out_dir=tmp_path, worker=lambda _p: pytest.fail("worker duplicated"), external_teacher=lambda _p: pytest.fail("external duplicated"), max_worker_attempts=1, max_teacher_passes=0)
+    assert second["pass"] is True
+    assert len(external_calls) == 1
 
 
 def test_teacher_sees_output_validation_and_previous_retry(tmp_path: Path):
@@ -104,8 +157,10 @@ def test_local_teacher_exhausted_then_external_resolution(tmp_path: Path):
 
 def test_external_teacher_unavailable_fails_closed(tmp_path: Path):
     result = run_capability_loop(task(), out_dir=tmp_path, worker=lambda p: response('{"answer":"wrong"}', "small-1.7b"), max_worker_attempts=1, max_teacher_passes=0, external_teacher=lambda p: (_ for _ in ()).throw(RuntimeError("not configured")))
-    assert result["disposition"] == "unresolved"
-    assert any(r.get("transition") == "external_teacher_unavailable" for r in records(tmp_path / "trajectory.jsonl"))
+    assert result["disposition"] == "infrastructure_error"
+    assert result["capability_verdict_available"] is False
+    assert result["unresolved"] is False
+    assert any(r.get("transition") == "external_teacher_infrastructure_failed" for r in records(tmp_path / "trajectory.jsonl"))
 
 
 @pytest.mark.parametrize(
@@ -319,7 +374,7 @@ def test_retry_ceiling_and_no_self_acceptance(tmp_path: Path):
         calls += 1
         return response("not-json", "small")
     result = run_capability_loop(task(), out_dir=tmp_path, worker=worker, max_worker_attempts=3, max_teacher_passes=0, external_teacher=lambda p: (_ for _ in ()).throw(RuntimeError("off")))
-    assert calls == 3 and result["disposition"] == "unresolved"
+    assert calls == 3 and result["disposition"] == "infrastructure_error"
     assert all(r.get("review_state") != "accepted" for r in records(tmp_path / "trajectory.jsonl"))
 
 
@@ -454,8 +509,10 @@ def test_scorecard_counts_only_durable_worker_intervention_sources(tmp_path: Pat
     assert result["external_teacher_call_count"] == 1
 
     scorecard = aggregate_scorecard([tmp_path / "baseline" / "trajectory.jsonl", tmp_path / "escalated" / "trajectory.jsonl"])
-    assert scorecard["by_intervention_source"]["none"]["trials"] == 2
+    assert scorecard["by_intervention_source"]["none"]["trials"] == 1
     assert scorecard["by_intervention_source"]["existing_patch"]["trials"] == 0
-    assert scorecard["by_intervention_source"]["local_teacher"]["trials"] == 1
+    # The task ended in an external infrastructure failure, so it is excluded
+    # from capability metrics rather than counted as a local-teacher trial.
+    assert scorecard["by_intervention_source"]["local_teacher"]["trials"] == 0
     assert scorecard["external_escalation_count"] == 1
     assert scorecard["external_teacher_call_count"] == 1

@@ -270,10 +270,70 @@ def _external_teacher(raw_prompt: str) -> tuple[str, str]:
     argv = shlex.split(command)
     if not argv:
         raise RuntimeError("external teacher unavailable: configured command is empty")
-    completed = subprocess.run(argv, input=raw_prompt, text=True, capture_output=True, timeout=900, check=False)
+    timeout_seconds = int(os.environ.get("ZTH_RUN3_EXTERNAL_TEACHER_TIMEOUT", "900"))
+    completed = subprocess.run(argv, input=raw_prompt, text=True, capture_output=True, timeout=timeout_seconds, check=False)
     if completed.returncode != 0:
-        raise RuntimeError(f"external teacher command failed with exit code {completed.returncode}")
+        error = RuntimeError(f"external teacher command failed with exit code {completed.returncode}")
+        error.exit_code = completed.returncode  # type: ignore[attr-defined]
+        error.stderr = completed.stderr  # type: ignore[attr-defined]
+        raise error
+    if not completed.stdout or not completed.stdout.strip():
+        error = RuntimeError("external teacher returned an empty response")
+        error.exit_code = completed.returncode  # type: ignore[attr-defined]
+        error.stderr = completed.stderr  # type: ignore[attr-defined]
+        raise error
     return identity, completed.stdout
+
+
+def _external_infrastructure_classification(exc: BaseException) -> str:
+    if isinstance(exc, subprocess.TimeoutExpired):
+        return "external_teacher_timeout"
+    if isinstance(exc, OSError):
+        return "external_teacher_launch_failure"
+    if "empty response" in str(exc).lower():
+        return "external_teacher_empty_response"
+    if "exit code" in str(exc).lower():
+        return "external_teacher_nonzero_exit"
+    return "external_teacher_infrastructure_error"
+
+
+def _write_external_infrastructure_failure(
+    out_dir: Path,
+    trajectory: Path,
+    task_id: str,
+    exc: BaseException,
+    *,
+    started_at: str,
+    timeout_seconds: int = 900,
+) -> dict[str, Any]:
+    completed_at = utc_now()
+    artifact = {
+        "schema": "zth_external_teacher_infrastructure_failure_v1",
+        "classification": _external_infrastructure_classification(exc),
+        "started_at": started_at,
+        "completed_at": completed_at,
+        "timeout_seconds": timeout_seconds,
+        "adapter_identity": os.environ.get("ZTH_EXTERNAL_TEACHER_IDENTITY", "codex-unconfigured"),
+        "exit_code": getattr(exc, "exit_code", None),
+        "stderr": str(getattr(exc, "stderr", ""))[-4000:],
+        "error": str(exc)[-4000:],
+        "response_present": False,
+        "capability_verdict_available": False,
+    }
+    path = out_dir / "external-teacher.infrastructure.json"
+    _json_write(path, artifact)
+    _transition(
+        trajectory,
+        transition="external_teacher_infrastructure_failed",
+        task_id=task_id,
+        attempt=1,
+        source="external_teacher",
+        artifact_ref=path.name,
+        artifact_hash=sha256_text(path.read_text()),
+        classification=artifact["classification"],
+        capability_verdict_available=False,
+    )
+    return artifact
 
 
 def _append_jsonl(path: Path, record: dict[str, Any]) -> None:
@@ -477,22 +537,27 @@ def run_capability_loop(
     external_pass = any(a.get("intervention_id") == "external_teacher:1" and a.get("validation", {}).get("validation_status") == "passed" for a in attempts)
     external_used = False
     external_record: dict[str, Any] | None = None
+    external_infrastructure: dict[str, Any] | None = None
     external_teacher_call_count = sum(
         1 for record in _records(trajectory) if record.get("transition") == "external_teacher_started"
     )
     if model_failure and not baseline_pass and not existing_pass and not patch_retry_passed and not local_pass:
         external_used = True
         external_path = out_dir / "external-teacher.json"
-        if external_path.exists():
+        infrastructure_path = out_dir / "external-teacher.infrastructure.json"
+        if infrastructure_path.exists():
+            external_infrastructure = json.loads(infrastructure_path.read_text(encoding="utf-8"))
+        elif external_path.exists():
             external_payload = json.loads(external_path.read_text(encoding="utf-8"))
         else:
-            _transition(trajectory, transition="external_teacher_started", task_id=task_id, attempt=1, source="external_teacher")
+            started_at = utc_now()
+            _transition(trajectory, transition="external_teacher_started", task_id=task_id, attempt=1, source="external_teacher", started_at=started_at)
             external_teacher_call_count += 1
             try:
                 identity, raw = external_teacher(_teacher_prompt(task, role="external_teacher_reviewer", failed_transitions=[*attempts, *teacher_records], patch_records=patch_records))
                 external_payload = {"identity": identity, "raw": raw, "parsed": _parse_teacher(raw)}
             except Exception as exc:
-                _transition(trajectory, transition="external_teacher_unavailable", task_id=task_id, attempt=1, source="external_teacher", diagnostic=str(exc))
+                external_infrastructure = _write_external_infrastructure_failure(out_dir, trajectory, task_id, exc, started_at=started_at, timeout_seconds=int(os.environ.get("ZTH_RUN3_EXTERNAL_TEACHER_TIMEOUT", "900")))
                 external_payload = None
         if external_payload is not None:
             if not external_path.exists():
@@ -509,7 +574,7 @@ def run_capability_loop(
         source_name: any(a.get("intervention_source") == source_name for a in attempts)
         for source_name in ("none", "existing_patch", "deterministic_patch_retry", "local_teacher", "external_teacher")
     }
-    capability_verdict_available = any(a.get("transport_valid") for a in attempts)
+    capability_verdict_available = any(a.get("transport_valid") for a in attempts) and external_infrastructure is None
     infrastructure_error_count = sum(not a.get("transport_valid") for a in attempts)
     intervention_outcome = "no-effect" if capability_verdict_available else "not-applicable"
     if source != "none":
@@ -521,9 +586,10 @@ def run_capability_loop(
             candidate_examples.append({"source": teacher.get("record_type"), "intervention_id": teacher.get("intervention_id"), "teacher_attempt": teacher.get("attempt"), "corrected_reference_output": teacher["corrected_reference_output"], "subsequent_worker_result": teacher.get("subsequent_worker_result", "not_run"), "review_state": "ready_for_review"})
     candidate_patches = [t["candidate_prompt_patch"] for t in all_teachers if t.get("candidate_prompt_patch")]
     if not any(r.get("transition") in {"ready_for_review", "unresolved"} for r in _records(trajectory)):
-        _transition(trajectory, transition="ready_for_review" if final_pass else "unresolved", task_id=task_id, source=source, disposition="ready_for_review" if final_pass else "unresolved", successful_intervention_source=source)
+        disposition = "ready_for_review" if final_pass else "infrastructure_error" if external_infrastructure else "unresolved"
+        _transition(trajectory, transition=disposition, task_id=task_id, source=source, disposition=disposition, successful_intervention_source=source, infrastructure_failure=bool(external_infrastructure))
     summary = {
-        "schema": "supervised_capability_trajectory_v2", "task_id": task_id, "task_family": task["task_family"], "endpoint_alias": os.environ.get("ZTH_PUBLIC_HOST_ALIAS", PUBLIC_ENDPOINT_ALIAS), "worker_model": attempts[0]["worker_model"] if attempts else None, "local_teacher_model": teacher_records[0].get("local_teacher_model") if teacher_records else None, "external_escalation_count": int(external_used), "external_teacher_call_count": external_teacher_call_count, "trials": 1, "capability_verdict_available": capability_verdict_available, "model_attempt_count": sum(bool(a.get("transport_valid")) for a in attempts), "infrastructure_error_count": infrastructure_error_count, "pass": final_pass, "first_attempt_pass": bool(attempts and (attempts[0].get("validation") or {}).get("validation_status") == "passed"), "pass_after_existing_patch": existing_pass, "patch_retry_attempted": patch_retry_attempted, "patch_retry_passed": patch_retry_passed, "patch_retry_failed": patch_retry_failed, "teacher_escalation_avoided": patch_retry_passed and not teacher_records and not external_record, "pass_after_local_teacher_intervention": local_pass, "pass_after_external_teacher_intervention": external_pass, "successful_intervention_source": source, "intervention_attempts": intervention_attempts, "intervention_outcome": intervention_outcome, "candidate_prompt_patches": candidate_patches, "candidate_curriculum_examples": candidate_examples, "unresolved": not final_pass if capability_verdict_available else False, "disposition": "ready_for_review" if final_pass else "unresolved", "attempt_count": len(attempts), "teacher_pass_count": len(teacher_records), "authority_boundaries": REQUIRED_AUTHORITY, "review_state": "ready_for_review" if final_pass else "unresolved", "trajectory_artifact": str(trajectory), "generated_at": utc_now()
+        "schema": "supervised_capability_trajectory_v2", "task_id": task_id, "task_family": task["task_family"], "endpoint_alias": os.environ.get("ZTH_PUBLIC_HOST_ALIAS", PUBLIC_ENDPOINT_ALIAS), "worker_model": attempts[0]["worker_model"] if attempts else None, "local_teacher_model": teacher_records[0].get("local_teacher_model") if teacher_records else None, "external_escalation_count": int(external_used), "external_teacher_call_count": external_teacher_call_count, "trials": 1, "capability_verdict_available": capability_verdict_available, "model_attempt_count": sum(bool(a.get("transport_valid")) for a in attempts), "infrastructure_error_count": infrastructure_error_count, "external_teacher_infrastructure_failure": external_infrastructure, "pass": final_pass if capability_verdict_available else False, "first_attempt_pass": bool(attempts and (attempts[0].get("validation") or {}).get("validation_status") == "passed"), "pass_after_existing_patch": existing_pass, "patch_retry_attempted": patch_retry_attempted, "patch_retry_passed": patch_retry_passed, "patch_retry_failed": patch_retry_failed, "teacher_escalation_avoided": patch_retry_passed and not teacher_records and not external_record, "pass_after_local_teacher_intervention": local_pass, "pass_after_external_teacher_intervention": external_pass, "successful_intervention_source": source, "intervention_attempts": intervention_attempts, "intervention_outcome": intervention_outcome, "candidate_prompt_patches": candidate_patches, "candidate_curriculum_examples": candidate_examples, "unresolved": not final_pass if capability_verdict_available else False, "disposition": "ready_for_review" if final_pass else "infrastructure_error" if external_infrastructure else "unresolved", "attempt_count": len(attempts), "teacher_pass_count": len(teacher_records), "authority_boundaries": REQUIRED_AUTHORITY, "review_state": "ready_for_review" if final_pass else "infrastructure_error" if external_infrastructure else "unresolved", "trajectory_artifact": str(trajectory), "generated_at": utc_now()
     }
     _json_write(summary_path, summary)
     return summary
@@ -568,7 +634,7 @@ def aggregate_scorecard(trajectory_paths: list[Path]) -> dict[str, Any]:
     unresolved_count = sum(int(s.get("unresolved", False)) for s in capability_summaries)
     patch_attempts = sum(int(s.get("patch_retry_attempted", False)) for s in capability_summaries)
     patch_passes = sum(int(s.get("patch_retry_passed", False)) for s in capability_summaries)
-    return {"schema": "supervised_capability_scorecard_v2", "trials": len(capability_summaries), "infrastructure_attempts_excluded": len(summaries) - len(capability_summaries), "pass_rate": global_counts["passes"] / len(capability_summaries) if capability_summaries else 0.0, **global_counts, "baseline_worker_passes": sum(int(s.get("first_attempt_pass", False)) for s in capability_summaries), "deterministic_patch_retry_attempts": patch_attempts, "deterministic_patch_retry_passes": patch_passes, "deterministic_patch_retry_rescue_rate": patch_passes / patch_attempts if patch_attempts else 0.0, "teacher_escalations_avoided": sum(int(s.get("teacher_escalation_avoided", False)) for s in capability_summaries), "groups": groups, "by_intervention_source": source_counts, "successful_intervention_source_counts": {source: counts["passes"] for source, counts in source_counts.items()}, "external_escalation_count": sum(int(s.get("external_escalation_count", 0)) for s in capability_summaries), "external_teacher_call_count": sum(int(s.get("external_teacher_call_count", 0)) for s in capability_summaries), "unresolved_count": unresolved_count, "intervention_helped": sum(int(s.get("intervention_outcome") == "helped") for s in capability_summaries), "intervention_hurt": sum(int(s.get("intervention_outcome") == "hurt") for s in capability_summaries), "intervention_no_effect": sum(int(s.get("intervention_outcome") == "no-effect") for s in capability_summaries), "intervention_not_applicable": sum(int(s.get("intervention_outcome") == "not-applicable") for s in summaries), "infrastructure_error_count": sum(int(s.get("infrastructure_error_count", 0)) for s in summaries), "candidate_prompt_patches": [p for s in capability_summaries for p in s.get("candidate_prompt_patches", [])], "candidate_curriculum_examples": [e for s in capability_summaries for e in s.get("candidate_curriculum_examples", [])]}
+    return {"schema": "supervised_capability_scorecard_v2", "trials": len(capability_summaries), "infrastructure_attempts_excluded": len(summaries) - len(capability_summaries), "pass_rate": global_counts["passes"] / len(capability_summaries) if capability_summaries else 0.0, **global_counts, "baseline_worker_passes": sum(int(s.get("first_attempt_pass", False)) for s in capability_summaries), "deterministic_patch_retry_attempts": patch_attempts, "deterministic_patch_retry_passes": patch_passes, "deterministic_patch_retry_rescue_rate": patch_passes / patch_attempts if patch_attempts else 0.0, "teacher_escalations_avoided": sum(int(s.get("teacher_escalation_avoided", False)) for s in capability_summaries), "groups": groups, "by_intervention_source": source_counts, "successful_intervention_source_counts": {source: counts["passes"] for source, counts in source_counts.items()}, "external_escalation_count": sum(int(s.get("external_escalation_count", 0)) for s in summaries), "external_teacher_call_count": sum(int(s.get("external_teacher_call_count", 0)) for s in summaries), "unresolved_count": unresolved_count, "intervention_helped": sum(int(s.get("intervention_outcome") == "helped") for s in capability_summaries), "intervention_hurt": sum(int(s.get("intervention_outcome") == "hurt") for s in capability_summaries), "intervention_no_effect": sum(int(s.get("intervention_outcome") == "no-effect") for s in capability_summaries), "intervention_not_applicable": sum(int(s.get("intervention_outcome") == "not-applicable") for s in summaries), "infrastructure_error_count": sum(int(s.get("infrastructure_error_count", 0)) for s in summaries), "candidate_prompt_patches": [p for s in capability_summaries for p in s.get("candidate_prompt_patches", [])], "candidate_curriculum_examples": [e for s in capability_summaries for e in s.get("candidate_curriculum_examples", [])]}
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -1,7 +1,7 @@
 {
   "schema":"zth_run3b_preregistration_v1",
   "experiment_id":"capability-mining-run-3b-advisory-routing-2026-08-19",
-  "setup_commit":"69ab9760ef6eb8d8ccf768dc0d9121e6200e623d",
+  "setup_commit":"305285d978aa3a28b2e479c9e7824d20bdf27221",
   "pilot_exclusion":{"status":"invalid_incomplete_execution_pilot","metrics_used":false,"partial_trajectories_used":false},
   "fixture_pack":{
     "path":"local_harness/fixtures/capability_loop/reviewed_v3b",
@@ -43,9 +43,9 @@
     "routing_policy_sha256":"cf6728e51e5b5e1ce5ed24539f83bbacd4f9a07dd818f26106c333cc7e543fe8",
     "capability_bundle_sha256":"383274a27c89345b3a8bcede75123420973a7a3e53318224e6460c0d05b47fc1",
     "execution_harness_freeze_path":"docs/research/RUN_3B_EXECUTION_HARNESS_FREEZE_2026-08-18.json",
-    "execution_harness_freeze_sha256":"2aba6af2a6b0d6b050b55c7c80e5103b45df80eb500bbb1c7b614a97e41fbaff",
+    "execution_harness_freeze_sha256":"619b43e262b8ab95e55d735ac0fe4b17b565786949f55841506b635f016e9af0",
     "driver_path":"scripts/zth_run3_routing_experiment.py",
-    "driver_sha256":"2b99de18f2bf843dbb22b6b5c5df12b7860d33f26f8ea8624933b6a46676dcd7",
+    "driver_sha256":"f9860cee729ff3185e7cf3821ce74072d4703b24a2b5df1240fb52d89d7e8d0a",
     "patch_id":"run1-experimental-distilled-strict-contract-v1",
     "patch_sha256":"7cfb4453919ad945f0d149ec8af8763653b3734a54b86f23303b84a60dfdacf6"
   },

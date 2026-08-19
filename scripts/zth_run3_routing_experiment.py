@@ -204,7 +204,7 @@ def _assert_no_incomplete_transitions(out_dir: Path) -> None:
             if not (out_dir / f"local-teacher-{record.get('attempt')}.json").exists():
                 raise Run3StateError(f"local-teacher call has no durable response; refusing resume: {out_dir}")
         elif transition == "external_teacher_started":
-            if not (out_dir / "external-teacher.json").exists():
+            if not (out_dir / "external-teacher.json").exists() and not (out_dir / "external-teacher.infrastructure.json").exists():
                 raise Run3StateError(f"external-teacher call has no durable response; refusing resume: {out_dir}")
 
 
