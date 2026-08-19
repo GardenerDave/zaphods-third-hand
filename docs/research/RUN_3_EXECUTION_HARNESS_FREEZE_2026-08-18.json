@@ -1,0 +1,25 @@
+{
+  "schema": "zth_run3_execution_harness_freeze_v1",
+  "commit": "9b55e1a1eee76e3319f9401f2e3a576db1bd094b",
+  "driver_path": "scripts/zth_run3_routing_experiment.py",
+  "driver_sha256": "65ac35adf16ac39513e0fdcab1e6bca5702165504617c62f133a6aebb43e9889",
+  "external_teacher_timeout_seconds": 120,
+  "external_teacher_identity": "codex-cli-0.146.0",
+  "transport_canary": {
+    "evidence_path": ".work/external_transport_canaries_2026-08-18/summary.json",
+    "evidence_sha256": "f3ab5956c044ce5661e3fc5de3c8d56b2592fc29c68c58e2b6026951d393a6f3",
+    "calls": 3,
+    "completed_valid_json": 3,
+    "failed": 0,
+    "timeouts": 0,
+    "exit_codes": [0, 0, 0],
+    "durations_seconds": [15.013, 10.094, 9.747],
+    "stream_fd_errors": 0,
+    "nonfatal_stderr_model_refresh_warnings": 1
+  },
+  "routing_policy_sha256": "cf6728e51e5b5e1ce5ed24539f83bbacd4f9a07dd818f26106c333cc7e543fe8",
+  "capability_evidence_bundle_sha256": "383274a27c89345b3a8bcede75123420973a7a3e53318224e6460c0d05b47fc1",
+  "status": "ready_for_run3b_preregistration",
+  "model_capability_scoring_performed": false,
+  "run3_fixtures_used": false
+}
