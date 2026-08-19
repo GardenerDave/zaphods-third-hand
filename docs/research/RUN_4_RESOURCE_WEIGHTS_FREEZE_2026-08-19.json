@@ -39,7 +39,8 @@
   },
   "approval": {
     "reviewer": "repository_operator_review",
-    "approved_at": "2026-08-19T00:00:00Z",
+    "approved_at": "2026-08-19T10:19:02-04:00",
+    "timestamp_source": "Git commit 3d9199ae92621c21b96591729d86d13eec073a28 commit timestamp (CommitDate)",
     "approval_basis": "Explicit operator approval of pooled Run 3C control+treatment timing calibration; derivation excluded capability and routing outcomes; median was selected before Run 4 task creation; ordering was stable across p25, median, mean, and p75."
   },
   "provenance": {
@@ -60,5 +61,5 @@
     "hardware_identity_available": false,
     "configuration_reuse_rule": "Material model, adapter/service, or hardware changes require review or recalibration before reuse."
   },
-  "manifest_sha256": "b8dc7c0a97a77d4b412e65a2092b30330fd3430e259bb56deb36d757cc6f4242"
+  "manifest_sha256": "33ad2521dc5acc0be5a67b3ef77c167e882cf6ce53140dc60acc8f89c9ad76ab"
 }

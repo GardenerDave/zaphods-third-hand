@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from datetime import datetime, time
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -104,6 +105,19 @@ def resource_weight_manifest_sha256(payload_or_path: Mapping[str, Any] | Path) -
     return hashlib.sha256(canonical_resource_weight_manifest(payload).encode("utf-8")).hexdigest()
 
 
+def _validate_approval_timestamp(value: Any) -> None:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError("approved resource weights require approved_at")
+    try:
+        timestamp = datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError("approved_at must be an ISO-8601 timestamp") from exc
+    if timestamp.tzinfo is None or timestamp.utcoffset() is None:
+        raise ValueError("approved_at must include an explicit timezone")
+    if timestamp.timetz().replace(tzinfo=None) == time(0, 0, 0):
+        raise ValueError("approved_at cannot use an exact-midnight placeholder timestamp")
+
+
 def load_approved_resource_weights(path: Path) -> dict[str, Any]:
     """Load weights only after an explicit, frozen approval decision."""
     payload = json.loads(path.read_text(encoding="utf-8"))
@@ -116,6 +130,7 @@ def load_approved_resource_weights(path: Path) -> dict[str, Any]:
     approval = payload.get("approval")
     if not isinstance(approval, dict) or any(not isinstance(approval.get(key), str) or not approval[key].strip() for key in ("reviewer", "approved_at", "approval_basis")):
         raise ValueError("approved resource weights require reviewer, approved_at, and approval_basis")
+    _validate_approval_timestamp(approval["approved_at"])
     provenance = payload.get("provenance")
     required_provenance = (
         "source_experiment", "source_preregistration_sha256", "worker_model",

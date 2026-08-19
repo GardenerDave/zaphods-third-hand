@@ -103,7 +103,7 @@ def _approved_weights() -> dict:
         "units": {field: "unit" if field == "worker_call" else None for field in fields},
         "sources": {field: "operator price sheet v1" if field == "worker_call" else None for field in fields},
         "weights": {field: 1 if field == "worker_call" else None for field in fields},
-        "approval": {"reviewer": "reviewer@example.invalid", "approved_at": "2026-08-19T00:00:00Z", "approval_basis": "reviewed resource policy"},
+        "approval": {"reviewer": "reviewer@example.invalid", "approved_at": "2026-08-19T10:19:02-04:00", "approval_basis": "reviewed resource policy"},
         "provenance": {
             "source_experiment": "synthetic",
             "source_preregistration_sha256": "a" * 64,
@@ -124,6 +124,22 @@ def test_approved_weights_load_with_non_self_referential_digest(tmp_path: Path):
     path = tmp_path / "weights.json"
     path.write_text(json.dumps(_approved_weights()))
     assert load_approved_resource_weights(path)["weights"]["worker_call"] == 1
+
+
+@pytest.mark.parametrize("approved_at", [
+    "2026-08-19T00:00:00Z",
+    "2026-08-19",
+    "2026-08-19T10:19:02",
+    "not-a-timestamp",
+])
+def test_approved_weights_reject_placeholder_or_nonconcrete_timestamps(tmp_path: Path, approved_at: str):
+    manifest = _approved_weights()
+    manifest["approval"]["approved_at"] = approved_at
+    manifest["manifest_sha256"] = resource_weight_manifest_sha256(manifest)
+    path = tmp_path / "weights.json"
+    path.write_text(json.dumps(manifest))
+    with pytest.raises(ValueError, match="approved_at"):
+        load_approved_resource_weights(path)
 
 
 @pytest.mark.parametrize("mutation", [
