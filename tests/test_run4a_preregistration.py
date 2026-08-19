@@ -72,3 +72,11 @@ def test_run4a_preregistration_binds_harness_and_validators():
         "total_model_calls": 100,
         "expected_elapsed_ms": 1077600.732,
     }
+
+
+def test_run4a_preregistration_binds_driver_and_incomplete_block_semantics():
+    prereg = json.loads(PREREG.read_text())
+    assert prereg["driver"]["sha256"] == _sha256(ROOT / prereg["driver"]["path"])
+    assert prereg["driver"]["explicit_execute_gate"] is True
+    assert prereg["execution_stop_semantics"]["intervention_outcomes_do_not_affect_selection"] is True
+    assert "mark the experiment incomplete" in prereg["execution_stop_semantics"]["incomplete_block"]

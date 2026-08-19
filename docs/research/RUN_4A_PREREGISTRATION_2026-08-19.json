@@ -72,6 +72,13 @@
     "no_cross_arm_artifacts": true,
     "ambiguous_started_call_fails_closed": true
   },
+  "driver": {
+    "path": "scripts/zth_run4a_intervention_calibration.py",
+    "sha256": "29f375e5ea1e5950e27051f1c78b4d9621587d515c758e2959959e019923a7f6",
+    "mode": "durable_baseline_selection_and_three_isolated_arms",
+    "dry_run_makes_zero_model_calls": true,
+    "explicit_execute_gate": true
+  },
   "validators": [
     {"path": "local_harness/supervised_capability_loop.py", "sha256": "23b26115201d8cba17b9da659af72793654897803988e35e28210eba02af81be"},
     {"path": "local_harness/supervised_reference_fact_validator.py", "sha256": "d86793dfde5a499988be92447f7df79da889a6074b8dc21b1c3b16bd7c60008a"},
@@ -127,6 +134,10 @@
     "eligibility": ["transport_valid=true", "transport_classification=model_response", "deterministic baseline validation failure"],
     "selection": "first four eligible candidates in frozen block order",
     "reserve": "all candidates not selected after baseline eligibility; candidate 005 is reserve-only only when the first four are eligible; no adaptive replacement"
+  },
+  "execution_stop_semantics": {
+    "incomplete_block": "Complete all five baselines and write selection for every block; execute arms only for blocks with four eligible failures; mark the experiment incomplete if any block lacks four eligible failures; do not author replacements.",
+    "intervention_outcomes_do_not_affect_selection": true
   },
   "intervention_arms": {
     "deterministic_patch_retry": {"calls": ["one worker retry"], "fallbacks": [], "patch_id": "run1-experimental-distilled-strict-contract-v1"},
