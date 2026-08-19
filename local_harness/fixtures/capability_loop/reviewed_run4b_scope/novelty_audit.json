@@ -1,0 +1,45 @@
+{
+  "audit_sha256": "e3ecb881d8d8610e0b9c19f6e215479dff614777b22937a0d4d2b08d79968569",
+  "counts": {
+    "candidates": 15,
+    "new_scenario_same_family": 0,
+    "new_source": 15,
+    "source_anchor_reuse": 0,
+    "source_document_reuse": 0
+  },
+  "exact_prompt_duplicates": [],
+  "high_similarity_pairs": [],
+  "model_outputs_consulted": false,
+  "normalized_prompt_duplicates": [],
+  "novelty_classification": {
+    "run4b-scope-001": "new_source",
+    "run4b-scope-002": "new_source",
+    "run4b-scope-003": "new_source",
+    "run4b-scope-004": "new_source",
+    "run4b-scope-005": "new_source",
+    "run4b-scope-006": "new_source",
+    "run4b-scope-007": "new_source",
+    "run4b-scope-008": "new_source",
+    "run4b-scope-009": "new_source",
+    "run4b-scope-010": "new_source",
+    "run4b-scope-011": "new_source",
+    "run4b-scope-012": "new_source",
+    "run4b-scope-013": "new_source",
+    "run4b-scope-014": "new_source",
+    "run4b-scope-015": "new_source"
+  },
+  "prior_packs": [
+    "reviewed_v1",
+    "reviewed_v2",
+    "reviewed_v3",
+    "reviewed_v3b",
+    "reviewed_v3c",
+    "reviewed_v4a",
+    "reviewed_run4_economic_triage"
+  ],
+  "schema": "zth_run4b_scope_novelty_audit_v1",
+  "similarity_threshold": 0.8,
+  "source_anchor_collisions": [],
+  "source_document_collisions": [],
+  "task_id_collisions": []
+}

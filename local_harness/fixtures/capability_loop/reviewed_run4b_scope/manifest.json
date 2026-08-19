@@ -1,0 +1,385 @@
+{
+  "candidate_count": 15,
+  "candidate_order": [
+    "run4b-scope-001",
+    "run4b-scope-002",
+    "run4b-scope-003",
+    "run4b-scope-004",
+    "run4b-scope-005",
+    "run4b-scope-006",
+    "run4b-scope-007",
+    "run4b-scope-008",
+    "run4b-scope-009",
+    "run4b-scope-010",
+    "run4b-scope-011",
+    "run4b-scope-012",
+    "run4b-scope-013",
+    "run4b-scope-014",
+    "run4b-scope-015"
+  ],
+  "eligibility": [
+    "transport_valid=true",
+    "transport_classification=model_response",
+    "deterministic baseline validation failure",
+    "target resolution=failure_class",
+    "target evidence key=scope-authority-boundary"
+  ],
+  "fixtures": [
+    {
+      "fixture_sha256": "5b1113369860a6d6775069c1bc8ba5061b184673be98ce9478090d5b38d959ed",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4b_scope/scope-001.json",
+      "reference_facts_sha256": "4763d834783a42095509d209c0f60a09cdc7685b5a96912829d3fc73d5b55949",
+      "source_anchor": "eligibility inspection versus launch approval boundary",
+      "source_document": "docs/experiments/AFFORDANCE_EXPERIMENT_ELIGIBILITY_V0.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "target_failure_classes": [
+        "authority_boundary",
+        "reference_fact_application",
+        "unsupported_inference"
+      ],
+      "task_family": "scope-authority-boundary",
+      "task_id": "run4b-scope-001"
+    },
+    {
+      "fixture_sha256": "9bd937fea391990c3cff4444efb067628601a4a01fec55d5f3ce1c833d6ef0bc",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4b_scope/scope-002.json",
+      "reference_facts_sha256": "d3d90a58eed4fe943957baa819653f206767d60d72dc086c9fe9fd4a641a679c",
+      "source_anchor": "approval record versus operator signoff",
+      "source_document": "docs/experiments/AFFORDANCE_EXPERIMENT_EXECUTION_APPROVAL_V0.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "target_failure_classes": [
+        "authority_boundary",
+        "reference_fact_application",
+        "unsupported_inference"
+      ],
+      "task_family": "scope-authority-boundary",
+      "task_id": "run4b-scope-002"
+    },
+    {
+      "fixture_sha256": "91163ccaff2791ec3cc133258f3958925be9391bfccab7bff06d1220a86b1ce4",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4b_scope/scope-003.json",
+      "reference_facts_sha256": "fa1a95342c7f3f3e7ca639cc202b2926e4d38d6364dbfdf1938340447891b7ef",
+      "source_anchor": "probe plan is not candidate action authority",
+      "source_document": "docs/experiments/AFFORDANCE_EXPERIMENT_PLAN_V0.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "target_failure_classes": [
+        "authority_boundary",
+        "reference_fact_application",
+        "unsupported_inference"
+      ],
+      "task_family": "scope-authority-boundary",
+      "task_id": "run4b-scope-003"
+    },
+    {
+      "fixture_sha256": "5a0168084531592c0109ce815567c762ca3358f27e2c6b0b7b05223bd46d706d",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4b_scope/scope-004.json",
+      "reference_facts_sha256": "338899bba8ec82a5e87f2b92239e01556c1ef7bff7c7d5157f4c852f1d3f51e5",
+      "source_anchor": "proposal evidence versus apply plan",
+      "source_document": "docs/experiments/AFFORDANCE_EXPERIMENT_PROPOSAL_V0.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "target_failure_classes": [
+        "authority_boundary",
+        "reference_fact_application",
+        "unsupported_inference"
+      ],
+      "task_family": "scope-authority-boundary",
+      "task_id": "run4b-scope-004"
+    },
+    {
+      "fixture_sha256": "eb4ed7473e437beaa8b77c43a855f2609e79f2d6255cf33573ca5f4ed15d3d38",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4b_scope/scope-005.json",
+      "reference_facts_sha256": "f2be7d8239fd5bb0fe2d7d056e2d40f06430491eff3061794c47a78552be2902",
+      "source_anchor": "decision record without promotion authority",
+      "source_document": "docs/experiments/AFFORDANCE_EXPERIMENT_DECISION_V0.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "target_failure_classes": [
+        "authority_boundary",
+        "reference_fact_application",
+        "unsupported_inference"
+      ],
+      "task_family": "scope-authority-boundary",
+      "task_id": "run4b-scope-005"
+    },
+    {
+      "fixture_sha256": "41c8232a031edd7a39d04aec14f826ad3a5a6ed4e0a0df0d7e0a9a6d6f908e89",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4b_scope/scope-006.json",
+      "reference_facts_sha256": "62ed1e2ab35848f231ea07699e5f915e195e28633706a0c19c46de056601b098",
+      "source_anchor": "agreement map with absent ownership",
+      "source_document": "docs/prompts/AGREEMENT_MAP_TEMPLATE.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "target_failure_classes": [
+        "authority_boundary",
+        "reference_fact_application",
+        "unsupported_inference"
+      ],
+      "task_family": "scope-authority-boundary",
+      "task_id": "run4b-scope-006"
+    },
+    {
+      "fixture_sha256": "3a3a83f32cd3d90ced5a11c5b557dd74c1f96e884476eb631d729a91558e4fe5",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4b_scope/scope-007.json",
+      "reference_facts_sha256": "d0f2a4b4cf177cfaa71cef7cbb2720f93e1a8e61605bad0c20b85108dadc2875",
+      "source_anchor": "role description versus delegation authority",
+      "source_document": "docs/prompts/ROLE_PACKET_TEMPLATE.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "target_failure_classes": [
+        "authority_boundary",
+        "reference_fact_application",
+        "unsupported_inference"
+      ],
+      "task_family": "scope-authority-boundary",
+      "task_id": "run4b-scope-007"
+    },
+    {
+      "fixture_sha256": "d3c67d05157b9db9aa9587e52bbc904c60f884ba7eaaefc7c3d5158b7a13d154",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4b_scope/scope-008.json",
+      "reference_facts_sha256": "95ac45afdde95260256de19c17485b4c0e09d2ac052af1a1532aaedabb6cb51b",
+      "source_anchor": "draft synthesis versus publish record",
+      "source_document": "docs/prompts/SYNTHESIS_OUTPUT_TEMPLATE.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "target_failure_classes": [
+        "authority_boundary",
+        "reference_fact_application",
+        "unsupported_inference"
+      ],
+      "task_family": "scope-authority-boundary",
+      "task_id": "run4b-scope-008"
+    },
+    {
+      "fixture_sha256": "65ab8616cd803d61bd77ee0e937d8568d275fef8d4949291aba3d99f6c00ce2a",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4b_scope/scope-009.json",
+      "reference_facts_sha256": "ff8504136deb7b3e73e5daa76859d2c4fc9bb4302d7bd4615a24e5ae7e79d1c2",
+      "source_anchor": "correction evidence versus application command",
+      "source_document": "docs/behavior_correction_cards/README.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "target_failure_classes": [
+        "authority_boundary",
+        "reference_fact_application",
+        "unsupported_inference"
+      ],
+      "task_family": "scope-authority-boundary",
+      "task_id": "run4b-scope-009"
+    },
+    {
+      "fixture_sha256": "4fdf907e313026599ae7bae24cceb123fdcca2a6be0bbf03c1607edf8653faac",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4b_scope/scope-010.json",
+      "reference_facts_sha256": "3060650cff658ba358e867c12678419fac6a79688e9d995f1ceb317f75e898a7",
+      "source_anchor": "holdout file with unidentified exception owner",
+      "source_document": "docs/behavior_correction_cards/file_scope_hold_out_v1.json",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "target_failure_classes": [
+        "authority_boundary",
+        "reference_fact_application",
+        "unsupported_inference"
+      ],
+      "task_family": "scope-authority-boundary",
+      "task_id": "run4b-scope-010"
+    },
+    {
+      "fixture_sha256": "eb48308a8c2f0cacaaeb6dfdd796fc69252ee499c410f103234a90b74d571989",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4b_scope/scope-011.json",
+      "reference_facts_sha256": "3b14037d6bbdde96c1761bc8c3ff373634983ec90fd9b78266620da439fc93b6",
+      "source_anchor": "release checklist without deployment ownership",
+      "source_document": "docs/releases/V0.4.0_EVIDENCE_BACKED_DOGFOOD_LOOP.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "target_failure_classes": [
+        "authority_boundary",
+        "reference_fact_application",
+        "unsupported_inference"
+      ],
+      "task_family": "scope-authority-boundary",
+      "task_id": "run4b-scope-011"
+    },
+    {
+      "fixture_sha256": "15d5df79de571d6eaf2ddd979b343b25c24b631290176f2cf84f1afabe8593da",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4b_scope/scope-012.json",
+      "reference_facts_sha256": "23dac5a6b6c82ea9643444f8d9fd98696efc00c46c51f8273e0ec148098435c9",
+      "source_anchor": "report index without acceptance authority",
+      "source_document": "docs/reports/README.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "target_failure_classes": [
+        "authority_boundary",
+        "reference_fact_application",
+        "unsupported_inference"
+      ],
+      "task_family": "scope-authority-boundary",
+      "task_id": "run4b-scope-012"
+    },
+    {
+      "fixture_sha256": "0a613c7971b6db7b1698a7280c6fa8afcc443095d84a602da94a12b69ba15684",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4b_scope/scope-013.json",
+      "reference_facts_sha256": "2044255945ff68adde1770a0e3cfed9f0295d08c3742af510c4ff9e2311b8084",
+      "source_anchor": "objective review versus frozen routing policy",
+      "source_document": "docs/research/RUN_4_ECONOMIC_OBJECTIVE_REVIEW_2026-08-19.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "target_failure_classes": [
+        "authority_boundary",
+        "reference_fact_application",
+        "unsupported_inference"
+      ],
+      "task_family": "scope-authority-boundary",
+      "task_id": "run4b-scope-013"
+    },
+    {
+      "fixture_sha256": "0464acc864359e1ca76ee532eb11fedf01670f0e21914b00ff7932bbfbafa089",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4b_scope/scope-014.json",
+      "reference_facts_sha256": "d62987cb74e0ef3a01b483c8f558c2b398979708b3418cc80c30b47a6fe03350",
+      "source_anchor": "calibration design without experiment approval",
+      "source_document": "docs/research/RUN_4A_INTERVENTION_MARKET_CALIBRATION_DESIGN_2026-08-19.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "target_failure_classes": [
+        "authority_boundary",
+        "reference_fact_application",
+        "unsupported_inference"
+      ],
+      "task_family": "scope-authority-boundary",
+      "task_id": "run4b-scope-014"
+    },
+    {
+      "fixture_sha256": "536f72f86ebe3ed06a63daee6a88a1227aaf9e90dbb7cb20b792d898808b89dc",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4b_scope/scope-015.json",
+      "reference_facts_sha256": "6e808e5c494833d7c5a2a07b650f6de1b5b1529d19620a2c3adeabf24865bc11",
+      "source_anchor": "telemetry readiness without weight approval",
+      "source_document": "docs/research/RUN_4_RESOURCE_TELEMETRY_READINESS_2026-08-19.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "target_failure_classes": [
+        "authority_boundary",
+        "reference_fact_application",
+        "unsupported_inference"
+      ],
+      "task_family": "scope-authority-boundary",
+      "task_id": "run4b-scope-015"
+    }
+  ],
+  "generated_at": "2026-08-19T22:23:10.818703+00:00",
+  "interventions": {
+    "control": "external_teacher",
+    "no_deterministic_patch": true,
+    "no_fallback_escalation": true,
+    "treatment": "local_teacher"
+  },
+  "manifest_sha256": "35db2e2113f9dd091b7c467a9f25fa6c9b23f1d56d0bebd644e9fb4da7010c62",
+  "model_outputs_consulted": false,
+  "novelty_audit_path": "local_harness/fixtures/capability_loop/reviewed_run4b_scope/novelty_audit.json",
+  "novelty_audit_sha256": "e3ecb881d8d8610e0b9c19f6e215479dff614777b22937a0d4d2b08d79968569",
+  "pack_id": "reviewed_run4b_scope",
+  "pack_sha256": "b2f6d5aa1c007dc2ccbbaccf724bb75f9c89b5b3096b96dbc31ab2c8ad7a17e9",
+  "pair_order": {
+    "algorithm": "sha256(str(seed) + ':' + task_id), first hex digit < 8 means control-first",
+    "orders": {
+      "run4b-scope-001": [
+        "treatment",
+        "control"
+      ],
+      "run4b-scope-002": [
+        "control",
+        "treatment"
+      ],
+      "run4b-scope-003": [
+        "control",
+        "treatment"
+      ],
+      "run4b-scope-004": [
+        "treatment",
+        "control"
+      ],
+      "run4b-scope-005": [
+        "treatment",
+        "control"
+      ],
+      "run4b-scope-006": [
+        "control",
+        "treatment"
+      ],
+      "run4b-scope-007": [
+        "treatment",
+        "control"
+      ],
+      "run4b-scope-008": [
+        "treatment",
+        "control"
+      ],
+      "run4b-scope-009": [
+        "control",
+        "treatment"
+      ],
+      "run4b-scope-010": [
+        "treatment",
+        "control"
+      ],
+      "run4b-scope-011": [
+        "treatment",
+        "control"
+      ],
+      "run4b-scope-012": [
+        "control",
+        "treatment"
+      ],
+      "run4b-scope-013": [
+        "treatment",
+        "control"
+      ],
+      "run4b-scope-014": [
+        "control",
+        "treatment"
+      ],
+      "run4b-scope-015": [
+        "control",
+        "treatment"
+      ]
+    },
+    "seed": 20260823
+  },
+  "reserve_rule": "Candidates not selected remain reserve-only; no adaptive replacement.",
+  "schema": "zth_run4b_scope_fixture_manifest_v1",
+  "selection_rule": "Select the first 12 eligible candidates in frozen order; intervention outcomes never affect inclusion.",
+  "target_evidence_key": "scope-authority-boundary",
+  "target_evidence_resolution": "failure_class",
+  "target_included_count": 12,
+  "task_family": "scope-authority-boundary"
+}

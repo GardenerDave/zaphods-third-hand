@@ -1,0 +1,117 @@
+{
+  "schema": "zth_run4b_scope_replication_preregistration_v1",
+  "experiment_id": "run4b-scope-intervention-replication-2026-08-19",
+  "status": "ready_for_review",
+  "model_calls_made": false,
+  "setup_commit": "b3ad77c263fdbcf6d5d61d35a0abe2b87d7347b3",
+  "interpretation_freeze": {
+    "path": "docs/research/RUN_4_TARGETED_INTERPRETATION_FREEZE_2026-08-19.md",
+    "sha256": "7d660b058328824917d63036ef7939a326b7ecad0f7d0c9137e1edd58f731bd8"
+  },
+  "run4_closeout": {
+    "path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_4_2026-08-19.md",
+    "sha256": "495aa9ea116abf5fdecb3b0b7ac77990af5c2c91b33b3e864412dca34c8ca3cb"
+  },
+  "frozen_inputs": {
+    "comparative_evidence_path": "docs/research/RUN_4A_COMPARATIVE_EVIDENCE_FREEZE_2026-08-19.json",
+    "comparative_evidence_file_sha256": "c48a97000fbf85b7ea3919a8269009d3200d3c2369924c456ec9dcc8736baf7b",
+    "comparative_evidence_freeze_sha256": "a23a7daa0c8681e8f57beed768c1cf3b3daafc360d139f48a147e8c4493dd0c3",
+    "resource_weight_manifest_path": "docs/research/RUN_4_RESOURCE_WEIGHTS_FREEZE_2026-08-19.json",
+    "resource_weight_manifest_sha256": "33ad2521dc5acc0be5a67b3ef77c167e882cf6ce53140dc60acc8f89c9ad76ab",
+    "resource_priors_ms": {
+      "worker_time_ms": 5276.567,
+      "local_teacher_time_ms": 16220.624,
+      "external_teacher_time_ms": 28704.012
+    }
+  },
+  "fixture_pack": {
+    "path": "local_harness/fixtures/capability_loop/reviewed_run4b_scope",
+    "manifest_path": "local_harness/fixtures/capability_loop/reviewed_run4b_scope/manifest.json",
+    "manifest_sha256": "35db2e2113f9dd091b7c467a9f25fa6c9b23f1d56d0bebd644e9fb4da7010c62",
+    "pack_sha256": "b2f6d5aa1c007dc2ccbbaccf724bb75f9c89b5b3096b96dbc31ab2c8ad7a17e9",
+    "novelty_audit_path": "local_harness/fixtures/capability_loop/reviewed_run4b_scope/novelty_audit.json",
+    "novelty_audit_file_sha256": "e595e6633870ee964164e6134d60beed0db0e1d275b7a9aedc04de7c6f05f15b",
+    "candidate_count": 15,
+    "target_included_count": 12,
+    "candidate_order": [
+      "run4b-scope-001", "run4b-scope-002", "run4b-scope-003", "run4b-scope-004", "run4b-scope-005",
+      "run4b-scope-006", "run4b-scope-007", "run4b-scope-008", "run4b-scope-009", "run4b-scope-010",
+      "run4b-scope-011", "run4b-scope-012", "run4b-scope-013", "run4b-scope-014", "run4b-scope-015"
+    ],
+    "eligibility": [
+      "transport_valid=true",
+      "transport_classification=model_response",
+      "deterministic baseline validation failure",
+      "target resolution=failure_class",
+      "target evidence key=scope-authority-boundary"
+    ],
+    "selection_rule": "Select the first 12 eligible failures in frozen candidate order; intervention outcomes never affect inclusion.",
+    "reserve_rule": "Candidates not selected remain reserve-only; no adaptive replacement."
+  },
+  "driver": {
+    "path": "scripts/zth_run4b_scope_replication.py",
+    "sha256": "4c1e0a58f80d162a2a4cdcdb23c3fc0c2c7f8aff6898c96ca8b71b5931bcbbfe",
+    "explicit_execute_gate": true,
+    "dry_run_makes_zero_model_calls": true,
+    "paired_isolated_arms": true
+  },
+  "validators": [
+    {"path": "local_harness/supervised_capability_loop.py", "sha256": "23b26115201d8cba17b9da659af72793654897803988e35e28210eba02af81be"},
+    {"path": "local_harness/supervised_reference_fact_validator.py", "sha256": "d86793dfde5a499988be92447f7df79da889a6074b8dc21b1c3b16bd7c60008a"},
+    {"path": "local_harness/supervised_attempt_output_validator.py", "sha256": "3ca42dfc6f683399752bfe4f5757b9edf4e7eafb09ac30166fe60e9f3beb0d27"}
+  ],
+  "models": {
+    "worker": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "local_teacher": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "external_teacher": "codex-cli-0.146.0",
+    "worker_endpoint_alias": "JARVIS_LOCAL",
+    "local_teacher_endpoint_alias": "JARVIS_LOCAL",
+    "external_service_class": "codex-cli"
+  },
+  "timeouts_seconds": {"worker": 900, "local_teacher": 900, "external_teacher": 120},
+  "target": {"family": "scope-authority-boundary", "resolution": "failure_class", "evidence_key": "scope-authority-boundary", "included_count": 12},
+  "interventions": {
+    "control": "external_teacher",
+    "treatment": "local_teacher",
+    "deterministic_patch": false,
+    "fallback_escalation": false,
+    "semantics": "Each selected baseline failure receives exactly one selected teacher call and one resulting worker retry; no fallback or cross-arm information."
+  },
+  "pair_order": {
+    "seed": 20260823,
+    "algorithm": "sha256(str(seed) + ':' + task_id), first hex digit < 8 means control-first",
+    "orders": {
+      "run4b-scope-001": ["treatment", "control"], "run4b-scope-002": ["control", "treatment"], "run4b-scope-003": ["control", "treatment"],
+      "run4b-scope-004": ["treatment", "control"], "run4b-scope-005": ["treatment", "control"], "run4b-scope-006": ["control", "treatment"],
+      "run4b-scope-007": ["treatment", "control"], "run4b-scope-008": ["treatment", "control"], "run4b-scope-009": ["control", "treatment"],
+      "run4b-scope-010": ["treatment", "control"], "run4b-scope-011": ["treatment", "control"], "run4b-scope-012": ["control", "treatment"],
+      "run4b-scope-013": ["treatment", "control"], "run4b-scope-014": ["control", "treatment"], "run4b-scope-015": ["control", "treatment"]
+    }
+  },
+  "metrics": {
+    "primary_quality": "local validated solve rate versus external validated solve rate among comparable pairs",
+    "primary_resource": "local versus external realized post-baseline elapsed_ms among comparable pairs",
+    "paired_outcomes": ["both_solve", "external_only", "local_only", "neither"],
+    "secondary": ["worker_retry_calls", "local_teacher_calls", "external_teacher_calls", "total_model_calls", "realized_elapsed_ms_by_role", "expected_decision_cost_ms", "token_telemetry_where_available", "infrastructure_exclusions"],
+    "interpretation": "Descriptive replication; no exact-equality requirement, no tolerated quality-loss margin, and no retirement inference."
+  },
+  "planning_budget": {
+    "maximum_model_calls": 63,
+    "expected_elapsed_ms": 744881.745,
+    "arithmetic": "15*5276.567 + 12*(16220.624+5276.567) + 12*(28704.012+5276.567)"
+  },
+  "authority_and_stop_conditions": {
+    "transport_inclusion": "Only valid model_response calls enter capability metrics.",
+    "no_fallback_escalation": true,
+    "no_cross_arm_information": true,
+    "no_adaptive_selection": true,
+    "no_evidence_merge": true,
+    "no_training": true,
+    "no_promotion": true,
+    "no_queue_insertion": true,
+    "ambiguous_started_call": "fail closed; do not rerun",
+    "incomplete_block": "If fewer than 12 eligible candidates exist, mark incomplete without replacement."
+  },
+  "execution_authority": "Preparation only; explicit operator authorization and --execute are required.",
+  "execution_commit_recorded_at_runtime": true
+}
