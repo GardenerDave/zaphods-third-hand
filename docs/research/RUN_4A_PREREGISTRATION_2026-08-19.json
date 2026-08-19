@@ -74,7 +74,7 @@
   },
   "driver": {
     "path": "scripts/zth_run4a_intervention_calibration.py",
-    "sha256": "29f375e5ea1e5950e27051f1c78b4d9621587d515c758e2959959e019923a7f6",
+    "sha256": "0fd09c204b840609da040d0de8256adcf55fc6f5f3d57ba04539ac8ddd99cdee",
     "mode": "durable_baseline_selection_and_three_isolated_arms",
     "dry_run_makes_zero_model_calls": true,
     "explicit_execute_gate": true

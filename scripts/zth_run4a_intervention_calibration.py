@@ -47,7 +47,6 @@ from local_harness.supervised_capability_loop import load_task_fixture
 
 ARM_NAMES = ("deterministic_patch_retry", "local_teacher", "external_teacher")
 TERMINAL_BASELINE_DISPOSITIONS = {"baseline_pass", "baseline_failed_eligible", "infrastructure_error"}
-TERMINAL_EXPERIMENT_STATES = {"experiment_completed", "experiment_incomplete"}
 
 
 class Run4ADriverError(RuntimeError):
@@ -283,6 +282,13 @@ def _arm_terminal(arm_dir: Path, binding: Mapping[str, Any]) -> dict[str, Any] |
     return summary
 
 
+def _is_terminal_execution(execution: Mapping[str, Any]) -> bool:
+    status = execution.get("status")
+    if status == "experiment_completed":
+        return True
+    return status == "experiment_incomplete" and bool(execution.get("completed_at"))
+
+
 def _write_arm_artifact_index(arm_dir: Path) -> None:
     files = {path.name: sha256_file(path) for path in sorted(arm_dir.iterdir()) if path.is_file() and path.name != "arm_artifacts.json"}
     _json_write(arm_dir / "arm_artifacts.json", {"schema": "zth_run4a_arm_artifact_index_v1", "files": files})
@@ -334,13 +340,13 @@ def run_experiment(context: Mapping[str, Any], output_dir: Path, *, worker: Call
     existing_execution = None
     if execution_manifest_path.exists():
         execution = _read_json(execution_manifest_path)
-        if execution.get("status") in TERMINAL_EXPERIMENT_STATES:
+        if _is_terminal_execution(execution):
             return execution
         active_call = execution.get("active_call")
         if active_call:
             raise Run4ADriverError(f"execution has an unresolved active call: {active_call}")
         existing_execution = execution
-    execution = existing_execution or {"schema": "zth_run4a_execution_manifest_v1", "status": "experiment_incomplete", "started_at": _utc_now(), "git_head": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(), "preregistration_sha256": canonical_sha256(prereg), "fixture_pack_sha256": manifest["pack_sha256"], "candidate_states": {task_id: "baseline_not_started" for task_id in prereg["fixture_pack"]["task_ids"]}, "arm_orders_executed": {}, "model_calls_started": False}
+    execution = existing_execution or {"schema": "zth_run4a_execution_manifest_v1", "status": "experiment_running", "started_at": _utc_now(), "git_head": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(), "preregistration_sha256": canonical_sha256(prereg), "fixture_pack_sha256": manifest["pack_sha256"], "candidate_states": {task_id: "baseline_not_started" for task_id in prereg["fixture_pack"]["task_ids"]}, "arm_orders_executed": {}, "model_calls_started": False}
     if execution.get("preregistration_sha256") != canonical_sha256(prereg) or execution.get("fixture_pack_sha256") != manifest["pack_sha256"]:
         raise Run4ADriverError("existing execution binding mismatch")
     _json_write(execution_manifest_path, execution)

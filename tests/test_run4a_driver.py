@@ -11,6 +11,10 @@ from local_harness.run4a_fixture_pack import representative_output, verify_manif
 from local_harness.supervised_capability_loop import load_task_fixture
 from scripts.zth_run4a_intervention_calibration import (
     Run4ADriverError,
+    _arm_binding,
+    _json_write,
+    _write_arm_artifact_index,
+    canonical_sha256,
     _arm_terminal,
     run_baseline,
     run_experiment,
@@ -138,3 +142,58 @@ def test_frozen_driver_run_with_stubs_makes_no_real_model_calls(tmp_path: Path):
     resumed = run_experiment(context, tmp_path / "execution", worker=lambda _: (_ for _ in ()).throw(AssertionError("duplicate model call")), local_teacher=lambda _: (_ for _ in ()).throw(AssertionError("duplicate teacher call")), external_teacher=lambda _: (_ for _ in ()).throw(AssertionError("duplicate external call")), deterministic_patch=patch)
     assert resumed["status"] == "experiment_completed"
     assert calls == calls_before_resume
+
+
+def test_partial_running_execution_resumes_terminal_work_without_duplicates(tmp_path: Path):
+    context = validate_preregistration(PREREG, ROOT)
+    tasks = {row["task_id"]: load_task_fixture(ROOT / row["path"]) for row in context["manifest"]["fixtures"]}
+    calls = {"worker": 0, "local_teacher": 0, "external_teacher": 0}
+
+    def worker(prompt: str) -> WorkerResponse:
+        calls["worker"] += 1
+        for task in tasks.values():
+            if task["prompt"] in prompt and prompt != task["prompt"]:
+                return _response(json.dumps(representative_output(task)))
+        return _failed_worker(prompt)
+
+    teacher = json.dumps({"failure_classification": "synthetic", "teacher_diagnosis": "review", "retry_guidance": "Return the contract."})
+    local = lambda _: (calls.__setitem__("local_teacher", calls["local_teacher"] + 1) or _response(teacher, model="local-teacher"))
+    external = lambda _: (calls.__setitem__("external_teacher", calls["external_teacher"] + 1) or ("codex-fixture", teacher))
+    execution_dir = tmp_path / "partial"
+    first_id = "run4a-candidate-contradiction-001"
+    first_task = tasks[first_id]
+    baseline_summary = run_baseline(first_task, execution_dir / "candidates" / first_id, worker=worker)
+    baseline = {"task_id": first_id, "transport_valid": True, "transport_classification": "model_response", "validation": baseline_summary["validation"], "raw": json.loads((execution_dir / "candidates" / first_id / "baseline.raw.json").read_text())}
+    prereg = context["preregistration"]
+    manifest = context["manifest"]
+    frozen = prereg["frozen_inputs"]
+    patch = {"patch_id": frozen["deterministic_patch_id"], "patch_path": str(ROOT / frozen["deterministic_patch_path"]), "patch_sha256": frozen["deterministic_patch_sha256"]}
+    intervention = prereg["arm_order"]["orders"][first_id][0]
+    arm_dir = execution_dir / "tasks" / first_id / "arms" / intervention
+    binding = _arm_binding(prereg, manifest, first_id, intervention, baseline_summary, ROOT)
+    _json_write(arm_dir / "arm_binding.json", binding)
+    from local_harness.run4a_intervention_harness import run_isolated_intervention_arm
+    run_isolated_intervention_arm(first_task, baseline, intervention=intervention, out_dir=arm_dir, worker=worker, local_teacher=local, external_teacher=external, deterministic_patch=patch)
+    _write_arm_artifact_index(arm_dir)
+    execution = {"schema": "zth_run4a_execution_manifest_v1", "status": "experiment_running", "started_at": "synthetic", "git_head": "synthetic", "preregistration_sha256": canonical_sha256(prereg), "fixture_pack_sha256": manifest["pack_sha256"], "candidate_states": {task_id: "baseline_not_started" for task_id in prereg["fixture_pack"]["task_ids"]}, "arm_orders_executed": {first_id: [intervention]}, "model_calls_started": True}
+    execution["candidate_states"][first_id] = "arm_terminal"
+    _json_write(execution_dir / "execution_manifest.json", execution)
+    result = run_experiment(context, execution_dir, worker=worker, local_teacher=local, external_teacher=external, deterministic_patch=patch)
+    assert result["status"] == "experiment_completed"
+    assert calls == {"worker": 68, "local_teacher": 16, "external_teacher": 16}
+    assert result["arm_orders_executed"][first_id] == context["preregistration"]["arm_order"]["orders"][first_id]
+
+
+def test_running_active_call_fails_closed_and_terminal_incomplete_is_reused(tmp_path: Path):
+    context = validate_preregistration(PREREG, ROOT)
+    prereg = context["preregistration"]
+    manifest = context["manifest"]
+    base = {"schema": "zth_run4a_execution_manifest_v1", "started_at": "synthetic", "git_head": "synthetic", "preregistration_sha256": canonical_sha256(prereg), "fixture_pack_sha256": manifest["pack_sha256"], "candidate_states": {}, "arm_orders_executed": {}, "model_calls_started": True}
+    active_dir = tmp_path / "active"
+    _json_write(active_dir / "execution_manifest.json", {**base, "status": "experiment_running", "active_call": {"kind": "arm", "task_id": "x", "intervention": "local_teacher"}})
+    with pytest.raises(Run4ADriverError):
+        run_experiment(context, active_dir, worker=_failed_worker, local_teacher=lambda _: _response(""), external_teacher=lambda _: ("x", ""), deterministic_patch={})
+    terminal_dir = tmp_path / "terminal"
+    terminal = {**base, "status": "experiment_incomplete", "completed_at": "synthetic-closeout"}
+    _json_write(terminal_dir / "execution_manifest.json", terminal)
+    assert run_experiment(context, terminal_dir, worker=lambda _: (_ for _ in ()).throw(AssertionError("duplicate")), local_teacher=lambda _: (_ for _ in ()).throw(AssertionError("duplicate")), external_teacher=lambda _: (_ for _ in ()).throw(AssertionError("duplicate")), deterministic_patch={}) == terminal
