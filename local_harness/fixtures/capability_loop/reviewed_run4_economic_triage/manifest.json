@@ -1,0 +1,302 @@
+{
+  "candidate_count": 15,
+  "candidate_order": [
+    "run4-economic-triage-001",
+    "run4-economic-triage-002",
+    "run4-economic-triage-003",
+    "run4-economic-triage-004",
+    "run4-economic-triage-005",
+    "run4-economic-triage-006",
+    "run4-economic-triage-007",
+    "run4-economic-triage-008",
+    "run4-economic-triage-009",
+    "run4-economic-triage-010",
+    "run4-economic-triage-011",
+    "run4-economic-triage-012",
+    "run4-economic-triage-013",
+    "run4-economic-triage-014",
+    "run4-economic-triage-015"
+  ],
+  "eligibility": [
+    "transport_valid=true",
+    "transport_classification=model_response",
+    "deterministic baseline validation failure",
+    "target resolution=task_family",
+    "target evidence key=triage-routing"
+  ],
+  "fixtures": [
+    {
+      "fixture_sha256": "21fad48a7d41c1b50060cd4b66c40cf792eb5e1346fe4293731746b5ded956db",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4_economic_triage/triage-001.json",
+      "reference_facts_sha256": "d49ec311f2f568944f3c7433c708a35ff3692476d92e39438ae028fbe9514731",
+      "source_anchor": "release-note evidence triage scenario",
+      "source_document": "docs/AIDER_FIRST_SUCCESS.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run4-economic-triage-001"
+    },
+    {
+      "fixture_sha256": "8a115c7be270d784bc66ba7b3d8843190369da3ade2d005e00a8b86aee657ec7",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4_economic_triage/triage-002.json",
+      "reference_facts_sha256": "468ee19e31e8c61b28086bd41fc220def1adbbfc93be2532ccbd17b9ef311f8f",
+      "source_anchor": "checksum versus comment triage scenario",
+      "source_document": "docs/FAILURE_CURRICULUM_TRAINING.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run4-economic-triage-002"
+    },
+    {
+      "fixture_sha256": "602f94943a545b2cfb4110ed5e0a7d5e61ba6202b5b6b1ad6e3c59b0faaeed86",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4_economic_triage/triage-003.json",
+      "reference_facts_sha256": "df2777fd03d3a48a96d84570e964358e2f4da5c7dd01227e8db7c3e63453f3e9",
+      "source_anchor": "completed trial without reviewer decision",
+      "source_document": "docs/LARQL_COMPLETED_RULE_DEMO.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run4-economic-triage-003"
+    },
+    {
+      "fixture_sha256": "abae000dab661e634d0cf65e05964ffe4845cbb456c684d2ffdf7c8754057fc2",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4_economic_triage/triage-004.json",
+      "reference_facts_sha256": "782cbbbb1cee0f4179b5202eeb69028901bf4975bc2f9faba8e2c63ee93ceb43",
+      "source_anchor": "intake example with absent disposition",
+      "source_document": "docs/LARQL_INTAKE_TO_INSTALL_BOUNDARY_PUBLIC_NARRATIVE.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run4-economic-triage-004"
+    },
+    {
+      "fixture_sha256": "7e87a57c5874a77321444327f68a5b72f1e0bdacaa81f660367da04b3f875a08",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4_economic_triage/triage-005.json",
+      "reference_facts_sha256": "f1e049f6ff2a864b7f1bc92acb75a2f2fda1b6a9fccdb51e9c4db3ffc75ec608",
+      "source_anchor": "template with blank downstream owner",
+      "source_document": "docs/LARQL_JSON_RULE_TRIAL_TEMPLATE.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run4-economic-triage-005"
+    },
+    {
+      "fixture_sha256": "792d4409e63ea578f1478c7b2ee76bbc63922e3dfae4ab7f3f1e703e823c1d76",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4_economic_triage/triage-006.json",
+      "reference_facts_sha256": "cca114d23590fa357a79534b2443e7c56e4fc4d905786f6d04c548a66e377e6f",
+      "source_anchor": "repeatability without acceptance decision",
+      "source_document": "docs/LARQL_PIPELINE_REPEATABILITY.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run4-economic-triage-006"
+    },
+    {
+      "fixture_sha256": "4db1f9741c6fd7cce369dc5bb6f0cffeede81162e92173045c98520feec78a6d",
+      "novelty": "new_scenario_same_family",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4_economic_triage/triage-007.json",
+      "reference_facts_sha256": "4aa89a8808c709d429b401a01049408f11ca07d533a29e2f3be3c51162af312e",
+      "source_anchor": "draft handoff without approval record",
+      "source_document": "docs/ARCHITECTURE.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run4-economic-triage-007"
+    },
+    {
+      "fixture_sha256": "0ed8a8e0bc112fb410e1ffaf292f3e5756a3c3edb87a9dbbe93123e50d026ae3",
+      "novelty": "new_scenario_same_family",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4_economic_triage/triage-008.json",
+      "reference_facts_sha256": "6920beedd5f8f784d878fce15b93a11cfcb4212d1d6cab5d1adea70e86947efc",
+      "source_anchor": "pending reviewer note on proposed correction",
+      "source_document": "docs/BEHAVIOR_CORRECTION_CARDS.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run4-economic-triage-008"
+    },
+    {
+      "fixture_sha256": "81243c5540390648f83263c0128be5859acd7d1ea12db6704f88c64abdf90051",
+      "novelty": "new_scenario_same_family",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4_economic_triage/triage-009.json",
+      "reference_facts_sha256": "4234b0a66f5169603018ed67ba8942686ea89d0a778cbdfe6aec8e2f5d22d4d6",
+      "source_anchor": "command example with unverified environment",
+      "source_document": "docs/LARQL_MACHINERY_QUICKSTART.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run4-economic-triage-009"
+    },
+    {
+      "fixture_sha256": "18fc6cc66534c40cc5490b15f2fb458be37c6ade0c227088e16d6679e9d20c16",
+      "novelty": "new_scenario_same_family",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4_economic_triage/triage-010.json",
+      "reference_facts_sha256": "ae4a7ff250ae7f10f6588ee5fab153caa4def77817c65d7accffe71f4b499937",
+      "source_anchor": "artifact without acceptance reviewer",
+      "source_document": "docs/FIRST_SUCCESS.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run4-economic-triage-010"
+    },
+    {
+      "fixture_sha256": "3651f3400f665f5bf05fe5651f98ca8859eca4ee7f0bb1ec99a6e4c236b8ec55",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4_economic_triage/triage-011.json",
+      "reference_facts_sha256": "7a611ded30963d4e03bb168f1f840af9de84cc0773ece21acbc8c5f12051a39b",
+      "source_anchor": "valid response with unresolved authority field",
+      "source_document": "docs/SUPERVISED_MODEL_ATTEMPT_RECORDER.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run4-economic-triage-011"
+    },
+    {
+      "fixture_sha256": "4e019d18952c3bef17cb0a74ac4bef1d732126415779c06d4b445a176b06bcf3",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4_economic_triage/triage-012.json",
+      "reference_facts_sha256": "cae0a3758cf5bdf05afb952cb1cf0d37ab21c253ab3d611cdd3500d7e4a91d08",
+      "source_anchor": "candidate destination without supporting check",
+      "source_document": "docs/TRIAGE_ROUTER.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run4-economic-triage-012"
+    },
+    {
+      "fixture_sha256": "15ae5b3f8289006ba5a1d78593698763d2058c1b68ccb8dcb6f88b0946b3a06a",
+      "novelty": "new_scenario_same_family",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4_economic_triage/triage-013.json",
+      "reference_facts_sha256": "1f1bdc58ea1a3e50ab8e4fd33e1638412e26787a587c8b48a05ca990b3a00293",
+      "source_anchor": "observed dependency without approval",
+      "source_document": "docs/ALPHA_READINESS_CHECKLIST.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run4-economic-triage-013"
+    },
+    {
+      "fixture_sha256": "7e3c5828891bdf08eb7103a9f552871847e96f20a65a8db675bc7287a7be72be",
+      "novelty": "new_scenario_same_family",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4_economic_triage/triage-014.json",
+      "reference_facts_sha256": "e58bc07fc074cfdd93208000ffc173ee918a1534ec6a7a2a1186ae41c5c99bf8",
+      "source_anchor": "earlier observation with unset final disposition",
+      "source_document": "docs/SUPERVISED_REVIEW_DECISION_RECORD.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run4-economic-triage-014"
+    },
+    {
+      "fixture_sha256": "ed996f0e6e693b4d6926b608185058d96a23760cd2145700ee7426147eef8fbd",
+      "novelty": "new_scenario_same_family",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run4_economic_triage/triage-015.json",
+      "reference_facts_sha256": "e490011a2b5cb97f54a1ee203388abc4918e07d96e05ce2a5dfbf2b71eec77fa",
+      "source_anchor": "bounded recommendation without recorded handoff",
+      "source_document": "docs/AGENT_TASK_SESSION.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run4-economic-triage-015"
+    }
+  ],
+  "generated_at": "2026-08-19T00:00:00-04:00",
+  "manifest_sha256": "7dcef17c93a5eab5605621951be3084b2a4929ddcedf74fb9c39f47b8d377fef",
+  "model_outputs_consulted": false,
+  "novelty_audit_path": "local_harness/fixtures/capability_loop/reviewed_run4_economic_triage/novelty_audit.json",
+  "novelty_audit_sha256": "8a379eb24903ba2787d069a85cef3d1fe7556eda22fe18daa968b1b3ce5a3290",
+  "pack_id": "reviewed_run4_economic_triage",
+  "pack_sha256": "7dcef17c93a5eab5605621951be3084b2a4929ddcedf74fb9c39f47b8d377fef",
+  "pair_order": {
+    "algorithm": "sha256(str(seed) + ':' + task_id), first hex digit < 8 means control-first, otherwise treatment-first",
+    "orders": {
+      "run4-economic-triage-001": [
+        "control",
+        "treatment"
+      ],
+      "run4-economic-triage-002": [
+        "control",
+        "treatment"
+      ],
+      "run4-economic-triage-003": [
+        "treatment",
+        "control"
+      ],
+      "run4-economic-triage-004": [
+        "treatment",
+        "control"
+      ],
+      "run4-economic-triage-005": [
+        "control",
+        "treatment"
+      ],
+      "run4-economic-triage-006": [
+        "treatment",
+        "control"
+      ],
+      "run4-economic-triage-007": [
+        "control",
+        "treatment"
+      ],
+      "run4-economic-triage-008": [
+        "control",
+        "treatment"
+      ],
+      "run4-economic-triage-009": [
+        "treatment",
+        "control"
+      ],
+      "run4-economic-triage-010": [
+        "treatment",
+        "control"
+      ],
+      "run4-economic-triage-011": [
+        "treatment",
+        "control"
+      ],
+      "run4-economic-triage-012": [
+        "treatment",
+        "control"
+      ],
+      "run4-economic-triage-013": [
+        "control",
+        "treatment"
+      ],
+      "run4-economic-triage-014": [
+        "treatment",
+        "control"
+      ],
+      "run4-economic-triage-015": [
+        "treatment",
+        "control"
+      ]
+    },
+    "seed": 20260822
+  },
+  "reserve_rule": "Candidates not selected after baseline eligibility remain reserve-only; no adaptive replacement.",
+  "schema": "zth_run4_economic_fixture_manifest_v1",
+  "selection_rule": "Select the first target count eligible candidates in frozen candidate order; never use intervention outcomes for inclusion.",
+  "target_included_count": 12,
+  "task_family": "triage-routing"
+}

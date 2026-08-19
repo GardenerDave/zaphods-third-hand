@@ -1,0 +1,125 @@
+{
+  "schema": "zth_run4_economic_routing_preregistration_v1",
+  "experiment_id": "run4-targeted-economic-triage-routing-2026-08-19",
+  "status": "ready_for_review",
+  "model_calls_made": false,
+  "setup_commit": "e278c2f2c1a6c3f98420fc334f3596cf43ea2331",
+  "design_note": {
+    "path": "docs/research/RUN_4_ECONOMIC_OBJECTIVE_REVIEW_2026-08-19.md",
+    "sha256": "25b0382fcc1eed134dc93101dceb7a729e83c780621b8426bda12b3a3b5950f9"
+  },
+  "frozen_inputs": {
+    "comparative_evidence_path": "docs/research/RUN_4A_COMPARATIVE_EVIDENCE_FREEZE_2026-08-19.json",
+    "comparative_evidence_file_sha256": "c48a97000fbf85b7ea3919a8269009d3200d3c2369924c456ec9dcc8736baf7b",
+    "comparative_evidence_freeze_sha256": "a23a7daa0c8681e8f57beed768c1cf3b3daafc360d139f48a147e8c4493dd0c3",
+    "policy_freeze_path": "docs/research/RUN_4_ECONOMIC_ROUTING_POLICY_FREEZE_2026-08-19.json",
+    "policy_freeze_file_sha256": "60732b15f0547ba51e66aaa134c26b86aeb089d23e44029b88b659f21cda12ed",
+    "policy_freeze_sha256": "5b0b2d4bc29d66070e13e2bf3f31b6463b97517849d9550821f5323b8896dd17",
+    "router_source_path": "local_harness/run4_economic_policy.py",
+    "router_source_sha256": "ef5a0ddba3b058baba006cde9d7791f15e21ece7b40d86d947a4af7fc371c72f",
+    "capability_bundle_path": ".work/capability_cards/capability_cards.json",
+    "capability_bundle_sha256": "383274a27c89345b3a8bcede75123420973a7a3e53318224e6460c0d05b47fc1",
+    "routing_policy_path": "docs/research/RUN_3_ROUTING_POLICY_FREEZE_2026-08-18.json",
+    "routing_policy_sha256": "cf6728e51e5b5e1ce5ed24539f83bbacd4f9a07dd818f26106c333cc7e543fe8",
+    "resource_weight_manifest_path": "docs/research/RUN_4_RESOURCE_WEIGHTS_FREEZE_2026-08-19.json",
+    "resource_weight_manifest_sha256": "33ad2521dc5acc0be5a67b3ef77c167e882cf6ce53140dc60acc8f89c9ad76ab",
+    "resource_priors_ms": {
+      "worker_time_ms": 5276.567,
+      "local_teacher_time_ms": 16220.624,
+      "external_teacher_time_ms": 28704.012
+    },
+    "deterministic_patch_id": "run1-experimental-distilled-strict-contract-v1",
+    "deterministic_patch_path": ".work/capability_batch_reviewed_v1/synthesis/run1_distilled_candidate_patch.json",
+    "deterministic_patch_sha256": "7cfb4453919ad945f0d149ec8af8763653b3734a54b86f23303b84a60dfdacf6"
+  },
+  "fixture_pack": {
+    "path": "local_harness/fixtures/capability_loop/reviewed_run4_economic_triage",
+    "manifest_path": "local_harness/fixtures/capability_loop/reviewed_run4_economic_triage/manifest.json",
+    "manifest_sha256": "7dcef17c93a5eab5605621951be3084b2a4929ddcedf74fb9c39f47b8d377fef",
+    "pack_sha256": "7dcef17c93a5eab5605621951be3084b2a4929ddcedf74fb9c39f47b8d377fef",
+    "novelty_audit_path": "local_harness/fixtures/capability_loop/reviewed_run4_economic_triage/novelty_audit.json",
+    "novelty_audit_sha256": "8a379eb24903ba2787d069a85cef3d1fe7556eda22fe18daa968b1b3ce5a3290",
+    "novelty_audit_file_sha256": "9ca583a367f894b63e283c50747fca981e4051e61abdff4a0e03f9763869109a",
+    "candidate_count": 15,
+    "target_included_count": 12,
+    "candidate_ids": [
+      "run4-economic-triage-001", "run4-economic-triage-002", "run4-economic-triage-003", "run4-economic-triage-004", "run4-economic-triage-005",
+      "run4-economic-triage-006", "run4-economic-triage-007", "run4-economic-triage-008", "run4-economic-triage-009", "run4-economic-triage-010",
+      "run4-economic-triage-011", "run4-economic-triage-012", "run4-economic-triage-013", "run4-economic-triage-014", "run4-economic-triage-015"
+    ],
+    "candidate_order": [
+      "run4-economic-triage-001", "run4-economic-triage-002", "run4-economic-triage-003", "run4-economic-triage-004", "run4-economic-triage-005",
+      "run4-economic-triage-006", "run4-economic-triage-007", "run4-economic-triage-008", "run4-economic-triage-009", "run4-economic-triage-010",
+      "run4-economic-triage-011", "run4-economic-triage-012", "run4-economic-triage-013", "run4-economic-triage-014", "run4-economic-triage-015"
+    ],
+    "eligibility": ["transport_valid=true", "transport_classification=model_response", "deterministic baseline validation failure", "target resolution=task_family", "target evidence key=triage-routing"],
+    "selection_rule": "Select the first 12 eligible candidates in frozen order; intervention outcomes never affect inclusion.",
+    "reserve_rule": "Candidates not selected remain reserve-only; no adaptive replacement."
+  },
+  "driver": {
+    "path": "scripts/zth_run4_economic_routing.py",
+    "sha256": "4ca21c86edf752afda30322721d3a19b5ee9f81914f985b208c2cfa2b7a70dd7",
+    "explicit_execute_gate": true,
+    "dry_run_makes_zero_model_calls": true,
+    "paired_isolated_arms": true
+  },
+  "validators": [
+    {"path": "local_harness/supervised_capability_loop.py", "sha256": "23b26115201d8cba17b9da659af72793654897803988e35e28210eba02af81be"},
+    {"path": "local_harness/supervised_reference_fact_validator.py", "sha256": "d86793dfde5a499988be92447f7df79da889a6074b8dc21b1c3b16bd7c60008a"},
+    {"path": "local_harness/supervised_attempt_output_validator.py", "sha256": "3ca42dfc6f683399752bfe4f5757b9edf4e7eafb09ac30166fe60e9f3beb0d27"}
+  ],
+  "models": {
+    "worker": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "local_teacher": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "external_teacher": "codex-cli-0.146.0",
+    "worker_endpoint_alias": "JARVIS_LOCAL",
+    "local_teacher_endpoint_alias": "JARVIS_LOCAL",
+    "external_service_class": "codex-cli"
+  },
+  "timeouts_seconds": {"worker": 900, "local_teacher": 900, "external_teacher": 120},
+  "target": {"family": "triage-routing", "resolution": "task_family", "evidence_key": "triage-routing", "included_count": 12},
+  "pair_order": {
+    "seed": 20260822,
+    "algorithm": "sha256(str(seed) + ':' + task_id), first hex digit < 8 means control-first, otherwise treatment-first",
+    "orders": {
+      "run4-economic-triage-001": ["control", "treatment"], "run4-economic-triage-002": ["control", "treatment"], "run4-economic-triage-003": ["treatment", "control"],
+      "run4-economic-triage-004": ["treatment", "control"], "run4-economic-triage-005": ["control", "treatment"], "run4-economic-triage-006": ["treatment", "control"],
+      "run4-economic-triage-007": ["control", "treatment"], "run4-economic-triage-008": ["control", "treatment"], "run4-economic-triage-009": ["treatment", "control"],
+      "run4-economic-triage-010": ["treatment", "control"], "run4-economic-triage-011": ["treatment", "control"], "run4-economic-triage-012": ["treatment", "control"],
+      "run4-economic-triage-013": ["control", "treatment"], "run4-economic-triage-014": ["treatment", "control"], "run4-economic-triage-015": ["treatment", "control"]
+    }
+  },
+  "policies": {
+    "control": "capability_first: highest rescue rate, then lowest frozen expected cost, then intervention ID",
+    "treatment": "cheapest_supported_positive: lowest frozen expected cost, then highest rescue rate, then intervention ID",
+    "no_supported_positive": "abstain/fail closed",
+    "expected_actions": {"control": "external_teacher", "treatment": "deterministic_patch_retry"}
+  },
+  "metrics": {
+    "shared_baseline_excluded_from_arm_cost": true,
+    "primary_quality": "treatment validated solve rate >= control",
+    "primary_resource": "treatment post-baseline realized elapsed_ms < control post-baseline realized elapsed_ms",
+    "paired_outcomes": ["both_solve", "control_only", "treatment_only", "neither"],
+    "secondary": ["worker_retry_calls", "local_teacher_calls", "external_teacher_calls", "total_model_calls", "realized_elapsed_ms_by_role", "expected_decision_cost_ms", "token_telemetry_where_available", "infrastructure_exclusions"],
+    "success": "quality_preserved AND resource_reduced"
+  },
+  "planning_budget": {
+    "maximum_model_calls": 51,
+    "expected_elapsed_ms": 550234.257,
+    "arithmetic": "15*5276.567 + 12*(28704.012+5276.567) + 12*5276.567"
+  },
+  "authority_and_stop_conditions": {
+    "transport_inclusion": "Only valid model_response calls enter capability metrics.",
+    "no_fallback_escalation": true,
+    "no_cross_arm_information": true,
+    "no_adaptive_selection": true,
+    "no_router_mutation": true,
+    "no_evidence_merge": true,
+    "no_training": true,
+    "no_promotion": true,
+    "no_queue_insertion": true,
+    "ambiguous_started_call": "fail closed; do not rerun"
+  },
+  "execution_authority": "Preparation only; explicit operator authorization and --execute are required.",
+  "execution_commit_recorded_at_runtime": true
+}

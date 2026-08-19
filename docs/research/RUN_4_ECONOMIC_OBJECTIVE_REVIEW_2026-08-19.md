@@ -76,8 +76,8 @@ population value with four observations per action.
 |---|---|---|---|---|
 | A. Cheapest supported-positive | Choose the lowest-cost supported-positive action | deterministic; deterministic; local; deterministic | No | Conservative cost tie-break; preserves support and negative evidence |
 | B. Highest rescue, cheapest tie-break | Maximize empirical rescue rate, then minimize cost | deterministic; external; local; deterministic | No | Capability-first comparator; exposes the triage cost/quality tradeoff |
-| C. Rescue rate / cost | Maximize empirical rescue per millisecond | deterministic in all four blocks | No explicit scalar, but treats sparse rates as cardinal | More cost-sensitive, but unstable with small samples |
-| D. Cost / rescue rate | Minimize cost per observed rescue | deterministic in all four blocks | No explicit scalar, but divides by sparse rates | Same small-sample instability; undefined at zero |
+| C. Rescue rate / cost | Maximize empirical rescue per millisecond | deterministic; deterministic; local; deterministic | No explicit scalar, but treats sparse rates as cardinal | More cost-sensitive, but unstable with small samples |
+| D. Cost / rescue rate | Minimize cost per observed rescue | deterministic; deterministic; local; deterministic | No explicit scalar, but divides by sparse rates | Same small-sample instability; undefined at zero |
 | E. Expected terminal cost | Action cost plus failure probability times downstream cost | Not evaluable | Requires a frozen downstream failure cost and sequential conditional probabilities | No defensible downstream cost exists in the current evidence |
 | F. Explicit budget/frontier | Select actions under a frozen resource budget | Not evaluated | Requires an independently grounded budget | Useful only after a budget is externally specified |
 

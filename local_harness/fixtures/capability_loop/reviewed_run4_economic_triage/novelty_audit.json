@@ -1,0 +1,77 @@
+{
+  "audit_sha256": "8a379eb24903ba2787d069a85cef3d1fe7556eda22fe18daa968b1b3ce5a3290",
+  "counts": {
+    "candidates": 15,
+    "new_scenario_same_family": 8,
+    "new_source": 7,
+    "source_anchor_reuse": 0,
+    "source_document_reuse": 8
+  },
+  "exact_prompt_duplicates": [],
+  "high_similarity_pairs": [],
+  "model_outputs_consulted": false,
+  "normalized_prompt_duplicates": [],
+  "novelty_classification": {
+    "run4-economic-triage-001": "new_source",
+    "run4-economic-triage-002": "new_source",
+    "run4-economic-triage-003": "new_source",
+    "run4-economic-triage-004": "new_source",
+    "run4-economic-triage-005": "new_source",
+    "run4-economic-triage-006": "new_source",
+    "run4-economic-triage-007": "new_scenario_same_family",
+    "run4-economic-triage-008": "new_scenario_same_family",
+    "run4-economic-triage-009": "new_scenario_same_family",
+    "run4-economic-triage-010": "new_scenario_same_family",
+    "run4-economic-triage-011": "new_scenario_same_family",
+    "run4-economic-triage-012": "new_source",
+    "run4-economic-triage-013": "new_scenario_same_family",
+    "run4-economic-triage-014": "new_scenario_same_family",
+    "run4-economic-triage-015": "new_scenario_same_family"
+  },
+  "prior_packs": [
+    "reviewed_v1",
+    "reviewed_v2",
+    "reviewed_v3",
+    "reviewed_v3b",
+    "reviewed_v3c",
+    "reviewed_v4a"
+  ],
+  "schema": "zth_run4_economic_novelty_audit_v1",
+  "similarity_threshold": 0.8,
+  "source_anchor_collisions": [],
+  "source_document_collisions": [
+    {
+      "source_document": "docs/ARCHITECTURE.md",
+      "task_id": "run4-economic-triage-007"
+    },
+    {
+      "source_document": "docs/BEHAVIOR_CORRECTION_CARDS.md",
+      "task_id": "run4-economic-triage-008"
+    },
+    {
+      "source_document": "docs/LARQL_MACHINERY_QUICKSTART.md",
+      "task_id": "run4-economic-triage-009"
+    },
+    {
+      "source_document": "docs/FIRST_SUCCESS.md",
+      "task_id": "run4-economic-triage-010"
+    },
+    {
+      "source_document": "docs/SUPERVISED_MODEL_ATTEMPT_RECORDER.md",
+      "task_id": "run4-economic-triage-011"
+    },
+    {
+      "source_document": "docs/ALPHA_READINESS_CHECKLIST.md",
+      "task_id": "run4-economic-triage-013"
+    },
+    {
+      "source_document": "docs/SUPERVISED_REVIEW_DECISION_RECORD.md",
+      "task_id": "run4-economic-triage-014"
+    },
+    {
+      "source_document": "docs/AGENT_TASK_SESSION.md",
+      "task_id": "run4-economic-triage-015"
+    }
+  ],
+  "task_id_collisions": []
+}

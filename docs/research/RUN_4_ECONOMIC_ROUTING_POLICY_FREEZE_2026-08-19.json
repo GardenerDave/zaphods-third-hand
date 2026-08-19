@@ -1,0 +1,50 @@
+{
+  "authority": "experiment_only_advisory_policy",
+  "comparative_evidence_freeze_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/research/RUN_4A_COMPARATIVE_EVIDENCE_FREEZE_2026-08-19.json",
+  "comparative_evidence_freeze_sha256": "a23a7daa0c8681e8f57beed768c1cf3b3daafc360d139f48a147e8c4493dd0c3",
+  "eligibility": "supported_positive only; negative, observed, and insufficient evidence are never selectable",
+  "execution_authority": "This freeze authorizes only the explicitly preregistered Run 4 comparison; it does not alter normal ZTH routing.",
+  "expected_policy_matrix": {
+    "contradiction-handling": {
+      "capability_first": "deterministic_patch_retry",
+      "cheapest_supported_positive": "deterministic_patch_retry"
+    },
+    "scope-authority-boundary": {
+      "capability_first": "local_teacher",
+      "cheapest_supported_positive": "local_teacher"
+    },
+    "triage-routing": {
+      "capability_first": "external_teacher",
+      "cheapest_supported_positive": "deterministic_patch_retry"
+    },
+    "unsupported-certainty": {
+      "capability_first": "deterministic_patch_retry",
+      "cheapest_supported_positive": "deterministic_patch_retry"
+    }
+  },
+  "policies": {
+    "capability_first": "highest empirical validated rescue rate, then lowest expected cost, then intervention ID",
+    "cheapest_supported_positive": "lowest expected cost, then highest empirical validated rescue rate, then intervention ID",
+    "no_supported_positive": "abstain/fail closed"
+  },
+  "policy_sha256": "5b0b2d4bc29d66070e13e2bf3f31b6463b97517849d9550821f5323b8896dd17",
+  "resource_costs_ms": {
+    "deterministic_patch_retry": 5276.567,
+    "external_teacher": 33980.579,
+    "local_teacher": 21497.191
+  },
+  "router_source_path": "local_harness/run4_economic_policy.py",
+  "router_source_sha256": "ef5a0ddba3b058baba006cde9d7791f15e21ece7b40d86d947a4af7fc371c72f",
+  "schema": "zth_run4_economic_routing_policy_freeze_v1",
+  "status": "reviewed_frozen_policy",
+  "support_thresholds": {
+    "minimum_comparable_opportunities": 3,
+    "minimum_rescue_rate": 0.5
+  },
+  "target_evidence_keys": [
+    "contradiction-handling",
+    "triage-routing",
+    "scope-authority-boundary",
+    "unsupported-certainty"
+  ]
+}
