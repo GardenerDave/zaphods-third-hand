@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3-contradiction-endpoint-capability-001",
+  "task_family": "contradiction-handling",
+  "prompt": "One operator note says an OpenAI-compatible endpoint accepts chat completions, while another note only records a model-list response. Identify what is actually evidenced and what remains unverified before using the endpoint.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "unverified_claims", "inspection_step", "reason"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["evidence", "unverified", "inspect"], "must_not_include": ["the endpoint is proven compatible"]}},
+  "provenance": {"source_document": "docs/OPENAI_COMPATIBLE_ENDPOINTS.md", "source_anchor": "compatibility definition and model listing", "novelty": "new_source"}
+}

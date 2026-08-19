@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3-evidence-endpoint-metadata-001",
+  "task_family": "evidence-grounding",
+  "prompt": "A local endpoint report contains a configured model name but no response usage metadata. State what can be reported and what cannot be inferred about model performance.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "missing_metadata", "unsupported_claims", "review_status"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["usage metadata", "cannot infer", "review"], "must_not_include": ["the model is stable"]}},
+  "provenance": {"source_document": "docs/OPENAI_COMPATIBLE_ENDPOINTS.md", "source_anchor": "configured endpoint and model assumptions", "novelty": "new_source"}
+}

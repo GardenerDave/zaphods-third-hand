@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3-contradiction-patch-status-001",
+  "task_family": "contradiction-handling",
+  "prompt": "A patch record is marked candidate in the library, while a note calls it active after an audition. State the durable facts, preserve the status conflict, and identify the authorized review step before any lifecycle change.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "status_conflict", "review_step", "reason"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["candidate", "review", "do not promote"], "must_not_include": ["automatically active"]}},
+  "provenance": {"source_document": "docs/PROMPT_PATCH_LIBRARY.md", "source_anchor": "candidate status and supervised promotion", "novelty": "new_source"}
+}

@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3-evidence-packet-authority-001",
+  "task_family": "evidence-grounding",
+  "prompt": "An orchestration packet contains a selected patch and output contract. Explain which fields are evidence about packet assembly and which authority claims are explicitly denied.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "evidence_fields", "denied_authority", "review_status"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["no automatic", "review", "evidence"], "must_not_include": ["the packet grants execution authority"]}},
+  "provenance": {"source_document": "docs/ORCHESTRATION_BOUNDARY.md", "source_anchor": "packet guarantees and explicit non-goals", "novelty": "new_source"}
+}

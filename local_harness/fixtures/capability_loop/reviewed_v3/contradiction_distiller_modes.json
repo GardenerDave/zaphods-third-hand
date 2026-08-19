@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3-contradiction-distiller-modes-001",
+  "task_family": "contradiction-handling",
+  "prompt": "The Context Distiller documentation describes both plan-only rendering and synthesis-only review bundles. A draft note treats them as the same operation. Separate the documented meanings, preserve the disagreement as evidence, and state the next bounded inspection step.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "contradiction", "next_inspection", "reason"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["contradiction", "inspect", "do not assume"], "must_not_include": ["silently choose one mode"]}},
+  "provenance": {"source_document": "docs/CONTEXT_DISTILLER_WORKFLOW.md", "source_anchor": "plan-only and synthesis-only modes", "novelty": "new_source"}
+}

@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3-queue-roadmap-candidate-001",
+  "task_family": "queue-authority-boundary",
+  "prompt": "A roadmap note proposes a future queue consumer for capability cards. Record the proposal as evidence and distinguish it from implemented queue insertion authority.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "roadmap_status", "queue_handoff_status", "authority_boundary"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"queue_handoff_status": "not_implemented", "must_include": ["roadmap", "not implemented", "no queue insertion"]}},
+  "provenance": {"source_document": "docs/ROADMAP.md", "source_anchor": "roadmap items are not implementation claims", "novelty": "new_source"}
+}

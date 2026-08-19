@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3-contradiction-review-lifecycle-001",
+  "task_family": "contradiction-handling",
+  "prompt": "A draft handoff labels an artifact accepted, but the supervised review documentation says the same output remains review-required evidence. Reconcile the records without changing lifecycle state and identify the review decision still needed.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "conflict", "lifecycle_status", "review_decision"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["review-required", "evidence", "human review"], "must_not_include": ["accepted for downstream use"]}},
+  "provenance": {"source_document": "docs/SUPERVISED_CAPABILITY_LOOP.md", "source_anchor": "review-required evidence and terminal states", "novelty": "new_source"}
+}

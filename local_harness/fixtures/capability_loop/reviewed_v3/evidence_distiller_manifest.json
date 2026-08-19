@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3-evidence-distiller-manifest-001",
+  "task_family": "evidence-grounding",
+  "prompt": "A distiller manifest records an input path and a generated bundle but does not show the source hash. Separate observed provenance from assumptions and state what must be checked before relying on the bundle.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "unsupported_inferences", "verification_step", "reason"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["source hash", "evidence", "verify"], "must_not_include": ["the bundle is fully verified"]}},
+  "provenance": {"source_document": "docs/CONTEXT_DISTILLER_WORKFLOW.md", "source_anchor": "manifest input/output controls and provenance", "novelty": "new_source"}
+}

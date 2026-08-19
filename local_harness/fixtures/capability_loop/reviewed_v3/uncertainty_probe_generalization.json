@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3-uncertainty-probe-generalization-001",
+  "task_family": "unsupported-certainty",
+  "prompt": "A logic probe passed on one saved response. The report asks whether the model has a permanent capability across arbitrary tasks. Separate the bounded observation from the unsupported generalization.",
+  "output_contract": {"format": "json", "required_fields": ["observed_result", "unsupported_claim", "uncertainty", "next_review_step"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"uncertainty": "uncertain generalization requires more evidence", "must_not_include": ["permanent capability is proven", "arbitrary generalization is proven"]}},
+  "provenance": {"source_document": "docs/LOGIC_PROBES.md", "source_anchor": "bounded evidence and non-benchmark framing", "novelty": "new_source"}
+}

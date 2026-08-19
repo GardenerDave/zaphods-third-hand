@@ -1,0 +1,118 @@
+{
+  "schema": "zth_run3_preregistration_v1",
+  "experiment_id": "capability-mining-run-3-advisory-routing-2026-08-18",
+  "preregistration_git_commit": "7f269d1fec270a540be21f4fdeb52427ebe1e5a4",
+  "task_pack": {
+    "path": "local_harness/fixtures/capability_loop/reviewed_v3",
+    "manifest_path": "local_harness/fixtures/capability_loop/reviewed_v3/manifest.json",
+    "manifest_sha256": "519b2ca2640a3bb00abff961f3bbcafb9e8feb5ccde15492083e594db6547ece",
+    "fixture_pack_sha256": "0400ed2550b342fb159cc7dc502bd53dc83e8a18b3fc57100bea16425d948c04",
+    "task_count": 24,
+    "task_ids": [
+      "capability-run3-contradiction-distiller-modes-001",
+      "capability-run3-contradiction-endpoint-capability-001",
+      "capability-run3-contradiction-patch-status-001",
+      "capability-run3-contradiction-review-lifecycle-001",
+      "capability-run3-destructive-artifact-prune-001",
+      "capability-run3-destructive-endpoint-stop-001",
+      "capability-run3-destructive-patch-delete-001",
+      "capability-run3-destructive-queue-template-cleanup-001",
+      "capability-run3-evidence-distiller-manifest-001",
+      "capability-run3-evidence-endpoint-metadata-001",
+      "capability-run3-evidence-packet-authority-001",
+      "capability-run3-evidence-preflight-scope-001",
+      "capability-run3-queue-agent-session-handoff-001",
+      "capability-run3-queue-orchestration-handoff-001",
+      "capability-run3-queue-review-bundle-gate-001",
+      "capability-run3-queue-roadmap-candidate-001",
+      "capability-run3-scope-docs-allowlist-001",
+      "capability-run3-scope-endpoint-config-001",
+      "capability-run3-scope-probe-contract-001",
+      "capability-run3-scope-session-paths-001",
+      "capability-run3-uncertainty-endpoint-claim-001",
+      "capability-run3-uncertainty-manifest-completeness-001",
+      "capability-run3-uncertainty-patch-promotion-001",
+      "capability-run3-uncertainty-probe-generalization-001"
+    ],
+    "family_mix": {
+      "contradiction-handling": 4,
+      "destructive-action-restraint": 4,
+      "evidence-grounding": 4,
+      "queue-authority-boundary": 4,
+      "scope-authority-boundary": 4,
+      "unsupported-certainty": 4
+    },
+    "novelty_mix": {"new_source": 24},
+    "selection_rule": "Select all 24 independently authored, satisfiable reviewed_v3 fixtures after policy freeze; do not select from model outcomes or teacher artifacts and do not adaptively replace tasks.",
+    "pre_behavioral_routing_classification": {
+      "status": "not_yet_observed",
+      "reason": "The router requires a valid baseline deterministic failure signature. No pre-call disposition is inferred from fixture declarations.",
+      "tasks_pending_baseline_signature": 24,
+      "disposition_counts": {"recommend": 0, "avoid": 0, "abstain": 0, "pending": 24},
+      "resolution_counts": {"exact_signature": 0, "semantic_signature": 0, "failure_class": 0, "task_family": 0, "none": 24}
+    }
+  },
+  "policy_freeze": {
+    "path": "docs/research/RUN_3_ROUTING_POLICY_FREEZE_2026-08-18.json",
+    "sha256": "cf6728e51e5b5e1ce5ed24539f83bbacd4f9a07dd818f26106c333cc7e543fe8",
+    "router_source": "local_harness/capability_cards.py",
+    "router_source_sha256": "3ded696a64c12a58979d4b6af3e6662f17463ed9f991da01585ad586f490e053",
+    "evidence_bundle_sha256": "383274a27c89345b3a8bcede75123420973a7a3e53318224e6460c0d05b47fc1",
+    "resolutions": ["exact_signature", "semantic_signature", "failure_class", "task_family"],
+    "thresholds": {"minimum_comparable_task_opportunities": 3, "minimum_positive_rescue_rate": 0.5},
+    "resource_order": ["baseline", "deterministic_patch_retry", "local_teacher", "external_teacher", "review/unresolved"],
+    "frozen_patch_id": "run1-experimental-distilled-strict-contract-v1",
+    "frozen_patch_artifact_sha256": "7cfb4453919ad945f0d149ec8af8763653b3734a54b86f23303b84a60dfdacf6"
+  },
+  "models": {
+    "worker": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "local_teacher": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "external_teacher": "Codex adapter, review-only, if configured"
+  },
+  "arms": {
+    "control": {
+      "name": "fixed_ladder",
+      "policy": ["baseline", "deterministic_patch_retry", "local_teacher", "external_teacher", "review/unresolved"]
+    },
+    "treatment": {
+      "name": "frozen_advisory_routing",
+      "router_authority": "advisory_only_with_explicit_experiment_harness_authorization",
+      "disposition_actions": {
+        "recommend_deterministic_patch_retry": "Run deterministic retry first; if it fails, continue the remaining local/external ladder.",
+        "recommend_local_teacher": "Skip deterministic retry, run the local-teacher ladder; if exhausted, continue to external teacher.",
+        "recommend_external_teacher": "Skip deterministic and local rungs only when external has supported-positive evidence at the selected resolution; run external, then review if it fails.",
+        "avoid_deterministic_patch_retry": "Do not run deterministic retry; continue the normal teacher ladder unless another supported-positive recommendation is selected.",
+        "abstain": "Use the fixed ladder unchanged."
+      },
+      "fallback": "No supported-positive recommendation means no cheaper rung is skipped; the fixed ladder is used.",
+      "recorded_inputs": ["baseline failure signature", "router output", "evidence resolution", "support counts", "policy freeze hash", "action taken"]
+    }
+  },
+  "validators": "The fixture-selected deterministic validator is authoritative and identical between arms; the model cannot select it.",
+  "transport": {
+    "included_only_when": "transport_classification=model_response",
+    "excluded_classes": ["transport_request_error", "transport_http_error", "transport_timeout", "empty_model_response", "other_infrastructure_error"],
+    "infrastructure_failures": "Preserve durable evidence, exclude from capability verdicts and metrics, and follow bounded review/retry policy."
+  },
+  "execution_order": {
+    "policy": "For each task, choose control-first or treatment-first from a stable hash of seed and task_id; do not adapt order.",
+    "seed": 20260818,
+    "task_order": "lexicographic task_id",
+    "arm_order_derivation": "sha256('20260818:' + task_id), first bit: 0=control-first, 1=treatment-first"
+  },
+  "metrics": {
+    "per_arm": ["final_validated_passes", "unresolved", "worker_calls", "deterministic_retry_calls", "local_teacher_tasks", "local_teacher_calls", "external_teacher_tasks", "external_teacher_calls", "infrastructure_failures"],
+    "primary_cost": "expensive_teacher_calls = local_teacher_calls + external_teacher_calls",
+    "primary_quality": "final_validated_solve_rate",
+    "secondary": ["teacher_calls_per_final_pass", "worker_calls_per_final_pass", "routing_disposition_counts", "evidence_resolution_counts"]
+  },
+  "success_criteria": {
+    "routing_cost_reduction_observed": "treatment expensive_teacher_calls < control expensive_teacher_calls",
+    "routing_quality_preserved": "treatment final_validated_passes >= control final_validated_passes",
+    "routing_success": "routing_cost_reduction_observed AND routing_quality_preserved",
+    "strong_routing_result": ">=25% reduction in expensive_teacher_calls AND treatment final validated solve rate >= control"
+  },
+  "stop_conditions": ["No adaptive task replacement", "No treatment changes after first model call", "No patch promotion", "No training", "No queue insertion", "No autonomous routing outside this explicitly authorized comparison"],
+  "status": "ready_for_review",
+  "model_calls_made": false
+}

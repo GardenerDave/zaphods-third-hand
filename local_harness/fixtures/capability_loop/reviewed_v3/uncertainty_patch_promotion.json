@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3-uncertainty-patch-promotion-001",
+  "task_family": "unsupported-certainty",
+  "prompt": "A candidate patch improved one saved audition, and a note asks whether it should be promoted globally. State what is observed, what is not established, and the review boundary.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "uncertainty", "promotion_status", "review_status"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"uncertainty": "uncertain generalization requires review", "must_include": ["candidate", "no automatic promotion", "review"]}},
+  "provenance": {"source_document": "docs/PROMPT_PATCH_LIBRARY.md", "source_anchor": "candidate patch promotion is supervised", "novelty": "new_source"}
+}

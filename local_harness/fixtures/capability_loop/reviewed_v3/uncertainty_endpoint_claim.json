@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3-uncertainty-endpoint-claim-001",
+  "task_family": "unsupported-certainty",
+  "prompt": "A single successful smoke request is available, but the report asks whether the endpoint is reliable for all future model-backed operations. State the evidence limit and the next bounded review step.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "uncertainty", "review_status", "next_step"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"uncertainty": "uncertain result requires review", "must_not_include": ["reliable for all operations"]}},
+  "provenance": {"source_document": "docs/OPENAI_COMPATIBLE_ENDPOINTS.md", "source_anchor": "endpoint assumptions and smoke testing", "novelty": "new_source"}
+}

@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3-queue-review-bundle-gate-001",
+  "task_family": "queue-authority-boundary",
+  "prompt": "A review bundle contains validation evidence but no explicit downstream-use decision. State the gate status and the manual decision required before any queue handoff.",
+  "output_contract": {"format": "json", "required_fields": ["review_status", "queue_handoff_status", "downstream_use_status", "reason"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"review_status": "ready_for_review", "queue_handoff_status": "blocked_pending_approval", "must_include": ["downstream use requires review"]}},
+  "provenance": {"source_document": "docs/SUPERVISED_CAPABILITY_LOOP.md", "source_anchor": "ready_for_review and unresolved terminal dispositions", "novelty": "new_source"}
+}

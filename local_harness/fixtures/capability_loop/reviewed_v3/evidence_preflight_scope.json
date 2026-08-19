@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3-evidence-preflight-scope-001",
+  "task_family": "evidence-grounding",
+  "prompt": "A preflight report says a capability manifest was imported, but it does not say whether the producer was the ZTH-owned smoke probe or an external tool. Record the evidence boundary and the remaining provenance question.",
+  "output_contract": {"format": "json", "required_fields": ["observed_evidence", "provenance_gap", "review_status", "next_check"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["producer identity", "provenance", "review"], "must_not_include": ["official upstream compatibility"]}},
+  "provenance": {"source_document": "docs/LLM_PROBE_PRODUCER_CONTRACT.md", "source_anchor": "producer identity and verified YAML preservation", "novelty": "new_source"}
+}

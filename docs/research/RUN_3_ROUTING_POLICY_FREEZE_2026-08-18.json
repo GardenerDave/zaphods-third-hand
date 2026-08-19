@@ -1,0 +1,59 @@
+{
+  "schema": "zth_run3_routing_policy_freeze_v1",
+  "policy_version": "run3-advisory-routing-v1",
+  "git_commit": "7f269d1fec270a540be21f4fdeb52427ebe1e5a4",
+  "router_source": "local_harness/capability_cards.py",
+  "router_source_sha256": "3ded696a64c12a58979d4b6af3e6662f17463ed9f991da01585ad586f490e053",
+  "capability_bundle": ".work/capability_cards/capability_cards.json",
+  "capability_bundle_sha256": "383274a27c89345b3a8bcede75123420973a7a3e53318224e6460c0d05b47fc1",
+  "evidence_source_runs": ["run1", "run2"],
+  "evidence_source_commits": [
+    "d27c1e7dd72997eda1bf0b69b73f0a586cb3e395",
+    "3fc3a44cfcefcac50a5fe06d0dbf35b6c9203815"
+  ],
+  "support_thresholds": {
+    "min_comparable_task_opportunities": 3,
+    "positive_rescue_rate": 0.5
+  },
+  "evidence_resolution_order": [
+    "exact_signature",
+    "semantic_signature",
+    "failure_class",
+    "task_family"
+  ],
+  "resource_order": [
+    "baseline",
+    "deterministic_patch_retry",
+    "local_teacher",
+    "external_teacher",
+    "review/unresolved"
+  ],
+  "routing_dispositions": ["recommend", "avoid", "abstain"],
+  "evidence_polarities": ["supported_positive", "supported_negative", "observed", "insufficient"],
+  "semantics": {
+    "supported_positive": "At least three comparable task opportunities and rescue rate at least 0.50; eligible for advisory recommendation at that resolution.",
+    "supported_negative": "At least three comparable task opportunities with rescue rate below 0.50; may support advisory avoidance, never a positive recommendation.",
+    "observed": "At least one comparable opportunity without sufficient support for a positive or negative policy claim.",
+    "insufficient": "No comparable valid evidence at the resolution.",
+    "abstain": "No available intervention has supported-positive evidence at any permitted resolution.",
+    "broader_backoff": "Broader evidence may be consulted only when the more-specific resolution lacks supported-positive evidence; more-specific evidence remains in the advisory record."
+  },
+  "failure_class_mapping": "The deterministic mapping registered in local_harness/capability_cards.py; unknown check IDs remain unclassified:<check_id>.",
+  "frozen_patch": {
+    "patch_id": "run1-experimental-distilled-strict-contract-v1",
+    "artifact_path": ".work/capability_batch_reviewed_v1/synthesis/run1_distilled_candidate_patch.json",
+    "artifact_sha256": "7cfb4453919ad945f0d149ec8af8763653b3734a54b86f23303b84a60dfdacf6",
+    "status": "experimental_review_only"
+  },
+  "authority": {
+    "mode": "advisory_only",
+    "no_execution": true,
+    "deterministic_validation_authoritative": true,
+    "no_patch_promotion": true,
+    "no_training": true,
+    "no_queue_insertion": true,
+    "no_model_authorized_routing": true
+  },
+  "frozen_at": "2026-08-18T21:02:21-04:00",
+  "operator_review_state": "ready_for_review"
+}

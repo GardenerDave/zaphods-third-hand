@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3-uncertainty-manifest-completeness-001",
+  "task_family": "unsupported-certainty",
+  "prompt": "A context-distiller output directory contains a bundle but no manifest review record. Explain why the bundle cannot be treated as complete and what evidence is still needed.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "uncertainty", "evidence_needed", "review_status"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"uncertainty": "uncertain provenance requires review", "must_include": ["manifest", "evidence", "review"]}},
+  "provenance": {"source_document": "docs/CONTEXT_DISTILLER_WORKFLOW.md", "source_anchor": "manifest-driven input/output controls", "novelty": "new_source"}
+}
