@@ -84,6 +84,51 @@ def test_transport_failure_is_infrastructure_only(tmp_path: Path):
     assert summary["capability_verdict_available"] is False
     assert not (tmp_path / "arm" / "worker-retry.validation.json").exists()
     assert (tmp_path / "arm" / "worker.infrastructure.json").is_file()
+    assert summary["infrastructure_artifact"] == "worker.infrastructure.json"
+
+
+@pytest.mark.parametrize("intervention,expected_artifact", [
+    ("local_teacher", "local_teacher.infrastructure.json"),
+    ("external_teacher", "external_teacher.infrastructure.json"),
+])
+def test_teacher_transport_failure_references_actual_artifact(tmp_path: Path, intervention: str, expected_artifact: str):
+    task, baseline = _task_and_baseline()
+    failed = WorkerResponse("request_error", "", "fixture", "fixture-model", "fixture-model", None, None, None, None, "transport")
+    local = lambda _: failed
+    external = lambda _: (_ for _ in ()).throw(RuntimeError("external adapter failed"))
+    summary = run_isolated_intervention_arm(
+        task, baseline, intervention=intervention, out_dir=tmp_path / intervention,
+        local_teacher=local, external_teacher=external,
+    )
+    assert summary["infrastructure_artifact"] == expected_artifact
+    artifact = json.loads((tmp_path / intervention / expected_artifact).read_text())
+    assert artifact["role"] == intervention
+
+
+@pytest.mark.parametrize("intervention", ["local_teacher", "external_teacher"])
+def test_worker_retry_failure_after_teacher_references_worker_artifact(tmp_path: Path, intervention: str):
+    task, baseline = _task_and_baseline()
+    calls = {"worker": 0}
+    failed_worker = WorkerResponse("request_error", "", "fixture", "fixture-model", "fixture-model", None, None, None, None, "transport")
+    teacher = json.dumps({"failure_classification": "fixture", "teacher_diagnosis": "review", "retry_guidance": "Return JSON."})
+
+    def worker(_):
+        calls["worker"] += 1
+        return failed_worker
+
+    def local(_):
+        return _response(teacher, model="local-teacher")
+
+    def external(_):
+        return "codex-fixture", teacher
+
+    summary = run_isolated_intervention_arm(
+        task, baseline, intervention=intervention, out_dir=tmp_path / intervention,
+        worker=worker, local_teacher=local, external_teacher=external,
+    )
+    assert calls["worker"] == 1
+    assert summary["infrastructure_artifact"] == "worker.infrastructure.json"
+    assert json.loads((tmp_path / intervention / "worker.infrastructure.json").read_text())["role"] == "worker"
 
 
 def test_ambiguous_started_call_fails_closed_without_duplicate(tmp_path: Path):

@@ -46,8 +46,10 @@ def test_run4a_preregistration_freezes_orders_and_all_six_permutations():
     assert prereg["arm_order"]["orders"] == manifest["arm_order"]["orders"]
     orders = [tuple(order) for order in prereg["arm_order"]["orders"].values()]
     assert set(orders) == set(PERMUTATIONS)
-    assert all(len(prereg["fixture_pack"]["included_candidates_by_block"][block]) == 4 for block in TARGET_BLOCKS)
-    assert all(len(prereg["fixture_pack"]["reserve_candidates_by_block"][block]) == 1 for block in TARGET_BLOCKS)
+    assert all(prereg["fixture_pack"]["included_candidates_by_block"][block] is None for block in TARGET_BLOCKS)
+    assert all(prereg["fixture_pack"]["reserve_candidates_by_block"][block] is None for block in TARGET_BLOCKS)
+    assert prereg["fixture_pack"]["target_included_count_by_block"] == {block: 4 for block in TARGET_BLOCKS}
+    assert "first target count" in prereg["fixture_pack"]["selection_rule"]
 
 
 def test_run4a_preregistration_binds_harness_and_validators():

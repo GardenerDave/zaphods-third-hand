@@ -3,7 +3,7 @@
   "experiment_id": "run4a-intervention-market-calibration-2026-08-21",
   "status": "ready_for_review",
   "model_calls_made": false,
-  "setup_commit": "71d1f3dae6f3afb2df5d781ef33cddc7fd1420d4",
+  "setup_commit": "93453e4620ebcfa6c636d5558fd17aa7614586fd",
   "design_note": {
     "path": "docs/research/RUN_4A_INTERVENTION_MARKET_CALIBRATION_DESIGN_2026-08-19.md",
     "sha256": "d0b05176f05ae653f62dbb5c3c56f43fe20fa89c9c9febdf3583e484dd8b159b"
@@ -24,8 +24,8 @@
   "fixture_pack": {
     "path": "local_harness/fixtures/capability_loop/reviewed_v4a",
     "manifest_path": "local_harness/fixtures/capability_loop/reviewed_v4a/manifest.json",
-    "manifest_sha256": "3c6f70959c044444d521306d7f507625a9ef5d164fd61414666a6a337062ee15",
-    "pack_sha256": "4b7314bd73d1d2f1c322b43c4aad75cc8dc9784a4671f7a415558ad3c6bf7996",
+    "manifest_sha256": "4d78f84a9d5d6eb051c4a9763fed3e1448cb0283b1186caa3876541d1736892e",
+    "pack_sha256": "0c10d1d712368cd66bd18be48557454e9e242a2d19d7b9f223d190be43f83d20",
     "novelty_audit_path": "local_harness/fixtures/capability_loop/reviewed_v4a/novelty_audit.json",
     "novelty_audit_sha256": "4edbae9e62828c7b66007e075c70495088ece53bb3f74811f0625d6e208f1d3b",
     "candidate_count": 20,
@@ -44,21 +44,29 @@
       "unsupported-certainty": ["run4a-candidate-uncertainty-001", "run4a-candidate-uncertainty-002", "run4a-candidate-uncertainty-003", "run4a-candidate-uncertainty-004", "run4a-candidate-uncertainty-005"]
     },
     "included_candidates_by_block": {
-      "contradiction-handling": ["run4a-candidate-contradiction-001", "run4a-candidate-contradiction-002", "run4a-candidate-contradiction-003", "run4a-candidate-contradiction-004"],
-      "triage-routing": ["run4a-candidate-triage-001", "run4a-candidate-triage-002", "run4a-candidate-triage-003", "run4a-candidate-triage-004"],
-      "scope-authority-boundary": ["run4a-candidate-scope-001", "run4a-candidate-scope-002", "run4a-candidate-scope-003", "run4a-candidate-scope-004"],
-      "unsupported-certainty": ["run4a-candidate-uncertainty-001", "run4a-candidate-uncertainty-002", "run4a-candidate-uncertainty-003", "run4a-candidate-uncertainty-004"]
+      "contradiction-handling": null,
+      "triage-routing": null,
+      "scope-authority-boundary": null,
+      "unsupported-certainty": null
     },
     "reserve_candidates_by_block": {
-      "contradiction-handling": ["run4a-candidate-contradiction-005"],
-      "triage-routing": ["run4a-candidate-triage-005"],
-      "scope-authority-boundary": ["run4a-candidate-scope-005"],
-      "unsupported-certainty": ["run4a-candidate-uncertainty-005"]
-    }
+      "contradiction-handling": null,
+      "triage-routing": null,
+      "scope-authority-boundary": null,
+      "unsupported-certainty": null
+    },
+    "target_included_count_by_block": {
+      "contradiction-handling": 4,
+      "triage-routing": 4,
+      "scope-authority-boundary": 4,
+      "unsupported-certainty": 4
+    },
+    "selection_rule": "Baseline-test all five candidates in frozen block order; select the first target count satisfying every baseline eligibility predicate.",
+    "reserve_rule": "Candidates not selected after baseline eligibility are reserve-only; candidate 005 is unused only when the first four candidates are eligible. No adaptive replacement."
   },
   "harness": {
     "path": "local_harness/run4a_intervention_harness.py",
-    "sha256": "652ef1b146a2723765516786f734fb459a30c295c16a3309d9deeaa4258318ec",
+    "sha256": "a6125d4b9d32ca912da81fd0df316cd56eada60c825b02789b5496fd24590f88",
     "mode": "isolated_one_intervention_one_worker_retry",
     "no_escalation": true,
     "no_cross_arm_artifacts": true,
@@ -117,8 +125,8 @@
     "per_block_candidate_count": 5,
     "included_count_per_block": 4,
     "eligibility": ["transport_valid=true", "transport_classification=model_response", "deterministic baseline validation failure"],
-    "selection": "first four eligible candidates in frozen lexicographic block order",
-    "reserve": "fifth candidate only; no replacement or adaptive selection"
+    "selection": "first four eligible candidates in frozen block order",
+    "reserve": "all candidates not selected after baseline eligibility; candidate 005 is reserve-only only when the first four are eligible; no adaptive replacement"
   },
   "intervention_arms": {
     "deterministic_patch_retry": {"calls": ["one worker retry"], "fallbacks": [], "patch_id": "run1-experimental-distilled-strict-contract-v1"},

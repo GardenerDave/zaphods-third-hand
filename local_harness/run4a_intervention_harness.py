@@ -147,7 +147,7 @@ def _default_external_teacher(prompt: str) -> tuple[str, str]:
     return os.environ.get("ZTH_EXTERNAL_TEACHER_IDENTITY", "codex-cli-0.146.0"), completed.stdout
 
 
-def _write_infrastructure_failure(out_dir: Path, trajectory: Path, *, call_id: str, role: str, started_at: str, started: float, exc: BaseException, timeout_seconds: int) -> dict[str, Any]:
+def _write_infrastructure_failure(out_dir: Path, trajectory: Path, *, call_id: str, role: str, started_at: str, started: float, exc: BaseException, timeout_seconds: int, response_present: bool = False, response_artifact: str | None = None) -> dict[str, Any]:
     if isinstance(exc, subprocess.TimeoutExpired):
         classification = "transport_timeout"
     elif isinstance(exc, OSError):
@@ -170,7 +170,7 @@ def _write_infrastructure_failure(out_dir: Path, trajectory: Path, *, call_id: s
         "exit_code": getattr(exc, "exit_code", None),
         "stderr": str(getattr(exc, "stderr", ""))[-4000:],
         "error": str(exc)[-4000:],
-        "response_present": False,
+        "response_present": response_present,
         "capability_verdict_available": False,
         "resource_telemetry": build_resource_telemetry(
             role=role,
@@ -183,6 +183,9 @@ def _write_infrastructure_failure(out_dir: Path, trajectory: Path, *, call_id: s
         ),
     }
     path = out_dir / f"{role}.infrastructure.json"
+    if response_artifact is not None:
+        artifact["response_artifact"] = response_artifact
+    artifact["artifact_ref"] = path.name
     digest = _json_write(path, artifact)
     _append_transition(trajectory, "infrastructure_failed", call_id=call_id, role=role, artifact_ref=path.name, artifact_sha256=digest, classification=classification, capability_verdict_available=False)
     return artifact
@@ -207,9 +210,7 @@ def _call_worker(out_dir: Path, trajectory: Path, task: Mapping[str, Any], promp
         return None, artifact
     raw_digest = _json_write(raw_path, raw)
     if raw["metadata"]["transport_classification"] != "model_response":
-        artifact = _write_infrastructure_failure(out_dir, trajectory, call_id=call_id, role="worker", started_at=started_at, started=started, exc=RuntimeError(raw["metadata"].get("error") or raw["metadata"]["transport_classification"]), timeout_seconds=int(os.environ.get("ZTH_CAPABILITY_WORKER_TIMEOUT", "900")))
-        artifact["response_present"] = True
-        artifact["response_artifact"] = raw_path.name
+        artifact = _write_infrastructure_failure(out_dir, trajectory, call_id=call_id, role="worker", started_at=started_at, started=started, exc=RuntimeError(raw["metadata"].get("error") or raw["metadata"]["transport_classification"]), timeout_seconds=int(os.environ.get("ZTH_CAPABILITY_WORKER_TIMEOUT", "900")), response_present=True, response_artifact=raw_path.name)
         return None, artifact
     validation = _validator_result(raw["content"], task, attempt_id=attempt_id)
     validation_digest = _json_write(validation_path, validation)
@@ -307,7 +308,7 @@ def run_isolated_intervention_arm(
             "schema": "zth_run4a_arm_summary_v1",
             "task_id": task["task_id"], "task_family": task["task_family"], "intervention": intervention,
             "capability_verdict_available": False, "deterministically_validated_rescue": False,
-            "transport_valid": False, "disposition": "infrastructure_error", "infrastructure_artifact": f"{intervention}.infrastructure.json",
+            "transport_valid": False, "disposition": "infrastructure_error", "infrastructure_artifact": infrastructure.get("artifact_ref"),
             "patch_binding": patch_binding, "baseline_reference": "baseline_reference.json",
             "expected_action_cost_ms": immediate_action_cost(intervention, {"worker_time_ms": 5276.567, "local_teacher_time_ms": 16220.624, "external_teacher_time_ms": 28704.012}),
             "authority": "calibration_only_review_required",

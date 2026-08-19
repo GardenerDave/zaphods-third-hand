@@ -190,6 +190,7 @@
       "source_document": "docs/ARCHITECTURE.md",
       "target_evidence_key": "contradiction-handling",
       "target_evidence_resolution": "task_family",
+      "target_failure_classes": [],
       "task_family": "contradiction-handling",
       "task_id": "run4a-candidate-contradiction-001"
     },
@@ -203,6 +204,7 @@
       "source_document": "docs/BEHAVIOR_CORRECTION_CARDS.md",
       "target_evidence_key": "contradiction-handling",
       "target_evidence_resolution": "task_family",
+      "target_failure_classes": [],
       "task_family": "contradiction-handling",
       "task_id": "run4a-candidate-contradiction-002"
     },
@@ -216,6 +218,7 @@
       "source_document": "docs/CHATGPT_EXPORT_DISTILLER.md",
       "target_evidence_key": "contradiction-handling",
       "target_evidence_resolution": "task_family",
+      "target_failure_classes": [],
       "task_family": "contradiction-handling",
       "task_id": "run4a-candidate-contradiction-003"
     },
@@ -229,6 +232,7 @@
       "source_document": "docs/DOGFOOD_RUNNER.md",
       "target_evidence_key": "contradiction-handling",
       "target_evidence_resolution": "task_family",
+      "target_failure_classes": [],
       "task_family": "contradiction-handling",
       "task_id": "run4a-candidate-contradiction-004"
     },
@@ -242,11 +246,12 @@
       "source_document": "docs/FIRST_SUCCESS.md",
       "target_evidence_key": "contradiction-handling",
       "target_evidence_resolution": "task_family",
+      "target_failure_classes": [],
       "task_family": "contradiction-handling",
       "task_id": "run4a-candidate-contradiction-005"
     },
     {
-      "fixture_sha256": "242a6684f0bcc7faa0f9567bb7cdc79113261123b6f4b3d123a829ff64b9dcb5",
+      "fixture_sha256": "89cdec557f8227f4f10a5360046d19dcc207a87fc658365804264fc819fdc87a",
       "novelty": "new_source",
       "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
       "path": "local_harness/fixtures/capability_loop/reviewed_v4a/scope-001.json",
@@ -254,12 +259,17 @@
       "source_anchor": "bounded patch target and held target",
       "source_document": "docs/PROMPT_PATCH_AB_HARNESS.md",
       "target_evidence_key": "scope-authority-boundary",
-      "target_evidence_resolution": "task_family",
+      "target_evidence_resolution": "failure_class",
+      "target_failure_classes": [
+        "authority_boundary",
+        "reference_fact_application",
+        "unsupported_inference"
+      ],
       "task_family": "scope-authority-boundary",
       "task_id": "run4a-candidate-scope-001"
     },
     {
-      "fixture_sha256": "296ddccfd8caf2d868a56e47758969d6ea3e158df926ca2343a1c828b10a009b",
+      "fixture_sha256": "c33738fe8bf3d75e3067802532ec9a2ddf23ff9ebf85d6d771be215aa0fc37bf",
       "novelty": "new_source",
       "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
       "path": "local_harness/fixtures/capability_loop/reviewed_v4a/scope-002.json",
@@ -267,12 +277,17 @@
       "source_anchor": "shareable scope and held material",
       "source_document": "docs/SHARING_CHECKLIST.md",
       "target_evidence_key": "scope-authority-boundary",
-      "target_evidence_resolution": "task_family",
+      "target_evidence_resolution": "failure_class",
+      "target_failure_classes": [
+        "authority_boundary",
+        "reference_fact_application",
+        "unsupported_inference"
+      ],
       "task_family": "scope-authority-boundary",
       "task_id": "run4a-candidate-scope-002"
     },
     {
-      "fixture_sha256": "65fbd69b052a2492336a578c80c55b9943e84fecfae7fee11f2388cd488c4fc4",
+      "fixture_sha256": "54fd7780986e14b84a080d4d7612a2adef7d57470b53a760fd9b87770306f2ee",
       "novelty": "new_source",
       "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
       "path": "local_harness/fixtures/capability_loop/reviewed_v4a/scope-003.json",
@@ -280,12 +295,17 @@
       "source_anchor": "attempt artifact scope and protected data",
       "source_document": "docs/SUPERVISED_ATTEMPT_OUTPUT_VALIDATION.md",
       "target_evidence_key": "scope-authority-boundary",
-      "target_evidence_resolution": "task_family",
+      "target_evidence_resolution": "failure_class",
+      "target_failure_classes": [
+        "authority_boundary",
+        "reference_fact_application",
+        "unsupported_inference"
+      ],
       "task_family": "scope-authority-boundary",
       "task_id": "run4a-candidate-scope-003"
     },
     {
-      "fixture_sha256": "f959eb4e6f254c339843d461ae86a65a2e9a90b036c6fa10992ccacea2050cc4",
+      "fixture_sha256": "46ac449748b3a9cb7819e7d85b07106a031a130eda90d0057016974adf905bac",
       "novelty": "new_source",
       "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
       "path": "local_harness/fixtures/capability_loop/reviewed_v4a/scope-004.json",
@@ -293,12 +313,17 @@
       "source_anchor": "chain inspection and release edit boundary",
       "source_document": "docs/SUPERVISED_CHAIN_SMOKE.md",
       "target_evidence_key": "scope-authority-boundary",
-      "target_evidence_resolution": "task_family",
+      "target_evidence_resolution": "failure_class",
+      "target_failure_classes": [
+        "authority_boundary",
+        "reference_fact_application",
+        "unsupported_inference"
+      ],
       "task_family": "scope-authority-boundary",
       "task_id": "run4a-candidate-scope-004"
     },
     {
-      "fixture_sha256": "2c1ad4f914163356f2eb0ec96be0d51ed2bc80076f8c1f79b59c4c4a62fa18ce",
+      "fixture_sha256": "757dee41b4df18928dc223f25c2d1c2d9305f8b4f2a3ac517f18514897a0029d",
       "novelty": "new_scenario_same_family",
       "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
       "path": "local_harness/fixtures/capability_loop/reviewed_v4a/scope-005.json",
@@ -306,7 +331,12 @@
       "source_anchor": "downstream read scope and queue insertion hold",
       "source_document": "docs/SUPERVISED_DOWNSTREAM_USE_GATE.md",
       "target_evidence_key": "scope-authority-boundary",
-      "target_evidence_resolution": "task_family",
+      "target_evidence_resolution": "failure_class",
+      "target_failure_classes": [
+        "authority_boundary",
+        "reference_fact_application",
+        "unsupported_inference"
+      ],
       "task_family": "scope-authority-boundary",
       "task_id": "run4a-candidate-scope-005"
     },
@@ -320,6 +350,7 @@
       "source_document": "docs/LARQL_JSON_CONTRACT_PROBE_WORKFLOW.md",
       "target_evidence_key": "triage-routing",
       "target_evidence_resolution": "task_family",
+      "target_failure_classes": [],
       "task_family": "triage-routing",
       "task_id": "run4a-candidate-triage-001"
     },
@@ -333,6 +364,7 @@
       "source_document": "docs/LARQL_MACHINERY_QUICKSTART.md",
       "target_evidence_key": "triage-routing",
       "target_evidence_resolution": "task_family",
+      "target_failure_classes": [],
       "task_family": "triage-routing",
       "task_id": "run4a-candidate-triage-002"
     },
@@ -346,6 +378,7 @@
       "source_document": "docs/LOCAL_SUBAGENT_CAPABILITY_LADDER.md",
       "target_evidence_key": "triage-routing",
       "target_evidence_resolution": "task_family",
+      "target_failure_classes": [],
       "task_family": "triage-routing",
       "task_id": "run4a-candidate-triage-003"
     },
@@ -359,6 +392,7 @@
       "source_document": "docs/MANAGEMENT_TEAM_OVERVIEW.md",
       "target_evidence_key": "triage-routing",
       "target_evidence_resolution": "task_family",
+      "target_failure_classes": [],
       "task_family": "triage-routing",
       "task_id": "run4a-candidate-triage-004"
     },
@@ -372,6 +406,7 @@
       "source_document": "docs/PREFLIGHT_AUDITION_PLAN.md",
       "target_evidence_key": "triage-routing",
       "target_evidence_resolution": "task_family",
+      "target_failure_classes": [],
       "task_family": "triage-routing",
       "task_id": "run4a-candidate-triage-005"
     },
@@ -385,6 +420,7 @@
       "source_document": "docs/SUPERVISED_TRAINING_PATTERNS.md",
       "target_evidence_key": "unsupported-certainty",
       "target_evidence_resolution": "task_family",
+      "target_failure_classes": [],
       "task_family": "unsupported-certainty",
       "task_id": "run4a-candidate-uncertainty-001"
     },
@@ -398,6 +434,7 @@
       "source_document": "docs/TOOL_MAKER.md",
       "target_evidence_key": "unsupported-certainty",
       "target_evidence_resolution": "task_family",
+      "target_failure_classes": [],
       "task_family": "unsupported-certainty",
       "task_id": "run4a-candidate-uncertainty-002"
     },
@@ -411,6 +448,7 @@
       "source_document": "docs/VOGON_PRINTER.md",
       "target_evidence_key": "unsupported-certainty",
       "target_evidence_resolution": "task_family",
+      "target_failure_classes": [],
       "task_family": "unsupported-certainty",
       "task_id": "run4a-candidate-uncertainty-003"
     },
@@ -424,6 +462,7 @@
       "source_document": "workflows/MANAGEMENT_TEAM_ROLE_CONTRACT.md",
       "target_evidence_key": "unsupported-certainty",
       "target_evidence_resolution": "task_family",
+      "target_failure_classes": [],
       "task_family": "unsupported-certainty",
       "task_id": "run4a-candidate-uncertainty-004"
     },
@@ -437,63 +476,43 @@
       "source_document": "workflows/MANAGEMENT_TEAM_STATUS_INDEX.md",
       "target_evidence_key": "unsupported-certainty",
       "target_evidence_resolution": "task_family",
+      "target_failure_classes": [],
       "task_family": "unsupported-certainty",
       "task_id": "run4a-candidate-uncertainty-005"
     }
   ],
-  "generated_at": "2026-08-19T17:03:30.759988+00:00",
+  "generated_at": "2026-08-19T17:21:00.602323+00:00",
   "included_candidates_by_block": {
-    "contradiction-handling": [
-      "run4a-candidate-contradiction-001",
-      "run4a-candidate-contradiction-002",
-      "run4a-candidate-contradiction-003",
-      "run4a-candidate-contradiction-004"
-    ],
-    "scope-authority-boundary": [
-      "run4a-candidate-scope-001",
-      "run4a-candidate-scope-002",
-      "run4a-candidate-scope-003",
-      "run4a-candidate-scope-004"
-    ],
-    "triage-routing": [
-      "run4a-candidate-triage-001",
-      "run4a-candidate-triage-002",
-      "run4a-candidate-triage-003",
-      "run4a-candidate-triage-004"
-    ],
-    "unsupported-certainty": [
-      "run4a-candidate-uncertainty-001",
-      "run4a-candidate-uncertainty-002",
-      "run4a-candidate-uncertainty-003",
-      "run4a-candidate-uncertainty-004"
-    ]
+    "contradiction-handling": null,
+    "scope-authority-boundary": null,
+    "triage-routing": null,
+    "unsupported-certainty": null
   },
-  "manifest_sha256": "3c6f70959c044444d521306d7f507625a9ef5d164fd61414666a6a337062ee15",
+  "manifest_sha256": "4d78f84a9d5d6eb051c4a9763fed3e1448cb0283b1186caa3876541d1736892e",
   "model_outputs_consulted": false,
   "novelty_audit_path": "local_harness/fixtures/capability_loop/reviewed_v4a/novelty_audit.json",
   "novelty_audit_sha256": "1bf03ce9f4a81e8005e9faa1d70c6ce65ecbe11885314353d0ea918da126a403",
   "pack_id": "reviewed_v4a",
-  "pack_sha256": "4b7314bd73d1d2f1c322b43c4aad75cc8dc9784a4671f7a415558ad3c6bf7996",
+  "pack_sha256": "0c10d1d712368cd66bd18be48557454e9e242a2d19d7b9f223d190be43f83d20",
   "reserve_candidates_by_block": {
-    "contradiction-handling": [
-      "run4a-candidate-contradiction-005"
-    ],
-    "scope-authority-boundary": [
-      "run4a-candidate-scope-005"
-    ],
-    "triage-routing": [
-      "run4a-candidate-triage-005"
-    ],
-    "unsupported-certainty": [
-      "run4a-candidate-uncertainty-005"
-    ]
+    "contradiction-handling": null,
+    "scope-authority-boundary": null,
+    "triage-routing": null,
+    "unsupported-certainty": null
   },
-  "reserve_rule": "The fifth lexicographic candidate in each block is reserve only; no replacement is permitted.",
+  "reserve_rule": "Candidates not selected after baseline eligibility are reserve-only; candidate 005 is unused only when the first four candidates are eligible. No adaptive replacement.",
   "schema": "zth_run4a_fixture_manifest_v1",
+  "selection_rule": "Baseline-test all five candidates in frozen block order; select the first target count satisfying every baseline eligibility predicate.",
   "target_blocks": [
     "contradiction-handling",
     "triage-routing",
     "scope-authority-boundary",
     "unsupported-certainty"
-  ]
+  ],
+  "target_included_count_by_block": {
+    "contradiction-handling": 4,
+    "scope-authority-boundary": 4,
+    "triage-routing": 4,
+    "unsupported-certainty": 4
+  }
 }

@@ -143,6 +143,13 @@ def intervention_orders(task_ids: list[str], seed: int = ARM_ORDER_SEED) -> dict
     return {task_id: list(PERMUTATIONS[index % len(PERMUTATIONS)]) for index, task_id in enumerate(ordered)}
 
 
+def select_included_candidates(candidate_order: list[str], eligible_ids: set[str], target_count: int = 4) -> tuple[list[str], list[str]]:
+    """Select the first eligible baseline failures; leave the rest as reserves."""
+    selected = [task_id for task_id in candidate_order if task_id in eligible_ids][:target_count]
+    reserve = [task_id for task_id in candidate_order if task_id not in selected]
+    return selected, reserve
+
+
 def build_manifest(pack_dir: Path, repo_root: Path, *, generated_at: str) -> tuple[dict[str, Any], dict[str, Any]]:
     paths = _paths(pack_dir)
     tasks = [load_task_fixture(path) for path in paths]
@@ -183,10 +190,12 @@ def build_manifest(pack_dir: Path, repo_root: Path, *, generated_at: str) -> tup
             "reference_facts_sha256": _sha256_json(task["validator"].get("reference_facts", {})),
             "target_evidence_resolution": task["calibration"]["target_evidence_resolution"],
             "target_evidence_key": task["calibration"]["target_evidence_key"],
+            "target_failure_classes": task["calibration"].get("target_failure_classes", []),
         })
     candidate_order = {block: sorted(ids) for block, ids in by_block.items()}
-    included = {block: ids[:4] for block, ids in candidate_order.items()}
-    reserves = {block: ids[4:] for block, ids in candidate_order.items()}
+    target_counts = {block: 4 for block in TARGET_BLOCKS}
+    included = {block: None for block in TARGET_BLOCKS}
+    reserves = {block: None for block in TARGET_BLOCKS}
     orders = intervention_orders([task["task_id"] for task in tasks])
     manifest = {
         "schema": "zth_run4a_fixture_manifest_v1",
@@ -200,8 +209,10 @@ def build_manifest(pack_dir: Path, repo_root: Path, *, generated_at: str) -> tup
         "candidate_order_by_block": candidate_order,
         "included_candidates_by_block": included,
         "reserve_candidates_by_block": reserves,
+        "target_included_count_by_block": target_counts,
         "baseline_eligibility": ["transport_valid=true", "transport_classification=model_response", "deterministic baseline validation failure"],
-        "reserve_rule": "The fifth lexicographic candidate in each block is reserve only; no replacement is permitted.",
+        "selection_rule": "Baseline-test all five candidates in frozen block order; select the first target count satisfying every baseline eligibility predicate.",
+        "reserve_rule": "Candidates not selected after baseline eligibility are reserve-only; candidate 005 is unused only when the first four candidates are eligible. No adaptive replacement.",
         "arm_order": {"seed": ARM_ORDER_SEED, "algorithm": "sort task IDs by sha256(str(seed) + ':' + task_id), then assign lexicographic permutation list round-robin", "permutations": [list(p) for p in PERMUTATIONS], "orders": orders},
         "novelty_audit_path": str((pack_dir / "novelty_audit.json").relative_to(repo_root)),
         "novelty_audit_sha256": None,
