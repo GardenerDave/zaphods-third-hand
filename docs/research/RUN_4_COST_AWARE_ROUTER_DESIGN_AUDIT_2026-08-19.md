@@ -105,3 +105,14 @@ action should be chosen automatically. The proposed control/treatment design
 is needed before making any cost-aware performance claim.
 
 No model calls were made.
+
+## Current design status
+
+The cost-aware router is **implementable** as a deterministic extension, but
+the current evidence is not sufficient to make an informative behavioral
+comparison: the current capability-only recommendation and the proposed
+cheapest-supported-positive rule select the same action for every supported
+key. Comparative intervention calibration is required first.
+
+`RUN_4_COST_AWARE_ROUTER_IMPLEMENTABLE=true`
+`RUN_4_COST_AWARE_EXPERIMENT_INFORMATIVE=false`
