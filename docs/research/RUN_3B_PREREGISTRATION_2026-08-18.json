@@ -43,9 +43,9 @@
     "routing_policy_sha256":"cf6728e51e5b5e1ce5ed24539f83bbacd4f9a07dd818f26106c333cc7e543fe8",
     "capability_bundle_sha256":"383274a27c89345b3a8bcede75123420973a7a3e53318224e6460c0d05b47fc1",
     "execution_harness_freeze_path":"docs/research/RUN_3B_EXECUTION_HARNESS_FREEZE_2026-08-18.json",
-    "execution_harness_freeze_sha256":"ed2e3f8b85b485a3ba2c24d3d6d93a20ca6944aa33502adf56d75f7ccf977f21",
+    "execution_harness_freeze_sha256":"2aba6af2a6b0d6b050b55c7c80e5103b45df80eb500bbb1c7b614a97e41fbaff",
     "driver_path":"scripts/zth_run3_routing_experiment.py",
-    "driver_sha256":"111867c4be0256b436b632873910da19b5d30fbf5eb61c9061dd4dadae00f25f",
+    "driver_sha256":"2b99de18f2bf843dbb22b6b5c5df12b7860d33f26f8ea8624933b6a46676dcd7",
     "patch_id":"run1-experimental-distilled-strict-contract-v1",
     "patch_sha256":"7cfb4453919ad945f0d149ec8af8763653b3734a54b86f23303b84a60dfdacf6"
   },

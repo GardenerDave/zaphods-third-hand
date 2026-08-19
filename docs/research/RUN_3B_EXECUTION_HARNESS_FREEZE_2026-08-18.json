@@ -1,8 +1,8 @@
 {
   "schema": "zth_run3b_execution_harness_freeze_v1",
-  "source_commit": "69ab9760ef6eb8d8ccf768dc0d9121e6200e623d",
+  "source_commit": "8592ed7504cd20bf904742c403c9ca9313cff18a",
   "driver_path": "scripts/zth_run3_routing_experiment.py",
-  "driver_sha256": "111867c4be0256b436b632873910da19b5d30fbf5eb61c9061dd4dadae00f25f",
+  "driver_sha256": "2b99de18f2bf843dbb22b6b5c5df12b7860d33f26f8ea8624933b6a46676dcd7",
   "preregistration_interface": "--preregistration; fixture_pack schema; seed and arm_order are preregistration-derived",
   "external_teacher_timeout_seconds": 120,
   "external_teacher_identity": "codex-cli-0.146.0",

@@ -17,6 +17,7 @@ from scripts.zth_run3_routing_experiment import (
     external_teacher,
     load_execution_preregistration,
     main,
+    validate_runtime_bindings,
     require_valid_preflight,
 )
 
@@ -66,6 +67,105 @@ def test_preregistration_manifest_drift_fails_closed(tmp_path):
     path.write_text(json.dumps(prereg))
     with pytest.raises(Run3StateError):
         load_execution_preregistration(path, repository_root=ROOT, driver_path=ROOT / "scripts/zth_run3_routing_experiment.py")
+
+
+@pytest.mark.parametrize("field", ["routing_policy_sha256", "execution_harness_freeze_sha256"])
+def test_frozen_artifact_drift_fails_closed(tmp_path, field):
+    prereg = json.loads(json.dumps(PREREG))
+    prereg["frozen_inputs"][field] = "0" * 64
+    path = tmp_path / "bad.json"
+    path.write_text(json.dumps(prereg))
+    with pytest.raises(Run3StateError):
+        load_execution_preregistration(path, repository_root=ROOT, driver_path=ROOT / "scripts/zth_run3_routing_experiment.py")
+
+
+def _valid_bindings(execution):
+    frozen = execution["preregistration"]["frozen_inputs"]
+    return validate_runtime_bindings(
+        execution,
+        policy_sha256=frozen["routing_policy_sha256"],
+        bundle_path=ROOT / ".work/capability_cards/capability_cards.json",
+        patch_id=frozen["patch_id"],
+        patch_sha256=frozen["patch_sha256"],
+        patch_path=ROOT / ".work/capability_batch_reviewed_v1/synthesis/run1_distilled_candidate_patch.json",
+        worker_model=PREREG["models"]["worker"],
+        local_teacher_model=PREREG["models"]["local_teacher"],
+        external_teacher_identity=PREREG["models"]["external_teacher"],
+        external_timeout="120",
+    )
+
+
+def test_runtime_bindings_match_all_frozen_identities_and_timeout():
+    execution = load_execution_preregistration(
+        ROOT / "docs/research/RUN_3B_PREREGISTRATION_2026-08-18.json",
+        repository_root=ROOT,
+        driver_path=ROOT / "scripts/zth_run3_routing_experiment.py",
+    )
+    bindings = _valid_bindings(execution)
+    assert bindings["external_timeout_seconds"] == 120
+
+
+@pytest.mark.parametrize("field", ["routing_policy_sha256", "capability_bundle_sha256", "patch_id", "patch_sha256"])
+def test_runtime_binding_drift_fails_closed(field):
+    execution = load_execution_preregistration(
+        ROOT / "docs/research/RUN_3B_PREREGISTRATION_2026-08-18.json",
+        repository_root=ROOT,
+        driver_path=ROOT / "scripts/zth_run3_routing_experiment.py",
+    )
+    frozen = execution["preregistration"]["frozen_inputs"]
+    kwargs = dict(
+        policy_sha256=frozen["routing_policy_sha256"],
+        bundle_path=ROOT / ".work/capability_cards/capability_cards.json",
+        patch_id=frozen["patch_id"],
+        patch_sha256=frozen["patch_sha256"],
+        patch_path=ROOT / ".work/capability_batch_reviewed_v1/synthesis/run1_distilled_candidate_patch.json",
+        worker_model=PREREG["models"]["worker"], local_teacher_model=PREREG["models"]["local_teacher"],
+        external_teacher_identity=PREREG["models"]["external_teacher"], external_timeout="120",
+    )
+    if field == "routing_policy_sha256": kwargs["policy_sha256"] = "0" * 64
+    elif field == "capability_bundle_sha256": kwargs["bundle_path"] = ROOT / "README.md"
+    elif field == "patch_id": kwargs["patch_id"] = "wrong-patch"
+    else: kwargs["patch_sha256"] = "0" * 64
+    with pytest.raises(Run3StateError):
+        validate_runtime_bindings(execution, **kwargs)
+
+
+@pytest.mark.parametrize("role", ["worker_model", "local_teacher_model", "external_teacher_identity"])
+def test_runtime_model_identity_drift_fails_closed(role):
+    execution = load_execution_preregistration(
+        ROOT / "docs/research/RUN_3B_PREREGISTRATION_2026-08-18.json",
+        repository_root=ROOT,
+        driver_path=ROOT / "scripts/zth_run3_routing_experiment.py",
+    )
+    frozen = execution["preregistration"]["frozen_inputs"]
+    kwargs = dict(
+        policy_sha256=frozen["routing_policy_sha256"], bundle_path=ROOT / ".work/capability_cards/capability_cards.json",
+        patch_id=frozen["patch_id"], patch_sha256=frozen["patch_sha256"],
+        patch_path=ROOT / ".work/capability_batch_reviewed_v1/synthesis/run1_distilled_candidate_patch.json",
+        worker_model=PREREG["models"]["worker"], local_teacher_model=PREREG["models"]["local_teacher"],
+        external_teacher_identity=PREREG["models"]["external_teacher"], external_timeout="120",
+    )
+    kwargs[role] = "wrong-identity"
+    with pytest.raises(Run3StateError):
+        validate_runtime_bindings(execution, **kwargs)
+
+
+def test_runtime_timeout_drift_fails_closed():
+    execution = load_execution_preregistration(
+        ROOT / "docs/research/RUN_3B_PREREGISTRATION_2026-08-18.json",
+        repository_root=ROOT,
+        driver_path=ROOT / "scripts/zth_run3_routing_experiment.py",
+    )
+    with pytest.raises(Run3StateError):
+        validate_runtime_bindings(
+            execution,
+            policy_sha256=PREREG["frozen_inputs"]["routing_policy_sha256"],
+            bundle_path=ROOT / ".work/capability_cards/capability_cards.json",
+            patch_id=PREREG["frozen_inputs"]["patch_id"], patch_sha256=PREREG["frozen_inputs"]["patch_sha256"],
+            patch_path=ROOT / ".work/capability_batch_reviewed_v1/synthesis/run1_distilled_candidate_patch.json",
+            worker_model=PREREG["models"]["worker"], local_teacher_model=PREREG["models"]["local_teacher"],
+            external_teacher_identity=PREREG["models"]["external_teacher"], external_timeout="121",
+        )
 
 
 def test_main_validates_preregistration_before_any_worker_call(tmp_path, monkeypatch):

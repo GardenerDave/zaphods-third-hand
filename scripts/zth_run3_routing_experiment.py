@@ -118,7 +118,54 @@ def load_execution_preregistration(
         raise Run3StateError("Run 3B must not reuse the prior Run 3 seed")
     if driver_path is not None and frozen.get("driver_sha256") != _sha256_file(driver_path):
         raise Run3StateError("execution driver hash mismatch")
-    return {"preregistration": preregistration, "fixtures_dir": fixtures_dir, "manifest": manifest, "seed": seed, "task_ids": task_ids, "arm_order": expected_orders}
+    for key in ("routing_policy_path", "execution_harness_freeze_path"):
+        artifact = repository_root / frozen[key]
+        if not artifact.is_file() or _sha256_file(artifact) != frozen[f"{key.replace('_path', '')}_sha256"]:
+            raise Run3StateError(f"frozen artifact hash mismatch: {key}")
+    return {"preregistration": preregistration, "preregistration_sha256": _sha256_file(preregistration_path), "fixtures_dir": fixtures_dir, "manifest": manifest, "seed": seed, "task_ids": task_ids, "arm_order": expected_orders}
+
+
+def validate_runtime_bindings(
+    execution: dict[str, Any],
+    *,
+    policy_sha256: str,
+    bundle_path: Path,
+    patch_id: str,
+    patch_sha256: str,
+    patch_path: Path,
+    worker_model: str | None = None,
+    local_teacher_model: str | None = None,
+    external_teacher_identity: str | None = None,
+    external_timeout: str | None = None,
+) -> dict[str, Any]:
+    """Verify CLI/config bindings against the frozen preregistration."""
+    prereg = execution["preregistration"]
+    frozen = prereg["frozen_inputs"]
+    models = prereg["models"]
+    if policy_sha256 != frozen["routing_policy_sha256"]:
+        raise Run3StateError("supplied policy hash does not match preregistration")
+    if not bundle_path.is_file() or _sha256_file(bundle_path) != frozen["capability_bundle_sha256"]:
+        raise Run3StateError("capability evidence bundle hash mismatch")
+    if patch_id != frozen["patch_id"] or patch_sha256 != frozen["patch_sha256"]:
+        raise Run3StateError("supplied patch identity does not match preregistration")
+    if not patch_path.is_file() or _sha256_file(patch_path) != frozen["patch_sha256"]:
+        raise Run3StateError("patch file hash does not match preregistration")
+    effective_models = {
+        "worker": worker_model if worker_model is not None else os.environ.get("ZTH_CAPABILITY_WORKER_MODEL"),
+        "local_teacher": local_teacher_model if local_teacher_model is not None else os.environ.get("ZTH_CAPABILITY_TEACHER_MODEL"),
+        "external_teacher": external_teacher_identity if external_teacher_identity is not None else os.environ.get("ZTH_EXTERNAL_TEACHER_IDENTITY"),
+    }
+    for role, expected in models.items():
+        if effective_models.get(role) != expected:
+            raise Run3StateError(f"configured {role} identity does not match preregistration")
+    configured_timeout = external_timeout if external_timeout is not None else os.environ.get("ZTH_RUN3_EXTERNAL_TEACHER_TIMEOUT", "120")
+    try:
+        timeout = int(configured_timeout)
+    except (TypeError, ValueError) as exc:
+        raise Run3StateError("external teacher timeout is not an integer") from exc
+    if timeout != prereg.get("external_teacher_timeout_seconds"):
+        raise Run3StateError("external teacher timeout does not match preregistration")
+    return {"models": effective_models, "external_timeout_seconds": timeout}
 
 
 def _valid_attempt_record(out_dir: Path) -> dict[str, Any] | None:
@@ -301,11 +348,20 @@ def main(argv: list[str] | None = None) -> int:
     except Run3StateError as exc:
         raise SystemExit(str(exc)) from exc
     fixtures = sorted(p for p in execution["fixtures_dir"].glob("*.json") if p.name != "manifest.json")
-    if not args.patch_path.is_file() or hashlib.sha256(args.patch_path.read_bytes()).hexdigest() != args.patch_sha256:
-        raise SystemExit("frozen patch hash mismatch")
+    try:
+        bindings = validate_runtime_bindings(
+            execution,
+            policy_sha256=args.policy_sha256,
+            bundle_path=args.bundle,
+            patch_id=args.patch_id,
+            patch_sha256=args.patch_sha256,
+            patch_path=args.patch_path,
+        )
+    except Run3StateError as exc:
+        raise SystemExit(str(exc)) from exc
     if args.out_dir.exists() and any(args.out_dir.iterdir()) and not args.resume:
         raise SystemExit("output directory is non-empty; use a new directory or explicit safe resume")
-    manifest = {"schema": "zth_run3_execution_manifest_v1", "status": "running", "seed": execution["seed"], "preregistration_path": str(args.preregistration), "task_ids": execution["task_ids"], "policy_sha256": args.policy_sha256, "patch_id": args.patch_id, "patch_sha256": args.patch_sha256, "arm_order": execution["arm_order"], "model_calls_started": False}
+    manifest = {"schema": "zth_run3_execution_manifest_v1", "status": "running", "preregistration_path": str(args.preregistration), "preregistration_sha256": execution["preregistration_sha256"], "policy_sha256": args.policy_sha256, "capability_bundle_sha256": execution["preregistration"]["frozen_inputs"]["capability_bundle_sha256"], "patch_id": args.patch_id, "patch_sha256": args.patch_sha256, "driver_sha256": execution["preregistration"]["frozen_inputs"]["driver_sha256"], "fixture_pack_sha256": execution["preregistration"]["fixture_pack"]["pack_sha256"], "worker_model": bindings["models"]["worker"], "local_teacher_model": bindings["models"]["local_teacher"], "external_teacher_identity": bindings["models"]["external_teacher"], "external_timeout_seconds": bindings["external_timeout_seconds"], "seed": execution["seed"], "task_ids": execution["task_ids"], "arm_order": execution["arm_order"], "model_calls_started": False}
     args.out_dir.mkdir(parents=True, exist_ok=True)
     manifest_path = args.out_dir / "run3_execution_manifest.json"
     if args.resume:
