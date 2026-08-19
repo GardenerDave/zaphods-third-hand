@@ -19,7 +19,7 @@
   },
   "routing_policy_sha256": "cf6728e51e5b5e1ce5ed24539f83bbacd4f9a07dd818f26106c333cc7e543fe8",
   "capability_evidence_bundle_sha256": "383274a27c89345b3a8bcede75123420973a7a3e53318224e6460c0d05b47fc1",
-  "status": "ready_for_run3b_execution",
+  "status": "ready_for_run3c_preregistration",
   "external_failure_artifact_schema": "zth_external_teacher_infrastructure_failure_v1",
   "started_without_response_fails_closed": true,
   "model_capability_scoring_performed": false,

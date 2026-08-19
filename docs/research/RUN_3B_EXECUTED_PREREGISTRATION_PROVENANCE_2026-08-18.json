@@ -1,0 +1,10 @@
+{
+  "schema": "zth_executed_preregistration_provenance_v1",
+  "experiment_id": "capability-mining-run-3b-advisory-routing-2026-08-19",
+  "source_commit": "305285d978aa3a28b2e479c9e7824d20bdf27221",
+  "preregistration_path": "docs/research/RUN_3B_PREREGISTRATION_2026-08-18.json",
+  "preregistration_sha256": "6285c6667337beb154471252df278f55998b890c6204dd66b4ee96ef7da6a7ab",
+  "execution_status": "invalid_incomplete_execution_pilot_2",
+  "metrics_used": false,
+  "historical_note": "This records the preregistration state used by the interrupted pilot. Later harness repairs and metadata updates do not retroactively alter the executed design or make the pilot valid."
+}

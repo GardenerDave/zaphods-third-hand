@@ -13,11 +13,15 @@ def build_session_command(command: list[str], log_path: Path, exit_status_path: 
     command_text = shlex.join(command)
     log = shlex.quote(str(log_path))
     status = shlex.quote(str(exit_status_path))
+    status_writer = (
+        'import json, os; json.dump({"exit_code": int(os.environ["ZTH_EXIT_CODE"]), '
+        '"status": "completed"}, open(os.environ["ZTH_STATUS_PATH"], "w"))'
+    )
     return (
         "set -o pipefail; "
         f"{command_text} >{log} 2>&1; "
         "rc=$?; "
-        f"ZTH_EXIT_CODE=$rc python3 -c 'import json; json.dump({{\"exit_code\": int(__import__(\"os\").environ[\"ZTH_EXIT_CODE\"]), \"status\": \"completed\"}}, open({status!r}, \"w\"))'; "
+        f"ZTH_EXIT_CODE=$rc ZTH_STATUS_PATH={status} python3 -c {shlex.quote(status_writer)}; "
         "exit $rc"
     )
 
@@ -37,6 +41,8 @@ def main() -> int:
     parser.add_argument("--exit-status", type=Path, required=True)
     parser.add_argument("command", nargs=argparse.REMAINDER)
     args = parser.parse_args()
+    if args.command[:1] == ["--"]:
+        args.command = args.command[1:]
     launch(args.session, args.log, args.exit_status, args.command)
     return 0
 
