@@ -82,6 +82,7 @@ Read the detailed records:
 
 - [`Run 1 synthesis`](docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_1_SYNTHESIS_2026-08-18.md)
 - [`Run 2 results`](docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_2_2026-08-18.md)
+- [`Capability Cards and Advisory Routing`](docs/CAPABILITY_CARDS_AND_ADVISORY_ROUTING.md)
 
 ## What You Can Do Today
 

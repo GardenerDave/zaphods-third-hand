@@ -684,6 +684,7 @@ Requirements:
 ## Roadmap Discipline
 
 - Roadmap items must not be represented as implemented until code, docs, and tests exist.
+- Empirical capability cards and an advisory-only intervention router now extract transport-valid Run 1/Run 2 evidence by task family and normalized deterministic failure signature; execution routing, automatic rung skipping, patch promotion, training, and queue insertion remain unimplemented. A proposed Run 3 cost/solve experiment is design-only.
 - Privacy-impacting features require explicit docs before implementation.
 - Workflow-changing gates should fail closed and preserve human override records.
 - Optional evidence should remain optional.
