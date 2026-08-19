@@ -380,7 +380,10 @@ def build_hierarchical_evidence(cards: Mapping[str, Any]) -> dict[str, Any]:
             rescued = len(group["rescued_task_ids"])
             rate = rescued / opportunities if opportunities else 0.0
             polarity = "supported_positive" if opportunities >= EVIDENCE_MIN_OBSERVATIONS and rate >= EVIDENCE_MIN_RESCUE_RATE else "supported_negative" if opportunities >= EVIDENCE_MIN_OBSERVATIONS else "observed" if opportunities else "insufficient"
-            group.update({"rescued_tasks": rescued, "rescue_rate": rate, "evidence_status": _evidence_status(opportunities, rate), "evidence_polarity": polarity})
+            # A sufficiently sampled failure pattern can be supported-negative
+            # even when it does not meet the positive rescue-rate threshold.
+            status = "supported" if opportunities >= EVIDENCE_MIN_OBSERVATIONS else "observed" if opportunities else "insufficient"
+            group.update({"rescued_tasks": rescued, "rescue_rate": rate, "evidence_status": status, "evidence_polarity": polarity})
             rows.append(group)
         result[resolution] = sorted(rows, key=lambda row: (row["task_family"], row["intervention"], row["resolution_key"]))
     return result

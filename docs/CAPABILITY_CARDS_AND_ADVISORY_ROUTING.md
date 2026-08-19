@@ -10,8 +10,10 @@ as exclusions and never become capability failures.
 Cards are evidence records, not model claims and not statistical certainty. The
 current labels are deliberately conservative: `insufficient` means no valid
 comparable opportunity, `observed` means at least one opportunity but too little
-evidence, and `supported` means at least three comparable opportunities with at
-least a 50% rescue rate.
+evidence, and `supported` means at least three comparable opportunities. A
+supported card is further labeled `supported_positive` when rescue rate is at
+least 50%, or `supported_negative` when the evidence supports avoiding that
+intervention for the pattern.
 
 The offline extractor reads durable Run 1 and Run 2 trajectories and writes
 review-only artifacts under `.work/capability_cards/`. It keeps the runs
