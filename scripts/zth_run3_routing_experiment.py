@@ -80,6 +80,25 @@ def _valid_attempt_record(out_dir: Path) -> dict[str, Any] | None:
     return record
 
 
+def _assert_no_incomplete_transitions(out_dir: Path) -> None:
+    trajectory = out_dir / "trajectory.jsonl"
+    if not trajectory.exists():
+        return
+    records = [json.loads(line) for line in trajectory.read_text().splitlines() if line.strip()]
+    for record in records:
+        transition = record.get("transition")
+        if transition == "worker_call_started":
+            attempt = record.get("attempt")
+            if not (out_dir / f"attempt-{attempt}.raw.json").exists():
+                raise Run3StateError(f"worker call has no durable response; refusing resume: {out_dir}")
+        elif transition == "local_teacher_started":
+            if not (out_dir / f"local-teacher-{record.get('attempt')}.json").exists():
+                raise Run3StateError(f"local-teacher call has no durable response; refusing resume: {out_dir}")
+        elif transition == "external_teacher_started":
+            if not (out_dir / "external-teacher.json").exists():
+                raise Run3StateError(f"external-teacher call has no durable response; refusing resume: {out_dir}")
+
+
 def _baseline(task: dict[str, Any], out_dir: Path, worker: Callable[[str], Any] | None = None) -> dict[str, Any]:
     """Make exactly one baseline call, or recover its already durable record."""
     existing = _valid_attempt_record(out_dir)
@@ -189,6 +208,7 @@ def _run_one(task: dict[str, Any], arm: str, out_dir: Path, bundle: dict[str, An
             _json_write(advisory_path, advisory)
     patch = patch_config if action in {"fixed_ladder", "deterministic_patch_retry"} else None
     teacher_passes = 0 if action == "external_teacher" else 2
+    _assert_no_incomplete_transitions(out_dir)
     run_capability_loop(task, out_dir=out_dir, max_worker_attempts=1, max_teacher_passes=teacher_passes, deterministic_patch_retry=patch, external_teacher=external_teacher)
     summary = json.loads(summary_path.read_text())
     summary.update({"arm": arm, "router_advisory": advisory, "routing_disposition": advisory.get("routing_disposition") if advisory else None, "routing_evidence_resolution": advisory.get("evidence_resolution") if advisory else None, "routing_action": action, "policy_freeze_sha256": patch_config["policy_sha256"]})

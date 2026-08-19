@@ -11,6 +11,7 @@ from scripts.zth_run3_routing_experiment import (
     RESOURCE_ACTIONS,
     Run3StateError,
     _baseline,
+    _assert_no_incomplete_transitions,
     arm_order,
     derive_action,
     external_teacher,
@@ -77,6 +78,13 @@ def test_incomplete_baseline_fails_closed_without_call(tmp_path):
     with pytest.raises(Run3StateError):
         _baseline({"task_id": "x", "prompt": "x"}, tmp_path, lambda _prompt: calls.append(1))
     assert calls == []
+
+
+def test_incomplete_intervention_transition_fails_closed(tmp_path):
+    trajectory = tmp_path / "trajectory.jsonl"
+    trajectory.write_text(json.dumps({"record_type": "transition", "transition": "external_teacher_started", "attempt": 1}) + "\n")
+    with pytest.raises(Run3StateError):
+        _assert_no_incomplete_transitions(tmp_path)
 
 
 def test_external_adapter_uses_bounded_timeout_without_invoking_process(monkeypatch):
