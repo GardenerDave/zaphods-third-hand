@@ -235,15 +235,21 @@ def build_capability_cards(run_roots: Iterable[Path], *, generated_at: str | Non
             "attempt": obs["baseline_attempt"], "artifact_refs": obs["baseline_artifacts"], "artifact_hashes": obs["baseline_hashes"],
         }, *obs["interventions"]]
         for entry in entries:
-            key = (obs["run_id"], obs["worker_model"], obs["task_family"], signature_key(base_sig), entry["source"], entry.get("intervention_id"))
+            # Run 1 and Run 2 use compatible transport/validation semantics;
+            # combine comparable evidence while retaining source_runs below.
+            key = (obs["worker_model"], obs["task_family"], signature_key(base_sig), entry["source"], entry.get("intervention_id"))
             card = groups.setdefault(key, {
                 "schema": "zth_capability_card_v1",
                 "identity": {"worker_model": obs["worker_model"], "intervention_type": entry["source"], "intervention_id": entry.get("intervention_id"), "patch_id": entry.get("patch_id"), "patch_sha256": entry.get("patch_hash")},
-                "context": {"run_id": obs["run_id"], "task_family": obs["task_family"], "failure_signature": base_sig},
+                "context": {"source_runs": [obs["run_id"]], "task_family": obs["task_family"], "failure_signature": base_sig},
                 "observations": {"eligible_attempts": 0, "valid_model_attempts": 0, "successes": 0, "failures": 0, "infrastructure_exclusions": 0, "task_ids": [], "attempts": [], "teacher_call_count": 0},
                 "cost": {"worker_calls": 0, "local_teacher_calls": 0, "external_teacher_calls": 0},
                 "provenance": {"source_runs": [obs["run_id"]], "source_commits": [SOURCE_COMMITS[obs["run_id"]]], "artifacts": []},
             })
+            if obs["run_id"] not in card["context"]["source_runs"]:
+                card["context"]["source_runs"].append(obs["run_id"])
+            if SOURCE_COMMITS[obs["run_id"]] not in card["provenance"]["source_commits"]:
+                card["provenance"]["source_commits"].append(SOURCE_COMMITS[obs["run_id"]])
             card["observations"]["eligible_attempts"] += 1
             card["observations"]["valid_model_attempts"] += 1
             card["observations"]["successes"] += int(entry["passed"])
@@ -271,7 +277,7 @@ def build_capability_cards(run_roots: Iterable[Path], *, generated_at: str | Non
         card["observations"]["rescue_rate"] = successes / eligible if eligible else 0.0
         card["evidence"] = {"sample_count": eligible, "status": _evidence_status(eligible, card["observations"]["rescue_rate"]), "limitations": "Counts are empirical and not statistical significance."}
         cards.append(card)
-    cards.sort(key=lambda c: (c["context"]["run_id"], c["context"]["task_family"], c["identity"]["intervention_type"], signature_key(c["context"]["failure_signature"])))
+    cards.sort(key=lambda c: (c["context"]["task_family"], c["identity"]["intervention_type"], signature_key(c["context"]["failure_signature"])))
     return {"schema": "zth_capability_cards_bundle_v1", "generated_at": generated_at, "thresholds": {"min_observations_for_supported": EVIDENCE_MIN_OBSERVATIONS, "min_rescue_rate_for_supported": EVIDENCE_MIN_RESCUE_RATE}, "cards": cards, "source_task_count": len(all_tasks), "transport_excluded_task_count": len(all_tasks) - len(observations)}
 
 
@@ -308,7 +314,7 @@ def write_evidence_bundle(bundle: Mapping[str, Any], output_dir: Path) -> None:
         family = card["context"]["task_family"]
         source = card["identity"]["intervention_type"]
         compact = {
-            "run_id": card["context"]["run_id"],
+            "source_runs": card["context"]["source_runs"],
             "intervention_id": card["identity"]["intervention_id"],
             "failure_signature": card["context"]["failure_signature"],
             "observations": card["observations"],
