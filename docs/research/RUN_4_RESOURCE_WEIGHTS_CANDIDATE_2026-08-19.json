@@ -1,0 +1,46 @@
+{
+  "schema": "zth_resource_weight_manifest_v1",
+  "version": 1,
+  "frozen": false,
+  "review_status": "draft",
+  "rationale": "Candidate elapsed-time basis derived from pooled Run 3C operational telemetry; retained for explicit review and not experimental authority.",
+  "units": {
+    "worker_call": null,
+    "worker_token": null,
+    "worker_time_ms": "milliseconds_per_call",
+    "local_teacher_call": null,
+    "local_teacher_token": null,
+    "local_teacher_time_ms": "milliseconds_per_call",
+    "external_teacher_call": null,
+    "external_teacher_token": null,
+    "external_teacher_time_ms": "milliseconds_per_call"
+  },
+  "sources": {
+    "worker_call": null,
+    "worker_token": null,
+    "worker_time_ms": "Run 3C control+treatment durable start/capture timing; pooled median observed elapsed_ms",
+    "local_teacher_call": null,
+    "local_teacher_token": null,
+    "local_teacher_time_ms": "Run 3C control+treatment durable start/capture timing; pooled median observed elapsed_ms",
+    "external_teacher_call": null,
+    "external_teacher_token": null,
+    "external_teacher_time_ms": "Run 3C control+treatment durable start/capture timing; pooled median observed elapsed_ms"
+  },
+  "weights": {
+    "worker_call": null,
+    "worker_token": null,
+    "worker_time_ms": 5276.567,
+    "local_teacher_call": null,
+    "local_teacher_token": null,
+    "local_teacher_time_ms": 16220.624,
+    "external_teacher_call": null,
+    "external_teacher_token": null,
+    "external_teacher_time_ms": 28704.012
+  },
+  "approval": {
+    "reviewer": null,
+    "approved_at": null,
+    "approval_basis": null
+  },
+  "manifest_sha256": "508c84227756132d830eb0b8ad4ac9e8a47719608a627096f138611a5a9a5232"
+}
