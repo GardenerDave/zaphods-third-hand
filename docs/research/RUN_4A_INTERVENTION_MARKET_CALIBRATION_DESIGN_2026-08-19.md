@@ -187,7 +187,7 @@ budget of:
 
 `68×5276.567 + 16×16220.624 + 16×28704.012 = 1,077,600.732 ms`
 
-approximately 17.61 minutes of serial model-call time under the frozen priors.
+approximately 17.96 minutes of serial model-call time under the frozen priors.
 Baseline passes and infrastructure exclusions reduce completed intervention
 calls; they must not be replaced adaptively. This is a planning estimate,
 not a guaranteed wall-clock duration.

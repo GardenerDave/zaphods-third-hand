@@ -6,7 +6,7 @@
   "setup_commit": "71d1f3dae6f3afb2df5d781ef33cddc7fd1420d4",
   "design_note": {
     "path": "docs/research/RUN_4A_INTERVENTION_MARKET_CALIBRATION_DESIGN_2026-08-19.md",
-    "sha256": "727fd2427f3a940ee539e47b11d5f12e3e4d730be943b36e8ee5074fd5ea22f1"
+    "sha256": "d0b05176f05ae653f62dbb5c3c56f43fe20fa89c9c9febdf3583e484dd8b159b"
   },
   "prior_experiments_excluded": ["Run 1", "Run 2", "Run 3", "Run 3B", "Run 3C"],
   "frozen_inputs": {
