@@ -1,12 +1,12 @@
 {
   "schema":"zth_run3b_preregistration_v1",
   "experiment_id":"capability-mining-run-3b-advisory-routing-2026-08-19",
-  "setup_commit":"51fce53e69b91573fe650aa8f178fa62f86d297b",
+  "setup_commit":"69ab9760ef6eb8d8ccf768dc0d9121e6200e623d",
   "pilot_exclusion":{"status":"invalid_incomplete_execution_pilot","metrics_used":false,"partial_trajectories_used":false},
   "fixture_pack":{
     "path":"local_harness/fixtures/capability_loop/reviewed_v3b",
     "manifest_path":"local_harness/fixtures/capability_loop/reviewed_v3b/manifest.json",
-    "manifest_sha256":"ffa08388673fe2cbc5081128fa7530af7e4badd6d8dc43fe043b6654ea274b10",
+    "manifest_sha256":"26dbb48b8c982f07e9a968bb1d80944a7b2070da1653c97a5da4228e26a1d1cb",
     "pack_sha256":"613f08b633c73c2603b251b95536e9a77d859d523326bac14e7cb4cbf5a8e7d7",
     "task_count":24,
     "family_mix":{"contradiction-handling":4,"destructive-action-restraint":4,"evidence-grounding":4,"queue-authority-boundary":4,"scope-authority-boundary":4,"unsupported-certainty":4},
@@ -42,10 +42,10 @@
     "routing_policy_path":"docs/research/RUN_3_ROUTING_POLICY_FREEZE_2026-08-18.json",
     "routing_policy_sha256":"cf6728e51e5b5e1ce5ed24539f83bbacd4f9a07dd818f26106c333cc7e543fe8",
     "capability_bundle_sha256":"383274a27c89345b3a8bcede75123420973a7a3e53318224e6460c0d05b47fc1",
-    "execution_harness_freeze_path":"docs/research/RUN_3_EXECUTION_HARNESS_FREEZE_2026-08-18.json",
-    "execution_harness_freeze_sha256":"71cb204f55c7c3f5beee80f166b5cf9b0f9327d13d73b0aad9b10a4de8289694",
+    "execution_harness_freeze_path":"docs/research/RUN_3B_EXECUTION_HARNESS_FREEZE_2026-08-18.json",
+    "execution_harness_freeze_sha256":"ed2e3f8b85b485a3ba2c24d3d6d93a20ca6944aa33502adf56d75f7ccf977f21",
     "driver_path":"scripts/zth_run3_routing_experiment.py",
-    "driver_sha256":"65ac35adf16ac39513e0fdcab1e6bca5702165504617c62f133a6aebb43e9889",
+    "driver_sha256":"111867c4be0256b436b632873910da19b5d30fbf5eb61c9061dd4dadae00f25f",
     "patch_id":"run1-experimental-distilled-strict-contract-v1",
     "patch_sha256":"7cfb4453919ad945f0d149ec8af8763653b3734a54b86f23303b84a60dfdacf6"
   },

@@ -33,7 +33,6 @@ from local_harness.supervised_capability_loop import (
     utc_now,
 )
 
-SEED = "20260818"
 RESOURCE_ACTIONS = {
     "fixed_ladder": ("baseline", "deterministic_patch_retry", "local_teacher", "external_teacher"),
     "deterministic_patch_retry": ("baseline", "deterministic_patch_retry", "local_teacher", "external_teacher"),
@@ -53,10 +52,73 @@ def require_valid_preflight(attempt: dict[str, Any]) -> None:
         raise Run3StateError("worker preflight is not a confirmed model response")
 
 
-def arm_order(task_id: str, seed: str = SEED) -> list[str]:
+def arm_order(task_id: str, seed: str) -> list[str]:
     """Match the preregistered first-bit SHA256 ordering exactly."""
     digest = hashlib.sha256(f"{seed}:{task_id}".encode()).hexdigest()
     return ["control", "treatment"] if int(digest[0], 16) < 8 else ["treatment", "control"]
+
+
+def _sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _fixture_pack_hash(manifest: dict[str, Any]) -> str:
+    values = sorted(entry["fixture_sha256"] for entry in manifest["fixtures"])
+    return hashlib.sha256(("\n".join(values) + "\n").encode()).hexdigest()
+
+
+def load_execution_preregistration(
+    preregistration_path: Path,
+    *,
+    repository_root: Path,
+    fixtures_dir_override: Path | None = None,
+    driver_path: Path | None = None,
+) -> dict[str, Any]:
+    """Load and verify experiment-specific execution authority before calls."""
+    preregistration = json.loads(preregistration_path.read_text())
+    pack = preregistration.get("fixture_pack")
+    order = preregistration.get("execution_order")
+    frozen = preregistration.get("frozen_inputs")
+    if not isinstance(pack, dict) or not isinstance(order, dict) or not isinstance(frozen, dict):
+        raise Run3StateError("preregistration lacks the required fixture_pack/execution_order/frozen_inputs schema")
+    if preregistration.get("model_calls_made") is not False:
+        raise Run3StateError("preregistration is not marked model_calls_made=false")
+    fixtures_dir = repository_root / pack["path"]
+    if fixtures_dir_override is not None and fixtures_dir_override.resolve() != fixtures_dir.resolve():
+        raise Run3StateError("supplied fixture directory does not match preregistration")
+    manifest_path = repository_root / pack["manifest_path"]
+    if not fixtures_dir.is_dir() or not manifest_path.is_file():
+        raise Run3StateError("preregistered fixture directory or manifest is missing")
+    if _sha256_file(manifest_path) != pack["manifest_sha256"]:
+        raise Run3StateError("fixture manifest hash mismatch")
+    manifest = json.loads(manifest_path.read_text())
+    entries = manifest.get("fixtures", [])
+    if len(entries) != pack["task_count"] or len(entries) != 24:
+        raise Run3StateError("fixture count does not match the preregistration")
+    task_ids = [entry.get("task_id") for entry in entries]
+    if task_ids != pack["task_ids"] or task_ids != sorted(task_ids) or len(set(task_ids)) != len(task_ids):
+        raise Run3StateError("preregistered task list drift or ordering mismatch")
+    if _fixture_pack_hash(manifest) != pack["pack_sha256"]:
+        raise Run3StateError("fixture pack hash mismatch")
+    for entry in entries:
+        fixture_path = fixtures_dir / entry["path"]
+        if not fixture_path.is_file() or _sha256_file(fixture_path) != entry["fixture_sha256"]:
+            raise Run3StateError(f"fixture hash mismatch: {entry.get('task_id')}")
+        fixture = json.loads(fixture_path.read_text())
+        contract_hash = hashlib.sha256(json.dumps(fixture["output_contract"], sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+        facts_hash = hashlib.sha256(json.dumps(fixture["validator"]["reference_facts"], sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+        if contract_hash != entry["output_contract_sha256"] or facts_hash != entry["reference_facts_sha256"]:
+            raise Run3StateError(f"fixture contract/reference hash mismatch: {entry.get('task_id')}")
+    seed = str(order.get("seed"))
+    recorded_orders = order.get("arm_order", {})
+    expected_orders = {task_id: arm_order(task_id, seed) for task_id in task_ids}
+    if recorded_orders != expected_orders:
+        raise Run3StateError("preregistered arm order does not match seed")
+    if seed == "20260818":
+        raise Run3StateError("Run 3B must not reuse the prior Run 3 seed")
+    if driver_path is not None and frozen.get("driver_sha256") != _sha256_file(driver_path):
+        raise Run3StateError("execution driver hash mismatch")
+    return {"preregistration": preregistration, "fixtures_dir": fixtures_dir, "manifest": manifest, "seed": seed, "task_ids": task_ids, "arm_order": expected_orders}
 
 
 def _valid_attempt_record(out_dir: Path) -> dict[str, Any] | None:
@@ -217,7 +279,8 @@ def _run_one(task: dict[str, Any], arm: str, out_dir: Path, bundle: dict[str, An
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("fixtures_dir", type=Path)
+    parser.add_argument("fixtures_dir", type=Path, nargs="?")
+    parser.add_argument("--preregistration", type=Path, required=True)
     parser.add_argument("--out-dir", type=Path, required=True)
     parser.add_argument("--bundle", type=Path, required=True)
     parser.add_argument("--patch-path", type=Path, required=True)
@@ -226,14 +289,23 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--policy-sha256", required=True)
     parser.add_argument("--resume", action="store_true")
     args = parser.parse_args(argv)
-    fixtures = sorted(p for p in args.fixtures_dir.glob("*.json") if p.name != "manifest.json")
-    if len(fixtures) != 24:
-        raise SystemExit("Run 3 requires exactly the preregistered 24 fixtures")
+    try:
+        execution = load_execution_preregistration(
+            args.preregistration,
+            repository_root=Path.cwd(),
+            fixtures_dir_override=args.fixtures_dir,
+            driver_path=Path(__file__).resolve(),
+        )
+    except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"invalid preregistration: {exc}") from exc
+    except Run3StateError as exc:
+        raise SystemExit(str(exc)) from exc
+    fixtures = sorted(p for p in execution["fixtures_dir"].glob("*.json") if p.name != "manifest.json")
     if not args.patch_path.is_file() or hashlib.sha256(args.patch_path.read_bytes()).hexdigest() != args.patch_sha256:
         raise SystemExit("frozen patch hash mismatch")
     if args.out_dir.exists() and any(args.out_dir.iterdir()) and not args.resume:
         raise SystemExit("output directory is non-empty; use a new directory or explicit safe resume")
-    manifest = {"schema": "zth_run3_execution_manifest_v1", "status": "running", "seed": SEED, "task_ids": [load_task_fixture(p)["task_id"] for p in fixtures], "policy_sha256": args.policy_sha256, "patch_id": args.patch_id, "patch_sha256": args.patch_sha256, "arm_order": {load_task_fixture(p)["task_id"]: arm_order(load_task_fixture(p)["task_id"]) for p in fixtures}, "model_calls_started": False}
+    manifest = {"schema": "zth_run3_execution_manifest_v1", "status": "running", "seed": execution["seed"], "preregistration_path": str(args.preregistration), "task_ids": execution["task_ids"], "policy_sha256": args.policy_sha256, "patch_id": args.patch_id, "patch_sha256": args.patch_sha256, "arm_order": execution["arm_order"], "model_calls_started": False}
     args.out_dir.mkdir(parents=True, exist_ok=True)
     manifest_path = args.out_dir / "run3_execution_manifest.json"
     if args.resume:
@@ -247,7 +319,7 @@ def main(argv: list[str] | None = None) -> int:
     _json_write(manifest_path, manifest)
     for fixture_path in fixtures:
         task = load_task_fixture(fixture_path)
-        for arm in arm_order(task["task_id"]):
+        for arm in execution["arm_order"][task["task_id"]]:
             _run_one(task, arm, args.out_dir / arm / task["task_id"], bundle, patch_config)
     manifest["status"] = "completed"
     _json_write(manifest_path, manifest)

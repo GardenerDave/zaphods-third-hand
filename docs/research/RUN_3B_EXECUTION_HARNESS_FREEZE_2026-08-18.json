@@ -1,0 +1,23 @@
+{
+  "schema": "zth_run3b_execution_harness_freeze_v1",
+  "source_commit": "69ab9760ef6eb8d8ccf768dc0d9121e6200e623d",
+  "driver_path": "scripts/zth_run3_routing_experiment.py",
+  "driver_sha256": "111867c4be0256b436b632873910da19b5d30fbf5eb61c9061dd4dadae00f25f",
+  "preregistration_interface": "--preregistration; fixture_pack schema; seed and arm_order are preregistration-derived",
+  "external_teacher_timeout_seconds": 120,
+  "external_teacher_identity": "codex-cli-0.146.0",
+  "prior_transport_canary": {
+    "evidence_path": ".work/external_transport_canaries_2026-08-18/summary.json",
+    "calls": 3,
+    "completed_valid_json": 3,
+    "failed": 0,
+    "timeouts": 0,
+    "stream_fd_errors": 0,
+    "rerun_required": false
+  },
+  "routing_policy_sha256": "cf6728e51e5b5e1ce5ed24539f83bbacd4f9a07dd818f26106c333cc7e543fe8",
+  "capability_evidence_bundle_sha256": "383274a27c89345b3a8bcede75123420973a7a3e53318224e6460c0d05b47fc1",
+  "status": "ready_for_run3b_execution",
+  "model_capability_scoring_performed": false,
+  "run3b_fixtures_used": false
+}

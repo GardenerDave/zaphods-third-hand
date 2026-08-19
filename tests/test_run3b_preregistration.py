@@ -40,7 +40,7 @@ def test_run3b_preregistration_is_self_verifying_and_model_free():
 
     expected = {
         "docs/research/RUN_3_ROUTING_POLICY_FREEZE_2026-08-18.json": prereg["frozen_inputs"]["routing_policy_sha256"],
-        "docs/research/RUN_3_EXECUTION_HARNESS_FREEZE_2026-08-18.json": prereg["frozen_inputs"]["execution_harness_freeze_sha256"],
+        prereg["frozen_inputs"]["execution_harness_freeze_path"]: prereg["frozen_inputs"]["execution_harness_freeze_sha256"],
         "scripts/zth_run3_routing_experiment.py": prereg["frozen_inputs"]["driver_sha256"],
     }
     for relative, digest in expected.items():

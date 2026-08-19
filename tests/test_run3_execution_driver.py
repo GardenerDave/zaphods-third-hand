@@ -15,19 +15,75 @@ from scripts.zth_run3_routing_experiment import (
     arm_order,
     derive_action,
     external_teacher,
+    load_execution_preregistration,
+    main,
     require_valid_preflight,
 )
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PREREG = json.loads((ROOT / "docs/research/RUN_3_PREREGISTRATION_2026-08-18.json").read_text())
+PREREG = json.loads((ROOT / "docs/research/RUN_3B_PREREGISTRATION_2026-08-18.json").read_text())
 
 
 def test_arm_order_matches_preregistered_seed_and_first_bit_for_all_tasks():
-    for task_id in PREREG["task_pack"]["task_ids"]:
-        first_bit_is_zero = int(hashlib.sha256(f"20260818:{task_id}".encode()).hexdigest()[0], 16) < 8
-        expected = ["control", "treatment"] if first_bit_is_zero else ["treatment", "control"]
-        assert arm_order(task_id) == expected
+    for task_id, expected in PREREG["execution_order"]["arm_order"].items():
+        assert arm_order(task_id, str(PREREG["execution_order"]["seed"])) == expected
+
+
+def test_run3b_preregistration_schema_loads_and_freezes_all_24_orders():
+    execution = load_execution_preregistration(
+        ROOT / "docs/research/RUN_3B_PREREGISTRATION_2026-08-18.json",
+        repository_root=ROOT,
+        driver_path=ROOT / "scripts/zth_run3_routing_experiment.py",
+    )
+    assert execution["seed"] == "20260819"
+    assert len(execution["task_ids"]) == 24
+    assert execution["arm_order"] == PREREG["execution_order"]["arm_order"]
+
+
+def test_preregistration_mismatched_seed_fails_closed(tmp_path):
+    prereg = json.loads(json.dumps(PREREG))
+    prereg["execution_order"]["seed"] = 20260818
+    path = tmp_path / "bad.json"
+    path.write_text(json.dumps(prereg))
+    with pytest.raises(Run3StateError):
+        load_execution_preregistration(path, repository_root=ROOT, driver_path=ROOT / "scripts/zth_run3_routing_experiment.py")
+
+
+def test_preregistration_task_drift_fails_closed(tmp_path):
+    prereg = json.loads(json.dumps(PREREG))
+    prereg["fixture_pack"]["task_ids"][0] = "drifted-task"
+    path = tmp_path / "bad.json"
+    path.write_text(json.dumps(prereg))
+    with pytest.raises(Run3StateError):
+        load_execution_preregistration(path, repository_root=ROOT, driver_path=ROOT / "scripts/zth_run3_routing_experiment.py")
+
+
+def test_preregistration_manifest_drift_fails_closed(tmp_path):
+    prereg = json.loads(json.dumps(PREREG))
+    prereg["fixture_pack"]["manifest_sha256"] = "0" * 64
+    path = tmp_path / "bad.json"
+    path.write_text(json.dumps(prereg))
+    with pytest.raises(Run3StateError):
+        load_execution_preregistration(path, repository_root=ROOT, driver_path=ROOT / "scripts/zth_run3_routing_experiment.py")
+
+
+def test_main_validates_preregistration_before_any_worker_call(tmp_path, monkeypatch):
+    prereg = json.loads(json.dumps(PREREG))
+    prereg["execution_order"]["seed"] = 20260818
+    path = tmp_path / "bad.json"
+    path.write_text(json.dumps(prereg))
+    monkeypatch.setattr("scripts.zth_run3_routing_experiment.call_worker", lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError("worker called")))
+    with pytest.raises(SystemExit):
+        main([
+            "--preregistration", str(path),
+            "--out-dir", str(tmp_path / "out"),
+            "--bundle", str(ROOT / ".work/capability_cards/capability_cards.json"),
+            "--patch-path", str(ROOT / ".work/capability_batch_reviewed_v1/synthesis/candidate_prompt_patches.json"),
+            "--patch-id", "run1-experimental-distilled-strict-contract-v1",
+            "--patch-sha256", PREREG["frozen_inputs"]["patch_sha256"],
+            "--policy-sha256", PREREG["frozen_inputs"]["routing_policy_sha256"],
+        ])
 
 
 def test_avoid_derives_deterministic_retry_from_supported_negative_alternative():
