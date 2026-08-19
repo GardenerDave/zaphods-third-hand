@@ -116,6 +116,14 @@ def load_approved_resource_weights(path: Path) -> dict[str, Any]:
     approval = payload.get("approval")
     if not isinstance(approval, dict) or any(not isinstance(approval.get(key), str) or not approval[key].strip() for key in ("reviewer", "approved_at", "approval_basis")):
         raise ValueError("approved resource weights require reviewer, approved_at, and approval_basis")
+    provenance = payload.get("provenance")
+    required_provenance = (
+        "source_experiment", "source_preregistration_sha256", "worker_model",
+        "local_teacher_model", "external_teacher_identity", "external_timeout_seconds",
+        "telemetry_schema", "calibration_schema",
+    )
+    if not isinstance(provenance, dict) or any(provenance.get(key) in (None, "") for key in required_provenance):
+        raise ValueError("approved resource weights require configuration provenance")
     digest = payload.get("manifest_sha256")
     if not isinstance(digest, str) or digest != resource_weight_manifest_sha256(payload):
         raise ValueError("resource weight manifest digest mismatch")
@@ -134,3 +142,24 @@ def load_approved_resource_weights(path: Path) -> dict[str, Any]:
         if not isinstance(sources.get(name), str) or not sources[name].strip():
             raise ValueError(f"resource weight {name!r} lacks source/basis")
     return payload
+
+
+def validate_resource_weight_bindings(
+    manifest: Mapping[str, Any],
+    *,
+    worker_model: str,
+    local_teacher_model: str,
+    external_teacher_identity: str,
+    external_timeout_seconds: int,
+) -> None:
+    """Fail closed when a future preregistration binds different resources."""
+    provenance = manifest.get("provenance") or {}
+    expected = {
+        "worker_model": worker_model,
+        "local_teacher_model": local_teacher_model,
+        "external_teacher_identity": external_teacher_identity,
+        "external_timeout_seconds": external_timeout_seconds,
+    }
+    for key, actual in expected.items():
+        if provenance.get(key) != actual:
+            raise ValueError(f"resource-weight binding mismatch: {key}")

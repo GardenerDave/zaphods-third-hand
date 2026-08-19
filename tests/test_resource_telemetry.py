@@ -104,6 +104,16 @@ def _approved_weights() -> dict:
         "sources": {field: "operator price sheet v1" if field == "worker_call" else None for field in fields},
         "weights": {field: 1 if field == "worker_call" else None for field in fields},
         "approval": {"reviewer": "reviewer@example.invalid", "approved_at": "2026-08-19T00:00:00Z", "approval_basis": "reviewed resource policy"},
+        "provenance": {
+            "source_experiment": "synthetic",
+            "source_preregistration_sha256": "a" * 64,
+            "worker_model": "worker",
+            "local_teacher_model": "local",
+            "external_teacher_identity": "external",
+            "external_timeout_seconds": 120,
+            "telemetry_schema": "zth_resource_telemetry_v1",
+            "calibration_schema": "zth_resource_calibration_v1",
+        },
         "manifest_sha256": None,
     }
     manifest["manifest_sha256"] = resource_weight_manifest_sha256(manifest)

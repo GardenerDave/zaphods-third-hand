@@ -117,3 +117,23 @@ def calibrate_resource_telemetry(root: Path) -> dict[str, Any]:
 
 def calibration_digest(payload: dict[str, Any]) -> str:
     return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+
+def expected_decision_cost(manifest: dict[str, Any], expected_calls: dict[str, int]) -> float:
+    """Compute planning cost only from an approved frozen time manifest."""
+    if manifest.get("frozen") is not True or manifest.get("review_status") != "approved":
+        raise ValueError("expected decision cost requires an approved frozen manifest")
+    weights = manifest.get("weights") or {}
+    mapping = {"worker": "worker_time_ms", "local_teacher": "local_teacher_time_ms", "external_teacher": "external_teacher_time_ms"}
+    total = 0.0
+    for role, calls in expected_calls.items():
+        weight = weights.get(mapping[role])
+        if not isinstance(weight, (int, float)):
+            raise ValueError(f"missing approved time weight for {role}")
+        total += calls * weight
+    return total
+
+
+def realized_resource_cost(elapsed_ms_by_role: dict[str, list[float]]) -> float:
+    """Compute realized elapsed cost from actual call intervals only."""
+    return sum(sum(values) for values in elapsed_ms_by_role.values())

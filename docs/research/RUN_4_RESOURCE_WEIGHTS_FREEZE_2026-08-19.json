@@ -1,0 +1,64 @@
+{
+  "schema": "zth_resource_weight_manifest_v1",
+  "version": 1,
+  "frozen": true,
+  "review_status": "approved",
+  "rationale": "Approved historical expected model-call elapsed-time priors for the currently bound Run 3C model/service configuration; these are not monetary, energy, hardware-independent, universal, or token-equivalent prices.",
+  "units": {
+    "worker_call": null,
+    "worker_token": null,
+    "worker_time_ms": "milliseconds_per_call",
+    "local_teacher_call": null,
+    "local_teacher_token": null,
+    "local_teacher_time_ms": "milliseconds_per_call",
+    "external_teacher_call": null,
+    "external_teacher_token": null,
+    "external_teacher_time_ms": "milliseconds_per_call"
+  },
+  "sources": {
+    "worker_call": null,
+    "worker_token": null,
+    "worker_time_ms": "Pooled Run 3C control+treatment calibration; 156/156 coverage; median durable elapsed time",
+    "local_teacher_call": null,
+    "local_teacher_token": null,
+    "local_teacher_time_ms": "Pooled Run 3C control+treatment calibration; 41/41 coverage; median durable elapsed time",
+    "external_teacher_call": null,
+    "external_teacher_token": null,
+    "external_teacher_time_ms": "Pooled Run 3C control+treatment calibration; 27/27 coverage; median durable elapsed time"
+  },
+  "weights": {
+    "worker_call": null,
+    "worker_token": null,
+    "worker_time_ms": 5276.567,
+    "local_teacher_call": null,
+    "local_teacher_token": null,
+    "local_teacher_time_ms": 16220.624,
+    "external_teacher_call": null,
+    "external_teacher_token": null,
+    "external_teacher_time_ms": 28704.012
+  },
+  "approval": {
+    "reviewer": "repository_operator_review",
+    "approved_at": "2026-08-19T00:00:00Z",
+    "approval_basis": "Explicit operator approval of pooled Run 3C control+treatment timing calibration; derivation excluded capability and routing outcomes; median was selected before Run 4 task creation; ordering was stable across p25, median, mean, and p75."
+  },
+  "provenance": {
+    "source_experiment": "Run 3C",
+    "source_preregistration_sha256": "fd45488ffd1e4b0ce4e67c40355b1cfa9404b98ebd53a022bd79cec9e6dae49b",
+    "calibration_note_path": "docs/research/RUN_4_RESOURCE_CALIBRATION_2026-08-19.md",
+    "calibration_note_sha256": "4cbddff4d936c329406b61108e3d43b247f7a705616210a919b4cb2ab1cf4969",
+    "draft_candidate_path": "docs/research/RUN_4_RESOURCE_WEIGHTS_CANDIDATE_2026-08-19.json",
+    "draft_candidate_sha256": "d1cbd3f95d0e54447f6c3a2512a3b1c269d5787c0e14ed04ec1216bc4ba56555",
+    "calibration_extractor_path": "local_harness/resource_calibration.py",
+    "calibration_extractor_sha256": "0e3d9b35ee22cd65a2bcb13c08cd23b7db214df30373ba5c196302798d0f7b8f",
+    "worker_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "local_teacher_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "external_teacher_identity": "codex-cli-0.146.0",
+    "external_timeout_seconds": 120,
+    "telemetry_schema": "zth_resource_telemetry_v1",
+    "calibration_schema": "zth_resource_calibration_v1",
+    "hardware_identity_available": false,
+    "configuration_reuse_rule": "Material model, adapter/service, or hardware changes require review or recalibration before reuse."
+  },
+  "manifest_sha256": "b8dc7c0a97a77d4b412e65a2092b30330fd3430e259bb56deb36d757cc6f4242"
+}

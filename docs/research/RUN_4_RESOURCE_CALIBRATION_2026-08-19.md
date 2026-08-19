@@ -76,6 +76,36 @@ approved resource-weight manifest. Raw counts remain secondary metrics:
 worker calls, deterministic retries, local-teacher calls, and external-teacher
 calls.
 
+## Future Run 4 cost semantics
+
+The frozen priors have one narrow future use: **expected decision cost** for a
+router is the sum of expected role-call counts multiplied by the corresponding
+frozen median elapsed-time prior. This is a planning quantity, not an outcome
+claim.
+
+The preferred experimental outcome is **realized resource cost**: the sum of
+actual elapsed milliseconds for all model calls, using the future monotonic
+telemetry records. A run must not declare success merely because its expected
+cost model predicted success. Validated solve rate remains the quality
+constraint. Worker calls, deterministic retries, local-teacher calls,
+external-teacher calls, total teacher calls, and actual elapsed time by role
+remain secondary reported metrics.
+
+## Post-hoc Run 3C sanity check
+
+Using the approved priors and authoritative Run 3C call counts only—not
+capability outcomes and not as a basis for the priors—the expected whole-model
+elapsed-time totals are:
+
+- control: `83×5276.567 + 24×16220.624 + 11×28704.012 = 1,142,994.169 ms`
+- treatment: `73×5276.567 + 17×16220.624 + 16×28704.012 = 1,120,204.191 ms`
+
+Treatment is 1.994% lower on this post-hoc expected whole-trajectory quantity.
+Teacher-only expected totals are 705,039.108 ms for control and 735,014.800 ms
+for treatment, so treatment is 4.252% higher on teacher-only expected time.
+This illustrates why whole-trajectory resource accounting differs from the
+preregistered teacher-call count and does not reinterpret Run 3C.
+
 This candidate is a first time-based resource basis, not a monetary or energy
 model. It is tied to the observed model/service configuration and should be
 reviewed or invalidated if model, adapter, hardware, or service configuration

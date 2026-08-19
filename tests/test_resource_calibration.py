@@ -1,13 +1,16 @@
 import json
 from pathlib import Path
 
-from local_harness.resource_calibration import calibrate_resource_telemetry, calibration_digest
-from local_harness.resource_telemetry import resource_weight_manifest_sha256
+import pytest
+
+from local_harness.resource_calibration import calibrate_resource_telemetry, calibration_digest, expected_decision_cost, realized_resource_cost
+from local_harness.resource_telemetry import load_approved_resource_weights, resource_weight_manifest_sha256, validate_resource_weight_bindings
 
 
 ROOT = Path(__file__).resolve().parents[1]
 RUN3C = ROOT / ".work/capability_batch_reviewed_v3c/run3c_execution_2026-08-20"
 CANDIDATE = ROOT / "docs/research/RUN_4_RESOURCE_WEIGHTS_CANDIDATE_2026-08-19.json"
+FREEZE = ROOT / "docs/research/RUN_4_RESOURCE_WEIGHTS_FREEZE_2026-08-19.json"
 
 
 def test_calibration_has_complete_elapsed_coverage_for_all_roles_and_external_tokens_are_unavailable():
@@ -41,3 +44,34 @@ def test_candidate_manifest_is_draft_and_digest_is_internal():
     assert payload["review_status"] == "draft"
     assert resource_weight_manifest_sha256(payload) == payload["manifest_sha256"]
     assert calibration_digest(payload)
+
+
+def test_approved_freeze_matches_reviewed_weights_and_bindings_fail_closed():
+    manifest = load_approved_resource_weights(FREEZE)
+    assert manifest["weights"]["worker_time_ms"] == 5276.567
+    assert manifest["weights"]["local_teacher_time_ms"] == 16220.624
+    assert manifest["weights"]["external_teacher_time_ms"] == 28704.012
+    validate_resource_weight_bindings(
+        manifest,
+        worker_model="Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+        local_teacher_model="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+        external_teacher_identity="codex-cli-0.146.0",
+        external_timeout_seconds=120,
+    )
+    with pytest.raises(ValueError, match="binding mismatch"):
+        validate_resource_weight_bindings(
+            manifest,
+            worker_model="changed-model",
+            local_teacher_model="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+            external_teacher_identity="codex-cli-0.146.0",
+            external_timeout_seconds=120,
+        )
+
+
+def test_expected_decision_and_realized_cost_are_distinct():
+    manifest = load_approved_resource_weights(FREEZE)
+    expected = expected_decision_cost(manifest, {"worker": 2, "local_teacher": 1, "external_teacher": 1})
+    realized = realized_resource_cost({"worker": [1000.0, 2000.0], "local_teacher": [3000.0], "external_teacher": [4000.0]})
+    assert expected == 5276.567 * 2 + 16220.624 + 28704.012
+    assert realized == 10000.0
+    assert expected != realized
