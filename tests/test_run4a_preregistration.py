@@ -60,3 +60,13 @@ def test_run4a_preregistration_binds_harness_and_validators():
     assert prereg["models"]["local_teacher"] == "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"
     assert prereg["models"]["external_teacher"] == "codex-cli-0.146.0"
     assert prereg["metrics"]["support_threshold"] == {"minimum_comparable_opportunities": 3, "minimum_rescue_rate": 0.5}
+    assert prereg["planning_budget_maximum"] == {
+        "candidate_baseline_calls": 20,
+        "included_tasks": 16,
+        "baseline_worker_calls": 20,
+        "post_intervention_worker_calls": 48,
+        "local_teacher_calls": 16,
+        "external_teacher_calls": 16,
+        "total_model_calls": 100,
+        "expected_elapsed_ms": 1077600.732,
+    }

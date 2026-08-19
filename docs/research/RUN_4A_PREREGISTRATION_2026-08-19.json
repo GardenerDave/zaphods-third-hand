@@ -6,7 +6,7 @@
   "setup_commit": "71d1f3dae6f3afb2df5d781ef33cddc7fd1420d4",
   "design_note": {
     "path": "docs/research/RUN_4A_INTERVENTION_MARKET_CALIBRATION_DESIGN_2026-08-19.md",
-    "sha256": "881eeb543e02d02d9a55879b2bcee90a4e08637153679d1c944a2f859c7230a4"
+    "sha256": "727fd2427f3a940ee539e47b11d5f12e3e4d730be943b36e8ee5074fd5ea22f1"
   },
   "prior_experiments_excluded": ["Run 1", "Run 2", "Run 3", "Run 3B", "Run 3C"],
   "frozen_inputs": {
@@ -150,7 +150,7 @@
     "no_router_modification": true,
     "no_model_authority": true
   },
-  "planning_budget_maximum": {"included_tasks": 16, "baseline_worker_calls": 16, "post_intervention_worker_calls": 48, "local_teacher_calls": 16, "external_teacher_calls": 16, "total_model_calls": 96, "expected_elapsed_ms": 1056494.464},
+  "planning_budget_maximum": {"candidate_baseline_calls": 20, "included_tasks": 16, "baseline_worker_calls": 20, "post_intervention_worker_calls": 48, "local_teacher_calls": 16, "external_teacher_calls": 16, "total_model_calls": 100, "expected_elapsed_ms": 1077600.732},
   "execution_authority": "This artifact freezes preparation only; execution requires explicit operator authorization after review.",
   "provenance": {"fixture_authoring_model_outputs_consulted": false, "capability_bundle_used_only_for_target_definitions": true}
 }

@@ -169,23 +169,23 @@ ready.
 
 ## Planning budget
 
-At the maximum preregistered case where all 16 included baseline attempts are
-valid failures, the three-way design requires:
+At the maximum preregistered case where all 20 candidate baselines complete
+and 16 included baselines are valid failures, the three-way design requires:
 
 | Resource | Calls |
 |---|---:|
-| baseline worker | 16 |
+| baseline worker | 20 |
 | deterministic retry worker | 16 |
 | local-teacher calls | 16 |
 | local-teacher retry worker | 16 |
 | external-teacher calls | 16 |
 | external-teacher retry worker | 16 |
-| **total model calls** | **96** |
+| **total model calls** | **100** |
 
-That is 48 intervention calls, 64 worker calls, and an expected elapsed-time
+That is 48 intervention calls, 68 worker calls, and an expected elapsed-time
 budget of:
 
-`64×5276.567 + 16×16220.624 + 16×28704.012 = 1,056,494.464 ms`
+`68×5276.567 + 16×16220.624 + 16×28704.012 = 1,077,600.732 ms`
 
 approximately 17.61 minutes of serial model-call time under the frozen priors.
 Baseline passes and infrastructure exclusions reduce completed intervention
