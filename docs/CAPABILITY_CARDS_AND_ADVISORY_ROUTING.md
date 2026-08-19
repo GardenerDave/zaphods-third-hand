@@ -21,11 +21,17 @@ teacher intervention.
 
 The advisory router matches a deterministic failure signature—not model prose—
 against these cards. It may recommend the cheapest historically supported
-intervention and show observed alternatives, but it returns
-`authority: advisory_only`. It does not call models, skip ladder stages, select
-teachers, promote patches, train, insert queue work, or accept outputs. The
-resource order is baseline 1.7B, deterministic 1.7B retry, local 30B teacher,
-external teacher, then review/unresolved.
+intervention and show observed alternatives. It resolves evidence in this
+order: exact signature, semantic signature, deterministic failure class, then
+task family. A broader recommendation always reports its resolution and keeps
+the more-specific observed or supported-negative evidence visible. Supported
+negative evidence can produce `avoid`; absent supported-positive evidence
+produces `abstain`. Every result returns `authority: advisory_only`.
+
+The router does not call models, skip ladder stages, select teachers, promote
+patches, train, insert queue work, or accept outputs. The resource order is
+baseline 1.7B, deterministic 1.7B retry, local 30B teacher, external teacher,
+then review/unresolved.
 
 Run 1 demonstrated teacher-assisted recovery and an 8/10 repaired holdout for
 the context-complete deterministic retry. Run 2 reproduced teacher-free
@@ -33,6 +39,12 @@ generalization on fresh tasks at 9/20 rescues, with family-dependent results.
 Cards turn those observations into transparent routing evidence; they do not
 claim weight learning, permanent capability change, optimal routing, or
 arbitrary out-of-distribution generalization.
+
+The derived evidence bundle separates task opportunities from worker retry
+attempts and teacher calls. This matters for multi-pass teacher cases: a task
+is one opportunity, while `local_teacher:1` and `local_teacher:2` remain two
+worker attempts and two teacher calls. Run-level audit rows preserve the task
+IDs behind those counts.
 
 The proposed next experiment is documented in
 [`RUN_3_ADVISORY_ROUTING_DESIGN.md`](reports/model_auditions/RUN_3_ADVISORY_ROUTING_DESIGN.md).

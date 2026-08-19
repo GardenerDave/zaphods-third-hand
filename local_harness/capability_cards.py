@@ -27,6 +27,29 @@ EVIDENCE_MIN_OBSERVATIONS = 3
 EVIDENCE_MIN_RESCUE_RATE = 0.50
 INTERVENTION_SOURCES = tuple(RESOURCE_TIERS)
 SOURCE_COMMITS = {"run1": "d27c1e7dd72997eda1bf0b69b73f0a586cb3e395", "run2": "3fc3a44cfcefcac50a5fe06d0dbf35b6c9203815"}
+FAILURE_CLASS_MAP = {
+    "parse_json": ("serialization",),
+    "required_fields": ("contract_shape",),
+    "required_field_types": ("contract_shape",),
+    "allowed_held_target_separation": ("contract_shape",),
+    "reference_required_packet_schema": ("contract_shape", "reference_fact_application"),
+    "reference_required_review_required": ("contract_shape", "reference_fact_application"),
+    "reference_review_schema": ("contract_shape", "reference_fact_application"),
+    "reference_required_allowed_targets": ("authority_boundary", "reference_fact_application"),
+    "reference_required_held_targets": ("authority_boundary", "reference_fact_application"),
+    "reference_forbidden_allowed_targets": ("authority_boundary", "reference_fact_application"),
+    "reference_out_of_scope_target": ("authority_boundary", "reference_fact_application"),
+    "reference_queue_handoff_status": ("authority_boundary", "reference_fact_application"),
+    "reference_repo_mutation_status": ("authority_boundary", "reference_fact_application"),
+    "reference_review_status": ("authority_boundary", "reference_fact_application"),
+    "reference_expected_review_status": ("authority_boundary", "reference_fact_application"),
+    "reference_source_review_status": ("authority_boundary", "reference_fact_application"),
+    "reference_required_authority_boundary_terms": ("authority_boundary", "reference_fact_application"),
+    "reference_requires_scope_expansion_flag": ("authority_boundary", "unsupported_inference"),
+    "reference_uncertainty": ("unsupported_inference",),
+    "reference_unsafe_cleanup": ("destructive_restraint",),
+    "reference_required_inspection_commands": ("destructive_restraint",),
+}
 
 
 class CapabilityEvidenceError(ValueError):
@@ -83,6 +106,31 @@ def signature_key(signature: Mapping[str, Any]) -> str:
         "semantic": sorted(signature.get("semantic", [])),
     }
     return json.dumps(normalized, sort_keys=True, separators=(",", ":"))
+
+
+def failure_classes(signature: Mapping[str, Any]) -> list[str]:
+    """Map known deterministic check IDs to broad classes; unknowns stay visible."""
+    classes: set[str] = set()
+    check_ids = [*signature.get("structural", []), *signature.get("semantic", [])]
+    for check_id in check_ids:
+        classes.update(FAILURE_CLASS_MAP.get(check_id, (f"unclassified:{check_id}",)))
+    return sorted(classes)
+
+
+def _resolution_key(signature: Mapping[str, Any], resolution: str) -> str:
+    family = signature.get("task_family")
+    if resolution == "exact_signature":
+        return signature_key(signature)
+    if resolution == "semantic_signature":
+        return json.dumps({"task_family": family, "semantic": sorted(signature.get("semantic", []))}, sort_keys=True, separators=(",", ":"))
+    if resolution == "failure_class":
+        return json.dumps({"task_family": family, "failure_classes": failure_classes(signature)}, sort_keys=True, separators=(",", ":"))
+    if resolution == "task_family":
+        return json.dumps({"task_family": family}, sort_keys=True, separators=(",", ":"))
+    raise CapabilityEvidenceError(f"unknown evidence resolution: {resolution}")
+
+
+EVIDENCE_RESOLUTIONS = ("exact_signature", "semantic_signature", "failure_class", "task_family")
 
 
 def _valid_worker_attempts(task_dir: Path) -> list[dict[str, Any]]:
@@ -242,7 +290,7 @@ def build_capability_cards(run_roots: Iterable[Path], *, generated_at: str | Non
                 "schema": "zth_capability_card_v1",
                 "identity": {"worker_model": obs["worker_model"], "intervention_type": entry["source"], "intervention_id": entry.get("intervention_id"), "patch_id": entry.get("patch_id"), "patch_sha256": entry.get("patch_hash")},
                 "context": {"source_runs": [obs["run_id"]], "task_family": obs["task_family"], "failure_signature": base_sig},
-                "observations": {"eligible_attempts": 0, "valid_model_attempts": 0, "successes": 0, "failures": 0, "infrastructure_exclusions": 0, "task_ids": [], "attempts": [], "teacher_call_count": 0},
+                "observations": {"eligible_attempts": 0, "eligible_task_opportunities": 0, "valid_model_attempts": 0, "successes": 0, "failures": 0, "rescued_tasks": 0, "task_ids": [], "rescued_task_ids": [], "attempts": [], "teacher_call_count": 0},
                 "cost": {"worker_calls": 0, "local_teacher_calls": 0, "external_teacher_calls": 0},
                 "provenance": {"source_runs": [obs["run_id"]], "source_commits": [SOURCE_COMMITS[obs["run_id"]]], "artifacts": []},
             })
@@ -256,6 +304,9 @@ def build_capability_cards(run_roots: Iterable[Path], *, generated_at: str | Non
             card["observations"]["failures"] += int(not entry["passed"])
             if obs["task_id"] not in card["observations"]["task_ids"]:
                 card["observations"]["task_ids"].append(obs["task_id"])
+                card["observations"]["eligible_task_opportunities"] += 1
+            if entry["passed"] and obs["task_id"] not in card["observations"]["rescued_task_ids"] and entry["source"] != "none":
+                card["observations"]["rescued_task_ids"].append(obs["task_id"])
             card["observations"]["attempts"].append({"task_id": obs["task_id"], "attempt": entry.get("attempt"), "intervention_attempt_id": entry.get("intervention_attempt_id"), "passed": entry["passed"], "artifact_refs": entry.get("artifact_refs", {}), "artifact_hashes": entry.get("artifact_hashes", {})})
             card["cost"]["worker_calls"] += 1
             if entry["source"] in {"local_teacher", "external_teacher"}:
@@ -274,75 +325,177 @@ def build_capability_cards(run_roots: Iterable[Path], *, generated_at: str | Non
     for card in groups.values():
         eligible = card["observations"]["eligible_attempts"]
         successes = card["observations"]["successes"]
-        card["observations"]["rescue_rate"] = successes / eligible if eligible else 0.0
-        card["evidence"] = {"sample_count": eligible, "status": _evidence_status(eligible, card["observations"]["rescue_rate"]), "limitations": "Counts are empirical and not statistical significance."}
+        opportunities = card["observations"]["eligible_task_opportunities"]
+        card["observations"]["rescued_tasks"] = len(card["observations"]["rescued_task_ids"])
+        card["observations"]["rescue_rate"] = card["observations"]["rescued_tasks"] / opportunities if opportunities else 0.0
+        card["evidence"] = {"sample_count": opportunities, "status": _evidence_status(opportunities, card["observations"]["rescue_rate"]), "limitations": "Counts are empirical and not statistical significance."}
         cards.append(card)
     cards.sort(key=lambda c: (c["context"]["task_family"], c["identity"]["intervention_type"], signature_key(c["context"]["failure_signature"])))
     return {"schema": "zth_capability_cards_bundle_v1", "generated_at": generated_at, "thresholds": {"min_observations_for_supported": EVIDENCE_MIN_OBSERVATIONS, "min_rescue_rate_for_supported": EVIDENCE_MIN_RESCUE_RATE}, "cards": cards, "source_task_count": len(all_tasks), "transport_excluded_task_count": len(all_tasks) - len(observations)}
 
 
-def _card_matches(card: Mapping[str, Any], sig: Mapping[str, Any], source: str) -> bool:
-    return card.get("identity", {}).get("intervention_type") == source and signature_key(card.get("context", {}).get("failure_signature", {})) == signature_key(sig)
+def _card_id(card: Mapping[str, Any]) -> str:
+    payload = {"identity": card.get("identity"), "context": card.get("context")}
+    return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
+
+
+def build_hierarchical_evidence(cards: Mapping[str, Any]) -> dict[str, Any]:
+    """Aggregate cards at each explicit resolution without losing card provenance."""
+    result: dict[str, Any] = {}
+    for resolution in EVIDENCE_RESOLUTIONS:
+        groups: dict[tuple[str, str], dict[str, Any]] = {}
+        for card in cards.get("cards", []):
+            sig = card["context"]["failure_signature"]
+            key = (_resolution_key(sig, resolution), card["identity"]["intervention_type"])
+            group = groups.setdefault(key, {
+                "resolution": resolution,
+                "resolution_key": key[0],
+                "task_family": sig["task_family"],
+                "intervention": key[1],
+                "eligible_task_opportunities": 0,
+                "worker_retry_attempts": 0,
+                "rescued_task_ids": [],
+                "task_ids": [],
+                "teacher_call_count": 0,
+                "source_runs": [],
+                "source_card_ids": [],
+            })
+            obs = card["observations"]
+            group["eligible_task_opportunities"] += int(obs.get("eligible_task_opportunities", len(obs.get("task_ids", []))))
+            group["worker_retry_attempts"] += int(obs.get("eligible_attempts", 0))
+            for task_id in obs.get("task_ids", []):
+                if task_id not in group["task_ids"]:
+                    group["task_ids"].append(task_id)
+            for task_id in obs.get("rescued_task_ids", []):
+                if task_id not in group["rescued_task_ids"]:
+                    group["rescued_task_ids"].append(task_id)
+            group["teacher_call_count"] += int(obs.get("teacher_call_count", 0))
+            for run in card["context"].get("source_runs", []):
+                if run not in group["source_runs"]:
+                    group["source_runs"].append(run)
+            group["source_card_ids"].append(_card_id(card))
+        rows = []
+        for group in groups.values():
+            opportunities = group["eligible_task_opportunities"]
+            rescued = len(group["rescued_task_ids"])
+            rate = rescued / opportunities if opportunities else 0.0
+            polarity = "supported_positive" if opportunities >= EVIDENCE_MIN_OBSERVATIONS and rate >= EVIDENCE_MIN_RESCUE_RATE else "supported_negative" if opportunities >= EVIDENCE_MIN_OBSERVATIONS else "observed" if opportunities else "insufficient"
+            group.update({"rescued_tasks": rescued, "rescue_rate": rate, "evidence_status": _evidence_status(opportunities, rate), "evidence_polarity": polarity})
+            rows.append(group)
+        result[resolution] = sorted(rows, key=lambda row: (row["task_family"], row["intervention"], row["resolution_key"]))
+    return result
+
+
+def _support_for_source(hierarchy: Mapping[str, Any], signature: Mapping[str, Any], source: str) -> list[dict[str, Any]]:
+    values = []
+    for resolution in EVIDENCE_RESOLUTIONS:
+        key = _resolution_key(signature, resolution)
+        values.extend(row for row in hierarchy.get(resolution, []) if row["resolution_key"] == key and row["intervention"] == source)
+    return values
 
 
 def recommend_intervention(*, task_family: str, validation: Mapping[str, Any], available_interventions: Iterable[str], cards: Mapping[str, Any]) -> dict[str, Any]:
+    """Return an advisory recommendation using exact-to-family evidence backoff."""
     sig = failure_signature(task_family, validation)
-    available = set(available_interventions)
+    hierarchy = cards.get("hierarchy") or build_hierarchical_evidence(cards)
+    available = {source for source in available_interventions if source in RESOURCE_TIERS}
     candidates = []
-    for source in sorted(available, key=lambda value: RESOURCE_TIERS.get(value, 99)):
-        if source not in RESOURCE_TIERS:
-            continue
-        matching = [c for c in cards.get("cards", []) if _card_matches(c, sig, source)]
-        eligible = sum(c["observations"]["eligible_attempts"] for c in matching)
-        successes = sum(c["observations"]["successes"] for c in matching)
-        rate = successes / eligible if eligible else 0.0
-        status = _evidence_status(eligible, rate)
-        candidates.append({"intervention": source, "resource_tier": RESOURCE_TIERS[source], "evidence_status": status, "eligible_tasks": eligible, "rescues": successes, "rescue_rate": rate})
-    supported = [c for c in candidates if c["evidence_status"] == "supported"]
-    observed = [c for c in candidates if c["evidence_status"] == "observed"]
-    ranked = sorted(supported, key=lambda c: (c["resource_tier"], -c["rescue_rate"]))
-    choice = ranked[0] if ranked else None
-    return {"recommended_intervention": choice["intervention"] if choice else None, "evidence_status": choice["evidence_status"] if choice else (observed[0]["evidence_status"] if observed else "insufficient"), "reason": "Advisory evidence only; no intervention is executed or skipped automatically.", "failure_signature": sig, "support": choice or {"eligible_tasks": 0, "rescues": 0, "rescue_rate": 0.0}, "alternatives": candidates, "authority": "advisory_only"}
+    for source in sorted(available, key=lambda value: RESOURCE_TIERS[value]):
+        rows = _support_for_source(hierarchy, sig, source)
+        by_resolution = {row["resolution"]: row for row in rows}
+        selected = None
+        for resolution in EVIDENCE_RESOLUTIONS:
+            row = by_resolution.get(resolution)
+            if row is None:
+                continue
+            if row["evidence_polarity"] == "supported_positive":
+                selected = row
+                break
+        most_specific = next((by_resolution[r] for r in EVIDENCE_RESOLUTIONS if r in by_resolution), None)
+        evidence_trace = [{"resolution": r, "evidence_status": by_resolution[r]["evidence_status"], "evidence_polarity": by_resolution[r]["evidence_polarity"], "eligible_task_opportunities": by_resolution[r]["eligible_task_opportunities"], "rescued_tasks": by_resolution[r]["rescued_tasks"], "rescue_rate": by_resolution[r]["rescue_rate"], "source_runs": by_resolution[r]["source_runs"]} for r in EVIDENCE_RESOLUTIONS if r in by_resolution]
+        basis = selected or most_specific
+        candidates.append({
+            "intervention": source,
+            "resource_tier": RESOURCE_TIERS[source],
+            "evidence_resolution": basis["resolution"] if basis else "none",
+            "evidence_status": basis["evidence_status"] if basis else "insufficient",
+            "evidence_polarity": basis["evidence_polarity"] if basis else "insufficient",
+            "eligible_task_opportunities": basis["eligible_task_opportunities"] if basis else 0,
+            "worker_retry_attempts": basis["worker_retry_attempts"] if basis else 0,
+            "rescued_tasks": basis["rescued_tasks"] if basis else 0,
+            "rescue_rate": basis["rescue_rate"] if basis else 0.0,
+            "source_runs": basis["source_runs"] if basis else [],
+            "more_specific_evidence": evidence_trace,
+            "supported_positive": selected is not None,
+        })
+    positive = [candidate for candidate in candidates if candidate["supported_positive"]]
+    choice = sorted(positive, key=lambda candidate: (candidate["resource_tier"], -candidate["rescue_rate"]))[0] if positive else None
+    negative = any(candidate["evidence_polarity"] == "supported_negative" for candidate in candidates)
+    disposition = "recommend" if choice else "avoid" if negative else "abstain"
+    reason = "Advisory evidence only; no intervention is executed or skipped automatically."
+    if disposition == "avoid":
+        reason = "Supported-negative evidence exists, but no available intervention has supported-positive evidence."
+    elif disposition == "abstain":
+        reason = "No available intervention has supported-positive evidence at any evidence resolution."
+    return {
+        "recommended_intervention": choice["intervention"] if choice else None,
+        "routing_disposition": disposition,
+        "evidence_resolution": choice["evidence_resolution"] if choice else "none",
+        "evidence_status": choice["evidence_status"] if choice else "insufficient",
+        "evidence_polarity": choice["evidence_polarity"] if choice else "insufficient",
+        "reason": reason,
+        "failure_signature": sig,
+        "support": choice or {"eligible_task_opportunities": 0, "rescued_tasks": 0, "rescue_rate": 0.0, "source_runs": []},
+        "more_specific_evidence": choice["more_specific_evidence"] if choice else [candidate["more_specific_evidence"] for candidate in candidates],
+        "alternatives": candidates,
+        "authority": "advisory_only",
+    }
+
+
+def build_accounting_audit(run_roots: Iterable[Path]) -> list[dict[str, Any]]:
+    """Count task opportunities separately from worker attempts and teacher calls."""
+    rows = []
+    for run_id, root in (("run2" if "reviewed_v2" in root.as_posix() else "run1", root) for root in run_roots):
+        tasks = []
+        excluded = 0
+        for _, task_dir in discover_task_dirs([root]):
+            observation = _task_observation(task_dir, run_id)
+            if observation is None:
+                excluded += 1
+            else:
+                tasks.append(observation)
+        sources = {"none": [], "deterministic_patch_retry": [], "local_teacher": [], "external_teacher": []}
+        for task in tasks:
+            sources["none"].append({"task_id": task["task_id"], "passed": task["baseline_pass"], "worker_attempts": 1, "teacher_calls": 0})
+            for source in ("deterministic_patch_retry", "local_teacher", "external_teacher"):
+                attempts = [item for item in task["interventions"] if item["source"] == source]
+                if source in {"local_teacher", "external_teacher"} and not attempts:
+                    continue
+                if not attempts:
+                    continue
+                sources[source].append({"task_id": task["task_id"], "passed": any(item["passed"] for item in attempts), "worker_attempts": len(attempts), "teacher_calls": task["teacher_calls"].get(source, 0)})
+        for source, values in sources.items():
+            rows.append({"run": run_id, "intervention": source, "task_ids": [v["task_id"] for v in values], "eligible_task_opportunities": len(values), "worker_retry_attempts": sum(v["worker_attempts"] for v in values), "rescued_tasks": sum(1 for v in values if v["passed"] and source != "none"), "passes": sum(1 for v in values if v["passed"]), "teacher_calls": sum(v["teacher_calls"] for v in values), "infrastructure_exclusions": excluded})
+    return rows
 
 
 def write_evidence_bundle(bundle: Mapping[str, Any], output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / "capability_cards.json").write_text(json.dumps(bundle, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    matrix_cards: dict[str, dict[str, list[Any]]] = defaultdict(lambda: defaultdict(list))
-    signatures: dict[str, dict[str, list[Any]]] = defaultdict(lambda: defaultdict(list))
-    for card in bundle["cards"]:
-        family = card["context"]["task_family"]
-        source = card["identity"]["intervention_type"]
-        compact = {
-            "source_runs": card["context"]["source_runs"],
-            "intervention_id": card["identity"]["intervention_id"],
-            "failure_signature": card["context"]["failure_signature"],
-            "observations": card["observations"],
-            "evidence": card["evidence"],
-        }
-        matrix_cards[family][source].append(compact)
-        signatures[signature_key(card["context"]["failure_signature"])][source].append(compact)
-    matrix: dict[str, dict[str, Any]] = defaultdict(dict)
-    for family, source_cards in matrix_cards.items():
-        for source, entries in source_cards.items():
-            eligible = sum(e["observations"]["eligible_attempts"] for e in entries)
-            successes = sum(e["observations"]["successes"] for e in entries)
-            rate = successes / eligible if eligible else 0.0
-            matrix[family][source] = {
-                "eligible_attempts": eligible,
-                "successes": successes,
-                "failures": eligible - successes,
-                "rescue_rate": rate,
-                "evidence_status": _evidence_status(eligible, rate),
-                "card_count": len(entries),
-                "worker_calls": sum(e["observations"]["eligible_attempts"] for e in entries),
-                "teacher_call_count": sum(e["observations"].get("teacher_call_count", 0) for e in entries),
-            }
-    (output_dir / "family_intervention_matrix.json").write_text(json.dumps(matrix, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    (output_dir / "failure_signature_matrix.json").write_text(json.dumps(signatures, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    hierarchy = build_hierarchical_evidence(bundle)
+    for resolution, filename in (("exact_signature", "exact_signature_matrix.json"), ("semantic_signature", "semantic_signature_matrix.json"), ("failure_class", "failure_class_matrix.json"), ("task_family", "family_intervention_matrix.json")):
+        rows = hierarchy[resolution]
+        (output_dir / filename).write_text(json.dumps(rows, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    accounting = []
+    for root in (Path(".work/capability_batch_reviewed_v1"), Path(".work/capability_batch_reviewed_v2/run")):
+        if root.exists():
+            accounting.extend(build_accounting_audit([root]))
+    (output_dir / "accounting_audit.json").write_text(json.dumps(accounting, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     examples = []
     seen_signatures = set()
     for card in bundle["cards"]:
+        if "run2" not in card["context"].get("source_runs", []):
+            continue
         sig = card["context"]["failure_signature"]
         key = signature_key(sig)
         if key in seen_signatures:
@@ -352,8 +505,8 @@ def write_evidence_bundle(bundle: Mapping[str, Any], output_dir: Path) -> None:
             "structural_checks": [{"check_id": check_id, "status": "failed"} for check_id in sig["structural"]],
             "semantic_checks": [{"check_id": check_id, "status": "failed"} for check_id in sig["semantic"]],
         }
-        examples.append(recommend_intervention(task_family=sig["task_family"], validation=validation, available_interventions=INTERVENTION_SOURCES, cards=bundle))
-    (output_dir / "routing_evidence_summary.json").write_text(json.dumps({"authority": "advisory_only", "resource_order": RESOURCE_TIERS, "examples": examples}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        examples.append(recommend_intervention(task_family=sig["task_family"], validation=validation, available_interventions=INTERVENTION_SOURCES, cards={**bundle, "hierarchy": hierarchy}))
+    (output_dir / "routing_evidence_summary.json").write_text(json.dumps({"authority": "advisory_only", "resource_order": RESOURCE_TIERS, "examples": examples, "evidence_resolutions": EVIDENCE_RESOLUTIONS}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
 def main() -> int:
