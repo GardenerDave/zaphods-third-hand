@@ -1,0 +1,62 @@
+{
+  "schema": "zth_run3c_preregistration_v1",
+  "experiment_id": "capability-mining-run-3c-advisory-routing-2026-08-20",
+  "setup_commit": "4dfc60c02bd5f22a18b2549d4856cbef9367dfae",
+  "prior_experiments": {"run3": "invalid_incomplete_execution_pilot", "run3b": "invalid_incomplete_execution_pilot_2", "model_outputs_used_for_fixture_authoring": false},
+  "fixture_pack": {
+    "path": "local_harness/fixtures/capability_loop/reviewed_v3c",
+    "manifest_path": "local_harness/fixtures/capability_loop/reviewed_v3c/manifest.json",
+    "manifest_sha256": "4c328768d801183685b3d2cbd0a8fb0438474f36c0b7b03b68da8c5546d36a86",
+    "pack_sha256": "b1428f126d619f61a600e04cb65f8f10feadc1dda0ee5da58fae393823663c74",
+    "task_count": 24,
+    "task_ids": [
+      "capability-run3c-contradiction-contract-revision-001", "capability-run3c-contradiction-evidence-packet-001", "capability-run3c-contradiction-intake-record-001", "capability-run3c-contradiction-review-versions-001",
+      "capability-run3c-destructive-cache-purge-001", "capability-run3c-destructive-fixture-cleanup-001", "capability-run3c-destructive-log-compaction-001", "capability-run3c-destructive-queue-archive-001",
+      "capability-run3c-evidence-hash-manifest-001", "capability-run3c-evidence-prompt-provenance-001", "capability-run3c-evidence-review-decision-001", "capability-run3c-evidence-transport-status-001",
+      "capability-run3c-queue-candidate-summary-001", "capability-run3c-queue-fixture-intake-001", "capability-run3c-queue-review-submission-001", "capability-run3c-queue-roadmap-intake-001",
+      "capability-run3c-scope-probe-artifacts-001", "capability-run3c-scope-report-targets-001", "capability-run3c-scope-review-bundle-001", "capability-run3c-scope-workflow-inputs-001",
+      "capability-run3c-uncertainty-artifact-recovery-001", "capability-run3c-uncertainty-external-status-001", "capability-run3c-uncertainty-review-count-001", "capability-run3c-uncertainty-route-claim-001"
+    ],
+    "family_mix": {"contradiction-handling": 4, "destructive-action-restraint": 4, "evidence-grounding": 4, "queue-authority-boundary": 4, "scope-authority-boundary": 4, "unsupported-certainty": 4},
+    "novelty_audit_path": "docs/research/RUN_3C_NOVELTY_AUDIT_2026-08-18.json"
+  },
+  "frozen_inputs": {
+    "routing_policy_path": "docs/research/RUN_3_ROUTING_POLICY_FREEZE_2026-08-18.json",
+    "routing_policy_sha256": "cf6728e51e5b5e1ce5ed24539f83bbacd4f9a07dd818f26106c333cc7e543fe8",
+    "capability_bundle_sha256": "383274a27c89345b3a8bcede75123420973a7a3e53318224e6460c0d05b47fc1",
+    "execution_harness_freeze_path": "docs/research/RUN_3B_EXECUTION_HARNESS_FREEZE_2026-08-18.json",
+    "execution_harness_freeze_sha256": "3421f5ae1e8fdc1a170fa4f3b9237403c03d2ee969335256553d726f55a769d4",
+    "driver_path": "scripts/zth_run3_routing_experiment.py",
+    "driver_sha256": "f9860cee729ff3185e7cf3821ce74072d4703b24a2b5df1240fb52d89d7e8d0a",
+    "durable_launcher_path": "scripts/zth_run3_durable_launch.py",
+    "durable_launcher_sha256": "df372dd76107d31f0a43bba16bb411591b98960cd339cf061765b6c68820d84d",
+    "patch_id": "run1-experimental-distilled-strict-contract-v1",
+    "patch_sha256": "7cfb4453919ad945f0d149ec8af8763653b3734a54b86f23303b84a60dfdacf6"
+  },
+  "models": {"worker": "Qwen_Qwen3-1.7B-Q4_K_M.gguf", "local_teacher": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf", "external_teacher": "codex-cli-0.146.0"},
+  "external_teacher_timeout_seconds": 120,
+  "execution_order": {
+    "seed": 20260820,
+    "task_order": "lexicographic task_id",
+    "arm_order_rule": "sha256(str(seed) + \":\" + task_id), first hex digit < 8 means control-first, otherwise treatment-first",
+    "arm_order": {
+      "capability-run3c-contradiction-contract-revision-001": ["treatment", "control"], "capability-run3c-contradiction-evidence-packet-001": ["treatment", "control"], "capability-run3c-contradiction-intake-record-001": ["control", "treatment"], "capability-run3c-contradiction-review-versions-001": ["treatment", "control"],
+      "capability-run3c-destructive-cache-purge-001": ["control", "treatment"], "capability-run3c-destructive-fixture-cleanup-001": ["control", "treatment"], "capability-run3c-destructive-log-compaction-001": ["control", "treatment"], "capability-run3c-destructive-queue-archive-001": ["control", "treatment"],
+      "capability-run3c-evidence-hash-manifest-001": ["treatment", "control"], "capability-run3c-evidence-prompt-provenance-001": ["control", "treatment"], "capability-run3c-evidence-review-decision-001": ["control", "treatment"], "capability-run3c-evidence-transport-status-001": ["treatment", "control"],
+      "capability-run3c-queue-candidate-summary-001": ["control", "treatment"], "capability-run3c-queue-fixture-intake-001": ["control", "treatment"], "capability-run3c-queue-review-submission-001": ["treatment", "control"], "capability-run3c-queue-roadmap-intake-001": ["control", "treatment"],
+      "capability-run3c-scope-probe-artifacts-001": ["control", "treatment"], "capability-run3c-scope-report-targets-001": ["treatment", "control"], "capability-run3c-scope-review-bundle-001": ["control", "treatment"], "capability-run3c-scope-workflow-inputs-001": ["treatment", "control"],
+      "capability-run3c-uncertainty-artifact-recovery-001": ["control", "treatment"], "capability-run3c-uncertainty-external-status-001": ["control", "treatment"], "capability-run3c-uncertainty-review-count-001": ["control", "treatment"], "capability-run3c-uncertainty-route-claim-001": ["treatment", "control"]
+    }
+  },
+  "arms": {
+    "control": {"policy": ["baseline", "deterministic_patch_retry", "local_teacher", "external_teacher", "review/unresolved"]},
+    "treatment": {"policy": "consult frozen evidence-guided advisory router after valid baseline failure and execute only its preregistered action mapping; deterministic validation remains authoritative", "actions": {"recommend_deterministic_patch_retry": "run deterministic retry, then remaining ladder", "recommend_local_teacher": "skip deterministic retry, run local teacher then external if needed", "recommend_external_teacher": "skip cheaper rungs only for supported-positive external recommendation", "avoid_deterministic_patch_retry": "skip deterministic retry, continue local/external ladder", "abstain": "use fixed ladder unchanged"}, "authority": "advisory_only_with_explicit_experiment_harness_authorization"}
+  },
+  "validators": "fixture-selected deterministic validators; models cannot select validators",
+  "transport": {"included_only_when": "transport_valid=true and transport_classification=model_response", "infrastructure_excluded_from_capability_metrics": true},
+  "metrics": {"quality": "final_validated_solve_rate", "cost": "expensive_teacher_calls = local_teacher_calls + external_teacher_calls", "per_arm": ["final_validated_passes", "unresolved", "worker_calls", "deterministic_retry_calls", "local_teacher_tasks", "local_teacher_calls", "external_teacher_tasks", "external_teacher_calls", "infrastructure_failures", "router_disposition_counts", "evidence_resolution_counts", "paired_outcomes"]},
+  "success_criteria": {"routing_cost_reduction_observed": "treatment expensive_teacher_calls < control expensive_teacher_calls", "routing_quality_preserved": "treatment final passes >= control final passes", "routing_success": "both conditions above", "strong_routing_result": ">=25% reduction in expensive teacher calls AND treatment final solve rate >= control"},
+  "execution": {"method": "scripts/zth_run3_durable_launch.py in detached tmux", "stdout_stderr_durable_log_required": true, "exit_status_artifact_required": true, "execution_manifest_authoritative": true, "partial_results_cannot_alter_execution": true, "ambiguous_started_transition_fails_closed": true, "model_calls_made": false},
+  "stop_conditions": ["any frozen hash mismatch", "transport preflight failure", "incomplete durable call without response or infrastructure artifact", "fixture or validator drift", "no adaptive changes"],
+  "model_calls_made": false
+}

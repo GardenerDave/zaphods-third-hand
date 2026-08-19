@@ -1,0 +1,16 @@
+{
+  "schema": "zth_fixture_novelty_audit_v1",
+  "new_pack": "reviewed_v3c",
+  "compared_packs": ["reviewed_v1", "reviewed_v2", "reviewed_v3", "reviewed_v3b"],
+  "new_task_count": 24,
+  "prior_task_count": 92,
+  "comparison_fields": ["task_id", "prompt", "normalized_prompt"],
+  "normalized_prompt_rule": "lowercase and replace non-alphanumeric runs with a single space",
+  "high_similarity_threshold": 0.8,
+  "task_id_collisions": [],
+  "exact_prompt_duplicates": [],
+  "normalized_prompt_duplicates": [],
+  "high_similarity_pairs": [],
+  "result": "passed",
+  "model_outputs_consulted": false
+}

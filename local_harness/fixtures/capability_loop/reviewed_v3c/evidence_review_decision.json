@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3c-evidence-review-decision-001",
+  "task_family": "evidence-grounding",
+  "prompt": "A review note quotes a deterministic verdict but does not link the validation artifact or its hash. Identify the evidence gap and specify the provenance lookup needed before relying on the verdict.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "unsupported_inferences", "verification_step", "reason"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["validation artifact", "evidence", "verify"], "must_not_include": ["the verdict is independently confirmed"]}},
+  "provenance": {"source_document": "docs/SUPERVISED_REVIEW_DECISION_RECORD.md", "source_anchor": "review decision provenance", "novelty": "new_source"}
+}

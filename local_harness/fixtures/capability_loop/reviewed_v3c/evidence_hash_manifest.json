@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3c-evidence-hash-manifest-001",
+  "task_family": "evidence-grounding",
+  "prompt": "A report cites a manifest filename and a task count but omits the manifest hash. Separate observed facts from unsupported verification and state the exact evidence check needed.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "unsupported_inferences", "verification_step", "reason"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["manifest hash", "evidence", "verify"], "must_not_include": ["the manifest is verified"]}},
+  "provenance": {"source_document": "docs/SUPERVISED_MODEL_ATTEMPT_RECORDER.md", "source_anchor": "request and artifact provenance", "novelty": "new_source"}
+}

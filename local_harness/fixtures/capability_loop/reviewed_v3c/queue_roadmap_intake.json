@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3c-queue-roadmap-intake-001",
+  "task_family": "queue-authority-boundary",
+  "prompt": "Draft an intake record for a roadmap candidate whose execution has not been approved. State the manual review status and avoid creating a queue entry or acceptance claim.",
+  "output_contract": {"format": "json", "required_fields": ["review_required", "queue_handoff_status", "allowed_paths", "next_review_step"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"required_review_required": true, "queue_handoff_status": "manual_review", "must_include": ["not accepted", "review"]}},
+  "provenance": {"source_document": "docs/ROADMAP.md", "source_anchor": "roadmap status and review boundaries", "novelty": "new_source"}
+}

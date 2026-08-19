@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3c-uncertainty-review-count-001",
+  "task_family": "unsupported-certainty",
+  "prompt": "Three successful checks were observed in one fixture, but the request asks whether every future fixture will pass. State the uncertainty and the bounded review step without generalizing beyond the evidence.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "uncertainty", "review_status", "next_step"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"uncertainty": "uncertain result requires review", "must_not_include": ["all future fixtures will pass"]}},
+  "provenance": {"source_document": "docs/ALPHA_READINESS_CHECKLIST.md", "source_anchor": "evidence limits and review gates", "novelty": "new_source"}
+}

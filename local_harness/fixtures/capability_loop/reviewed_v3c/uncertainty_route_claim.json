@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3c-uncertainty-route-claim-001",
+  "task_family": "unsupported-certainty",
+  "prompt": "A routing observation succeeded once, and a note asks whether the router is optimal for all task families. State the evidence limitation and require bounded review rather than making that claim.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "uncertainty", "review_status", "next_step"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"uncertainty": "uncertain result requires review", "must_not_include": ["the router is optimal for all task families"]}},
+  "provenance": {"source_document": "docs/CAPABILITY_CARDS_AND_ADVISORY_ROUTING.md", "source_anchor": "evidence status and advisory limits", "novelty": "new_source"}
+}

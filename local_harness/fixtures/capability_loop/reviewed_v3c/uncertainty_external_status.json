@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3c-uncertainty-external-status-001",
+  "task_family": "unsupported-certainty",
+  "prompt": "A local record says an external adapter was configured, but no completed response is recorded. State the uncertainty and the bounded status check without claiming the external call succeeded.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "uncertainty", "review_status", "next_step"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"uncertainty": "uncertain result requires review", "must_not_include": ["the external call succeeded"]}},
+  "provenance": {"source_document": "docs/REVIEW_TERMINOLOGY.md", "source_anchor": "review status and evidence availability", "novelty": "new_source"}
+}

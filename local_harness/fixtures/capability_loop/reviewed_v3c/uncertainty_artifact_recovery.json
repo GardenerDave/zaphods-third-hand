@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3c-uncertainty-artifact-recovery-001",
+  "task_family": "unsupported-certainty",
+  "prompt": "A recovery report contains one complete trajectory but does not establish that all interrupted work is recoverable. Describe the uncertainty and the next review action without claiming complete recovery.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "uncertainty", "review_status", "next_step"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"uncertainty": "uncertain result requires review", "must_not_include": ["all interrupted work is recoverable"]}},
+  "provenance": {"source_document": "docs/FAILURE_CURRICULUM_LOOP.md", "source_anchor": "durability and review of failed attempts", "novelty": "new_source"}
+}

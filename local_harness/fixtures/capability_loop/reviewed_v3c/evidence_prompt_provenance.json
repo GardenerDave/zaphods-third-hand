@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3c-evidence-prompt-provenance-001",
+  "task_family": "evidence-grounding",
+  "prompt": "A worker result is summarized with a model name, but the rendered prompt hash and request metadata are absent. Describe the evidence limitation and the next provenance check.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "unsupported_inferences", "verification_step", "reason"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["prompt hash", "evidence", "verify"], "must_not_include": ["the request is replayable"]}},
+  "provenance": {"source_document": "docs/MODEL_PROMPT_PACKET_RENDERER.md", "source_anchor": "rendered prompt provenance", "novelty": "new_source"}
+}

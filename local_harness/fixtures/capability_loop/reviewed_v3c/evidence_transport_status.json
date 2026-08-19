@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3c-evidence-transport-status-001",
+  "task_family": "evidence-grounding",
+  "prompt": "A run summary lists a response artifact but its transport status is missing. State what is observed, what cannot be concluded, and the bounded check required before capability scoring.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "unsupported_inferences", "verification_step", "reason"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["transport status", "evidence", "verify"], "must_not_include": ["the model response is valid"]}},
+  "provenance": {"source_document": "docs/SUPERVISED_CAPABILITY_LOOP.md", "source_anchor": "transport-valid capability accounting", "novelty": "new_source"}
+}

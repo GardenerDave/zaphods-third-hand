@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3c-contradiction-evidence-packet-001",
+  "task_family": "contradiction-handling",
+  "prompt": "A generated evidence packet labels a source as verified, while its provenance entry says the source hash was not checked. State the conflict, distinguish evidence from assumption, and give the next inspection action.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "contradiction", "next_inspection", "reason"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["hash", "not checked", "inspect"], "must_not_include": ["the source is verified"]}},
+  "provenance": {"source_document": "docs/SUPERVISED_CAPABILITY_LOOP.md", "source_anchor": "artifact hashes and deterministic evidence", "novelty": "new_source"}
+}

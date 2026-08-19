@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3c-contradiction-intake-record-001",
+  "task_family": "contradiction-handling",
+  "prompt": "An intake record says a change request is approved, while the linked review note says approval is pending. Reconcile the conflict as evidence, identify what is directly observed, and name one bounded verification step before any status is treated as final.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "contradiction", "verification_step", "reason"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["contradiction", "pending", "verify"], "must_not_include": ["silently mark approved"]}},
+  "provenance": {"source_document": "docs/SUPERVISED_REVIEW_DECISION_RECORD.md", "source_anchor": "decision evidence and pending review state", "novelty": "new_source"}
+}

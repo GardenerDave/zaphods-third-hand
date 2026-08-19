@@ -1,0 +1,8 @@
+{
+  "task_id": "capability-run3c-contradiction-review-versions-001",
+  "task_family": "contradiction-handling",
+  "prompt": "Two review records for the same change have different lifecycle states and neither record identifies which is newer. Describe the contradiction without selecting a winner and request a bounded ordering check.",
+  "output_contract": {"format": "json", "required_fields": ["known_facts", "contradiction", "ordering_check", "reason"]},
+  "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["different lifecycle states", "newer", "inspect"], "must_not_include": ["choose the newer record without evidence"]}},
+  "provenance": {"source_document": "docs/JOB_LIFECYCLE.md", "source_anchor": "lifecycle transitions and review records", "novelty": "new_source"}
+}
