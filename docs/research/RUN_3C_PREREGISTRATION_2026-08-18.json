@@ -6,8 +6,8 @@
   "fixture_pack": {
     "path": "local_harness/fixtures/capability_loop/reviewed_v3c",
     "manifest_path": "local_harness/fixtures/capability_loop/reviewed_v3c/manifest.json",
-    "manifest_sha256": "4c328768d801183685b3d2cbd0a8fb0438474f36c0b7b03b68da8c5546d36a86",
-    "pack_sha256": "b1428f126d619f61a600e04cb65f8f10feadc1dda0ee5da58fae393823663c74",
+    "manifest_sha256": "941f035b47fb43c48893a8175a5c0c1f6ab828715ebfff5fb652d1f9bbdcd85e",
+    "pack_sha256": "b0744d9610ea1a5357b8097c3bf536580c568b4e140d15fb3f10ebf7ef5b67fa",
     "task_count": 24,
     "task_ids": [
       "capability-run3c-contradiction-contract-revision-001", "capability-run3c-contradiction-evidence-packet-001", "capability-run3c-contradiction-intake-record-001", "capability-run3c-contradiction-review-versions-001",
@@ -25,9 +25,9 @@
     "routing_policy_sha256": "cf6728e51e5b5e1ce5ed24539f83bbacd4f9a07dd818f26106c333cc7e543fe8",
     "capability_bundle_sha256": "383274a27c89345b3a8bcede75123420973a7a3e53318224e6460c0d05b47fc1",
     "execution_harness_freeze_path": "docs/research/RUN_3B_EXECUTION_HARNESS_FREEZE_2026-08-18.json",
-    "execution_harness_freeze_sha256": "3421f5ae1e8fdc1a170fa4f3b9237403c03d2ee969335256553d726f55a769d4",
+    "execution_harness_freeze_sha256": "a332c31c6c8d3ff9a3f9901b337634d7a2ef46b593b6438746a8a23fb5a221ce",
     "driver_path": "scripts/zth_run3_routing_experiment.py",
-    "driver_sha256": "f9860cee729ff3185e7cf3821ce74072d4703b24a2b5df1240fb52d89d7e8d0a",
+    "driver_sha256": "90d9d58026fc55a8795280f1da0ea9d5d69a3e73e8f875575214bacaf75ef6ce",
     "durable_launcher_path": "scripts/zth_run3_durable_launch.py",
     "durable_launcher_sha256": "df372dd76107d31f0a43bba16bb411591b98960cd339cf061765b6c68820d84d",
     "patch_id": "run1-experimental-distilled-strict-contract-v1",

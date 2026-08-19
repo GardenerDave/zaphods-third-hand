@@ -4,5 +4,5 @@
   "prompt": "A packet schema declares a required review field, but a later example omits it. Explain the schema contradiction, preserve both observations, and specify the contract check needed before accepting the example.",
   "output_contract": {"format": "json", "required_fields": ["known_facts", "contradiction", "contract_check", "reason"]},
   "validator": {"kind": "zth_output_contract", "reference_facts": {"must_include": ["required review", "contradiction", "check"], "must_not_include": ["ignore the declared field"]}},
-  "provenance": {"source_document": "docs/SUPERVISED_HANDOFF_PACKET.md", "source_anchor": "packet contract and review field requirements", "novelty": "new_source"}
+  "provenance": {"source_document": "docs/SUPERVISED_HANDOFF_PACKET.md", "source_anchor": "packet contract and review field requirements", "novelty": "new_scenario_same_family"}
 }

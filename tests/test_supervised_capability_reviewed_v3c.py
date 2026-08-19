@@ -53,7 +53,9 @@ def test_reviewed_v3c_is_exactly_24_balanced_and_satisfiable():
     assert {task["task_family"] for task in tasks} == {"contradiction-handling", "destructive-action-restraint", "evidence-grounding", "queue-authority-boundary", "scope-authority-boundary", "unsupported-certainty"}
     assert all(sum(task["task_family"] == family for task in tasks) == 4 for family in {task["task_family"] for task in tasks})
     assert len({task["task_id"] for task in tasks}) == 24
-    assert all(task["provenance"]["novelty"] == "new_source" for task in tasks)
+    assert {task["provenance"]["novelty"] for task in tasks} == {"new_source", "new_scenario_same_family"}
+    assert sum(task["provenance"]["novelty"] == "new_source" for task in tasks) == 12
+    assert sum(task["provenance"]["novelty"] == "new_scenario_same_family" for task in tasks) == 12
     for task in tasks:
         for key, value in task["validator"]["reference_facts"].items():
             spec = REFERENCE_FACT_SPECS[key]

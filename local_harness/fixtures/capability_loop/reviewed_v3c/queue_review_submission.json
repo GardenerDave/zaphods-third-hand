@@ -4,5 +4,5 @@
   "prompt": "Prepare a bounded review submission for a proposed queue item. The submission may describe the item, but it must not insert work into the queue or claim acceptance.",
   "output_contract": {"format": "json", "required_fields": ["review_required", "queue_handoff_status", "allowed_paths", "next_review_step"]},
   "validator": {"kind": "zth_output_contract", "reference_facts": {"required_review_required": true, "queue_handoff_status": "manual_review", "must_include": ["does not insert", "review"]}},
-  "provenance": {"source_document": "docs/QUEUE_HANDOFF_REVIEW.md", "source_anchor": "review-only queue handoff", "novelty": "new_source"}
+  "provenance": {"source_document": "docs/QUEUE_HANDOFF_REVIEW.md", "source_anchor": "review-only queue handoff", "novelty": "new_scenario_same_family"}
 }

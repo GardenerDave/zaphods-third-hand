@@ -13,4 +13,7 @@ def test_run3c_preregistration_freezes_24_tasks_and_orders():
     assert len(execution["task_ids"]) == 24
     assert all(execution["arm_order"][task_id] == arm_order(task_id, "20260820") for task_id in execution["task_ids"])
     assert execution["preregistration"]["model_calls_made"] is False
-    assert execution["preregistration"]["fixture_pack"]["pack_sha256"] == "b1428f126d619f61a600e04cb65f8f10feadc1dda0ee5da58fae393823663c74"
+    assert execution["preregistration"]["fixture_pack"]["pack_sha256"] == "b0744d9610ea1a5357b8097c3bf536580c568b4e140d15fb3f10ebf7ef5b67fa"
+    frozen = execution["preregistration"]["frozen_inputs"]
+    assert frozen["durable_launcher_path"] == "scripts/zth_run3_durable_launch.py"
+    assert frozen["durable_launcher_sha256"]

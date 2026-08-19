@@ -2,7 +2,7 @@
   "schema": "zth_run3b_execution_harness_freeze_v1",
   "source_commit": "305285d978aa3a28b2e479c9e7824d20bdf27221",
   "driver_path": "scripts/zth_run3_routing_experiment.py",
-  "driver_sha256": "f9860cee729ff3185e7cf3821ce74072d4703b24a2b5df1240fb52d89d7e8d0a",
+  "driver_sha256": "90d9d58026fc55a8795280f1da0ea9d5d69a3e73e8f875575214bacaf75ef6ce",
   "durable_launcher_path": "scripts/zth_run3_durable_launch.py",
   "durable_launcher_sha256": "793495c6022ffba4c2eed89b91daa4289f8fde1c3bd32ae711cc486126e9f9c5",
   "preregistration_interface": "--preregistration; fixture_pack schema; seed and arm_order are preregistration-derived",

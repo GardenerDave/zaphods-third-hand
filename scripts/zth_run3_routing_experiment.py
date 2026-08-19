@@ -122,6 +122,10 @@ def load_execution_preregistration(
         artifact = repository_root / frozen[key]
         if not artifact.is_file() or _sha256_file(artifact) != frozen[f"{key.replace('_path', '')}_sha256"]:
             raise Run3StateError(f"frozen artifact hash mismatch: {key}")
+    if frozen.get("durable_launcher_path"):
+        launcher = repository_root / frozen["durable_launcher_path"]
+        if not launcher.is_file() or _sha256_file(launcher) != frozen.get("durable_launcher_sha256"):
+            raise Run3StateError("frozen durable launcher hash mismatch")
     return {"preregistration": preregistration, "preregistration_sha256": _sha256_file(preregistration_path), "fixtures_dir": fixtures_dir, "manifest": manifest, "seed": seed, "task_ids": task_ids, "arm_order": expected_orders}
 
 
