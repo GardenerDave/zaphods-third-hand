@@ -1,0 +1,347 @@
+{
+  "authority": "not_production_routing_authority",
+  "blocks": {
+    "contradiction-handling": {
+      "deterministic_patch_retry": {
+        "evidence_key": "contradiction-handling",
+        "evidence_status": "supported_positive",
+        "expected_immediate_action_cost_ms": 5276.567,
+        "opportunities": 4,
+        "realized_elapsed_ms": {
+          "count": 4,
+          "max_ms": 8720.633,
+          "mean_ms": 7755.7065,
+          "median_ms": 7800.586499999999,
+          "min_ms": 6701.02,
+          "p25_ms": 7030.37875,
+          "p75_ms": 8525.91425
+        },
+        "rescue_rate": 0.5,
+        "resolution": "task_family",
+        "source_artifact": ".work/run4a_intervention_market_calibration/run_20260819T184835Z/aggregate.json",
+        "source_task_ids": [
+          "run4a-candidate-contradiction-001",
+          "run4a-candidate-contradiction-002",
+          "run4a-candidate-contradiction-003",
+          "run4a-candidate-contradiction-004"
+        ],
+        "validated_rescues": 2
+      },
+      "external_teacher": {
+        "evidence_key": "contradiction-handling",
+        "evidence_status": "supported_negative",
+        "expected_immediate_action_cost_ms": 33980.579,
+        "opportunities": 4,
+        "realized_elapsed_ms": {
+          "count": 4,
+          "max_ms": 44499.035,
+          "mean_ms": 36199.7345,
+          "median_ms": 38619.3245,
+          "min_ms": 23061.254,
+          "p25_ms": 30579.554,
+          "p75_ms": 44239.505
+        },
+        "rescue_rate": 0.25,
+        "resolution": "task_family",
+        "source_artifact": ".work/run4a_intervention_market_calibration/run_20260819T184835Z/aggregate.json",
+        "source_task_ids": [
+          "run4a-candidate-contradiction-001",
+          "run4a-candidate-contradiction-002",
+          "run4a-candidate-contradiction-003",
+          "run4a-candidate-contradiction-004"
+        ],
+        "validated_rescues": 1
+      },
+      "local_teacher": {
+        "evidence_key": "contradiction-handling",
+        "evidence_status": "supported_negative",
+        "expected_immediate_action_cost_ms": 21497.191,
+        "opportunities": 4,
+        "realized_elapsed_ms": {
+          "count": 4,
+          "max_ms": 15913.482,
+          "mean_ms": 13630.715250000001,
+          "median_ms": 13573.263,
+          "min_ms": 11462.853,
+          "p25_ms": 12585.893250000001,
+          "p75_ms": 14618.085
+        },
+        "rescue_rate": 0.0,
+        "resolution": "task_family",
+        "source_artifact": ".work/run4a_intervention_market_calibration/run_20260819T184835Z/aggregate.json",
+        "source_task_ids": [
+          "run4a-candidate-contradiction-001",
+          "run4a-candidate-contradiction-002",
+          "run4a-candidate-contradiction-003",
+          "run4a-candidate-contradiction-004"
+        ],
+        "validated_rescues": 0
+      }
+    },
+    "scope-authority-boundary": {
+      "deterministic_patch_retry": {
+        "evidence_key": "scope-authority-boundary",
+        "evidence_status": "supported_negative",
+        "expected_immediate_action_cost_ms": 5276.567,
+        "opportunities": 4,
+        "realized_elapsed_ms": {
+          "count": 4,
+          "max_ms": 6447.859,
+          "mean_ms": 5452.68975,
+          "median_ms": 5458.2245,
+          "min_ms": 4446.451,
+          "p25_ms": 4493.128,
+          "p75_ms": 6417.78625
+        },
+        "rescue_rate": 0.25,
+        "resolution": "failure_class",
+        "source_artifact": ".work/run4a_intervention_market_calibration/run_20260819T184835Z/aggregate.json",
+        "source_task_ids": [
+          "run4a-candidate-scope-001",
+          "run4a-candidate-scope-002",
+          "run4a-candidate-scope-003",
+          "run4a-candidate-scope-004"
+        ],
+        "validated_rescues": 1
+      },
+      "external_teacher": {
+        "evidence_key": "scope-authority-boundary",
+        "evidence_status": "supported_positive",
+        "expected_immediate_action_cost_ms": 33980.579,
+        "opportunities": 4,
+        "realized_elapsed_ms": {
+          "count": 4,
+          "max_ms": 40371.803,
+          "mean_ms": 30520.39775,
+          "median_ms": 29309.74,
+          "min_ms": 23090.308,
+          "p25_ms": 27744.381250000002,
+          "p75_ms": 32085.7565
+        },
+        "rescue_rate": 1.0,
+        "resolution": "failure_class",
+        "source_artifact": ".work/run4a_intervention_market_calibration/run_20260819T184835Z/aggregate.json",
+        "source_task_ids": [
+          "run4a-candidate-scope-001",
+          "run4a-candidate-scope-002",
+          "run4a-candidate-scope-003",
+          "run4a-candidate-scope-004"
+        ],
+        "validated_rescues": 4
+      },
+      "local_teacher": {
+        "evidence_key": "scope-authority-boundary",
+        "evidence_status": "supported_positive",
+        "expected_immediate_action_cost_ms": 21497.191,
+        "opportunities": 4,
+        "realized_elapsed_ms": {
+          "count": 4,
+          "max_ms": 12705.155999999999,
+          "mean_ms": 11439.65775,
+          "median_ms": 11583.243999999999,
+          "min_ms": 9886.987000000001,
+          "p25_ms": 10740.68425,
+          "p75_ms": 12282.217499999999
+        },
+        "rescue_rate": 1.0,
+        "resolution": "failure_class",
+        "source_artifact": ".work/run4a_intervention_market_calibration/run_20260819T184835Z/aggregate.json",
+        "source_task_ids": [
+          "run4a-candidate-scope-001",
+          "run4a-candidate-scope-002",
+          "run4a-candidate-scope-003",
+          "run4a-candidate-scope-004"
+        ],
+        "validated_rescues": 4
+      }
+    },
+    "triage-routing": {
+      "deterministic_patch_retry": {
+        "evidence_key": "triage-routing",
+        "evidence_status": "supported_positive",
+        "expected_immediate_action_cost_ms": 5276.567,
+        "opportunities": 4,
+        "realized_elapsed_ms": {
+          "count": 4,
+          "max_ms": 23046.915,
+          "mean_ms": 11060.197,
+          "median_ms": 7494.6875,
+          "min_ms": 6204.498,
+          "p25_ms": 6341.17125,
+          "p75_ms": 12213.71325
+        },
+        "rescue_rate": 0.5,
+        "resolution": "task_family",
+        "source_artifact": ".work/run4a_intervention_market_calibration/run_20260819T184835Z/aggregate.json",
+        "source_task_ids": [
+          "run4a-candidate-triage-001",
+          "run4a-candidate-triage-002",
+          "run4a-candidate-triage-003",
+          "run4a-candidate-triage-004"
+        ],
+        "validated_rescues": 2
+      },
+      "external_teacher": {
+        "evidence_key": "triage-routing",
+        "evidence_status": "supported_positive",
+        "expected_immediate_action_cost_ms": 33980.579,
+        "opportunities": 4,
+        "realized_elapsed_ms": {
+          "count": 4,
+          "max_ms": 36441.941,
+          "mean_ms": 33754.754499999995,
+          "median_ms": 34788.284,
+          "min_ms": 29000.509,
+          "p25_ms": 32351.008749999994,
+          "p75_ms": 36192.02975
+        },
+        "rescue_rate": 0.75,
+        "resolution": "task_family",
+        "source_artifact": ".work/run4a_intervention_market_calibration/run_20260819T184835Z/aggregate.json",
+        "source_task_ids": [
+          "run4a-candidate-triage-001",
+          "run4a-candidate-triage-002",
+          "run4a-candidate-triage-003",
+          "run4a-candidate-triage-004"
+        ],
+        "validated_rescues": 3
+      },
+      "local_teacher": {
+        "evidence_key": "triage-routing",
+        "evidence_status": "supported_positive",
+        "expected_immediate_action_cost_ms": 21497.191,
+        "opportunities": 4,
+        "realized_elapsed_ms": {
+          "count": 4,
+          "max_ms": 14739.077,
+          "mean_ms": 13110.801749999999,
+          "median_ms": 13122.3265,
+          "min_ms": 11459.476999999999,
+          "p25_ms": 11665.15925,
+          "p75_ms": 14567.969
+        },
+        "rescue_rate": 0.5,
+        "resolution": "task_family",
+        "source_artifact": ".work/run4a_intervention_market_calibration/run_20260819T184835Z/aggregate.json",
+        "source_task_ids": [
+          "run4a-candidate-triage-001",
+          "run4a-candidate-triage-002",
+          "run4a-candidate-triage-003",
+          "run4a-candidate-triage-004"
+        ],
+        "validated_rescues": 2
+      }
+    },
+    "unsupported-certainty": {
+      "deterministic_patch_retry": {
+        "evidence_key": "unsupported-certainty",
+        "evidence_status": "supported_positive",
+        "expected_immediate_action_cost_ms": 5276.567,
+        "opportunities": 4,
+        "realized_elapsed_ms": {
+          "count": 4,
+          "max_ms": 9826.586,
+          "mean_ms": 7914.773999999999,
+          "median_ms": 7353.639,
+          "min_ms": 7125.232,
+          "p25_ms": 7160.3425,
+          "p75_ms": 8108.0705
+        },
+        "rescue_rate": 0.75,
+        "resolution": "task_family",
+        "source_artifact": ".work/run4a_intervention_market_calibration/run_20260819T184835Z/aggregate.json",
+        "source_task_ids": [
+          "run4a-candidate-uncertainty-001",
+          "run4a-candidate-uncertainty-002",
+          "run4a-candidate-uncertainty-003",
+          "run4a-candidate-uncertainty-004"
+        ],
+        "validated_rescues": 3
+      },
+      "external_teacher": {
+        "evidence_key": "unsupported-certainty",
+        "evidence_status": "supported_positive",
+        "expected_immediate_action_cost_ms": 33980.579,
+        "opportunities": 4,
+        "realized_elapsed_ms": {
+          "count": 4,
+          "max_ms": 40196.901,
+          "mean_ms": 27860.0825,
+          "median_ms": 26782.684,
+          "min_ms": 17678.061,
+          "p25_ms": 21260.02275,
+          "p75_ms": 33382.743749999994
+        },
+        "rescue_rate": 0.75,
+        "resolution": "task_family",
+        "source_artifact": ".work/run4a_intervention_market_calibration/run_20260819T184835Z/aggregate.json",
+        "source_task_ids": [
+          "run4a-candidate-uncertainty-001",
+          "run4a-candidate-uncertainty-002",
+          "run4a-candidate-uncertainty-003",
+          "run4a-candidate-uncertainty-004"
+        ],
+        "validated_rescues": 3
+      },
+      "local_teacher": {
+        "evidence_key": "unsupported-certainty",
+        "evidence_status": "supported_positive",
+        "expected_immediate_action_cost_ms": 21497.191,
+        "opportunities": 4,
+        "realized_elapsed_ms": {
+          "count": 4,
+          "max_ms": 15226.604,
+          "mean_ms": 13766.10225,
+          "median_ms": 13937.688999999998,
+          "min_ms": 11962.427,
+          "p25_ms": 13233.351499999997,
+          "p75_ms": 14470.43975
+        },
+        "rescue_rate": 0.5,
+        "resolution": "task_family",
+        "source_artifact": ".work/run4a_intervention_market_calibration/run_20260819T184835Z/aggregate.json",
+        "source_task_ids": [
+          "run4a-candidate-uncertainty-001",
+          "run4a-candidate-uncertainty-002",
+          "run4a-candidate-uncertainty-003",
+          "run4a-candidate-uncertainty-004"
+        ],
+        "validated_rescues": 2
+      }
+    }
+  },
+  "calibration_only": true,
+  "capability_bundle_unchanged": true,
+  "evidence_formation": {
+    "blocks_with_at_least_two_supported_positive": 3,
+    "criterion": "At least 2 of 4 blocks have >=2 supported-positive interventions",
+    "met": true
+  },
+  "execution_commit": "15dd84cfa82d9c2cef47778111e811e11ecf7274",
+  "freeze_sha256": "a23a7daa0c8681e8f57beed768c1cf3b3daafc360d139f48a147e8c4493dd0c3",
+  "resource_weights_unchanged": true,
+  "routing_policy_unchanged": true,
+  "schema": "zth_run4a_comparative_evidence_freeze_v1",
+  "source": {
+    "aggregate_path": ".work/run4a_intervention_market_calibration/run_20260819T184835Z/aggregate.json",
+    "aggregate_sha256": "bee66dac025f40c964b207442e6dd232a9f39a4d18448e568b2b6430b34f3016",
+    "closeout_report_path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_4A_2026-08-19.md",
+    "closeout_report_sha256": "361faf4580c94455d61826ee5b293d8dcdb7cf3fa256c877b97965c014e7b512",
+    "driver_path": "scripts/zth_run4a_intervention_calibration.py",
+    "driver_sha256": "0fd09c204b840609da040d0de8256adcf55fc6f5f3d57ba04539ac8ddd99cdee",
+    "execution_manifest_path": ".work/run4a_intervention_market_calibration/run_20260819T184835Z/execution_manifest.json",
+    "execution_manifest_sha256": "25f879eb5af2340f41c4504270ede365e2dd715bec48f7939945e509ca22c4ca",
+    "fixture_pack_sha256": "0c10d1d712368cd66bd18be48557454e9e242a2d19d7b9f223d190be43f83d20",
+    "harness_path": "local_harness/run4a_intervention_harness.py",
+    "harness_sha256": "a6125d4b9d32ca912da81fd0df316cd56eada60c825b02789b5496fd24590f88",
+    "preregistration_path": "docs/research/RUN_4A_PREREGISTRATION_2026-08-19.json",
+    "preregistration_sha256": "a9418fe1e45a05e46b4fd183a6345333893192305fbf767461f3b280b26d748b",
+    "resource_manifest_canonical_sha256": "33ad2521dc5acc0be5a67b3ef77c167e882cf6ce53140dc60acc8f89c9ad76ab",
+    "resource_manifest_path": "docs/research/RUN_4_RESOURCE_WEIGHTS_FREEZE_2026-08-19.json"
+  },
+  "status": "reviewed_frozen_calibration_evidence",
+  "thresholds": {
+    "minimum_comparable_opportunities": 3,
+    "minimum_rescue_rate": 0.5
+  }
+}

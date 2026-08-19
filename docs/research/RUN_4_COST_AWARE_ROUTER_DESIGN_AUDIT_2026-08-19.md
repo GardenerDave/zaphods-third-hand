@@ -106,13 +106,15 @@ is needed before making any cost-aware performance claim.
 
 No model calls were made.
 
-## Current design status
+## Current design status (superseded by Run 4A review)
 
-The cost-aware router is **implementable** as a deterministic extension, but
-the current evidence is not sufficient to make an informative behavioral
-comparison: the current capability-only recommendation and the proposed
-cheapest-supported-positive rule select the same action for every supported
-key. Comparative intervention calibration is required first.
+The pre-Run-4A choice-set audit found that the existing Run 1/Run 2 evidence
+alone could not make the proposed treatment behaviorally distinct. Run 4A has
+since supplied reviewed comparative evidence with competing supported-positive
+actions in triage-routing and scope-authority-boundary. The detailed current
+objective and control/treatment design are recorded in
+`RUN_4_ECONOMIC_OBJECTIVE_REVIEW_2026-08-19.md`; this earlier audit remains
+the historical pre-calibration record.
 
 `RUN_4_COST_AWARE_ROUTER_IMPLEMENTABLE=true`
 `RUN_4_COST_AWARE_EXPERIMENT_INFORMATIVE=false`
