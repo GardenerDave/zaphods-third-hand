@@ -50,7 +50,7 @@
   },
   "driver": {
     "path": "scripts/zth_run4b_scope_replication.py",
-    "sha256": "4c1e0a58f80d162a2a4cdcdb23c3fc0c2c7f8aff6898c96ca8b71b5931bcbbfe",
+    "sha256": "d2154079ea78a9a2f64d615c28feb5f7ecfc42babc63d81e73fd8ec14a2574c0",
     "explicit_execute_gate": true,
     "dry_run_makes_zero_model_calls": true,
     "paired_isolated_arms": true

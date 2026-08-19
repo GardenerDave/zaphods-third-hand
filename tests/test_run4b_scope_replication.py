@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import hashlib
 from pathlib import Path
 
 import pytest
@@ -15,7 +16,8 @@ from local_harness.run4b_scope_fixture_pack import (
 )
 from local_harness.supervised_capability_loop import load_task_fixture
 from scripts.zth_run4a_intervention_calibration import Run4ADriverError
-from scripts.zth_run4b_scope_replication import run_experiment, validate_preregistration
+import scripts.zth_run4b_scope_replication as run4b_driver
+from scripts.zth_run4b_scope_replication import aggregate_results, execution_resource_history, run_baseline, run_experiment, validate_preregistration
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -108,6 +110,149 @@ def test_run4b_stub_execution_has_exactly_two_teacher_arms_and_no_patch(tmp_path
     aggregate = json.loads((tmp_path / "execution" / "aggregate.json").read_text())
     assert aggregate["comparable_pairs"] == 12
     assert aggregate["infrastructure_excluded_pairs"] == 0
+    history = aggregate["execution_resource_history"]
+    assert history["attempts_by_role"] == {"external_teacher": 12, "local_teacher": 12, "worker": 39}
+    assert history["total_model_call_attempts"] == 63
+
+
+def _stub_callbacks(tasks, calls):
+    def worker(prompt: str) -> WorkerResponse:
+        calls["worker"] += 1
+        for task in tasks.values():
+            if prompt == task["prompt"]:
+                return _response("{}")
+            if task["prompt"] in prompt:
+                return _response(json.dumps(representative_output(task), sort_keys=True))
+        return _response("{}")
+
+    def local(prompt: str) -> WorkerResponse:
+        calls["local_teacher"] += 1
+        return _response(json.dumps({"failure_classification": "synthetic", "teacher_diagnosis": "review", "retry_guidance": "Return bounded JSON."}), model="local-teacher")
+
+    def external(prompt: str):
+        calls["external_teacher"] += 1
+        return "codex-fixture", json.dumps({"failure_classification": "synthetic", "teacher_diagnosis": "review", "retry_guidance": "Return bounded JSON."})
+
+    return worker, local, external
+
+
+def test_run4b_partial_resume_reuses_terminal_work_without_duplicates(tmp_path: Path, monkeypatch):
+    context = validate_preregistration(PREREG, ROOT)
+    tasks = {row["task_id"]: load_task_fixture(ROOT / row["path"]) for row in context["manifest"]["fixtures"]}
+    calls = {"worker": 0, "local_teacher": 0, "external_teacher": 0}
+    worker, local, external = _stub_callbacks(tasks, calls)
+    output = tmp_path / "partial"
+    real_arm = run4b_driver.run_isolated_intervention_arm
+    interrupted = {"value": False}
+
+    def stop_after_first_terminal_arm(*args, **kwargs):
+        result = real_arm(*args, **kwargs)
+        if not interrupted["value"]:
+            interrupted["value"] = True
+            raise RuntimeError("synthetic clean interruption after terminal arm")
+        return result
+
+    monkeypatch.setattr(run4b_driver, "run_isolated_intervention_arm", stop_after_first_terminal_arm)
+    with pytest.raises(RuntimeError, match="clean interruption"):
+        run_experiment(context, output, worker=worker, local_teacher=local, external_teacher=external)
+    first_task = context["manifest"]["candidate_order"][0]
+    first_arm = context["manifest"]["pair_order"]["orders"][first_task][0]
+    run4b_driver._write_arm_artifact_index(output / "tasks" / first_task / "arms" / first_arm)
+    manifest_path = output / "execution_manifest.json"
+    execution = json.loads(manifest_path.read_text())
+    assert execution["active_call"]["kind"] == "paired_arm"
+    execution.pop("active_call")
+    manifest_path.write_text(json.dumps(execution))
+    monkeypatch.setattr(run4b_driver, "run_isolated_intervention_arm", real_arm)
+    resumed = run_experiment(context, output, worker=worker, local_teacher=local, external_teacher=external)
+    assert resumed["status"] == "experiment_completed"
+    assert calls == {"worker": 39, "local_teacher": 12, "external_teacher": 12}
+    assert json.loads((output / "selection.json").read_text())["included_task_ids"] == context["manifest"]["candidate_order"][:12]
+
+
+def test_run4b_terminal_states_and_unbound_directory_fail_closed(tmp_path: Path):
+    context = validate_preregistration(PREREG, ROOT)
+    base = {"schema": "zth_run4b_scope_execution_manifest_v1", "preregistration_sha256": hashlib.sha256(context["preregistration_path"].read_bytes()).hexdigest(), "fixture_pack_sha256": context["manifest"]["pack_sha256"], "pair_orders": context["manifest"]["pair_order"]["orders"]}
+    for status in ("experiment_completed", "experiment_incomplete"):
+        out = tmp_path / status
+        out.mkdir()
+        payload = {**base, "status": status, "completed_at": "2026-08-19T00:00:00+00:00"}
+        (out / "execution_manifest.json").write_text(json.dumps(payload))
+        result = run_experiment(context, out, worker=lambda _: (_ for _ in ()).throw(AssertionError("duplicate worker")))
+        assert result["status"] == status
+    unrelated = tmp_path / "unrelated"
+    unrelated.mkdir()
+    (unrelated / "unbound.txt").write_text("not a Run 4B execution")
+    with pytest.raises(Run4ADriverError, match="lacks a bound execution manifest"):
+        run_experiment(context, unrelated, worker=lambda _: (_ for _ in ()).throw(AssertionError("no call")))
+
+
+def test_run4b_baseline_terminal_reuse_and_started_state_fail_closed(tmp_path: Path):
+    context = validate_preregistration(PREREG, ROOT)
+    row = context["manifest"]["fixtures"][0]
+    task = load_task_fixture(ROOT / row["path"])
+    calls = {"worker": 0}
+
+    def worker(prompt: str) -> WorkerResponse:
+        calls["worker"] += 1
+        return _response("{}")
+
+    candidate = tmp_path / "candidate"
+    first = run_baseline(task, candidate, worker=worker)
+    second = run_baseline(task, candidate, worker=lambda _: (_ for _ in ()).throw(AssertionError("duplicate baseline")))
+    assert first == second
+    assert calls["worker"] == 1
+    interrupted = tmp_path / "interrupted"
+    (interrupted / "state.json").parent.mkdir(parents=True)
+    (interrupted / "state.json").write_text(json.dumps({"state": "baseline_started", "task_id": task["task_id"], "attempt": 1}))
+    with pytest.raises(Run4ADriverError, match="baseline interrupted"):
+        run_baseline(task, interrupted, worker=lambda _: (_ for _ in ()).throw(AssertionError("no retry")))
+
+
+def test_run4b_infrastructure_excluded_pair_preserves_attempted_resource_history(tmp_path: Path):
+    output = tmp_path / "infra"
+    (output / "tasks" / "one" / "arms" / "control").mkdir(parents=True)
+    (output / "tasks" / "one" / "arms" / "treatment").mkdir(parents=True)
+    (output / "execution_manifest.json").write_text("{}")
+    control = output / "tasks/one/arms/control"
+    treatment = output / "tasks/one/arms/treatment"
+    (control / "trajectory.jsonl").write_text(json.dumps({"transition": "call_started", "call_id": "external_teacher:1", "role": "external_teacher"}) + "\n" + json.dumps({"transition": "response_captured", "call_id": "external_teacher:1", "artifact_ref": "external_teacher.raw.json"}) + "\n")
+    (control / "external_teacher.raw.json").write_text(json.dumps({"transport_valid": True, "transport_classification": "model_response", "resource_telemetry": {"elapsed_ms": 5}}))
+    (treatment / "trajectory.jsonl").write_text(json.dumps({"transition": "call_started", "call_id": "local_teacher:1", "role": "local_teacher"}) + "\n" + json.dumps({"transition": "infrastructure_failed", "call_id": "local_teacher:1", "role": "local_teacher", "artifact_ref": "local_teacher.infrastructure.json"}) + "\n")
+    (treatment / "local_teacher.infrastructure.json").write_text(json.dumps({"classification": "transport_request_error", "capability_verdict_available": False, "resource_telemetry": {"elapsed_ms": 7}}))
+    pair = {"disposition": "infrastructure_excluded", "valid_arms": {"control": True, "treatment": False}, "infrastructure_failures": [{"arm": "treatment", "role": "local_teacher", "artifact": "local_teacher.infrastructure.json"}], "control": {"rescue": True, "elapsed_ms": 5}, "treatment": {"rescue": False, "elapsed_ms": None}, "paired_outcome": "control_only"}
+    (output / "tasks/one/pair_summary.json").write_text(json.dumps(pair))
+    result = aggregate_results({}, output)
+    assert result["selected_pairs"] == 1
+    assert result["comparable_pairs"] == 0
+    assert result["infrastructure_excluded_pairs"] == 1
+    assert result["result_available"] is False
+    assert result["quality_preserved"] is None
+    assert result["resource_reduced"] is None
+    assert result["infrastructure_exclusions"]["by_arm"] == {"treatment": 1}
+    history = execution_resource_history(output)
+    assert history["attempts_by_role"] == {"external_teacher": 1, "local_teacher": 1}
+    assert history["infrastructure_failures_by_role"] == {"local_teacher": 1}
+    assert history["total_model_call_attempts"] == 2
+
+
+def test_run4b_corrupted_terminal_arm_is_rejected(tmp_path: Path):
+    context = validate_preregistration(PREREG, ROOT)
+    tasks = {row["task_id"]: load_task_fixture(ROOT / row["path"]) for row in context["manifest"]["fixtures"]}
+    calls = {"worker": 0, "local_teacher": 0, "external_teacher": 0}
+    worker, local, external = _stub_callbacks(tasks, calls)
+    output = tmp_path / "corrupt"
+    run_experiment(context, output, worker=worker, local_teacher=local, external_teacher=external)
+    first = context["manifest"]["candidate_order"][0]
+    arm = output / "tasks" / first / "arms" / context["manifest"]["pair_order"]["orders"][first][0]
+    artifact = next(path for path in arm.iterdir() if path.name not in {"arm_artifacts.json", "arm_binding.json", "arm_summary.json", "trajectory.jsonl"} and path.is_file())
+    artifact.write_text(artifact.read_text() + "\ncorrupt\n")
+    execution = json.loads((output / "execution_manifest.json").read_text())
+    execution.pop("completed_at")
+    execution["status"] = "experiment_running"
+    (output / "execution_manifest.json").write_text(json.dumps(execution))
+    with pytest.raises(Run4ADriverError, match="artifact hash mismatch"):
+        run_experiment(context, output, worker=lambda _: (_ for _ in ()).throw(AssertionError("no duplicate")), local_teacher=lambda _: (_ for _ in ()).throw(AssertionError("no duplicate")), external_teacher=lambda _: (_ for _ in ()).throw(AssertionError("no duplicate")))
 
 
 def test_run4b_active_call_fails_closed(tmp_path: Path):

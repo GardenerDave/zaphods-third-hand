@@ -142,6 +142,99 @@ def _write_pair_summary(task_dir: Path, task_id: str, arm_summaries: Mapping[str
     return pair
 
 
+def _telemetry_from_artifact(artifact: Mapping[str, Any]) -> Mapping[str, Any] | None:
+    """Return only explicitly recorded call telemetry; never infer timing."""
+    metadata = artifact.get("metadata")
+    if isinstance(metadata, Mapping) and isinstance(metadata.get("resource_telemetry"), Mapping):
+        return metadata["resource_telemetry"]
+    telemetry = artifact.get("resource_telemetry")
+    return telemetry if isinstance(telemetry, Mapping) else None
+
+
+def execution_resource_history(output_dir: Path) -> dict[str, Any]:
+    """Account for every durable call attempt, including excluded pairs.
+
+    This is intentionally separate from the comparable-pair capability and
+    cost denominators.  A call is counted from a durable ``call_started``
+    transition, while validity and timing come only from its captured durable
+    response or infrastructure artifact.
+    """
+    attempts_by_role: dict[str, int] = {}
+    valid_by_role: dict[str, int] = {}
+    infrastructure_by_role: dict[str, int] = {}
+    elapsed_by_role: dict[str, float] = {}
+    elapsed_coverage_by_role: dict[str, int] = {}
+    attempts_by_phase: dict[str, int] = {}
+    infrastructure_by_arm: dict[str, int] = {}
+    seen: set[tuple[str, str]] = set()
+
+    trajectory_paths = sorted(output_dir.glob("candidates/*/trajectory.jsonl")) + sorted(output_dir.glob("tasks/*/arms/*/trajectory.jsonl"))
+    for trajectory_path in trajectory_paths:
+        rows = [_read_json_line(line) for line in trajectory_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+        completions = {
+            row.get("call_id"): row
+            for row in rows
+            if row.get("transition") in {"response_captured", "infrastructure_failed"}
+        }
+        relative = trajectory_path.relative_to(output_dir).parts
+        phase = "baseline" if relative[0] == "candidates" else relative[3]
+        arm_label = None if phase == "baseline" else phase
+        for started in (row for row in rows if row.get("transition") == "call_started"):
+            call_id = str(started.get("call_id"))
+            key = (str(trajectory_path), call_id)
+            if key in seen:
+                continue
+            seen.add(key)
+            role = str(started.get("role") or "unknown")
+            attempts_by_role[role] = attempts_by_role.get(role, 0) + 1
+            attempts_by_phase[phase] = attempts_by_phase.get(phase, 0) + 1
+            completion = completions.get(started.get("call_id"))
+            if completion is None:
+                continue
+            artifact_ref = completion.get("artifact_ref")
+            artifact = _read_json(trajectory_path.parent / artifact_ref) if artifact_ref else {}
+            if completion.get("transition") == "infrastructure_failed":
+                infrastructure_by_role[role] = infrastructure_by_role.get(role, 0) + 1
+                if arm_label is not None:
+                    infrastructure_by_arm[arm_label] = infrastructure_by_arm.get(arm_label, 0) + 1
+            else:
+                artifact_metadata = artifact.get("metadata", {}) if isinstance(artifact, Mapping) else {}
+                classification = artifact_metadata.get("transport_classification", artifact.get("transport_classification")) if isinstance(artifact, Mapping) else None
+                transport_valid = artifact_metadata.get("transport_valid", artifact.get("transport_valid")) if isinstance(artifact, Mapping) else None
+                if transport_valid is True and classification == "model_response":
+                    valid_by_role[role] = valid_by_role.get(role, 0) + 1
+            telemetry = _telemetry_from_artifact(artifact)
+            elapsed = telemetry.get("elapsed_ms") if telemetry else None
+            if isinstance(elapsed, (int, float)):
+                elapsed_by_role[role] = elapsed_by_role.get(role, 0.0) + float(elapsed)
+                elapsed_coverage_by_role[role] = elapsed_coverage_by_role.get(role, 0) + 1
+
+    return {
+        "schema": "zth_run4b_execution_resource_history_v1",
+        "total_model_call_attempts": sum(attempts_by_role.values()),
+        "total_worker_attempts": attempts_by_role.get("worker", 0),
+        "total_teacher_attempts": attempts_by_role.get("local_teacher", 0) + attempts_by_role.get("external_teacher", 0),
+        "attempts_by_role": attempts_by_role,
+        "attempts_by_phase": attempts_by_phase,
+        "valid_responses_by_role": valid_by_role,
+        "infrastructure_failures_by_role": infrastructure_by_role,
+        "infrastructure_failures_by_arm": infrastructure_by_arm,
+        "realized_elapsed_ms_by_role": elapsed_by_role,
+        "elapsed_telemetry_coverage_by_role": elapsed_coverage_by_role,
+        "accounting_scope": "all durable call attempts, including infrastructure-excluded pairs",
+    }
+
+
+def _read_json_line(line: str) -> dict[str, Any]:
+    try:
+        value = json.loads(line)
+    except json.JSONDecodeError as exc:
+        raise Run4ADriverError(f"invalid trajectory transition: {exc}") from exc
+    if not isinstance(value, dict):
+        raise Run4ADriverError("trajectory transition must be an object")
+    return value
+
+
 def aggregate_results(execution: Mapping[str, Any], output_dir: Path) -> dict[str, Any]:
     pairs = [_read_json(path) for path in sorted(output_dir.glob("tasks/*/pair_summary.json"))]
     comparable = [pair for pair in pairs if pair.get("disposition") == "terminal" and all(pair.get("valid_arms", {}).values())]
@@ -156,6 +249,7 @@ def aggregate_results(execution: Mapping[str, Any], output_dir: Path) -> dict[st
             by_arm[failure["arm"]] = by_arm.get(failure["arm"], 0) + 1
             by_role[failure.get("role") or "unknown"] = by_role.get(failure.get("role") or "unknown", 0) + 1
     available = bool(comparable)
+    resource_history = execution_resource_history(output_dir)
     result = {
         "schema": "zth_run4b_scope_aggregate_v1", "status": "review_required",
         "selected_pairs": len(pairs), "comparable_pairs": len(comparable), "infrastructure_excluded_pairs": len(excluded),
@@ -167,6 +261,12 @@ def aggregate_results(execution: Mapping[str, Any], output_dir: Path) -> dict[st
         "scope_efficiency_replication": treatment_solve >= control_solve and treatment_elapsed < control_elapsed if available else None,
         "result_available": available,
         "infrastructure_exclusions": {"by_arm": by_arm, "by_role": by_role},
+        "scientific_comparable_resource": {
+            "scope": "comparable pairs only",
+            "control_post_baseline_elapsed_ms": control_elapsed if available else None,
+            "treatment_post_baseline_elapsed_ms": treatment_elapsed if available else None,
+        },
+        "execution_resource_history": resource_history,
         "execution_manifest_sha256": sha256_file(output_dir / "execution_manifest.json"),
         "authority": "review_required_no_evidence_merge",
     }
