@@ -58,6 +58,24 @@ The supported-positive actions dominated within a block are:
 Negative or unsupported interventions are not called “dominated” by this
 frontier calculation; they remain negative/insufficient evidence.
 
+### Research priority, not retirement
+
+Pareto domination in four Run 4A opportunities is not capability retirement.
+The current research-priority classifications are:
+
+- `triage-routing / local_teacher`: `dominated_needs_replication`;
+- `scope-authority-boundary / external_teacher`:
+  `dominated_needs_replication`;
+- `unsupported-certainty / local_teacher`:
+  `dominated_needs_replication`;
+- `unsupported-certainty / external_teacher`:
+  `dominated_needs_replication`.
+
+No intervention is classified as retired. In particular, scope external
+teacher matched local teacher at 4/4 while costing more, but four opportunities
+cannot establish that it has no unique capability on harder scope tasks or
+under revised intervention semantics.
+
 ## Triage tradeoff
 
 The two triage frontier alternatives are:

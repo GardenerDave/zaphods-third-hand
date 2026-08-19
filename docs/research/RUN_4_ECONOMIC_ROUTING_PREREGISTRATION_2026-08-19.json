@@ -6,7 +6,7 @@
   "setup_commit": "e278c2f2c1a6c3f98420fc334f3596cf43ea2331",
   "design_note": {
     "path": "docs/research/RUN_4_ECONOMIC_OBJECTIVE_REVIEW_2026-08-19.md",
-    "sha256": "25b0382fcc1eed134dc93101dceb7a729e83c780621b8426bda12b3a3b5950f9"
+    "sha256": "c294b72690862ceba35dfcc5f9efddf4b2b9512d4663dbe03faa4e3a989896f1"
   },
   "frozen_inputs": {
     "comparative_evidence_path": "docs/research/RUN_4A_COMPARATIVE_EVIDENCE_FREEZE_2026-08-19.json",
@@ -58,7 +58,7 @@
   },
   "driver": {
     "path": "scripts/zth_run4_economic_routing.py",
-    "sha256": "4ca21c86edf752afda30322721d3a19b5ee9f81914f985b208c2cfa2b7a70dd7",
+    "sha256": "82699f24d13a3d6929dc89a858f6f3376b012a850b325fadddd2cb9293b164af",
     "explicit_execute_gate": true,
     "dry_run_makes_zero_model_calls": true,
     "paired_isolated_arms": true

@@ -72,8 +72,9 @@ def _runtime_identities(preregistration: Mapping[str, Any], *, require: bool) ->
         for role in ("worker", "local_teacher"):
             if not configured[role]:
                 raise Run4ADriverError(f"missing runtime identity: {role}")
-        for role, expected in models.items():
-            key = "external_teacher" if role == "external_teacher" else role
+        for role in ("worker", "local_teacher", "external_teacher"):
+            expected = models[role]
+            key = role
             if configured[key] != expected:
                 raise Run4ADriverError(f"runtime identity mismatch for {key}")
     return {role: configured[role] or models[role] for role in ("worker", "local_teacher", "external_teacher")}
@@ -83,6 +84,9 @@ def validate_preregistration(prereg_path: Path, repo_root: Path, *, require_runt
     prereg = _read_json(prereg_path)
     if prereg.get("model_calls_made") is not False:
         raise Run4ADriverError("Run 4 preregistration must remain model-call-free before execution")
+    design_note = prereg["design_note"]
+    if sha256_file(repo_root / design_note["path"]) != design_note["sha256"]:
+        raise Run4ADriverError("economic objective review hash mismatch")
     pack = prereg["fixture_pack"]
     pack_dir = repo_root / pack["path"]
     manifest = verify_manifest(pack_dir, repo_root)
@@ -155,20 +159,42 @@ def _arm_terminal(arm_dir: Path, binding: Mapping[str, Any]) -> dict[str, Any] |
     if _read_json(arm_dir / "arm_binding.json") != dict(binding):
         raise Run4ADriverError(f"paired arm binding drift: {arm_dir}")
     _no_ambiguous_started(arm_dir / "trajectory.jsonl")
+    index = _read_json(arm_dir / "arm_artifacts.json")
+    current = {
+        path.name: sha256_file(path)
+        for path in sorted(arm_dir.iterdir())
+        if path.is_file() and path.name != "arm_artifacts.json"
+    }
+    if index.get("files") != current:
+        raise Run4ADriverError(f"paired arm artifact hash mismatch: {arm_dir}")
     return _read_json(summary_path)
 
 
 def _write_pair_summary(task_dir: Path, task_id: str, policy_outputs: Mapping[str, Any], arm_summaries: Mapping[str, Any]) -> dict[str, Any]:
     control = arm_summaries["control"]
     treatment = arm_summaries["treatment"]
-    if not all(summary.get("transport_valid") is True and summary.get("transport_classification") == "model_response" for summary in arm_summaries.values()):
+    valid_arms = {
+        arm: summary.get("capability_verdict_available") is True
+        and summary.get("transport_valid") is True
+        and summary.get("transport_classification") == "model_response"
+        for arm, summary in arm_summaries.items()
+    }
+    if not all(valid_arms.values()):
         disposition = "infrastructure_excluded"
     else:
         disposition = "terminal"
+    infrastructure = []
+    for arm, summary in arm_summaries.items():
+        if not valid_arms[arm]:
+            artifact = summary.get("infrastructure_artifact")
+            role = artifact.split(".", 1)[0] if isinstance(artifact, str) and artifact else summary.get("intervention")
+            infrastructure.append({"arm": arm, "intervention": summary.get("intervention"), "role": role, "artifact": artifact})
     pair = {
         "schema": "zth_run4_economic_pair_summary_v1",
         "task_id": task_id,
         "disposition": disposition,
+        "valid_arms": valid_arms,
+        "infrastructure_failures": infrastructure,
         "policy_outputs": dict(policy_outputs),
         "control": {"intervention": control.get("intervention"), "rescue": bool(control.get("deterministically_validated_rescue")), "elapsed_ms": control.get("realized_elapsed_ms")},
         "treatment": {"intervention": treatment.get("intervention"), "rescue": bool(treatment.get("deterministically_validated_rescue")), "elapsed_ms": treatment.get("realized_elapsed_ms")},
@@ -181,23 +207,38 @@ def _write_pair_summary(task_dir: Path, task_id: str, policy_outputs: Mapping[st
 
 def aggregate_results(execution: Mapping[str, Any], output_dir: Path) -> dict[str, Any]:
     pairs = [_read_json(path) for path in sorted(output_dir.glob("tasks/*/pair_summary.json"))]
-    control_solve = sum(item["control"]["rescue"] for item in pairs)
-    treatment_solve = sum(item["treatment"]["rescue"] for item in pairs)
-    control_elapsed = sum(float(item["control"]["elapsed_ms"] or 0) for item in pairs)
-    treatment_elapsed = sum(float(item["treatment"]["elapsed_ms"] or 0) for item in pairs)
-    outcome_counts = {name: sum(item["paired_outcome"] == name for item in pairs) for name in ("both_solve", "control_only", "treatment_only", "neither")}
+    comparable = [item for item in pairs if item.get("disposition") == "terminal" and all(item.get("valid_arms", {}).values())]
+    excluded = [item for item in pairs if item not in comparable]
+    control_valid = sum(bool(item.get("valid_arms", {}).get("control")) for item in pairs)
+    treatment_valid = sum(bool(item.get("valid_arms", {}).get("treatment")) for item in pairs)
+    control_solve = sum(item["control"]["rescue"] for item in comparable)
+    treatment_solve = sum(item["treatment"]["rescue"] for item in comparable)
+    control_elapsed = sum(float(item["control"]["elapsed_ms"] or 0) for item in comparable)
+    treatment_elapsed = sum(float(item["treatment"]["elapsed_ms"] or 0) for item in comparable)
+    outcome_counts = {name: sum(item["paired_outcome"] == name for item in comparable) for name in ("both_solve", "control_only", "treatment_only", "neither")}
+    infrastructure_by_arm: dict[str, int] = {}
+    infrastructure_by_role: dict[str, int] = {}
+    for item in excluded:
+        for failure in item.get("infrastructure_failures", []):
+            infrastructure_by_arm[failure["arm"]] = infrastructure_by_arm.get(failure["arm"], 0) + 1
+            role = failure.get("role") or "unknown"
+            infrastructure_by_role[role] = infrastructure_by_role.get(role, 0) + 1
+    has_comparable = bool(comparable)
     result = {
         "schema": "zth_run4_economic_aggregate_v1",
         "status": "review_required",
         "candidate_baselines": 15,
-        "included_pairs": len(pairs),
-        "control": {"validated_passes": control_solve, "solve_rate": control_solve / len(pairs) if pairs else 0.0, "post_baseline_elapsed_ms": control_elapsed, "worker_retry_calls": len(pairs), "external_teacher_calls": len(pairs), "local_teacher_calls": 0, "expected_decision_cost_ms": 33980.579 * len(pairs)},
-        "treatment": {"validated_passes": treatment_solve, "solve_rate": treatment_solve / len(pairs) if pairs else 0.0, "post_baseline_elapsed_ms": treatment_elapsed, "worker_retry_calls": len(pairs), "external_teacher_calls": 0, "local_teacher_calls": 0, "expected_decision_cost_ms": 5276.567 * len(pairs)},
+        "selected_pairs": len(pairs),
+        "comparable_pairs": len(comparable),
+        "infrastructure_excluded_pairs": len(excluded),
+        "control": {"valid_responses": control_valid, "validated_passes": control_solve, "solve_rate": control_solve / len(comparable) if comparable else None, "post_baseline_elapsed_ms": control_elapsed if has_comparable else None, "worker_retry_calls": control_valid, "external_teacher_calls": control_valid, "local_teacher_calls": 0, "expected_decision_cost_ms": 33980.579 * len(comparable)},
+        "treatment": {"valid_responses": treatment_valid, "validated_passes": treatment_solve, "solve_rate": treatment_solve / len(comparable) if comparable else None, "post_baseline_elapsed_ms": treatment_elapsed if has_comparable else None, "worker_retry_calls": treatment_valid, "external_teacher_calls": 0, "local_teacher_calls": 0, "expected_decision_cost_ms": 5276.567 * len(comparable)},
         "paired_outcomes": outcome_counts,
-        "quality_preserved": treatment_solve >= control_solve,
-        "resource_reduced": treatment_elapsed < control_elapsed,
-        "economic_routing_success": treatment_solve >= control_solve and treatment_elapsed < control_elapsed,
-        "infrastructure_exclusions": 0,
+        "quality_preserved": treatment_solve >= control_solve if has_comparable else None,
+        "resource_reduced": treatment_elapsed < control_elapsed if has_comparable else None,
+        "economic_routing_success": treatment_solve >= control_solve and treatment_elapsed < control_elapsed if has_comparable else None,
+        "result_available": has_comparable,
+        "infrastructure_exclusions": {"by_arm": infrastructure_by_arm, "by_role": infrastructure_by_role},
         "execution_manifest_sha256": sha256_file(output_dir / "execution_manifest.json"),
         "authority": "review_required_no_evidence_merge",
     }
@@ -211,12 +252,22 @@ def run_experiment(context: Mapping[str, Any], output_dir: Path, *, worker: Call
     existing = output_dir / "execution_manifest.json"
     if existing.exists():
         execution = _read_json(existing)
+        if execution.get("schema") != "zth_run4_economic_execution_manifest_v1":
+            raise Run4ADriverError("existing execution manifest schema is not bound to Run 4")
+        if execution.get("preregistration_sha256") != sha256_file(context["preregistration_path"]):
+            raise Run4ADriverError("existing execution preregistration binding mismatch")
+        if execution.get("fixture_pack_sha256") != manifest["pack_sha256"]:
+            raise Run4ADriverError("existing execution fixture binding mismatch")
+        if execution.get("arm_orders") != manifest["pair_order"]["orders"]:
+            raise Run4ADriverError("existing execution arm-order binding mismatch")
         if execution.get("status") in TERMINAL_STATUSES and execution.get("completed_at"):
             return execution
         if execution.get("active_call"):
             raise Run4ADriverError("ambiguous active call; refusing to resume")
+    elif output_dir.exists() and any(output_dir.iterdir()):
+        raise Run4ADriverError("existing output directory lacks a bound execution manifest")
     else:
-        output_dir.mkdir(parents=True, exist_ok=False)
+        output_dir.mkdir(parents=True, exist_ok=True)
         execution = {"schema": "zth_run4_economic_execution_manifest_v1", "status": "experiment_running", "started_at": utc_now(), "git_head": context.get("git_head"), "preregistration_sha256": sha256_file(context["preregistration_path"]), "fixture_pack_sha256": manifest["pack_sha256"], "candidate_states": {}, "arm_orders": manifest["pair_order"]["orders"], "model_calls_started": True}
         _json_write(existing, execution)
     tasks = {row["task_id"]: load_task_fixture(context["pack_dir"] / Path(row["path"]).name) for row in manifest["fixtures"]}
@@ -283,8 +334,6 @@ def main() -> int:
     if not args.execute:
         print(json.dumps({"status": "dry_run_valid", "model_calls": 0, "policy_matrix": context["policy"]["expected_policy_matrix"]}, sort_keys=True))
         return 0
-    if args.output_dir.exists() and any(args.output_dir.iterdir()):
-        raise Run4ADriverError("output directory is not new")
     frozen = context["preregistration"]["frozen_inputs"]
     patch = {"patch_id": frozen["deterministic_patch_id"], "patch_path": str(root / frozen["deterministic_patch_path"]), "patch_sha256": frozen["deterministic_patch_sha256"]}
     result = run_experiment(context, args.output_dir, deterministic_patch=patch)
