@@ -32,6 +32,7 @@ from local_harness.supervised_attempt_output_validator import (
 from local_harness.supervised_model_attempt import build_supervised_model_attempt_record
 from local_harness.supervised_reference_fact_validator import validate_reference_facts
 from local_harness.distilled_retry_packet import render_distilled_retry_prompt
+from local_harness.resource_telemetry import build_resource_telemetry
 
 
 TERMINAL_DISPOSITIONS = {"ready_for_review", "unresolved"}
@@ -126,7 +127,25 @@ def _response_payload(response: WorkerResponse) -> dict[str, Any]:
     # the stable camera-facing identity used by the overnight controller.
     metadata["request_url"] = None
     metadata["endpoint_alias"] = os.environ.get("ZTH_PUBLIC_HOST_ALIAS", PUBLIC_ENDPOINT_ALIAS)
+    provenance = metadata.get("request_provenance") or {}
+    if provenance.get("request_start_monotonic") is not None and provenance.get("response_capture_monotonic") is not None:
+        metadata["resource_telemetry"] = build_resource_telemetry(
+            role="worker",
+            request_start_monotonic=provenance["request_start_monotonic"],
+            response_capture_monotonic=provenance["response_capture_monotonic"],
+            response_metadata=metadata,
+            timeout_seconds=None,
+            hardware_device_identity=_hardware_identity("worker"),
+        )
     return {"status": response.status, "content": response.content, "metadata": metadata}
+
+
+def _hardware_identity(role: str) -> str | None:
+    return os.environ.get({
+        "worker": "ZTH_CAPABILITY_WORKER_HARDWARE",
+        "local_teacher": "ZTH_CAPABILITY_TEACHER_HARDWARE",
+        "external_teacher": "ZTH_EXTERNAL_TEACHER_SERVICE_CLASS",
+    }[role]) or None
 
 
 def _validator_result(raw_output: str, task: Mapping[str, Any], *, attempt_id: str) -> dict[str, Any]:
@@ -305,6 +324,8 @@ def _write_external_infrastructure_failure(
     *,
     started_at: str,
     timeout_seconds: int = 900,
+    started_monotonic: float | None = None,
+    completed_monotonic: float | None = None,
 ) -> dict[str, Any]:
     completed_at = utc_now()
     artifact = {
@@ -320,6 +341,17 @@ def _write_external_infrastructure_failure(
         "response_present": False,
         "capability_verdict_available": False,
     }
+    if started_monotonic is not None and completed_monotonic is not None:
+        artifact["resource_telemetry"] = build_resource_telemetry(
+            role="external_teacher",
+            request_start_monotonic=started_monotonic,
+            response_capture_monotonic=completed_monotonic,
+            model_identity=os.environ.get("ZTH_EXTERNAL_TEACHER_IDENTITY"),
+            adapter_server_identity=os.environ.get("ZTH_EXTERNAL_TEACHER_SERVICE_CLASS"),
+            timeout_seconds=timeout_seconds,
+            transport_classification=artifact["classification"],
+            hardware_device_identity=_hardware_identity("external_teacher"),
+        )
     path = out_dir / "external-teacher.infrastructure.json"
     _json_write(path, artifact)
     _transition(
@@ -445,8 +477,18 @@ def run_capability_loop(
             raw_payload = json.loads(raw_path.read_text(encoding="utf-8"))
         else:
             _transition(trajectory, transition="worker_call_started", task_id=task_id, attempt=n, source=source, intervention_id=intervention_id, prompt_artifact=prompt_path.name, prompt_sha256=sha256_text(prompt))
+            started_monotonic = time.monotonic()
             response = worker(prompt)
+            captured_monotonic = time.monotonic()
             raw_payload = _response_payload(response)
+            raw_payload["metadata"]["resource_telemetry"] = build_resource_telemetry(
+                role="worker",
+                request_start_monotonic=started_monotonic,
+                response_capture_monotonic=captured_monotonic,
+                response_metadata=raw_payload["metadata"],
+                timeout_seconds=int(os.environ.get("ZTH_CAPABILITY_WORKER_TIMEOUT", "900")),
+                hardware_device_identity=_hardware_identity("worker"),
+            )
             _json_write(raw_path, raw_payload)
             _transition(trajectory, transition="worker_output_captured", task_id=task_id, attempt=n, source=source, intervention_id=intervention_id, artifact_ref=raw_path.name, artifact_hash=sha256_text(raw_path.read_text()))
         transport_classification = raw_payload.get("metadata", {}).get("transport_classification") or classify_worker_response(raw_payload.get("status", ""), raw_payload.get("metadata", {}).get("error"))
@@ -521,8 +563,19 @@ def run_capability_loop(
             teacher_payload = json.loads(teacher_path.read_text(encoding="utf-8"))
         else:
             _transition(trajectory, transition="local_teacher_started", task_id=task_id, attempt=teacher_pass, source="local_teacher")
+            started_monotonic = time.monotonic()
             teacher_response = local_teacher(_teacher_prompt(task, role="local_teacher_reviewer", failed_transitions=failed + teacher_records, patch_records=patch_records))
-            teacher_payload = {"raw": _response_payload(teacher_response), "parsed": _parse_teacher(teacher_response.content)}
+            captured_monotonic = time.monotonic()
+            teacher_raw = _response_payload(teacher_response)
+            teacher_raw["metadata"]["resource_telemetry"] = build_resource_telemetry(
+                role="local_teacher",
+                request_start_monotonic=started_monotonic,
+                response_capture_monotonic=captured_monotonic,
+                response_metadata=teacher_raw["metadata"],
+                timeout_seconds=int(os.environ.get("ZTH_CAPABILITY_TEACHER_TIMEOUT", "900")),
+                hardware_device_identity=_hardware_identity("local_teacher"),
+            )
+            teacher_payload = {"raw": teacher_raw, "parsed": _parse_teacher(teacher_response.content)}
             _json_write(teacher_path, teacher_payload)
             _transition(trajectory, transition="local_teacher_response_captured", task_id=task_id, attempt=teacher_pass, source="local_teacher", artifact_ref=teacher_path.name, artifact_hash=sha256_text(teacher_path.read_text()), evidence=teacher_payload)
         parsed = teacher_payload["parsed"]
@@ -551,13 +604,29 @@ def run_capability_loop(
             external_payload = json.loads(external_path.read_text(encoding="utf-8"))
         else:
             started_at = utc_now()
+            started_monotonic = time.monotonic()
             _transition(trajectory, transition="external_teacher_started", task_id=task_id, attempt=1, source="external_teacher", started_at=started_at)
             external_teacher_call_count += 1
             try:
                 identity, raw = external_teacher(_teacher_prompt(task, role="external_teacher_reviewer", failed_transitions=[*attempts, *teacher_records], patch_records=patch_records))
-                external_payload = {"identity": identity, "raw": raw, "parsed": _parse_teacher(raw)}
+                captured_monotonic = time.monotonic()
+                external_payload = {
+                    "identity": identity,
+                    "raw": raw,
+                    "parsed": _parse_teacher(raw),
+                    "resource_telemetry": build_resource_telemetry(
+                        role="external_teacher",
+                        request_start_monotonic=started_monotonic,
+                        response_capture_monotonic=captured_monotonic,
+                        model_identity=identity,
+                        adapter_server_identity=os.environ.get("ZTH_EXTERNAL_TEACHER_SERVICE_CLASS"),
+                        timeout_seconds=int(os.environ.get("ZTH_RUN3_EXTERNAL_TEACHER_TIMEOUT", "900")),
+                        transport_classification="model_response",
+                        hardware_device_identity=_hardware_identity("external_teacher"),
+                    ),
+                }
             except Exception as exc:
-                external_infrastructure = _write_external_infrastructure_failure(out_dir, trajectory, task_id, exc, started_at=started_at, timeout_seconds=int(os.environ.get("ZTH_RUN3_EXTERNAL_TEACHER_TIMEOUT", "900")))
+                external_infrastructure = _write_external_infrastructure_failure(out_dir, trajectory, task_id, exc, started_at=started_at, timeout_seconds=int(os.environ.get("ZTH_RUN3_EXTERNAL_TEACHER_TIMEOUT", "900")), started_monotonic=started_monotonic, completed_monotonic=time.monotonic())
                 external_payload = None
         if external_payload is not None:
             if not external_path.exists():

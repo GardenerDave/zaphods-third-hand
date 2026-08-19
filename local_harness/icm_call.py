@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 import sys
+import time
 import urllib.error
 import urllib.request
 from typing import Any, Sequence
@@ -181,10 +182,12 @@ def call_worker(
     if prompt is None:
         prompt = sys.stdin.read()
 
+    request_started_monotonic = time.monotonic()
     model, resolution_attempted, resolution_error = _resolve_model_alias(spec, timeout)
     request_url = completion_url(spec)
     request_provenance = _request_provenance(spec, prompt, max_tokens)
     request_provenance["resolved_model"] = model
+    request_provenance["request_start_monotonic"] = request_started_monotonic
     payload = _build_payload(spec, prompt, model, max_tokens)
     data = json.dumps(payload).encode("utf-8")
     request = urllib.request.Request(
@@ -197,6 +200,7 @@ def call_worker(
     try:
         result = _read_json_response(request, timeout)
     except urllib.error.HTTPError as exc:
+        request_provenance["response_capture_monotonic"] = time.monotonic()
         body = exc.read().decode("utf-8", errors="replace")
         return WorkerResponse(
             status="http_error",
@@ -214,6 +218,7 @@ def call_worker(
             request_provenance=request_provenance,
         )
     except Exception as exc:
+        request_provenance["response_capture_monotonic"] = time.monotonic()
         return WorkerResponse(
             status="request_error",
             content=f"[request error]\n{exc}",
@@ -232,6 +237,7 @@ def call_worker(
 
     try:
         status, content, finish_reason = _content_from_response(spec, result)
+        request_provenance["response_capture_monotonic"] = time.monotonic()
         response_model = result.get("model", model) if isinstance(result, dict) else model
         usage = result.get("usage") if isinstance(result, dict) else None
         timings = result.get("timings") if isinstance(result, dict) else None
@@ -250,6 +256,7 @@ def call_worker(
             request_provenance=request_provenance,
         )
     except Exception as exc:
+        request_provenance["response_capture_monotonic"] = time.monotonic()
         return WorkerResponse(
             status="parse_error",
             content="[harness parse error]\n" + str(exc) + "\nRAW RESPONSE:\n" + json.dumps(result, indent=2),
