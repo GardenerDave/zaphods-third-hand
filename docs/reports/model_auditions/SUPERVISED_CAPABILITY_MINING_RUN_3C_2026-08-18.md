@@ -75,7 +75,7 @@ the remaining paired cases had equal intervention cost.
 | destructive-action-restraint | 4/4 | 2/4 | 1 | 4 |
 | evidence-grounding | 2/4 | 2/4 | 6 | 6 |
 | queue-authority-boundary | 1/4 | 2/4 | 12 | 9 |
-| scope-authority-boundary | 1/4 | 4/4 | 10 | 7 |
+| scope-authority-boundary | 1/4 | 4/4 | 10 | 4 |
 | unsupported-certainty | 4/4 | 4/4 | 0 | 1 |
 
 The aggregate reduction coexists with family variation: treatment improved
