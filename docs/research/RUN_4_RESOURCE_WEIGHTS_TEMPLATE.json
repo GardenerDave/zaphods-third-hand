@@ -16,9 +16,15 @@
     "external_teacher_time_ms": null
   },
   "sources": {
-    "worker": null,
-    "local_teacher": null,
-    "external_teacher": null
+    "worker_call": null,
+    "worker_token": null,
+    "worker_time_ms": null,
+    "local_teacher_call": null,
+    "local_teacher_token": null,
+    "local_teacher_time_ms": null,
+    "external_teacher_call": null,
+    "external_teacher_token": null,
+    "external_teacher_time_ms": null
   },
   "weights": {
     "worker_call": null,

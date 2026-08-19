@@ -92,21 +92,45 @@ def validate_resource_telemetry(record: Mapping[str, Any]) -> None:
         raise ValueError("resource telemetry elapsed_ms cannot be negative")
 
 
-def resource_weight_manifest_sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+def canonical_resource_weight_manifest(payload: Mapping[str, Any]) -> str:
+    """Canonical JSON digest with the self-referential digest removed."""
+    canonical = dict(payload)
+    canonical["manifest_sha256"] = None
+    return json.dumps(canonical, sort_keys=True, separators=(",", ":"))
+
+
+def resource_weight_manifest_sha256(payload_or_path: Mapping[str, Any] | Path) -> str:
+    payload = json.loads(payload_or_path.read_text(encoding="utf-8")) if isinstance(payload_or_path, Path) else payload_or_path
+    return hashlib.sha256(canonical_resource_weight_manifest(payload).encode("utf-8")).hexdigest()
 
 
 def load_approved_resource_weights(path: Path) -> dict[str, Any]:
     """Load weights only after an explicit, frozen approval decision."""
     payload = json.loads(path.read_text(encoding="utf-8"))
-    if payload.get("schema") != "zth_resource_weight_manifest_v1":
+    if payload.get("schema") != "zth_resource_weight_manifest_v1" or payload.get("version") != 1:
         raise ValueError("resource weight manifest schema mismatch")
     if payload.get("frozen") is not True or payload.get("review_status") != "approved":
         raise ValueError("resource weights require frozen approved manifest")
+    if not isinstance(payload.get("rationale"), str) or not payload["rationale"].strip():
+        raise ValueError("approved resource weights require rationale")
+    approval = payload.get("approval")
+    if not isinstance(approval, dict) or any(not isinstance(approval.get(key), str) or not approval[key].strip() for key in ("reviewer", "approved_at", "approval_basis")):
+        raise ValueError("approved resource weights require reviewer, approved_at, and approval_basis")
+    digest = payload.get("manifest_sha256")
+    if not isinstance(digest, str) or digest != resource_weight_manifest_sha256(payload):
+        raise ValueError("resource weight manifest digest mismatch")
     weights = payload.get("weights")
-    if not isinstance(weights, dict) or not weights:
+    units = payload.get("units")
+    sources = payload.get("sources")
+    if not isinstance(weights, dict) or not weights or not isinstance(units, dict) or not isinstance(sources, dict):
         raise ValueError("approved resource weight manifest has no weights")
     for name, value in weights.items():
-        if not isinstance(value, (int, float)) or value < 0:
+        if value is None:
+            continue
+        if not isinstance(value, (int, float)) or isinstance(value, bool) or value < 0:
             raise ValueError(f"resource weight {name!r} must be a non-negative number")
+        if not isinstance(units.get(name), str) or not units[name].strip():
+            raise ValueError(f"resource weight {name!r} lacks explicit units")
+        if not isinstance(sources.get(name), str) or not sources[name].strip():
+            raise ValueError(f"resource weight {name!r} lacks source/basis")
     return payload

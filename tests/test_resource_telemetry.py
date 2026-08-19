@@ -6,6 +6,7 @@ import pytest
 from local_harness.resource_telemetry import (
     RESOURCE_TELEMETRY_SCHEMA,
     build_resource_telemetry,
+    resource_weight_manifest_sha256,
     load_approved_resource_weights,
     validate_resource_telemetry,
 )
@@ -80,6 +81,7 @@ def test_server_usage_and_monotonic_elapsed_are_preserved():
 def test_resource_weights_require_frozen_approval(tmp_path: Path):
     draft = {
         "schema": "zth_resource_weight_manifest_v1",
+        "version": 1,
         "frozen": False,
         "review_status": "draft",
         "weights": {"worker_call": 1},
@@ -87,6 +89,47 @@ def test_resource_weights_require_frozen_approval(tmp_path: Path):
     path = tmp_path / "weights.json"
     path.write_text(json.dumps(draft))
     with pytest.raises(ValueError, match="frozen approved"):
+        load_approved_resource_weights(path)
+
+
+def _approved_weights() -> dict:
+    fields = ["worker_call", "worker_token", "worker_time_ms", "local_teacher_call", "local_teacher_token", "local_teacher_time_ms", "external_teacher_call", "external_teacher_token", "external_teacher_time_ms"]
+    manifest = {
+        "schema": "zth_resource_weight_manifest_v1",
+        "version": 1,
+        "frozen": True,
+        "review_status": "approved",
+        "rationale": "Operator-approved count-only pilot basis.",
+        "units": {field: "unit" if field == "worker_call" else None for field in fields},
+        "sources": {field: "operator price sheet v1" if field == "worker_call" else None for field in fields},
+        "weights": {field: 1 if field == "worker_call" else None for field in fields},
+        "approval": {"reviewer": "reviewer@example.invalid", "approved_at": "2026-08-19T00:00:00Z", "approval_basis": "reviewed resource policy"},
+        "manifest_sha256": None,
+    }
+    manifest["manifest_sha256"] = resource_weight_manifest_sha256(manifest)
+    return manifest
+
+
+def test_approved_weights_load_with_non_self_referential_digest(tmp_path: Path):
+    path = tmp_path / "weights.json"
+    path.write_text(json.dumps(_approved_weights()))
+    assert load_approved_resource_weights(path)["weights"]["worker_call"] == 1
+
+
+@pytest.mark.parametrize("mutation", [
+    lambda m: m["weights"].__setitem__("worker_call", 2),
+    lambda m: m["sources"].__setitem__("worker_call", "different basis"),
+    lambda m: m.__setitem__("rationale", ""),
+    lambda m: m["units"].__setitem__("worker_call", None),
+    lambda m: m["sources"].__setitem__("worker_call", None),
+    lambda m: m["approval"].__setitem__("reviewer", None),
+])
+def test_approved_weight_mutations_fail_closed(tmp_path: Path, mutation):
+    manifest = _approved_weights()
+    mutation(manifest)
+    path = tmp_path / "weights.json"
+    path.write_text(json.dumps(manifest))
+    with pytest.raises(ValueError):
         load_approved_resource_weights(path)
 
 

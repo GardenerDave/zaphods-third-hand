@@ -65,6 +65,19 @@ Old artifacts remain valid without the new optional field. New execution
 artifacts will carry the common record at the worker/local/external call
 boundaries.
 
+## Explicit Run 4 decision modes
+
+Run 4 has two scientifically distinct options:
+
+**A. Count-based replication.** Report worker, deterministic-retry,
+local-teacher, and external-teacher resource counts separately. This mode does
+not require a resource-weight manifest and is the currently available mode.
+
+**B. Weighted-cost experiment.** Use weighted scoring or routing only after an
+approved, frozen resource-weight manifest has a canonical digest, explicit
+units and source/basis for every non-null weight, rationale, reviewer,
+approval time, and approval basis. No default weights exist.
+
 ## Requirement before a weighted-cost Run 4
 
 Before preregistering weighted cost, obtain complete external usage telemetry or
@@ -74,5 +87,10 @@ rationale, sources, and approval state. Until then, the defensible primary
 cost metric remains separate direct counts—especially
 `local_teacher_calls + external_teacher_calls`—with telemetry reported as
 secondary evidence.
+
+Telemetry collection readiness must not be described as weighted-cost
+readiness. Count-based Run 4 is ready from an instrumentation perspective;
+weighted-cost Run 4 remains gated on the approved manifest and complete enough
+external resource evidence.
 
 No model calls were made for this readiness work.
