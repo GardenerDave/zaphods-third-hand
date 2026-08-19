@@ -4,6 +4,11 @@ This is a model-free design artifact. It does not create fixtures, call
 models, modify the Run 3 capability bundle, change the approved resource
 weights, or implement the economic Run 4 router.
 
+The executable freeze below supersedes the earlier exploratory 18-task sizing
+sketch: it uses four target blocks, 20 candidates, and a target of 16 included
+tasks (the first four valid baseline failures per block), with one reserve per
+block.
+
 ## Established
 
 The frozen Run 1 + Run 2 capability evidence contains 96 evidence keys:
@@ -42,11 +47,12 @@ production capability bundle.
 
 ## Proposed paired design
 
-Use 18 genuinely fresh tasks: six families, four tasks per family is not
-required for this calibration; the smallest defensible block is three tasks
-per family:
+The executable calibration uses 20 genuinely fresh candidates: five per
+target block. The first four valid baseline failures in each block become the
+included comparative tasks; the fifth remains a preregistered reserve and is
+never substituted adaptively.
 
-| Family | Tasks |
+| Target block | Candidates |
 |---|---:|
 | contradiction-handling | 3 |
 | destructive-action-restraint | 3 |
@@ -54,14 +60,14 @@ per family:
 | queue-authority-boundary | 3 |
 | scope-authority-boundary | 3 |
 | unsupported-certainty | 3 |
-| **Total** | **18** |
+| **Total** | **20** |
 
-Each family block should use one preregistered normalized failure-signature
-target and three independently authored scenarios, while preserving the
-actual per-task validator signature. This gives every intervention three
-comparable opportunities at family/block resolution if all three baseline
-attempts are valid failures. It is the minimum count that can reach the
-existing `n >= 3` support threshold in every block; it is not a formal power
+Each target block uses one preregistered normalized failure-signature target
+and five independently authored scenarios, while preserving the actual
+per-task validator signature. The first four valid failures provide the target
+16 three-way comparative tasks. This gives every intervention four comparable
+opportunities per block when all candidates are eligible, while the existing
+`n >= 3` support threshold remains unchanged. This is not a formal power
 calculation.
 
 The fixtures must be authored after this design and before preregistration,
@@ -163,25 +169,25 @@ ready.
 
 ## Planning budget
 
-At the maximum case where all 18 baseline attempts are valid failures, the
-three-way design requires:
+At the maximum preregistered case where all 16 included baseline attempts are
+valid failures, the three-way design requires:
 
 | Resource | Calls |
 |---|---:|
-| baseline worker | 18 |
-| deterministic retry worker | 18 |
-| local-teacher calls | 18 |
-| local-teacher retry worker | 18 |
-| external-teacher calls | 18 |
-| external-teacher retry worker | 18 |
-| **total model calls** | **108** |
+| baseline worker | 16 |
+| deterministic retry worker | 16 |
+| local-teacher calls | 16 |
+| local-teacher retry worker | 16 |
+| external-teacher calls | 16 |
+| external-teacher retry worker | 16 |
+| **total model calls** | **96** |
 
-That is 54 intervention calls, 72 worker calls, and an expected elapsed-time
+That is 48 intervention calls, 64 worker calls, and an expected elapsed-time
 budget of:
 
-`72×5276.567 + 18×16220.624 + 18×28704.012 = 1,188,556.272 ms`
+`64×5276.567 + 16×16220.624 + 16×28704.012 = 1,056,494.464 ms`
 
-approximately 19.81 minutes of serial model-call time under the frozen priors.
+approximately 17.61 minutes of serial model-call time under the frozen priors.
 Baseline passes and infrastructure exclusions reduce completed intervention
 calls; they must not be replaced adaptively. This is a planning estimate,
 not a guaranteed wall-clock duration.

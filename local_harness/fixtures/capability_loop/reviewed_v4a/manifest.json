@@ -1,0 +1,499 @@
+{
+  "arm_order": {
+    "algorithm": "sort task IDs by sha256(str(seed) + ':' + task_id), then assign lexicographic permutation list round-robin",
+    "orders": {
+      "run4a-candidate-contradiction-001": [
+        "deterministic_patch_retry",
+        "local_teacher",
+        "external_teacher"
+      ],
+      "run4a-candidate-contradiction-002": [
+        "local_teacher",
+        "external_teacher",
+        "deterministic_patch_retry"
+      ],
+      "run4a-candidate-contradiction-003": [
+        "deterministic_patch_retry",
+        "local_teacher",
+        "external_teacher"
+      ],
+      "run4a-candidate-contradiction-004": [
+        "deterministic_patch_retry",
+        "external_teacher",
+        "local_teacher"
+      ],
+      "run4a-candidate-contradiction-005": [
+        "local_teacher",
+        "external_teacher",
+        "deterministic_patch_retry"
+      ],
+      "run4a-candidate-scope-001": [
+        "deterministic_patch_retry",
+        "external_teacher",
+        "local_teacher"
+      ],
+      "run4a-candidate-scope-002": [
+        "deterministic_patch_retry",
+        "local_teacher",
+        "external_teacher"
+      ],
+      "run4a-candidate-scope-003": [
+        "deterministic_patch_retry",
+        "local_teacher",
+        "external_teacher"
+      ],
+      "run4a-candidate-scope-004": [
+        "external_teacher",
+        "local_teacher",
+        "deterministic_patch_retry"
+      ],
+      "run4a-candidate-scope-005": [
+        "external_teacher",
+        "local_teacher",
+        "deterministic_patch_retry"
+      ],
+      "run4a-candidate-triage-001": [
+        "local_teacher",
+        "external_teacher",
+        "deterministic_patch_retry"
+      ],
+      "run4a-candidate-triage-002": [
+        "local_teacher",
+        "deterministic_patch_retry",
+        "external_teacher"
+      ],
+      "run4a-candidate-triage-003": [
+        "deterministic_patch_retry",
+        "external_teacher",
+        "local_teacher"
+      ],
+      "run4a-candidate-triage-004": [
+        "external_teacher",
+        "deterministic_patch_retry",
+        "local_teacher"
+      ],
+      "run4a-candidate-triage-005": [
+        "local_teacher",
+        "deterministic_patch_retry",
+        "external_teacher"
+      ],
+      "run4a-candidate-uncertainty-001": [
+        "external_teacher",
+        "local_teacher",
+        "deterministic_patch_retry"
+      ],
+      "run4a-candidate-uncertainty-002": [
+        "external_teacher",
+        "deterministic_patch_retry",
+        "local_teacher"
+      ],
+      "run4a-candidate-uncertainty-003": [
+        "external_teacher",
+        "deterministic_patch_retry",
+        "local_teacher"
+      ],
+      "run4a-candidate-uncertainty-004": [
+        "local_teacher",
+        "deterministic_patch_retry",
+        "external_teacher"
+      ],
+      "run4a-candidate-uncertainty-005": [
+        "deterministic_patch_retry",
+        "external_teacher",
+        "local_teacher"
+      ]
+    },
+    "permutations": [
+      [
+        "deterministic_patch_retry",
+        "local_teacher",
+        "external_teacher"
+      ],
+      [
+        "deterministic_patch_retry",
+        "external_teacher",
+        "local_teacher"
+      ],
+      [
+        "local_teacher",
+        "deterministic_patch_retry",
+        "external_teacher"
+      ],
+      [
+        "local_teacher",
+        "external_teacher",
+        "deterministic_patch_retry"
+      ],
+      [
+        "external_teacher",
+        "deterministic_patch_retry",
+        "local_teacher"
+      ],
+      [
+        "external_teacher",
+        "local_teacher",
+        "deterministic_patch_retry"
+      ]
+    ],
+    "seed": 20260821
+  },
+  "baseline_eligibility": [
+    "transport_valid=true",
+    "transport_classification=model_response",
+    "deterministic baseline validation failure"
+  ],
+  "block_counts": {
+    "contradiction-handling": 5,
+    "scope-authority-boundary": 5,
+    "triage-routing": 5,
+    "unsupported-certainty": 5
+  },
+  "candidate_count": 20,
+  "candidate_order_by_block": {
+    "contradiction-handling": [
+      "run4a-candidate-contradiction-001",
+      "run4a-candidate-contradiction-002",
+      "run4a-candidate-contradiction-003",
+      "run4a-candidate-contradiction-004",
+      "run4a-candidate-contradiction-005"
+    ],
+    "scope-authority-boundary": [
+      "run4a-candidate-scope-001",
+      "run4a-candidate-scope-002",
+      "run4a-candidate-scope-003",
+      "run4a-candidate-scope-004",
+      "run4a-candidate-scope-005"
+    ],
+    "triage-routing": [
+      "run4a-candidate-triage-001",
+      "run4a-candidate-triage-002",
+      "run4a-candidate-triage-003",
+      "run4a-candidate-triage-004",
+      "run4a-candidate-triage-005"
+    ],
+    "unsupported-certainty": [
+      "run4a-candidate-uncertainty-001",
+      "run4a-candidate-uncertainty-002",
+      "run4a-candidate-uncertainty-003",
+      "run4a-candidate-uncertainty-004",
+      "run4a-candidate-uncertainty-005"
+    ]
+  },
+  "fixtures": [
+    {
+      "fixture_sha256": "3695370113bbf51f2635599e959928e2cdc37c62656a3f74a7f8bbb5d199e62b",
+      "novelty": "new_source",
+      "output_contract_sha256": "33c1b400fd5faa4ae8272314bf12edc3d771eca63abed73b5f3a1be868533697",
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/contradiction-001.json",
+      "reference_facts_sha256": "8efa6a3a012edb7328e73fe935bb01fd1fc987abda94fa9feda4bd5b6dd47074",
+      "source_anchor": "supervised authority and workflow boundaries",
+      "source_document": "docs/ARCHITECTURE.md",
+      "target_evidence_key": "contradiction-handling",
+      "target_evidence_resolution": "task_family",
+      "task_family": "contradiction-handling",
+      "task_id": "run4a-candidate-contradiction-001"
+    },
+    {
+      "fixture_sha256": "64119660e34378816d151856d8809f586073f207285fa548ab904fcafa9f26e9",
+      "novelty": "new_source",
+      "output_contract_sha256": "93b05b76b03e3bbdad963a205ee79db6cdc8dca0203c21091aaa7698b3ce60f0",
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/contradiction-002.json",
+      "reference_facts_sha256": "7ddd40ade40e5c4a1bd7f8598ee3ee6e752eba2db32c09f5aede669de2a5a905",
+      "source_anchor": "correction evidence and supervised acceptance",
+      "source_document": "docs/BEHAVIOR_CORRECTION_CARDS.md",
+      "target_evidence_key": "contradiction-handling",
+      "target_evidence_resolution": "task_family",
+      "task_family": "contradiction-handling",
+      "task_id": "run4a-candidate-contradiction-002"
+    },
+    {
+      "fixture_sha256": "1a3609829980787ee34eec1ffc16282bff5ddc93d285eb81ce824730f650f8b3",
+      "novelty": "new_source",
+      "output_contract_sha256": "a7b760d4772139e98d4d8bcf2d25ac3a2d566377022ef868d87b365263a66ed4",
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/contradiction-003.json",
+      "reference_facts_sha256": "03eaa4ffbaf926ec368c46461f25c61db38052e91fcf392b3b109fae473b91fe",
+      "source_anchor": "source preservation and derived handoff",
+      "source_document": "docs/CHATGPT_EXPORT_DISTILLER.md",
+      "target_evidence_key": "contradiction-handling",
+      "target_evidence_resolution": "task_family",
+      "task_family": "contradiction-handling",
+      "task_id": "run4a-candidate-contradiction-003"
+    },
+    {
+      "fixture_sha256": "cd2bea23b08174fe70852d3ecb9b1e224fd22744b118f91f7c6c57aeca82dc3b",
+      "novelty": "new_source",
+      "output_contract_sha256": "6fe8262b6f99165ba400d9ed51267c79432f23988b53c99ba1e54a1d130a5e60",
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/contradiction-004.json",
+      "reference_facts_sha256": "b8a655f5a52d514ce76441f0db45a31f81a9bedd4b00362ce5eee78ace7c9ab9",
+      "source_anchor": "handoff status and operator review",
+      "source_document": "docs/DOGFOOD_RUNNER.md",
+      "target_evidence_key": "contradiction-handling",
+      "target_evidence_resolution": "task_family",
+      "task_family": "contradiction-handling",
+      "task_id": "run4a-candidate-contradiction-004"
+    },
+    {
+      "fixture_sha256": "fdf173a5e80a719bfab88d53c504f1a3e8e5c97c86e7285c33ed66791697e268",
+      "novelty": "new_source",
+      "output_contract_sha256": "b1497b972575c6ec312441ff07a69c98d098f9fedee3f2464109854c4798c3c4",
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/contradiction-005.json",
+      "reference_facts_sha256": "26cc4c5c7a46f8d10b884d6e11d00337a395ba3f8b489b700dcdd42b3094e613",
+      "source_anchor": "deterministic verification and evidence claims",
+      "source_document": "docs/FIRST_SUCCESS.md",
+      "target_evidence_key": "contradiction-handling",
+      "target_evidence_resolution": "task_family",
+      "task_family": "contradiction-handling",
+      "task_id": "run4a-candidate-contradiction-005"
+    },
+    {
+      "fixture_sha256": "242a6684f0bcc7faa0f9567bb7cdc79113261123b6f4b3d123a829ff64b9dcb5",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/scope-001.json",
+      "reference_facts_sha256": "1a35febef227f45725abfe97f210b38b422ba3f9f0d54a696060a72b660844c6",
+      "source_anchor": "bounded patch target and held target",
+      "source_document": "docs/PROMPT_PATCH_AB_HARNESS.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "task_family",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run4a-candidate-scope-001"
+    },
+    {
+      "fixture_sha256": "296ddccfd8caf2d868a56e47758969d6ea3e158df926ca2343a1c828b10a009b",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/scope-002.json",
+      "reference_facts_sha256": "2dad92baf6e4906338000efbe2904c1a6b0a5958ecb361bc6adc257c72511c93",
+      "source_anchor": "shareable scope and held material",
+      "source_document": "docs/SHARING_CHECKLIST.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "task_family",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run4a-candidate-scope-002"
+    },
+    {
+      "fixture_sha256": "65fbd69b052a2492336a578c80c55b9943e84fecfae7fee11f2388cd488c4fc4",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/scope-003.json",
+      "reference_facts_sha256": "fef632e0cafb001c309d79e67aa52870896c39373c2a9e5ccc8c29ebc81ec58d",
+      "source_anchor": "attempt artifact scope and protected data",
+      "source_document": "docs/SUPERVISED_ATTEMPT_OUTPUT_VALIDATION.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "task_family",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run4a-candidate-scope-003"
+    },
+    {
+      "fixture_sha256": "f959eb4e6f254c339843d461ae86a65a2e9a90b036c6fa10992ccacea2050cc4",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/scope-004.json",
+      "reference_facts_sha256": "7c6b29df1b40d2e89d202534a3aa28951a71936b6e751b3e415edb2424daad34",
+      "source_anchor": "chain inspection and release edit boundary",
+      "source_document": "docs/SUPERVISED_CHAIN_SMOKE.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "task_family",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run4a-candidate-scope-004"
+    },
+    {
+      "fixture_sha256": "2c1ad4f914163356f2eb0ec96be0d51ed2bc80076f8c1f79b59c4c4a62fa18ce",
+      "novelty": "new_scenario_same_family",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/scope-005.json",
+      "reference_facts_sha256": "4ca6404f561e64e68c9a7e3dc7686acde4e3324cad65aeefb4013afe54a30a62",
+      "source_anchor": "downstream read scope and queue insertion hold",
+      "source_document": "docs/SUPERVISED_DOWNSTREAM_USE_GATE.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "task_family",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run4a-candidate-scope-005"
+    },
+    {
+      "fixture_sha256": "f75dc46a60fcec356d987cd20e0751822c248328fb0d098b7db9134603f6b803",
+      "novelty": "new_source",
+      "output_contract_sha256": "618f287f401bae4845dc8f4e57cc2f71850cd8b0e50abcab8e0ddefdfdcf63de",
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/triage-001.json",
+      "reference_facts_sha256": "433812dd0038deb5dc5612b4db6b9842ea426984d401ada2d9c670412ee4a683",
+      "source_anchor": "bounded probe intake and review routing",
+      "source_document": "docs/LARQL_JSON_CONTRACT_PROBE_WORKFLOW.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run4a-candidate-triage-001"
+    },
+    {
+      "fixture_sha256": "f60091498721721f0c956bcadfc18d5f83f3114cb33671a2540c8e7bb7e0627f",
+      "novelty": "new_source",
+      "output_contract_sha256": "618f287f401bae4845dc8f4e57cc2f71850cd8b0e50abcab8e0ddefdfdcf63de",
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/triage-002.json",
+      "reference_facts_sha256": "c02e8de055c1826fa0c5b81b48083a6683ba336b25e25e115bff86f7c53ccd42",
+      "source_anchor": "setup scope and mutation boundary",
+      "source_document": "docs/LARQL_MACHINERY_QUICKSTART.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run4a-candidate-triage-002"
+    },
+    {
+      "fixture_sha256": "ebad0de226c4e54a10bc16f0050ec4f3daeaf1300974952b7acd93cd6530b4a0",
+      "novelty": "new_source",
+      "output_contract_sha256": "618f287f401bae4845dc8f4e57cc2f71850cd8b0e50abcab8e0ddefdfdcf63de",
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/triage-003.json",
+      "reference_facts_sha256": "173ce7df3ff4640f5cd975cda389d24455e29f97256de9ba521adaf1317b5e96",
+      "source_anchor": "scoped worker requests and review boundary",
+      "source_document": "docs/LOCAL_SUBAGENT_CAPABILITY_LADDER.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run4a-candidate-triage-003"
+    },
+    {
+      "fixture_sha256": "1b9d2ae2fbc1eb1a3e82ad41e084e899c4388567aa0583bdb563f59fcb350815",
+      "novelty": "new_source",
+      "output_contract_sha256": "618f287f401bae4845dc8f4e57cc2f71850cd8b0e50abcab8e0ddefdfdcf63de",
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/triage-004.json",
+      "reference_facts_sha256": "dafc994df22a4bc432a3962b0e62c2f02295e80d2e7203ba48d28d1bbd1ded59",
+      "source_anchor": "status reporting and priority authority",
+      "source_document": "docs/MANAGEMENT_TEAM_OVERVIEW.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run4a-candidate-triage-004"
+    },
+    {
+      "fixture_sha256": "c4968ec44baf233e56aa72f130b0f1ecfdaba6a381b5ae5cd488dea39cb6d50e",
+      "novelty": "new_source",
+      "output_contract_sha256": "618f287f401bae4845dc8f4e57cc2f71850cd8b0e50abcab8e0ddefdfdcf63de",
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/triage-005.json",
+      "reference_facts_sha256": "0b2e7af89b6626b5478a12e065814be59b313db5d4b2c95365ac08d1c22e72b2",
+      "source_anchor": "preflight gate and waiver review",
+      "source_document": "docs/PREFLIGHT_AUDITION_PLAN.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run4a-candidate-triage-005"
+    },
+    {
+      "fixture_sha256": "7d521329bdd3c6bab8dee3044ceae4489cf6ada7083827a6aadaccbbb1b3ff68",
+      "novelty": "new_source",
+      "output_contract_sha256": "9d824eac2898658c118c6d4a5ded2517743a56eb3930ad6b83926358a277ab39",
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/uncertainty-001.json",
+      "reference_facts_sha256": "c7eae09a6ea02cac141189352d98667919b0b44b15c31e0524d3bb2faaffd815",
+      "source_anchor": "evidence limits before reuse",
+      "source_document": "docs/SUPERVISED_TRAINING_PATTERNS.md",
+      "target_evidence_key": "unsupported-certainty",
+      "target_evidence_resolution": "task_family",
+      "task_family": "unsupported-certainty",
+      "task_id": "run4a-candidate-uncertainty-001"
+    },
+    {
+      "fixture_sha256": "57467ef372f90e1f43cd5b381f98b903644a480abc737a37995c34fb54c67fa8",
+      "novelty": "new_source",
+      "output_contract_sha256": "9d824eac2898658c118c6d4a5ded2517743a56eb3930ad6b83926358a277ab39",
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/uncertainty-002.json",
+      "reference_facts_sha256": "8eb00382f91aec25bd04d19bf5d21b70d49c19a9f0b01a36b657825e58a699d0",
+      "source_anchor": "bounded tool claims and review",
+      "source_document": "docs/TOOL_MAKER.md",
+      "target_evidence_key": "unsupported-certainty",
+      "target_evidence_resolution": "task_family",
+      "task_family": "unsupported-certainty",
+      "task_id": "run4a-candidate-uncertainty-002"
+    },
+    {
+      "fixture_sha256": "d6a7b86d7f3aa1bb9713f235c204d5fa472f18ca4860bd92e0f69ec793bd6218",
+      "novelty": "new_source",
+      "output_contract_sha256": "9d824eac2898658c118c6d4a5ded2517743a56eb3930ad6b83926358a277ab39",
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/uncertainty-003.json",
+      "reference_facts_sha256": "fc739702892f10e14fe2f2933217e2f8d6cdf34db5f3548c766c79d74ee2f454",
+      "source_anchor": "demonstration evidence and bounded claims",
+      "source_document": "docs/VOGON_PRINTER.md",
+      "target_evidence_key": "unsupported-certainty",
+      "target_evidence_resolution": "task_family",
+      "task_family": "unsupported-certainty",
+      "task_id": "run4a-candidate-uncertainty-003"
+    },
+    {
+      "fixture_sha256": "eded1a06f32bca2dc24c77b1c8c23636b850b5f3e9dbc1d0abaf4676d31bdeb9",
+      "novelty": "new_source",
+      "output_contract_sha256": "9d824eac2898658c118c6d4a5ded2517743a56eb3930ad6b83926358a277ab39",
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/uncertainty-004.json",
+      "reference_facts_sha256": "6acc6418d58a2ae6d7c6cd18eee65514e4717f940fe1963fd0bd7a49a029dea8",
+      "source_anchor": "role evidence and future-claim boundary",
+      "source_document": "workflows/MANAGEMENT_TEAM_ROLE_CONTRACT.md",
+      "target_evidence_key": "unsupported-certainty",
+      "target_evidence_resolution": "task_family",
+      "task_family": "unsupported-certainty",
+      "task_id": "run4a-candidate-uncertainty-004"
+    },
+    {
+      "fixture_sha256": "c7e969eb08bedb8b86b764ad1939f6cff4a6fc2b309a6c3c7aa517ce1edb6685",
+      "novelty": "new_source",
+      "output_contract_sha256": "9d824eac2898658c118c6d4a5ded2517743a56eb3930ad6b83926358a277ab39",
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/uncertainty-005.json",
+      "reference_facts_sha256": "8aee6afc4f70bd8b3f79776cadf2c7783cfc8c3a2722b2d6e9b65408ce4e012b",
+      "source_anchor": "status evidence and readiness claim",
+      "source_document": "workflows/MANAGEMENT_TEAM_STATUS_INDEX.md",
+      "target_evidence_key": "unsupported-certainty",
+      "target_evidence_resolution": "task_family",
+      "task_family": "unsupported-certainty",
+      "task_id": "run4a-candidate-uncertainty-005"
+    }
+  ],
+  "generated_at": "2026-08-19T17:03:30.759988+00:00",
+  "included_candidates_by_block": {
+    "contradiction-handling": [
+      "run4a-candidate-contradiction-001",
+      "run4a-candidate-contradiction-002",
+      "run4a-candidate-contradiction-003",
+      "run4a-candidate-contradiction-004"
+    ],
+    "scope-authority-boundary": [
+      "run4a-candidate-scope-001",
+      "run4a-candidate-scope-002",
+      "run4a-candidate-scope-003",
+      "run4a-candidate-scope-004"
+    ],
+    "triage-routing": [
+      "run4a-candidate-triage-001",
+      "run4a-candidate-triage-002",
+      "run4a-candidate-triage-003",
+      "run4a-candidate-triage-004"
+    ],
+    "unsupported-certainty": [
+      "run4a-candidate-uncertainty-001",
+      "run4a-candidate-uncertainty-002",
+      "run4a-candidate-uncertainty-003",
+      "run4a-candidate-uncertainty-004"
+    ]
+  },
+  "manifest_sha256": "3c6f70959c044444d521306d7f507625a9ef5d164fd61414666a6a337062ee15",
+  "model_outputs_consulted": false,
+  "novelty_audit_path": "local_harness/fixtures/capability_loop/reviewed_v4a/novelty_audit.json",
+  "novelty_audit_sha256": "1bf03ce9f4a81e8005e9faa1d70c6ce65ecbe11885314353d0ea918da126a403",
+  "pack_id": "reviewed_v4a",
+  "pack_sha256": "4b7314bd73d1d2f1c322b43c4aad75cc8dc9784a4671f7a415558ad3c6bf7996",
+  "reserve_candidates_by_block": {
+    "contradiction-handling": [
+      "run4a-candidate-contradiction-005"
+    ],
+    "scope-authority-boundary": [
+      "run4a-candidate-scope-005"
+    ],
+    "triage-routing": [
+      "run4a-candidate-triage-005"
+    ],
+    "unsupported-certainty": [
+      "run4a-candidate-uncertainty-005"
+    ]
+  },
+  "reserve_rule": "The fifth lexicographic candidate in each block is reserve only; no replacement is permitted.",
+  "schema": "zth_run4a_fixture_manifest_v1",
+  "target_blocks": [
+    "contradiction-handling",
+    "triage-routing",
+    "scope-authority-boundary",
+    "unsupported-certainty"
+  ]
+}

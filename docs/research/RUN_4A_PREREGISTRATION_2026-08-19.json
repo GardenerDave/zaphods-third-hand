@@ -1,0 +1,156 @@
+{
+  "schema": "zth_run4a_preregistration_v1",
+  "experiment_id": "run4a-intervention-market-calibration-2026-08-21",
+  "status": "ready_for_review",
+  "model_calls_made": false,
+  "setup_commit": "71d1f3dae6f3afb2df5d781ef33cddc7fd1420d4",
+  "design_note": {
+    "path": "docs/research/RUN_4A_INTERVENTION_MARKET_CALIBRATION_DESIGN_2026-08-19.md",
+    "sha256": "881eeb543e02d02d9a55879b2bcee90a4e08637153679d1c944a2f859c7230a4"
+  },
+  "prior_experiments_excluded": ["Run 1", "Run 2", "Run 3", "Run 3B", "Run 3C"],
+  "frozen_inputs": {
+    "routing_policy_path": "docs/research/RUN_3_ROUTING_POLICY_FREEZE_2026-08-18.json",
+    "routing_policy_sha256": "cf6728e51e5b5e1ce5ed24539f83bbacd4f9a07dd818f26106c333cc7e543fe8",
+    "capability_bundle_path": ".work/capability_cards/capability_cards.json",
+    "capability_bundle_sha256": "383274a27c89345b3a8bcede75123420973a7a3e53318224e6460c0d05b47fc1",
+    "resource_weight_manifest_path": "docs/research/RUN_4_RESOURCE_WEIGHTS_FREEZE_2026-08-19.json",
+    "resource_weight_manifest_sha256": "33ad2521dc5acc0be5a67b3ef77c167e882cf6ce53140dc60acc8f89c9ad76ab",
+    "resource_priors_ms": {"worker_time_ms": 5276.567, "local_teacher_time_ms": 16220.624, "external_teacher_time_ms": 28704.012},
+    "deterministic_patch_id": "run1-experimental-distilled-strict-contract-v1",
+    "deterministic_patch_path": ".work/capability_batch_reviewed_v1/synthesis/run1_distilled_candidate_patch.json",
+    "deterministic_patch_sha256": "7cfb4453919ad945f0d149ec8af8763653b3734a54b86f23303b84a60dfdacf6"
+  },
+  "fixture_pack": {
+    "path": "local_harness/fixtures/capability_loop/reviewed_v4a",
+    "manifest_path": "local_harness/fixtures/capability_loop/reviewed_v4a/manifest.json",
+    "manifest_sha256": "3c6f70959c044444d521306d7f507625a9ef5d164fd61414666a6a337062ee15",
+    "pack_sha256": "4b7314bd73d1d2f1c322b43c4aad75cc8dc9784a4671f7a415558ad3c6bf7996",
+    "novelty_audit_path": "local_harness/fixtures/capability_loop/reviewed_v4a/novelty_audit.json",
+    "novelty_audit_sha256": "4edbae9e62828c7b66007e075c70495088ece53bb3f74811f0625d6e208f1d3b",
+    "candidate_count": 20,
+    "target_blocks": ["contradiction-handling", "triage-routing", "scope-authority-boundary", "unsupported-certainty"],
+    "block_counts": {"contradiction-handling": 5, "triage-routing": 5, "scope-authority-boundary": 5, "unsupported-certainty": 5},
+    "task_ids": [
+      "run4a-candidate-contradiction-001", "run4a-candidate-contradiction-002", "run4a-candidate-contradiction-003", "run4a-candidate-contradiction-004", "run4a-candidate-contradiction-005",
+      "run4a-candidate-scope-001", "run4a-candidate-scope-002", "run4a-candidate-scope-003", "run4a-candidate-scope-004", "run4a-candidate-scope-005",
+      "run4a-candidate-triage-001", "run4a-candidate-triage-002", "run4a-candidate-triage-003", "run4a-candidate-triage-004", "run4a-candidate-triage-005",
+      "run4a-candidate-uncertainty-001", "run4a-candidate-uncertainty-002", "run4a-candidate-uncertainty-003", "run4a-candidate-uncertainty-004", "run4a-candidate-uncertainty-005"
+    ],
+    "candidate_order_by_block": {
+      "contradiction-handling": ["run4a-candidate-contradiction-001", "run4a-candidate-contradiction-002", "run4a-candidate-contradiction-003", "run4a-candidate-contradiction-004", "run4a-candidate-contradiction-005"],
+      "triage-routing": ["run4a-candidate-triage-001", "run4a-candidate-triage-002", "run4a-candidate-triage-003", "run4a-candidate-triage-004", "run4a-candidate-triage-005"],
+      "scope-authority-boundary": ["run4a-candidate-scope-001", "run4a-candidate-scope-002", "run4a-candidate-scope-003", "run4a-candidate-scope-004", "run4a-candidate-scope-005"],
+      "unsupported-certainty": ["run4a-candidate-uncertainty-001", "run4a-candidate-uncertainty-002", "run4a-candidate-uncertainty-003", "run4a-candidate-uncertainty-004", "run4a-candidate-uncertainty-005"]
+    },
+    "included_candidates_by_block": {
+      "contradiction-handling": ["run4a-candidate-contradiction-001", "run4a-candidate-contradiction-002", "run4a-candidate-contradiction-003", "run4a-candidate-contradiction-004"],
+      "triage-routing": ["run4a-candidate-triage-001", "run4a-candidate-triage-002", "run4a-candidate-triage-003", "run4a-candidate-triage-004"],
+      "scope-authority-boundary": ["run4a-candidate-scope-001", "run4a-candidate-scope-002", "run4a-candidate-scope-003", "run4a-candidate-scope-004"],
+      "unsupported-certainty": ["run4a-candidate-uncertainty-001", "run4a-candidate-uncertainty-002", "run4a-candidate-uncertainty-003", "run4a-candidate-uncertainty-004"]
+    },
+    "reserve_candidates_by_block": {
+      "contradiction-handling": ["run4a-candidate-contradiction-005"],
+      "triage-routing": ["run4a-candidate-triage-005"],
+      "scope-authority-boundary": ["run4a-candidate-scope-005"],
+      "unsupported-certainty": ["run4a-candidate-uncertainty-005"]
+    }
+  },
+  "harness": {
+    "path": "local_harness/run4a_intervention_harness.py",
+    "sha256": "652ef1b146a2723765516786f734fb459a30c295c16a3309d9deeaa4258318ec",
+    "mode": "isolated_one_intervention_one_worker_retry",
+    "no_escalation": true,
+    "no_cross_arm_artifacts": true,
+    "ambiguous_started_call_fails_closed": true
+  },
+  "validators": [
+    {"path": "local_harness/supervised_capability_loop.py", "sha256": "23b26115201d8cba17b9da659af72793654897803988e35e28210eba02af81be"},
+    {"path": "local_harness/supervised_reference_fact_validator.py", "sha256": "d86793dfde5a499988be92447f7df79da889a6074b8dc21b1c3b16bd7c60008a"},
+    {"path": "local_harness/supervised_attempt_output_validator.py", "sha256": "3ca42dfc6f683399752bfe4f5757b9edf4e7eafb09ac30166fe60e9f3beb0d27"}
+  ],
+  "models": {
+    "worker": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "local_teacher": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "external_teacher": "codex-cli-0.146.0",
+    "worker_endpoint_alias": "JARVIS_LOCAL",
+    "local_teacher_endpoint_alias": "JARVIS_LOCAL",
+    "external_service_class": "codex-cli"
+  },
+  "timeouts_seconds": {"worker": 900, "local_teacher": 900, "external_teacher": 120},
+  "telemetry_schema": "zth_resource_telemetry_v1",
+  "arm_order": {
+    "seed": 20260821,
+    "algorithm": "sort task IDs by sha256(str(seed) + ':' + task_id), then assign the six lexicographic intervention permutations round-robin",
+    "permutations": [
+      ["deterministic_patch_retry", "local_teacher", "external_teacher"],
+      ["deterministic_patch_retry", "external_teacher", "local_teacher"],
+      ["local_teacher", "deterministic_patch_retry", "external_teacher"],
+      ["local_teacher", "external_teacher", "deterministic_patch_retry"],
+      ["external_teacher", "deterministic_patch_retry", "local_teacher"],
+      ["external_teacher", "local_teacher", "deterministic_patch_retry"]
+    ],
+    "orders": {
+      "run4a-candidate-contradiction-001": ["deterministic_patch_retry", "local_teacher", "external_teacher"],
+      "run4a-candidate-contradiction-002": ["local_teacher", "external_teacher", "deterministic_patch_retry"],
+      "run4a-candidate-contradiction-003": ["deterministic_patch_retry", "local_teacher", "external_teacher"],
+      "run4a-candidate-contradiction-004": ["deterministic_patch_retry", "external_teacher", "local_teacher"],
+      "run4a-candidate-contradiction-005": ["local_teacher", "external_teacher", "deterministic_patch_retry"],
+      "run4a-candidate-scope-001": ["deterministic_patch_retry", "external_teacher", "local_teacher"],
+      "run4a-candidate-scope-002": ["deterministic_patch_retry", "local_teacher", "external_teacher"],
+      "run4a-candidate-scope-003": ["deterministic_patch_retry", "local_teacher", "external_teacher"],
+      "run4a-candidate-scope-004": ["external_teacher", "local_teacher", "deterministic_patch_retry"],
+      "run4a-candidate-scope-005": ["external_teacher", "local_teacher", "deterministic_patch_retry"],
+      "run4a-candidate-triage-001": ["local_teacher", "external_teacher", "deterministic_patch_retry"],
+      "run4a-candidate-triage-002": ["local_teacher", "deterministic_patch_retry", "external_teacher"],
+      "run4a-candidate-triage-003": ["deterministic_patch_retry", "external_teacher", "local_teacher"],
+      "run4a-candidate-triage-004": ["external_teacher", "deterministic_patch_retry", "local_teacher"],
+      "run4a-candidate-triage-005": ["local_teacher", "deterministic_patch_retry", "external_teacher"],
+      "run4a-candidate-uncertainty-001": ["external_teacher", "local_teacher", "deterministic_patch_retry"],
+      "run4a-candidate-uncertainty-002": ["external_teacher", "deterministic_patch_retry", "local_teacher"],
+      "run4a-candidate-uncertainty-003": ["external_teacher", "deterministic_patch_retry", "local_teacher"],
+      "run4a-candidate-uncertainty-004": ["local_teacher", "deterministic_patch_retry", "external_teacher"],
+      "run4a-candidate-uncertainty-005": ["deterministic_patch_retry", "external_teacher", "local_teacher"]
+    }
+  },
+  "baseline_selection": {
+    "per_block_candidate_count": 5,
+    "included_count_per_block": 4,
+    "eligibility": ["transport_valid=true", "transport_classification=model_response", "deterministic baseline validation failure"],
+    "selection": "first four eligible candidates in frozen lexicographic block order",
+    "reserve": "fifth candidate only; no replacement or adaptive selection"
+  },
+  "intervention_arms": {
+    "deterministic_patch_retry": {"calls": ["one worker retry"], "fallbacks": [], "patch_id": "run1-experimental-distilled-strict-contract-v1"},
+    "local_teacher": {"calls": ["one local-teacher call", "one resulting worker retry"], "fallbacks": []},
+    "external_teacher": {"calls": ["one external-teacher call", "one resulting worker retry"], "fallbacks": []}
+  },
+  "metrics": {
+    "primary_observation": "deterministically_validated_rescue",
+    "support_threshold": {"minimum_comparable_opportunities": 3, "minimum_rescue_rate": 0.5},
+    "statuses": ["supported_positive", "supported_negative", "observed", "insufficient"],
+    "resource_metrics": ["baseline_worker_calls", "post_intervention_worker_calls", "intervention_calls", "realized_elapsed_ms_by_role", "total_realized_elapsed_ms", "expected_decision_cost_ms", "token_telemetry_where_available", "transport_metadata"],
+    "expected_vs_realized_cost_distinct": true
+  },
+  "completion_and_success": {
+    "terminal_requirements": ["every candidate baseline terminal", "every included task has all three arms terminal or infrastructure-excluded", "no ambiguous started transitions", "no cross-arm contamination"],
+    "evidence_formation": "At least 2 of the 4 target evidence blocks have >=2 supported-positive interventions.",
+    "future_economic_gate": "Separate review/freeze must establish comparative evidence, a defensible cardinal capability-plus-cost rule, and a frozen evidence state where that rule selects differently from capability-only control.",
+    "no_superiority_claim": true
+  },
+  "authority_and_stop_conditions": {
+    "transport_inclusion": "Only transport_valid=true and transport_classification=model_response enter capability denominators.",
+    "infrastructure_excluded": true,
+    "no_adaptive_task_replacement": true,
+    "no_adaptive_intervention_choice_or_escalation": true,
+    "no_evidence_merge": true,
+    "no_training": true,
+    "no_promotion": true,
+    "no_queue_insertion": true,
+    "no_router_modification": true,
+    "no_model_authority": true
+  },
+  "planning_budget_maximum": {"included_tasks": 16, "baseline_worker_calls": 16, "post_intervention_worker_calls": 48, "local_teacher_calls": 16, "external_teacher_calls": 16, "total_model_calls": 96, "expected_elapsed_ms": 1056494.464},
+  "execution_authority": "This artifact freezes preparation only; execution requires explicit operator authorization after review.",
+  "provenance": {"fixture_authoring_model_outputs_consulted": false, "capability_bundle_used_only_for_target_definitions": true}
+}

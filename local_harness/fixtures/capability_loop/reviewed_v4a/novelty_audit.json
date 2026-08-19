@@ -1,0 +1,54 @@
+{
+  "audit_sha256": "1bf03ce9f4a81e8005e9faa1d70c6ce65ecbe11885314353d0ea918da126a403",
+  "counts": {
+    "candidates": 20,
+    "new_scenario_same_family": 1,
+    "new_source": 19,
+    "source_anchor_reuse": 0,
+    "source_document_reuse": 1
+  },
+  "exact_prompt_duplicates": [],
+  "high_similarity_pairs": [],
+  "model_outputs_consulted": false,
+  "normalized_prompt_duplicates": [],
+  "novelty_classification": {
+    "run4a-candidate-contradiction-001": "new_source",
+    "run4a-candidate-contradiction-002": "new_source",
+    "run4a-candidate-contradiction-003": "new_source",
+    "run4a-candidate-contradiction-004": "new_source",
+    "run4a-candidate-contradiction-005": "new_source",
+    "run4a-candidate-scope-001": "new_source",
+    "run4a-candidate-scope-002": "new_source",
+    "run4a-candidate-scope-003": "new_source",
+    "run4a-candidate-scope-004": "new_source",
+    "run4a-candidate-scope-005": "new_scenario_same_family",
+    "run4a-candidate-triage-001": "new_source",
+    "run4a-candidate-triage-002": "new_source",
+    "run4a-candidate-triage-003": "new_source",
+    "run4a-candidate-triage-004": "new_source",
+    "run4a-candidate-triage-005": "new_source",
+    "run4a-candidate-uncertainty-001": "new_source",
+    "run4a-candidate-uncertainty-002": "new_source",
+    "run4a-candidate-uncertainty-003": "new_source",
+    "run4a-candidate-uncertainty-004": "new_source",
+    "run4a-candidate-uncertainty-005": "new_source"
+  },
+  "novelty_mismatches": [],
+  "prior_packs": [
+    "reviewed_v1",
+    "reviewed_v2",
+    "reviewed_v3",
+    "reviewed_v3b",
+    "reviewed_v3c"
+  ],
+  "schema": "zth_run4a_novelty_audit_v1",
+  "similarity_threshold": 0.8,
+  "source_anchor_collisions": [],
+  "source_document_collisions": [
+    {
+      "source_document": "docs/SUPERVISED_DOWNSTREAM_USE_GATE.md",
+      "task_id": "run4a-candidate-scope-005"
+    }
+  ],
+  "task_id_collisions": []
+}
