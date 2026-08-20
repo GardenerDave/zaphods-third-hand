@@ -22,6 +22,9 @@ PACK_ROOT = "local_harness/fixtures/capability_loop"
 PAIR_ORDER_SEED = 20260824
 SIMILARITY_THRESHOLD = 0.80
 EXCLUDED_PACKS = {spec["directory"] for spec in PACKS.values()}
+# Future reviewed packs must not retroactively alter the historical Run 5
+# novelty input universe or invalidate its frozen manifests.
+FUTURE_PACKS = {"reviewed_run6_triage", "reviewed_run6_scope"}
 
 
 class Run5FixtureError(ValueError):
@@ -52,7 +55,7 @@ def prior_tasks(repo_root: Path) -> list[dict[str, Any]]:
     result = []
     fixture_root = repo_root / PACK_ROOT
     for pack_dir in sorted(fixture_root.glob("reviewed*")):
-        if pack_dir.name in EXCLUDED_PACKS:
+        if pack_dir.name in EXCLUDED_PACKS or pack_dir.name in FUTURE_PACKS:
             continue
         for path in fixture_paths(pack_dir):
             result.append(load_task_fixture(path))
@@ -83,7 +86,7 @@ def novelty_audit(pack_dir: Path, repo_root: Path) -> dict[str, Any]:
     result: dict[str, Any] = {
         "schema": "zth_run5_mixed_novelty_audit_v1",
         "model_outputs_consulted": False,
-        "prior_fixture_packs": sorted(pack.name for pack in (repo_root / PACK_ROOT).glob("reviewed*")),
+        "prior_fixture_packs": sorted(pack.name for pack in (repo_root / PACK_ROOT).glob("reviewed*") if pack.name not in FUTURE_PACKS),
         "similarity_threshold": SIMILARITY_THRESHOLD,
         "task_id_collisions": [], "exact_prompt_duplicates": [], "normalized_prompt_duplicates": [],
         "high_similarity_pairs": [], "source_document_collisions": [], "source_anchor_collisions": [],

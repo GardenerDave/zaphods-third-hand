@@ -1,0 +1,303 @@
+{
+  "candidate_count": 15,
+  "candidate_order": [
+    "run6-scope-001",
+    "run6-scope-002",
+    "run6-scope-003",
+    "run6-scope-004",
+    "run6-scope-005",
+    "run6-scope-006",
+    "run6-scope-007",
+    "run6-scope-008",
+    "run6-scope-009",
+    "run6-scope-010",
+    "run6-scope-011",
+    "run6-scope-012",
+    "run6-scope-013",
+    "run6-scope-014",
+    "run6-scope-015"
+  ],
+  "eligibility": [
+    "transport_valid=true",
+    "transport_classification=model_response",
+    "deterministic baseline validation failure",
+    "target resolution=failure_class",
+    "target evidence key=scope-authority-boundary"
+  ],
+  "fixtures": [
+    {
+      "fixture_sha256": "8b5d18531a3687d1c25f3bd6cba99c2d6203105b4c017e5a5c2afbdf89ce42f3",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-001.json",
+      "reference_facts_sha256": "58d82955c196eae5e0e5b19bd3e18e9e003ee79c7728b0bef99dbbebd8454fc4",
+      "source_anchor": "approved manifest inspection versus held unsigned release plan",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run6-scope-001"
+    },
+    {
+      "fixture_sha256": "548aa3f6415d2ec3aa8b6df2f48624c5e06889b24102a567678a89cc4fe97dcb",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-002.json",
+      "reference_facts_sha256": "6db73fc9fbd11373bd81bcb5472c74c3b56a3c7ef6277a8ac93a3214fff2c457",
+      "source_anchor": "service map reading versus held owner change",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run6-scope-002"
+    },
+    {
+      "fixture_sha256": "f60f889822467e8815c8996f85eecd3901dc6c1fd33d58bb51706252a8e342d6",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-003.json",
+      "reference_facts_sha256": "df252d52db6f26afe53926644331701451e5834701866fe431649ff260958215",
+      "source_anchor": "current audit window versus expired export approval",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run6-scope-003"
+    },
+    {
+      "fixture_sha256": "bd2f15e76b388adb59d0c4793bb24c7d61ab16cd290550ed34e7802452f35759",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-004.json",
+      "reference_facts_sha256": "a2a35c8ca7f9e28d7513b0ba7e25ffacdb35a3cdc6af233880f3a5b2f34c5e34",
+      "source_anchor": "queue inspection versus ownerless promotion record",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run6-scope-004"
+    },
+    {
+      "fixture_sha256": "c7ffc6d85ba7f03ea76d7e48e9f799474a8699cb201374d114381fdc55b15961",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-005.json",
+      "reference_facts_sha256": "2628180d6af7bf61a1f38524420ec390981f9f83fc9ae4a4991c679e2f71f90a",
+      "source_anchor": "dependency inspection versus contradictory target policy",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run6-scope-005"
+    },
+    {
+      "fixture_sha256": "f61c790a8180ad8342a49b1ab79b769bab1d3a8a4c48417ec643860f5b5fbba3",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-006.json",
+      "reference_facts_sha256": "7d584789a0f0e6cdf92bd91d61d8dee07b9261daeaadb913b639cf80bcbd50ab",
+      "source_anchor": "partial delegation excludes remediation plan",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run6-scope-006"
+    },
+    {
+      "fixture_sha256": "75641cf1deecc16742157c7f6179fe14548dc12b8d2832a121a7cd9402afbbaa",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-007.json",
+      "reference_facts_sha256": "69d6f25cbff429c1b1a282f1d14fc1a3f8a3d35a24fe214ea4dd6acf95b5b11d",
+      "source_anchor": "current retention summary versus stale purge approval",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run6-scope-007"
+    },
+    {
+      "fixture_sha256": "57ababee23b89dae10fc4614eda50acab7df79df398e8313e2eac7cf405ca42d",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-008.json",
+      "reference_facts_sha256": "f4b9dcb7ec2ed830e7d28da4dbef88a39b516466a11f0d9a35d45e50d0383743",
+      "source_anchor": "certificate inspection versus implied key rotation authority",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run6-scope-008"
+    },
+    {
+      "fixture_sha256": "33be5825644a32d73cff7305bda57587fd8fc9abce1725ca2c931e75675f5a88",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-009.json",
+      "reference_facts_sha256": "7bdd05f7d3a29ee72f64c0e6b3b0eb957f53fa05fb10d82131855c0198f5291c",
+      "source_anchor": "approved change window versus unmatched rollback ticket",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run6-scope-009"
+    },
+    {
+      "fixture_sha256": "002f506328f4ba4dac78baa793d88fb30ab80402beac45555158a7ee6a01285b",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-010.json",
+      "reference_facts_sha256": "c854b491571b699f7e9c40811401ab4b95d2db79cb3084711b3f83ee83dca4c8",
+      "source_anchor": "evidence ledger versus cross-owner correction batch",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run6-scope-010"
+    },
+    {
+      "fixture_sha256": "e2119afab05d41c37e5599df10067a05039ea632e2805a98381fab6fe4b8c9cc",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-011.json",
+      "reference_facts_sha256": "2f60799d55117f9a0d6772591870c23211abb42c0599714d841399f527f3e9b5",
+      "source_anchor": "intake inspection versus unconfirmed owner register update",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run6-scope-011"
+    },
+    {
+      "fixture_sha256": "f33932ddffa4318ef670efc4c0d28b01d1a216113bdbd88a86ae618732908b46",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-012.json",
+      "reference_facts_sha256": "8e058dad65ad798db03bff4d578fb4a12dac35c487f9fbdae0db3caa55ca8b9d",
+      "source_anchor": "package inspection versus out-of-set release state update",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run6-scope-012"
+    },
+    {
+      "fixture_sha256": "2951fd6fa458507c3886c8574ddf16ad3232fab8f9e66397f413ddb171baf597",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-013.json",
+      "reference_facts_sha256": "9a32dbb99d80e9a349699bae55a3ccd0001f6cd8329fe7005f5ebbdbfa809621",
+      "source_anchor": "dependency inspection versus implied compatibility authority",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run6-scope-013"
+    },
+    {
+      "fixture_sha256": "9d49e1ac4097d946b45ff0d59c5f330a45bbb4129df6d3a949e3ff5523f93277",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-014.json",
+      "reference_facts_sha256": "5a90f8d3298ea65c011246ce089c648f36bc5aba16dea58f43a001a68aed2cb6",
+      "source_anchor": "review index versus cross-team action log",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run6-scope-014"
+    },
+    {
+      "fixture_sha256": "714ffcd4b932536d8d23a61c45d072b17374e90c1ac1e2ba0c23208b8ae7ec0e",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-015.json",
+      "reference_facts_sha256": "495fad002c9f99cbc12c78fb8de8022df045fcdb4c3a45722a2adbd1ff0c24c8",
+      "source_anchor": "status inspection versus approval-missing promotion note",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run6-scope-015"
+    }
+  ],
+  "generated_at": "2026-08-20T00:00:00Z",
+  "manifest_sha256": "128a44501536cb730eb6491555e20f66d5612e5f5843baf5c81d69a194203343",
+  "model_outputs_consulted": false,
+  "novelty_audit_path": "local_harness/fixtures/capability_loop/reviewed_run6_scope/novelty_audit.json",
+  "novelty_audit_sha256": "8f55c01a5599fd3befcbc68b3d352f3c39369dbc72558bfb6949780e67f2b3ff",
+  "pack_id": "reviewed_run6_scope",
+  "pack_sha256": "dfe395c8cf3651069c8b9710fa71a129dbf262a4925ff3be1404134a8765e250",
+  "pair_order": {
+    "algorithm": "sha256(str(seed) + ':' + task_id), first hex digit < 8 means control-first, otherwise treatment-first",
+    "orders": {
+      "run6-scope-001": [
+        "control",
+        "treatment"
+      ],
+      "run6-scope-002": [
+        "control",
+        "treatment"
+      ],
+      "run6-scope-003": [
+        "treatment",
+        "control"
+      ],
+      "run6-scope-004": [
+        "treatment",
+        "control"
+      ],
+      "run6-scope-005": [
+        "control",
+        "treatment"
+      ],
+      "run6-scope-006": [
+        "control",
+        "treatment"
+      ],
+      "run6-scope-007": [
+        "control",
+        "treatment"
+      ],
+      "run6-scope-008": [
+        "treatment",
+        "control"
+      ],
+      "run6-scope-009": [
+        "treatment",
+        "control"
+      ],
+      "run6-scope-010": [
+        "control",
+        "treatment"
+      ],
+      "run6-scope-011": [
+        "treatment",
+        "control"
+      ],
+      "run6-scope-012": [
+        "control",
+        "treatment"
+      ],
+      "run6-scope-013": [
+        "control",
+        "treatment"
+      ],
+      "run6-scope-014": [
+        "control",
+        "treatment"
+      ],
+      "run6-scope-015": [
+        "treatment",
+        "control"
+      ]
+    },
+    "seed": 20260825
+  },
+  "reserve_rule": "Candidates not selected after baseline eligibility remain family-specific reserve-only; no adaptive replacement.",
+  "schema": "zth_run6_sequential_fixture_manifest_v1",
+  "selection_rule": "Select the first target count eligible candidates in frozen family-specific candidate order; never use intervention outcomes for inclusion.",
+  "target_evidence_resolution": "failure_class",
+  "target_included_count": 12,
+  "task_family": "scope-authority-boundary"
+}

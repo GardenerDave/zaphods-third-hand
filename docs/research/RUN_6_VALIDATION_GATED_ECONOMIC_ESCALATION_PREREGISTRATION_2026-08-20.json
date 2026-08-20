@@ -1,0 +1,131 @@
+{
+  "schema": "zth_run6_sequential_preregistration_v1",
+  "experiment_id": "run6-validation-gated-economic-escalation-2026-08-20",
+  "authority": "review_only_experiment; no production routing authority; no capability merge; no training promotion queueing or retirement",
+  "model_calls_made": false,
+  "policy_freeze": {
+    "path": "docs/research/RUN_6_VALIDATION_GATED_POLICY_FREEZE_2026-08-20.json",
+    "file_sha256": "8038870ad8e489e88e1cc3e67e86fe5284e4f9c719327b8bdb30ca1da3fc5337",
+    "canonical_sha256": "20967f513a1939cd6a8afdf498c211b053e7bd381c6b9cf703ca1a706ffe5c7a"
+  },
+  "driver": {
+    "path": "scripts/zth_run6_sequential_economic_routing.py",
+    "sha256": "01683c0f4b4eb29669258e4313fc261a85edbc36bab68210db9a31c2c418dc1c"
+  },
+  "policy_source": {
+    "path": "local_harness/run6_sequential_policy.py",
+    "sha256": "7f28fa843c09a886f71138c71f11ce0e672786b23a9c9ff63127edbf48547e58"
+  },
+  "research_basis": [
+    {"path": "docs/research/RUN_5_INTERPRETATION_FREEZE_2026-08-20.json", "sha256": "a17591b29870f874a5f493107acf5c9b9982c1d2feae78c606200638a825cf22"},
+    {"path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_5_MIXED_2026-08-20.md", "sha256": "bfd41515bba5db7d9cf0ff60e7340a3c98b2f0c297320d544d5847037cf44cc9"},
+    {"path": "docs/research/RUN_4A_COMPARATIVE_EVIDENCE_FREEZE_2026-08-19.json", "sha256": "c48a97000fbf85b7ea3919a8269009d3200d3c2369924c456ec9dcc8736baf7b"},
+    {"path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_4B_SCOPE_2026-08-19.md", "sha256": "ddb09bd03fc62cdfaa71acbdc5e18fcb301be9a4f644496bb7292ce7d672df19"}
+  ],
+  "fixture_packs": {
+    "triage": {
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_triage",
+      "manifest_sha256": "a06c56370240bd767062fd6692237bd42646c5fd4bdda532d2b90f58b0f4d344",
+      "pack_sha256": "7f939b42581e78cfb56a2706b00d5e5ee711453e3467a52c2d64f937076fcaf7",
+      "novelty_audit_sha256": "3f1c577f2ce9f4f73697a4df8bb6dbf90dd4c62f5072c9cce23c776bef0fadfd",
+      "candidate_count": 15,
+      "target_included_count": 12,
+      "family": "triage-routing",
+      "resolution": "task_family",
+      "candidate_order": ["run6-triage-001", "run6-triage-002", "run6-triage-003", "run6-triage-004", "run6-triage-005", "run6-triage-006", "run6-triage-007", "run6-triage-008", "run6-triage-009", "run6-triage-010", "run6-triage-011", "run6-triage-012", "run6-triage-013", "run6-triage-014", "run6-triage-015"]
+    },
+    "scope": {
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_scope",
+      "manifest_sha256": "128a44501536cb730eb6491555e20f66d5612e5f5843baf5c81d69a194203343",
+      "pack_sha256": "dfe395c8cf3651069c8b9710fa71a129dbf262a4925ff3be1404134a8765e250",
+      "novelty_audit_sha256": "ab2f7709606e1ceba496572e8248d529da8fe9d1f44ef28fe811974b97466926",
+      "candidate_count": 15,
+      "target_included_count": 12,
+      "family": "scope-authority-boundary",
+      "resolution": "failure_class",
+      "candidate_order": ["run6-scope-001", "run6-scope-002", "run6-scope-003", "run6-scope-004", "run6-scope-005", "run6-scope-006", "run6-scope-007", "run6-scope-008", "run6-scope-009", "run6-scope-010", "run6-scope-011", "run6-scope-012", "run6-scope-013", "run6-scope-014", "run6-scope-015"]
+    }
+  },
+  "fixture_provenance": {"path": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md", "sha256": "43cf2e2b5f75f6727f58c63a836cad0391d571948915778296299df93c656593"},
+  "selection": {
+    "eligibility": ["transport_valid=true", "transport_classification=model_response", "deterministic baseline validation failure", "family-specific frozen resolution and evidence key"],
+    "rule": "Select the first 12 eligible failures in frozen order within each family.",
+    "reserve_rule": "Remaining candidates are reserve-only; no replacement or cross-family substitution.",
+    "adaptive_replacement": false
+  },
+  "pair_order": {
+    "seed": 20260825,
+    "algorithm": "sha256(str(seed) + ':' + task_id), first hex digit < 8 means control-first, otherwise treatment-first",
+    "orders_bound_by": "the exact orders in each frozen fixture manifest"
+  },
+  "policies": {
+    "control": "external_everywhere",
+    "treatment": "validation_gated_economic_escalation",
+    "control_family_actions": {"triage-routing": "external_teacher", "scope-authority-boundary": "external_teacher"},
+    "treatment_family_initial_actions": {"triage-routing": "external_teacher", "scope-authority-boundary": "local_teacher"},
+    "treatment_scope_escalation": "external_teacher only after deterministic local validation failure",
+    "identical_triage_action_is_physically_shared": true,
+    "control_treatment_scope_isolation": true,
+    "fallback": false,
+    "third_teacher": false,
+    "deterministic_patch": false
+  },
+  "models": {
+    "worker": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "local_teacher": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "external_teacher": "codex-cli-0.146.0",
+    "external_service_class": "codex-cli",
+    "worker_endpoint_alias": "JARVIS_LOCAL",
+    "local_teacher_endpoint_alias": "JARVIS_LOCAL"
+  },
+  "timeouts_seconds": {"worker": 900, "local_teacher": 900, "external_teacher": 120},
+  "resource_manifest": {
+    "path": "docs/research/RUN_4_RESOURCE_WEIGHTS_FREEZE_2026-08-19.json",
+    "sha256": "8f7820a6a3e5734e071452f643374d8c6c769d4d149bcec3f2f82b88ee6530c2",
+    "canonical_sha256": "33ad2521dc5acc0be5a67b3ef77c167e882cf6ce53140dc60acc8f89c9ad76ab",
+    "weights_ms": {"worker_time_ms": 5276.567, "local_teacher_time_ms": 16220.624, "external_teacher_time_ms": 28704.012}
+  },
+  "validators": [
+    {"path": "local_harness/supervised_capability_loop.py", "sha256": "23b26115201d8cba17b9da659af72793654897803988e35e28210eba02af81be"},
+    {"path": "local_harness/supervised_reference_fact_validator.py", "sha256": "d86793dfde5a499988be92447f7df79da889a6074b8dc21b1c3b16bd7c60008a"},
+    {"path": "local_harness/supervised_attempt_output_validator.py", "sha256": "3ca42dfc6f683399752bfe4f5757b9edf4e7eafb09ac30166fe60e9f3beb0d27"}
+  ],
+  "deterministic_patch": {"used": false, "id": null, "path": null, "sha256": null},
+  "metrics": {
+    "quality": "treatment final validated portfolio solve rate >= control final validated portfolio solve rate",
+    "resource": "treatment realized policy-level post-baseline elapsed_ms < control realized policy-level post-baseline elapsed_ms",
+    "success": "quality and resource criteria both true",
+    "treatment_scope_secondary": ["local_first_passes", "local_first_failures", "escalations", "escalation_rescues", "escalation_failures", "escalation_rate", "local_first_elapsed_ms", "escalation_elapsed_ms", "total_sequential_scope_elapsed_ms"],
+    "infrastructure_excluded_from_primary": true,
+    "physical_cost": "all durable model-call attempts; common triage action counted once",
+    "control_policy_cost": "common triage external plus scope external-direct",
+    "treatment_policy_cost": "common triage external plus scope local-first and conditional external escalation"
+  },
+  "planning_budget": {
+    "maximum_calls": {"worker": 78, "external_teacher": 36, "local_teacher": 12, "total": 126},
+    "maximum_physical_expected_elapsed_ms": 1639564.146,
+    "control_expected_post_baseline_ms": 815533.896,
+    "treatment_expected_post_baseline_max_ms": 1073500.188,
+    "treatment_expected_post_baseline_formula": "12*external_action + 12*local_action + escalation_count*external_action",
+    "treatment_maximum_scope_escalations": 12
+  },
+  "durability": {
+    "explicit_execute_gate": true,
+    "zero_call_dry_run": true,
+    "active_call_fail_closed": true,
+    "clean_partial_resume": true,
+    "terminal_artifact_hash_verification": true,
+    "common_action_no_duplicate_on_resume": true,
+    "local_stage_no_duplicate_on_resume": true,
+    "escalation_no_duplicate_on_resume": true,
+    "infrastructure_is_not_capability_failure": true
+  },
+  "authority_and_stop_conditions": {
+    "no_evidence_merge": true,
+    "no_production_routing_mutation": true,
+    "no_training_promotion_queue": true,
+    "no_retirement": true,
+    "family_incomplete_is_terminal_incomplete": true,
+    "zero_comparable_tasks_means_result_unavailable": true
+  }
+}

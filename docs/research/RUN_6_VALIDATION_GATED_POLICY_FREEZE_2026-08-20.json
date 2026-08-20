@@ -1,0 +1,50 @@
+{
+  "schema": "zth_run6_sequential_policy_freeze_v1",
+  "experiment_id": "run6-validation-gated-economic-escalation-2026-08-20",
+  "status": "frozen_experiment_only",
+  "authority": "review_only_experiment; no production routing authority; no capability merge",
+  "research_basis": {
+    "run5_interpretation_freeze_path": "docs/research/RUN_5_INTERPRETATION_FREEZE_2026-08-20.json",
+    "run5_interpretation_freeze_sha256": "d460794fd7726cea9ea7ce9c179bb8d3b44b778cf8ccad3e16e8c0a34dce279c",
+    "run5_result": "quality_preserved=false; resource_reduced=true; economic_routing_success=false",
+    "post_hoc_sequential_reconstruction_is_exploratory": true
+  },
+  "policy_source": {
+    "path": "local_harness/run6_sequential_policy.py",
+    "sha256": "7f28fa843c09a886f71138c71f11ce0e672786b23a9c9ff63127edbf48547e58"
+  },
+  "family_action_matrix": {
+    "triage-routing": {
+      "external_everywhere": "external_teacher",
+      "validation_gated_economic_escalation": "external_teacher"
+    },
+    "scope-authority-boundary": {
+      "external_everywhere": "external_teacher",
+      "validation_gated_economic_escalation": "local_teacher"
+    }
+  },
+  "resolutions": {
+    "triage-routing": "task_family",
+    "scope-authority-boundary": "failure_class"
+  },
+  "intervention_semantics": {
+    "control": "external_teacher plus exactly one worker retry and deterministic validation",
+    "treatment_triage": "external_teacher plus exactly one worker retry and deterministic validation",
+    "treatment_scope_initial": "local_teacher plus exactly one worker retry and deterministic validation",
+    "treatment_scope_escalation": "only after deterministic local validation failure; external_teacher plus exactly one additional worker retry and deterministic validation",
+    "fallback": false,
+    "third_teacher": false,
+    "deterministic_patch": false,
+    "adaptive_threshold": false,
+    "escalation_trigger": "deterministic validation failure only",
+    "infrastructure_failure_triggers_escalation": false
+  },
+  "resource_priors_ms": {
+    "worker_time_ms": 5276.567,
+    "local_teacher_time_ms": 16220.624,
+    "external_teacher_time_ms": 28704.012,
+    "local_action_ms": 21497.191,
+    "external_action_ms": 33980.579
+  },
+  "freeze_sha256": "20967f513a1939cd6a8afdf498c211b053e7bd381c6b9cf703ca1a706ffe5c7a"
+}

@@ -1,0 +1,303 @@
+{
+  "candidate_count": 15,
+  "candidate_order": [
+    "run6-triage-001",
+    "run6-triage-002",
+    "run6-triage-003",
+    "run6-triage-004",
+    "run6-triage-005",
+    "run6-triage-006",
+    "run6-triage-007",
+    "run6-triage-008",
+    "run6-triage-009",
+    "run6-triage-010",
+    "run6-triage-011",
+    "run6-triage-012",
+    "run6-triage-013",
+    "run6-triage-014",
+    "run6-triage-015"
+  ],
+  "eligibility": [
+    "transport_valid=true",
+    "transport_classification=model_response",
+    "deterministic baseline validation failure",
+    "target resolution=task_family",
+    "target evidence key=triage-routing"
+  ],
+  "fixtures": [
+    {
+      "fixture_sha256": "cba9cd2273b8cba9d8cfe6db92377782940a1fd03e9017ee5831b184321b9dd2",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_triage/triage-001.json",
+      "reference_facts_sha256": "cb9f1191cd0349b831b2a20444aa0ad2d54917de818e6a247b8953e2bff4b3ad",
+      "source_anchor": "release note checksum review beside unapproved deployment request",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run6-triage-001"
+    },
+    {
+      "fixture_sha256": "2cc5eb426a3f11b55872e04f0a632e87c58f67bee159205ed81fb30f6fc7ba1d",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_triage/triage-002.json",
+      "reference_facts_sha256": "0b530326dd670e8f74df600c835ddf944a3e138709909ba60b1c54717599cd1d",
+      "source_anchor": "schema mismatch with ownerless rollback instruction",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run6-triage-002"
+    },
+    {
+      "fixture_sha256": "4d2b70cf6899dd37ddadb78be0dbe1d74950fe106776cf1813133451ec16b5e8",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_triage/triage-003.json",
+      "reference_facts_sha256": "8915e4c090aebc26756d0337aa90e318546406939f385408ec650518829dfce8",
+      "source_anchor": "verified certificate warning beside ticketless access suggestion",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run6-triage-003"
+    },
+    {
+      "fixture_sha256": "b57fabe33e2a74f0f72ddff56064bacab45a2fc8925951cb0e78b31def6604f5",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_triage/triage-004.json",
+      "reference_facts_sha256": "884c08d3215ed2bf3f78ab3e78bbdf9d66ce1da4c8e7bb72084f34424465c5bd",
+      "source_anchor": "confirmed queue overflow beside ownerless capacity request",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run6-triage-004"
+    },
+    {
+      "fixture_sha256": "312c1dfc0fda7c6c02bf4cd82e1e33a1ea083ac63532d83bfd3f98b078af449d",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_triage/triage-005.json",
+      "reference_facts_sha256": "817a76c364958a85c2aaaeadf73e74c625c21d4e6c56bcb068a4a19cdbe8d93c",
+      "source_anchor": "signed timestamp anomaly beside unsigned purge instruction",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run6-triage-005"
+    },
+    {
+      "fixture_sha256": "963b4928b68a87effbbc4c134998fb613ab82866e2a6a7086ce1b62ef58337e1",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_triage/triage-006.json",
+      "reference_facts_sha256": "37cc8f0ddce03b91e1a255afe012203ecb8617fb3db5de8c70ec7c0c4760e6ab",
+      "source_anchor": "failed integrity check beside unsigned bypass proposal",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run6-triage-006"
+    },
+    {
+      "fixture_sha256": "0e65ad38c53677f44c1be0c0295e1bc3c1a69b0e21d8ea9f3203482843bd0069",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_triage/triage-007.json",
+      "reference_facts_sha256": "d06995022f793276a72278e1b0b43103de5e300e1e6cf4d9d7c31ac6e29f62a0",
+      "source_anchor": "rejected signature with reviewerless reissue request",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run6-triage-007"
+    },
+    {
+      "fixture_sha256": "47b9202d10caf258fb17072b1695b32bc6865ae3fe60b9bfb2ecf548333bc276",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_triage/triage-008.json",
+      "reference_facts_sha256": "81648f67a0ad42b7a2577c9c02ea41d27608b6cd48faed246f6e8c3b20b66b33",
+      "source_anchor": "unexpected configuration delta beside ownerless broad application",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run6-triage-008"
+    },
+    {
+      "fixture_sha256": "4a983893546666fc1650287658a4cd1918804b2e9042ea24aa1383b4216e4947",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_triage/triage-009.json",
+      "reference_facts_sha256": "92b558437d7bd408669f5cd09c68b6c9f215794af5c5445ab811a2425e73be3b",
+      "source_anchor": "signed retention mismatch beside unsigned archive rewrite",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run6-triage-009"
+    },
+    {
+      "fixture_sha256": "6c956afe56a2736e84689b389bc3af4d599523bf5313f41d03c14cce94365d5a",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_triage/triage-010.json",
+      "reference_facts_sha256": "9c1d90b1e5b0e6f8c3c2c9ffc8728a69a45ad8c32248df08ead6f047485d1bc2",
+      "source_anchor": "dependency checksum drift beside acceptance-free version pin",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run6-triage-010"
+    },
+    {
+      "fixture_sha256": "ddc0e628a7223f37e6a4cb4a7ac796647b8280222daeef39af638a625defc27f",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_triage/triage-011.json",
+      "reference_facts_sha256": "49bed63a379c44c4efd6283105624dfd1defe4d6e766ff079c4bc8c9cf4727e9",
+      "source_anchor": "orphaned service account with ownerless disable recommendation",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run6-triage-011"
+    },
+    {
+      "fixture_sha256": "5dd334b939e9b65329464f0dd7f99368cfd5e7f332abcc496718de84259cf88d",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_triage/triage-012.json",
+      "reference_facts_sha256": "846a839af6ea4f3da0d5eb2a2425d24a5c9f2ea7793d213580537815ecf05c87",
+      "source_anchor": "unsigned export manifest beside pre-review release request",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run6-triage-012"
+    },
+    {
+      "fixture_sha256": "60808432b6effbead9364d7bcbbfcbeb01accf89e7f3c05b8ac2aba3132a9aa6",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_triage/triage-013.json",
+      "reference_facts_sha256": "21a783f34fa4e816842826d1efbea1e9bd648ebb42519cdbd964f8af21c780d6",
+      "source_anchor": "duplicate dispatch beside unsigned replay proposal",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run6-triage-013"
+    },
+    {
+      "fixture_sha256": "75ffafe13e7baac14960d1bbdd09c74644eb7054ac0827f4712b55309c3b0f47",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_triage/triage-014.json",
+      "reference_facts_sha256": "8bcc70375b75fe510fcd5050657ebf44bbafc2236ba8f7017cc173a66795b41d",
+      "source_anchor": "malformed routing header beside reviewerless acceptance",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run6-triage-014"
+    },
+    {
+      "fixture_sha256": "7b0bdd944c1672473e2f26cca985f3545c2924c061af2fb23dc1bcec92d005dd",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run6_triage/triage-015.json",
+      "reference_facts_sha256": "891cd7d718ddeeccaf748428e9649ee86d1b7b293d7db84ddb56d5c3f4fb3478",
+      "source_anchor": "stale authorization beside ownerless action proposal",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run6-triage-015"
+    }
+  ],
+  "generated_at": "2026-08-20T00:00:00Z",
+  "manifest_sha256": "a06c56370240bd767062fd6692237bd42646c5fd4bdda532d2b90f58b0f4d344",
+  "model_outputs_consulted": false,
+  "novelty_audit_path": "local_harness/fixtures/capability_loop/reviewed_run6_triage/novelty_audit.json",
+  "novelty_audit_sha256": "fe000c37df6c66daaa7580bac90f3ecf5c6dda09be525ee4b5934e100530e520",
+  "pack_id": "reviewed_run6_triage",
+  "pack_sha256": "7f939b42581e78cfb56a2706b00d5e5ee711453e3467a52c2d64f937076fcaf7",
+  "pair_order": {
+    "algorithm": "sha256(str(seed) + ':' + task_id), first hex digit < 8 means control-first, otherwise treatment-first",
+    "orders": {
+      "run6-triage-001": [
+        "treatment",
+        "control"
+      ],
+      "run6-triage-002": [
+        "treatment",
+        "control"
+      ],
+      "run6-triage-003": [
+        "treatment",
+        "control"
+      ],
+      "run6-triage-004": [
+        "treatment",
+        "control"
+      ],
+      "run6-triage-005": [
+        "treatment",
+        "control"
+      ],
+      "run6-triage-006": [
+        "control",
+        "treatment"
+      ],
+      "run6-triage-007": [
+        "control",
+        "treatment"
+      ],
+      "run6-triage-008": [
+        "control",
+        "treatment"
+      ],
+      "run6-triage-009": [
+        "control",
+        "treatment"
+      ],
+      "run6-triage-010": [
+        "control",
+        "treatment"
+      ],
+      "run6-triage-011": [
+        "control",
+        "treatment"
+      ],
+      "run6-triage-012": [
+        "control",
+        "treatment"
+      ],
+      "run6-triage-013": [
+        "control",
+        "treatment"
+      ],
+      "run6-triage-014": [
+        "control",
+        "treatment"
+      ],
+      "run6-triage-015": [
+        "treatment",
+        "control"
+      ]
+    },
+    "seed": 20260825
+  },
+  "reserve_rule": "Candidates not selected after baseline eligibility remain family-specific reserve-only; no adaptive replacement.",
+  "schema": "zth_run6_sequential_fixture_manifest_v1",
+  "selection_rule": "Select the first target count eligible candidates in frozen family-specific candidate order; never use intervention outcomes for inclusion.",
+  "target_evidence_resolution": "task_family",
+  "target_included_count": 12,
+  "task_family": "triage-routing"
+}

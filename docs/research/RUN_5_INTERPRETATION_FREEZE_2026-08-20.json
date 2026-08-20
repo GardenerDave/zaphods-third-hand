@@ -1,0 +1,48 @@
+{
+  "schema": "zth_run5_interpretation_freeze_v1",
+  "experiment_id": "run5-mixed-economic-routing-2026-08-20",
+  "status": "reviewed_post_execution",
+  "authority": "interpretation_only; no production routing authority; no capability merge",
+  "source": {
+    "closeout_commit": "a96bade2d32dcd83d67598802649a47a1f82b901",
+    "closeout_report": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_5_MIXED_2026-08-20.md",
+    "closeout_report_sha256": "bfd41515bba5db7d9cf0ff60e7340a3c98b2f0c297320d544d5847037cf44cc9",
+    "execution_directory": ".work/run5_mixed_economic_routing/run_20260819T013828Z",
+    "execution_manifest_sha256": "69ebfbb54e9d86f29ff899621858ec64cb0de1eea1f104a89e7db537a2c0f39f",
+    "aggregate_sha256": "9f5b9c01e62fcdd5d1c039e5380c1d55d17ea3abfacd2f5c6f8c30adad3a51dc",
+    "scope_discordant_scorecard_sha256": "9b2cee52f91e11b464c5d154d6fb4e6dd36db6c0bea725ae8ed2a2b1fa607307",
+    "scope_control_arm_sha256": "2d127c3b531f68714952ed81364071e456dc10348c6cea6f5ce8ddb3e9b40215",
+    "scope_treatment_arm_sha256": "2f22e864a462cd378b967570d0b737b4d844d21f06e09f924547cdca361d2b01"
+  },
+  "established": {
+    "triage_common_external": "10/12",
+    "scope_external": "12/12",
+    "scope_local": "11/12",
+    "scope_paired": {"both_solve": 11, "external_only": 1, "local_only": 0, "neither": 0},
+    "portfolio_control": "22/24",
+    "portfolio_treatment": "21/24",
+    "control_realized_policy_elapsed_ms": 857832.460,
+    "treatment_realized_policy_elapsed_ms": 566776.858,
+    "realized_reduction_ms": 291055.602,
+    "realized_reduction_percent": 33.929,
+    "quality_preserved": false,
+    "resource_reduced": true,
+    "economic_routing_success": false,
+    "quality_difference_source": "run5-scope-011: local treatment failed while external control passed"
+  },
+  "exploratory_post_hoc_sequential_reconstruction": {
+    "label": "exploratory; not a Run 5 experimental result",
+    "task_id": "run5-scope-011",
+    "local_treatment_elapsed_ms": 9462.528,
+    "external_control_elapsed_ms": 37792.511,
+    "run5_treatment_cost_ms": 566776.858,
+    "added_external_escalation_ms": 37792.511,
+    "reconstructed_sequential_cost_ms": 604569.369,
+    "control_cost_ms": 857832.460,
+    "descriptive_reconstructed_savings_ms": 253263.091,
+    "descriptive_reconstructed_reduction_percent": 29.524,
+    "descriptive_reconstructed_final_solves": "22/24",
+    "interpretation": "This reconstruction motivates Run 6 but does not confirm a sequential policy."
+  },
+  "freeze_sha256": "d460794fd7726cea9ea7ce9c179bb8d3b44b778cf8ccad3e16e8c0a34dce279c"
+}

@@ -1,0 +1,50 @@
+{
+  "audit_sha256": "fe000c37df6c66daaa7580bac90f3ecf5c6dda09be525ee4b5934e100530e520",
+  "counts": {
+    "candidates": 15,
+    "new_scenario_same_family": 0,
+    "new_source": 15,
+    "source_anchor_reuse": 0,
+    "source_document_reuse": 0
+  },
+  "exact_prompt_duplicates": [],
+  "high_similarity_pairs": [],
+  "model_outputs_consulted": false,
+  "normalized_prompt_duplicates": [],
+  "novelty_classification": {
+    "run6-triage-001": "new_source",
+    "run6-triage-002": "new_source",
+    "run6-triage-003": "new_source",
+    "run6-triage-004": "new_source",
+    "run6-triage-005": "new_source",
+    "run6-triage-006": "new_source",
+    "run6-triage-007": "new_source",
+    "run6-triage-008": "new_source",
+    "run6-triage-009": "new_source",
+    "run6-triage-010": "new_source",
+    "run6-triage-011": "new_source",
+    "run6-triage-012": "new_source",
+    "run6-triage-013": "new_source",
+    "run6-triage-014": "new_source",
+    "run6-triage-015": "new_source"
+  },
+  "prior_fixture_packs": [
+    "reviewed_run4_economic_triage",
+    "reviewed_run4b_scope",
+    "reviewed_run5_scope",
+    "reviewed_run5_triage",
+    "reviewed_run6_scope",
+    "reviewed_run6_triage",
+    "reviewed_v1",
+    "reviewed_v2",
+    "reviewed_v3",
+    "reviewed_v3b",
+    "reviewed_v3c",
+    "reviewed_v4a"
+  ],
+  "schema": "zth_run6_sequential_novelty_audit_v1",
+  "similarity_threshold": 0.8,
+  "source_anchor_collisions": [],
+  "source_document_collisions": [],
+  "task_id_collisions": []
+}
