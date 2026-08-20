@@ -168,6 +168,105 @@ def test_run6_clean_partial_resume_reuses_local_and_escalation_without_duplicate
     assert calls == {"worker": 78, "local_teacher": 12, "external_teacher": 36}
 
 
+def test_run6_local_pass_before_treatment_closeout_resumes_without_escalation(tmp_path: Path, monkeypatch):
+    context = _context(); calls = {"worker": 0, "local_teacher": 0, "external_teacher": 0}; worker, local, external = _callbacks(context, calls, local_pass=True); output = tmp_path / "local-pass"
+    original = driver._treatment_summary
+    interrupted = {"value": False}
+
+    def interrupt_once(*args, **kwargs):
+        if not interrupted["value"]:
+            interrupted["value"] = True
+            raise RuntimeError("interrupt after durable local pass")
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(driver, "_treatment_summary", interrupt_once)
+    with pytest.raises(RuntimeError, match="durable local pass"):
+        driver.run_experiment(context, output, worker=worker, local_teacher=local, external_teacher=external)
+    monkeypatch.setattr(driver, "_treatment_summary", original)
+    resumed = driver.run_experiment(context, output, worker=worker, local_teacher=local, external_teacher=external)
+    assert resumed["status"] == "experiment_completed"
+    assert calls == {"worker": 66, "local_teacher": 12, "external_teacher": 24}
+    assert not list((output / "tasks" / "scope").glob("*/escalation/arm_summary.json"))
+    scorecards = list((output / "tasks" / "scope").glob("*/scorecard.json"))
+    assert all(json.loads(path.read_text())["treatment"]["rescue"] for path in scorecards)
+
+
+def test_run6_local_failure_before_escalation_resumes_with_one_escalation(tmp_path: Path, monkeypatch):
+    context = _context(); calls = {"worker": 0, "local_teacher": 0, "external_teacher": 0}; worker, local, external = _callbacks(context, calls); output = tmp_path / "local-fail-before-escalation"
+    original_gate = driver.should_escalate
+    original_summary = driver._treatment_summary
+    interrupted = {"value": False}
+
+    def interrupt_once(*args, **kwargs):
+        if not interrupted["value"]:
+            interrupted["value"] = True
+            raise RuntimeError("interrupt before escalation active call")
+        return original_summary(*args, **kwargs)
+
+    monkeypatch.setattr(driver, "should_escalate", lambda _: False)
+    monkeypatch.setattr(driver, "_treatment_summary", interrupt_once)
+    with pytest.raises(RuntimeError, match="before escalation"):
+        driver.run_experiment(context, output, worker=worker, local_teacher=local, external_teacher=external)
+    assert not list((output / "tasks" / "scope").glob("*/escalation/arm_summary.json"))
+    monkeypatch.setattr(driver, "should_escalate", original_gate)
+    monkeypatch.setattr(driver, "_treatment_summary", original_summary)
+    resumed = driver.run_experiment(context, output, worker=worker, local_teacher=local, external_teacher=external)
+    assert resumed["status"] == "experiment_completed"
+    assert calls == {"worker": 78, "local_teacher": 12, "external_teacher": 36}
+    escalation_prompt = next((output / "tasks" / "scope").glob("*/escalation/external_teacher.prompt.txt"))
+    assert "local_first_attempt" in escalation_prompt.read_text()
+    assert all(json.loads(path.read_text())["treatment"]["rescue"] for path in (output / "tasks" / "scope").glob("*/scorecard.json"))
+
+
+def test_run6_escalation_before_treatment_closeout_resumes_without_duplicate_stages(tmp_path: Path, monkeypatch):
+    context = _context(); calls = {"worker": 0, "local_teacher": 0, "external_teacher": 0}; worker, local, external = _callbacks(context, calls); output = tmp_path / "escalation-closeout"
+    original = driver._treatment_summary
+    interrupted = {"value": False}
+
+    def interrupt_once(*args, **kwargs):
+        if not interrupted["value"]:
+            interrupted["value"] = True
+            raise RuntimeError("interrupt after durable escalation")
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(driver, "_treatment_summary", interrupt_once)
+    with pytest.raises(RuntimeError, match="durable escalation"):
+        driver.run_experiment(context, output, worker=worker, local_teacher=local, external_teacher=external)
+    monkeypatch.setattr(driver, "_treatment_summary", original)
+    assert list((output / "tasks" / "scope").glob("*/escalation/arm_summary.json"))
+    resumed = driver.run_experiment(context, output, worker=worker, local_teacher=local, external_teacher=external)
+    assert resumed["status"] == "experiment_completed"
+    assert calls == {"worker": 78, "local_teacher": 12, "external_teacher": 36}
+    assert all(json.loads(path.read_text())["treatment"]["rescue"] for path in (output / "tasks" / "scope").glob("*/scorecard.json"))
+
+
+@pytest.mark.parametrize("stage", ["local_first", "escalation"])
+def test_run6_sequential_terminal_artifact_corruption_fails_closed(tmp_path: Path, stage: str):
+    context = _context(); calls = {"worker": 0, "local_teacher": 0, "external_teacher": 0}; worker, local, external = _callbacks(context, calls); output = tmp_path / stage
+    driver.run_experiment(context, output, worker=worker, local_teacher=local, external_teacher=external)
+    action = next((output / "tasks" / "scope").glob(f"*/{stage}"))
+    indexed = [p for p in action.iterdir() if p.name not in {"arm_artifacts.json", "arm_binding.json", "arm_summary.json", "trajectory.jsonl"} and p.is_file()]
+    assert indexed
+    indexed[0].write_text(indexed[0].read_text() + "\ncorrupt\n")
+    manifest = json.loads((output / "execution_manifest.json").read_text()); manifest.pop("completed_at"); manifest["status"] = "experiment_running"; (output / "execution_manifest.json").write_text(json.dumps(manifest))
+    before = dict(calls)
+    with pytest.raises(Run4ADriverError, match="artifact hash mismatch"):
+        driver.run_experiment(context, output, worker=lambda _: (_ for _ in ()).throw(AssertionError("no duplicate")), local_teacher=lambda _: (_ for _ in ()).throw(AssertionError("no duplicate")), external_teacher=lambda _: (_ for _ in ()).throw(AssertionError("no duplicate")))
+    assert calls == before
+
+
+@pytest.mark.parametrize("field", ["preregistration_sha256", "driver_sha256", "policy_freeze_sha256", "fixture_pack_sha256", "models", "timeouts_seconds", "pair_order_seed", "git_head"])
+def test_run6_resume_rejects_every_recorded_binding_drift(tmp_path: Path, field: str):
+    context = _context()
+    payload = {"schema": "zth_run6_sequential_execution_manifest_v1", "status": "experiment_running", "git_head": context["git_head"], "preregistration_sha256": hashlib.sha256(PREREG.read_bytes()).hexdigest(), "driver_sha256": context["preregistration"]["driver"]["sha256"], "policy_freeze_sha256": context["preregistration"]["policy_freeze"]["canonical_sha256"], "fixture_pack_sha256": {f: context["manifests"][f]["pack_sha256"] for f in ("triage", "scope")}, "models": context["preregistration"]["models"], "timeouts_seconds": context["preregistration"]["timeouts_seconds"], "pair_order_seed": 20260825}
+    if field == "fixture_pack_sha256": payload[field] = {"triage": "drift", "scope": payload[field]["scope"]}
+    elif field in {"models", "timeouts_seconds"}: payload[field] = dict(payload[field]); payload[field][next(iter(payload[field]))] = "drift"
+    else: payload[field] = "drift"
+    output = tmp_path / field; output.mkdir(); (output / "execution_manifest.json").write_text(json.dumps(payload))
+    with pytest.raises(Run4ADriverError, match="binding drift"):
+        driver.run_experiment(context, output, worker=lambda _: (_ for _ in ()).throw(AssertionError("no model call")), local_teacher=lambda _: (_ for _ in ()).throw(AssertionError("no model call")), external_teacher=lambda _: (_ for _ in ()).throw(AssertionError("no model call")))
+
+
 def test_run6_active_call_and_terminal_states_fail_closed_or_reuse(tmp_path: Path):
     context = _context()
     base = {"schema": "zth_run6_sequential_execution_manifest_v1", "git_head": context["git_head"], "preregistration_sha256": hashlib.sha256(PREREG.read_bytes()).hexdigest(), "driver_sha256": context["preregistration"]["driver"]["sha256"], "policy_freeze_sha256": context["preregistration"]["policy_freeze"]["canonical_sha256"], "fixture_pack_sha256": {f: context["manifests"][f]["pack_sha256"] for f in ("triage", "scope")}, "models": context["preregistration"]["models"], "timeouts_seconds": context["preregistration"]["timeouts_seconds"], "pair_order_seed": 20260825}
