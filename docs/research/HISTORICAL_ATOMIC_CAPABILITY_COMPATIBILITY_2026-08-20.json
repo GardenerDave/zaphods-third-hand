@@ -1,0 +1,349 @@
+{
+  "existing_qwen3_0_6b_press": {
+    "aggregates": {
+      "interface_normalized": {
+        "allowed_exact": 6,
+        "allowed_micro": {
+          "f1": 0.6060606060606061,
+          "false_negatives": 4,
+          "false_positives": 9,
+          "precision": 0.5263157894736842,
+          "recall": 0.7142857142857143,
+          "true_positives": 10
+        },
+        "contract_usable": 10,
+        "error_cluster_tags": {
+          "allowed_held_overlap": 2,
+          "allowed_target_mismatch": 6,
+          "held_target_mismatch": 6,
+          "review_status_mismatch": 12
+        },
+        "field_types_all_correct": 12,
+        "fully_validator_valid": 0,
+        "held_exact": 6,
+        "held_micro": {
+          "f1": 0.5652173913043478,
+          "false_negatives": 11,
+          "false_positives": 9,
+          "precision": 0.5909090909090909,
+          "recall": 0.5416666666666666,
+          "true_positives": 13
+        },
+        "mechanically_recoverable": 12,
+        "no_overlap": 10,
+        "raw_parse_valid": null,
+        "reference_semantic_all_fields": 0,
+        "review_status_exact": 0,
+        "review_status_observed": {
+          "allowed": 3,
+          "approved": 5,
+          "hold": 2,
+          "ready": 1,
+          "required": 1
+        },
+        "scope_expansion_correct": 12,
+        "scope_expansion_type_correct": 12,
+        "semantic_fields_3_of_4": 5,
+        "semantic_fields_distribution": {
+          "1": 5,
+          "2": 2,
+          "3": 5
+        },
+        "task_count": 12
+      },
+      "interface_raw": {
+        "allowed_exact": 3,
+        "allowed_micro": {
+          "f1": 0.5,
+          "false_negatives": 8,
+          "false_positives": 4,
+          "precision": 0.6,
+          "recall": 0.42857142857142855,
+          "true_positives": 6
+        },
+        "contract_usable": 4,
+        "error_cluster_tags": {
+          "allowed_held_overlap": 2,
+          "allowed_target_mismatch": 9,
+          "held_target_mismatch": 8,
+          "missing_structured_object": 6,
+          "review_status_mismatch": 12,
+          "scope_expansion_uninterpretable": 6
+        },
+        "field_types_all_correct": 6,
+        "fully_validator_valid": 0,
+        "held_exact": 4,
+        "held_micro": {
+          "f1": 0.5142857142857142,
+          "false_negatives": 15,
+          "false_positives": 2,
+          "precision": 0.8181818181818182,
+          "recall": 0.375,
+          "true_positives": 9
+        },
+        "mechanically_recoverable": null,
+        "no_overlap": 10,
+        "raw_parse_valid": 6,
+        "reference_semantic_all_fields": 0,
+        "review_status_exact": 0,
+        "review_status_observed": {
+          "None": 6,
+          "allowed": 3,
+          "approved": 1,
+          "hold": 1,
+          "required": 1
+        },
+        "scope_expansion_correct": 6,
+        "scope_expansion_type_correct": 6,
+        "semantic_fields_3_of_4": 3,
+        "semantic_fields_distribution": {
+          "0": 6,
+          "1": 2,
+          "2": 1,
+          "3": 3
+        },
+        "task_count": 12
+      },
+      "stage_a_normalized": {
+        "allowed_exact": 6,
+        "allowed_micro": {
+          "f1": 0.5161290322580646,
+          "false_negatives": 6,
+          "false_positives": 9,
+          "precision": 0.47058823529411764,
+          "recall": 0.5714285714285714,
+          "true_positives": 8
+        },
+        "contract_usable": 3,
+        "error_cluster_tags": {
+          "allowed_held_overlap": 2,
+          "allowed_target_mismatch": 6,
+          "held_target_mismatch": 10,
+          "review_status_mismatch": 12,
+          "scope_expansion_mismatch": 3,
+          "scope_expansion_uninterpretable": 7,
+          "type_or_representation_error": 9
+        },
+        "field_types_all_correct": 3,
+        "fully_validator_valid": 0,
+        "held_exact": 2,
+        "held_micro": {
+          "f1": 0.3076923076923077,
+          "false_negatives": 18,
+          "false_positives": 9,
+          "precision": 0.4,
+          "recall": 0.25,
+          "true_positives": 6
+        },
+        "mechanically_recoverable": 12,
+        "no_overlap": 10,
+        "raw_parse_valid": null,
+        "reference_semantic_all_fields": 0,
+        "review_status_exact": 0,
+        "review_status_observed": {
+          "allowed": 1,
+          "approved": 4,
+          "hold": 2,
+          "pending": 2,
+          "proposal": 1,
+          "read-only": 1,
+          "ready": 1
+        },
+        "scope_expansion_correct": 2,
+        "scope_expansion_type_correct": 1,
+        "semantic_fields_3_of_4": 1,
+        "semantic_fields_distribution": {
+          "0": 6,
+          "1": 3,
+          "2": 2,
+          "3": 1
+        },
+        "task_count": 12
+      },
+      "stage_a_raw": {
+        "allowed_exact": 0,
+        "allowed_micro": {
+          "f1": null,
+          "false_negatives": 14,
+          "false_positives": 0,
+          "precision": null,
+          "recall": 0.0,
+          "true_positives": 0
+        },
+        "contract_usable": 0,
+        "error_cluster_tags": {
+          "allowed_target_mismatch": 12,
+          "held_target_mismatch": 12,
+          "missing_structured_object": 12,
+          "review_status_mismatch": 12,
+          "scope_expansion_uninterpretable": 12
+        },
+        "field_types_all_correct": 0,
+        "fully_validator_valid": 0,
+        "held_exact": 0,
+        "held_micro": {
+          "f1": null,
+          "false_negatives": 24,
+          "false_positives": 0,
+          "precision": null,
+          "recall": 0.0,
+          "true_positives": 0
+        },
+        "mechanically_recoverable": null,
+        "no_overlap": 12,
+        "raw_parse_valid": 0,
+        "reference_semantic_all_fields": 0,
+        "review_status_exact": 0,
+        "review_status_observed": {
+          "None": 12
+        },
+        "scope_expansion_correct": 0,
+        "scope_expansion_type_correct": 0,
+        "semantic_fields_3_of_4": 0,
+        "semantic_fields_distribution": {
+          "0": 12
+        },
+        "task_count": 12
+      }
+    },
+    "capability_map": {
+      "allowed_held_separation": {
+        "classification": "PARTIAL",
+        "evidence": "No-overlap 10/12 in each normalized run.",
+        "qualifiers": []
+      },
+      "allowed_target_identification": {
+        "classification": "PARTIAL",
+        "evidence": "Normalized exact-set 6/12 in both runs; interface micro precision/recall improved.",
+        "qualifiers": []
+      },
+      "complete_bounded_scope_authority_decision": {
+        "classification": "NOT_DEMONSTRATED",
+        "evidence": "0/12 fully validated in both runs.",
+        "qualifiers": []
+      },
+      "held_target_identification": {
+        "classification": "PARTIAL",
+        "evidence": "Normalized exact-set Stage A 2/12; interface 6/12.",
+        "qualifiers": []
+      },
+      "machine_readable_json": {
+        "classification": "PARTIAL",
+        "evidence": "Stage A normalized 12/12 objects; raw 0/12. Interface raw 6/12 bare objects.",
+        "qualifiers": [
+          "INTERFACE_DEPENDENT"
+        ]
+      },
+      "required_field_types": {
+        "classification": "PARTIAL",
+        "evidence": "Stage A normalized 3/12 all types; interface 12/12.",
+        "qualifiers": [
+          "INTERFACE_DEPENDENT"
+        ]
+      },
+      "review_status_selection": {
+        "classification": "NOT_DEMONSTRATED",
+        "evidence": "0/12 exact in both normalized runs.",
+        "qualifiers": []
+      },
+      "scope_expansion_detection": {
+        "classification": "DEMONSTRATED",
+        "evidence": "Interface normalized 12/12 correct; no negative-required branch in this sample.",
+        "qualifiers": [
+          "positive-required-branch-only"
+        ]
+      }
+    },
+    "classification": "PARTIAL_ATOMIC_PRESS_COMPATIBLE",
+    "reason": "Imported from the preserved 0.6B atomic press rather than rescored; it contains reference facts, per-task scores, and immutable run-tree manifests, but its two exploratory interface views are not the same lifecycle as Runs 4B-8.",
+    "source_path": "docs/research/MODEL_SIZE_SUPPLIER_FLOOR_QWEN3_0_6B_ATOMIC_CAPABILITY_MATRIX_2026-08-20.json",
+    "source_sha256": "b9d804d4ff1b874003bc35987504a4a507583d155d42831631b08b9a9156d1ed"
+  },
+  "historical_artifacts_changed": false,
+  "model_calls_made": 0,
+  "runs": {
+    "run4b": {
+      "aggregate_sha256": "f49c38c91f5d3c136927cd05697e88721aa7ba965f31c0be004b6910b830b5ea",
+      "classification": "FULL_ATOMIC_PRESS_COMPATIBLE",
+      "escalation_branch_observed": false,
+      "fixture_dir": "local_harness/fixtures/capability_loop/reviewed_run4b_scope",
+      "fixture_manifest_sha256": "308d9b097db77b720a09135f88fa9e288109b82f6eff5a202715fc367767488e",
+      "reason": "Selected scope tasks have preserved raw worker outputs, deterministic validation artifacts, fixture reference facts, and durable provenance; stage availability is recorded in the matrix.",
+      "report_path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_4B_SCOPE_2026-08-19.md",
+      "report_sha256": "ddb09bd03fc62cdfaa71acbdc5e18fcb301be9a4f644496bb7292ce7d672df19",
+      "run_root": ".work/run4b_scope_replication/run_20260819T231103Z",
+      "selected_count": 12,
+      "stages_observed": [
+        "control_external",
+        "local_first"
+      ]
+    },
+    "run5": {
+      "aggregate_sha256": "9f5b9c01e62fcdd5d1c039e5380c1d55d17ea3abfacd2f5c6f8c30adad3a51dc",
+      "classification": "FULL_ATOMIC_PRESS_COMPATIBLE",
+      "escalation_branch_observed": false,
+      "fixture_dir": "local_harness/fixtures/capability_loop/reviewed_run5_scope",
+      "fixture_manifest_sha256": "273bf634c9eac4e6ddeb2d30d09cb0fd31dd49c670115c48274f1eb9a943418c",
+      "reason": "Selected scope tasks have preserved raw worker outputs, deterministic validation artifacts, fixture reference facts, and durable provenance; stage availability is recorded in the matrix.",
+      "report_path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_5_MIXED_2026-08-20.md",
+      "report_sha256": "bfd41515bba5db7d9cf0ff60e7340a3c98b2f0c297320d544d5847037cf44cc9",
+      "run_root": ".work/run5_mixed_economic_routing/run_20260819T013828Z",
+      "selected_count": 12,
+      "stages_observed": [
+        "control_external",
+        "local_first"
+      ]
+    },
+    "run6": {
+      "aggregate_sha256": "29f8f38862af6558d23ce6e8d71935bfe5776b889613fc22bee9b73af3773bda",
+      "classification": "FULL_ATOMIC_PRESS_COMPATIBLE",
+      "escalation_branch_observed": false,
+      "fixture_dir": "local_harness/fixtures/capability_loop/reviewed_run6_scope",
+      "fixture_manifest_sha256": "835d2a65f71a535c9d1afe327e6335e67adc1f0647b0f6b88adf910a8d7a6cae",
+      "reason": "Selected scope tasks have preserved raw worker outputs, deterministic validation artifacts, fixture reference facts, and durable provenance; stage availability is recorded in the matrix.",
+      "report_path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_6_VALIDATION_GATED_2026-08-20.md",
+      "report_sha256": "d4d41117f541720ccb9881a1ccd805608955fbd8b532342e80c88dd38fd58600",
+      "run_root": ".work/run6_sequential_economic_routing/run_20260820T030541Z",
+      "selected_count": 12,
+      "stages_observed": [
+        "control_external",
+        "local_first"
+      ]
+    },
+    "run7": {
+      "aggregate_sha256": "c64d7ff2a5031f5151f3af44437b5142824af00e8fcb391e97376d5f9a07f3eb",
+      "classification": "FULL_ATOMIC_PRESS_COMPATIBLE",
+      "escalation_branch_observed": true,
+      "fixture_dir": "local_harness/fixtures/capability_loop/run7_scope",
+      "fixture_manifest_sha256": "dcf29415dbca3da838cceb0c1758123c41313382b675cc0c7cfb23efb395735a",
+      "reason": "Selected scope tasks have preserved raw worker outputs, deterministic validation artifacts, fixture reference facts, and durable provenance; stage availability is recorded in the matrix.",
+      "report_path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_7_VALIDATION_GATED_2026-08-20.md",
+      "report_sha256": "985cc7935d529e9decae3efcea83d1e4d7fdd83a787c311d75896904f530606c",
+      "run_root": ".work/run7_scope_escalation/run_20260820T045113Z",
+      "selected_count": 20,
+      "stages_observed": [
+        "control_external",
+        "escalation",
+        "local_first"
+      ]
+    },
+    "run8": {
+      "aggregate_sha256": "225f1afaba0aa05212eb241481002ac1d6515575a139b894c3b5d5f466c7538d",
+      "classification": "FULL_ATOMIC_PRESS_COMPATIBLE",
+      "escalation_branch_observed": true,
+      "fixture_dir": "local_harness/fixtures/capability_loop/run8_scope",
+      "fixture_manifest_sha256": "9e6ef8fd4a54c23fd2457efc826f028538b15fa316dd7ef95f296b4c924bfff9",
+      "reason": "Selected scope tasks have preserved raw worker outputs, deterministic validation artifacts, fixture reference facts, and durable provenance; stage availability is recorded in the matrix.",
+      "report_path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_8_VALIDATION_GATED_2026-08-20.md",
+      "report_sha256": "dcbaf423fc4a4f6f0357fd65cf823a64ba3bfd4b1fb4bd1ba6079ec43a5359b9",
+      "run_root": ".work/run8_scope_escalation/run_20260820T150846Z",
+      "selected_count": 20,
+      "stages_observed": [
+        "control_external",
+        "escalation",
+        "local_first"
+      ]
+    }
+  },
+  "schema": "zth_historical_atomic_capability_compatibility_v1"
+}

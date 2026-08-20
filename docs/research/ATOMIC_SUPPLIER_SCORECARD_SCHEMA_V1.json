@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "zth://research/atomic-supplier-scorecard-v1",
+  "title": "Atomic supplier scorecard v1",
+  "description": "Model-free evidence schema for bounded task-family supplier auditions; not a capability-card or production-routing schema.",
+  "type": "object",
+  "required": [
+    "provenance",
+    "supplier",
+    "task_family",
+    "attempts",
+    "atomic_profile",
+    "resource_profile",
+    "escalation_profile"
+  ],
+  "properties": {
+    "provenance": {
+      "type": "object",
+      "required": ["evidence_resolution", "source_paths", "source_hashes"],
+      "properties": {
+        "evidence_resolution": {"type": "string"},
+        "source_paths": {"type": "array", "items": {"type": "string"}},
+        "source_hashes": {"type": "array", "items": {"type": "string"}},
+        "raw_artifacts_changed": {"type": "boolean"},
+        "model_calls_made": {"type": "integer", "const": 0}
+      }
+    },
+    "supplier": {
+      "type": "object",
+      "required": ["model_identity", "runtime_identity"],
+      "properties": {
+        "model_identity": {"type": ["string", "null"]},
+        "parameter_count": {"type": ["integer", "null"]},
+        "quantization": {"type": ["string", "null"]},
+        "runtime_identity": {"type": ["string", "null"]},
+        "hardware_identity": {"type": ["string", "null"]}
+      }
+    },
+    "task_family": {"type": "string"},
+    "attempts": {
+      "type": "object",
+      "properties": {
+        "tasks": {"type": "integer"},
+        "transport_valid": {"type": "integer"},
+        "raw_parse_valid": {"type": "integer"},
+        "full_validator_passes": {"type": "integer"}
+      }
+    },
+    "atomic_profile": {
+      "type": "object",
+      "description": "Task-family adapter output; preserve vectors instead of an intelligence scalar.",
+      "properties": {
+        "structured_output": {"type": "object"},
+        "field_types": {"type": "object"},
+        "allowed_targets": {"type": "object"},
+        "held_targets": {"type": "object"},
+        "authority_separation": {"type": "object"},
+        "scope_expansion": {"type": "object"},
+        "review_status": {"type": "object"},
+        "semantic_fields_correct_distribution": {"type": "object"},
+        "full_task": {"type": "object"}
+      }
+    },
+    "resource_profile": {
+      "type": "object",
+      "properties": {
+        "latency_ms": {"type": "object"},
+        "energy_joules": {"type": "object"},
+        "measurement_boundary": {"type": ["string", "null"]}
+      }
+    },
+    "escalation_profile": {
+      "type": "object",
+      "properties": {
+        "escalation_count": {"type": "integer"},
+        "rescue_count": {"type": "integer"},
+        "repair_deltas": {"type": "array"}
+      }
+    }
+  }
+}
