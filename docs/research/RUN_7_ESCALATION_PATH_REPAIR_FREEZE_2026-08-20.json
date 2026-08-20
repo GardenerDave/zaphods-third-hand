@@ -1,0 +1,57 @@
+{
+  "schema": "zth_run7_escalation_path_repair_freeze_v1",
+  "status": "future_evaluation_only",
+  "model_calls_made": false,
+  "forensic_report": {
+    "path": "docs/research/RUN_7_ESCALATION_PATH_FORENSIC_ANALYSIS_2026-08-20.md",
+    "sha256": "e0974d1bb8d0d59e5846e8abaa2797bc8d22f97acead9603f92cacf33f9be3ab"
+  },
+  "historical_run7": {
+    "execution_commit": "08298d87147f67ad9ad2624c376adb8790cf1f75",
+    "preregistration": {
+      "path": "docs/research/RUN_7_VALIDATION_GATED_ESCALATION_PREREGISTRATION_2026-08-20.json",
+      "sha256": "1c45ce7be83194d4adfb5cf1af6b04d90495712b6779956bc6f7691ac4055de6"
+    },
+    "driver": {
+      "path": "scripts/zth_run7_scope_escalation.py",
+      "sha256": "f1bdac815109a2dce473529ae14ddc24d60b048b74f3268e25fa6f9d9b1ad547"
+    },
+    "raw_evidence_changed": false
+  },
+  "repair": {
+    "repair_commit": "6ff7570479d3ad85915341eec39ba062650874c8",
+    "driver": {
+      "path": "scripts/zth_run7_scope_escalation.py",
+      "sha256": "e52511f73461a122b5849dc6ba661008b31567fd0ab0c629c5ba507bf7d92337"
+    },
+    "repair_note": {
+      "path": "docs/research/RUN_7_ESCALATION_PATH_REPAIR_2026-08-20.md",
+      "sha256": "cbce295bcf1676bae9b83ebf636177ab3a5053526b7023a31c07c0bd21b3054f"
+    },
+    "future_confirmation_required": true,
+    "scientific_evidence_produced": false
+  },
+  "unchanged_bindings": {
+    "policy_source": {
+      "path": "local_harness/run7_escalation_policy.py",
+      "sha256": "015c0ee04724a6480e20b7730e9fcfd2663622c473dda937cf76f3e9f8ad2220"
+    },
+    "fixture_pack_sha256": "7b0f94b5301bba35a10165030b37313a8b5734f01c7a934d9e5ea9c25b800740",
+    "validators": [
+      {
+        "path": "local_harness/supervised_capability_loop.py",
+        "sha256": "23b26115201d8cba17b9da659af72793654897803988e35e28210eba02af81be"
+      },
+      {
+        "path": "local_harness/supervised_reference_fact_validator.py",
+        "sha256": "d86793dfde5a499988be92447f7df79da889a6074b8dc21b1c3b16bd7c60008a"
+      },
+      {
+        "path": "local_harness/supervised_attempt_output_validator.py",
+        "sha256": "3ca42dfc6f683399752bfe4f5757b9edf4e7eafb09ac30166fe60e9f3beb0d27"
+      }
+    ]
+  },
+  "authority": "review_only_future_evaluation; no historical evidence reinterpretation; no production routing; no capability merge; no training, promotion, retirement, or queueing",
+  "run7_raw_evidence_changed": false
+}

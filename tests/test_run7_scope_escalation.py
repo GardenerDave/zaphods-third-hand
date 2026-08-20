@@ -22,6 +22,7 @@ from scripts.zth_run4a_intervention_calibration import Run4ADriverError
 
 ROOT = Path(__file__).resolve().parents[1]
 PREREG = ROOT / "docs/research/RUN_7_VALIDATION_GATED_ESCALATION_PREREGISTRATION_2026-08-20.json"
+REPAIR_FREEZE = ROOT / "docs/research/RUN_7_ESCALATION_PATH_REPAIR_FREEZE_2026-08-20.json"
 PACK = ROOT / "local_harness/fixtures/capability_loop/run7_scope"
 FAMILY = "scope-authority-boundary"
 
@@ -31,10 +32,19 @@ def _response(content: str, model: str = "fixture-model") -> WorkerResponse:
 
 
 def _context() -> dict:
-    context = driver._load_context(PREREG, ROOT, require_runtime=False)
-    context["preregistration_path"] = PREREG
+    repair_prereg = _repair_validation_preregistration()
+    context = driver._load_context(repair_prereg, ROOT, require_runtime=False)
+    context["preregistration_path"] = repair_prereg
     context["git_head"] = "synthetic-run7-head"
     return context
+
+
+def _repair_validation_preregistration() -> Path:
+    payload = json.loads(PREREG.read_text())
+    payload["driver"]["sha256"] = driver.sha256_file(ROOT / payload["driver"]["path"])
+    path = Path("/tmp/run7_scope_repair_validation_preregistration.json")
+    path.write_text(json.dumps(payload, indent=2) + "\n")
+    return path
 
 
 def _valid(task: dict) -> str:
@@ -99,10 +109,32 @@ def test_run7_fixture_pack_is_intervention_blind_and_bound():
     assert audit["counts"]["new_source"] == 24
 
 
-def test_run7_dry_run_makes_zero_model_calls():
+def test_run7_historical_binding_rejects_repaired_driver_without_calls():
     result = subprocess.run(["python3", "scripts/zth_run7_scope_escalation.py", "--preregistration", str(PREREG), "--output-dir", "/tmp/run7-scope-dry"], cwd=ROOT, capture_output=True, text=True)
+    assert result.returncode != 0
+    assert "Run 7 driver binding mismatch" in result.stderr
+
+
+def test_run7_repair_validation_dry_run_makes_zero_model_calls():
+    repair_prereg = _repair_validation_preregistration()
+    result = subprocess.run(["python3", "scripts/zth_run7_scope_escalation.py", "--preregistration", str(repair_prereg), "--output-dir", "/tmp/run7-scope-repair-dry"], cwd=ROOT, capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     assert json.loads(result.stdout) == {"control": "external_direct", "model_calls": 0, "pair_order_seed": 20260826, "status": "dry_run_valid", "treatment": "validation_gated_economic_escalation"}
+
+
+def test_run7_repair_freeze_separates_historical_and_repaired_bindings():
+    freeze = json.loads(REPAIR_FREEZE.read_text())
+    historical = json.loads(PREREG.read_text())
+    historical_prereg_sha = driver.sha256_file(PREREG)
+    current_driver_sha = driver.sha256_file(ROOT / "scripts/zth_run7_scope_escalation.py")
+    assert historical_prereg_sha == "1c45ce7be83194d4adfb5cf1af6b04d90495712b6779956bc6f7691ac4055de6"
+    assert historical["driver"]["sha256"] == "f1bdac815109a2dce473529ae14ddc24d60b048b74f3268e25fa6f9d9b1ad547"
+    assert freeze["historical_run7"]["preregistration"]["sha256"] == historical_prereg_sha
+    assert freeze["historical_run7"]["driver"]["sha256"] == historical["driver"]["sha256"]
+    assert freeze["repair"]["driver"]["sha256"] == current_driver_sha
+    assert freeze["historical_run7"]["driver"]["sha256"] != freeze["repair"]["driver"]["sha256"]
+    assert freeze["historical_run7"]["raw_evidence_changed"] is False
+    assert freeze["repair"]["scientific_evidence_produced"] is False
 
 
 def test_run7_all_escalate_clean_counts_and_branch_metrics(tmp_path: Path):

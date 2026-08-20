@@ -37,10 +37,12 @@ direct isolated-arm provenance contract. It is included in the existing
 terminal artifact index and is therefore covered by binding and hash
 verification on reuse.
 
-The Run 7 preregistration driver binding was re-bound from the historical
-driver implementation to the repaired future-evaluation implementation. The
-historical execution directory remains immutable and is not reinterpreted or
-re-executed.
+The historical Run 7 preregistration remains immutable and continues to bind
+the historical driver implementation. The repaired driver is separately frozen
+for future evaluation only; it is not bound into the historical
+preregistration. Run 7 therefore cannot be reinterpreted as having run the
+repaired implementation. A separately authorized future experiment is required
+before the repaired implementation can produce scientific evidence.
 
 ## Model-free verification
 
