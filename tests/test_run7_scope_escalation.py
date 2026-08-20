@@ -129,7 +129,7 @@ def test_run7_local_pass_has_no_escalations(tmp_path: Path):
     assert aggregate["escalations"] == 0
 
 
-def test_run7_local_failure_before_escalation_resume_has_no_duplicates(tmp_path: Path, monkeypatch):
+def test_run7_escalation_durable_before_treatment_closeout_resume_has_no_duplicates(tmp_path: Path, monkeypatch):
     context = _context(); calls = {"worker": 0, "local_teacher": 0, "external_teacher": 0}; worker, local, external = _callbacks(context, calls); output = tmp_path / "partial"
     original = driver._treatment_summary; interrupted = {"value": False}
 
@@ -150,6 +150,43 @@ def test_run7_local_failure_before_escalation_resume_has_no_duplicates(tmp_path:
     assert calls == {"worker": 84, "local_teacher": 20, "external_teacher": 40}
 
 
+def test_run7_local_failure_before_escalation_resume_has_no_duplicates(tmp_path: Path, monkeypatch):
+    context = _context(); calls = {"worker": 0, "local_teacher": 0, "external_teacher": 0}; worker, local, external = _callbacks(context, calls); output = tmp_path / "pre-escalation"
+    original_valid = driver._valid; interrupted = {"value": False}
+
+    def interrupt_after_local(summary):
+        if not interrupted["value"] and summary.get("intervention") == "local_teacher":
+            interrupted["value"] = True
+            raise RuntimeError("clean interruption before escalation active call")
+        return original_valid(summary)
+
+    monkeypatch.setattr(driver, "_valid", interrupt_after_local)
+    with pytest.raises(RuntimeError, match="before escalation active call"):
+        driver.run_experiment(context, output, worker=worker, local_teacher=local, external_teacher=external)
+    manifest = json.loads((output / "execution_manifest.json").read_text())
+    assert manifest["status"] == "experiment_running"
+    assert "active_call" not in manifest
+    selected = json.loads((output / "selections" / "scope.json").read_text())["included_task_ids"]
+    task_id = selected[0]
+    local_dir = output / "tasks" / "scope" / task_id / "local_first"
+    assert (local_dir / "arm_summary.json").exists()
+    assert (local_dir / "arm_artifacts.json").exists()
+    assert not (output / "tasks" / "scope" / task_id / "escalation").exists()
+    trajectory = (local_dir / "trajectory.jsonl").read_text()
+    assert '"role": "local_teacher"' in trajectory
+    assert '"call_id": "worker:worker-retry"' in trajectory
+    assert calls["local_teacher"] == 1
+    assert calls["external_teacher"] in {0, 1}
+    before_resume = dict(calls)
+    monkeypatch.setattr(driver, "_valid", original_valid)
+    resumed = driver.run_experiment(context, output, worker=worker, local_teacher=local, external_teacher=external)
+    assert resumed["status"] == "experiment_completed"
+    assert calls == {"worker": 84, "local_teacher": 20, "external_teacher": 40}
+    assert calls["local_teacher"] == before_resume["local_teacher"] + 19
+    escalation_prompt = next((output / "tasks" / "scope").glob("*/escalation/external_teacher.prompt.txt"))
+    assert "local_first_attempt" in escalation_prompt.read_text()
+
+
 def test_run7_terminal_action_corruption_fails_closed(tmp_path: Path):
     context = _context(); calls = {"worker": 0, "local_teacher": 0, "external_teacher": 0}; worker, local, external = _callbacks(context, calls); output = tmp_path / "corrupt"
     driver.run_experiment(context, output, worker=worker, local_teacher=local, external_teacher=external)
@@ -160,6 +197,20 @@ def test_run7_terminal_action_corruption_fails_closed(tmp_path: Path):
     with pytest.raises(Run4ADriverError, match="artifact hash mismatch"):
         driver.run_experiment(context, output, worker=lambda _: (_ for _ in ()).throw(AssertionError("duplicate")), local_teacher=lambda _: (_ for _ in ()).throw(AssertionError("duplicate")), external_teacher=lambda _: (_ for _ in ()).throw(AssertionError("duplicate")))
     assert calls == {"worker": 84, "local_teacher": 20, "external_teacher": 40}
+
+
+def test_run7_escalation_action_corruption_fails_closed(tmp_path: Path):
+    context = _context(); calls = {"worker": 0, "local_teacher": 0, "external_teacher": 0}; worker, local, external = _callbacks(context, calls); output = tmp_path / "escalation-corrupt"
+    driver.run_experiment(context, output, worker=worker, local_teacher=local, external_teacher=external)
+    action = next((output / "tasks" / "scope").glob("*/escalation"))
+    indexed = [p for p in action.iterdir() if p.name not in {"arm_artifacts.json", "arm_binding.json", "arm_summary.json", "trajectory.jsonl"}]
+    assert indexed
+    indexed[0].write_text(indexed[0].read_text() + "\ncorrupt\n")
+    manifest = json.loads((output / "execution_manifest.json").read_text()); manifest.pop("completed_at"); manifest["status"] = "experiment_running"; (output / "execution_manifest.json").write_text(json.dumps(manifest))
+    before = dict(calls)
+    with pytest.raises(Run4ADriverError, match="artifact hash mismatch"):
+        driver.run_experiment(context, output, worker=lambda _: (_ for _ in ()).throw(AssertionError("duplicate worker")), local_teacher=lambda _: (_ for _ in ()).throw(AssertionError("duplicate local")), external_teacher=lambda _: (_ for _ in ()).throw(AssertionError("duplicate external")))
+    assert calls == before
 
 
 def test_run7_local_infrastructure_does_not_escalate(tmp_path: Path):
