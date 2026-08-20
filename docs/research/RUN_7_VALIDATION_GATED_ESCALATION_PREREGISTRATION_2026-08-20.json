@@ -14,7 +14,7 @@
     "canonical_sha256": "8e84c1c625eec039e68ea70fadb5ca551300fb1d04ac5604ceff36c82b0c1974"
   },
   "policy_source": {"path": "local_harness/run7_escalation_policy.py", "sha256": "015c0ee04724a6480e20b7730e9fcfd2663622c473dda937cf76f3e9f8ad2220"},
-  "driver": {"path": "scripts/zth_run7_scope_escalation.py", "sha256": "f1bdac815109a2dce473529ae14ddc24d60b048b74f3268e25fa6f9d9b1ad547"},
+  "driver": {"path": "scripts/zth_run7_scope_escalation.py", "sha256": "e52511f73461a122b5849dc6ba661008b31567fd0ab0c629c5ba507bf7d92337"},
   "difficulty_criteria": {"path": "docs/research/RUN_7_SCOPE_DIFFICULTY_CRITERIA_FREEZE_2026-08-20.json", "sha256": "5d8ffee88086f4d2cacd26549f153ee5d44b587e5c5d9d412228dfdd7ebbf770", "minimum_structural_features_per_candidate": 3, "selection_is_intervention_blind": true, "model_outputs_consulted": false},
   "fixture_provenance": {"path": "docs/research/RUN_7_FIXTURE_PROVENANCE_2026-08-20.md", "sha256": "b4e0d4157cef2a700703fad7269d96804f872a2222445c8ada1e207ab0ae7875"},
   "fixture_pack": {

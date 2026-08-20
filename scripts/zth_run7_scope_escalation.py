@@ -16,25 +16,30 @@ from typing import Any, Callable, Mapping
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from local_harness.run4a_intervention_harness import (  # noqa: E402
+    REQUIRED_AUTHORITY,
+    _call_teacher,
+    _call_worker,
     _default_external_teacher,
     _default_local_teacher,
     _default_worker,
     _json_write,
+    _teacher_prompt,
 )
 from local_harness.run6_sequential_fixture_pack import verify_manifest as verify_run6_manifest  # noqa: E402
 from local_harness.run7_escalation_policy import verify_policy  # noqa: E402
 from local_harness.run7_scope_fixture_pack import verify_manifest  # noqa: E402
 from local_harness.supervised_capability_loop import load_task_fixture  # noqa: E402
-from scripts.zth_run4_economic_routing import _baseline_payload  # noqa: E402
+from scripts.zth_run4_economic_routing import _arm_terminal, _baseline_payload  # noqa: E402
 from scripts.zth_run4a_intervention_calibration import (  # noqa: E402
     Run4ADriverError,
+    _append_transition,
     _read_json,
+    _write_arm_artifact_index,
     run_baseline,
 )
 from scripts.zth_run6_sequential_economic_routing import (  # noqa: E402
     _assert_action_reusable,
     _resource_history,
-    _run_external_escalation,
     _run_single_action,
     _treatment_summary,
     _valid,
@@ -45,6 +50,148 @@ from scripts.zth_run6_sequential_economic_routing import (  # noqa: E402
 TARGET_COUNT = 20
 FAMILY = "scope-authority-boundary"
 TERMINAL_STATUSES = {"experiment_completed", "experiment_incomplete"}
+
+
+def _run_external_escalation(
+    context: Mapping[str, Any],
+    output_dir: Path,
+    task_id: str,
+    baseline: Mapping[str, Any],
+    local_summary: Mapping[str, Any],
+    *,
+    worker: Callable[..., Any],
+    external_teacher: Callable[..., Any],
+) -> dict[str, Any]:
+    """Run the repaired Run 7 escalation action.
+
+    Escalation uses the same diagnostic/review-only teacher contract as the
+    proven direct intervention path.  The local validation failure is carried
+    as an additional failed transition; it is evidence for diagnosis, never
+    authoritative task guidance.
+    """
+
+    action_dir = output_dir / "tasks" / "scope" / task_id / "escalation"
+    prereg = context["preregistration"]
+    baseline_digest = hashlib.sha256(
+        json.dumps(baseline, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+    ).hexdigest()
+    binding = {
+        "schema": "zth_run7_escalation_action_binding_v1",
+        "family": "scope-authority-boundary",
+        "task_id": task_id,
+        "stage": "escalation",
+        "intervention": "external_teacher",
+        "preregistration_sha256": sha256_file(context["preregistration_path"]),
+        "fixture_pack_sha256": context["manifests"]["scope"]["pack_sha256"],
+        "baseline_summary_sha256": baseline_digest,
+        "policy_freeze_sha256": prereg["policy_freeze"]["canonical_sha256"],
+        "models": prereg["models"],
+        "timeouts_seconds": prereg["timeouts_seconds"],
+    }
+    terminal = _arm_terminal(action_dir, binding)
+    if terminal is not None:
+        return terminal
+    if action_dir.exists():
+        _assert_action_reusable(action_dir)
+        if any(action_dir.iterdir()):
+            raise Run4ADriverError(f"incomplete Run 7 escalation artifacts in {action_dir}")
+    action_dir.mkdir(parents=True, exist_ok=True)
+    _json_write(action_dir / "arm_binding.json", binding)
+
+    baseline_copy = dict(baseline)
+    baseline_copy["raw"] = dict(baseline.get("raw", {}))
+    _json_write(action_dir / "baseline_reference.json", baseline_copy)
+
+    trajectory = action_dir / "trajectory.jsonl"
+    task = context["tasks"][task_id]
+    failed_transitions = [
+        {"validation": baseline["validation"], "intervention_id": "none:1"},
+        {
+            "validation": {
+                "validation_status": local_summary.get("validation_status"),
+                "failed_checks": local_summary.get("failed_checks", []),
+                "diagnostics": local_summary.get("failed_checks", []),
+            },
+            "intervention_id": "local_first",
+        },
+    ]
+    escalation_prompt = _teacher_prompt(
+        task,
+        role="external_teacher",
+        failed_transitions=failed_transitions,
+        patch_records=[],
+    )
+    teacher_payload, infrastructure = _call_teacher(
+        action_dir,
+        trajectory,
+        task,
+        escalation_prompt,
+        role="external_teacher",
+        local_teacher=lambda _: (_ for _ in ()).throw(Run4ADriverError("local teacher forbidden in escalation")),
+        external_teacher=external_teacher,
+    )
+    worker_result = None
+    if teacher_payload is not None:
+        retry_prompt = json.dumps(
+            {
+                "task_prompt": task["prompt"],
+                "output_contract": task["output_contract"],
+                "reference_facts": task["validator"].get("reference_facts", {}),
+                "baseline_diagnostics": baseline["validation"].get("diagnostics", []),
+                "local_first_validation_failure": local_summary.get("failed_checks", []),
+                "intervention": teacher_payload.get("parsed", {}),
+                "authority": REQUIRED_AUTHORITY,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        worker_result, infrastructure = _call_worker(
+            action_dir,
+            trajectory,
+            task,
+            retry_prompt,
+            worker=worker,
+            attempt_id="worker-retry",
+        )
+    if infrastructure is not None:
+        summary = {
+            "schema": "zth_run7_stage_summary_v1",
+            "task_id": task_id,
+            "task_family": task["task_family"],
+            "stage": "escalation",
+            "intervention": "external_teacher",
+            "capability_verdict_available": False,
+            "deterministically_validated_rescue": False,
+            "transport_valid": False,
+            "disposition": "infrastructure_error",
+            "infrastructure_artifact": infrastructure.get("artifact_ref"),
+            "trigger": "deterministic validation failure",
+            "authority": "review_required_no_evidence_merge",
+        }
+    else:
+        validation = worker_result["validation"]
+        summary = {
+            "schema": "zth_run7_stage_summary_v1",
+            "task_id": task_id,
+            "task_family": task["task_family"],
+            "stage": "escalation",
+            "intervention": "external_teacher",
+            "capability_verdict_available": True,
+            "transport_valid": True,
+            "transport_classification": "model_response",
+            "deterministically_validated_rescue": validation["validation_status"] == "passed",
+            "validation_status": validation["validation_status"],
+            "failed_checks": [c["check_id"] for c in validation.get("checks", []) if c.get("status") == "failed"],
+            "realized_elapsed_ms": worker_result["telemetry"]["elapsed_ms"] + teacher_payload["resource_telemetry"]["elapsed_ms"],
+            "resource_telemetry": {"worker": worker_result["telemetry"], "external_teacher": teacher_payload["resource_telemetry"]},
+            "disposition": "ready_for_review" if validation["validation_status"] == "passed" else "unresolved",
+            "trigger": "deterministic validation failure",
+            "authority": "review_required_no_evidence_merge",
+        }
+    _append_transition(trajectory, summary["disposition"], task_id=task_id, stage="escalation", capability_verdict_available=summary["capability_verdict_available"])
+    _json_write(action_dir / "arm_summary.json", summary)
+    _write_arm_artifact_index(action_dir)
+    return summary
 
 
 def utc_now() -> str:

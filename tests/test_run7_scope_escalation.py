@@ -16,6 +16,7 @@ from local_harness.run7_escalation_policy import (
     verify_policy,
 )
 from local_harness.run7_scope_fixture_pack import verify_manifest
+from local_harness.supervised_capability_loop import _parse_teacher
 from scripts import zth_run7_scope_escalation as driver
 from scripts.zth_run4a_intervention_calibration import Run4ADriverError
 
@@ -184,7 +185,8 @@ def test_run7_local_failure_before_escalation_resume_has_no_duplicates(tmp_path:
     assert calls == {"worker": 84, "local_teacher": 20, "external_teacher": 40}
     assert calls["local_teacher"] == before_resume["local_teacher"] + 19
     escalation_prompt = next((output / "tasks" / "scope").glob("*/escalation/external_teacher.prompt.txt"))
-    assert "local_first_attempt" in escalation_prompt.read_text()
+    prompt_payload = json.loads(escalation_prompt.read_text())
+    assert prompt_payload["failed_transitions"][1]["intervention_id"] == "local_first"
 
 
 def test_run7_terminal_action_corruption_fails_closed(tmp_path: Path):
@@ -211,6 +213,104 @@ def test_run7_escalation_action_corruption_fails_closed(tmp_path: Path):
     with pytest.raises(Run4ADriverError, match="artifact hash mismatch"):
         driver.run_experiment(context, output, worker=lambda _: (_ for _ in ()).throw(AssertionError("duplicate worker")), local_teacher=lambda _: (_ for _ in ()).throw(AssertionError("duplicate local")), external_teacher=lambda _: (_ for _ in ()).throw(AssertionError("duplicate external")))
     assert calls == before
+
+
+def test_run7_escalation_uses_diagnostic_contract_and_preserves_baseline_reference(tmp_path: Path):
+    context = _context()
+    calls = {"worker": 0, "local_teacher": 0, "external_teacher": 0}
+    captured_worker_prompts: list[str] = []
+
+    def worker(prompt: str) -> WorkerResponse:
+        calls["worker"] += 1
+        captured_worker_prompts.append(prompt)
+        for task in context["tasks"].values():
+            if prompt == task["prompt"]:
+                return _response(_invalid(task))
+            if task["prompt"] in prompt and "local_first_validation_failure" in prompt:
+                return _response(_valid(task))
+        return _response("{}")
+
+    def local(_: str) -> WorkerResponse:
+        calls["local_teacher"] += 1
+        return _response('{"teacher_diagnosis":"local miss"}', model="local-teacher")
+
+    def external(_: str):
+        calls["external_teacher"] += 1
+        return "codex-fixture", json.dumps(
+            {
+                "failure_classification": "scope_boundary",
+                "teacher_diagnosis": "recover from local validation failure",
+                "retry_guidance": "preserve allowed targets and hold unauthorized targets",
+                "corrected_reference_output": {
+                    "allowed_targets": ["target-a"],
+                    "held_targets": ["target-b"],
+                    "scope_expansion_required": False,
+                    "review_status": "review_only",
+                },
+            }
+        )
+
+    output = tmp_path / "semantic-contract"
+    driver.run_experiment(context, output, worker=worker, local_teacher=local, external_teacher=external)
+    escalation = next((output / "tasks" / "scope").glob("*/escalation"))
+    teacher_prompt = json.loads((escalation / "external_teacher.prompt.txt").read_text())
+    retry_prompt = json.loads((escalation / "worker-retry.prompt.txt").read_text())
+    intervention = retry_prompt["intervention"]
+    control = next((output / "tasks" / "scope").glob("*/control"))
+    control_retry_prompt = json.loads((control / "worker-retry.prompt.txt").read_text())
+
+    assert teacher_prompt["allowed_fields"] == [
+        "failure_classification",
+        "teacher_diagnosis",
+        "candidate_prompt_patch",
+        "retry_guidance",
+        "corrected_reference_output",
+    ]
+    assert len(teacher_prompt["failed_transitions"]) == 2
+    assert teacher_prompt["failed_transitions"][1]["intervention_id"] == "local_first"
+    assert intervention["teacher_parse_status"] == "passed"
+    assert intervention["teacher_diagnosis"] == "recover from local validation failure"
+    assert intervention["retry_guidance"]
+    corrected = intervention["corrected_reference_output"]
+    assert isinstance(corrected["allowed_targets"], list)
+    assert isinstance(corrected["held_targets"], list)
+    assert isinstance(corrected["scope_expansion_required"], bool)
+    assert isinstance(corrected["review_status"], str)
+    assert set(intervention) != {"teacher_parse_status"}
+    for field in ("teacher_diagnosis", "retry_guidance", "corrected_reference_output", "teacher_parse_status"):
+        assert field in control_retry_prompt["intervention"]
+        assert field in intervention
+    assert (escalation / "baseline_reference.json").exists()
+    index = json.loads((escalation / "arm_artifacts.json").read_text())
+    assert "baseline_reference.json" in index["files"]
+    assert captured_worker_prompts
+
+
+def test_run7_observed_escalation_response_shapes_are_not_lossy_when_guidance_is_diagnostic():
+    parsed = _parse_teacher(
+        json.dumps(
+            {
+                "failure_classification": "scope_boundary",
+                "teacher_diagnosis": "the local answer omitted held targets",
+                "retry_guidance": "emit the bounded review-only result",
+                "corrected_reference_output": {
+                    "allowed_targets": ["a", "b"],
+                    "held_targets": ["c"],
+                    "scope_expansion_required": True,
+                    "review_status": "review_only",
+                },
+            }
+        )
+    )
+    assert parsed["teacher_parse_status"] == "passed"
+    assert parsed["failure_classification"] == "scope_boundary"
+    assert parsed["teacher_diagnosis"]
+    assert parsed["retry_guidance"]
+    assert isinstance(parsed["corrected_reference_output"]["allowed_targets"], list)
+    assert isinstance(parsed["corrected_reference_output"]["held_targets"], list)
+    assert isinstance(parsed["corrected_reference_output"]["scope_expansion_required"], bool)
+    assert isinstance(parsed["corrected_reference_output"]["review_status"], str)
+    assert set(parsed) != {"teacher_parse_status"}
 
 
 def test_run7_local_infrastructure_does_not_escalate(tmp_path: Path):
