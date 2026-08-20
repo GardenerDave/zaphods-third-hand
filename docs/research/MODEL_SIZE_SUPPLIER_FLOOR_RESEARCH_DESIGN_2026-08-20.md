@@ -26,7 +26,10 @@ cheap evidenced supplier
 
 The completed 1.7B phase remains the reference. Run 8 observed 18/20 initial
 local passes, 2/2 escalation rescues, 20/20 final treatment solves, 20/20
-external-direct control solves, and 60.843% realized policy reduction.
+external-direct control solves, and a 60.843% realized sequential latency
+reduction. This historical percentage is wall-clock elapsed time measured in
+milliseconds. It does not mean 60.843% less electrical energy, monetary cost,
+FLOPs, or hardware cost.
 
 ## Supplier ladder
 
@@ -112,6 +115,57 @@ p_fail < (C_reference - C_small) / C_escalation
 The value must be recomputed from measured candidate costs. The historical
 35% Run 7/8 break-even rate is not copied to smaller suppliers.
 
+Latency and energy are separate economic analyses. For measured energy, define
+
+```text
+E = integral(P(t) dt)
+```
+
+and, for sampled telemetry:
+
+```text
+energy_joules = sum(power_watts * sample_interval_seconds)
+```
+
+Joules are the canonical short-inference energy unit. Report joules per
+action, joules per validated task, and joules per final sequentially validated
+task; Wh may be included for readability. Record energy separately for the
+candidate supplier, worker/retry, escalation supplier, full sequential
+policy, and physical experimental execution. Device TDP is not measured
+energy.
+
+For energy economics, define `E_small`, `p_fail`, `E_escalation`, and
+`E_reference` analogously. The expected sequential energy is:
+
+```text
+E_small + p_fail * E_escalation
+```
+
+Energy viability requires:
+
+```text
+E_small + p_fail * E_escalation < E_reference
+```
+
+so the candidate-specific maximum energetically tolerable failure rate is:
+
+```text
+p_fail < (E_reference - E_small) / E_escalation
+```
+
+Keep this threshold separate from the latency threshold. A supplier may have
+latency viability, energy viability, both, or neither.
+
+The research therefore keeps three economic views separate:
+
+- latency economics: milliseconds per validated result;
+- energy economics: joules per validated result;
+- optional later deployment economics: dollars per validated result, including
+  electricity and amortized hardware cost if separately justified.
+
+The first M-parameter experiment should measure physical latency and energy;
+it should not introduce dollar economics without separate justification.
+
 ## Initial target capability
 
 The first candidate domain is `scope-authority-boundary`. It is useful because
@@ -192,6 +246,36 @@ and include:
 - economic viability classification;
 - provenance and durable artifact bindings.
 
+Confirmation-quality supplier records should also include:
+
+- hardware host identity/class, CPU model, accelerator model and count;
+- RAM, VRAM, and power-measurement source;
+- power sample interval, idle baseline power if measured, average active watts,
+  and peak observed watts;
+- action, validated-task, and sequential-policy energy in joules;
+- latency in milliseconds, generated tokens, and prompt tokens where
+  available;
+- software/runtime, quantization, and context configuration.
+
+Not every telemetry field is required for screening, but an energy claim at
+confirmation quality must document how it was measured.
+
+### Power-measurement quality
+
+Energy evidence is graded as follows:
+
+- **Level 1 — external physical measurement:** wall/outlet or inline DC
+  measurement covering the relevant system;
+- **Level 2 — device telemetry:** GPU, CPU, or package energy/power counters
+  with known sampling behavior;
+- **Level 3 — software estimate:** runtime-derived or indirect estimate;
+- **Level 4 — nominal/specification proxy:** TDP or vendor specification only.
+
+Confirmation-quality comparisons should prefer Levels 1 or 2. Levels 3 and 4
+may support screening but must not be described as direct measured energy. If
+idle-subtracted energy is reported, retain gross energy and document the
+subtraction method.
+
 ## Search movement rules
 
 These are qualitative framework rules; numerical thresholds come only from
@@ -211,6 +295,57 @@ The 1.7B reference is not rerun merely because a smaller candidate is
 introduced. A future contemporaneous 1.7B control requires separate scientific
 justification and preregistration.
 
+## Hardware and physical-resource comparison
+
+The strongest model-level comparison uses the same task workload, hardware,
+software/runtime where practical, quantization class where scientifically
+appropriate, context limits, and output constraints. When candidate models can
+reasonably run on the same hardware, prefer that design and record the precise
+hardware identity. This isolates supplier differences more effectively than a
+cross-machine comparison.
+
+Two distinct questions must remain visible:
+
+- **Model-level efficiency:** how suppliers compare on the same compute
+  substrate;
+- **System-level/native-hardware efficiency:** what each supplier costs on the
+  hardware on which it would realistically be deployed.
+
+A same-hardware winner need not be the best deployment supplier. For example,
+a tiny CPU/SBC model could lose a same-GPU latency comparison yet use less
+energy on its native hardware.
+
+Do not normalize different hardware with generic benchmark scores, advertised
+TFLOPS, synthetic GPU scores, TDP ratios, or vendor performance claims. If
+same-hardware comparison is impossible, require workload-specific bridge
+calibration before making normalized model-efficiency claims.
+
+For hardware A and B, bridge calibration requires:
+
+1. freeze one or more bridge models that run meaningfully on both platforms;
+2. freeze a representative ZTH workload and configuration;
+3. run the same model/workload on both platforms;
+4. measure latency, joules, generated tokens, utilization, and memory use;
+5. repeat sufficiently to characterize variability;
+6. derive an empirical cross-hardware ratio with an uncertainty or range.
+
+Prefer multiple bridge models. One bridge ratio must not be treated as
+universal across architectures, quantizations, or workload shapes. Every
+normalized result must retain the raw native measurements beside the
+normalization.
+
+For energy, freeze the measurement boundary before execution. It may be the
+model inference process, accelerator/device, host system, or full wall power,
+but the same boundary must be used for a 1:1 comparison or a separately
+validated conversion must be supplied. GPU-only energy for one supplier must
+not be compared with whole-system energy for another.
+
+A sequential policy may span machines, such as a tiny CPU/SBC supplier,
+validation, and a stronger GPU supplier. Sequential energy includes every
+invoked stage within the frozen boundary. The small supplier does not receive
+credit for escalation energy it caused. Likewise, latency remains sequential
+wall-clock elapsed time, not only the successful final-stage duration.
+
 ## Expected stewardship map
 
 The eventual output should answer “What is the cheapest demonstrated supplier
@@ -225,6 +360,18 @@ for this responsibility?” rather than rank generic intelligence:
 
 The entries below 1.7B are intentionally unfilled until candidate survey,
 screening, and separately authorized confirmation occur.
+
+The map must preserve multiple floors rather than one generic “efficiency”
+label: a latency-economic floor, an energy-economic floor, and, only if later
+justified, a deployment-cost floor. The smallest capability-bearing model may
+differ from the fastest economically useful model, the lowest-energy useful
+model, and the lowest-cost deployment supplier.
+
+Future reporting should name the metric explicitly. For example, use
+“60.843% realized sequential latency reduction” for historical Run 8, and
+future phrases such as “latency reduced X%” or “measured energy reduced Y%.”
+Do not use “efficiency” without identifying whether it means latency, energy,
+or deployment cost.
 
 ## Authority boundary and next step
 
