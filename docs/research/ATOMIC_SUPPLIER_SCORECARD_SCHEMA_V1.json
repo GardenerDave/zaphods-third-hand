@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "zth://research/atomic-supplier-scorecard-v1",
   "title": "Atomic supplier scorecard v1",
-  "description": "Model-free evidence schema for bounded task-family supplier auditions; not a capability-card or production-routing schema.",
+  "description": "Evidence schema for bounded task-family supplier auditions; not a capability-card or production-routing schema. provenance.analysis_model_calls_made counts calls used to generate or analyze this scorecard, while attempts.supplier_model_calls_made counts calls made by the supplier under audition. These are distinct quantities.",
   "type": "object",
   "required": [
     "provenance",
@@ -16,13 +16,13 @@
   "properties": {
     "provenance": {
       "type": "object",
-      "required": ["evidence_resolution", "source_paths", "source_hashes"],
+      "required": ["evidence_resolution", "source_paths", "source_hashes", "analysis_model_calls_made"],
       "properties": {
         "evidence_resolution": {"type": "string"},
         "source_paths": {"type": "array", "items": {"type": "string"}},
         "source_hashes": {"type": "array", "items": {"type": "string"}},
         "raw_artifacts_changed": {"type": "boolean"},
-        "model_calls_made": {"type": "integer", "const": 0}
+        "analysis_model_calls_made": {"type": "integer", "minimum": 0}
       }
     },
     "supplier": {
@@ -39,16 +39,20 @@
     "task_family": {"type": "string"},
     "attempts": {
       "type": "object",
+      "required": ["supplier_model_calls_made", "tasks", "transport_valid", "raw_parse_valid", "contract_valid", "full_validator_passes"],
       "properties": {
-        "tasks": {"type": "integer"},
-        "transport_valid": {"type": "integer"},
-        "raw_parse_valid": {"type": "integer"},
-        "full_validator_passes": {"type": "integer"}
+        "supplier_model_calls_made": {"type": "integer", "minimum": 0},
+        "tasks": {"type": "integer", "minimum": 0},
+        "transport_valid": {"type": "integer", "minimum": 0},
+        "raw_parse_valid": {"type": "integer", "minimum": 0},
+        "contract_valid": {"type": "integer", "minimum": 0},
+        "full_validator_passes": {"type": "integer", "minimum": 0}
       }
     },
     "atomic_profile": {
       "type": "object",
       "description": "Task-family adapter output; preserve vectors instead of an intelligence scalar.",
+      "required": ["structured_output", "field_types", "allowed_targets", "held_targets", "authority_separation", "scope_expansion", "review_status", "semantic_fields_correct_distribution", "full_task"],
       "properties": {
         "structured_output": {"type": "object"},
         "field_types": {"type": "object"},

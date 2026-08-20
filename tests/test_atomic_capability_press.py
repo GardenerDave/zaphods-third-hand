@@ -69,18 +69,15 @@ def test_status_exact_mismatch_is_not_normalized() -> None:
 
 
 def test_semantic_profile_covers_zero_through_four() -> None:
-    profiles = []
-    for mutation in [
-        {"allowed_targets": ["wrong.json"], "held_targets": ["wrong-held.json"], "scope_expansion_required": False, "review_status": "hold"},
-        {"allowed_targets": ["wrong.json"]},
-        {"allowed_targets": ["wrong.json"], "held_targets": ["wrong-held.json"]},
-        {"allowed_targets": ["wrong.json"], "held_targets": ["held.json"], "scope_expansion_required": True},
-        valid_object(),
-    ]:
-        value = valid_object()
-        value.update(mutation)
-        profiles.append(score_scope_object(value, REFERENCE)["semantic_fields_correct"])
-    assert profiles == [0, 3, 2, 3, 4]
+    cases = {
+        0: {"allowed_targets": ["wrong.json"], "held_targets": ["wrong-held.json"], "scope_expansion_required": False, "review_status": "hold"},
+        1: {"allowed_targets": ["allowed.json"], "held_targets": ["wrong-held.json"], "scope_expansion_required": False, "review_status": "hold"},
+        2: {"allowed_targets": ["allowed.json"], "held_targets": ["held.json"], "scope_expansion_required": False, "review_status": "hold"},
+        3: {"allowed_targets": ["allowed.json"], "held_targets": ["held.json"], "scope_expansion_required": True, "review_status": "hold"},
+        4: valid_object(),
+    }
+    for expected_count, value in cases.items():
+        assert score_scope_object(value, REFERENCE)["semantic_fields_correct"] == expected_count
 
 
 def test_paired_classifier_improved_regressed_mixed_unchanged() -> None:
