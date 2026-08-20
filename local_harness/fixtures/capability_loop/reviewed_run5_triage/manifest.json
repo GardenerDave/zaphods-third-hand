@@ -1,0 +1,303 @@
+{
+  "candidate_count": 15,
+  "candidate_order": [
+    "run5-triage-001",
+    "run5-triage-002",
+    "run5-triage-003",
+    "run5-triage-004",
+    "run5-triage-005",
+    "run5-triage-006",
+    "run5-triage-007",
+    "run5-triage-008",
+    "run5-triage-009",
+    "run5-triage-010",
+    "run5-triage-011",
+    "run5-triage-012",
+    "run5-triage-013",
+    "run5-triage-014",
+    "run5-triage-015"
+  ],
+  "eligibility": [
+    "transport_valid=true",
+    "transport_classification=model_response",
+    "deterministic baseline validation failure",
+    "target resolution=task_family",
+    "target evidence key=triage-routing"
+  ],
+  "fixtures": [
+    {
+      "fixture_sha256": "0bf8a00d962b38a775d64af44e8f585904747185bce101e359d40b5c7a030c9a",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-001.json",
+      "reference_facts_sha256": "d9bb4035d021308634cc47a10528d6521c7808e4237af7dd3bc0117941391172",
+      "source_anchor": "confirmed evidence beside an unverified maintenance request",
+      "source_document": "docs/experiments/AFFORDANCE_BASELINE_EXECUTION_PACKET_V0.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run5-triage-001"
+    },
+    {
+      "fixture_sha256": "2a386dbefbfc6a29f51fe966cc6dd684218b772d5ebf4a2cd7cf579119c467cd",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-002.json",
+      "reference_facts_sha256": "0fb879fc8443e617541dfb213c5d3faeb9fae6b21ad5913afaca2a2900df34d4",
+      "source_anchor": "repair warning versus unapproved deployment proposal",
+      "source_document": "docs/experiments/AFFORDANCE_BASELINE_REPAIR_DECISION_V0.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run5-triage-002"
+    },
+    {
+      "fixture_sha256": "cb992f9f1f9f155c4b06e213cce202d4d93aa553ce0299e47fa9541770907a0b",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-003.json",
+      "reference_facts_sha256": "25e37d43aadfacf6de089ee4eaa586b2bcddc4173427e31d7f58e6ac48eb837e",
+      "source_anchor": "missing-file evidence beside destructive cleanup request",
+      "source_document": "docs/experiments/AFFORDANCE_BASELINE_REPAIR_PACKET_V0.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run5-triage-003"
+    },
+    {
+      "fixture_sha256": "23eb4e72791163620cbc8931701012df3561df2b8914db4bfbf9fa78cb2a4605",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-004.json",
+      "reference_facts_sha256": "ed9f4d62b2d63c53db9c56ac84d87c244894c68b57807f26b968b79aa6aef3c7",
+      "source_anchor": "contract mismatch versus unsupported source rewrite",
+      "source_document": "docs/experiments/AFFORDANCE_BASELINE_REPAIR_PROPOSAL_V0.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run5-triage-004"
+    },
+    {
+      "fixture_sha256": "2bcd2018a0f07c9c7914a79b0d5b6e42a4d50c6c94182449487791850f3a21e3",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-005.json",
+      "reference_facts_sha256": "4c742316e892ba41ccd0fefc06fcf108c882f51e9d9debd44bb78a6d2959e7c5",
+      "source_anchor": "parser exception versus worker launch request",
+      "source_document": "docs/experiments/AFFORDANCE_BASELINE_RUNNER_V0.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run5-triage-005"
+    },
+    {
+      "fixture_sha256": "c1df7aba88c3912f54fe169a2440f4aaa1e7594aba1e8bdfb6d1a35a11e29ad7",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-006.json",
+      "reference_facts_sha256": "9d81ab8c8a73f04539374e5324e4d5619f3dcd5d78ebad1361f26feeb29a0000",
+      "source_anchor": "reference mismatch versus pending acceptance decision",
+      "source_document": "docs/experiments/AFFORDANCE_CANDIDATE_PROBE_RUNNER_V0.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run5-triage-006"
+    },
+    {
+      "fixture_sha256": "231a09bfb1a3b0af433b53018a4c28c829830c4a9b0c46209f79a08a99d514c0",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-007.json",
+      "reference_facts_sha256": "c1a7d732638586db2d1206cd78c27e2524bddc0e39009fa972f22abc8685961b",
+      "source_anchor": "queue stall evidence versus release gate proposal",
+      "source_document": "docs/experiments/AFFORDANCE_DOGFOOD_REPORT_V0.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run5-triage-007"
+    },
+    {
+      "fixture_sha256": "13a4a654ce652a619dd5eebc82975d95a4cd174ab68fb5d6362d16b1888c6fc6",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-008.json",
+      "reference_facts_sha256": "85958542c6837540b80b6ceb65f52f7f23c509df24e73b98b5a66bb29c61cadb",
+      "source_anchor": "absence finding versus installation request",
+      "source_document": "docs/experiments/AFFORDANCE_LARQL_ABSENCE_OF_EVIDENCE_FILE_AUTHORITY_V0.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run5-triage-008"
+    },
+    {
+      "fixture_sha256": "39281d771ab5039b013120f12ba57d11933a64d393851bce0eccffd82fc01e76",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-009.json",
+      "reference_facts_sha256": "fcccf3c6eb332e5178443dc16af2583f16a62d16b716ace9dbe72af796e84649",
+      "source_anchor": "missing approval fact versus runtime change request",
+      "source_document": "docs/experiments/AFFORDANCE_LARQL_ABSENCE_OF_EVIDENCE_RUNTIME_RULE_PACKET_V0.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run5-triage-009"
+    },
+    {
+      "fixture_sha256": "67175e21756b7109903f290971da9a3a4fcab33d72ebdd42469aa4e8c4df1b1c",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-010.json",
+      "reference_facts_sha256": "e9bcfcf7d0b110d9d7b51744d20b3202854cdd25ebd814208ec8b6d624178e6a",
+      "source_anchor": "dry-run result versus immediate application request",
+      "source_document": "docs/experiments/AFFORDANCE_LARQL_APPLY_PACKET_V0.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run5-triage-010"
+    },
+    {
+      "fixture_sha256": "e362796ec224dc297b6bb52d928d1da349bc09bb9f12e67f11b7cf040a95a42c",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-011.json",
+      "reference_facts_sha256": "c68efb25d6607d612d12cc6f4818e76f83a2761324063606dfac69084e83d96a",
+      "source_anchor": "context mismatch versus pending layer edit",
+      "source_document": "docs/experiments/AFFORDANCE_LARQL_APPLY_REVIEW_V0.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run5-triage-011"
+    },
+    {
+      "fixture_sha256": "bab4f29119aad6c87303ae7431b9dc2e6dde97875d4c5afcb8c8d66d57627362",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-012.json",
+      "reference_facts_sha256": "abf321870ec9ed7dc64ef60459973785abd8b7ff513b2859af79ca41e67658db",
+      "source_anchor": "syntax validation versus unsupported production request",
+      "source_document": "docs/experiments/AFFORDANCE_LARQL_APPLY_V0.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run5-triage-012"
+    },
+    {
+      "fixture_sha256": "da9f67a21e53430f022b1003fa0c056c07233c1852222075b379168dfe92ccf0",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-013.json",
+      "reference_facts_sha256": "5e7c9c6ac6d40b61b37e4548c3f52899a0e3bdf2f25abf9231e6663563046f58",
+      "source_anchor": "bounded preview versus installation request",
+      "source_document": "docs/experiments/AFFORDANCE_LARQL_DRY_RUN_PACKET_V0.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run5-triage-013"
+    },
+    {
+      "fixture_sha256": "59600007aa485d1e0139dc15ac2b54a07e5a54c3ac441f32b9ccd2786d19805d",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-014.json",
+      "reference_facts_sha256": "6104b7dc20dfb6e0b4454e4427a032e91b4949d47c14096297ff9e94d9b4cb5b",
+      "source_anchor": "safe no-op evidence versus rule change request",
+      "source_document": "docs/experiments/AFFORDANCE_LARQL_DRY_RUN_REVIEW_V0.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run5-triage-014"
+    },
+    {
+      "fixture_sha256": "7131c1b0f00fee92f113c108f8b0f5c898e5a962681d60eb8dd93da2a5d78403",
+      "novelty": "new_source",
+      "output_contract_sha256": "717991724634cab3a6cf26e3361dc450f57f01ef149ab99872465d5d22b51d4b",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-015.json",
+      "reference_facts_sha256": "2792b89d6f28a864019d14945a432b50c0dcae7dc83f571ba21d25e049c1a4ac",
+      "source_anchor": "bounded context omission versus expansion request",
+      "source_document": "docs/experiments/AFFORDANCE_LARQL_MODEL_CONTEXT_PACKET_V0.md",
+      "target_evidence_key": "triage-routing",
+      "target_evidence_resolution": "task_family",
+      "task_family": "triage-routing",
+      "task_id": "run5-triage-015"
+    }
+  ],
+  "generated_at": "2026-08-20T00:00:00+00:00",
+  "manifest_sha256": "72ab5f704444472eaab25c695bc0dbc5ba8ba07036df352736dfb0511d194d9e",
+  "model_outputs_consulted": false,
+  "novelty_audit_path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/novelty_audit.json",
+  "novelty_audit_sha256": "199db8fe1b8ecf133ab0b6fd030ac1f003e1242db6a872b16db3b0b3cd3aa3d4",
+  "pack_id": "reviewed_run5_triage",
+  "pack_sha256": "85aabb3803a82665b647c370bc0ae9783c62c891e0187f2f19688316f01949ce",
+  "pair_order": {
+    "algorithm": "sha256(str(seed) + ':' + task_id), first hex digit < 8 means control-first, otherwise treatment-first",
+    "orders": {
+      "run5-triage-001": [
+        "control",
+        "treatment"
+      ],
+      "run5-triage-002": [
+        "treatment",
+        "control"
+      ],
+      "run5-triage-003": [
+        "treatment",
+        "control"
+      ],
+      "run5-triage-004": [
+        "treatment",
+        "control"
+      ],
+      "run5-triage-005": [
+        "treatment",
+        "control"
+      ],
+      "run5-triage-006": [
+        "treatment",
+        "control"
+      ],
+      "run5-triage-007": [
+        "treatment",
+        "control"
+      ],
+      "run5-triage-008": [
+        "treatment",
+        "control"
+      ],
+      "run5-triage-009": [
+        "control",
+        "treatment"
+      ],
+      "run5-triage-010": [
+        "control",
+        "treatment"
+      ],
+      "run5-triage-011": [
+        "treatment",
+        "control"
+      ],
+      "run5-triage-012": [
+        "control",
+        "treatment"
+      ],
+      "run5-triage-013": [
+        "control",
+        "treatment"
+      ],
+      "run5-triage-014": [
+        "control",
+        "treatment"
+      ],
+      "run5-triage-015": [
+        "control",
+        "treatment"
+      ]
+    },
+    "seed": 20260824
+  },
+  "reserve_rule": "Candidates not selected after baseline eligibility remain family-specific reserve-only; no adaptive replacement.",
+  "schema": "zth_run5_mixed_fixture_manifest_v1",
+  "selection_rule": "Select the first target count eligible candidates in frozen family-specific candidate order; never use intervention outcomes for inclusion.",
+  "target_evidence_resolution": "task_family",
+  "target_included_count": 12,
+  "task_family": "triage-routing"
+}

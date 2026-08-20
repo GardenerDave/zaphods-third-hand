@@ -1,0 +1,303 @@
+{
+  "candidate_count": 15,
+  "candidate_order": [
+    "run5-scope-001",
+    "run5-scope-002",
+    "run5-scope-003",
+    "run5-scope-004",
+    "run5-scope-005",
+    "run5-scope-006",
+    "run5-scope-007",
+    "run5-scope-008",
+    "run5-scope-009",
+    "run5-scope-010",
+    "run5-scope-011",
+    "run5-scope-012",
+    "run5-scope-013",
+    "run5-scope-014",
+    "run5-scope-015"
+  ],
+  "eligibility": [
+    "transport_valid=true",
+    "transport_classification=model_response",
+    "deterministic baseline validation failure",
+    "target resolution=failure_class",
+    "target evidence key=scope-authority-boundary"
+  ],
+  "fixtures": [
+    {
+      "fixture_sha256": "47a9c72d0e7af02129dd0ca2ffae53984811b8ff5361235b068e3ef8847196ae",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_scope/scope-001.json",
+      "reference_facts_sha256": "233eff6d8a6280d4687f89a81d5a06ca48675da21c34dfbd37a2acd4a6e2ea01",
+      "source_anchor": "inspection target versus held publication request",
+      "source_document": "docs/experiments/AFFORDANCE_LARQL_MODEL_RESPONSE_PROBE_V0.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run5-scope-001"
+    },
+    {
+      "fixture_sha256": "fe98142801f46811d368857f1af21bf0a7bc44e81bcb4196fad46aa5fd158ce0",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_scope/scope-002.json",
+      "reference_facts_sha256": "d3ecee178c65ec846a2a2fc27e88e508fe75bced1bcc8b07ab3346993ec6dc3a",
+      "source_anchor": "repair evidence versus held apply command",
+      "source_document": "docs/experiments/AFFORDANCE_LARQL_MODEL_RESPONSE_REPAIR_PACKET_V0.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run5-scope-002"
+    },
+    {
+      "fixture_sha256": "c9b688cccfc0266b9b63b3ded20623c0e6223eaf2c1f09ca6db6212fe43cdef7",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_scope/scope-003.json",
+      "reference_facts_sha256": "c733623c2cfd3755e80e671ed9aec96659a601c42ca13eb90fc1d7ef86a4f064",
+      "source_anchor": "repair notes versus held ownership transfer",
+      "source_document": "docs/experiments/AFFORDANCE_LARQL_MODEL_RESPONSE_REPAIR_REVIEW_V0.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run5-scope-003"
+    },
+    {
+      "fixture_sha256": "714b771b4aca60281d1d11bf60371ea635aabc97ed0f20e7f56b6c33cc9db5c4",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_scope/scope-004.json",
+      "reference_facts_sha256": "3ad2965126683e56501bb973c45da662f6983bc951466212c646724b1d8705fd",
+      "source_anchor": "response review authority versus unresolved execution plan",
+      "source_document": "docs/experiments/AFFORDANCE_LARQL_MODEL_RESPONSE_REVIEW_V0.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run5-scope-004"
+    },
+    {
+      "fixture_sha256": "ac69f40e52fb0e85eba7b89f301fcd80718b1bff6ec6db05e90d4a69c647d3c2",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_scope/scope-005.json",
+      "reference_facts_sha256": "7741047bab8e4e4c4d5d2b4b43ac23dbee0088c1c1fbc7372f652792860a210b",
+      "source_anchor": "consultation read access versus runtime mutation request",
+      "source_document": "docs/experiments/AFFORDANCE_LARQL_RUNTIME_CONSULTATION_PROBE_V0.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run5-scope-005"
+    },
+    {
+      "fixture_sha256": "cdcd991dd18923cc4384dfc19eb2ab2c6f6b17db4a257fbc7c1be7010d10c41b",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_scope/scope-006.json",
+      "reference_facts_sha256": "905700d75ac7c88ebc5ba1cb6dc83fa658d8ed92afee63c5ffda39333308d5f1",
+      "source_anchor": "installation plan versus unsigned service restart",
+      "source_document": "docs/experiments/AFFORDANCE_LARQL_RUNTIME_INSTALL_PACKET_V0.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run5-scope-006"
+    },
+    {
+      "fixture_sha256": "2e2e5991eb453c66b5aae07c3063509ec5fff2dc29ec5f7a6d261f202882f450",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_scope/scope-007.json",
+      "reference_facts_sha256": "48f12b2c709b94a59dcae8fcf89de77709b79d15ddf3defa03ea2947ddc27fd5",
+      "source_anchor": "checksum inspection versus stale restart approval",
+      "source_document": "docs/experiments/AFFORDANCE_LARQL_RUNTIME_INSTALL_REVIEW_V0.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run5-scope-007"
+    },
+    {
+      "fixture_sha256": "ef7f273f62223a745d5e97fc59a9e56343e94707ecc6a8fee4a718989efe3704",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_scope/scope-008.json",
+      "reference_facts_sha256": "996bffed10825840a1749cb6200f0202175a14fe182d4c4bb6b1d69ab2c0a339",
+      "source_anchor": "install status evidence versus unowned service patch",
+      "source_document": "docs/experiments/AFFORDANCE_LARQL_RUNTIME_INSTALL_V0.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run5-scope-008"
+    },
+    {
+      "fixture_sha256": "872e6a3179f4db0acad4ca87a42fc77915a853ee0507831818fff4cdf6bff309",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_scope/scope-009.json",
+      "reference_facts_sha256": "f2b7531632e225fa32d7d4c49ab0b10b85a6da31e42ea69ae721c27a8df3b95b",
+      "source_anchor": "validation evidence versus implied endpoint edit",
+      "source_document": "docs/experiments/AFFORDANCE_LARQL_RUNTIME_VALIDATE_V0.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run5-scope-009"
+    },
+    {
+      "fixture_sha256": "a30b3852a466f43334a31772ca0629a8591cc071b9298684eb68b86cfb0e8a08",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_scope/scope-010.json",
+      "reference_facts_sha256": "d26435b1ff39b01651e36d262ee400031adeb2c5b2d1be3898ea60e270ef02d3",
+      "source_anchor": "validation log versus unauthorized policy edit",
+      "source_document": "docs/experiments/AFFORDANCE_LARQL_VALIDATE_V0.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run5-scope-010"
+    },
+    {
+      "fixture_sha256": "fa9fd80e59914ac43f4ac073b49309dc2fb745c9729b4de6db0d0901695841bb",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_scope/scope-011.json",
+      "reference_facts_sha256": "fdf69d9623c3f66d6481f699aff04de32a366bacbc87f5f1668be91f69e3f7cc",
+      "source_anchor": "agent output scope versus reviewer decision authority",
+      "source_document": "docs/prompts/AGENT_OUTPUT_CONTRACT.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run5-scope-011"
+    },
+    {
+      "fixture_sha256": "779914b2bacb6bb4f1cfaf5792d371a67f25262686086e72f52c3d2d33dcc22f",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_scope/scope-012.json",
+      "reference_facts_sha256": "f52351d5d638371f12ba1416b40e83b3e4ab9fb33be8f5e9c9136be79f935521",
+      "source_anchor": "absence report versus held runtime rule patch",
+      "source_document": "docs/reports/affordance_larql/ABSENCE_OF_EVIDENCE_JSON_MODEL_CONTEXT_PASS_CLOSEOUT_2026-06-28.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run5-scope-012"
+    },
+    {
+      "fixture_sha256": "f6411510ccf6e40c89cff3cb16f1a7cf6c0cec416f18fbd24b7bb0782524a8f2",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_scope/scope-013.json",
+      "reference_facts_sha256": "9d6e870ede17b33fb783d949ddd00fd3e20a2a557130b621044fa9b36a3c20ab",
+      "source_anchor": "candidate delta versus final materializer authority",
+      "source_document": "docs/reports/affordance_larql/LARQL_DIRECT_LAYER_EDIT_REAUDITION_REVIEW_2026-06-29.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run5-scope-013"
+    },
+    {
+      "fixture_sha256": "8128c39a95c1dfaf2b69f0225fb53abbbf8b7a2d1ac7522c3bf1590d576cb3ba",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_scope/scope-014.json",
+      "reference_facts_sha256": "0b29c07514647d14f1b51c6e617cfff0f591d4b52cf578960011e3725d3b3234",
+      "source_anchor": "registry status versus unapproved registry edit",
+      "source_document": "docs/reports/affordance_larql/LARQL_RULE_REGISTRY_STATUS.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run5-scope-014"
+    },
+    {
+      "fixture_sha256": "446103c6a60d3cdedab6f4cf7db33c59e30f2692ba2f1504cbc575131c3354ea",
+      "novelty": "new_source",
+      "output_contract_sha256": "e5bc2a68aaf614a16d55da61889d57112b955413490e10487574f3fb50ae940a",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_scope/scope-015.json",
+      "reference_facts_sha256": "29599340d87e0b3b1fe66cc25ce77324e300e7dead1c586b96bb310e3ace08e4",
+      "source_anchor": "repeatability evidence versus ownerless rule change",
+      "source_document": "docs/reports/affordance_larql/LARQL_INTAKE_TO_INSTALL_BOUNDARY_CHAIN_REVIEW.md",
+      "target_evidence_key": "scope-authority-boundary",
+      "target_evidence_resolution": "failure_class",
+      "task_family": "scope-authority-boundary",
+      "task_id": "run5-scope-015"
+    }
+  ],
+  "generated_at": "2026-08-20T00:00:00+00:00",
+  "manifest_sha256": "d94209d5182f25b20caee6837e57df12744d42045ebce42783e690c319843dc4",
+  "model_outputs_consulted": false,
+  "novelty_audit_path": "local_harness/fixtures/capability_loop/reviewed_run5_scope/novelty_audit.json",
+  "novelty_audit_sha256": "cd96cb12f7ca16fd649901c3cef95bf28fe9e8e53e71f8b8520e70c609bc59a7",
+  "pack_id": "reviewed_run5_scope",
+  "pack_sha256": "cee93ab449b6aa0ebc838f9ba9077d9a30de218a171307408f718aab5e763379",
+  "pair_order": {
+    "algorithm": "sha256(str(seed) + ':' + task_id), first hex digit < 8 means control-first, otherwise treatment-first",
+    "orders": {
+      "run5-scope-001": [
+        "control",
+        "treatment"
+      ],
+      "run5-scope-002": [
+        "control",
+        "treatment"
+      ],
+      "run5-scope-003": [
+        "treatment",
+        "control"
+      ],
+      "run5-scope-004": [
+        "control",
+        "treatment"
+      ],
+      "run5-scope-005": [
+        "control",
+        "treatment"
+      ],
+      "run5-scope-006": [
+        "treatment",
+        "control"
+      ],
+      "run5-scope-007": [
+        "treatment",
+        "control"
+      ],
+      "run5-scope-008": [
+        "control",
+        "treatment"
+      ],
+      "run5-scope-009": [
+        "treatment",
+        "control"
+      ],
+      "run5-scope-010": [
+        "treatment",
+        "control"
+      ],
+      "run5-scope-011": [
+        "control",
+        "treatment"
+      ],
+      "run5-scope-012": [
+        "treatment",
+        "control"
+      ],
+      "run5-scope-013": [
+        "treatment",
+        "control"
+      ],
+      "run5-scope-014": [
+        "control",
+        "treatment"
+      ],
+      "run5-scope-015": [
+        "control",
+        "treatment"
+      ]
+    },
+    "seed": 20260824
+  },
+  "reserve_rule": "Candidates not selected after baseline eligibility remain family-specific reserve-only; no adaptive replacement.",
+  "schema": "zth_run5_mixed_fixture_manifest_v1",
+  "selection_rule": "Select the first target count eligible candidates in frozen family-specific candidate order; never use intervention outcomes for inclusion.",
+  "target_evidence_resolution": "failure_class",
+  "target_included_count": 12,
+  "task_family": "scope-authority-boundary"
+}

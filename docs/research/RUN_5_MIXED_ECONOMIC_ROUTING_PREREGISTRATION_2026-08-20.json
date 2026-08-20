@@ -1,0 +1,330 @@
+{
+  "authority": "review_only_experiment; no production routing authority",
+  "authority_and_stop_conditions": {
+    "active_call_fail_closed": true,
+    "common_action_must_not_duplicate_on_resume": true,
+    "explicit_execute_gate": true,
+    "no_escalation": true,
+    "no_evidence_merge": true,
+    "no_fallback": true,
+    "no_production_routing_mutation": true,
+    "no_training_promotion_queue": true,
+    "terminal_artifact_hash_verification": true,
+    "zero_comparable_tasks_means_result_unavailable": true
+  },
+  "deterministic_patch": {
+    "id": "run1-experimental-distilled-strict-contract-v1",
+    "path": ".work/capability_batch_reviewed_v1/synthesis/run1_distilled_candidate_patch.json",
+    "sha256": "7cfb4453919ad945f0d149ec8af8763653b3734a54b86f23303b84a60dfdacf6"
+  },
+  "driver": {
+    "path": "scripts/zth_run5_mixed_economic_routing.py",
+    "sha256": "cca4bac38749ba85c22d2049b76e9aebdcfe063705b94e31ef7924e56e341891"
+  },
+  "evidence_inputs": [
+    {
+      "path": "docs/research/RUN_4_TARGETED_INTERPRETATION_FREEZE_2026-08-19.md",
+      "sha256": "7d660b058328824917d63036ef7939a326b7ecad0f7d0c9137e1edd58f731bd8"
+    },
+    {
+      "path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_4_2026-08-19.md",
+      "sha256": "495aa9ea116abf5fdecb3b0b7ac77990af5c2c91b33b3e864412dca34c8ca3cb"
+    },
+    {
+      "path": "docs/research/RUN_4A_COMPARATIVE_EVIDENCE_FREEZE_2026-08-19.json",
+      "sha256": "c48a97000fbf85b7ea3919a8269009d3200d3c2369924c456ec9dcc8736baf7b"
+    },
+    {
+      "path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_4B_SCOPE_2026-08-19.md",
+      "sha256": "ddb09bd03fc62cdfaa71acbdc5e18fcb301be9a4f644496bb7292ce7d672df19"
+    }
+  ],
+  "execution_commit_recorded_at_runtime": true,
+  "experiment_id": "run5-mixed-economic-routing-2026-08-20",
+  "fixture_packs": {
+    "scope": {
+      "candidate_count": 15,
+      "candidate_order": [
+        "run5-scope-001",
+        "run5-scope-002",
+        "run5-scope-003",
+        "run5-scope-004",
+        "run5-scope-005",
+        "run5-scope-006",
+        "run5-scope-007",
+        "run5-scope-008",
+        "run5-scope-009",
+        "run5-scope-010",
+        "run5-scope-011",
+        "run5-scope-012",
+        "run5-scope-013",
+        "run5-scope-014",
+        "run5-scope-015"
+      ],
+      "family": "scope-authority-boundary",
+      "manifest_path": "local_harness/fixtures/capability_loop/reviewed_run5_scope/manifest.json",
+      "manifest_sha256": "d94209d5182f25b20caee6837e57df12744d42045ebce42783e690c319843dc4",
+      "novelty_audit_path": "local_harness/fixtures/capability_loop/reviewed_run5_scope/novelty_audit.json",
+      "novelty_audit_sha256": "acf9f939398851a616a6146af65d4f1fef19aa850423b31d0ddf51a91b5917c1",
+      "pack_sha256": "cee93ab449b6aa0ebc838f9ba9077d9a30de218a171307408f718aab5e763379",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_scope",
+      "resolution": "failure_class",
+      "target_included_count": 12
+    },
+    "triage": {
+      "candidate_count": 15,
+      "candidate_order": [
+        "run5-triage-001",
+        "run5-triage-002",
+        "run5-triage-003",
+        "run5-triage-004",
+        "run5-triage-005",
+        "run5-triage-006",
+        "run5-triage-007",
+        "run5-triage-008",
+        "run5-triage-009",
+        "run5-triage-010",
+        "run5-triage-011",
+        "run5-triage-012",
+        "run5-triage-013",
+        "run5-triage-014",
+        "run5-triage-015"
+      ],
+      "family": "triage-routing",
+      "manifest_path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/manifest.json",
+      "manifest_sha256": "72ab5f704444472eaab25c695bc0dbc5ba8ba07036df352736dfb0511d194d9e",
+      "novelty_audit_path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/novelty_audit.json",
+      "novelty_audit_sha256": "e7bde86b1a4bd01682b18415e9969cbd81a23aaf2f85f770d2b8e3e498988558",
+      "pack_sha256": "85aabb3803a82665b647c370bc0ae9783c62c891e0187f2f19688316f01949ce",
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage",
+      "resolution": "task_family",
+      "target_included_count": 12
+    }
+  },
+  "metrics": {
+    "control_policy_cost": "observed common triage cost plus scope external cost",
+    "family_level_reporting_required": true,
+    "infrastructure_excluded_from_primary": true,
+    "physical_cost": "actual durable model-call attempts; common triage action counted once",
+    "quality": "treatment portfolio validated solve rate >= control portfolio validated solve rate",
+    "resource": "treatment policy-level post-baseline realized elapsed_ms < control policy-level post-baseline realized elapsed_ms",
+    "success": "both quality and resource criteria",
+    "treatment_policy_cost": "observed common triage cost plus scope local cost"
+  },
+  "model_calls_made": false,
+  "models": {
+    "external_service_class": "codex-cli",
+    "external_teacher": "codex-cli-0.146.0",
+    "local_teacher": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "local_teacher_endpoint_alias": "JARVIS_LOCAL",
+    "worker": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "worker_endpoint_alias": "JARVIS_LOCAL"
+  },
+  "pair_order": {
+    "algorithm": "sha256(str(seed) + ':' + task_id), first hex digit < 8 means control-first, otherwise treatment-first",
+    "orders": {
+      "scope": {
+        "run5-scope-001": [
+          "control",
+          "treatment"
+        ],
+        "run5-scope-002": [
+          "control",
+          "treatment"
+        ],
+        "run5-scope-003": [
+          "treatment",
+          "control"
+        ],
+        "run5-scope-004": [
+          "control",
+          "treatment"
+        ],
+        "run5-scope-005": [
+          "control",
+          "treatment"
+        ],
+        "run5-scope-006": [
+          "treatment",
+          "control"
+        ],
+        "run5-scope-007": [
+          "treatment",
+          "control"
+        ],
+        "run5-scope-008": [
+          "control",
+          "treatment"
+        ],
+        "run5-scope-009": [
+          "treatment",
+          "control"
+        ],
+        "run5-scope-010": [
+          "treatment",
+          "control"
+        ],
+        "run5-scope-011": [
+          "control",
+          "treatment"
+        ],
+        "run5-scope-012": [
+          "treatment",
+          "control"
+        ],
+        "run5-scope-013": [
+          "treatment",
+          "control"
+        ],
+        "run5-scope-014": [
+          "control",
+          "treatment"
+        ],
+        "run5-scope-015": [
+          "control",
+          "treatment"
+        ]
+      },
+      "triage": {
+        "run5-triage-001": [
+          "control",
+          "treatment"
+        ],
+        "run5-triage-002": [
+          "treatment",
+          "control"
+        ],
+        "run5-triage-003": [
+          "treatment",
+          "control"
+        ],
+        "run5-triage-004": [
+          "treatment",
+          "control"
+        ],
+        "run5-triage-005": [
+          "treatment",
+          "control"
+        ],
+        "run5-triage-006": [
+          "treatment",
+          "control"
+        ],
+        "run5-triage-007": [
+          "treatment",
+          "control"
+        ],
+        "run5-triage-008": [
+          "treatment",
+          "control"
+        ],
+        "run5-triage-009": [
+          "control",
+          "treatment"
+        ],
+        "run5-triage-010": [
+          "control",
+          "treatment"
+        ],
+        "run5-triage-011": [
+          "treatment",
+          "control"
+        ],
+        "run5-triage-012": [
+          "control",
+          "treatment"
+        ],
+        "run5-triage-013": [
+          "control",
+          "treatment"
+        ],
+        "run5-triage-014": [
+          "control",
+          "treatment"
+        ],
+        "run5-triage-015": [
+          "control",
+          "treatment"
+        ]
+      }
+    },
+    "seed": 20260824
+  },
+  "planning_budget": {
+    "expected_control_policy_post_baseline_cost_ms": 815533.896,
+    "expected_physical_experiment_cost_ms": 1231797.198,
+    "expected_policy_savings_ms": 149800.656,
+    "expected_policy_savings_percent": 18.368,
+    "expected_treatment_policy_post_baseline_cost_ms": 665733.24,
+    "maximum_external_teacher_calls": 24,
+    "maximum_local_teacher_calls": 12,
+    "maximum_physical_calls": 102,
+    "maximum_worker_calls": 66
+  },
+  "policies": {
+    "control": "external_everywhere",
+    "matrix": {
+      "scope-authority-boundary": {
+        "control": "external_teacher",
+        "execution": "two isolated arms",
+        "treatment": "local_teacher"
+      },
+      "triage-routing": {
+        "control": "external_teacher",
+        "execution": "one common external action bound to both scorecards",
+        "treatment": "external_teacher"
+      }
+    },
+    "treatment": "evidence_qualified_economic"
+  },
+  "policy_freeze": {
+    "canonical_sha256": "b4079d01b9569fcabbdd8b1517a81bdecdb3f5b4b02aa2f7dec668510974d055",
+    "file_sha256": "c0402861a93599372d5b20f3659b81eb99333983922454849876733a7527c877",
+    "path": "docs/research/RUN_5_MIXED_ECONOMIC_ROUTING_POLICY_FREEZE_2026-08-20.json"
+  },
+  "resource_manifest": {
+    "canonical_sha256": "33ad2521dc5acc0be5a67b3ef77c167e882cf6ce53140dc60acc8f89c9ad76ab",
+    "path": "docs/research/RUN_4_RESOURCE_WEIGHTS_FREEZE_2026-08-19.json",
+    "priors_ms": {
+      "external_teacher_time_ms": 28704.012,
+      "local_teacher_time_ms": 16220.624,
+      "worker_time_ms": 5276.567
+    },
+    "sha256": "8f7820a6a3e5734e071452f643374d8c6c769d4d149bcec3f2f82b88ee6530c2"
+  },
+  "schema": "zth_run5_mixed_economic_routing_preregistration_v1",
+  "selection": {
+    "candidates_per_family": 15,
+    "eligibility": [
+      "transport_valid=true",
+      "transport_classification=model_response",
+      "deterministic baseline validation failure",
+      "family-specific frozen resolution and evidence key"
+    ],
+    "included_target_per_family": 12,
+    "incomplete_if_either_family_has_fewer_than_12": true,
+    "no_adaptive_replacement": true,
+    "rule": "first 12 eligible baseline failures in frozen family-specific order"
+  },
+  "setup_commit": "108dbb7f6d39c86815fc79ad60a5fb6dbdbdc022",
+  "status": "ready_for_review",
+  "timeouts_seconds": {
+    "external_teacher": 120,
+    "local_teacher": 900,
+    "worker": 900
+  },
+  "validators": [
+    {
+      "path": "local_harness/supervised_capability_loop.py",
+      "sha256": "23b26115201d8cba17b9da659af72793654897803988e35e28210eba02af81be"
+    },
+    {
+      "path": "local_harness/supervised_reference_fact_validator.py",
+      "sha256": "d86793dfde5a499988be92447f7df79da889a6074b8dc21b1c3b16bd7c60008a"
+    },
+    {
+      "path": "local_harness/supervised_attempt_output_validator.py",
+      "sha256": "3ca42dfc6f683399752bfe4f5757b9edf4e7eafb09ac30166fe60e9f3beb0d27"
+    }
+  ]
+}

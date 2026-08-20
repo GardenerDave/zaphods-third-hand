@@ -1,0 +1,77 @@
+{
+  "authority": "experiment_only_no_production_routing_authority",
+  "evidence_bindings": {
+    "run4_closeout": {
+      "path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_4_2026-08-19.md",
+      "sha256": "495aa9ea116abf5fdecb3b0b7ac77990af5c2c91b33b3e864412dca34c8ca3cb"
+    },
+    "run4_interpretation": {
+      "path": "docs/research/RUN_4_TARGETED_INTERPRETATION_FREEZE_2026-08-19.md",
+      "sha256": "7d660b058328824917d63036ef7939a326b7ecad0f7d0c9137e1edd58f731bd8"
+    },
+    "run4a_comparative": {
+      "canonical_freeze_sha256": "a23a7daa0c8681e8f57beed768c1cf3b3daafc360d139f48a147e8c4493dd0c3",
+      "path": "docs/research/RUN_4A_COMPARATIVE_EVIDENCE_FREEZE_2026-08-19.json",
+      "sha256": "c48a97000fbf85b7ea3919a8269009d3200d3c2369924c456ec9dcc8736baf7b"
+    },
+    "run4b_report": {
+      "path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_4B_SCOPE_2026-08-19.md",
+      "sha256": "ddb09bd03fc62cdfaa71acbdc5e18fcb301be9a4f644496bb7292ce7d672df19"
+    }
+  },
+  "family_action_matrix": {
+    "scope-authority-boundary": {
+      "evidence_qualified_economic": "local_teacher",
+      "external_everywhere": "external_teacher"
+    },
+    "triage-routing": {
+      "evidence_qualified_economic": "external_teacher",
+      "external_everywhere": "external_teacher"
+    }
+  },
+  "policy_sha256": "b4079d01b9569fcabbdd8b1517a81bdecdb3f5b4b02aa2f7dec668510974d055",
+  "policy_source": {
+    "path": "local_harness/run5_mixed_economic_policy.py",
+    "sha256": "8a35889f84e9d0642357c6c2beb996252d525d6c5aa78ae82b1428c49a34cd96"
+  },
+  "research_basis": {
+    "interpretation": "Reviewed evidence supports a scope-local substitution on the tested distribution, while triage requires external capability; these are not universal equivalence claims.",
+    "run4_interpretation_path": "docs/research/RUN_4_TARGETED_INTERPRETATION_FREEZE_2026-08-19.md",
+    "run4_triage_deterministic_solves": "1/12",
+    "run4_triage_external_solves": "10/12",
+    "run4_triage_paired": {
+      "both_solve": 1,
+      "deterministic_only": 0,
+      "external_only": 9,
+      "neither": 2
+    },
+    "run4a_scope_external": "4/4",
+    "run4a_scope_local": "4/4",
+    "run4b_scope_external": "12/12",
+    "run4b_scope_external_elapsed_ms": 434458.484,
+    "run4b_scope_local": "12/12",
+    "run4b_scope_local_elapsed_ms": 142306.701,
+    "run4b_scope_paired": {
+      "both_solve": 12,
+      "external_only": 0,
+      "local_only": 0,
+      "neither": 0
+    }
+  },
+  "resource_manifest": {
+    "canonical_sha256": "33ad2521dc5acc0be5a67b3ef77c167e882cf6ce53140dc60acc8f89c9ad76ab",
+    "path": "docs/research/RUN_4_RESOURCE_WEIGHTS_FREEZE_2026-08-19.json",
+    "sha256": "8f7820a6a3e5734e071452f643374d8c6c769d4d149bcec3f2f82b88ee6530c2"
+  },
+  "resource_priors_ms": {
+    "external_teacher_time_ms": 28704.012,
+    "local_teacher_time_ms": 16220.624,
+    "worker_time_ms": 5276.567
+  },
+  "schema": "zth_run5_mixed_economic_policy_freeze_v1",
+  "status": "reviewed_frozen_experiment_only",
+  "support_thresholds": {
+    "minimum_comparable_opportunities": 3,
+    "minimum_rescue_rate": 0.5
+  }
+}
