@@ -1,0 +1,89 @@
+{
+  "schema": "zth_run7_validation_gated_escalation_preregistration_v1",
+  "experiment_id": "run7-validation-gated-escalation-2026-08-20",
+  "model_calls_made": false,
+  "authority": "review_only_experiment; no production routing authority; no capability merge; no training promotion queueing or retirement",
+  "research_question": "On fresh difficulty-enriched scope-authority-boundary failures selected without intervention outputs, can deterministic validation identify local-first failures and gate external escalation so final validated performance is preserved while sequential cost remains below external-first?",
+  "research_basis": {
+    "run6_interpretation_freeze": {"path": "docs/research/RUN_6_INTERPRETATION_FREEZE_2026-08-20.json", "sha256": "153ae13ce59e0de42def6b0f34cf4580d7bcc01236a6e17bf5bc07f408fa8e0a"},
+    "run6_documentation_commit": "91e007a9f923c9fd6da64da13ec3ee0e0b94235e"
+  },
+  "policy_freeze": {
+    "path": "docs/research/RUN_7_VALIDATION_GATED_POLICY_FREEZE_2026-08-20.json",
+    "file_sha256": "1315ac04a5dc7171cc3d0c528a375da52a37b96cf9bf82a1a4ffd2fbea2e4cb1",
+    "canonical_sha256": "8e84c1c625eec039e68ea70fadb5ca551300fb1d04ac5604ceff36c82b0c1974"
+  },
+  "policy_source": {"path": "local_harness/run7_escalation_policy.py", "sha256": "015c0ee04724a6480e20b7730e9fcfd2663622c473dda937cf76f3e9f8ad2220"},
+  "driver": {"path": "scripts/zth_run7_scope_escalation.py", "sha256": "f1bdac815109a2dce473529ae14ddc24d60b048b74f3268e25fa6f9d9b1ad547"},
+  "difficulty_criteria": {"path": "docs/research/RUN_7_SCOPE_DIFFICULTY_CRITERIA_FREEZE_2026-08-20.json", "sha256": "5d8ffee88086f4d2cacd26549f153ee5d44b587e5c5d9d412228dfdd7ebbf770", "minimum_structural_features_per_candidate": 3, "selection_is_intervention_blind": true, "model_outputs_consulted": false},
+  "fixture_provenance": {"path": "docs/research/RUN_7_FIXTURE_PROVENANCE_2026-08-20.md", "sha256": "b4e0d4157cef2a700703fad7269d96804f872a2222445c8ada1e207ab0ae7875"},
+  "fixture_pack": {
+    "path": "local_harness/fixtures/capability_loop/run7_scope",
+    "manifest_file_sha256": "dcf29415dbca3da838cceb0c1758123c41313382b675cc0c7cfb23efb395735a",
+    "manifest_sha256": "f708ce62a524085446e0b42e633dbcf738be816d00564785d573230d1352117c",
+    "pack_sha256": "7b0f94b5301bba35a10165030b37313a8b5734f01c7a934d9e5ea9c25b800740",
+    "novelty_audit_file_sha256": "b9155e0465621720d43c17560d65b4e434ba73dbcf9880a22622841491ae04a0",
+    "novelty_audit_sha256": "bbc548e52c69b88fc24b2d83dee3b3690b453e2e55ca947e67daea5b8ed240f2",
+    "candidate_count": 24,
+    "target_included_count": 20,
+    "family": "scope-authority-boundary",
+    "resolution": "failure_class",
+    "evidence_key": "scope-authority-boundary",
+    "candidate_order": ["run7-scope-001", "run7-scope-002", "run7-scope-003", "run7-scope-004", "run7-scope-005", "run7-scope-006", "run7-scope-007", "run7-scope-008", "run7-scope-009", "run7-scope-010", "run7-scope-011", "run7-scope-012", "run7-scope-013", "run7-scope-014", "run7-scope-015", "run7-scope-016", "run7-scope-017", "run7-scope-018", "run7-scope-019", "run7-scope-020", "run7-scope-021", "run7-scope-022", "run7-scope-023", "run7-scope-024"]
+  },
+  "selection": {
+    "eligibility": ["transport_valid=true", "transport_classification=model_response", "deterministic baseline validation failure", "resolution=failure_class", "evidence_key=scope-authority-boundary", "frozen structural difficulty criteria satisfied"],
+    "rule": "Select the first 20 eligible failures in frozen candidate order.",
+    "reserve_rule": "Candidates not selected after baseline testing remain reserve-only; no adaptive replacement.",
+    "intervention_outputs_used_for_selection": false
+  },
+  "pair_order": {"seed": 20260826, "algorithm": "sha256(str(seed) + ':' + task_id), first hex digit < 8 means control-first", "orders_bound_by": "fixture manifest"},
+  "policies": {
+    "control": "external_teacher direct + one worker retry + deterministic validation + stop",
+    "treatment": "local_teacher + one worker retry + deterministic validation; external_teacher + one additional worker retry only after valid local model response with deterministic validation failure",
+    "no_patch": true,
+    "no_third_teacher": true,
+    "no_adaptive_threshold": true,
+    "infrastructure_does_not_trigger_escalation": true
+  },
+  "models": {
+    "worker": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "local_teacher": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "external_teacher": "codex-cli-0.146.0",
+    "worker_endpoint_alias": "JARVIS_LOCAL",
+    "local_teacher_endpoint_alias": "JARVIS_LOCAL",
+    "external_service_class": "codex-cli"
+  },
+  "timeouts_seconds": {"worker": 900, "local_teacher": 900, "external_teacher": 120},
+  "resource_manifest": {"path": "docs/research/RUN_4_RESOURCE_WEIGHTS_FREEZE_2026-08-19.json", "sha256": "8f7820a6a3e5734e071452f643374d8c6c769d4d149bcec3f2f82b88ee6530c2", "canonical_sha256": "33ad2521dc5acc0be5a67b3ef77c167e882cf6ce53140dc60acc8f89c9ad76ab", "weights_ms": {"worker_time_ms": 5276.567, "local_teacher_time_ms": 16220.624, "external_teacher_time_ms": 28704.012}},
+  "validators": [
+    {"path": "local_harness/supervised_capability_loop.py", "sha256": "23b26115201d8cba17b9da659af72793654897803988e35e28210eba02af81be"},
+    {"path": "local_harness/supervised_reference_fact_validator.py", "sha256": "d86793dfde5a499988be92447f7df79da889a6074b8dc21b1c3b16bd7c60008a"},
+    {"path": "local_harness/supervised_attempt_output_validator.py", "sha256": "3ca42dfc6f683399752bfe4f5757b9edf4e7eafb09ac30166fe60e9f3beb0d27"}
+  ],
+  "metrics": {
+    "quality": "treatment final validated solve rate >= control validated solve rate",
+    "resource": "treatment realized sequential policy elapsed_ms < control external-first policy elapsed_ms",
+    "success": "quality and resource criteria both true",
+    "escalation": ["local_first_passes", "local_first_failures", "validation_gate_identifications", "escalations", "escalation_rescues", "escalation_failures", "escalation_rate", "unresolved_after_escalation", "local_first_elapsed_ms", "escalation_elapsed_ms", "external_direct_elapsed_ms", "sequential_scope_elapsed_ms"],
+    "paired_outcomes": ["both_solve", "control_only", "treatment_only", "neither"],
+    "infrastructure_excluded_from_primary": true,
+    "physical_cost": "all durable model-call attempts",
+    "control_policy_cost": "external direct for every selected task",
+    "treatment_policy_cost": "local-first for every selected task plus external escalation only for valid local validation failures"
+  },
+  "planning_budget": {
+    "selected_tasks": 20,
+    "maximum_calls": {"worker": 84, "local_teacher": 20, "external_teacher": 40, "total": 144},
+    "maximum_physical_expected_elapsed_ms": 1915804.588,
+    "control_expected_post_baseline_ms": 679611.58,
+    "treatment_expected_post_baseline_formula": "20*21497.191 + escalation_count*33980.579",
+    "treatment_zero_escalation_ms": 429943.82,
+    "treatment_all_escalation_ms": 1109555.4,
+    "break_even": {"strictly_cheaper_when_escalations_at_most": 7, "strictly_cheaper_rate_at_most": 0.35, "next_escalation_count": 8, "next_escalation_rate": 0.4, "derivation": "20*21497.191 + E*33980.579 < 20*33980.579"}
+  },
+  "durability": {"explicit_execute_gate": true, "zero_call_dry_run": true, "active_call_fail_closed": true, "clean_partial_resume": true, "terminal_artifact_hash_verification": true, "local_pass_resume": true, "local_failure_before_escalation_resume": true, "escalation_before_closeout_resume": true, "no_duplicate_stage_calls": true},
+  "infrastructure": {"is_not_capability_failure": true, "local_first_infrastructure_does_not_trigger_escalation": true, "escalation_infrastructure_excluded_from_primary": true},
+  "stop_conditions": {"fewer_than_20_eligible": "terminal incomplete; no replacement", "zero_comparable": "result unavailable", "ambiguous_active_call": "fail closed", "corrupt_terminal_artifact": "fail closed"},
+  "authority_boundary": {"merge_capability_evidence": false, "modify_production_routing": false, "train_promote_retire_queue": false, "add_m_parameter_model": false}
+}

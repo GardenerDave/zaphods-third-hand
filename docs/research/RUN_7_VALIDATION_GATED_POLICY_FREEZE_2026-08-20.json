@@ -1,0 +1,58 @@
+{
+  "schema": "zth_run7_validation_gated_policy_freeze_v1",
+  "experiment_id": "run7-validation-gated-escalation-2026-08-20",
+  "frozen": true,
+  "authority": "review_only_experiment; no production routing authority; no capability merge; no training promotion queueing or retirement",
+  "research_basis": {
+    "run6_interpretation_freeze": "docs/research/RUN_6_INTERPRETATION_FREEZE_2026-08-20.json",
+    "run6_interpretation_freeze_sha256": "153ae13ce59e0de42def6b0f34cf4580d7bcc01236a6e17bf5bc07f408fa8e0a"
+  },
+  "policy_source": {
+    "path": "local_harness/run7_escalation_policy.py",
+    "sha256": "015c0ee04724a6480e20b7730e9fcfd2663622c473dda937cf76f3e9f8ad2220"
+  },
+  "family": "scope-authority-boundary",
+  "resolution": "failure_class",
+  "evidence_key": "scope-authority-boundary",
+  "control": {
+    "name": "external_direct",
+    "intervention": "external_teacher",
+    "worker_retry_count": 1,
+    "validation": "deterministic",
+    "stop_after_validation": true
+  },
+  "treatment": {
+    "name": "validation_gated_economic_escalation",
+    "initial_intervention": "local_teacher",
+    "initial_worker_retry_count": 1,
+    "validation": "deterministic",
+    "escalate_only_when": "valid local model response and deterministic validation_status=failed",
+    "escalation_intervention": "external_teacher",
+    "escalation_worker_retry_count": 1,
+    "escalation_validation": "deterministic",
+    "maximum_escalations_per_task": 1,
+    "third_teacher": false,
+    "deterministic_patch": false,
+    "infrastructure_trigger": false
+  },
+  "resource_priors": {
+    "path": "docs/research/RUN_4_RESOURCE_WEIGHTS_FREEZE_2026-08-19.json",
+    "sha256": "8f7820a6a3e5734e071452f643374d8c6c769d4d149bcec3f2f82b88ee6530c2",
+    "worker_time_ms": 5276.567,
+    "local_teacher_time_ms": 16220.624,
+    "external_teacher_time_ms": 28704.012,
+    "local_action_ms": 21497.191,
+    "external_action_ms": 33980.579
+  },
+  "planning": {
+    "candidate_count": 24,
+    "target_included_count": 20,
+    "maximum_calls": {"worker": 84, "local_teacher": 20, "external_teacher": 40, "total": 144},
+    "maximum_baseline_worker_calls": 24,
+    "control_expected_post_baseline_ms": 679611.58,
+    "treatment_expected_post_baseline_formula": "20*21497.191 + escalation_count*33980.579",
+    "treatment_zero_escalation_ms": 429943.82,
+    "treatment_all_escalation_ms": 1109555.4
+  },
+  "canonical_digest": "8e84c1c625eec039e68ea70fadb5ca551300fb1d04ac5604ceff36c82b0c1974"
+}

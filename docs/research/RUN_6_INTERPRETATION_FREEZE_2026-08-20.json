@@ -1,0 +1,39 @@
+{
+  "schema": "zth_run6_interpretation_freeze_v1",
+  "experiment_id": "run6-validation-gated-economic-escalation-2026-08-20",
+  "frozen": true,
+  "review_status": "reviewed",
+  "source_report": {
+    "path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_6_VALIDATION_GATED_2026-08-20.md",
+    "sha256": "d4d41117f541720ccb9881a1ccd805608955fbd8b532342e80c88dd38fd58600"
+  },
+  "execution": {
+    "commit": "4eb07b9427c2c3a3d808e6f314e772ee15cfcd5d",
+    "manifest_path": ".work/run6_sequential_economic_routing/run_20260820T030541Z/execution_manifest.json",
+    "manifest_sha256": "f35d39d6ba7135c840a47da208c25a76dab8796b6ae7c9069185e8438ade86c4",
+    "aggregate_path": ".work/run6_sequential_economic_routing/run_20260820T030541Z/aggregate.json",
+    "aggregate_sha256": "29f8f38862af6558d23ce6e8d71935bfe5776b889613fc22bee9b73af3773bda"
+  },
+  "established": {
+    "portfolio_control": "23/24",
+    "portfolio_treatment": "23/24",
+    "quality_preserved": true,
+    "resource_reduced": true,
+    "economic_routing_success": true,
+    "control_policy_elapsed_ms": 923227.067,
+    "treatment_policy_elapsed_ms": 558908.599,
+    "savings_ms": 364318.468,
+    "savings_percent": 39.461,
+    "scope_local_first": "12/12",
+    "scope_external": "12/12",
+    "scope_escalations": 0,
+    "infrastructure_exclusions": 0
+  },
+  "interpretation_boundary": {
+    "claim": "reviewed sample-level result only",
+    "escalation_effectiveness": "unavailable because no local-first failure occurred",
+    "production_authority": false,
+    "capability_bundle_merge": false
+  },
+  "canonical_digest": "run6-interpretation-freeze-2026-08-20"
+}
