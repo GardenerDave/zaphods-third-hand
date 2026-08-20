@@ -13,6 +13,28 @@ criteria were met on this fresh mixed workload. This is review-only evidence;
 it does not modify production routing, capability cards, prior Run 4/4A/4B/5
 evidence, resource priors, or intervention status.
 
+## Executive result
+
+Run 6 met both preregistered portfolio criteria on the fresh mixed
+triage/scope workload:
+
+| Policy | Validated solves | Realized policy-level elapsed |
+|---|---:|---:|
+| Control: `external_everywhere` | 23/24 | 923,227.067 ms |
+| Treatment: validation-gated local-first | 23/24 | 558,908.599 ms |
+| **Difference** | **0 solves** | **364,318.468 ms lower; 39.461% reduction** |
+
+Thus, on this workload, the treatment preserved observed validated portfolio
+performance while materially reducing realized inference resource use.
+
+**Important mechanism limitation:** all 12 scope local-first attempts passed
+deterministic validation. Consequently, local-first scope solves were 12/12,
+local-first failures were 0, external escalations were 0, escalation rescues
+were 0, and escalation failures were 0. Run 6 observed only the
+no-escalation branch of the sequential policy. The validation-gated external
+recovery mechanism was preregistered, implemented, and tested model-free, but
+was not scientifically exercised by this sample.
+
 ## Frozen provenance
 
 - Execution commit: `4eb07b9427c2c3a3d808e6f314e772ee15cfcd5d`
@@ -124,6 +146,25 @@ first stage passed deterministic validation.
 The single portfolio miss was the shared triage `neither` outcome and therefore
 affected both policies equally. No scope quality difference was observed.
 
+## Policy success versus escalation coverage
+
+**Policy result — established on this sample.** The complete treatment policy
+met its frozen success criteria: equal observed validated portfolio quality at
+lower realized policy cost.
+
+**Local-first substitution — observed.** The local teacher solved all 12 fresh
+scope tasks in the treatment’s first stage.
+
+**Validation-gated external recovery — not empirically exercised.** No local
+scope attempt failed, so Run 6 provides no new scientific observation of:
+
+- whether deterministic validation catches a real local miss in this sample;
+- whether treatment-side external escalation then rescues it;
+- the realized incremental cost of that recovery path.
+
+The mechanism remains available and model-free tested, but this open empirical
+question is not answered by the completed scientific sample.
+
 ## Escalation economics
 
 - Scope local-first passes: 12/12
@@ -177,6 +218,55 @@ for treatment, yielding 364,318.468 ms (39.461%) realized savings. Expected
 decision cost, realized policy cost, and physical experiment cost remain
 separate quantities.
 
+Zero escalations reduced physical execution from the preregistered 126-call
+maximum to 102 actual calls: 66 worker, 24 external-teacher, and 12
+local-teacher calls.
+
+## Run 5 to Run 6 comparison
+
+The fresh scope results form a useful but bounded progression:
+
+| Experiment | Scope external | Scope local/local-first | Scope paired result | Portfolio result | Resource reduction |
+|---|---:|---:|---|---|---:|
+| Run 5 | 12/12 | 11/12 | 11 both; 1 control-only | 22/24 vs 21/24 | 33.929%; quality not preserved |
+| Run 6 | 12/12 | 12/12 | 12 both; 0 discordant | 23/24 vs 23/24 | 39.461%; quality preserved |
+
+Run 5 showed that static local substitution can miss an occasional task. Run 6
+supports the local-first economic-routing hypothesis on another fresh scope
+sample, but because local solved every Run 6 scope task it does not provide the
+confirmatory external-recovery observation motivated by Run 5’s single local
+miss. The Run 5 miss remains scientifically relevant and is not disproved.
+
+## Descriptive cumulative scope evidence
+
+These are separate experiments, retained as separate records:
+
+| Experiment | Local/local-first | External |
+|---|---:|---:|
+| Run 4A | 4/4 | 4/4 |
+| Run 4B | 12/12 | 12/12 |
+| Run 5 | 11/12 | 12/12 |
+| Run 6 | 12/12 | 12/12 |
+| **Descriptive total** | **39/40** | **40/40** |
+
+The 39/40 versus 40/40 arithmetic is descriptive cumulative evidence only. It
+is not one pooled preregistered experiment, a formal equivalence test, or a
+population-level reliability estimate. It does not authorize retiring
+`external_teacher`; the single observed local miss remains important.
+
+## What Run 6 adds
+
+Run 4 showed that a cheap intervention is not automatically substitutable. Run
+4B established a replicated static local/external scope-efficiency pattern.
+Run 5 showed that even replicated static substitution can be imperfect. Run 6
+demonstrated that, on another fresh mixed workload, routing scope to local
+first can preserve portfolio quality while reducing resource use.
+
+The intended safety valve—validation-triggered external recovery—still needs a
+direct scientific observation on a local failure. The research progression is
+therefore a successful local-first sample result with mechanism coverage still
+incomplete, not evidence that recovery is unnecessary.
+
 ## Interpretation and limitations
 
 On this fresh mixed triage/scope workload, deterministic validation-gated
@@ -187,9 +277,19 @@ not a universal economic-routing claim.
 
 The observed treatment branch had zero local failures and therefore did not
 exercise external recovery. The experiment does not establish local universal
-substitutability, universal escalation effectiveness, or a value-of-success
-constant. It does not evaluate contradiction-handling or unsupported-certainty,
-and it does not retire `external_teacher`.
+substitutability, empirical escalation rescue effectiveness, universal
+reliability of deterministic validation as a recovery trigger, or a
+value-of-success constant. It does not establish that `external_teacher` has
+no harder-task niche or should be retired; that all task families support
+local-first routing; that M-parameter models are validated; or that
+contradiction-handling and unsupported-certainty are covered.
+
+Run 6 supports only sample-level portfolio quality preservation, sample-level
+resource reduction, successful evidence-qualified local-first routing on this
+mixed workload, and another fresh 12/12 scope-local observation. The next
+unresolved research question is whether the treatment preserves quality when a
+fresh scope task actually fails local-first validation and exercises external
+recovery.
 
 No evidence was merged into capability cards or production routing. No
 training, promotion, queueing, retirement, or autonomous downstream action was
