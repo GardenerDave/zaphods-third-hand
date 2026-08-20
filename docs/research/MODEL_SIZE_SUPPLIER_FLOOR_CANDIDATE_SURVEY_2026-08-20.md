@@ -1,7 +1,8 @@
 # Model-Size Supplier-Floor Candidate Survey
 
-Status: model-free survey and selection pass. No model was downloaded,
-installed, started, or called. This document selects a Stage A screening
+Status: model-free survey and runtime-freeze follow-up. The selected artifact
+was independently SHA-verified after placement, but no model was called and
+Stage A screening has not started. This document selects a Stage A screening
 candidate only; it is not a scientific experiment preregistration and its
 facts are not capability evidence.
 
@@ -17,8 +18,9 @@ First candidate:
 
 ```text
 model identity: Qwen/Qwen3-0.6B
-proposed screening artifact: Qwen_Qwen3-0.6B-Q4_K_M.gguf
-proposed quantized source: bartowski/Qwen_Qwen3-0.6B-GGUF
+screening artifact: Qwen3-0.6B-Q4_K_M.gguf
+quantized source: Qwen/Qwen3-0.6B-GGUF
+source revision: 1208e45d782fe18602c5eaf10e5758d5b0f24c03
 ```
 
 This is the strongest first screening choice because it reduces parameter
@@ -27,15 +29,16 @@ post-trained model identity, an available GGUF path, and a llama.cpp-compatible
 deployment route. It provides a cleaner size-reduction test than Qwen3.5-0.8B,
 whose newer hybrid multimodal architecture changes more than size.
 
-The exact artifact is not downloaded or frozen as a scientific input here. The
-Stage A preparation task must re-check its immutable revision, file hash,
-license, chat template, and runtime behavior before use.
+The artifact is now locally present and independently SHA-verified, and is
+frozen for screening preparation. This does not imply successful capability,
+and the Stage A runtime record remains distinct from any future scientific
+evidence.
 
 ## Candidate comparison
 
 | Candidate | Size / family | Runtime and format position | Scientific role |
 |---|---|---|---|
-| `Qwen/Qwen3-0.6B` | 0.6B; same Qwen3 family as the 1.7B reference | Official Qwen GGUF distribution exists; the inspected official GGUF tree exposes Q8_0. Q4_K_M is available from reproducible community GGUF distributions. | **Selected first screening candidate** |
+| `Qwen/Qwen3-0.6B` | 0.6B; same Qwen3 family as the 1.7B reference | Official Qwen GGUF distribution, including the selected Q4_K_M artifact, with llama.cpp path. | **Selected first screening candidate** |
 | `Qwen/Qwen3.5-0.8B` | 0.8B; newer Qwen3.5 hybrid multimodal family | Official Transformers artifact; Qwen documents vLLM/SGLang/Transformers serving. GGUF availability exists through `ggml-org`, but this is not the same architecture/runtime control. | Alternate-family control; defer |
 | `TinyLlama/TinyLlama-1.1B-Chat-v1.0` | 1.1B; Llama 2 architecture/tokenizer | Official Transformers chat artifact; community quantizations are available. | Alternate-family control; defer |
 | `HuggingFaceTB/SmolLM2-360M-Instruct` | 360M; SmolLM2 compact family | Official Transformers artifact; the card documents Transformers, Transformers.js, vLLM, and SGLang. Quantized descendants exist, but no exact GGUF artifact is selected here. | Next-down candidate |
@@ -58,37 +61,32 @@ non-thinking modes; the card documents `/no_think` and an API-level
 `enable_thinking` control. The screening runtime must freeze non-thinking
 behavior if that is the intended ZTH configuration.
 
-The official Qwen GGUF family is [`Qwen/Qwen3-0.6B-GGUF`](https://huggingface.co/Qwen/Qwen3-0.6B-GGUF).
-The inspected main tree currently shows `Qwen3-0.6B-Q8_0.gguf` at 639 MB;
-the official Qwen llama.cpp instructions document GGUF and Q4_K_M usage for
-the Qwen3 family. For a directly comparable Q4_K_M artifact, the inspected
-[`bartowski/Qwen_Qwen3-0.6B-GGUF` file](https://huggingface.co/bartowski/Qwen_Qwen3-0.6B-GGUF/blob/main/Qwen_Qwen3-0.6B-Q4_K_M.gguf)
+The official Qwen GGUF family and selected artifact are in
+[`Qwen/Qwen3-0.6B-GGUF`](https://huggingface.co/Qwen/Qwen3-0.6B-GGUF), revision
+`1208e45d782fe18602c5eaf10e5758d5b0f24c03`. The selected Q4_K_M artifact
 reports:
 
 ```text
-filename: Qwen_Qwen3-0.6B-Q4_K_M.gguf
-published size: 484 MB
-published SHA256: 9acfc1e001311f34b4252001b626f2e466d592a42065f66571bff3790d4e1b14
-source revision shown by the file page: 7bcae0b
-license shown by the source family/model metadata: Apache-2.0
+filename: Qwen3-0.6B-Q4_K_M.gguf
+exact local size: 396704416 bytes
+verified SHA256: b0638f08417a2d3c8652760462eb5407c6e30173cf9608ad0820757a281eea0e
+repository revision: 1208e45d782fe18602c5eaf10e5758d5b0f24c03
+license: Apache-2.0
+local placement: /home/navigator/ai/models/small-auditions/qwen3-0.6b/Qwen3-0.6B-Q4_K_M.gguf
 ```
 
-This proposed artifact is a community conversion of the official Qwen model,
-not an official Qwen-organization Q4_K_M file. That provenance distinction
-must remain explicit. If Stage A uses it, the exact downloaded bytes and
-revision must be frozen before any screening call. The file page documents
-llama.cpp usage and the Q4_K_M filename. The official Qwen card documents
-OpenAI-compatible local serving through a custom endpoint, while Qwen's
-llama.cpp documentation documents official GGUF distribution and Q4_K_M
-quantization. These facts make same-runtime comparison plausible, but do not
-replace local load validation.
+This is an official Qwen-organization Q4_K_M artifact. Its verified placement
+and runtime metadata are frozen separately in
+`MODEL_SIZE_SUPPLIER_FLOOR_QWEN3_0_6B_STAGE_A_RUNTIME_FREEZE_2026-08-20.json`.
+The Qwen card and llama.cpp documentation establish the model/runtime path,
+but successful placement and loading do not constitute capability evidence.
 
 Compatibility assessment:
 
 - **Model-family control:** high; it is the same Qwen3 family as the
   established Qwen3 1.7B Q4_K_M reference.
 - **Runtime control:** high in principle; GGUF and llama.cpp are available.
-- **Hardware control:** high in principle; its proposed Q4_K_M file is far
+- **Hardware control:** high in principle; its Q4_K_M file is far
   below the reference model's size and should fit on the reference hardware;
   actual fit remains a preparation check.
 - **Quantization control:** high if Q4_K_M is frozen for both suppliers;
@@ -102,9 +100,9 @@ Compatibility assessment:
   Q4_K_M class are feasible in principle.
 
 Known risks are small-model structured-output reliability, Qwen3 thinking-mode
-configuration, community-conversion provenance for Q4_K_M, and any tokenizer,
-chat-template, or llama.cpp version interaction. None is evidence of failure;
-all are preparation checks.
+configuration, and any tokenizer, chat-template, or llama.cpp version
+interaction. None is evidence of failure; all remain screening preparation
+checks.
 
 ### Qwen3.5-0.8B — alternate-family control
 
@@ -216,21 +214,22 @@ search strategy rather than turning Stage A into a benchmark.
 
 ## Next step
 
-The next separate task is to prepare, download/install, and freeze the Stage A
-screening runtime for the selected Qwen3-0.6B candidate. That task must verify
-the exact artifact and bytes before any screening call. Screening results will
-be labeled Stage A and will not be treated as confirmatory scientific evidence.
-No Stage B confirmation preregistration is created by this survey.
+The Stage A runtime is now prepared and frozen, but screening has not started.
+Screening results will be labeled Stage A and will not be treated as
+confirmatory scientific evidence. No Stage B confirmation preregistration is
+created by this survey.
 
 ## Selection record
 
 ```text
 disposition: SELECT_QWEN3_0_6B_FOR_SCREENING
 first_candidate: Qwen/Qwen3-0.6B
-proposed_quantization: Q4_K_M
-proposed_artifact: bartowski/Qwen_Qwen3-0.6B-GGUF/Qwen_Qwen3-0.6B-Q4_K_M.gguf
-downloaded: false
-installed: false
+quantization: Q4_K_M
+artifact: Qwen/Qwen3-0.6B-GGUF@1208e45d782fe18602c5eaf10e5758d5b0f24c03/Qwen3-0.6B-Q4_K_M.gguf
+artifact_sha256: b0638f08417a2d3c8652760462eb5407c6e30173cf9608ad0820757a281eea0e
+exact_size_bytes: 396704416
+downloaded: true
+installed: true
 model_calls: 0
 screening_started: false
 scientific_preregistration_created: false

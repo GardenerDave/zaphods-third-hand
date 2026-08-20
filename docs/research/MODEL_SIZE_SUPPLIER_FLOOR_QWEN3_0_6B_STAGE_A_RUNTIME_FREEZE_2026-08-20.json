@@ -1,0 +1,90 @@
+{
+  "schema": "model_size_supplier_floor_stage_a_runtime_freeze_v1",
+  "status": "screening_only_runtime_freeze",
+  "authority": "screening_only_no_capability_evidence",
+  "candidate": {
+    "model_identity": "Qwen/Qwen3-0.6B",
+    "role": "first_model_size_supplier_floor_stage_a_candidate",
+    "repository": "Qwen/Qwen3-0.6B-GGUF",
+    "repository_revision": "1208e45d782fe18602c5eaf10e5758d5b0f24c03",
+    "filename": "Qwen3-0.6B-Q4_K_M.gguf",
+    "sha256": "b0638f08417a2d3c8652760462eb5407c6e30173cf9608ad0820757a281eea0e",
+    "size_bytes": 396704416,
+    "quantization": "Q4_K_M",
+    "local_path": "/home/navigator/ai/models/small-auditions/qwen3-0.6b/Qwen3-0.6B-Q4_K_M.gguf",
+    "downloaded": true,
+    "installed": true,
+    "sha_verified_after_final_placement": true
+  },
+  "model_metadata_exposed_by_llama_cpp": {
+    "n_params": 596049920,
+    "n_ctx": 40960,
+    "n_ctx_train": 40960,
+    "n_embd": 1024
+  },
+  "runtime": {
+    "llama_cpp_version": "9314",
+    "build_revision": "d55fb9717",
+    "binary": "/home/navigator/llama.cpp/build-cuda-v100/bin/llama-server",
+    "reasoning": "off",
+    "model_loaded": true,
+    "all_slots_idle_at_observation": true,
+    "observed_idle_gpu_allocation_mib": 3186,
+    "load_evidence_is_capability_evidence": false
+  },
+  "non_generative_load_evidence": {
+    "source": "/v1/models",
+    "exposed_id": "Qwen3-0.6B-Q4_K_M.gguf",
+    "n_params": 596049920,
+    "n_ctx": 40960,
+    "n_ctx_train": 40960,
+    "n_embd": 1024,
+    "startup_thinking": 0,
+    "model_loaded": true,
+    "all_slots_idle": true,
+    "observed_idle_gpu_allocation_mib": 3186,
+    "interpretation": "non_generative_runtime_load_evidence_only"
+  },
+  "hardware": {
+    "gpu_class": "NVIDIA GeForce GTX 1650",
+    "gpu_memory_mib": 4096,
+    "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+    "exclusive_gpu_use_required_for_comparison": true
+  },
+  "comparison_flags": {
+    "device": "CUDA0",
+    "split_mode": "none",
+    "ctx_size": 40960,
+    "parallel": 1,
+    "fit": "on",
+    "fit_target": 512,
+    "threads": 2,
+    "threads_batch": 4,
+    "reasoning": "off",
+    "same_context_as_reference_required": true,
+    "same_llama_cpp_build_as_reference_required": true,
+    "same_hardware_as_reference_required": true,
+    "no_simultaneous_candidate_and_reference_residency": true
+  },
+  "reference_1_7b": {
+    "model_identity": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb",
+    "size_bytes": 1282439584,
+    "hardware": "same NVIDIA GeForce GTX 1650",
+    "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+    "llama_cpp_build_revision": "d55fb9717",
+    "comparison_requirement": "exclusive_one_model_at_a_time_on_the_GTX_1650"
+  },
+  "external_teacher_hardware": {
+    "gpu_class": "Tesla V100-SXM2-16GB",
+    "role": "independently_hosted_stronger_teacher",
+    "network_addresses_recorded": false
+  },
+  "lifecycle": {
+    "screening_started": false,
+    "model_calls_made": false,
+    "scientific_preregistration_created": false,
+    "production_routing_changed": false,
+    "capability_evidence_created": false
+  }
+}
