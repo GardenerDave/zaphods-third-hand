@@ -2,13 +2,14 @@
 
 Status: completed; review required; no capability-evidence merge.
 
-Run 7 evaluated the frozen validation-gated escalation policy on 20 selected
-fresh, difficulty-enriched `scope-authority-boundary` failures. The control
-used external-first execution. The treatment used local-first execution and
-escalated to the external teacher only after a valid local response failed
-deterministic validation.
+Run 7 successfully exercised the previously unobserved validation-gated
+escalation branch on 20 selected fresh, difficulty-enriched
+`scope-authority-boundary` failures. Local-first failed deterministic
+validation on 3/20 tasks. All three failures triggered exactly one
+preregistered external recovery attempt; one recovered and two remained
+unresolved.
 
-The treatment was cheaper but did not preserve final validated performance:
+The primary result was:
 
 | Policy | Final validated solves | Realized post-baseline policy elapsed |
 |---|---:|---:|
@@ -16,15 +17,99 @@ The treatment was cheaper but did not preserve final validated performance:
 | Treatment, local-first + conditional escalation | 18/20 (0.900) | 330,432.860 ms |
 | Difference | -2 solves | -468,022.979 ms (-58.616%) |
 
-Accordingly, `quality_preserved=false`, `resource_reduced=true`, and
-`economic_routing_success=false`.
+Thus `quality_preserved=false`, `resource_reduced=true`, and
+`economic_routing_success=false`. Run 7 demonstrated substantial economic
+savings but failed the frozen quality-preservation criterion.
 
-## Escalation-branch result
+## Local supplier, validation gate, and recovery path
 
-The branch was empirically exercised. Of 20 local-first attempts, 17 passed
-validation and 3 failed. All 3 failures triggered exactly one external
-escalation. One escalation rescued the task; two remained unresolved after
-escalation.
+The sequential policy decomposes into three experimentally distinct
+mechanisms.
+
+### Local supplier
+
+Local-first passed deterministic validation on 17/20 tasks and failed on 3/20.
+The observed initial local success rate was 85%.
+
+### Validation gate
+
+All three observed deterministic local failures caused exactly one escalation.
+The control-flow gate therefore behaved according to the frozen policy on all
+three observed failure cases. This is evidence about these observations, not
+a population-level estimate of validator sensitivity.
+
+### External recovery
+
+There were 3 escalation attempts, 1 rescue, and 2 unresolved tasks. The
+observed recovery fraction was 1/3. Three observations are not a
+population-level recovery-rate estimate.
+
+## Direct external success versus escalation-path failure
+
+The external-direct control solved 20/20, including all three tasks on which
+local-first failed: `run7-scope-001`, `run7-scope-006`, and
+`run7-scope-019`. The treatment-side external escalation solved only
+`run7-scope-006`; it failed on `run7-scope-001` and `run7-scope-019`.
+
+The external teacher identity was the same frozen supplier, but the
+intervention paths differed. Control used:
+
+```text
+original baseline/task -> external teacher -> worker retry -> validation
+```
+
+Treatment recovery used:
+
+```text
+original baseline/task + local-failure evidence
+    -> external escalation -> worker retry -> validation
+```
+
+The two `control_only` outcomes therefore cannot be explained simply as the
+external teacher lacking capability on those tasks: matched direct control
+paths solved both. The discrepancy makes treatment recovery path construction,
+intervention context, or retry interaction the next diagnostic target. This
+report does not claim which factor caused the discrepancy.
+
+### Escalation-task comparison
+
+Values below are mechanically extracted from the paired scorecards and stage
+summaries. Treatment sequential elapsed is local-first elapsed plus escalation
+elapsed.
+
+| Task | Control external validation | Local-first validation | Escalated | Escalation validation | Final treatment | Paired outcome | Local ms | Escalation ms | Treatment sequential ms | Matched control ms |
+|---|---|---|---|---|---|---|---:|---:|---:|---:|
+| `run7-scope-001` | passed | failed | yes | failed | failed | control_only | 12,429.491 | 39,908.104 | 52,337.595 | 30,019.182 |
+| `run7-scope-006` | passed | failed | yes | passed | passed | both_solve | 13,519.074 | 16,192.341 | 29,711.415 | 38,018.105 |
+| `run7-scope-019` | passed | failed | yes | failed | failed | control_only | 11,896.758 | 58,401.492 | 70,298.250 | 34,656.247 |
+
+## Gate effectiveness versus recovery effectiveness
+
+Observed gate behavior was complete on the observed failures:
+
+```text
+3 local deterministic failures -> 3 escalations triggered
+```
+
+Observed recovery behavior was incomplete:
+
+```text
+3 escalations -> 1 rescue, 2 unresolved
+```
+
+The quality failure occurred after the gate had triggered the intended
+recovery action. The artifacts do not support describing this as a failure to
+detect the local misses.
+
+## Escalation economics
+
+The observed escalation rate was 3/20 = 15%. Under frozen priors, treatment
+remains strictly cheaper through 7/20 = 35%; at 8/20 = 40% it is no longer
+cheaper. Run 7 was therefore well inside the frozen economic envelope.
+
+Run 7 did not fail because too many tasks escalated. It failed because two
+escalated tasks were not recovered. This is why the resource criterion passed
+while the combined economic-routing criterion failed.
 
 | Treatment stage | Count |
 |---|---:|
@@ -35,9 +120,7 @@ escalation.
 | Escalation failures | 2 |
 | Final treatment solves | 18 |
 
-The escalation rate was 3/20 = 15.000%, below the frozen 35% economic
-break-even rate (7/20). That favorable cost position did not compensate for
-the two final quality losses. The observed paired outcomes were:
+The observed paired outcomes were:
 
 | Paired outcome | Count |
 |---|---:|
@@ -46,9 +129,7 @@ the two final quality losses. The observed paired outcomes were:
 | Treatment only | 0 |
 | Neither | 0 |
 
-The three escalation tasks were `run7-scope-001`, `run7-scope-006`, and
-`run7-scope-019`. `run7-scope-006` was rescued; the other two remained
-unresolved. All intervention and escalation transport classifications were
+All intervention and escalation transport classifications were
 `model_response`; infrastructure exclusions were zero.
 
 ## Selection and baseline dispositions
@@ -66,6 +147,85 @@ Reserve-only candidates:
 `run7-scope-021`, `run7-scope-022`, `run7-scope-023`, `run7-scope-024`.
 
 The selection artifact records `selection_uses_intervention_outputs=false`.
+
+## Run 6 to Run 7
+
+Run 6 had 12/12 scope local-first solves, zero escalations, 12/12 final scope
+treatment solves, preserved portfolio quality, and 39.461% resource
+reduction. Its escalation branch was unobserved.
+
+Run 7 produced naturally observed local failures without intervention-based
+fixture selection. It supplied the missing escalation observations: 17/20
+local-first passes, 3 failures, 3 escalations, 1 rescue, and 2 unresolved
+tasks. The branch trigger worked on this sample, but recovery was
+insufficient to preserve quality.
+
+## What Run 7 resolved
+
+Run 6 left open whether naturally occurring local failures would trigger the
+sequential recovery branch. Run 7 answers yes: three naturally observed local
+validation failures triggered it.
+
+Run 6 also left open whether escalation would reliably restore quality lost by
+local-first. Run 7 answers no on this sample: one of three escalated failures
+was recovered, while matched external-direct control solved all three.
+
+The next unresolved diagnostic question is why the same frozen external
+teacher solved `run7-scope-001` and `run7-scope-019` directly but failed to
+recover them in treatment escalation. The next analysis should inspect the
+paired artifacts before any policy change, including:
+
+- teacher prompt construction;
+- baseline evidence presented;
+- local-failure diagnostics added;
+- authority context;
+- teacher and worker outputs;
+- deterministic validation diagnostics;
+- token, context, and resource metadata where available.
+
+This report does not design or preregister a subsequent experiment.
+
+## Descriptive cumulative scope chain
+
+The following are separate experiments, verified from their frozen aggregate
+artifacts:
+
+| Experiment | Local/local-first | External/external-direct |
+|---|---:|---:|
+| Run 4A | 4/4 | 4/4 |
+| Run 4B | 12/12 | 12/12 |
+| Run 5 | 11/12 | 12/12 |
+| Run 6 | 12/12 | 12/12 |
+| Run 7 | 17/20 | 20/20 |
+| Descriptive total | 56/60 | 60/60 |
+
+**DESCRIPTIVE CUMULATIVE ARITHMETIC ONLY.** This is not one pooled
+experiment, a formal equivalence analysis, a population reliability estimate,
+retirement justification, or production-routing authorization. Run 7's
+sequential final treatment result is reported separately as 18/20 after
+escalation; it is not mixed into the initial-local numerator.
+
+## Claim boundaries
+
+Run 7 supports:
+
+- naturally observed local failures on a difficulty-enriched fresh sample;
+- deterministic triggering of the frozen escalation branch for those failures;
+- one observed successful recovery and two observed unsuccessful recoveries;
+- substantial realized resource savings;
+- failure of the complete sequential policy to preserve quality on this
+  sample.
+
+Run 7 does not establish:
+
+- universal escalation ineffectiveness;
+- universal external-teacher weakness;
+- validator failure;
+- a universal 15% local failure rate or 1/3 escalation rescue rate;
+- that local-first should be abandoned;
+- that `external_teacher` should be retired;
+- that the M-parameter model should be inserted;
+- production-routing authority.
 
 ## Planning economics and physical accounting
 
@@ -95,19 +255,12 @@ The 110 calls comprise 24 baselines, 20 external control actions, 20 local
 first-stage actions, 3 treatment escalations, and their worker retries. No
 call was triggered by infrastructure failure.
 
-## Interpretation
+## Authority boundary
 
-Run 7 demonstrates that the validation gate can identify naturally observed
-local failures and invoke the preregistered external recovery path. In this
-sample, recovery succeeded once and failed twice. The complete sequential
-policy therefore did not meet its quality-preservation criterion, despite a
-large realized resource reduction.
-
-This is not evidence that validation-gated escalation is universally
-ineffective; it is the observed result on this difficulty-enriched sample.
-The result does not authorize production routing, capability-card changes,
-retirement, promotion, training, queueing, or addition of the M-parameter
-model. It remains review-only.
+This report is a durable review artifact only. Run 7 evidence has not been
+merged into capability cards or production routing, and no intervention has
+been retired, promoted, trained, queued, or otherwise operationalized. The
+M-parameter model remains outside this work.
 
 ## Frozen provenance
 
@@ -138,10 +291,4 @@ Runtime identities were the frozen worker
 `Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf`, and external teacher
 `codex-cli-0.146.0`. The recorded timeouts were worker/local 900 seconds and
 external 120 seconds. The raw execution directory remains under `.work` and
-was not modified by this closeout report.
-
-## Authority boundary
-
-This report is a durable review artifact only. Run 7 evidence has not been
-merged into capability cards or production routing, and no intervention has
-been retired, promoted, trained, queued, or otherwise operationalized.
+was not modified by this documentation change.
