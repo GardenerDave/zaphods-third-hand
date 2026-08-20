@@ -67,6 +67,24 @@ def _terminal_execution(value: Mapping[str, Any]) -> bool:
     return value.get("status") == "experiment_completed" or (value.get("status") == "experiment_incomplete" and bool(value.get("completed_at")))
 
 
+def _validate_execution_bindings(context: Mapping[str, Any], execution: Mapping[str, Any]) -> None:
+    expected = {
+        "preregistration_sha256": sha256_file(context["preregistration_path"]),
+        "driver_sha256": context["preregistration"]["driver"]["sha256"],
+        "policy_freeze_sha256": context["preregistration"]["policy_freeze"]["canonical_sha256"],
+        "fixture_pack_sha256": {family: context["manifests"][family]["pack_sha256"] for family in ("triage", "scope")},
+        "models": context["preregistration"]["models"],
+        "timeouts_seconds": context["preregistration"]["timeouts_seconds"],
+        "pair_order_seed": context["preregistration"]["pair_order"]["seed"],
+    }
+    for field, value in expected.items():
+        if execution.get(field) != value:
+            raise Run4ADriverError(f"Run 5 execution binding drift: {field}")
+    expected_head = context.get("git_head")
+    if expected_head is not None and execution.get("git_head") != expected_head:
+        raise Run4ADriverError("Run 5 execution binding drift: git_head")
+
+
 def _task_map(repo_root: Path, manifests: Mapping[str, Mapping[str, Any]]) -> dict[str, dict[str, Any]]:
     result = {}
     for family, manifest in manifests.items():
@@ -217,19 +235,20 @@ def aggregate_results(context: Mapping[str, Any], output_dir: Path, execution: M
     return result
 
 
-def run_experiment(context: Mapping[str, Any], output_dir: Path, *, worker: Callable[..., Any], local_teacher: Callable[..., Any], external_teacher: Callable[..., Any]) -> dict[str, Any]:
+def run_experiment(context: Mapping[str, Any], output_dir: Path, *, worker: Callable[..., Any], local_teacher: Callable[..., Any], external_teacher: Callable[..., Any], checkpoint_hook: Callable[[str, Mapping[str, Any]], None] | None = None) -> dict[str, Any]:
     manifest_path = output_dir / "execution_manifest.json"
     if manifest_path.exists():
         execution = _read_json(manifest_path)
-        if execution.get("schema") != "zth_run5_mixed_execution_manifest_v1" or execution.get("preregistration_sha256") != sha256_file(context["preregistration_path"]):
+        if execution.get("schema") != "zth_run5_mixed_execution_manifest_v1":
             raise Run4ADriverError("Run 5 execution binding mismatch")
+        _validate_execution_bindings(context, execution)
         if _terminal_execution(execution): return execution
         if execution.get("active_call"): raise Run4ADriverError("ambiguous active Run 5 call; refusing resume")
     elif output_dir.exists() and any(output_dir.iterdir()):
         raise Run4ADriverError("existing nonempty output directory lacks a bound Run 5 execution manifest")
     else:
         output_dir.mkdir(parents=True, exist_ok=True)
-        execution = {"schema": "zth_run5_mixed_execution_manifest_v1", "status": "experiment_running", "started_at": utc_now(), "git_head": git_head(Path.cwd()), "preregistration_sha256": sha256_file(context["preregistration_path"]), "driver_sha256": context["preregistration"]["driver"]["sha256"], "policy_freeze_sha256": context["preregistration"]["policy_freeze"]["canonical_sha256"], "fixture_pack_sha256": {family: context["manifests"][family]["pack_sha256"] for family in context["manifests"]}, "models": context["preregistration"]["models"], "timeouts_seconds": context["preregistration"]["timeouts_seconds"], "pair_order_seed": context["preregistration"]["pair_order"]["seed"], "candidate_states": {}, "model_calls_started": True}
+        execution = {"schema": "zth_run5_mixed_execution_manifest_v1", "status": "experiment_running", "started_at": utc_now(), "git_head": context.get("git_head") or git_head(Path.cwd()), "preregistration_sha256": sha256_file(context["preregistration_path"]), "driver_sha256": context["preregistration"]["driver"]["sha256"], "policy_freeze_sha256": context["preregistration"]["policy_freeze"]["canonical_sha256"], "fixture_pack_sha256": {family: context["manifests"][family]["pack_sha256"] for family in context["manifests"]}, "models": context["preregistration"]["models"], "timeouts_seconds": context["preregistration"]["timeouts_seconds"], "pair_order_seed": context["preregistration"]["pair_order"]["seed"], "candidate_states": {}, "model_calls_started": True}
         _json_write(manifest_path, execution)
     for family in ("triage", "scope"):
         summaries = {}
@@ -239,6 +258,7 @@ def run_experiment(context: Mapping[str, Any], output_dir: Path, *, worker: Call
             execution["active_call"] = {"kind": "baseline", "family": family, "task_id": task_id, "role": "worker"}; _json_write(manifest_path, execution)
             summaries[task_id] = run_baseline(context["tasks"][task_id], candidate_dir, worker=worker)
             execution.pop("active_call", None); execution["candidate_states"][f"{family}:{task_id}"] = "baseline_terminal"; _json_write(manifest_path, execution)
+            if checkpoint_hook is not None: checkpoint_hook(f"baseline_terminal:{family}:{task_id}", execution)
         selection = _selection(candidate_order, summaries)
         _json_write(output_dir / "selections" / f"{family}.json", selection)
         execution.setdefault("selections", {})[family] = selection; _json_write(manifest_path, execution)
@@ -252,6 +272,7 @@ def run_experiment(context: Mapping[str, Any], output_dir: Path, *, worker: Call
                 common = _run_action(context, output_dir, family, task_id, "common", "external_teacher", baseline, worker=worker, local_teacher=local_teacher, external_teacher=external_teacher, common=True)
                 execution.pop("active_call", None); _json_write(manifest_path, execution)
                 _write_scorecard(output_dir / "tasks" / family / task_id / "scorecard.json", family=family, task_id=task_id, common=common)
+                if checkpoint_hook is not None: checkpoint_hook(f"common_terminal:{family}:{task_id}", execution)
             else:
                 order = context["manifests"][family]["pair_order"]["orders"][task_id]
                 summaries = {}
@@ -260,6 +281,7 @@ def run_experiment(context: Mapping[str, Any], output_dir: Path, *, worker: Call
                     execution["active_call"] = {"kind": "paired_arm", "family": family, "task_id": task_id, "arm": arm, "intervention": intervention}; _json_write(manifest_path, execution)
                     summaries[arm] = _run_action(context, output_dir, family, task_id, arm, intervention, baseline, worker=worker, local_teacher=local_teacher, external_teacher=external_teacher)
                     execution.pop("active_call", None); _json_write(manifest_path, execution)
+                    if checkpoint_hook is not None: checkpoint_hook(f"arm_terminal:{family}:{task_id}:{arm}", execution)
                 _write_scorecard(output_dir / "tasks" / family / task_id / "scorecard.json", family=family, task_id=task_id, control=summaries["control"], treatment=summaries["treatment"])
             execution["candidate_states"][f"{family}:{task_id}"] = "terminal"; _json_write(manifest_path, execution)
     execution.update({"status": "experiment_completed", "completed_at": utc_now(), "aggregate_path": "aggregate.json"}); _json_write(manifest_path, execution); aggregate_results(context, output_dir, execution); return execution

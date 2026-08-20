@@ -19,7 +19,7 @@
   },
   "driver": {
     "path": "scripts/zth_run5_mixed_economic_routing.py",
-    "sha256": "cca4bac38749ba85c22d2049b76e9aebdcfe063705b94e31ef7924e56e341891"
+    "sha256": "8c35f344d4ceff822ae83fee0e66bba4a49f9fab3f911b15bbdc54eeb4746725"
   },
   "evidence_inputs": [
     {

@@ -39,7 +39,26 @@ def _output(task: dict, *, valid: bool) -> str:
 def _context() -> dict:
     context = driver._load_context(PREREG, ROOT, require_runtime=False)
     context["preregistration_path"] = PREREG
+    context["git_head"] = "synthetic-run5-head"
     return context
+
+
+def _execution_manifest(context: dict, *, status: str, completed_at: str | None = None) -> dict:
+    value = {
+        "schema": "zth_run5_mixed_execution_manifest_v1",
+        "status": status,
+        "git_head": context["git_head"],
+        "preregistration_sha256": hashlib.sha256(PREREG.read_bytes()).hexdigest(),
+        "driver_sha256": context["preregistration"]["driver"]["sha256"],
+        "policy_freeze_sha256": context["preregistration"]["policy_freeze"]["canonical_sha256"],
+        "fixture_pack_sha256": {family: context["manifests"][family]["pack_sha256"] for family in ("triage", "scope")},
+        "models": context["preregistration"]["models"],
+        "timeouts_seconds": context["preregistration"]["timeouts_seconds"],
+        "pair_order_seed": 20260824,
+    }
+    if completed_at is not None:
+        value["completed_at"] = completed_at
+    return value
 
 
 def _callbacks(context: dict, calls: dict[str, int]):
@@ -153,6 +172,76 @@ def test_run5_terminal_reuse_and_common_artifact_corruption_fail_closed(tmp_path
         driver.run_experiment(context, output, worker=lambda _: (_ for _ in ()).throw(AssertionError("duplicate")), local_teacher=lambda _: _response("{}"), external_teacher=lambda _: ("x", "{}"))
 
 
+def test_run5_clean_partial_resume_reuses_all_terminal_work_without_duplicates(tmp_path: Path):
+    context = _context()
+    calls = {"worker": 0, "local_teacher": 0, "external_teacher": 0}
+    callbacks = _callbacks(context, calls)
+    interrupted = {"value": False}
+
+    def checkpoint(event: str, _execution: dict):
+        if event.startswith("arm_terminal:scope:") and not interrupted["value"]:
+            interrupted["value"] = True
+            raise RuntimeError("synthetic clean Run 5 interruption")
+
+    output = tmp_path / "partial"
+    with pytest.raises(RuntimeError, match="clean Run 5 interruption"):
+        driver.run_experiment(context, output, worker=callbacks[0], local_teacher=callbacks[1], external_teacher=callbacks[2], checkpoint_hook=checkpoint)
+    manifest = json.loads((output / "execution_manifest.json").read_text())
+    assert manifest["status"] == "experiment_running"
+    assert "active_call" not in manifest
+    calls_after_interrupt = dict(calls)
+    resumed = driver.run_experiment(context, output, worker=callbacks[0], local_teacher=callbacks[1], external_teacher=callbacks[2])
+    assert resumed["status"] == "experiment_completed"
+    assert calls == {"worker": 66, "local_teacher": 12, "external_teacher": 24}
+    assert sum(calls[role] - calls_after_interrupt[role] for role in calls) > 0
+    assert json.loads((output / "selections" / "triage.json").read_text())["included_task_ids"] == context["manifests"]["triage"]["candidate_order"][:12]
+    assert json.loads((output / "selections" / "scope.json").read_text())["included_task_ids"] == context["manifests"]["scope"]["candidate_order"][:12]
+    triage_score = json.loads(next((output / "tasks" / "triage").glob("*/scorecard.json")).read_text())
+    assert triage_score["common_action_reused"] is True
+    assert triage_score["control"] == triage_score["treatment"]
+    aggregate = json.loads((output / "aggregate.json").read_text())
+    assert aggregate["physical_execution_resource_history"]["total_model_call_attempts"] == 102
+
+
+@pytest.mark.parametrize("field", ["preregistration_sha256", "driver_sha256", "policy_freeze_sha256", "fixture_pack_sha256", "models", "timeouts_seconds", "pair_order_seed", "git_head"])
+def test_run5_resume_rejects_recorded_binding_drift(tmp_path: Path, field: str):
+    context = _context()
+    payload = _execution_manifest(context, status="experiment_running")
+    if field == "fixture_pack_sha256":
+        payload[field] = {"triage": "drift", "scope": context["manifests"]["scope"]["pack_sha256"]}
+    elif field in {"models", "timeouts_seconds"}:
+        payload[field] = dict(payload[field]); payload[field][next(iter(payload[field]))] = "drift"
+    elif field == "pair_order_seed":
+        payload[field] = 99
+    else:
+        payload[field] = "drift"
+    output = tmp_path / "drift"
+    output.mkdir()
+    (output / "execution_manifest.json").write_text(json.dumps(payload))
+    with pytest.raises(Run4ADriverError, match="binding drift"):
+        driver.run_experiment(context, output, worker=lambda _: (_ for _ in ()).throw(AssertionError("no model call")), local_teacher=lambda _: _response("{}"), external_teacher=lambda _: ("x", "{}"))
+
+
+def test_run5_terminal_and_active_call_lifecycle_is_explicit(tmp_path: Path):
+    context = _context()
+    for status in ("experiment_completed", "experiment_incomplete"):
+        output = tmp_path / status
+        output.mkdir()
+        (output / "execution_manifest.json").write_text(json.dumps(_execution_manifest(context, status=status, completed_at="synthetic-closeout")))
+        result = driver.run_experiment(context, output, worker=lambda _: (_ for _ in ()).throw(AssertionError("duplicate")), local_teacher=lambda _: _response("{}"), external_teacher=lambda _: ("x", "{}"))
+        assert result["status"] == status
+    active = _execution_manifest(context, status="experiment_running")
+    active["active_call"] = {"kind": "common_action", "family": "triage", "task_id": "run5-triage-001"}
+    output = tmp_path / "active"
+    output.mkdir(); (output / "execution_manifest.json").write_text(json.dumps(active))
+    with pytest.raises(Run4ADriverError, match="ambiguous active"):
+        driver.run_experiment(context, output, worker=lambda _: (_ for _ in ()).throw(AssertionError("duplicate")), local_teacher=lambda _: _response("{}"), external_teacher=lambda _: ("x", "{}"))
+    unrelated = tmp_path / "unrelated"
+    unrelated.mkdir(); (unrelated / "unrelated.txt").write_text("not Run 5")
+    with pytest.raises(Run4ADriverError, match="lacks a bound Run 5"):
+        driver.run_experiment(context, unrelated, worker=lambda _: _response("{}"), local_teacher=lambda _: _response("{}"), external_teacher=lambda _: ("x", "{}"))
+
+
 def test_run5_common_infrastructure_is_excluded_from_both_policy_scorecards(tmp_path: Path):
     context = _context()
     calls = {"worker": 0, "local_teacher": 0, "external_teacher": 0}
@@ -168,4 +257,55 @@ def test_run5_common_infrastructure_is_excluded_from_both_policy_scorecards(tmp_
     assert triage["comparable_tasks"] == 0
     assert triage["infrastructure_excluded_tasks"] == 12
     assert aggregate["portfolio"]["comparable_policy_tasks"] == 0
+    assert aggregate["portfolio"]["control_solve_rate"] is None
+    assert aggregate["portfolio"]["treatment_solve_rate"] is None
+    assert aggregate["portfolio"]["quality_preserved"] is None
+    assert aggregate["portfolio"]["resource_reduced"] is None
+    assert aggregate["portfolio"]["economic_routing_success"] is None
     assert aggregate["physical_execution_resource_history"]["infrastructure_failures_by_role"]["external_teacher"] == 24
+
+
+def test_run5_triage_only_infrastructure_exclusion_preserves_other_family(tmp_path: Path):
+    context = _context(); calls = {"worker": 0, "local_teacher": 0, "external_teacher": 0}; callbacks = _callbacks(context, calls)
+    target = "run5-triage-001"
+    def external(prompt: str):
+        if context["tasks"][target]["prompt"] in prompt:
+            calls["external_teacher"] += 1
+            raise OSError("one common triage transport failure")
+        return callbacks[2](prompt)
+    driver.run_experiment(context, tmp_path / "triage-infra", worker=callbacks[0], local_teacher=callbacks[1], external_teacher=external)
+    aggregate = json.loads((tmp_path / "triage-infra" / "aggregate.json").read_text())
+    assert aggregate["family_results"]["triage"]["comparable_tasks"] == 11
+    assert aggregate["family_results"]["scope"]["comparable_tasks"] == 12
+    assert aggregate["portfolio"]["comparable_policy_tasks"] == 23
+    assert aggregate["physical_execution_resource_history"]["infrastructure_failures_by_role"]["external_teacher"] == 1
+
+
+def test_run5_scope_only_infrastructure_exclusion_preserves_triage_and_other_scope(tmp_path: Path):
+    context = _context(); calls = {"worker": 0, "local_teacher": 0, "external_teacher": 0}; callbacks = _callbacks(context, calls)
+    target = "run5-scope-001"
+    def local(prompt: str):
+        if context["tasks"][target]["prompt"] in prompt:
+            calls["local_teacher"] += 1
+            raise OSError("one local scope transport failure")
+        return callbacks[1](prompt)
+    driver.run_experiment(context, tmp_path / "scope-infra", worker=callbacks[0], local_teacher=local, external_teacher=callbacks[2])
+    aggregate = json.loads((tmp_path / "scope-infra" / "aggregate.json").read_text())
+    assert aggregate["family_results"]["triage"]["comparable_tasks"] == 12
+    assert aggregate["family_results"]["scope"]["comparable_tasks"] == 11
+    assert aggregate["portfolio"]["comparable_policy_tasks"] == 23
+    assert aggregate["physical_execution_resource_history"]["infrastructure_failures_by_role"]["local_teacher"] == 1
+    excluded = [row for row in aggregate["family_results"]["scope"]["infrastructure"] if row["task_id"] == target]
+    assert excluded
+
+
+def test_run5_scope_arm_artifact_corruption_fails_closed(tmp_path: Path):
+    context = _context(); calls = {"worker": 0, "local_teacher": 0, "external_teacher": 0}; callbacks = _callbacks(context, calls); output = tmp_path / "scope-corrupt"
+    driver.run_experiment(context, output, worker=callbacks[0], local_teacher=callbacks[1], external_teacher=callbacks[2])
+    arm = next(output.glob("tasks/scope/*/arms/*"))
+    index = json.loads((arm / "arm_artifacts.json").read_text())
+    artifact = next(name for name in index["files"] if name.endswith(".raw.json"))
+    (arm / artifact).write_text((arm / artifact).read_text() + "\ncorrupt")
+    manifest = json.loads((output / "execution_manifest.json").read_text()); manifest["status"] = "experiment_running"; manifest.pop("completed_at", None); (output / "execution_manifest.json").write_text(json.dumps(manifest))
+    with pytest.raises(Run4ADriverError, match="artifact hash mismatch"):
+        driver.run_experiment(context, output, worker=lambda _: (_ for _ in ()).throw(AssertionError("duplicate")), local_teacher=lambda _: _response("{}"), external_teacher=lambda _: ("x", "{}"))
