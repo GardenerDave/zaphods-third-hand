@@ -1,0 +1,28 @@
+{
+  "schema": "zth_run8_validation_gated_policy_freeze_v1",
+  "experiment_id": "run8-validation-gated-escalation-2026-08-20",
+  "frozen": true,
+  "authority": "review_only_experiment; no production routing authority; no capability merge; no training promotion queueing or retirement",
+  "research_question": "After repairing the confirmed Run 7 escalation-guidance integration defect, does validation-gated local-first escalation preserve final validated quality relative to external-direct control while reducing realized inference resource use on fresh difficulty-enriched scope-authority-boundary failures?",
+  "historical_run7_result": {
+    "result_path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_7_VALIDATION_GATED_2026-08-20.md",
+    "result_sha256": "985cc7935d529e9decae3efcea83d1e4d7fdd83a787c311d75896904f530606c",
+    "control_validated_solves": 20,
+    "treatment_final_validated_solves": 18,
+    "quality_preserved": false,
+    "resource_reduced": true,
+    "economic_routing_success": false
+  },
+  "forensic_report": {"path": "docs/research/RUN_7_ESCALATION_PATH_FORENSIC_ANALYSIS_2026-08-20.md", "sha256": "e0974d1bb8d0d59e5846e8abaa2797bc8d22f97acead9603f92cacf33f9be3ab"},
+  "repair_note": {"path": "docs/research/RUN_7_ESCALATION_PATH_REPAIR_2026-08-20.md", "sha256": "cbce295bcf1676bae9b83ebf636177ab3a5053526b7023a31c07c0bd21b3054f"},
+  "repair_freeze": {"path": "docs/research/RUN_7_ESCALATION_PATH_REPAIR_FREEZE_2026-08-20.json", "file_sha256": "1258bcea172c300259e3230aaf028a0b75161616ad1129f492d6c2b2214e49e5", "repaired_driver_sha256": "e52511f73461a122b5849dc6ba661008b31567fd0ab0c629c5ba507bf7d92337"},
+  "policy_source": {"path": "local_harness/run7_escalation_policy.py", "sha256": "015c0ee04724a6480e20b7730e9fcfd2663622c473dda937cf76f3e9f8ad2220"},
+  "family": "scope-authority-boundary",
+  "resolution": "failure_class",
+  "evidence_key": "scope-authority-boundary",
+  "control": {"name": "external_direct", "intervention": "external_teacher", "worker_retry_count": 1, "validation": "deterministic", "stop_after_validation": true},
+  "treatment": {"name": "validation_gated_economic_escalation", "initial_intervention": "local_teacher", "initial_worker_retry_count": 1, "validation": "deterministic", "escalate_only_when": "valid local model response and deterministic validation_status=failed", "escalation_intervention": "external_teacher_using_repaired_diagnostic_contract", "escalation_worker_retry_count": 1, "escalation_validation": "deterministic", "maximum_escalations_per_task": 1, "third_teacher": false, "deterministic_patch": false, "infrastructure_trigger": false},
+  "resource_priors": {"path": "docs/research/RUN_4_RESOURCE_WEIGHTS_FREEZE_2026-08-19.json", "sha256": "8f7820a6a3e5734e071452f643374d8c6c769d4d149bcec3f2f82b88ee6530c2", "worker_time_ms": 5276.567, "local_teacher_time_ms": 16220.624, "external_teacher_time_ms": 28704.012, "local_action_ms": 21497.191, "external_action_ms": 33980.579},
+  "planning": {"candidate_count": 24, "target_included_count": 20, "maximum_calls": {"worker": 84, "external_teacher": 40, "local_teacher": 20, "total": 144}, "maximum_baseline_worker_calls": 24, "all_local_pass_calls": {"worker": 64, "external_teacher": 20, "local_teacher": 20, "total": 104}, "all_escalate_calls": {"worker": 84, "external_teacher": 40, "local_teacher": 20, "total": 144}, "control_expected_post_baseline_ms": 679611.58, "treatment_expected_post_baseline_formula": "20*21497.191 + escalation_count*33980.579", "treatment_zero_escalation_ms": 429943.82, "treatment_all_escalation_ms": 1109555.4, "break_even_escalation_count": 7, "break_even_escalation_rate": 0.35, "strictly_cheaper_condition": "escalation_count <= 7"},
+  "canonical_digest": "f1337771a1c88052c95988f7de91c66bc95092fa96722d09c724f83eab99871b"
+}

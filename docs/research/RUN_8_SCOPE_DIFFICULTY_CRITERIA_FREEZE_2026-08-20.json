@@ -1,0 +1,24 @@
+{
+  "schema": "zth_run8_scope_difficulty_criteria_v1",
+  "experiment": "run8-validation-gated-escalation-2026-08-20",
+  "frozen": true,
+  "selection_is_intervention_blind": true,
+  "model_outputs_consulted": false,
+  "target_family": "scope-authority-boundary",
+  "target_resolution": "failure_class",
+  "minimum_structural_features_per_candidate": 3,
+  "required_feature_domains": ["authority_boundary", "reference_fact_application", "unsupported_inference"],
+  "allowed_structural_features": [
+    "multi_simultaneous_allowed_held_boundaries",
+    "partial_or_stale_authority",
+    "conflicting_authority_across_artifacts",
+    "implicit_explicit_approval_distinction",
+    "nested_responsibility_authority",
+    "scope_change_requires_separate_authorization",
+    "preserve_allowed_targets_hold_others",
+    "cross_artifact_target_consistency"
+  ],
+  "difficulty_enrichment_rule": "Each candidate combines at least three allowed structural features, preserves an explicit allowed/held target distinction, and requires exact reference facts; selection uses only structural annotations and provenance, never intervention outputs.",
+  "excluded_selection_signals": ["worker response", "local teacher response", "external teacher response", "validation outcome from any intervention", "predicted intervention winner", "post-hoc difficulty judgment"],
+  "review_status": "frozen_for_run8_preparation"
+}
