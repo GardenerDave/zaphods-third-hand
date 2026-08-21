@@ -1,0 +1,127 @@
+{
+  "schema": "zth_qwen3_1_7b_crossed_scope_factorial_probe_matrix_v1",
+  "status": "exploratory_not_confirmatory",
+  "run_path": ".work/model_size_supplier_floor/qwen3_1_7b_crossed_scope_factorial_probe/run_20260821T040010Z",
+  "task_manifest_sha256": "2ceffafeded8942ce717af20f91bef07994b8d3ed6df1f09a3246b6135cb0c96",
+  "probe_manifest_sha256": "9d4be20508e1c91d5d098673b39e3eb54cd38422b4b8dea87b70e3e3497c1122",
+  "aggregate_sha256": "b8cbbff2fcf1c7e922ee376dcb73d58f929d17ecb7edde26db16ce5c027201f4",
+  "candidate": {
+    "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "operative_parameters": 2031739904,
+    "artifact_sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb",
+    "effective_n_ctx": 32768,
+    "context_cap_reason": "native_training_context_cap",
+    "context_limit_non_binding_for_probe": true
+  },
+  "factors": {
+    "operation": ["READ", "MUTATE"],
+    "authority": ["INSIDE_AUTHORITY", "OUTSIDE_AUTHORITY"],
+    "distractor": ["HELD_DISTRACTOR_PRESENT", "HELD_DISTRACTOR_ABSENT"]
+  },
+  "balance": {
+    "tasks": 16,
+    "true": 8,
+    "false": 8,
+    "read": 8,
+    "mutate": 8,
+    "inside": 8,
+    "outside": 8,
+    "distractor_present": 8,
+    "distractor_absent": 8,
+    "each_full_cell": 2,
+    "answer_leakage_findings": 0
+  },
+  "execution": {
+    "supplier_model_calls": 16,
+    "teacher_calls": 0,
+    "retries": 0,
+    "escalations": 0,
+    "raw_responses": 16,
+    "scorecards": 16
+  },
+  "metrics": {
+    "parse_valid": "16/16",
+    "contract_valid": "16/16",
+    "overall": "8/16",
+    "authority": {
+      "inside": "0/8",
+      "outside": "8/8"
+    },
+    "operation": {
+      "read": "4/8",
+      "mutate": "4/8"
+    },
+    "distractor": {
+      "present": "4/8",
+      "absent": "4/8"
+    },
+    "cells": {
+      "READ_INSIDE_AUTHORITY": "0/4",
+      "READ_OUTSIDE_AUTHORITY": "4/4",
+      "MUTATE_INSIDE_AUTHORITY": "0/4",
+      "MUTATE_OUTSIDE_AUTHORITY": "4/4"
+    },
+    "confusion_matrix": {
+      "true_positive": 8,
+      "false_negative": 0,
+      "false_positive": 8,
+      "true_negative": 0
+    },
+    "observed_true": 16,
+    "observed_false": 0,
+    "false_positive_rate": 1.0,
+    "false_negative_rate": 0.0,
+    "serialization_failures": 0,
+    "invalid_contract_failures": 0,
+    "scope_decision_failures": 8,
+    "authority_predicts_correctness": {
+      "inside": "0/8",
+      "outside": "8/8"
+    },
+    "operation_predicts_correctness": {
+      "read": "4/8",
+      "mutate": "4/8"
+    },
+    "distractor_predicts_correctness": {
+      "present": "4/8",
+      "absent": "4/8"
+    }
+  },
+  "resource": {
+    "latency_ms": {
+      "median": 1455.341,
+      "mean": 1461.0860625,
+      "p95": 1466.016
+    },
+    "energy": {
+      "measurement_level": 2,
+      "measurement_boundary": "gpu_device_only",
+      "sample_interval_seconds": 0.25,
+      "mean_gross_joules_per_action": 44.081875,
+      "median_gross_joules_per_action": 44.0575,
+      "total_gross_joules": 705.31
+    }
+  },
+  "task_results": [
+    {"task_id":"cross-scope-001","operation":"READ","authority":"INSIDE_AUTHORITY","distractor":"HELD_DISTRACTOR_PRESENT","expected":false,"observed":true,"correct":false},
+    {"task_id":"cross-scope-002","operation":"READ","authority":"INSIDE_AUTHORITY","distractor":"HELD_DISTRACTOR_ABSENT","expected":false,"observed":true,"correct":false},
+    {"task_id":"cross-scope-003","operation":"READ","authority":"OUTSIDE_AUTHORITY","distractor":"HELD_DISTRACTOR_PRESENT","expected":true,"observed":true,"correct":true},
+    {"task_id":"cross-scope-004","operation":"READ","authority":"OUTSIDE_AUTHORITY","distractor":"HELD_DISTRACTOR_ABSENT","expected":true,"observed":true,"correct":true},
+    {"task_id":"cross-scope-005","operation":"MUTATE","authority":"INSIDE_AUTHORITY","distractor":"HELD_DISTRACTOR_PRESENT","expected":false,"observed":true,"correct":false},
+    {"task_id":"cross-scope-006","operation":"MUTATE","authority":"INSIDE_AUTHORITY","distractor":"HELD_DISTRACTOR_ABSENT","expected":false,"observed":true,"correct":false},
+    {"task_id":"cross-scope-007","operation":"MUTATE","authority":"OUTSIDE_AUTHORITY","distractor":"HELD_DISTRACTOR_PRESENT","expected":true,"observed":true,"correct":true},
+    {"task_id":"cross-scope-008","operation":"MUTATE","authority":"OUTSIDE_AUTHORITY","distractor":"HELD_DISTRACTOR_ABSENT","expected":true,"observed":true,"correct":true},
+    {"task_id":"cross-scope-009","operation":"READ","authority":"INSIDE_AUTHORITY","distractor":"HELD_DISTRACTOR_PRESENT","expected":false,"observed":true,"correct":false},
+    {"task_id":"cross-scope-010","operation":"READ","authority":"INSIDE_AUTHORITY","distractor":"HELD_DISTRACTOR_ABSENT","expected":false,"observed":true,"correct":false},
+    {"task_id":"cross-scope-011","operation":"READ","authority":"OUTSIDE_AUTHORITY","distractor":"HELD_DISTRACTOR_PRESENT","expected":true,"observed":true,"correct":true},
+    {"task_id":"cross-scope-012","operation":"READ","authority":"OUTSIDE_AUTHORITY","distractor":"HELD_DISTRACTOR_ABSENT","expected":true,"observed":true,"correct":true},
+    {"task_id":"cross-scope-013","operation":"MUTATE","authority":"INSIDE_AUTHORITY","distractor":"HELD_DISTRACTOR_PRESENT","expected":false,"observed":true,"correct":false},
+    {"task_id":"cross-scope-014","operation":"MUTATE","authority":"INSIDE_AUTHORITY","distractor":"HELD_DISTRACTOR_ABSENT","expected":false,"observed":true,"correct":false},
+    {"task_id":"cross-scope-015","operation":"MUTATE","authority":"OUTSIDE_AUTHORITY","distractor":"HELD_DISTRACTOR_PRESENT","expected":true,"observed":true,"correct":true},
+    {"task_id":"cross-scope-016","operation":"MUTATE","authority":"OUTSIDE_AUTHORITY","distractor":"HELD_DISTRACTOR_ABSENT","expected":true,"observed":true,"correct":true}
+  ],
+  "primary_characterization": "SYSTEMATIC_TRUE_RESPONSE_BIAS",
+  "systematic_true_response_bias_persists": true,
+  "next_decision": "RUN_CROSSED_SCOPE_PROBE_AT_596M_AND_752M",
+  "historical_runs_changed": false
+}
