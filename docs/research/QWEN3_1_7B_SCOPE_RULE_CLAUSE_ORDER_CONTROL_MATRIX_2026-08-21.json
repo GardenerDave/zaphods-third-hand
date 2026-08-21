@@ -1,0 +1,137 @@
+{
+  "schema": "zth_qwen3_1_7b_scope_rule_clause_order_control_matrix_v1",
+  "status": "exploratory_not_confirmatory",
+  "candidate": {
+    "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "operative_parameters": 2031739904,
+    "artifact_sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb"
+  },
+  "run": {
+    "path": ".work/model_size_supplier_floor/qwen3_1_7b_scope_rule_clause_order_control/run_20260821T084255Z/",
+    "tree_sha256": "a0b018c8007faeda738ce25825999ffaafdceae81ec646ede415b8e3213aaa70",
+    "probe_manifest_sha256": "5266c6c397e33f80669745495569078ae09cd60c74ea9929c5311fa14237cde8",
+    "preflight_sha256": "4a6f45708d1970cc0ea98c8d9729559bfdb0ff8b77b17584b18f4d279fff7bbe",
+    "aggregate_sha256": "c2251d481f496c533fec043df296630af86656d3aeeba790dd1b1ef0d4ecf60d",
+    "execution_git_commit": "adb836d"
+  },
+  "frozen_bindings": {
+    "task_manifest_sha256": "2ceffafeded8942ce717af20f91bef07994b8d3ed6df1f09a3246b6135cb0c96",
+    "neutral_output_suffix_sha256": "388ac630153ce01948c088f09853713cb1d89e77dec258ed80ca93fae453599b",
+    "schema_sha256": "5b9aef0b84726bd3ad42147d84d73d332e69241966301aeb5b4f0dc5881193c5",
+    "response_format_sha256": "99fecf522400406cfedeacb54cc3f3025cc4243b49d3edb3c8ef0b7ed4f3f14a2",
+    "tf_rule_sha256": "1d0a1b2ec5a0ac88989c1161e2a224741c926c8c50e6bb493ed859fa82058426",
+    "ft_rule_sha256": "09d104250027789591b188c2148940c866b11dc71e618e210758172fc6d5501a",
+    "tf_ft_diff_sha256": "0d94eab674b9992e1aa28722a4fd61f123632797ef9aceb34d4fc5fc505d3040",
+    "tf_ft_only_clause_order": true,
+    "held_clause_identical_and_last": true,
+    "worked_boolean_exemplars": 0,
+    "structured_constraint_allows_true": true,
+    "structured_constraint_allows_false": true,
+    "task_count": 16,
+    "branch_balance": {"true": 8, "false": 8},
+    "temporal_order_balance": {"TF_then_FT": 8, "FT_then_TF": 8}
+  },
+  "runtime": {
+    "effective_n_ctx": 32768,
+    "n_ctx_train": 32768,
+    "context_limit_non_binding": true,
+    "telemetry_level": 2,
+    "measurement_boundary": "gpu_device_only",
+    "sample_interval_seconds": 0.25,
+    "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85"
+  },
+  "arms": {
+    "TF": {
+      "true_selected": 16,
+      "false_selected": 0,
+      "correct": 8,
+      "inside_correct": 0,
+      "outside_correct": 8,
+      "read_correct": 4,
+      "mutate_correct": 4,
+      "distractor_present_correct": 4,
+      "distractor_absent_correct": 4,
+      "parse_valid": 16,
+      "contract_valid": 16,
+      "confusion_matrix": {"TP": 8, "FN": 0, "FP": 8, "TN": 0},
+      "cells": {
+        "READ_INSIDE": {"correct": 0, "total": 4},
+        "READ_OUTSIDE": {"correct": 4, "total": 4},
+        "MUTATE_INSIDE": {"correct": 0, "total": 4},
+        "MUTATE_OUTSIDE": {"correct": 4, "total": 4}
+      },
+      "failures": {"serialization": 0, "contract": 0, "scope_decision": 8},
+      "latency_ms": {"median": 1072.2165, "mean": 1006.2914375, "p95": 1224.036},
+      "energy_joules": {"mean_per_action": 29.73109375, "median_per_action": 31.355, "total": 475.6975}
+    },
+    "FT": {
+      "true_selected": 0,
+      "false_selected": 16,
+      "correct": 8,
+      "inside_correct": 8,
+      "outside_correct": 0,
+      "read_correct": 4,
+      "mutate_correct": 4,
+      "distractor_present_correct": 4,
+      "distractor_absent_correct": 4,
+      "parse_valid": 16,
+      "contract_valid": 16,
+      "confusion_matrix": {"TP": 0, "FN": 8, "FP": 0, "TN": 8},
+      "cells": {
+        "READ_INSIDE": {"correct": 4, "total": 4},
+        "READ_OUTSIDE": {"correct": 0, "total": 4},
+        "MUTATE_INSIDE": {"correct": 4, "total": 4},
+        "MUTATE_OUTSIDE": {"correct": 0, "total": 4}
+      },
+      "failures": {"serialization": 0, "contract": 0, "scope_decision": 8},
+      "latency_ms": {"median": 1343.958, "mean": 1375.9114375, "p95": 1643.432},
+      "energy_joules": {"mean_per_action": 38.8659375, "median_per_action": 37.18625, "total": 621.855}
+    }
+  },
+  "paired": {
+    "tf_to_ft_flip_count": 16,
+    "inside_recovery_count": 8,
+    "outside_retention_count": 0,
+    "classification_counts": {
+      "SAME_CORRECT": 0,
+      "SAME_INCORRECT": 0,
+      "TF_INCORRECT_FT_CORRECT": 8,
+      "TF_CORRECT_FT_INCORRECT": 8,
+      "OTHER": 0
+    },
+    "task_observations": [
+      {"task_id":"cross-scope-001","expected":false,"TF":true,"FT":false,"classification":"TF_INCORRECT_FT_CORRECT"},
+      {"task_id":"cross-scope-002","expected":false,"TF":true,"FT":false,"classification":"TF_INCORRECT_FT_CORRECT"},
+      {"task_id":"cross-scope-003","expected":true,"TF":true,"FT":false,"classification":"TF_CORRECT_FT_INCORRECT"},
+      {"task_id":"cross-scope-004","expected":true,"TF":true,"FT":false,"classification":"TF_CORRECT_FT_INCORRECT"},
+      {"task_id":"cross-scope-005","expected":false,"TF":true,"FT":false,"classification":"TF_INCORRECT_FT_CORRECT"},
+      {"task_id":"cross-scope-006","expected":false,"TF":true,"FT":false,"classification":"TF_INCORRECT_FT_CORRECT"},
+      {"task_id":"cross-scope-007","expected":true,"TF":true,"FT":false,"classification":"TF_CORRECT_FT_INCORRECT"},
+      {"task_id":"cross-scope-008","expected":true,"TF":true,"FT":false,"classification":"TF_CORRECT_FT_INCORRECT"},
+      {"task_id":"cross-scope-009","expected":false,"TF":true,"FT":false,"classification":"TF_INCORRECT_FT_CORRECT"},
+      {"task_id":"cross-scope-010","expected":false,"TF":true,"FT":false,"classification":"TF_INCORRECT_FT_CORRECT"},
+      {"task_id":"cross-scope-011","expected":true,"TF":true,"FT":false,"classification":"TF_CORRECT_FT_INCORRECT"},
+      {"task_id":"cross-scope-012","expected":true,"TF":true,"FT":false,"classification":"TF_CORRECT_FT_INCORRECT"},
+      {"task_id":"cross-scope-013","expected":false,"TF":true,"FT":false,"classification":"TF_INCORRECT_FT_CORRECT"},
+      {"task_id":"cross-scope-014","expected":false,"TF":true,"FT":false,"classification":"TF_INCORRECT_FT_CORRECT"},
+      {"task_id":"cross-scope-015","expected":true,"TF":true,"FT":false,"classification":"TF_CORRECT_FT_INCORRECT"},
+      {"task_id":"cross-scope-016","expected":true,"TF":true,"FT":false,"classification":"TF_CORRECT_FT_INCORRECT"}
+    ]
+  },
+  "interpretation": {
+    "primary_characterization": "SCOPE_RULE_ORDER_EFFECT_PARTIAL",
+    "scope_interface_state": "SCOPE_INTERFACE_STILL_UNSTABLE",
+    "next_decision": "VALIDATE_CANONICAL_SCOPE_INTERFACE_STABILITY",
+    "interface_robust_capability": false,
+    "capability_under_tested_interface": true
+  },
+  "integrity": {
+    "prior_neutral_report_sha256": "c8bcfd59a2f4b49d28614b4c2c86beeccb3eaf5615b6c97a5aec439da0f0f154",
+    "prior_generic_report_sha256": "8df2ac14782da51cb2622edc229ba0394b83e6a8f95846d9b3f4751b3ddc49de",
+    "historical_runs_changed": false,
+    "model_calls": 32,
+    "teacher_calls": 0,
+    "retries": 0,
+    "escalations": 0
+  }
+}
