@@ -1,0 +1,68 @@
+{
+  "schema": "zth_qwen3_1_7b_clean_scope_logic_probe_runtime_freeze_v1",
+  "status": "matched_exploratory_pre_inference_freeze",
+  "authority": "exploratory_not_confirmatory",
+  "model_label": "Qwen3-1.7B",
+  "supplier_prose_label": "Qwen3 1.7B-labeled / 2.032B operative supplier",
+  "artifact": {
+    "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "path_on_serving_host": "/home/navigator/ai/models/small-auditions/qwen3-1.7b/Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb",
+    "size_bytes": 1282439584,
+    "quantization": "Q4_K_M"
+  },
+  "operative_supplier": {
+    "n_params": 2031739904,
+    "parameter_count_source": "llama.cpp /v1/models exposed metadata",
+    "filename_label_not_used_as_parameter_count": true
+  },
+  "context": {
+    "requested_n_ctx": 40960,
+    "effective_n_ctx": 32768,
+    "n_ctx_train": 32768,
+    "cap_reason": "native_training_context_cap",
+    "operator_evidence": "llama.cpp reported n_ctx_seq (40960) > n_ctx_train (32768) and capped the new slot to n_ctx=32768",
+    "fit_was_not_cause": true,
+    "context_limit_non_binding_for_probe": true,
+    "probe_max_prompt_chars": 1181,
+    "max_output_tokens": 512,
+    "conservative_prompt_plus_completion_bound": 1693,
+    "bound_units": "characters_plus_output_tokens; conservative upper bound below effective context"
+  },
+  "runtime": {
+    "llama_cpp_version": "9314",
+    "build_revision": "d55fb9717",
+    "binary": "/home/navigator/llama.cpp/build-cuda-v100/bin/llama-server",
+    "flags": {
+      "device": "CUDA0",
+      "split_mode": "none",
+      "requested_ctx_size": 40960,
+      "parallel": 1,
+      "fit": "on",
+      "fit_target": 512,
+      "threads": 2,
+      "threads_batch": 4,
+      "reasoning": "off",
+      "port": 8081
+    }
+  },
+  "hardware": {
+    "gpu_class": "NVIDIA GeForce GTX 1650",
+    "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+    "same_gpu_as_596m_and_752m": true,
+    "reference_1_7b_exclusive_residency": true,
+    "v100_teacher_touched": false
+  },
+  "telemetry": {
+    "transport": "remote_read_only_http",
+    "measurement_level": 2,
+    "measurement_boundary": "gpu_device_only",
+    "sample_interval_seconds": 0.25,
+    "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85"
+  },
+  "lifecycle": {
+    "stage_b_preregistered": false,
+    "model_calls_made": false,
+    "production_routing_changed": false
+  }
+}
