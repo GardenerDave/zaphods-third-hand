@@ -1,0 +1,23 @@
+{
+  "schema": "zth_generic_boolean_selection_prior_task_set_v1",
+  "status": "fresh_exploratory_calibration_not_scope_evidence",
+  "marker_mapping": {"KAPPA-7": true, "LAMBDA-4": false},
+  "tasks": [
+    {"task_id":"generic-boolean-001","marker_code":"KAPPA-7","expected":true},
+    {"task_id":"generic-boolean-002","marker_code":"LAMBDA-4","expected":false},
+    {"task_id":"generic-boolean-003","marker_code":"KAPPA-7","expected":true},
+    {"task_id":"generic-boolean-004","marker_code":"LAMBDA-4","expected":false},
+    {"task_id":"generic-boolean-005","marker_code":"KAPPA-7","expected":true},
+    {"task_id":"generic-boolean-006","marker_code":"LAMBDA-4","expected":false},
+    {"task_id":"generic-boolean-007","marker_code":"KAPPA-7","expected":true},
+    {"task_id":"generic-boolean-008","marker_code":"LAMBDA-4","expected":false},
+    {"task_id":"generic-boolean-009","marker_code":"KAPPA-7","expected":true},
+    {"task_id":"generic-boolean-010","marker_code":"LAMBDA-4","expected":false},
+    {"task_id":"generic-boolean-011","marker_code":"KAPPA-7","expected":true},
+    {"task_id":"generic-boolean-012","marker_code":"LAMBDA-4","expected":false},
+    {"task_id":"generic-boolean-013","marker_code":"KAPPA-7","expected":true},
+    {"task_id":"generic-boolean-014","marker_code":"LAMBDA-4","expected":false},
+    {"task_id":"generic-boolean-015","marker_code":"KAPPA-7","expected":true},
+    {"task_id":"generic-boolean-016","marker_code":"LAMBDA-4","expected":false}
+  ]
+}
