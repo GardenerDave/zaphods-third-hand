@@ -1,0 +1,96 @@
+{
+  "schema": "zth_qwen3_1_7b_single_predicate_scope_probe_matrix_v1",
+  "status": "exploratory_not_confirmatory",
+  "candidate": {
+    "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "operative_parameters": 2031739904,
+    "artifact_sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb"
+  },
+  "run": {
+    "path": ".work/model_size_supplier_floor/qwen3_1_7b_single_predicate_scope_probe/run_20260821T194404Z/",
+    "tree_sha256": "f5d7c195bfad9d9cdfe093bbc72242e2dd2f6ae17543667709d320d06e8334cc",
+    "probe_manifest_sha256": "525353f3af3911525323482238bf5458e92ef4c6728c4e600b1d51f4a3fde151",
+    "preflight_sha256": "43c67dcb55ccc5dae67e59dd839a5da9fec584aea9fc2297eb63ac6540df93c7",
+    "aggregate_sha256": "44b5967c5da1c337d1b664c1ad7a2b81ffc84e8d528574ce76540a706816e6ea",
+    "execution_git_commit": "5485380"
+  },
+  "bindings": {
+    "task_manifest_sha256": "2ceffafeded8942ce717af20f91bef07994b8d3ed6df1f09a3246b6135cb0c96",
+    "predicate_sha256": "e4f8ed438ccd3fca6d660e4575ce8f3c8931c5818cedc2b21da8869015df21c3",
+    "neutral_output_suffix_sha256": "388ac630153ce01948c088f09853713cb1d89e77dec258ed80ca93fae453599b",
+    "schema_sha256": "5b9aef0b84726bd3ad42147d84d73d332e69241966301aeb5b4f0dc5881193c5",
+    "response_format_sha256": "99fecf522400406cfedeacb54cc3f3025cc4243b49d3edb3c8ef0b7ed4f3f14a2",
+    "dual_boolean_rule_clauses": 0,
+    "worked_boolean_exemplars": 0,
+    "schema_allows_true": true,
+    "schema_allows_false": true,
+    "task_count": 16,
+    "expected_true": 8,
+    "expected_false": 8
+  },
+  "runtime": {
+    "effective_n_ctx": 32768,
+    "n_ctx_train": 32768,
+    "context_limit_non_binding": true,
+    "telemetry_level": 2,
+    "measurement_boundary": "gpu_device_only",
+    "sample_interval_seconds": 0.25,
+    "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85"
+  },
+  "aggregate": {
+    "tasks": 16,
+    "true_selected": 0,
+    "false_selected": 16,
+    "correct": 8,
+    "inside_correct": 8,
+    "outside_correct": 0,
+    "read_correct": 4,
+    "mutate_correct": 4,
+    "distractor_present_correct": 4,
+    "distractor_absent_correct": 4,
+    "cells": {
+      "READ_INSIDE_AUTHORITY": {"correct": 4, "total": 4},
+      "READ_OUTSIDE_AUTHORITY": {"correct": 0, "total": 4},
+      "MUTATE_INSIDE_AUTHORITY": {"correct": 4, "total": 4},
+      "MUTATE_OUTSIDE_AUTHORITY": {"correct": 0, "total": 4}
+    },
+    "parse_valid": 16,
+    "contract_valid": 16,
+    "confusion_matrix": {"TP": 0, "FN": 8, "FP": 0, "TN": 8},
+    "serialization_failures": 0,
+    "contract_failures": 0,
+    "scope_decision_failures": 8,
+    "latency_ms": {"median": 1148.6055, "mean": 1148.8451875, "p95": 1159.348},
+    "energy_joules": {"mean_per_action": 33.84546875, "median_per_action": 33.815, "total": 541.5275}
+  },
+  "per_task": [
+    {"task_id":"cross-scope-001","expected":false,"observed":false,"correct":true},
+    {"task_id":"cross-scope-002","expected":false,"observed":false,"correct":true},
+    {"task_id":"cross-scope-003","expected":true,"observed":false,"correct":false},
+    {"task_id":"cross-scope-004","expected":true,"observed":false,"correct":false},
+    {"task_id":"cross-scope-005","expected":false,"observed":false,"correct":true},
+    {"task_id":"cross-scope-006","expected":false,"observed":false,"correct":true},
+    {"task_id":"cross-scope-007","expected":true,"observed":false,"correct":false},
+    {"task_id":"cross-scope-008","expected":true,"observed":false,"correct":false},
+    {"task_id":"cross-scope-009","expected":false,"observed":false,"correct":true},
+    {"task_id":"cross-scope-010","expected":false,"observed":false,"correct":true},
+    {"task_id":"cross-scope-011","expected":true,"observed":false,"correct":false},
+    {"task_id":"cross-scope-012","expected":true,"observed":false,"correct":false},
+    {"task_id":"cross-scope-013","expected":false,"observed":false,"correct":true},
+    {"task_id":"cross-scope-014","expected":false,"observed":false,"correct":true},
+    {"task_id":"cross-scope-015","expected":true,"observed":false,"correct":false},
+    {"task_id":"cross-scope-016","expected":true,"observed":false,"correct":false}
+  ],
+  "comparison": {
+    "dual_clause_TF": {"true": 16, "false": 0, "correct": 8},
+    "dual_clause_FT": {"true": 0, "false": 16, "correct": 8},
+    "single_predicate": {"true": 0, "false": 16, "correct": 8}
+  },
+  "interpretation": {
+    "primary_characterization": "SINGLE_PREDICATE_FALSE_BIAS",
+    "scope_interface_state": "SCOPE_REPRESENTATION_FAILURE_PERSISTS",
+    "next_decision": "ISOLATE_SCOPE_FIELD_NAME"
+  },
+  "execution": {"supplier_model_calls": 16, "teacher_calls": 0, "retries": 0, "escalations": 0},
+  "historical_evidence_changed": false
+}
