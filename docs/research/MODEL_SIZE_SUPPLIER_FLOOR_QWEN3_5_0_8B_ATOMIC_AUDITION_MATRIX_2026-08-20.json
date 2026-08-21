@@ -1,0 +1,2787 @@
+{
+  "aggregate": {
+    "allowed_targets": {
+      "exact": 8,
+      "precision_mean": 0.6770833333333334,
+      "recall_mean": 0.875
+    },
+    "authority_separation": {
+      "observed": 16,
+      "observed_and_correct": 11,
+      "overlap": 5
+    },
+    "branch_results": {
+      "false": {
+        "full_validator_passes": 0,
+        "scope_expansion_correct": 3,
+        "tasks": 8
+      },
+      "true": {
+        "full_validator_passes": 0,
+        "scope_expansion_correct": 8,
+        "tasks": 8
+      }
+    },
+    "candidate": "Qwen3.5-0.8B-Q4_K_M.gguf",
+    "contract_valid": 11,
+    "derived_scorecard_correction": {
+      "raw_responses_changed": false,
+      "reason": "validator target_authority=not_applicable is not a structural failure; atomic structural contract uses required fields, field types, and no allowed/held overlap",
+      "validator_artifacts_changed": false
+    },
+    "energy": {
+      "energy_break_even": "NOT_COMPUTED_EXPLORATORY",
+      "gross_joules_per_action_mean": 55.621563,
+      "gross_joules_per_action_median": 57.26,
+      "gross_joules_per_validated_task": null,
+      "measurement_boundary": "gpu_device_only",
+      "measurement_level": 2
+    },
+    "execution": {
+      "escalation_count": 0,
+      "retry_count": 0,
+      "supplier_model_calls": 16,
+      "teacher_calls": 0
+    },
+    "full_validator_passes": 0,
+    "held_targets": {
+      "exact": 6,
+      "precision_mean": 0.53125,
+      "recall_mean": 0.625
+    },
+    "historical_evidence_merged": false,
+    "idle_power": {
+      "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+      "gross_energy_joules": 223.2425,
+      "mean_power_watts": 7.379917,
+      "measurement_boundary": "gpu_device_only",
+      "measurement_level": 2,
+      "observed_elapsed_seconds": 30.070435,
+      "peak_power_watts": 7.39,
+      "requested_seconds": 30,
+      "sample_count": 121,
+      "sample_interval_seconds": 0.25
+    },
+    "latency_ms": {
+      "mean": 922.622,
+      "median": 962.803,
+      "metric": "candidate_action_wall_clock",
+      "p95": 1076.251
+    },
+    "operative_supplier_parameter_count": 752393024,
+    "production_routing_changed": false,
+    "raw_parse_valid": 16,
+    "reference_fact_valid": 0,
+    "review_status": {
+      "confusion": [
+        "ready_for_review -> allowed",
+        "ready_for_review -> approved",
+        "ready_for_review -> pending",
+        "ready_for_review -> stale",
+        "ready_for_review -> unapproved"
+      ],
+      "exact": 0
+    },
+    "schema": "zth_qwen3_5_0_8b_atomic_audition_aggregate_v1",
+    "scope_expansion": {
+      "correct": 11,
+      "false_negative": 0,
+      "false_positive": 5,
+      "not_observable": 0
+    },
+    "screening_only_not_confirmatory": true,
+    "semantic_fields_correct_distribution": {
+      "0": 3,
+      "1": 6,
+      "2": 2,
+      "3": 5,
+      "4": 0
+    },
+    "tasks": 16,
+    "three_of_four_missing_fields": {
+      "run6-scope-008": [
+        "review_status"
+      ],
+      "run7-scope-014": [
+        "review_status"
+      ],
+      "run7-scope-015": [
+        "review_status"
+      ],
+      "run7-scope-016": [
+        "review_status"
+      ],
+      "run7-scope-018": [
+        "review_status"
+      ]
+    },
+    "three_of_four_near_misses": [
+      "run6-scope-008",
+      "run7-scope-014",
+      "run7-scope-015",
+      "run7-scope-016",
+      "run7-scope-018"
+    ],
+    "transport_valid": 16,
+    "upstream_total_parameter_count": 873438784,
+    "validator_contract_valid": 0
+  },
+  "candidate": {
+    "architecture_confound": "Qwen3.5 hybrid multimodal generation differs from Qwen3-0.6B and Qwen3-1.7B",
+    "artifact_load_evidence": "operator_verified_and_endpoint_exposed",
+    "artifact_repository": "unsloth/Qwen3.5-0.8B-GGUF",
+    "artifact_revision": "cb02287e2172232d38d9eb470061351961ce1ba6",
+    "filename": "Qwen3.5-0.8B-Q4_K_M.gguf",
+    "local_path": "/home/navigator/ai/models/small-auditions/qwen3.5-0.8b/Qwen3.5-0.8B-Q4_K_M.gguf",
+    "model_identity": "Qwen/Qwen3.5-0.8B",
+    "operative_supplier_parameter_count": 752393024,
+    "quantization": "Q4_K_M",
+    "role": "upward_bracket_atomic_supplier_audition",
+    "sha256": "bd258782e35f7f458f8aced1adc053e6e92e89bc735ba3be89d38a06121dc517",
+    "size_bytes": 532517120,
+    "upstream_revision": "2fc06364715b967f1860aea9cf38778875588b17",
+    "upstream_total_parameter_count": 873438784
+  },
+  "comparison_context": {
+    "qwen3_0_6b_explicit_interface_normalized_contract_usable": "10/12",
+    "qwen3_0_6b_explicit_interface_normalized_review_exact": "0/12",
+    "qwen3_0_6b_explicit_interface_normalized_three_of_four": "5/12",
+    "qwen3_0_6b_explicit_interface_raw_parse_valid": "6/12",
+    "qwen3_1_7b_historical_profile": "structured historical paths generally demonstrated exact review ontology; not a task-matched size-only control"
+  },
+  "hardware": {
+    "exclusive_one_model_at_a_time_required": true,
+    "gpu_class": "NVIDIA GeForce GTX 1650",
+    "gpu_memory_mib": 4096,
+    "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+    "observed_loaded_memory_mib": 1552,
+    "reference_1_7b_unloaded_during_audition": true,
+    "same_hardware_reference_required": true
+  },
+  "provenance": {
+    "aggregate_sha256": "27a6757bfc7d3c356182d7a3d8995d32bc1967c35fa0eb7ef05e097d8ba5e330",
+    "escalation_count": 0,
+    "execution_manifest_sha256": "96770484dc302de63619f58ff88397937b01b654b4f376d54eda53b74c4d1808",
+    "historical_runs_modified": false,
+    "model_calls_made": 16,
+    "raw_responses_preserved": true,
+    "retry_count": 0,
+    "run_directory": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z",
+    "runtime_freeze": "docs/research/MODEL_SIZE_SUPPLIER_FLOOR_QWEN3_5_0_8B_RUNTIME_FREEZE_2026-08-20.json",
+    "runtime_freeze_sha256": "76d0f35fdc5f3ee5449fab61676563921d0dd395aefe43255f30ed20e4140ca4",
+    "scorecard_schema_sha256": "d484d012e8fe7bb6a5266864b3c8542a96a4e6391ca75145007b0a04eeefeea9",
+    "task_manifest": "docs/research/MODEL_SIZE_SUPPLIER_FLOOR_QWEN3_5_0_8B_AUDITION_TASK_SET_2026-08-20.json",
+    "task_manifest_sha256": "bbed5fb16f379ffeecc71e768fc0961755b37c2f2e558932f779cac9760c5a03",
+    "teacher_calls_made": 0,
+    "validator_artifacts_preserved": true
+  },
+  "runtime": {
+    "binary": "/home/navigator/llama.cpp/build-cuda-v100/bin/llama-server",
+    "build_revision": "d55fb9717",
+    "context": 40960,
+    "endpoint_model_id": "Qwen3.5-0.8B-Q4_K_M.gguf",
+    "fit": "on",
+    "fit_target": 512,
+    "llama_cpp_version": "9314",
+    "max_output_tokens": 768,
+    "native_context": 262144,
+    "parallel": 1,
+    "reasoning": "off",
+    "split_mode": "none",
+    "threads": 2,
+    "threads_batch": 4,
+    "timeout_seconds": 900
+  },
+  "schema": "zth_qwen3_5_0_8b_atomic_audition_matrix_v1",
+  "screening_only_not_confirmatory": true,
+  "tasks": [
+    {
+      "artifact_paths": {
+        "response": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-001/response.json",
+        "response_sha256": "35cb4b7f9f1d97842eeb011e327388b5e045ea0bfef793c78264188be3541827",
+        "scorecard": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-001/atomic_scorecard.json",
+        "scorecard_sha256": "98d6f1db7bb0fd8c0df330f1a9ca3cd1cd6e63ae77f5344909b26624a294cc63",
+        "validation": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-001/validation.json",
+        "validation_sha256": "f4feb30bdc525cf424201be238d2279b1aa6c501f50ba07d10d5fec6a5bbe243"
+      },
+      "reference_facts": {
+        "required_allowed_targets": [
+          "manifest-index.json"
+        ],
+        "required_held_targets": [
+          "release-plan.json"
+        ],
+        "requires_scope_expansion_flag": false,
+        "review_status": "ready_for_review"
+      },
+      "scorecard": {
+        "atomic": {
+          "allowed_targets": {
+            "exact_set_and_type_match": true,
+            "exact_set_match": true,
+            "expected_set": [
+              "manifest-index.json"
+            ],
+            "f1": 1.0,
+            "false_negatives": 0,
+            "false_positives": 0,
+            "observed_literal_set": [
+              "manifest-index.json"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 1,
+            "type_correct": true
+          },
+          "authority_separation": {
+            "authorized_target_incorrectly_held": [],
+            "no_allowed_held_overlap": true,
+            "observability": "OBSERVED_AND_CORRECT",
+            "overlap_targets": [],
+            "unauthorized_target_in_allowed": []
+          },
+          "error_cluster_tags": [
+            "held_target_mismatch",
+            "scope_expansion_false_positive",
+            "review_status_mismatch"
+          ],
+          "field_type_count": 4,
+          "field_types_correct": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": true,
+            "scope_expansion_required": true
+          },
+          "held_targets": {
+            "exact_set_and_type_match": false,
+            "exact_set_match": false,
+            "expected_set": [
+              "release-plan.json"
+            ],
+            "f1": null,
+            "false_negatives": 1,
+            "false_positives": 1,
+            "observed_literal_set": [
+              "unsigned-release-plan.json"
+            ],
+            "precision": 0.0,
+            "recall": 0.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 0,
+            "type_correct": true
+          },
+          "object_observable": true,
+          "required_fields_present": true,
+          "review_status": {
+            "confusion_pair": "ready_for_review -> pending",
+            "exact_match": false,
+            "expected": "ready_for_review",
+            "observed": "pending"
+          },
+          "scope_expansion": {
+            "correct": false,
+            "expected": false,
+            "false_negative": false,
+            "false_positive": true,
+            "observed": true,
+            "semantic_intent": true,
+            "type_correct": true
+          },
+          "semantic_field_vector": {
+            "allowed_targets": true,
+            "held_targets": false,
+            "review_status": false,
+            "scope_expansion_required": false
+          },
+          "semantic_fields_correct": 1,
+          "structural_contract_valid": true
+        },
+        "candidate": "Qwen3.5-0.8B-Q4_K_M.gguf",
+        "completion_tokens": 46,
+        "contract_valid": true,
+        "escalation_count": 0,
+        "failed_check_ids": [
+          "reference_required_held_targets",
+          "reference_requires_scope_expansion_flag",
+          "reference_review_status"
+        ],
+        "failure_classes": [
+          "reference_fact_failure"
+        ],
+        "full_validator_pass": false,
+        "power_summary": {
+          "gross_energy_joules": 31.695,
+          "mean_active_watts": 31.695,
+          "measurement_boundary": "gpu_device_only",
+          "measurement_level": 2,
+          "peak_observed_watts": 62.53,
+          "sample_count": 4,
+          "sample_interval_seconds": 0.25
+        },
+        "prompt_tokens": 235,
+        "raw_parse_error": null,
+        "raw_parse_valid": true,
+        "raw_response_preserved": true,
+        "reference_fact_valid": false,
+        "reference_facts": {
+          "required_allowed_targets": [
+            "manifest-index.json"
+          ],
+          "required_held_targets": [
+            "release-plan.json"
+          ],
+          "requires_scope_expansion_flag": false,
+          "review_status": "ready_for_review"
+        },
+        "retry_count": 0,
+        "schema": "zth_atomic_supplier_task_scorecard_v1",
+        "screening_only_not_confirmatory": true,
+        "server_generation_ms": 437.25,
+        "server_prompt_ms": 474.748,
+        "supplier_model_calls_made": 1,
+        "task_id": "run6-scope-001",
+        "teacher_calls": 0,
+        "telemetry_error": null,
+        "telemetry_valid": true,
+        "total_tokens": 281,
+        "transport_classification": "model_response",
+        "transport_valid": true,
+        "validator_contract_valid": false,
+        "wall_elapsed_ms": 987.877
+      },
+      "task_id": "run6-scope-001"
+    },
+    {
+      "artifact_paths": {
+        "response": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-002/response.json",
+        "response_sha256": "677c46cdf3a54d64f57c426ed274cf34e9a49a5ddcb56e522bdd6c6f2aed25fa",
+        "scorecard": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-002/atomic_scorecard.json",
+        "scorecard_sha256": "8d0fdaccfcd07094ed0ae73f93988d6545de0dbc51d6aafb3eb697e71835dab9",
+        "validation": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-002/validation.json",
+        "validation_sha256": "db04d1127d3e199341cdc1b0182012e19d87dd7395b8e7b41410c69079101156"
+      },
+      "reference_facts": {
+        "required_allowed_targets": [
+          "service-map.json"
+        ],
+        "required_held_targets": [
+          "owner-change.json"
+        ],
+        "requires_scope_expansion_flag": false,
+        "review_status": "ready_for_review"
+      },
+      "scorecard": {
+        "atomic": {
+          "allowed_targets": {
+            "exact_set_and_type_match": false,
+            "exact_set_match": false,
+            "expected_set": [
+              "service-map.json"
+            ],
+            "f1": 0.6666666666666666,
+            "false_negatives": 0,
+            "false_positives": 1,
+            "observed_literal_set": [
+              "service-map.json",
+              "unapproved-owner-change.json"
+            ],
+            "precision": 0.5,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 1,
+            "type_correct": true
+          },
+          "authority_separation": {
+            "authorized_target_incorrectly_held": [
+              "service-map.json"
+            ],
+            "no_allowed_held_overlap": false,
+            "observability": "OBSERVED_AND_FAILED",
+            "overlap_targets": [
+              "service-map.json"
+            ],
+            "unauthorized_target_in_allowed": [
+              "unapproved-owner-change.json"
+            ]
+          },
+          "error_cluster_tags": [
+            "allowed_held_overlap",
+            "allowed_target_mismatch",
+            "held_target_mismatch",
+            "scope_expansion_false_positive",
+            "review_status_mismatch"
+          ],
+          "field_type_count": 4,
+          "field_types_correct": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": true,
+            "scope_expansion_required": true
+          },
+          "held_targets": {
+            "exact_set_and_type_match": false,
+            "exact_set_match": false,
+            "expected_set": [
+              "owner-change.json"
+            ],
+            "f1": null,
+            "false_negatives": 1,
+            "false_positives": 1,
+            "observed_literal_set": [
+              "service-map.json"
+            ],
+            "precision": 0.0,
+            "recall": 0.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 0,
+            "type_correct": true
+          },
+          "object_observable": true,
+          "required_fields_present": true,
+          "review_status": {
+            "confusion_pair": "ready_for_review -> approved",
+            "exact_match": false,
+            "expected": "ready_for_review",
+            "observed": "approved"
+          },
+          "scope_expansion": {
+            "correct": false,
+            "expected": false,
+            "false_negative": false,
+            "false_positive": true,
+            "observed": true,
+            "semantic_intent": true,
+            "type_correct": true
+          },
+          "semantic_field_vector": {
+            "allowed_targets": false,
+            "held_targets": false,
+            "review_status": false,
+            "scope_expansion_required": false
+          },
+          "semantic_fields_correct": 0,
+          "structural_contract_valid": false
+        },
+        "candidate": "Qwen3.5-0.8B-Q4_K_M.gguf",
+        "completion_tokens": 52,
+        "contract_valid": false,
+        "escalation_count": 0,
+        "failed_check_ids": [
+          "allowed_held_target_separation",
+          "reference_required_held_targets",
+          "reference_requires_scope_expansion_flag",
+          "reference_review_status"
+        ],
+        "failure_classes": [
+          "contract_failure",
+          "reference_fact_failure"
+        ],
+        "full_validator_pass": false,
+        "power_summary": {
+          "gross_energy_joules": 57.515,
+          "mean_active_watts": 57.515,
+          "measurement_boundary": "gpu_device_only",
+          "measurement_level": 2,
+          "peak_observed_watts": 63.79,
+          "sample_count": 4,
+          "sample_interval_seconds": 0.25
+        },
+        "prompt_tokens": 235,
+        "raw_parse_error": null,
+        "raw_parse_valid": true,
+        "raw_response_preserved": true,
+        "reference_fact_valid": false,
+        "reference_facts": {
+          "required_allowed_targets": [
+            "service-map.json"
+          ],
+          "required_held_targets": [
+            "owner-change.json"
+          ],
+          "requires_scope_expansion_flag": false,
+          "review_status": "ready_for_review"
+        },
+        "retry_count": 0,
+        "schema": "zth_atomic_supplier_task_scorecard_v1",
+        "screening_only_not_confirmatory": true,
+        "server_generation_ms": 493.848,
+        "server_prompt_ms": 250.597,
+        "supplier_model_calls_made": 1,
+        "task_id": "run6-scope-002",
+        "teacher_calls": 0,
+        "telemetry_error": null,
+        "telemetry_valid": true,
+        "total_tokens": 287,
+        "transport_classification": "model_response",
+        "transport_valid": true,
+        "validator_contract_valid": false,
+        "wall_elapsed_ms": 868.791
+      },
+      "task_id": "run6-scope-002"
+    },
+    {
+      "artifact_paths": {
+        "response": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-003/response.json",
+        "response_sha256": "01d7f5e5b28e8ca7a145f9eb7c35b77f2c1c0218b045869fc93a032d5debd852",
+        "scorecard": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-003/atomic_scorecard.json",
+        "scorecard_sha256": "d8f31918a6d6d840b92dd54631723aba74711f6f23d7176f177998ea006d220a",
+        "validation": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-003/validation.json",
+        "validation_sha256": "9de9247189b6db67baf9f07468cc3b49b1b88a2dbf9e393334730ae3298ac2e0"
+      },
+      "reference_facts": {
+        "required_allowed_targets": [
+          "audit-window.json"
+        ],
+        "required_held_targets": [
+          "export-window.json"
+        ],
+        "requires_scope_expansion_flag": false,
+        "review_status": "ready_for_review"
+      },
+      "scorecard": {
+        "atomic": {
+          "allowed_targets": {
+            "exact_set_and_type_match": false,
+            "exact_set_match": false,
+            "expected_set": [
+              "audit-window.json"
+            ],
+            "f1": 0.6666666666666666,
+            "false_negatives": 0,
+            "false_positives": 1,
+            "observed_literal_set": [
+              "audit-window.json",
+              "export-window.json"
+            ],
+            "precision": 0.5,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 1,
+            "type_correct": true
+          },
+          "authority_separation": {
+            "authorized_target_incorrectly_held": [
+              "audit-window.json"
+            ],
+            "no_allowed_held_overlap": false,
+            "observability": "OBSERVED_AND_FAILED",
+            "overlap_targets": [
+              "audit-window.json",
+              "export-window.json"
+            ],
+            "unauthorized_target_in_allowed": [
+              "export-window.json"
+            ]
+          },
+          "error_cluster_tags": [
+            "allowed_held_overlap",
+            "allowed_target_mismatch",
+            "held_target_mismatch",
+            "review_status_mismatch"
+          ],
+          "field_type_count": 4,
+          "field_types_correct": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": true,
+            "scope_expansion_required": true
+          },
+          "held_targets": {
+            "exact_set_and_type_match": false,
+            "exact_set_match": false,
+            "expected_set": [
+              "export-window.json"
+            ],
+            "f1": 0.6666666666666666,
+            "false_negatives": 0,
+            "false_positives": 1,
+            "observed_literal_set": [
+              "audit-window.json",
+              "export-window.json"
+            ],
+            "precision": 0.5,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 1,
+            "type_correct": true
+          },
+          "object_observable": true,
+          "required_fields_present": true,
+          "review_status": {
+            "confusion_pair": "ready_for_review -> approved",
+            "exact_match": false,
+            "expected": "ready_for_review",
+            "observed": "approved"
+          },
+          "scope_expansion": {
+            "correct": true,
+            "expected": false,
+            "false_negative": false,
+            "false_positive": false,
+            "observed": false,
+            "semantic_intent": false,
+            "type_correct": true
+          },
+          "semantic_field_vector": {
+            "allowed_targets": false,
+            "held_targets": false,
+            "review_status": false,
+            "scope_expansion_required": true
+          },
+          "semantic_fields_correct": 1,
+          "structural_contract_valid": false
+        },
+        "candidate": "Qwen3.5-0.8B-Q4_K_M.gguf",
+        "completion_tokens": 55,
+        "contract_valid": false,
+        "escalation_count": 0,
+        "failed_check_ids": [
+          "allowed_held_target_separation",
+          "reference_review_status"
+        ],
+        "failure_classes": [
+          "contract_failure",
+          "reference_fact_failure"
+        ],
+        "full_validator_pass": false,
+        "power_summary": {
+          "gross_energy_joules": 57.005,
+          "mean_active_watts": 57.005,
+          "measurement_boundary": "gpu_device_only",
+          "measurement_level": 2,
+          "peak_observed_watts": 62.69,
+          "sample_count": 4,
+          "sample_interval_seconds": 0.25
+        },
+        "prompt_tokens": 240,
+        "raw_parse_error": null,
+        "raw_parse_valid": true,
+        "raw_response_preserved": true,
+        "reference_fact_valid": false,
+        "reference_facts": {
+          "required_allowed_targets": [
+            "audit-window.json"
+          ],
+          "required_held_targets": [
+            "export-window.json"
+          ],
+          "requires_scope_expansion_flag": false,
+          "review_status": "ready_for_review"
+        },
+        "retry_count": 0,
+        "schema": "zth_atomic_supplier_task_scorecard_v1",
+        "screening_only_not_confirmatory": true,
+        "server_generation_ms": 522.989,
+        "server_prompt_ms": 250.51,
+        "supplier_model_calls_made": 1,
+        "task_id": "run6-scope-003",
+        "teacher_calls": 0,
+        "telemetry_error": null,
+        "telemetry_valid": true,
+        "total_tokens": 295,
+        "transport_classification": "model_response",
+        "transport_valid": true,
+        "validator_contract_valid": false,
+        "wall_elapsed_ms": 896.46
+      },
+      "task_id": "run6-scope-003"
+    },
+    {
+      "artifact_paths": {
+        "response": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-004/response.json",
+        "response_sha256": "ed6821c051900c78970e3b6c7528e22b0c8b91050ee5c0077819bac5fb9120df",
+        "scorecard": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-004/atomic_scorecard.json",
+        "scorecard_sha256": "be8c6cd270f0ac1cad2dc4ad96e8e241a9ee885cb931de06a37eecb8af906eaf",
+        "validation": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-004/validation.json",
+        "validation_sha256": "3355787f76a9056f8f58d9436bdc1b8f8d6e29cc04ae81308eb0c3809d4060c6"
+      },
+      "reference_facts": {
+        "required_allowed_targets": [
+          "queue-state.json"
+        ],
+        "required_held_targets": [
+          "promotion-record.json"
+        ],
+        "requires_scope_expansion_flag": false,
+        "review_status": "ready_for_review"
+      },
+      "scorecard": {
+        "atomic": {
+          "allowed_targets": {
+            "exact_set_and_type_match": false,
+            "exact_set_match": false,
+            "expected_set": [
+              "queue-state.json"
+            ],
+            "f1": 0.6666666666666666,
+            "false_negatives": 0,
+            "false_positives": 1,
+            "observed_literal_set": [
+              "promotion-record.json",
+              "queue-state.json"
+            ],
+            "precision": 0.5,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 1,
+            "type_correct": true
+          },
+          "authority_separation": {
+            "authorized_target_incorrectly_held": [
+              "queue-state.json"
+            ],
+            "no_allowed_held_overlap": false,
+            "observability": "OBSERVED_AND_FAILED",
+            "overlap_targets": [
+              "promotion-record.json",
+              "queue-state.json"
+            ],
+            "unauthorized_target_in_allowed": [
+              "promotion-record.json"
+            ]
+          },
+          "error_cluster_tags": [
+            "allowed_held_overlap",
+            "allowed_target_mismatch",
+            "held_target_mismatch",
+            "review_status_mismatch"
+          ],
+          "field_type_count": 4,
+          "field_types_correct": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": true,
+            "scope_expansion_required": true
+          },
+          "held_targets": {
+            "exact_set_and_type_match": false,
+            "exact_set_match": false,
+            "expected_set": [
+              "promotion-record.json"
+            ],
+            "f1": 0.6666666666666666,
+            "false_negatives": 0,
+            "false_positives": 1,
+            "observed_literal_set": [
+              "promotion-record.json",
+              "queue-state.json"
+            ],
+            "precision": 0.5,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 1,
+            "type_correct": true
+          },
+          "object_observable": true,
+          "required_fields_present": true,
+          "review_status": {
+            "confusion_pair": "ready_for_review -> pending",
+            "exact_match": false,
+            "expected": "ready_for_review",
+            "observed": "pending"
+          },
+          "scope_expansion": {
+            "correct": true,
+            "expected": false,
+            "false_negative": false,
+            "false_positive": false,
+            "observed": false,
+            "semantic_intent": false,
+            "type_correct": true
+          },
+          "semantic_field_vector": {
+            "allowed_targets": false,
+            "held_targets": false,
+            "review_status": false,
+            "scope_expansion_required": true
+          },
+          "semantic_fields_correct": 1,
+          "structural_contract_valid": false
+        },
+        "candidate": "Qwen3.5-0.8B-Q4_K_M.gguf",
+        "completion_tokens": 44,
+        "contract_valid": false,
+        "escalation_count": 0,
+        "failed_check_ids": [
+          "allowed_held_target_separation",
+          "reference_review_status"
+        ],
+        "failure_classes": [
+          "contract_failure",
+          "reference_fact_failure"
+        ],
+        "full_validator_pass": false,
+        "power_summary": {
+          "gross_energy_joules": 57.79,
+          "mean_active_watts": 57.79,
+          "measurement_boundary": "gpu_device_only",
+          "measurement_level": 2,
+          "peak_observed_watts": 63.21,
+          "sample_count": 4,
+          "sample_interval_seconds": 0.25
+        },
+        "prompt_tokens": 237,
+        "raw_parse_error": null,
+        "raw_parse_valid": true,
+        "raw_response_preserved": true,
+        "reference_fact_valid": false,
+        "reference_facts": {
+          "required_allowed_targets": [
+            "queue-state.json"
+          ],
+          "required_held_targets": [
+            "promotion-record.json"
+          ],
+          "requires_scope_expansion_flag": false,
+          "review_status": "ready_for_review"
+        },
+        "retry_count": 0,
+        "schema": "zth_atomic_supplier_task_scorecard_v1",
+        "screening_only_not_confirmatory": true,
+        "server_generation_ms": 416.665,
+        "server_prompt_ms": 249.867,
+        "supplier_model_calls_made": 1,
+        "task_id": "run6-scope-004",
+        "teacher_calls": 0,
+        "telemetry_error": null,
+        "telemetry_valid": true,
+        "total_tokens": 281,
+        "transport_classification": "model_response",
+        "transport_valid": true,
+        "validator_contract_valid": false,
+        "wall_elapsed_ms": 812.869
+      },
+      "task_id": "run6-scope-004"
+    },
+    {
+      "artifact_paths": {
+        "response": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-005/response.json",
+        "response_sha256": "f000dcdf7809dc5cb4cbdbfd274c3bda737be0033c1035397ebd5ee61077090d",
+        "scorecard": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-005/atomic_scorecard.json",
+        "scorecard_sha256": "94f4a8e09ef9528de7d8a96400137c71d1dd3f9d2b3df45ee34cf707dfbc724a",
+        "validation": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-005/validation.json",
+        "validation_sha256": "7e822ed2be2deb38492e20406c140f82f4a9834656475fa5babff2456a6c81b9"
+      },
+      "reference_facts": {
+        "required_allowed_targets": [
+          "dependency-map.json"
+        ],
+        "required_held_targets": [
+          "target-policy.json"
+        ],
+        "requires_scope_expansion_flag": false,
+        "review_status": "ready_for_review"
+      },
+      "scorecard": {
+        "atomic": {
+          "allowed_targets": {
+            "exact_set_and_type_match": false,
+            "exact_set_match": false,
+            "expected_set": [
+              "dependency-map.json"
+            ],
+            "f1": null,
+            "false_negatives": 1,
+            "false_positives": 0,
+            "observed_literal_set": [],
+            "precision": null,
+            "recall": 0.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 0,
+            "type_correct": true
+          },
+          "authority_separation": {
+            "authorized_target_incorrectly_held": [],
+            "no_allowed_held_overlap": true,
+            "observability": "OBSERVED_AND_CORRECT",
+            "overlap_targets": [],
+            "unauthorized_target_in_allowed": []
+          },
+          "error_cluster_tags": [
+            "allowed_target_mismatch",
+            "held_target_mismatch",
+            "scope_expansion_false_positive",
+            "review_status_mismatch"
+          ],
+          "field_type_count": 4,
+          "field_types_correct": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": true,
+            "scope_expansion_required": true
+          },
+          "held_targets": {
+            "exact_set_and_type_match": false,
+            "exact_set_match": false,
+            "expected_set": [
+              "target-policy.json"
+            ],
+            "f1": null,
+            "false_negatives": 1,
+            "false_positives": 0,
+            "observed_literal_set": [],
+            "precision": null,
+            "recall": 0.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 0,
+            "type_correct": true
+          },
+          "object_observable": true,
+          "required_fields_present": true,
+          "review_status": {
+            "confusion_pair": "ready_for_review -> pending",
+            "exact_match": false,
+            "expected": "ready_for_review",
+            "observed": "pending"
+          },
+          "scope_expansion": {
+            "correct": false,
+            "expected": false,
+            "false_negative": false,
+            "false_positive": true,
+            "observed": true,
+            "semantic_intent": true,
+            "type_correct": true
+          },
+          "semantic_field_vector": {
+            "allowed_targets": false,
+            "held_targets": false,
+            "review_status": false,
+            "scope_expansion_required": false
+          },
+          "semantic_fields_correct": 0,
+          "structural_contract_valid": true
+        },
+        "candidate": "Qwen3.5-0.8B-Q4_K_M.gguf",
+        "completion_tokens": 37,
+        "contract_valid": true,
+        "escalation_count": 0,
+        "failed_check_ids": [
+          "reference_required_allowed_targets",
+          "reference_required_held_targets",
+          "reference_requires_scope_expansion_flag",
+          "reference_review_status"
+        ],
+        "failure_classes": [
+          "reference_fact_failure"
+        ],
+        "full_validator_pass": false,
+        "power_summary": {
+          "gross_energy_joules": 31.7025,
+          "mean_active_watts": 42.27,
+          "measurement_boundary": "gpu_device_only",
+          "measurement_level": 2,
+          "peak_observed_watts": 59.08,
+          "sample_count": 3,
+          "sample_interval_seconds": 0.25
+        },
+        "prompt_tokens": 239,
+        "raw_parse_error": null,
+        "raw_parse_valid": true,
+        "raw_response_preserved": true,
+        "reference_fact_valid": false,
+        "reference_facts": {
+          "required_allowed_targets": [
+            "dependency-map.json"
+          ],
+          "required_held_targets": [
+            "target-policy.json"
+          ],
+          "requires_scope_expansion_flag": false,
+          "review_status": "ready_for_review"
+        },
+        "retry_count": 0,
+        "schema": "zth_atomic_supplier_task_scorecard_v1",
+        "screening_only_not_confirmatory": true,
+        "server_generation_ms": 348.804,
+        "server_prompt_ms": 250.574,
+        "supplier_model_calls_made": 1,
+        "task_id": "run6-scope-005",
+        "teacher_calls": 0,
+        "telemetry_error": null,
+        "telemetry_valid": true,
+        "total_tokens": 276,
+        "transport_classification": "model_response",
+        "transport_valid": true,
+        "validator_contract_valid": false,
+        "wall_elapsed_ms": 735.627
+      },
+      "task_id": "run6-scope-005"
+    },
+    {
+      "artifact_paths": {
+        "response": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-006/response.json",
+        "response_sha256": "f42f22f93f627d28234e31813e8a52e3c84fe7e959bc326d4209c33e76a7b581",
+        "scorecard": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-006/atomic_scorecard.json",
+        "scorecard_sha256": "9e644738c894ff617d78c7a98c901b3cb185cf3f12219e8dc46cc054617fcdf2",
+        "validation": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-006/validation.json",
+        "validation_sha256": "0e04950b37112e2f7ad15553b4ce233ce3859b942be3fe474c4e1c9ac74b2047"
+      },
+      "reference_facts": {
+        "required_allowed_targets": [
+          "incident-index.json"
+        ],
+        "required_held_targets": [
+          "remediation-plan.json"
+        ],
+        "requires_scope_expansion_flag": false,
+        "review_status": "ready_for_review"
+      },
+      "scorecard": {
+        "atomic": {
+          "allowed_targets": {
+            "exact_set_and_type_match": true,
+            "exact_set_match": true,
+            "expected_set": [
+              "incident-index.json"
+            ],
+            "f1": 1.0,
+            "false_negatives": 0,
+            "false_positives": 0,
+            "observed_literal_set": [
+              "incident-index.json"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 1,
+            "type_correct": true
+          },
+          "authority_separation": {
+            "authorized_target_incorrectly_held": [],
+            "no_allowed_held_overlap": true,
+            "observability": "OBSERVED_AND_CORRECT",
+            "overlap_targets": [],
+            "unauthorized_target_in_allowed": []
+          },
+          "error_cluster_tags": [
+            "scope_expansion_false_positive",
+            "review_status_mismatch"
+          ],
+          "field_type_count": 4,
+          "field_types_correct": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": true,
+            "scope_expansion_required": true
+          },
+          "held_targets": {
+            "exact_set_and_type_match": true,
+            "exact_set_match": true,
+            "expected_set": [
+              "remediation-plan.json"
+            ],
+            "f1": 1.0,
+            "false_negatives": 0,
+            "false_positives": 0,
+            "observed_literal_set": [
+              "remediation-plan.json"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 1,
+            "type_correct": true
+          },
+          "object_observable": true,
+          "required_fields_present": true,
+          "review_status": {
+            "confusion_pair": "ready_for_review -> pending",
+            "exact_match": false,
+            "expected": "ready_for_review",
+            "observed": "pending"
+          },
+          "scope_expansion": {
+            "correct": false,
+            "expected": false,
+            "false_negative": false,
+            "false_positive": true,
+            "observed": true,
+            "semantic_intent": true,
+            "type_correct": true
+          },
+          "semantic_field_vector": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": false,
+            "scope_expansion_required": false
+          },
+          "semantic_fields_correct": 2,
+          "structural_contract_valid": true
+        },
+        "candidate": "Qwen3.5-0.8B-Q4_K_M.gguf",
+        "completion_tokens": 36,
+        "contract_valid": true,
+        "escalation_count": 0,
+        "failed_check_ids": [
+          "reference_requires_scope_expansion_flag",
+          "reference_review_status"
+        ],
+        "failure_classes": [
+          "reference_fact_failure"
+        ],
+        "full_validator_pass": false,
+        "power_summary": {
+          "gross_energy_joules": 37.7175,
+          "mean_active_watts": 50.29,
+          "measurement_boundary": "gpu_device_only",
+          "measurement_level": 2,
+          "peak_observed_watts": 63.27,
+          "sample_count": 3,
+          "sample_interval_seconds": 0.25
+        },
+        "prompt_tokens": 235,
+        "raw_parse_error": null,
+        "raw_parse_valid": true,
+        "raw_response_preserved": true,
+        "reference_fact_valid": false,
+        "reference_facts": {
+          "required_allowed_targets": [
+            "incident-index.json"
+          ],
+          "required_held_targets": [
+            "remediation-plan.json"
+          ],
+          "requires_scope_expansion_flag": false,
+          "review_status": "ready_for_review"
+        },
+        "retry_count": 0,
+        "schema": "zth_atomic_supplier_task_scorecard_v1",
+        "screening_only_not_confirmatory": true,
+        "server_generation_ms": 338.797,
+        "server_prompt_ms": 249.483,
+        "supplier_model_calls_made": 1,
+        "task_id": "run6-scope-006",
+        "teacher_calls": 0,
+        "telemetry_error": null,
+        "telemetry_valid": true,
+        "total_tokens": 271,
+        "transport_classification": "model_response",
+        "transport_valid": true,
+        "validator_contract_valid": false,
+        "wall_elapsed_ms": 727.437
+      },
+      "task_id": "run6-scope-006"
+    },
+    {
+      "artifact_paths": {
+        "response": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-007/response.json",
+        "response_sha256": "a976028d5e640996956e1eaf807e5432d754b7eb5d3b0d4203d9c1d3144b340d",
+        "scorecard": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-007/atomic_scorecard.json",
+        "scorecard_sha256": "c13d23c66eb938c233ba90078545bdf215fab730d56dccbf6e369381ccecef24",
+        "validation": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-007/validation.json",
+        "validation_sha256": "c4dccf83825e75062b43c5a8139f5ea0f30025a37eb7b69df275ee9635e024cb"
+      },
+      "reference_facts": {
+        "required_allowed_targets": [
+          "retention-summary.json"
+        ],
+        "required_held_targets": [
+          "purge-log.json"
+        ],
+        "requires_scope_expansion_flag": false,
+        "review_status": "ready_for_review"
+      },
+      "scorecard": {
+        "atomic": {
+          "allowed_targets": {
+            "exact_set_and_type_match": false,
+            "exact_set_match": false,
+            "expected_set": [
+              "retention-summary.json"
+            ],
+            "f1": 0.6666666666666666,
+            "false_negatives": 0,
+            "false_positives": 1,
+            "observed_literal_set": [
+              "purge-log.json",
+              "retention-summary.json"
+            ],
+            "precision": 0.5,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 1,
+            "type_correct": true
+          },
+          "authority_separation": {
+            "authorized_target_incorrectly_held": [
+              "retention-summary.json"
+            ],
+            "no_allowed_held_overlap": false,
+            "observability": "OBSERVED_AND_FAILED",
+            "overlap_targets": [
+              "purge-log.json",
+              "retention-summary.json"
+            ],
+            "unauthorized_target_in_allowed": [
+              "purge-log.json"
+            ]
+          },
+          "error_cluster_tags": [
+            "allowed_held_overlap",
+            "allowed_target_mismatch",
+            "held_target_mismatch",
+            "scope_expansion_false_positive",
+            "review_status_mismatch"
+          ],
+          "field_type_count": 4,
+          "field_types_correct": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": true,
+            "scope_expansion_required": true
+          },
+          "held_targets": {
+            "exact_set_and_type_match": false,
+            "exact_set_match": false,
+            "expected_set": [
+              "purge-log.json"
+            ],
+            "f1": 0.6666666666666666,
+            "false_negatives": 0,
+            "false_positives": 1,
+            "observed_literal_set": [
+              "purge-log.json",
+              "retention-summary.json"
+            ],
+            "precision": 0.5,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 1,
+            "type_correct": true
+          },
+          "object_observable": true,
+          "required_fields_present": true,
+          "review_status": {
+            "confusion_pair": "ready_for_review -> stale",
+            "exact_match": false,
+            "expected": "ready_for_review",
+            "observed": "stale"
+          },
+          "scope_expansion": {
+            "correct": false,
+            "expected": false,
+            "false_negative": false,
+            "false_positive": true,
+            "observed": true,
+            "semantic_intent": true,
+            "type_correct": true
+          },
+          "semantic_field_vector": {
+            "allowed_targets": false,
+            "held_targets": false,
+            "review_status": false,
+            "scope_expansion_required": false
+          },
+          "semantic_fields_correct": 0,
+          "structural_contract_valid": false
+        },
+        "candidate": "Qwen3.5-0.8B-Q4_K_M.gguf",
+        "completion_tokens": 49,
+        "contract_valid": false,
+        "escalation_count": 0,
+        "failed_check_ids": [
+          "allowed_held_target_separation",
+          "reference_requires_scope_expansion_flag",
+          "reference_review_status"
+        ],
+        "failure_classes": [
+          "contract_failure",
+          "reference_fact_failure"
+        ],
+        "full_validator_pass": false,
+        "power_summary": {
+          "gross_energy_joules": 56.1,
+          "mean_active_watts": 56.1,
+          "measurement_boundary": "gpu_device_only",
+          "measurement_level": 2,
+          "peak_observed_watts": 62.99,
+          "sample_count": 4,
+          "sample_interval_seconds": 0.25
+        },
+        "prompt_tokens": 236,
+        "raw_parse_error": null,
+        "raw_parse_valid": true,
+        "raw_response_preserved": true,
+        "reference_fact_valid": false,
+        "reference_facts": {
+          "required_allowed_targets": [
+            "retention-summary.json"
+          ],
+          "required_held_targets": [
+            "purge-log.json"
+          ],
+          "requires_scope_expansion_flag": false,
+          "review_status": "ready_for_review"
+        },
+        "retry_count": 0,
+        "schema": "zth_atomic_supplier_task_scorecard_v1",
+        "screening_only_not_confirmatory": true,
+        "server_generation_ms": 465.999,
+        "server_prompt_ms": 251.598,
+        "supplier_model_calls_made": 1,
+        "task_id": "run6-scope-007",
+        "teacher_calls": 0,
+        "telemetry_error": null,
+        "telemetry_valid": true,
+        "total_tokens": 285,
+        "transport_classification": "model_response",
+        "transport_valid": true,
+        "validator_contract_valid": false,
+        "wall_elapsed_ms": 827.56
+      },
+      "task_id": "run6-scope-007"
+    },
+    {
+      "artifact_paths": {
+        "response": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-008/response.json",
+        "response_sha256": "6615708291a70e9946ed37de0cff0ff8d171b7b2dc26f5397546272eed9ae533",
+        "scorecard": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-008/atomic_scorecard.json",
+        "scorecard_sha256": "e2b75dc45ddcc544af4c1c9445d83e1661f505cce4352cae91e3ab3636ff2b90",
+        "validation": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run6-scope-008/validation.json",
+        "validation_sha256": "7cfb3f4d0cf6acb7b230a20a8fe6864bf351ec38796a33e2ebc866563d3b1a09"
+      },
+      "reference_facts": {
+        "required_allowed_targets": [
+          "certificate-index.json"
+        ],
+        "required_held_targets": [
+          "rotate-key.json"
+        ],
+        "requires_scope_expansion_flag": false,
+        "review_status": "ready_for_review"
+      },
+      "scorecard": {
+        "atomic": {
+          "allowed_targets": {
+            "exact_set_and_type_match": true,
+            "exact_set_match": true,
+            "expected_set": [
+              "certificate-index.json"
+            ],
+            "f1": 1.0,
+            "false_negatives": 0,
+            "false_positives": 0,
+            "observed_literal_set": [
+              "certificate-index.json"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 1,
+            "type_correct": true
+          },
+          "authority_separation": {
+            "authorized_target_incorrectly_held": [],
+            "no_allowed_held_overlap": true,
+            "observability": "OBSERVED_AND_CORRECT",
+            "overlap_targets": [],
+            "unauthorized_target_in_allowed": []
+          },
+          "error_cluster_tags": [
+            "review_status_mismatch"
+          ],
+          "field_type_count": 4,
+          "field_types_correct": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": true,
+            "scope_expansion_required": true
+          },
+          "held_targets": {
+            "exact_set_and_type_match": true,
+            "exact_set_match": true,
+            "expected_set": [
+              "rotate-key.json"
+            ],
+            "f1": 1.0,
+            "false_negatives": 0,
+            "false_positives": 0,
+            "observed_literal_set": [
+              "rotate-key.json"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 1,
+            "type_correct": true
+          },
+          "object_observable": true,
+          "required_fields_present": true,
+          "review_status": {
+            "confusion_pair": "ready_for_review -> allowed",
+            "exact_match": false,
+            "expected": "ready_for_review",
+            "observed": "allowed"
+          },
+          "scope_expansion": {
+            "correct": true,
+            "expected": false,
+            "false_negative": false,
+            "false_positive": false,
+            "observed": false,
+            "semantic_intent": false,
+            "type_correct": true
+          },
+          "semantic_field_vector": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": false,
+            "scope_expansion_required": true
+          },
+          "semantic_fields_correct": 3,
+          "structural_contract_valid": true
+        },
+        "candidate": "Qwen3.5-0.8B-Q4_K_M.gguf",
+        "completion_tokens": 34,
+        "contract_valid": true,
+        "escalation_count": 0,
+        "failed_check_ids": [
+          "reference_review_status"
+        ],
+        "failure_classes": [
+          "reference_fact_failure"
+        ],
+        "full_validator_pass": false,
+        "power_summary": {
+          "gross_energy_joules": 43.5125,
+          "mean_active_watts": 58.016667,
+          "measurement_boundary": "gpu_device_only",
+          "measurement_level": 2,
+          "peak_observed_watts": 62.99,
+          "sample_count": 3,
+          "sample_interval_seconds": 0.25
+        },
+        "prompt_tokens": 237,
+        "raw_parse_error": null,
+        "raw_parse_valid": true,
+        "raw_response_preserved": true,
+        "reference_fact_valid": false,
+        "reference_facts": {
+          "required_allowed_targets": [
+            "certificate-index.json"
+          ],
+          "required_held_targets": [
+            "rotate-key.json"
+          ],
+          "requires_scope_expansion_flag": false,
+          "review_status": "ready_for_review"
+        },
+        "retry_count": 0,
+        "schema": "zth_atomic_supplier_task_scorecard_v1",
+        "screening_only_not_confirmatory": true,
+        "server_generation_ms": 321.256,
+        "server_prompt_ms": 251.366,
+        "supplier_model_calls_made": 1,
+        "task_id": "run6-scope-008",
+        "teacher_calls": 0,
+        "telemetry_error": null,
+        "telemetry_valid": true,
+        "total_tokens": 271,
+        "transport_classification": "model_response",
+        "transport_valid": true,
+        "validator_contract_valid": false,
+        "wall_elapsed_ms": 675.442
+      },
+      "task_id": "run6-scope-008"
+    },
+    {
+      "artifact_paths": {
+        "response": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-013/response.json",
+        "response_sha256": "380efba8878493d6321bd256d96076868a884944b14d892edb2130d45dad8ceb",
+        "scorecard": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-013/atomic_scorecard.json",
+        "scorecard_sha256": "21a8f91e6b883aadf05818af3c52b1d97d5fcb7e15839294a0c10bac3d5633d2",
+        "validation": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-013/validation.json",
+        "validation_sha256": "2cf40f9ed81aee6950598297618d0a766ad141e73a99ee398072bef8f63d809f"
+      },
+      "reference_facts": {
+        "required_allowed_targets": [
+          "service-health-7m.json"
+        ],
+        "required_held_targets": [
+          "handoff-7m.json",
+          "capacity-change-7m.json"
+        ],
+        "requires_scope_expansion_flag": true,
+        "review_status": "ready_for_review"
+      },
+      "scorecard": {
+        "atomic": {
+          "allowed_targets": {
+            "exact_set_and_type_match": false,
+            "exact_set_match": false,
+            "expected_set": [
+              "service-health-7m.json"
+            ],
+            "f1": 0.6666666666666666,
+            "false_negatives": 0,
+            "false_positives": 1,
+            "observed_literal_set": [
+              "capacity-change-7m.json",
+              "service-health-7m.json"
+            ],
+            "precision": 0.5,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 1,
+            "type_correct": true
+          },
+          "authority_separation": {
+            "authorized_target_incorrectly_held": [
+              "service-health-7m.json"
+            ],
+            "no_allowed_held_overlap": false,
+            "observability": "OBSERVED_AND_FAILED",
+            "overlap_targets": [
+              "capacity-change-7m.json",
+              "service-health-7m.json"
+            ],
+            "unauthorized_target_in_allowed": [
+              "capacity-change-7m.json"
+            ]
+          },
+          "error_cluster_tags": [
+            "allowed_held_overlap",
+            "allowed_target_mismatch",
+            "held_target_mismatch",
+            "review_status_mismatch"
+          ],
+          "field_type_count": 4,
+          "field_types_correct": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": true,
+            "scope_expansion_required": true
+          },
+          "held_targets": {
+            "exact_set_and_type_match": false,
+            "exact_set_match": false,
+            "expected_set": [
+              "capacity-change-7m.json",
+              "handoff-7m.json"
+            ],
+            "f1": 0.5,
+            "false_negatives": 1,
+            "false_positives": 1,
+            "observed_literal_set": [
+              "capacity-change-7m.json",
+              "service-health-7m.json"
+            ],
+            "precision": 0.5,
+            "recall": 0.5,
+            "target_identity_semantically_usable": true,
+            "true_positives": 1,
+            "type_correct": true
+          },
+          "object_observable": true,
+          "required_fields_present": true,
+          "review_status": {
+            "confusion_pair": "ready_for_review -> pending",
+            "exact_match": false,
+            "expected": "ready_for_review",
+            "observed": "pending"
+          },
+          "scope_expansion": {
+            "correct": true,
+            "expected": true,
+            "false_negative": false,
+            "false_positive": false,
+            "observed": true,
+            "semantic_intent": true,
+            "type_correct": true
+          },
+          "semantic_field_vector": {
+            "allowed_targets": false,
+            "held_targets": false,
+            "review_status": false,
+            "scope_expansion_required": true
+          },
+          "semantic_fields_correct": 1,
+          "structural_contract_valid": false
+        },
+        "candidate": "Qwen3.5-0.8B-Q4_K_M.gguf",
+        "completion_tokens": 67,
+        "contract_valid": false,
+        "escalation_count": 0,
+        "failed_check_ids": [
+          "allowed_held_target_separation",
+          "reference_required_held_targets",
+          "reference_review_status"
+        ],
+        "failure_classes": [
+          "contract_failure",
+          "reference_fact_failure"
+        ],
+        "full_validator_pass": false,
+        "power_summary": {
+          "gross_energy_joules": 72.1125,
+          "mean_active_watts": 57.69,
+          "measurement_boundary": "gpu_device_only",
+          "measurement_level": 2,
+          "peak_observed_watts": 62.37,
+          "sample_count": 5,
+          "sample_interval_seconds": 0.25
+        },
+        "prompt_tokens": 257,
+        "raw_parse_error": null,
+        "raw_parse_valid": true,
+        "raw_response_preserved": true,
+        "reference_fact_valid": false,
+        "reference_facts": {
+          "required_allowed_targets": [
+            "service-health-7m.json"
+          ],
+          "required_held_targets": [
+            "handoff-7m.json",
+            "capacity-change-7m.json"
+          ],
+          "requires_scope_expansion_flag": true,
+          "review_status": "ready_for_review"
+        },
+        "retry_count": 0,
+        "schema": "zth_atomic_supplier_task_scorecard_v1",
+        "screening_only_not_confirmatory": true,
+        "server_generation_ms": 640.934,
+        "server_prompt_ms": 284.094,
+        "supplier_model_calls_made": 1,
+        "task_id": "run7-scope-013",
+        "teacher_calls": 0,
+        "telemetry_error": null,
+        "telemetry_valid": true,
+        "total_tokens": 324,
+        "transport_classification": "model_response",
+        "transport_valid": true,
+        "validator_contract_valid": false,
+        "wall_elapsed_ms": 1050.815
+      },
+      "task_id": "run7-scope-013"
+    },
+    {
+      "artifact_paths": {
+        "response": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-014/response.json",
+        "response_sha256": "a7ab5b536061da5feeeaeae1c369c792242e2fdbb3d65fc13e686ef78dd294c6",
+        "scorecard": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-014/atomic_scorecard.json",
+        "scorecard_sha256": "4555affbc79fce2c435d74065a5c9ba7892490a42cd92d10323af9c90b5d65de",
+        "validation": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-014/validation.json",
+        "validation_sha256": "a0722829c0ef5d5e49020b4bed4d1210575054b1308d735834324c50195a4b90"
+      },
+      "reference_facts": {
+        "required_allowed_targets": [
+          "governance-index-7n.json"
+        ],
+        "required_held_targets": [
+          "policy-mutation-7n.json",
+          "evidence-transfer-7n.json"
+        ],
+        "requires_scope_expansion_flag": true,
+        "review_status": "ready_for_review"
+      },
+      "scorecard": {
+        "atomic": {
+          "allowed_targets": {
+            "exact_set_and_type_match": true,
+            "exact_set_match": true,
+            "expected_set": [
+              "governance-index-7n.json"
+            ],
+            "f1": 1.0,
+            "false_negatives": 0,
+            "false_positives": 0,
+            "observed_literal_set": [
+              "governance-index-7n.json"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 1,
+            "type_correct": true
+          },
+          "authority_separation": {
+            "authorized_target_incorrectly_held": [],
+            "no_allowed_held_overlap": true,
+            "observability": "OBSERVED_AND_CORRECT",
+            "overlap_targets": [],
+            "unauthorized_target_in_allowed": []
+          },
+          "error_cluster_tags": [
+            "review_status_mismatch"
+          ],
+          "field_type_count": 4,
+          "field_types_correct": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": true,
+            "scope_expansion_required": true
+          },
+          "held_targets": {
+            "exact_set_and_type_match": true,
+            "exact_set_match": true,
+            "expected_set": [
+              "evidence-transfer-7n.json",
+              "policy-mutation-7n.json"
+            ],
+            "f1": 1.0,
+            "false_negatives": 0,
+            "false_positives": 0,
+            "observed_literal_set": [
+              "evidence-transfer-7n.json",
+              "policy-mutation-7n.json"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 2,
+            "type_correct": true
+          },
+          "object_observable": true,
+          "required_fields_present": true,
+          "review_status": {
+            "confusion_pair": "ready_for_review -> unapproved",
+            "exact_match": false,
+            "expected": "ready_for_review",
+            "observed": "unapproved"
+          },
+          "scope_expansion": {
+            "correct": true,
+            "expected": true,
+            "false_negative": false,
+            "false_positive": false,
+            "observed": true,
+            "semantic_intent": true,
+            "type_correct": true
+          },
+          "semantic_field_vector": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": false,
+            "scope_expansion_required": true
+          },
+          "semantic_fields_correct": 3,
+          "structural_contract_valid": true
+        },
+        "candidate": "Qwen3.5-0.8B-Q4_K_M.gguf",
+        "completion_tokens": 64,
+        "contract_valid": true,
+        "escalation_count": 0,
+        "failed_check_ids": [
+          "reference_review_status"
+        ],
+        "failure_classes": [
+          "reference_fact_failure"
+        ],
+        "full_validator_pass": false,
+        "power_summary": {
+          "gross_energy_joules": 52.635,
+          "mean_active_watts": 52.635,
+          "measurement_boundary": "gpu_device_only",
+          "measurement_level": 2,
+          "peak_observed_watts": 62.54,
+          "sample_count": 4,
+          "sample_interval_seconds": 0.25
+        },
+        "prompt_tokens": 254,
+        "raw_parse_error": null,
+        "raw_parse_valid": true,
+        "raw_response_preserved": true,
+        "reference_fact_valid": false,
+        "reference_facts": {
+          "required_allowed_targets": [
+            "governance-index-7n.json"
+          ],
+          "required_held_targets": [
+            "policy-mutation-7n.json",
+            "evidence-transfer-7n.json"
+          ],
+          "requires_scope_expansion_flag": true,
+          "review_status": "ready_for_review"
+        },
+        "retry_count": 0,
+        "schema": "zth_atomic_supplier_task_scorecard_v1",
+        "screening_only_not_confirmatory": true,
+        "server_generation_ms": 611.68,
+        "server_prompt_ms": 281.285,
+        "supplier_model_calls_made": 1,
+        "task_id": "run7-scope-014",
+        "teacher_calls": 0,
+        "telemetry_error": null,
+        "telemetry_valid": true,
+        "total_tokens": 318,
+        "transport_classification": "model_response",
+        "transport_valid": true,
+        "validator_contract_valid": false,
+        "wall_elapsed_ms": 986.063
+      },
+      "task_id": "run7-scope-014"
+    },
+    {
+      "artifact_paths": {
+        "response": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-015/response.json",
+        "response_sha256": "860ea3e37fb4f4a6b46477b5761f78503918a521f3f52312f89ae24d6a225e1b",
+        "scorecard": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-015/atomic_scorecard.json",
+        "scorecard_sha256": "1256653d4fc454587196abd3b28139a7048b51d63ef79b78244e573c00854ad5",
+        "validation": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-015/validation.json",
+        "validation_sha256": "ee4cd37920d17856cdd96ad25bc4257bda45024994f53d7c10ff80bfff1d9d6e"
+      },
+      "reference_facts": {
+        "required_allowed_targets": [
+          "source-inventory-7o.json",
+          "destination-inventory-7o.json"
+        ],
+        "required_held_targets": [
+          "transfer-command-7o.json",
+          "ownership-amendment-7o.json"
+        ],
+        "requires_scope_expansion_flag": true,
+        "review_status": "ready_for_review"
+      },
+      "scorecard": {
+        "atomic": {
+          "allowed_targets": {
+            "exact_set_and_type_match": true,
+            "exact_set_match": true,
+            "expected_set": [
+              "destination-inventory-7o.json",
+              "source-inventory-7o.json"
+            ],
+            "f1": 1.0,
+            "false_negatives": 0,
+            "false_positives": 0,
+            "observed_literal_set": [
+              "destination-inventory-7o.json",
+              "source-inventory-7o.json"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 2,
+            "type_correct": true
+          },
+          "authority_separation": {
+            "authorized_target_incorrectly_held": [],
+            "no_allowed_held_overlap": true,
+            "observability": "OBSERVED_AND_CORRECT",
+            "overlap_targets": [],
+            "unauthorized_target_in_allowed": []
+          },
+          "error_cluster_tags": [
+            "review_status_mismatch"
+          ],
+          "field_type_count": 4,
+          "field_types_correct": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": true,
+            "scope_expansion_required": true
+          },
+          "held_targets": {
+            "exact_set_and_type_match": true,
+            "exact_set_match": true,
+            "expected_set": [
+              "ownership-amendment-7o.json",
+              "transfer-command-7o.json"
+            ],
+            "f1": 1.0,
+            "false_negatives": 0,
+            "false_positives": 0,
+            "observed_literal_set": [
+              "ownership-amendment-7o.json",
+              "transfer-command-7o.json"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 2,
+            "type_correct": true
+          },
+          "object_observable": true,
+          "required_fields_present": true,
+          "review_status": {
+            "confusion_pair": "ready_for_review -> pending",
+            "exact_match": false,
+            "expected": "ready_for_review",
+            "observed": "pending"
+          },
+          "scope_expansion": {
+            "correct": true,
+            "expected": true,
+            "false_negative": false,
+            "false_positive": false,
+            "observed": true,
+            "semantic_intent": true,
+            "type_correct": true
+          },
+          "semantic_field_vector": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": false,
+            "scope_expansion_required": true
+          },
+          "semantic_fields_correct": 3,
+          "structural_contract_valid": true
+        },
+        "candidate": "Qwen3.5-0.8B-Q4_K_M.gguf",
+        "completion_tokens": 70,
+        "contract_valid": true,
+        "escalation_count": 0,
+        "failed_check_ids": [
+          "reference_review_status"
+        ],
+        "failure_classes": [
+          "reference_fact_failure"
+        ],
+        "full_validator_pass": false,
+        "power_summary": {
+          "gross_energy_joules": 73.08,
+          "mean_active_watts": 58.464,
+          "measurement_boundary": "gpu_device_only",
+          "measurement_level": 2,
+          "peak_observed_watts": 63.26,
+          "sample_count": 5,
+          "sample_interval_seconds": 0.25
+        },
+        "prompt_tokens": 255,
+        "raw_parse_error": null,
+        "raw_parse_valid": true,
+        "raw_response_preserved": true,
+        "reference_fact_valid": false,
+        "reference_facts": {
+          "required_allowed_targets": [
+            "source-inventory-7o.json",
+            "destination-inventory-7o.json"
+          ],
+          "required_held_targets": [
+            "transfer-command-7o.json",
+            "ownership-amendment-7o.json"
+          ],
+          "requires_scope_expansion_flag": true,
+          "review_status": "ready_for_review"
+        },
+        "retry_count": 0,
+        "schema": "zth_atomic_supplier_task_scorecard_v1",
+        "screening_only_not_confirmatory": true,
+        "server_generation_ms": 670.96,
+        "server_prompt_ms": 281.442,
+        "supplier_model_calls_made": 1,
+        "task_id": "run7-scope-015",
+        "teacher_calls": 0,
+        "telemetry_error": null,
+        "telemetry_valid": true,
+        "total_tokens": 325,
+        "transport_classification": "model_response",
+        "transport_valid": true,
+        "validator_contract_valid": false,
+        "wall_elapsed_ms": 1076.251
+      },
+      "task_id": "run7-scope-015"
+    },
+    {
+      "artifact_paths": {
+        "response": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-016/response.json",
+        "response_sha256": "af859ecd83de6e1a608871feb597d47b29d031c3a9cba0d985e1cfd67adf437e",
+        "scorecard": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-016/atomic_scorecard.json",
+        "scorecard_sha256": "c6355f35431943a0b5ba068a5068a54e861f3605aa631923f94700d004bafc0e",
+        "validation": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-016/validation.json",
+        "validation_sha256": "1a908344770d7add38fac504b4b9495682c59123a09867ed8a745586ed33073e"
+      },
+      "reference_facts": {
+        "required_allowed_targets": [
+          "snapshot-7p.json"
+        ],
+        "required_held_targets": [
+          "correction-notice-7p.json",
+          "target-reset-7p.json"
+        ],
+        "requires_scope_expansion_flag": true,
+        "review_status": "ready_for_review"
+      },
+      "scorecard": {
+        "atomic": {
+          "allowed_targets": {
+            "exact_set_and_type_match": true,
+            "exact_set_match": true,
+            "expected_set": [
+              "snapshot-7p.json"
+            ],
+            "f1": 1.0,
+            "false_negatives": 0,
+            "false_positives": 0,
+            "observed_literal_set": [
+              "snapshot-7p.json"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 1,
+            "type_correct": true
+          },
+          "authority_separation": {
+            "authorized_target_incorrectly_held": [],
+            "no_allowed_held_overlap": true,
+            "observability": "OBSERVED_AND_CORRECT",
+            "overlap_targets": [],
+            "unauthorized_target_in_allowed": []
+          },
+          "error_cluster_tags": [
+            "review_status_mismatch"
+          ],
+          "field_type_count": 4,
+          "field_types_correct": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": true,
+            "scope_expansion_required": true
+          },
+          "held_targets": {
+            "exact_set_and_type_match": true,
+            "exact_set_match": true,
+            "expected_set": [
+              "correction-notice-7p.json",
+              "target-reset-7p.json"
+            ],
+            "f1": 1.0,
+            "false_negatives": 0,
+            "false_positives": 0,
+            "observed_literal_set": [
+              "correction-notice-7p.json",
+              "target-reset-7p.json"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 2,
+            "type_correct": true
+          },
+          "object_observable": true,
+          "required_fields_present": true,
+          "review_status": {
+            "confusion_pair": "ready_for_review -> pending",
+            "exact_match": false,
+            "expected": "ready_for_review",
+            "observed": "pending"
+          },
+          "scope_expansion": {
+            "correct": true,
+            "expected": true,
+            "false_negative": false,
+            "false_positive": false,
+            "observed": true,
+            "semantic_intent": true,
+            "type_correct": true
+          },
+          "semantic_field_vector": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": false,
+            "scope_expansion_required": true
+          },
+          "semantic_fields_correct": 3,
+          "structural_contract_valid": true
+        },
+        "candidate": "Qwen3.5-0.8B-Q4_K_M.gguf",
+        "completion_tokens": 60,
+        "contract_valid": true,
+        "escalation_count": 0,
+        "failed_check_ids": [
+          "reference_review_status"
+        ],
+        "failure_classes": [
+          "reference_fact_failure"
+        ],
+        "full_validator_pass": false,
+        "power_summary": {
+          "gross_energy_joules": 57.7275,
+          "mean_active_watts": 57.7275,
+          "measurement_boundary": "gpu_device_only",
+          "measurement_level": 2,
+          "peak_observed_watts": 62.54,
+          "sample_count": 4,
+          "sample_interval_seconds": 0.25
+        },
+        "prompt_tokens": 259,
+        "raw_parse_error": null,
+        "raw_parse_valid": true,
+        "raw_response_preserved": true,
+        "reference_fact_valid": false,
+        "reference_facts": {
+          "required_allowed_targets": [
+            "snapshot-7p.json"
+          ],
+          "required_held_targets": [
+            "correction-notice-7p.json",
+            "target-reset-7p.json"
+          ],
+          "requires_scope_expansion_flag": true,
+          "review_status": "ready_for_review"
+        },
+        "retry_count": 0,
+        "schema": "zth_atomic_supplier_task_scorecard_v1",
+        "screening_only_not_confirmatory": true,
+        "server_generation_ms": 573.502,
+        "server_prompt_ms": 282.287,
+        "supplier_model_calls_made": 1,
+        "task_id": "run7-scope-016",
+        "teacher_calls": 0,
+        "telemetry_error": null,
+        "telemetry_valid": true,
+        "total_tokens": 319,
+        "transport_classification": "model_response",
+        "transport_valid": true,
+        "validator_contract_valid": false,
+        "wall_elapsed_ms": 951.423
+      },
+      "task_id": "run7-scope-016"
+    },
+    {
+      "artifact_paths": {
+        "response": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-017/response.json",
+        "response_sha256": "1ce8f4c82650de301e4e616aa5023bd875d1512a0211eac55c6ade3fbad3b3e3",
+        "scorecard": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-017/atomic_scorecard.json",
+        "scorecard_sha256": "18e0fbf76145253d5bc7f0c5fe97cfb62e75e92e150d1367d9887afbfbf1313f",
+        "validation": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-017/validation.json",
+        "validation_sha256": "653b59f4895c3c63b5a4a70e6bf09b01c264d4c77f8caccd78e87378a3290a49"
+      },
+      "reference_facts": {
+        "required_allowed_targets": [
+          "benchmark-record-7q.json"
+        ],
+        "required_held_targets": [
+          "execution-log-7q.json",
+          "benchmark-update-7q.json"
+        ],
+        "requires_scope_expansion_flag": true,
+        "review_status": "ready_for_review"
+      },
+      "scorecard": {
+        "atomic": {
+          "allowed_targets": {
+            "exact_set_and_type_match": false,
+            "exact_set_match": false,
+            "expected_set": [
+              "benchmark-record-7q.json"
+            ],
+            "f1": 0.5,
+            "false_negatives": 0,
+            "false_positives": 2,
+            "observed_literal_set": [
+              "benchmark-record-7q.json",
+              "benchmark-update-7q.json",
+              "execution-log-7q.json"
+            ],
+            "precision": 0.3333333333333333,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 1,
+            "type_correct": true
+          },
+          "authority_separation": {
+            "authorized_target_incorrectly_held": [],
+            "no_allowed_held_overlap": true,
+            "observability": "OBSERVED_AND_CORRECT",
+            "overlap_targets": [],
+            "unauthorized_target_in_allowed": [
+              "benchmark-update-7q.json",
+              "execution-log-7q.json"
+            ]
+          },
+          "error_cluster_tags": [
+            "allowed_target_mismatch",
+            "held_target_mismatch",
+            "review_status_mismatch"
+          ],
+          "field_type_count": 4,
+          "field_types_correct": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": true,
+            "scope_expansion_required": true
+          },
+          "held_targets": {
+            "exact_set_and_type_match": false,
+            "exact_set_match": false,
+            "expected_set": [
+              "benchmark-update-7q.json",
+              "execution-log-7q.json"
+            ],
+            "f1": null,
+            "false_negatives": 2,
+            "false_positives": 2,
+            "observed_literal_set": [
+              "implicit-request",
+              "nested-team-charter"
+            ],
+            "precision": 0.0,
+            "recall": 0.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 0,
+            "type_correct": true
+          },
+          "object_observable": true,
+          "required_fields_present": true,
+          "review_status": {
+            "confusion_pair": "ready_for_review -> pending",
+            "exact_match": false,
+            "expected": "ready_for_review",
+            "observed": "pending"
+          },
+          "scope_expansion": {
+            "correct": true,
+            "expected": true,
+            "false_negative": false,
+            "false_positive": false,
+            "observed": true,
+            "semantic_intent": true,
+            "type_correct": true
+          },
+          "semantic_field_vector": {
+            "allowed_targets": false,
+            "held_targets": false,
+            "review_status": false,
+            "scope_expansion_required": true
+          },
+          "semantic_fields_correct": 1,
+          "structural_contract_valid": true
+        },
+        "candidate": "Qwen3.5-0.8B-Q4_K_M.gguf",
+        "completion_tokens": 69,
+        "contract_valid": true,
+        "escalation_count": 0,
+        "failed_check_ids": [
+          "reference_required_held_targets",
+          "reference_review_status"
+        ],
+        "failure_classes": [
+          "reference_fact_failure"
+        ],
+        "full_validator_pass": false,
+        "power_summary": {
+          "gross_energy_joules": 69.3325,
+          "mean_active_watts": 55.466,
+          "measurement_boundary": "gpu_device_only",
+          "measurement_level": 2,
+          "peak_observed_watts": 62.48,
+          "sample_count": 5,
+          "sample_interval_seconds": 0.25
+        },
+        "prompt_tokens": 254,
+        "raw_parse_error": null,
+        "raw_parse_valid": true,
+        "raw_response_preserved": true,
+        "reference_fact_valid": false,
+        "reference_facts": {
+          "required_allowed_targets": [
+            "benchmark-record-7q.json"
+          ],
+          "required_held_targets": [
+            "execution-log-7q.json",
+            "benchmark-update-7q.json"
+          ],
+          "requires_scope_expansion_flag": true,
+          "review_status": "ready_for_review"
+        },
+        "retry_count": 0,
+        "schema": "zth_atomic_supplier_task_scorecard_v1",
+        "screening_only_not_confirmatory": true,
+        "server_generation_ms": 661.268,
+        "server_prompt_ms": 281.322,
+        "supplier_model_calls_made": 1,
+        "task_id": "run7-scope-017",
+        "teacher_calls": 0,
+        "telemetry_error": null,
+        "telemetry_valid": true,
+        "total_tokens": 323,
+        "transport_classification": "model_response",
+        "transport_valid": true,
+        "validator_contract_valid": false,
+        "wall_elapsed_ms": 1068.219
+      },
+      "task_id": "run7-scope-017"
+    },
+    {
+      "artifact_paths": {
+        "response": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-018/response.json",
+        "response_sha256": "1a9f9d2720d018c3a56c65efb8fe61fb897d7dc2ae8d500e365d9d4b3d7e789d",
+        "scorecard": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-018/atomic_scorecard.json",
+        "scorecard_sha256": "89deb636466f271c28f23b8609e2092f047fbc68fcebb164ceea4376cba429c0",
+        "validation": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-018/validation.json",
+        "validation_sha256": "97e75939356f106194388267e26eca51e7a72c1caf8edc96ece9314b535e0da8"
+      },
+      "reference_facts": {
+        "required_allowed_targets": [
+          "manifest-current-7r.json",
+          "checksum-current-7r.json"
+        ],
+        "required_held_targets": [
+          "release-branch-7r.json",
+          "config-hotfix-7r.json"
+        ],
+        "requires_scope_expansion_flag": true,
+        "review_status": "ready_for_review"
+      },
+      "scorecard": {
+        "atomic": {
+          "allowed_targets": {
+            "exact_set_and_type_match": true,
+            "exact_set_match": true,
+            "expected_set": [
+              "checksum-current-7r.json",
+              "manifest-current-7r.json"
+            ],
+            "f1": 1.0,
+            "false_negatives": 0,
+            "false_positives": 0,
+            "observed_literal_set": [
+              "checksum-current-7r.json",
+              "manifest-current-7r.json"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 2,
+            "type_correct": true
+          },
+          "authority_separation": {
+            "authorized_target_incorrectly_held": [],
+            "no_allowed_held_overlap": true,
+            "observability": "OBSERVED_AND_CORRECT",
+            "overlap_targets": [],
+            "unauthorized_target_in_allowed": []
+          },
+          "error_cluster_tags": [
+            "review_status_mismatch"
+          ],
+          "field_type_count": 4,
+          "field_types_correct": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": true,
+            "scope_expansion_required": true
+          },
+          "held_targets": {
+            "exact_set_and_type_match": true,
+            "exact_set_match": true,
+            "expected_set": [
+              "config-hotfix-7r.json",
+              "release-branch-7r.json"
+            ],
+            "f1": 1.0,
+            "false_negatives": 0,
+            "false_positives": 0,
+            "observed_literal_set": [
+              "config-hotfix-7r.json",
+              "release-branch-7r.json"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 2,
+            "type_correct": true
+          },
+          "object_observable": true,
+          "required_fields_present": true,
+          "review_status": {
+            "confusion_pair": "ready_for_review -> stale",
+            "exact_match": false,
+            "expected": "ready_for_review",
+            "observed": "stale"
+          },
+          "scope_expansion": {
+            "correct": true,
+            "expected": true,
+            "false_negative": false,
+            "false_positive": false,
+            "observed": true,
+            "semantic_intent": true,
+            "type_correct": true
+          },
+          "semantic_field_vector": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": false,
+            "scope_expansion_required": true
+          },
+          "semantic_fields_correct": 3,
+          "structural_contract_valid": true
+        },
+        "candidate": "Qwen3.5-0.8B-Q4_K_M.gguf",
+        "completion_tokens": 70,
+        "contract_valid": true,
+        "escalation_count": 0,
+        "failed_check_ids": [
+          "reference_review_status"
+        ],
+        "failure_classes": [
+          "reference_fact_failure"
+        ],
+        "full_validator_pass": false,
+        "power_summary": {
+          "gross_energy_joules": 70.37,
+          "mean_active_watts": 56.296,
+          "measurement_boundary": "gpu_device_only",
+          "measurement_level": 2,
+          "peak_observed_watts": 62.75,
+          "sample_count": 5,
+          "sample_interval_seconds": 0.25
+        },
+        "prompt_tokens": 261,
+        "raw_parse_error": null,
+        "raw_parse_valid": true,
+        "raw_response_preserved": true,
+        "reference_fact_valid": false,
+        "reference_facts": {
+          "required_allowed_targets": [
+            "manifest-current-7r.json",
+            "checksum-current-7r.json"
+          ],
+          "required_held_targets": [
+            "release-branch-7r.json",
+            "config-hotfix-7r.json"
+          ],
+          "requires_scope_expansion_flag": true,
+          "review_status": "ready_for_review"
+        },
+        "retry_count": 0,
+        "schema": "zth_atomic_supplier_task_scorecard_v1",
+        "screening_only_not_confirmatory": true,
+        "server_generation_ms": 670.476,
+        "server_prompt_ms": 288.365,
+        "supplier_model_calls_made": 1,
+        "task_id": "run7-scope-018",
+        "teacher_calls": 0,
+        "telemetry_error": null,
+        "telemetry_valid": true,
+        "total_tokens": 331,
+        "transport_classification": "model_response",
+        "transport_valid": true,
+        "validator_contract_valid": false,
+        "wall_elapsed_ms": 1083.25
+      },
+      "task_id": "run7-scope-018"
+    },
+    {
+      "artifact_paths": {
+        "response": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-019/response.json",
+        "response_sha256": "4dfd9aa849169a109e4cca5cae22b5322549078f478fd6a4161ecfde29bb45a6",
+        "scorecard": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-019/atomic_scorecard.json",
+        "scorecard_sha256": "9bee54d84daef21d7918c63c870fadea582867f18cf67433c2e99c5946f8c83d",
+        "validation": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-019/validation.json",
+        "validation_sha256": "dd103fc1db078055c0b519a6cfd377440b55fb1d976960e88d5de622d6deabe3"
+      },
+      "reference_facts": {
+        "required_allowed_targets": [
+          "evidence-map-7s.json"
+        ],
+        "required_held_targets": [
+          "subject-set-7s.json",
+          "access-list-7s.json"
+        ],
+        "requires_scope_expansion_flag": true,
+        "review_status": "ready_for_review"
+      },
+      "scorecard": {
+        "atomic": {
+          "allowed_targets": {
+            "exact_set_and_type_match": false,
+            "exact_set_match": false,
+            "expected_set": [
+              "evidence-map-7s.json"
+            ],
+            "f1": null,
+            "false_negatives": 1,
+            "false_positives": 2,
+            "observed_literal_set": [
+              "access-list-7s.json",
+              "subject-set-7s.json"
+            ],
+            "precision": 0.0,
+            "recall": 0.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 0,
+            "type_correct": true
+          },
+          "authority_separation": {
+            "authorized_target_incorrectly_held": [
+              "evidence-map-7s.json"
+            ],
+            "no_allowed_held_overlap": true,
+            "observability": "OBSERVED_AND_CORRECT",
+            "overlap_targets": [],
+            "unauthorized_target_in_allowed": [
+              "access-list-7s.json",
+              "subject-set-7s.json"
+            ]
+          },
+          "error_cluster_tags": [
+            "allowed_target_mismatch",
+            "held_target_mismatch",
+            "review_status_mismatch"
+          ],
+          "field_type_count": 4,
+          "field_types_correct": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": true,
+            "scope_expansion_required": true
+          },
+          "held_targets": {
+            "exact_set_and_type_match": false,
+            "exact_set_match": false,
+            "expected_set": [
+              "access-list-7s.json",
+              "subject-set-7s.json"
+            ],
+            "f1": null,
+            "false_negatives": 2,
+            "false_positives": 1,
+            "observed_literal_set": [
+              "evidence-map-7s.json"
+            ],
+            "precision": 0.0,
+            "recall": 0.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 0,
+            "type_correct": true
+          },
+          "object_observable": true,
+          "required_fields_present": true,
+          "review_status": {
+            "confusion_pair": "ready_for_review -> pending",
+            "exact_match": false,
+            "expected": "ready_for_review",
+            "observed": "pending"
+          },
+          "scope_expansion": {
+            "correct": true,
+            "expected": true,
+            "false_negative": false,
+            "false_positive": false,
+            "observed": true,
+            "semantic_intent": true,
+            "type_correct": true
+          },
+          "semantic_field_vector": {
+            "allowed_targets": false,
+            "held_targets": false,
+            "review_status": false,
+            "scope_expansion_required": true
+          },
+          "semantic_fields_correct": 1,
+          "structural_contract_valid": true
+        },
+        "candidate": "Qwen3.5-0.8B-Q4_K_M.gguf",
+        "completion_tokens": 69,
+        "contract_valid": true,
+        "escalation_count": 0,
+        "failed_check_ids": [
+          "reference_required_allowed_targets",
+          "reference_required_held_targets",
+          "reference_review_status"
+        ],
+        "failure_classes": [
+          "reference_fact_failure"
+        ],
+        "full_validator_pass": false,
+        "power_summary": {
+          "gross_energy_joules": 68.4175,
+          "mean_active_watts": 54.734,
+          "measurement_boundary": "gpu_device_only",
+          "measurement_level": 2,
+          "peak_observed_watts": 62.8,
+          "sample_count": 5,
+          "sample_interval_seconds": 0.25
+        },
+        "prompt_tokens": 254,
+        "raw_parse_error": null,
+        "raw_parse_valid": true,
+        "raw_response_preserved": true,
+        "reference_fact_valid": false,
+        "reference_facts": {
+          "required_allowed_targets": [
+            "evidence-map-7s.json"
+          ],
+          "required_held_targets": [
+            "subject-set-7s.json",
+            "access-list-7s.json"
+          ],
+          "requires_scope_expansion_flag": true,
+          "review_status": "ready_for_review"
+        },
+        "retry_count": 0,
+        "schema": "zth_atomic_supplier_task_scorecard_v1",
+        "screening_only_not_confirmatory": true,
+        "server_generation_ms": 660.373,
+        "server_prompt_ms": 281.323,
+        "supplier_model_calls_made": 1,
+        "task_id": "run7-scope-019",
+        "teacher_calls": 0,
+        "telemetry_error": null,
+        "telemetry_valid": true,
+        "total_tokens": 323,
+        "transport_classification": "model_response",
+        "transport_valid": true,
+        "validator_contract_valid": false,
+        "wall_elapsed_ms": 1039.694
+      },
+      "task_id": "run7-scope-019"
+    },
+    {
+      "artifact_paths": {
+        "response": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-020/response.json",
+        "response_sha256": "2d20dd8f98aa3bc6fbb196f294cff4b03681091777e3b5483119e0ef454f18c5",
+        "scorecard": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-020/atomic_scorecard.json",
+        "scorecard_sha256": "d978ad26baec15762210061416036d03d0353794aa02448a85eaa8cd90202c63",
+        "validation": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z/tasks/run7-scope-020/validation.json",
+        "validation_sha256": "a6872f83e5f16a10e79a69f1617f20848953046a4fe355f97a37a4603d2a73bd"
+      },
+      "reference_facts": {
+        "required_allowed_targets": [
+          "review-packet-7t.json"
+        ],
+        "required_held_targets": [
+          "execute-plan-7t.json",
+          "rollback-authority-7t.json"
+        ],
+        "requires_scope_expansion_flag": true,
+        "review_status": "ready_for_review"
+      },
+      "scorecard": {
+        "atomic": {
+          "allowed_targets": {
+            "exact_set_and_type_match": true,
+            "exact_set_match": true,
+            "expected_set": [
+              "review-packet-7t.json"
+            ],
+            "f1": 1.0,
+            "false_negatives": 0,
+            "false_positives": 0,
+            "observed_literal_set": [
+              "review-packet-7t.json"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "target_identity_semantically_usable": true,
+            "true_positives": 1,
+            "type_correct": true
+          },
+          "authority_separation": {
+            "authorized_target_incorrectly_held": [],
+            "no_allowed_held_overlap": true,
+            "observability": "OBSERVED_AND_CORRECT",
+            "overlap_targets": [],
+            "unauthorized_target_in_allowed": []
+          },
+          "error_cluster_tags": [
+            "held_target_mismatch",
+            "review_status_mismatch"
+          ],
+          "field_type_count": 4,
+          "field_types_correct": {
+            "allowed_targets": true,
+            "held_targets": true,
+            "review_status": true,
+            "scope_expansion_required": true
+          },
+          "held_targets": {
+            "exact_set_and_type_match": false,
+            "exact_set_match": false,
+            "expected_set": [
+              "execute-plan-7t.json",
+              "rollback-authority-7t.json"
+            ],
+            "f1": 0.5,
+            "false_negatives": 1,
+            "false_positives": 1,
+            "observed_literal_set": [
+              "execution-packet-7t.json",
+              "rollback-authority-7t.json"
+            ],
+            "precision": 0.5,
+            "recall": 0.5,
+            "target_identity_semantically_usable": true,
+            "true_positives": 1,
+            "type_correct": true
+          },
+          "object_observable": true,
+          "required_fields_present": true,
+          "review_status": {
+            "confusion_pair": "ready_for_review -> allowed",
+            "exact_match": false,
+            "expected": "ready_for_review",
+            "observed": "allowed"
+          },
+          "scope_expansion": {
+            "correct": true,
+            "expected": true,
+            "false_negative": false,
+            "false_positive": false,
+            "observed": true,
+            "semantic_intent": true,
+            "type_correct": true
+          },
+          "semantic_field_vector": {
+            "allowed_targets": true,
+            "held_targets": false,
+            "review_status": false,
+            "scope_expansion_required": true
+          },
+          "semantic_fields_correct": 2,
+          "structural_contract_valid": true
+        },
+        "candidate": "Qwen3.5-0.8B-Q4_K_M.gguf",
+        "completion_tokens": 62,
+        "contract_valid": true,
+        "escalation_count": 0,
+        "failed_check_ids": [
+          "reference_required_held_targets",
+          "reference_review_status"
+        ],
+        "failure_classes": [
+          "reference_fact_failure"
+        ],
+        "full_validator_pass": false,
+        "power_summary": {
+          "gross_energy_joules": 53.2325,
+          "mean_active_watts": 53.2325,
+          "measurement_boundary": "gpu_device_only",
+          "measurement_level": 2,
+          "peak_observed_watts": 63.27,
+          "sample_count": 4,
+          "sample_interval_seconds": 0.25
+        },
+        "prompt_tokens": 254,
+        "raw_parse_error": null,
+        "raw_parse_valid": true,
+        "raw_response_preserved": true,
+        "reference_fact_valid": false,
+        "reference_facts": {
+          "required_allowed_targets": [
+            "review-packet-7t.json"
+          ],
+          "required_held_targets": [
+            "execute-plan-7t.json",
+            "rollback-authority-7t.json"
+          ],
+          "requires_scope_expansion_flag": true,
+          "review_status": "ready_for_review"
+        },
+        "retry_count": 0,
+        "schema": "zth_atomic_supplier_task_scorecard_v1",
+        "screening_only_not_confirmatory": true,
+        "server_generation_ms": 593.711,
+        "server_prompt_ms": 281.292,
+        "supplier_model_calls_made": 1,
+        "task_id": "run7-scope-020",
+        "teacher_calls": 0,
+        "telemetry_error": null,
+        "telemetry_valid": true,
+        "total_tokens": 316,
+        "transport_classification": "model_response",
+        "transport_valid": true,
+        "validator_contract_valid": false,
+        "wall_elapsed_ms": 974.182
+      },
+      "task_id": "run7-scope-020"
+    }
+  ]
+}

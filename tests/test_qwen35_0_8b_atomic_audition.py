@@ -14,6 +14,7 @@ def _row(task_id: str, expansion: bool, semantic_fields: int, passed: bool = Fal
         "contract_valid": True,
         "reference_fact_valid": passed,
         "full_validator_pass": passed,
+        "validator_contract_valid": False,
         "atomic": {
             "semantic_fields_correct": semantic_fields,
             "allowed_targets": {"exact_set_match": True, "precision": 1.0, "recall": 1.0},
@@ -23,6 +24,7 @@ def _row(task_id: str, expansion: bool, semantic_fields: int, passed: bool = Fal
             "review_status": {"exact_match": passed, "confusion_pair": None if passed else "ready_for_review -> other"},
             "semantic_field_vector": {"allowed_targets": True, "held_targets": True, "scope_expansion_required": expansion, "review_status": passed},
             "object_observable": True,
+            "structural_contract_valid": True,
         },
         "wall_elapsed_ms": 10.0,
         "power_summary": {"gross_energy_joules": 2.0},

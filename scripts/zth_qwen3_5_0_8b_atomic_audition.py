@@ -287,7 +287,8 @@ def scorecard(task: dict[str, Any], raw: str, validation: dict[str, Any] | None,
         "transport_valid": metadata.get("transport_classification") == "model_response",
         "transport_classification": metadata.get("transport_classification"),
         "raw_parse_valid": quality["parse_valid"],
-        "contract_valid": quality["contract_valid"],
+        "contract_valid": atomic["structural_contract_valid"],
+        "validator_contract_valid": quality["contract_valid"],
         "reference_fact_valid": quality["reference_fact_valid"],
         "full_validator_pass": bool(validation and validation.get("validation_status") == "passed"),
         "failure_classes": quality["failure_classes"],
@@ -507,6 +508,7 @@ def aggregate_rows(rows: list[dict[str, Any]], idle_summary: dict[str, Any]) -> 
         "transport_valid": count(lambda r: r["transport_valid"]),
         "raw_parse_valid": count(lambda r: r["raw_parse_valid"]),
         "contract_valid": count(lambda r: r["contract_valid"]),
+        "validator_contract_valid": count(lambda r: r.get("validator_contract_valid", r["contract_valid"])),
         "reference_fact_valid": count(lambda r: r["reference_fact_valid"]),
         "full_validator_passes": count(lambda r: r["full_validator_pass"]),
         "allowed_targets": {"exact": exact("allowed_targets"), "precision_mean": statistics.mean([r["atomic"]["allowed_targets"]["precision"] or 0 for r in rows]), "recall_mean": statistics.mean([r["atomic"]["allowed_targets"]["recall"] or 0 for r in rows])},
@@ -527,12 +529,40 @@ def aggregate_rows(rows: list[dict[str, Any]], idle_summary: dict[str, Any]) -> 
     }
 
 
+def repair_derived(output_dir: Path) -> None:
+    """Correct only derived scorecard contract classification; never touch raw/validator files."""
+    manifest = load_json(output_dir / "screening_manifest.json")
+    rows = []
+    for task_id in manifest["selection"]["task_order"]:
+        path = output_dir / "tasks" / task_id / "atomic_scorecard.json"
+        row = load_json(path)
+        row["validator_contract_valid"] = row.get("validator_contract_valid", row.get("contract_valid"))
+        row["contract_valid"] = bool(row["atomic"]["structural_contract_valid"])
+        write_json(path, row)
+        rows.append(row)
+    idle_summary = load_json(output_dir / "idle_power_samples.json")["summary"]
+    aggregate = aggregate_rows(rows, idle_summary)
+    aggregate["derived_scorecard_correction"] = {
+        "reason": "validator target_authority=not_applicable is not a structural failure; atomic structural contract uses required fields, field types, and no allowed/held overlap",
+        "raw_responses_changed": False,
+        "validator_artifacts_changed": False,
+    }
+    write_json(output_dir / "aggregate.json", aggregate)
+    print(json.dumps({"status": "derived_scorecards_corrected", "model_calls": 0, "raw_responses_changed": False, "validator_artifacts_changed": False}, indent=2))
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-dir", type=Path, required=True)
-    parser.add_argument("--execute", action="store_true", required=True)
+    parser.add_argument("--execute", action="store_true")
+    parser.add_argument("--repair-derived", action="store_true")
     args = parser.parse_args()
-    execute(args.output_dir)
+    if args.execute == args.repair_derived:
+        parser.error("choose exactly one of --execute or --repair-derived")
+    if args.execute:
+        execute(args.output_dir)
+    else:
+        repair_derived(args.output_dir)
     return 0
 
 
