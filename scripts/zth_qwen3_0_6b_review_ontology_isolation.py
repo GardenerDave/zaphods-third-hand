@@ -24,7 +24,7 @@ ORIGINAL_RUN = ROOT / ".work/model_size_supplier_floor/qwen3_0_6b_interface_disa
 ORIGINAL_MANIFEST_SHA = "5cbb191ca44318bb105980be489d9f9fda49c934ce601463a81cb73cc4b72f49"
 ORIGINAL_AGGREGATE_SHA = "3d4807e5079f079664333e23320f27c7fea9caac52be475aecb64777c4be68c7"
 ORIGINAL_SUFFIX_SHA = "8386cb934c15b3a07b6a668075961c505a2c5ecd2d57980a5509c885c67ff4bc"
-EXPECTED_HEAD = "26b16f200573cdfbd10fab6589539344f851d559"
+AUTHORITATIVE_PREPARATION_HEAD = "230effdf216b8f3c2910ada479d4c1f147283d79"
 EXPECTED_RUNTIME_SHA = stage_a.EXPECTED_RUNTIME_SHA
 EXPECTED_MODEL_SHA = stage_a.EXPECTED_MODEL_SHA
 EXPECTED_MODEL_ID = stage_a.EXPECTED_MODEL_ID
@@ -86,8 +86,7 @@ def telemetry_url() -> str:
 
 
 def preflight(spec, records: list[dict], runtime: dict) -> dict:
-    if subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip() != EXPECTED_HEAD:
-        raise RuntimeError("wrong execution commit")
+    execution_head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
     if sha_file(stage_a.RUNTIME_FREEZE) != EXPECTED_RUNTIME_SHA:
         raise RuntimeError("runtime freeze hash mismatch")
     if sha_file(ORIGINAL_RUN / "screening_manifest.json") != ORIGINAL_MANIFEST_SHA:
@@ -121,6 +120,8 @@ def preflight(spec, records: list[dict], runtime: dict) -> dict:
         "corrected_suffix_sha256": sha_bytes(NEW_SUFFIX.encode()),
         "prompt_diff_sha256": sha_bytes(PROMPT_DIFF.encode()),
         "model_calls": 0,
+        "execution_head": execution_head,
+        "authoritative_preparation_head": AUTHORITATIVE_PREPARATION_HEAD,
         "public_telemetry_alias": os.environ.get("ZTH_GPU_TELEMETRY_PUBLIC_ALIAS", "JARVIS_LOCAL"),
     }
 
@@ -228,7 +229,8 @@ def main() -> int:
         "schema": "zth_qwen3_0_6b_review_ontology_isolation_manifest_v1",
         "screening_only_not_confirmatory": True,
         "protocol_compliance_isolation": True,
-        "execution_commit": EXPECTED_HEAD,
+        "execution_commit": binding["execution_head"],
+        "authoritative_preparation_commit": AUTHORITATIVE_PREPARATION_HEAD,
         "driver": str(Path(__file__).resolve().relative_to(ROOT)),
         "driver_sha256": sha_file(Path(__file__).resolve()),
         "runtime_freeze_path": str(stage_a.RUNTIME_FREEZE.relative_to(ROOT)),
