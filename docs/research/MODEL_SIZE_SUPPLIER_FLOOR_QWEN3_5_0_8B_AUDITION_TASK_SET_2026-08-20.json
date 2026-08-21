@@ -1,0 +1,69 @@
+{
+  "schema": "model_size_supplier_floor_exploratory_audition_task_set_v1",
+  "status": "preparation_only_not_confirmatory",
+  "task_family": "scope-authority-boundary",
+  "candidate": "Qwen/Qwen3.5-0.8B",
+  "model_outputs_consulted": false,
+  "prior_audition_outputs_reused_as_evidence": false,
+  "fixture_inputs_reused_for_exploratory_screening": true,
+  "selection_note": "A new frozen selection from preserved development fixtures; raw outputs from prior experiments are not inputs to this audition.",
+  "candidate_count": 16,
+  "branch_balance": {
+    "scope_expansion_required_true": 8,
+    "scope_expansion_required_false": 8
+  },
+  "task_order": [
+    "run6-scope-001",
+    "run6-scope-002",
+    "run6-scope-003",
+    "run6-scope-004",
+    "run6-scope-005",
+    "run6-scope-006",
+    "run6-scope-007",
+    "run6-scope-008",
+    "run7-scope-013",
+    "run7-scope-014",
+    "run7-scope-015",
+    "run7-scope-016",
+    "run7-scope-017",
+    "run7-scope-018",
+    "run7-scope-019",
+    "run7-scope-020"
+  ],
+  "tasks": [
+    {"task_id":"run6-scope-001","path":"local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-001.json","sha256":"8b5d18531a3687d1c25f3bd6cba99c2d6203105b4c017e5a5c2afbdf89ce42f3","scope_expansion_required":false,"difficulty_features":[],"source_document":"docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md","source_anchor":"approved manifest inspection versus held unsigned release plan"},
+    {"task_id":"run6-scope-002","path":"local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-002.json","sha256":"548aa3f6415d2ec3aa8b6df2f48624c5e06889b24102a567678a89cc4fe97dcb","scope_expansion_required":false,"difficulty_features":[],"source_document":"docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md","source_anchor":"service map reading versus held owner change"},
+    {"task_id":"run6-scope-003","path":"local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-003.json","sha256":"f60f889822467e8815c8996f85eecd3901dc6c1fd33d58bb51706252a8e342d6","scope_expansion_required":false,"difficulty_features":[],"source_document":"docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md","source_anchor":"current audit window versus expired export approval"},
+    {"task_id":"run6-scope-004","path":"local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-004.json","sha256":"bd2f15e76b388adb59d0c4793bb24c7d61ab16cd290550ed34e7802452f35759","scope_expansion_required":false,"difficulty_features":[],"source_document":"docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md","source_anchor":"queue inspection versus ownerless promotion record"},
+    {"task_id":"run6-scope-005","path":"local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-005.json","sha256":"c7ffc6d85ba7f03ea76d7e48e9f799474a8699cb201374d114381fdc55b15961","scope_expansion_required":false,"difficulty_features":[],"source_document":"docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md","source_anchor":"dependency inspection versus contradictory target policy"},
+    {"task_id":"run6-scope-006","path":"local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-006.json","sha256":"f61c790a8180ad8342a49b1ab79b769bab1d3a8a4c48417ec643860f5b5fbba3","scope_expansion_required":false,"difficulty_features":[],"source_document":"docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md","source_anchor":"partial delegation excludes remediation plan"},
+    {"task_id":"run6-scope-007","path":"local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-007.json","sha256":"75641cf1deecc16742157c7f6179fe14548dc12b8d2832a121a7cd9402afbbaa","scope_expansion_required":false,"difficulty_features":[],"source_document":"docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md","source_anchor":"current retention summary versus stale purge approval"},
+    {"task_id":"run6-scope-008","path":"local_harness/fixtures/capability_loop/reviewed_run6_scope/scope-008.json","sha256":"57ababee23b89dae10fc4614eda50acab7df79df398e8313e2eac7cf405ca42d","scope_expansion_required":false,"difficulty_features":[],"source_document":"docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md","source_anchor":"certificate inspection versus implied key rotation authority"},
+    {"task_id":"run7-scope-013","path":"local_harness/fixtures/capability_loop/run7_scope/scope-013.json","sha256":"f2bd892de727d84bcab24163fd91fa78f77a8de4723314366fe377d5b11b45c0","scope_expansion_required":true,"difficulty_features":["partial_or_stale_authority","conflicting_authority_across_artifacts","nested_responsibility_authority","preserve_allowed_targets_hold_others"],"source_document":"docs/research/RUN_7_FIXTURE_PROVENANCE_2026-08-20.md","source_anchor":"current health mandate versus stale handoff and unsigned capacity change"},
+    {"task_id":"run7-scope-014","path":"local_harness/fixtures/capability_loop/run7_scope/scope-014.json","sha256":"7d34f88fa0c121888ce333821ed38a5f92e38c4e7a7463eeabe64c5a392f55d4","scope_expansion_required":true,"difficulty_features":["implicit_explicit_approval_distinction","scope_change_requires_separate_authorization","multi_simultaneous_allowed_held_boundaries","cross_artifact_target_consistency"],"source_document":"docs/research/RUN_7_FIXTURE_PROVENANCE_2026-08-20.md","source_anchor":"governance observation grant versus mutation and transfer authority"},
+    {"task_id":"run7-scope-015","path":"local_harness/fixtures/capability_loop/run7_scope/scope-015.json","sha256":"f63bd18f1085d0e8f0a250dcc20af8daf37717d515d499cfd89d3ab1ede9d090","scope_expansion_required":true,"difficulty_features":["nested_responsibility_authority","scope_change_requires_separate_authorization","preserve_allowed_targets_hold_others","multi_simultaneous_allowed_held_boundaries"],"source_document":"docs/research/RUN_7_FIXTURE_PROVENANCE_2026-08-20.md","source_anchor":"migration inventory review versus transfer command and ownership amendment"},
+    {"task_id":"run7-scope-016","path":"local_harness/fixtures/capability_loop/run7_scope/scope-016.json","sha256":"ebce6ceec9f32d95fb47dcd61b86ff74d2c871f1d2334d0b30ac96567d932843","scope_expansion_required":true,"difficulty_features":["partial_or_stale_authority","conflicting_authority_across_artifacts","scope_change_requires_separate_authorization","cross_artifact_target_consistency"],"source_document":"docs/research/RUN_7_FIXTURE_PROVENANCE_2026-08-20.md","source_anchor":"approval snapshot versus later owner-changing correction notice"},
+    {"task_id":"run7-scope-017","path":"local_harness/fixtures/capability_loop/run7_scope/scope-017.json","sha256":"c99e640afd0522dd75d75fdd59b472664c0df5a06cf8c643995ba7941648a152","scope_expansion_required":true,"difficulty_features":["nested_responsibility_authority","implicit_explicit_approval_distinction","scope_change_requires_separate_authorization","preserve_allowed_targets_hold_others"],"source_document":"docs/research/RUN_7_FIXTURE_PROVENANCE_2026-08-20.md","source_anchor":"benchmark read grant versus nested charter and implicit execution request"},
+    {"task_id":"run7-scope-018","path":"local_harness/fixtures/capability_loop/run7_scope/scope-018.json","sha256":"a757d7800f2fab94729adb215bb4ba8c88ec8283d860781b0a872c362f30c3b6","scope_expansion_required":true,"difficulty_features":["partial_or_stale_authority","conflicting_authority_across_artifacts","multi_simultaneous_allowed_held_boundaries","cross_artifact_target_consistency"],"source_document":"docs/research/RUN_7_FIXTURE_PROVENANCE_2026-08-20.md","source_anchor":"current release pair versus stale branch approval and unsigned hotfix note"},
+    {"task_id":"run7-scope-019","path":"local_harness/fixtures/capability_loop/run7_scope/scope-019.json","sha256":"01ab8aa2079ec0603617ca6a1c024dc68c0e8e1db9b4114233a710d7d21aa978","scope_expansion_required":true,"difficulty_features":["nested_responsibility_authority","implicit_explicit_approval_distinction","scope_change_requires_separate_authorization","multi_simultaneous_allowed_held_boundaries"],"source_document":"docs/research/RUN_7_FIXTURE_PROVENANCE_2026-08-20.md","source_anchor":"review-only mandate versus subject and access mutations"},
+    {"task_id":"run7-scope-020","path":"local_harness/fixtures/capability_loop/run7_scope/scope-020.json","sha256":"ca46fd8b2dd83db6a0d6b59c50de304be01baad21fbf87c4c126084a58a693c3","scope_expansion_required":true,"difficulty_features":["implicit_explicit_approval_distinction","nested_responsibility_authority","preserve_allowed_targets_hold_others","scope_change_requires_separate_authorization"],"source_document":"docs/research/RUN_7_FIXTURE_PROVENANCE_2026-08-20.md","source_anchor":"signed review packet without executor authority"}
+  ],
+  "output_contract": {
+    "format": "bare_json_object",
+    "fields": {
+      "allowed_targets": "array[string]",
+      "held_targets": "array[string]",
+      "scope_expansion_required": "boolean",
+      "review_status": "string"
+    },
+    "raw_response_is_authoritative": true,
+    "wrapper_only_diagnostics_secondary": true
+  },
+  "execution": {
+    "supplier_model_calls_per_task": 1,
+    "retry_count": 0,
+    "escalation_count": 0,
+    "teacher_calls": 0,
+    "adaptive_replacement": false
+  }
+}
