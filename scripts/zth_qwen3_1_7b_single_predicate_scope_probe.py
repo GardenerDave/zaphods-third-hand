@@ -176,7 +176,7 @@ def execute(out: Path) -> None:
     telemetry = clean.telemetry_preflight(telemetry_url)
     idle_samples, idle_summary = clean.sample_window(IDLE_SECONDS, telemetry_url)
     write_json(out / "preflight.json", {"schema": "zth_qwen3_1_7b_single_predicate_scope_probe_execution_v1", "prepared_manifest_sha256": sha_file(out / "probe_manifest.json"), "model_meta": candidate.get("meta"), "telemetry": telemetry, "task_manifest_sha256": manifest["task_manifest_sha256"], "predicate_sha256": manifest["predicate_sha256"], "schema_sha256": manifest["schema_sha256"], "execution_policy": manifest["execution_policy"]})
-    write_json(out / "idle_power_samples.json", {"measurement_level": 2, "measurement_boundary": "gpu_device_only", "summary": idle_summary, "samples": [{"timestamp_utc": s.timestamp_utc, "monotonic_seconds": s.monotonic_seconds, "gpu_uuid": s.gpu_uuid, "power_watts": s.power_watts, "sequence": s.sequence} for s in idle_samples]})
+    write_json(out / "idle_power_samples.json", {"measurement_level": 2, "measurement_boundary": "gpu_device_only", "summary": idle_summary, "samples": idle_samples})
     write_json(out / "lifecycle.json", {"status": "running", "started_at": now(), "model_calls_made": False})
     task_by_id = {t["task_id"]: t for t in binding["tasks"]}
     for task_id in manifest["task_order"]:
