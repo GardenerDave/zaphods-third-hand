@@ -1,0 +1,40 @@
+{
+  "schema": "zth_clean_scope_matched_interpretation_erratum_v1",
+  "authority": "additive_interpretation_only",
+  "raw_evidence_changed": false,
+  "model_calls_made": 0,
+  "original_metrics": {
+    "596m": {
+      "true_branch": "8/8",
+      "false_branch": "0/8",
+      "overall": "8/16"
+    },
+    "752m": {
+      "true_branch": "8/8",
+      "false_branch": "1/8",
+      "overall": "9/16",
+      "supplier_only_correction": "clean-scope-007",
+      "remaining_false_branch_failures": 7
+    }
+  },
+  "corrected_interpretation": {
+    "scope_characterization": "SCOPE_RULE_PARTIAL",
+    "matched_comparison": "PARTIAL_SCOPE_GAIN",
+    "practical_scope_bracket": "PARTIAL",
+    "next_decision": "RUN_CLEAN_SCOPE_PROBE_AT_1_7B"
+  },
+  "rationale": [
+    "752M shows directional improvement over 596M.",
+    "752M retains 8/8 true-branch performance.",
+    "752M corrects one previously missed false case.",
+    "Seven of eight false-branch tasks remain incorrect.",
+    "One recovered observation is insufficient to establish a stable practical supplier bracket.",
+    "The architecture and training-generation confound remains explicit."
+  ],
+  "bindings": {
+    "596m_aggregate_sha256": "4525802f61b87da8e069a8f128df3412873b5d41acd6f36be649a83dabaf5f74",
+    "752m_aggregate_sha256": "6b5c1d5689853194d01881c1ec1757346ebe0f75d74a9113b39f281dd9fc9012",
+    "task_manifest_sha256": "f9c91ddb2a886690251a4e8aea5d4c9e41d59c63249e69c720f7c8f29dee382d",
+    "original_comparison_path": "docs/research/MODEL_SIZE_SUPPLIER_FLOOR_CLEAN_SCOPE_596M_VS_752M_2026-08-21.md"
+  }
+}
