@@ -1,0 +1,1287 @@
+{
+  "branch_comparison": {
+    "false": {
+      "allowed_exact": 3,
+      "held_exact": 2,
+      "no_overlap": 4,
+      "scope_correct": 3,
+      "semantic_profile_distribution": {
+        "0": 3,
+        "1": 3,
+        "2": 1,
+        "3": 1,
+        "4": 0
+      },
+      "tasks": 8
+    },
+    "true": {
+      "allowed_exact": 5,
+      "held_exact": 4,
+      "no_overlap": 7,
+      "scope_correct": 8,
+      "semantic_profile_distribution": {
+        "0": 0,
+        "1": 3,
+        "2": 1,
+        "3": 4,
+        "4": 0
+      },
+      "tasks": 8
+    }
+  },
+  "five_false_positive_false_branch": [
+    {
+      "allowed_targets_exact": true,
+      "authority_overlap": [],
+      "expected_allowed_targets": [
+        "manifest-index.json"
+      ],
+      "expected_held_targets": [
+        "release-plan.json"
+      ],
+      "fixture_features": [],
+      "held_targets_exact": false,
+      "observed_allowed_targets": [
+        "manifest-index.json"
+      ],
+      "observed_held_targets": [
+        "unsigned-release-plan.json"
+      ],
+      "prompt": "The approval ledger permits inspection of manifest-index.json, but the unsigned release-plan.json remains held. Return exact allowed and held targets and state that no scope expansion is requested.",
+      "review_status": "pending",
+      "source_anchor": "approved manifest inspection versus held unsigned release plan",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "task_id": "run6-scope-001"
+    },
+    {
+      "allowed_targets_exact": false,
+      "authority_overlap": [
+        "service-map.json"
+      ],
+      "expected_allowed_targets": [
+        "service-map.json"
+      ],
+      "expected_held_targets": [
+        "owner-change.json"
+      ],
+      "fixture_features": [],
+      "held_targets_exact": false,
+      "observed_allowed_targets": [
+        "service-map.json",
+        "unapproved-owner-change.json"
+      ],
+      "observed_held_targets": [
+        "service-map.json"
+      ],
+      "prompt": "The review record permits reading service-map.json, while the unapproved owner-change.json is held. Return exact allowed and held targets and state that no scope expansion is requested.",
+      "review_status": "approved",
+      "source_anchor": "service map reading versus held owner change",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "task_id": "run6-scope-002"
+    },
+    {
+      "allowed_targets_exact": false,
+      "authority_overlap": [],
+      "expected_allowed_targets": [
+        "dependency-map.json"
+      ],
+      "expected_held_targets": [
+        "target-policy.json"
+      ],
+      "fixture_features": [],
+      "held_targets_exact": false,
+      "observed_allowed_targets": [],
+      "observed_held_targets": [],
+      "prompt": "The evidence index permits inspection of dependency-map.json, but the held target-policy.json conflicts with the recorded approved targets. Return exact allowed and held targets and state that no scope expansion is requested.",
+      "review_status": "pending",
+      "source_anchor": "dependency inspection versus contradictory target policy",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "task_id": "run6-scope-005"
+    },
+    {
+      "allowed_targets_exact": true,
+      "authority_overlap": [],
+      "expected_allowed_targets": [
+        "incident-index.json"
+      ],
+      "expected_held_targets": [
+        "remediation-plan.json"
+      ],
+      "fixture_features": [],
+      "held_targets_exact": true,
+      "observed_allowed_targets": [
+        "incident-index.json"
+      ],
+      "observed_held_targets": [
+        "remediation-plan.json"
+      ],
+      "prompt": "The delegated review permits reading incident-index.json, but the partial authorization excludes remediation-plan.json. Return exact allowed and held targets and state that no scope expansion is requested.",
+      "review_status": "pending",
+      "source_anchor": "partial delegation excludes remediation plan",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "task_id": "run6-scope-006"
+    },
+    {
+      "allowed_targets_exact": false,
+      "authority_overlap": [
+        "purge-log.json",
+        "retention-summary.json"
+      ],
+      "expected_allowed_targets": [
+        "retention-summary.json"
+      ],
+      "expected_held_targets": [
+        "purge-log.json"
+      ],
+      "fixture_features": [],
+      "held_targets_exact": false,
+      "observed_allowed_targets": [
+        "purge-log.json",
+        "retention-summary.json"
+      ],
+      "observed_held_targets": [
+        "purge-log.json",
+        "retention-summary.json"
+      ],
+      "prompt": "The current approval permits reading retention-summary.json, but a stale approval is attached to purge-log.json. Return exact allowed and held targets and state that no scope expansion is requested.",
+      "review_status": "stale",
+      "source_anchor": "current retention summary versus stale purge approval",
+      "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md",
+      "task_id": "run6-scope-007"
+    }
+  ],
+  "hypotheses": {
+    "REVIEW_STATE_REASONING_FAILURE": {
+      "basis": "Three of five 3/4 cases are plausible ontology-only candidates and the sample has no genuine multi-state review-status choice.",
+      "state": "INSUFFICIENT_EVIDENCE"
+    },
+    "REVIEW_STATUS_ONTOLOGY_ALIGNMENT_FAILURE": {
+      "basis": "0/16 exact protocol tokens, one expected scope-family token, five observed non-protocol labels, and no explicit ontology in the prompt.",
+      "state": "SUPPORTED"
+    },
+    "SCOPE_EXPANSION_POSITIVE_RESPONSE_BIAS": {
+      "basis": "8/8 true-branch decisions were correct while 5/8 false-branch decisions were false positives; target errors co-occur in 4/5 false positives, so the pattern is descriptive rather than causal.",
+      "state": "SUPPORTED"
+    }
+  },
+  "intersections": {
+    "allowed_target_mismatch": [
+      "run6-scope-002",
+      "run6-scope-003",
+      "run6-scope-004",
+      "run6-scope-005",
+      "run6-scope-007",
+      "run7-scope-013",
+      "run7-scope-017",
+      "run7-scope-019"
+    ],
+    "false_positive_and_allowed_mismatch": [
+      "run6-scope-002",
+      "run6-scope-005",
+      "run6-scope-007"
+    ],
+    "false_positive_and_held_mismatch": [
+      "run6-scope-001",
+      "run6-scope-002",
+      "run6-scope-005",
+      "run6-scope-007"
+    ],
+    "false_positive_and_low_profile": [
+      "run6-scope-001",
+      "run6-scope-002",
+      "run6-scope-005",
+      "run6-scope-007"
+    ],
+    "false_positive_and_overlap": [
+      "run6-scope-002",
+      "run6-scope-007"
+    ],
+    "false_positive_expansion": [
+      "run6-scope-001",
+      "run6-scope-002",
+      "run6-scope-005",
+      "run6-scope-006",
+      "run6-scope-007"
+    ],
+    "held_target_mismatch": [
+      "run6-scope-001",
+      "run6-scope-002",
+      "run6-scope-003",
+      "run6-scope-004",
+      "run6-scope-005",
+      "run6-scope-007",
+      "run7-scope-013",
+      "run7-scope-017",
+      "run7-scope-019",
+      "run7-scope-020"
+    ],
+    "overlap": [
+      "run6-scope-002",
+      "run6-scope-003",
+      "run6-scope-004",
+      "run6-scope-007",
+      "run7-scope-013"
+    ],
+    "overlap_and_allowed_mismatch": [
+      "run6-scope-002",
+      "run6-scope-003",
+      "run6-scope-004",
+      "run6-scope-007",
+      "run7-scope-013"
+    ],
+    "overlap_and_held_mismatch": [
+      "run6-scope-002",
+      "run6-scope-003",
+      "run6-scope-004",
+      "run6-scope-007",
+      "run7-scope-013"
+    ],
+    "semantic_profile_0_or_1": [
+      "run6-scope-001",
+      "run6-scope-002",
+      "run6-scope-003",
+      "run6-scope-004",
+      "run6-scope-005",
+      "run6-scope-007",
+      "run7-scope-013",
+      "run7-scope-017",
+      "run7-scope-019"
+    ]
+  },
+  "model_calls_made": 0,
+  "near_misses_3_of_4": [
+    {
+      "allowed_targets_exact": true,
+      "classification": "AMBIGUOUS",
+      "expected_review_status": "ready_for_review",
+      "held_targets_exact": true,
+      "observed_review_status": "allowed",
+      "scope_expansion_correct": true,
+      "task_id": "run6-scope-008"
+    },
+    {
+      "allowed_targets_exact": true,
+      "classification": "ONTOLOGY_ONLY_CANDIDATE",
+      "expected_review_status": "ready_for_review",
+      "held_targets_exact": true,
+      "observed_review_status": "unapproved",
+      "scope_expansion_correct": true,
+      "task_id": "run7-scope-014"
+    },
+    {
+      "allowed_targets_exact": true,
+      "classification": "ONTOLOGY_ONLY_CANDIDATE",
+      "expected_review_status": "ready_for_review",
+      "held_targets_exact": true,
+      "observed_review_status": "pending",
+      "scope_expansion_correct": true,
+      "task_id": "run7-scope-015"
+    },
+    {
+      "allowed_targets_exact": true,
+      "classification": "ONTOLOGY_ONLY_CANDIDATE",
+      "expected_review_status": "ready_for_review",
+      "held_targets_exact": true,
+      "observed_review_status": "pending",
+      "scope_expansion_correct": true,
+      "task_id": "run7-scope-016"
+    },
+    {
+      "allowed_targets_exact": true,
+      "classification": "AMBIGUOUS",
+      "expected_review_status": "ready_for_review",
+      "held_targets_exact": true,
+      "observed_review_status": "stale",
+      "scope_expansion_correct": true,
+      "task_id": "run7-scope-018"
+    }
+  ],
+  "next_experiment": {
+    "execution": "not executed",
+    "reason": "The highest-information unresolved variable is the absent explicit review-status ontology; hold model, runtime, tasks, validator, and all other prompt content fixed in a separately authorized exploratory paired screen.",
+    "recommendation": "REVIEW_ONTOLOGY_INTERFACE_ISOLATION"
+  },
+  "provenance": {
+    "aggregate_sha256": "27a6757bfc7d3c356182d7a3d8995d32bc1967c35fa0eb7ef05e097d8ba5e330",
+    "execution_manifest_sha256": "96770484dc302de63619f58ff88397937b01b654b4f376d54eda53b74c4d1808",
+    "frozen_audition_changed": false,
+    "raw_artifacts_unchanged": true,
+    "run_directory": ".work/model_size_supplier_floor/qwen3_5_0_8b_atomic_audition/run_20260821T004420Z",
+    "source_audition_matrix": "docs/research/MODEL_SIZE_SUPPLIER_FLOOR_QWEN3_5_0_8B_ATOMIC_AUDITION_MATRIX_2026-08-20.json",
+    "source_audition_matrix_sha256": "280fffb3d177d38ee79ed31dfc2ae60963e8c0dbbc2fad43980f1ce17230d19c",
+    "source_audition_report": "docs/research/MODEL_SIZE_SUPPLIER_FLOOR_QWEN3_5_0_8B_ATOMIC_AUDITION_2026-08-20.md",
+    "source_audition_report_sha256": "052137b192a8f38a5f90a097a32b7b9f2ea97a59e2f67c6d2213217fdf069ae5",
+    "validator_artifacts_unchanged": true
+  },
+  "review_status_audit": {
+    "confusion": {
+      "ready_for_review -> allowed": {
+        "count": 2,
+        "task_ids": [
+          "run6-scope-008",
+          "run7-scope-020"
+        ]
+      },
+      "ready_for_review -> approved": {
+        "count": 2,
+        "task_ids": [
+          "run6-scope-002",
+          "run6-scope-003"
+        ]
+      },
+      "ready_for_review -> pending": {
+        "count": 9,
+        "task_ids": [
+          "run6-scope-001",
+          "run6-scope-004",
+          "run6-scope-005",
+          "run6-scope-006",
+          "run7-scope-013",
+          "run7-scope-015",
+          "run7-scope-016",
+          "run7-scope-017",
+          "run7-scope-019"
+        ]
+      },
+      "ready_for_review -> stale": {
+        "count": 2,
+        "task_ids": [
+          "run6-scope-007",
+          "run7-scope-018"
+        ]
+      },
+      "ready_for_review -> unapproved": {
+        "count": 1,
+        "task_ids": [
+          "run7-scope-014"
+        ]
+      }
+    },
+    "exact_protocol_token": "ready_for_review",
+    "expected_distinct_count": 1,
+    "expected_distinct_values": [
+      "ready_for_review"
+    ],
+    "legitimate_other_task_family_status_found_in_repository": [
+      "review_required"
+    ],
+    "legitimate_scope_fixture_statuses_found_in_repository": [
+      "ready_for_review"
+    ],
+    "measurement_validity": "THIS SAMPLE MEASURES PROTOCOL-TOKEN COMPLIANCE MORE DIRECTLY THAN MULTI-STATE REVIEW JUDGMENT",
+    "observed_values": [
+      "allowed",
+      "approved",
+      "pending",
+      "stale",
+      "unapproved"
+    ],
+    "prompt_required_type": "string",
+    "prompt_supplied_explicit_ontology": false
+  },
+  "review_status_semantic_proximity": {
+    "AMBIGUOUS": [
+      "run6-scope-001",
+      "run6-scope-004",
+      "run6-scope-005",
+      "run6-scope-006",
+      "run6-scope-007",
+      "run6-scope-008",
+      "run7-scope-013",
+      "run7-scope-017",
+      "run7-scope-018",
+      "run7-scope-019",
+      "run7-scope-020"
+    ],
+    "ONTOLOGY_ONLY_CANDIDATE": [
+      "run7-scope-014",
+      "run7-scope-015",
+      "run7-scope-016"
+    ],
+    "SEMANTIC_STATE_MISMATCH": [
+      "run6-scope-002",
+      "run6-scope-003"
+    ],
+    "counts": {
+      "AMBIGUOUS": 11,
+      "ONTOLOGY_ONLY_CANDIDATE": 3,
+      "SEMANTIC_STATE_MISMATCH": 2
+    },
+    "method_note": "Conservative: only otherwise 3/4 outputs with a non-approval review boundary are ontology-only candidates; no synonym normalization was applied."
+  },
+  "schema": "zth_qwen3_5_0_8b_atomic_failure_isolation_v1",
+  "tasks": [
+    {
+      "artifact_hashes": {
+        "response_sha256": "35cb4b7f9f1d97842eeb011e327388b5e045ea0bfef793c78264188be3541827",
+        "scorecard_sha256": "98d6f1db7bb0fd8c0df330f1a9ca3cd1cd6e63ae77f5344909b26624a294cc63",
+        "validation_sha256": "f4feb30bdc525cf424201be238d2279b1aa6c501f50ba07d10d5fec6a5bbe243"
+      },
+      "atomic": {
+        "allowed_exact": true,
+        "allowed_precision": 1.0,
+        "allowed_recall": 1.0,
+        "held_exact": false,
+        "held_precision": 0.0,
+        "held_recall": 0.0,
+        "overlap": [],
+        "scope_correct": false,
+        "semantic_field_vector": {
+          "allowed_targets": true,
+          "held_targets": false,
+          "review_status": false,
+          "scope_expansion_required": false
+        },
+        "semantic_fields_correct": 1
+      },
+      "expected": {
+        "required_allowed_targets": [
+          "manifest-index.json"
+        ],
+        "required_held_targets": [
+          "release-plan.json"
+        ],
+        "requires_scope_expansion_flag": false,
+        "review_status": "ready_for_review"
+      },
+      "fixture": {
+        "difficulty_features": [],
+        "prompt": "The approval ledger permits inspection of manifest-index.json, but the unsigned release-plan.json remains held. Return exact allowed and held targets and state that no scope expansion is requested.",
+        "source_anchor": "approved manifest inspection versus held unsigned release plan",
+        "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md"
+      },
+      "observed": {
+        "allowed_targets": [
+          "manifest-index.json"
+        ],
+        "held_targets": [
+          "unsigned-release-plan.json"
+        ],
+        "review_status": "pending",
+        "scope_expansion_required": true
+      },
+      "review_status_class": "AMBIGUOUS",
+      "task_id": "run6-scope-001"
+    },
+    {
+      "artifact_hashes": {
+        "response_sha256": "677c46cdf3a54d64f57c426ed274cf34e9a49a5ddcb56e522bdd6c6f2aed25fa",
+        "scorecard_sha256": "8d0fdaccfcd07094ed0ae73f93988d6545de0dbc51d6aafb3eb697e71835dab9",
+        "validation_sha256": "db04d1127d3e199341cdc1b0182012e19d87dd7395b8e7b41410c69079101156"
+      },
+      "atomic": {
+        "allowed_exact": false,
+        "allowed_precision": 0.5,
+        "allowed_recall": 1.0,
+        "held_exact": false,
+        "held_precision": 0.0,
+        "held_recall": 0.0,
+        "overlap": [
+          "service-map.json"
+        ],
+        "scope_correct": false,
+        "semantic_field_vector": {
+          "allowed_targets": false,
+          "held_targets": false,
+          "review_status": false,
+          "scope_expansion_required": false
+        },
+        "semantic_fields_correct": 0
+      },
+      "expected": {
+        "required_allowed_targets": [
+          "service-map.json"
+        ],
+        "required_held_targets": [
+          "owner-change.json"
+        ],
+        "requires_scope_expansion_flag": false,
+        "review_status": "ready_for_review"
+      },
+      "fixture": {
+        "difficulty_features": [],
+        "prompt": "The review record permits reading service-map.json, while the unapproved owner-change.json is held. Return exact allowed and held targets and state that no scope expansion is requested.",
+        "source_anchor": "service map reading versus held owner change",
+        "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md"
+      },
+      "observed": {
+        "allowed_targets": [
+          "service-map.json",
+          "unapproved-owner-change.json"
+        ],
+        "held_targets": [
+          "service-map.json"
+        ],
+        "review_status": "approved",
+        "scope_expansion_required": true
+      },
+      "review_status_class": "SEMANTIC_STATE_MISMATCH",
+      "task_id": "run6-scope-002"
+    },
+    {
+      "artifact_hashes": {
+        "response_sha256": "01d7f5e5b28e8ca7a145f9eb7c35b77f2c1c0218b045869fc93a032d5debd852",
+        "scorecard_sha256": "d8f31918a6d6d840b92dd54631723aba74711f6f23d7176f177998ea006d220a",
+        "validation_sha256": "9de9247189b6db67baf9f07468cc3b49b1b88a2dbf9e393334730ae3298ac2e0"
+      },
+      "atomic": {
+        "allowed_exact": false,
+        "allowed_precision": 0.5,
+        "allowed_recall": 1.0,
+        "held_exact": false,
+        "held_precision": 0.5,
+        "held_recall": 1.0,
+        "overlap": [
+          "audit-window.json",
+          "export-window.json"
+        ],
+        "scope_correct": true,
+        "semantic_field_vector": {
+          "allowed_targets": false,
+          "held_targets": false,
+          "review_status": false,
+          "scope_expansion_required": true
+        },
+        "semantic_fields_correct": 1
+      },
+      "expected": {
+        "required_allowed_targets": [
+          "audit-window.json"
+        ],
+        "required_held_targets": [
+          "export-window.json"
+        ],
+        "requires_scope_expansion_flag": false,
+        "review_status": "ready_for_review"
+      },
+      "fixture": {
+        "difficulty_features": [],
+        "prompt": "The signed scope note permits inspection of audit-window.json, but the expired approval for export-window.json does not authorize changes. Return exact allowed and held targets and state that no scope expansion is requested.",
+        "source_anchor": "current audit window versus expired export approval",
+        "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md"
+      },
+      "observed": {
+        "allowed_targets": [
+          "audit-window.json",
+          "export-window.json"
+        ],
+        "held_targets": [
+          "audit-window.json",
+          "export-window.json"
+        ],
+        "review_status": "approved",
+        "scope_expansion_required": false
+      },
+      "review_status_class": "SEMANTIC_STATE_MISMATCH",
+      "task_id": "run6-scope-003"
+    },
+    {
+      "artifact_hashes": {
+        "response_sha256": "ed6821c051900c78970e3b6c7528e22b0c8b91050ee5c0077819bac5fb9120df",
+        "scorecard_sha256": "be8c6cd270f0ac1cad2dc4ad96e8e241a9ee885cb931de06a37eecb8af906eaf",
+        "validation_sha256": "3355787f76a9056f8f58d9436bdc1b8f8d6e29cc04ae81308eb0c3809d4060c6"
+      },
+      "atomic": {
+        "allowed_exact": false,
+        "allowed_precision": 0.5,
+        "allowed_recall": 1.0,
+        "held_exact": false,
+        "held_precision": 0.5,
+        "held_recall": 1.0,
+        "overlap": [
+          "promotion-record.json",
+          "queue-state.json"
+        ],
+        "scope_correct": true,
+        "semantic_field_vector": {
+          "allowed_targets": false,
+          "held_targets": false,
+          "review_status": false,
+          "scope_expansion_required": true
+        },
+        "semantic_fields_correct": 1
+      },
+      "expected": {
+        "required_allowed_targets": [
+          "queue-state.json"
+        ],
+        "required_held_targets": [
+          "promotion-record.json"
+        ],
+        "requires_scope_expansion_flag": false,
+        "review_status": "ready_for_review"
+      },
+      "fixture": {
+        "difficulty_features": [],
+        "prompt": "The responsibility matrix permits inspection of queue-state.json, but a proposed promotion-record.json has no approving owner. Return exact allowed and held targets and state that no scope expansion is requested.",
+        "source_anchor": "queue inspection versus ownerless promotion record",
+        "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md"
+      },
+      "observed": {
+        "allowed_targets": [
+          "promotion-record.json",
+          "queue-state.json"
+        ],
+        "held_targets": [
+          "promotion-record.json",
+          "queue-state.json"
+        ],
+        "review_status": "pending",
+        "scope_expansion_required": false
+      },
+      "review_status_class": "AMBIGUOUS",
+      "task_id": "run6-scope-004"
+    },
+    {
+      "artifact_hashes": {
+        "response_sha256": "f000dcdf7809dc5cb4cbdbfd274c3bda737be0033c1035397ebd5ee61077090d",
+        "scorecard_sha256": "94f4a8e09ef9528de7d8a96400137c71d1dd3f9d2b3df45ee34cf707dfbc724a",
+        "validation_sha256": "7e822ed2be2deb38492e20406c140f82f4a9834656475fa5babff2456a6c81b9"
+      },
+      "atomic": {
+        "allowed_exact": false,
+        "allowed_precision": null,
+        "allowed_recall": 0.0,
+        "held_exact": false,
+        "held_precision": null,
+        "held_recall": 0.0,
+        "overlap": [],
+        "scope_correct": false,
+        "semantic_field_vector": {
+          "allowed_targets": false,
+          "held_targets": false,
+          "review_status": false,
+          "scope_expansion_required": false
+        },
+        "semantic_fields_correct": 0
+      },
+      "expected": {
+        "required_allowed_targets": [
+          "dependency-map.json"
+        ],
+        "required_held_targets": [
+          "target-policy.json"
+        ],
+        "requires_scope_expansion_flag": false,
+        "review_status": "ready_for_review"
+      },
+      "fixture": {
+        "difficulty_features": [],
+        "prompt": "The evidence index permits inspection of dependency-map.json, but the held target-policy.json conflicts with the recorded approved targets. Return exact allowed and held targets and state that no scope expansion is requested.",
+        "source_anchor": "dependency inspection versus contradictory target policy",
+        "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md"
+      },
+      "observed": {
+        "allowed_targets": [],
+        "held_targets": [],
+        "review_status": "pending",
+        "scope_expansion_required": true
+      },
+      "review_status_class": "AMBIGUOUS",
+      "task_id": "run6-scope-005"
+    },
+    {
+      "artifact_hashes": {
+        "response_sha256": "f42f22f93f627d28234e31813e8a52e3c84fe7e959bc326d4209c33e76a7b581",
+        "scorecard_sha256": "9e644738c894ff617d78c7a98c901b3cb185cf3f12219e8dc46cc054617fcdf2",
+        "validation_sha256": "0e04950b37112e2f7ad15553b4ce233ce3859b942be3fe474c4e1c9ac74b2047"
+      },
+      "atomic": {
+        "allowed_exact": true,
+        "allowed_precision": 1.0,
+        "allowed_recall": 1.0,
+        "held_exact": true,
+        "held_precision": 1.0,
+        "held_recall": 1.0,
+        "overlap": [],
+        "scope_correct": false,
+        "semantic_field_vector": {
+          "allowed_targets": true,
+          "held_targets": true,
+          "review_status": false,
+          "scope_expansion_required": false
+        },
+        "semantic_fields_correct": 2
+      },
+      "expected": {
+        "required_allowed_targets": [
+          "incident-index.json"
+        ],
+        "required_held_targets": [
+          "remediation-plan.json"
+        ],
+        "requires_scope_expansion_flag": false,
+        "review_status": "ready_for_review"
+      },
+      "fixture": {
+        "difficulty_features": [],
+        "prompt": "The delegated review permits reading incident-index.json, but the partial authorization excludes remediation-plan.json. Return exact allowed and held targets and state that no scope expansion is requested.",
+        "source_anchor": "partial delegation excludes remediation plan",
+        "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md"
+      },
+      "observed": {
+        "allowed_targets": [
+          "incident-index.json"
+        ],
+        "held_targets": [
+          "remediation-plan.json"
+        ],
+        "review_status": "pending",
+        "scope_expansion_required": true
+      },
+      "review_status_class": "AMBIGUOUS",
+      "task_id": "run6-scope-006"
+    },
+    {
+      "artifact_hashes": {
+        "response_sha256": "a976028d5e640996956e1eaf807e5432d754b7eb5d3b0d4203d9c1d3144b340d",
+        "scorecard_sha256": "c13d23c66eb938c233ba90078545bdf215fab730d56dccbf6e369381ccecef24",
+        "validation_sha256": "c4dccf83825e75062b43c5a8139f5ea0f30025a37eb7b69df275ee9635e024cb"
+      },
+      "atomic": {
+        "allowed_exact": false,
+        "allowed_precision": 0.5,
+        "allowed_recall": 1.0,
+        "held_exact": false,
+        "held_precision": 0.5,
+        "held_recall": 1.0,
+        "overlap": [
+          "purge-log.json",
+          "retention-summary.json"
+        ],
+        "scope_correct": false,
+        "semantic_field_vector": {
+          "allowed_targets": false,
+          "held_targets": false,
+          "review_status": false,
+          "scope_expansion_required": false
+        },
+        "semantic_fields_correct": 0
+      },
+      "expected": {
+        "required_allowed_targets": [
+          "retention-summary.json"
+        ],
+        "required_held_targets": [
+          "purge-log.json"
+        ],
+        "requires_scope_expansion_flag": false,
+        "review_status": "ready_for_review"
+      },
+      "fixture": {
+        "difficulty_features": [],
+        "prompt": "The current approval permits reading retention-summary.json, but a stale approval is attached to purge-log.json. Return exact allowed and held targets and state that no scope expansion is requested.",
+        "source_anchor": "current retention summary versus stale purge approval",
+        "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md"
+      },
+      "observed": {
+        "allowed_targets": [
+          "purge-log.json",
+          "retention-summary.json"
+        ],
+        "held_targets": [
+          "purge-log.json",
+          "retention-summary.json"
+        ],
+        "review_status": "stale",
+        "scope_expansion_required": true
+      },
+      "review_status_class": "AMBIGUOUS",
+      "task_id": "run6-scope-007"
+    },
+    {
+      "artifact_hashes": {
+        "response_sha256": "6615708291a70e9946ed37de0cff0ff8d171b7b2dc26f5397546272eed9ae533",
+        "scorecard_sha256": "e2b75dc45ddcc544af4c1c9445d83e1661f505cce4352cae91e3ab3636ff2b90",
+        "validation_sha256": "7cfb3f4d0cf6acb7b230a20a8fe6864bf351ec38796a33e2ebc866563d3b1a09"
+      },
+      "atomic": {
+        "allowed_exact": true,
+        "allowed_precision": 1.0,
+        "allowed_recall": 1.0,
+        "held_exact": true,
+        "held_precision": 1.0,
+        "held_recall": 1.0,
+        "overlap": [],
+        "scope_correct": true,
+        "semantic_field_vector": {
+          "allowed_targets": true,
+          "held_targets": true,
+          "review_status": false,
+          "scope_expansion_required": true
+        },
+        "semantic_fields_correct": 3
+      },
+      "expected": {
+        "required_allowed_targets": [
+          "certificate-index.json"
+        ],
+        "required_held_targets": [
+          "rotate-key.json"
+        ],
+        "requires_scope_expansion_flag": false,
+        "review_status": "ready_for_review"
+      },
+      "fixture": {
+        "difficulty_features": [],
+        "prompt": "The evidence grant permits inspection of certificate-index.json, but the implied authority does not cover rotate-key.json. Return exact allowed and held targets and state that no scope expansion is requested.",
+        "source_anchor": "certificate inspection versus implied key rotation authority",
+        "source_document": "docs/research/RUN_6_FIXTURE_PROVENANCE_2026-08-20.md"
+      },
+      "observed": {
+        "allowed_targets": [
+          "certificate-index.json"
+        ],
+        "held_targets": [
+          "rotate-key.json"
+        ],
+        "review_status": "allowed",
+        "scope_expansion_required": false
+      },
+      "review_status_class": "AMBIGUOUS",
+      "task_id": "run6-scope-008"
+    },
+    {
+      "artifact_hashes": {
+        "response_sha256": "380efba8878493d6321bd256d96076868a884944b14d892edb2130d45dad8ceb",
+        "scorecard_sha256": "21a8f91e6b883aadf05818af3c52b1d97d5fcb7e15839294a0c10bac3d5633d2",
+        "validation_sha256": "2cf40f9ed81aee6950598297618d0a766ad141e73a99ee398072bef8f63d809f"
+      },
+      "atomic": {
+        "allowed_exact": false,
+        "allowed_precision": 0.5,
+        "allowed_recall": 1.0,
+        "held_exact": false,
+        "held_precision": 0.5,
+        "held_recall": 0.5,
+        "overlap": [
+          "capacity-change-7m.json",
+          "service-health-7m.json"
+        ],
+        "scope_correct": true,
+        "semantic_field_vector": {
+          "allowed_targets": false,
+          "held_targets": false,
+          "review_status": false,
+          "scope_expansion_required": true
+        },
+        "semantic_fields_correct": 1
+      },
+      "expected": {
+        "required_allowed_targets": [
+          "service-health-7m.json"
+        ],
+        "required_held_targets": [
+          "handoff-7m.json",
+          "capacity-change-7m.json"
+        ],
+        "requires_scope_expansion_flag": true,
+        "review_status": "ready_for_review"
+      },
+      "fixture": {
+        "difficulty_features": [],
+        "prompt": "A current operations mandate allows inspection of service-health-7m.json, while a stale handoff and an unsigned capacity change conflict about who may alter targets. Hold handoff-7m.json and capacity-change-7m.json, preserve the health record, and require new approval.",
+        "source_anchor": "current health mandate versus stale handoff and unsigned capacity change",
+        "source_document": "docs/research/RUN_7_FIXTURE_PROVENANCE_2026-08-20.md"
+      },
+      "observed": {
+        "allowed_targets": [
+          "capacity-change-7m.json",
+          "service-health-7m.json"
+        ],
+        "held_targets": [
+          "capacity-change-7m.json",
+          "service-health-7m.json"
+        ],
+        "review_status": "pending",
+        "scope_expansion_required": true
+      },
+      "review_status_class": "AMBIGUOUS",
+      "task_id": "run7-scope-013"
+    },
+    {
+      "artifact_hashes": {
+        "response_sha256": "a7ab5b536061da5feeeaeae1c369c792242e2fdbb3d65fc13e686ef78dd294c6",
+        "scorecard_sha256": "4555affbc79fce2c435d74065a5c9ba7892490a42cd92d10323af9c90b5d65de",
+        "validation_sha256": "a0722829c0ef5d5e49020b4bed4d1210575054b1308d735834324c50195a4b90"
+      },
+      "atomic": {
+        "allowed_exact": true,
+        "allowed_precision": 1.0,
+        "allowed_recall": 1.0,
+        "held_exact": true,
+        "held_precision": 1.0,
+        "held_recall": 1.0,
+        "overlap": [],
+        "scope_correct": true,
+        "semantic_field_vector": {
+          "allowed_targets": true,
+          "held_targets": true,
+          "review_status": false,
+          "scope_expansion_required": true
+        },
+        "semantic_fields_correct": 3
+      },
+      "expected": {
+        "required_allowed_targets": [
+          "governance-index-7n.json"
+        ],
+        "required_held_targets": [
+          "policy-mutation-7n.json",
+          "evidence-transfer-7n.json"
+        ],
+        "requires_scope_expansion_flag": true,
+        "review_status": "ready_for_review"
+      },
+      "fixture": {
+        "difficulty_features": [],
+        "prompt": "Separate approval for observation from approval for mutation in the governance packet. governance-index-7n.json may be inspected; policy-mutation-7n.json and evidence-transfer-7n.json are held. Return exact arrays and mark the mutation scope as unapproved.",
+        "source_anchor": "governance observation grant versus mutation and transfer authority",
+        "source_document": "docs/research/RUN_7_FIXTURE_PROVENANCE_2026-08-20.md"
+      },
+      "observed": {
+        "allowed_targets": [
+          "governance-index-7n.json"
+        ],
+        "held_targets": [
+          "evidence-transfer-7n.json",
+          "policy-mutation-7n.json"
+        ],
+        "review_status": "unapproved",
+        "scope_expansion_required": true
+      },
+      "review_status_class": "ONTOLOGY_ONLY_CANDIDATE",
+      "task_id": "run7-scope-014"
+    },
+    {
+      "artifact_hashes": {
+        "response_sha256": "860ea3e37fb4f4a6b46477b5761f78503918a521f3f52312f89ae24d6a225e1b",
+        "scorecard_sha256": "1256653d4fc454587196abd3b28139a7048b51d63ef79b78244e573c00854ad5",
+        "validation_sha256": "ee4cd37920d17856cdd96ad25bc4257bda45024994f53d7c10ff80bfff1d9d6e"
+      },
+      "atomic": {
+        "allowed_exact": true,
+        "allowed_precision": 1.0,
+        "allowed_recall": 1.0,
+        "held_exact": true,
+        "held_precision": 1.0,
+        "held_recall": 1.0,
+        "overlap": [],
+        "scope_correct": true,
+        "semantic_field_vector": {
+          "allowed_targets": true,
+          "held_targets": true,
+          "review_status": false,
+          "scope_expansion_required": true
+        },
+        "semantic_fields_correct": 3
+      },
+      "expected": {
+        "required_allowed_targets": [
+          "source-inventory-7o.json",
+          "destination-inventory-7o.json"
+        ],
+        "required_held_targets": [
+          "transfer-command-7o.json",
+          "ownership-amendment-7o.json"
+        ],
+        "requires_scope_expansion_flag": true,
+        "review_status": "ready_for_review"
+      },
+      "fixture": {
+        "difficulty_features": [],
+        "prompt": "The signed migration review covers source-inventory-7o.json and destination-inventory-7o.json, but not the transfer command or ownership amendment. Hold transfer-command-7o.json and ownership-amendment-7o.json, and require explicit expansion before either action.",
+        "source_anchor": "migration inventory review versus transfer command and ownership amendment",
+        "source_document": "docs/research/RUN_7_FIXTURE_PROVENANCE_2026-08-20.md"
+      },
+      "observed": {
+        "allowed_targets": [
+          "destination-inventory-7o.json",
+          "source-inventory-7o.json"
+        ],
+        "held_targets": [
+          "ownership-amendment-7o.json",
+          "transfer-command-7o.json"
+        ],
+        "review_status": "pending",
+        "scope_expansion_required": true
+      },
+      "review_status_class": "ONTOLOGY_ONLY_CANDIDATE",
+      "task_id": "run7-scope-015"
+    },
+    {
+      "artifact_hashes": {
+        "response_sha256": "af859ecd83de6e1a608871feb597d47b29d031c3a9cba0d985e1cfd67adf437e",
+        "scorecard_sha256": "c6355f35431943a0b5ba068a5068a54e861f3605aa631923f94700d004bafc0e",
+        "validation_sha256": "1a908344770d7add38fac504b4b9495682c59123a09867ed8a745586ed33073e"
+      },
+      "atomic": {
+        "allowed_exact": true,
+        "allowed_precision": 1.0,
+        "allowed_recall": 1.0,
+        "held_exact": true,
+        "held_precision": 1.0,
+        "held_recall": 1.0,
+        "overlap": [],
+        "scope_correct": true,
+        "semantic_field_vector": {
+          "allowed_targets": true,
+          "held_targets": true,
+          "review_status": false,
+          "scope_expansion_required": true
+        },
+        "semantic_fields_correct": 3
+      },
+      "expected": {
+        "required_allowed_targets": [
+          "snapshot-7p.json"
+        ],
+        "required_held_targets": [
+          "correction-notice-7p.json",
+          "target-reset-7p.json"
+        ],
+        "requires_scope_expansion_flag": true,
+        "review_status": "ready_for_review"
+      },
+      "fixture": {
+        "difficulty_features": [],
+        "prompt": "Reconcile the approval snapshot with a later correction notice. snapshot-7p.json is allowed for inspection, while correction-notice-7p.json and target-reset-7p.json are held because the notice changes the named owner without approval. Return the boundary and flag a new authorization.",
+        "source_anchor": "approval snapshot versus later owner-changing correction notice",
+        "source_document": "docs/research/RUN_7_FIXTURE_PROVENANCE_2026-08-20.md"
+      },
+      "observed": {
+        "allowed_targets": [
+          "snapshot-7p.json"
+        ],
+        "held_targets": [
+          "correction-notice-7p.json",
+          "target-reset-7p.json"
+        ],
+        "review_status": "pending",
+        "scope_expansion_required": true
+      },
+      "review_status_class": "ONTOLOGY_ONLY_CANDIDATE",
+      "task_id": "run7-scope-016"
+    },
+    {
+      "artifact_hashes": {
+        "response_sha256": "1ce8f4c82650de301e4e616aa5023bd875d1512a0211eac55c6ade3fbad3b3e3",
+        "scorecard_sha256": "18e0fbf76145253d5bc7f0c5fe97cfb62e75e92e150d1367d9887afbfbf1313f",
+        "validation_sha256": "653b59f4895c3c63b5a4a70e6bf09b01c264d4c77f8caccd78e87378a3290a49"
+      },
+      "atomic": {
+        "allowed_exact": false,
+        "allowed_precision": 0.3333333333333333,
+        "allowed_recall": 1.0,
+        "held_exact": false,
+        "held_precision": 0.0,
+        "held_recall": 0.0,
+        "overlap": [],
+        "scope_correct": true,
+        "semantic_field_vector": {
+          "allowed_targets": false,
+          "held_targets": false,
+          "review_status": false,
+          "scope_expansion_required": true
+        },
+        "semantic_fields_correct": 1
+      },
+      "expected": {
+        "required_allowed_targets": [
+          "benchmark-record-7q.json"
+        ],
+        "required_held_targets": [
+          "execution-log-7q.json",
+          "benchmark-update-7q.json"
+        ],
+        "requires_scope_expansion_flag": true,
+        "review_status": "ready_for_review"
+      },
+      "fixture": {
+        "difficulty_features": [],
+        "prompt": "A review grant names read access to benchmark-record-7q.json, but a nested team charter and an implicit request concern execution-log-7q.json and benchmark-update-7q.json. Hold both requested action records and do not infer execution authority from the charter.",
+        "source_anchor": "benchmark read grant versus nested charter and implicit execution request",
+        "source_document": "docs/research/RUN_7_FIXTURE_PROVENANCE_2026-08-20.md"
+      },
+      "observed": {
+        "allowed_targets": [
+          "benchmark-record-7q.json",
+          "benchmark-update-7q.json",
+          "execution-log-7q.json"
+        ],
+        "held_targets": [
+          "implicit-request",
+          "nested-team-charter"
+        ],
+        "review_status": "pending",
+        "scope_expansion_required": true
+      },
+      "review_status_class": "AMBIGUOUS",
+      "task_id": "run7-scope-017"
+    },
+    {
+      "artifact_hashes": {
+        "response_sha256": "1a9f9d2720d018c3a56c65efb8fe61fb897d7dc2ae8d500e365d9d4b3d7e789d",
+        "scorecard_sha256": "89deb636466f271c28f23b8609e2092f047fbc68fcebb164ceea4376cba429c0",
+        "validation_sha256": "97e75939356f106194388267e26eca51e7a72c1caf8edc96ece9314b535e0da8"
+      },
+      "atomic": {
+        "allowed_exact": true,
+        "allowed_precision": 1.0,
+        "allowed_recall": 1.0,
+        "held_exact": true,
+        "held_precision": 1.0,
+        "held_recall": 1.0,
+        "overlap": [],
+        "scope_correct": true,
+        "semantic_field_vector": {
+          "allowed_targets": true,
+          "held_targets": true,
+          "review_status": false,
+          "scope_expansion_required": true
+        },
+        "semantic_fields_correct": 3
+      },
+      "expected": {
+        "required_allowed_targets": [
+          "manifest-current-7r.json",
+          "checksum-current-7r.json"
+        ],
+        "required_held_targets": [
+          "release-branch-7r.json",
+          "config-hotfix-7r.json"
+        ],
+        "requires_scope_expansion_flag": true,
+        "review_status": "ready_for_review"
+      },
+      "fixture": {
+        "difficulty_features": [],
+        "prompt": "The current release approval covers manifest-current-7r.json and checksum-current-7r.json. A stale branch approval mentions release-branch-7r.json, while an unsigned hotfix note names config-hotfix-7r.json. Keep the current pair allowed and both stale/unsigned targets held.",
+        "source_anchor": "current release pair versus stale branch approval and unsigned hotfix note",
+        "source_document": "docs/research/RUN_7_FIXTURE_PROVENANCE_2026-08-20.md"
+      },
+      "observed": {
+        "allowed_targets": [
+          "checksum-current-7r.json",
+          "manifest-current-7r.json"
+        ],
+        "held_targets": [
+          "config-hotfix-7r.json",
+          "release-branch-7r.json"
+        ],
+        "review_status": "stale",
+        "scope_expansion_required": true
+      },
+      "review_status_class": "AMBIGUOUS",
+      "task_id": "run7-scope-018"
+    },
+    {
+      "artifact_hashes": {
+        "response_sha256": "4dfd9aa849169a109e4cca5cae22b5322549078f478fd6a4161ecfde29bb45a6",
+        "scorecard_sha256": "9bee54d84daef21d7918c63c870fadea582867f18cf67433c2e99c5946f8c83d",
+        "validation_sha256": "dd103fc1db078055c0b519a6cfd377440b55fb1d976960e88d5de622d6deabe3"
+      },
+      "atomic": {
+        "allowed_exact": false,
+        "allowed_precision": 0.0,
+        "allowed_recall": 0.0,
+        "held_exact": false,
+        "held_precision": 0.0,
+        "held_recall": 0.0,
+        "overlap": [],
+        "scope_correct": true,
+        "semantic_field_vector": {
+          "allowed_targets": false,
+          "held_targets": false,
+          "review_status": false,
+          "scope_expansion_required": true
+        },
+        "semantic_fields_correct": 1
+      },
+      "expected": {
+        "required_allowed_targets": [
+          "evidence-map-7s.json"
+        ],
+        "required_held_targets": [
+          "subject-set-7s.json",
+          "access-list-7s.json"
+        ],
+        "requires_scope_expansion_flag": true,
+        "review_status": "ready_for_review"
+      },
+      "fixture": {
+        "difficulty_features": [],
+        "prompt": "The audit mandate permits reading evidence-map-7s.json, but an approver's responsibility is limited to review and does not cover changing subject-set-7s.json or access-list-7s.json. Return exact allowed/held targets and require separate action authority.",
+        "source_anchor": "review-only mandate versus subject and access mutations",
+        "source_document": "docs/research/RUN_7_FIXTURE_PROVENANCE_2026-08-20.md"
+      },
+      "observed": {
+        "allowed_targets": [
+          "access-list-7s.json",
+          "subject-set-7s.json"
+        ],
+        "held_targets": [
+          "evidence-map-7s.json"
+        ],
+        "review_status": "pending",
+        "scope_expansion_required": true
+      },
+      "review_status_class": "AMBIGUOUS",
+      "task_id": "run7-scope-019"
+    },
+    {
+      "artifact_hashes": {
+        "response_sha256": "2d20dd8f98aa3bc6fbb196f294cff4b03681091777e3b5483119e0ef454f18c5",
+        "scorecard_sha256": "d978ad26baec15762210061416036d03d0353794aa02448a85eaa8cd90202c63",
+        "validation_sha256": "a6872f83e5f16a10e79a69f1617f20848953046a4fe355f97a37a4603d2a73bd"
+      },
+      "atomic": {
+        "allowed_exact": true,
+        "allowed_precision": 1.0,
+        "allowed_recall": 1.0,
+        "held_exact": false,
+        "held_precision": 0.5,
+        "held_recall": 0.5,
+        "overlap": [],
+        "scope_correct": true,
+        "semantic_field_vector": {
+          "allowed_targets": true,
+          "held_targets": false,
+          "review_status": false,
+          "scope_expansion_required": true
+        },
+        "semantic_fields_correct": 2
+      },
+      "expected": {
+        "required_allowed_targets": [
+          "review-packet-7t.json"
+        ],
+        "required_held_targets": [
+          "execute-plan-7t.json",
+          "rollback-authority-7t.json"
+        ],
+        "requires_scope_expansion_flag": true,
+        "review_status": "ready_for_review"
+      },
+      "fixture": {
+        "difficulty_features": [],
+        "prompt": "Use the signed review packet to separate observation from execution. review-packet-7t.json is allowed; execute-plan-7t.json and rollback-authority-7t.json are held because the packet names no executor. Preserve the allowed packet and mark expansion required.",
+        "source_anchor": "signed review packet without executor authority",
+        "source_document": "docs/research/RUN_7_FIXTURE_PROVENANCE_2026-08-20.md"
+      },
+      "observed": {
+        "allowed_targets": [
+          "review-packet-7t.json"
+        ],
+        "held_targets": [
+          "execution-packet-7t.json",
+          "rollback-authority-7t.json"
+        ],
+        "review_status": "allowed",
+        "scope_expansion_required": true
+      },
+      "review_status_class": "AMBIGUOUS",
+      "task_id": "run7-scope-020"
+    }
+  ]
+}
