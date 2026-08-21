@@ -288,9 +288,12 @@ def execute(output_dir: Path) -> None:
 
 def aggregate(output_dir: Path, manifest: dict[str, Any], idle: dict[str, Any]) -> dict[str, Any]:
     rows = {arm: [] for arm in ARMS}
+    task_factors = {row["task_id"]: row for row in manifest["tasks"]}
     for task_id in manifest["task_order"]:
         for arm in ARMS:
-            rows[arm].append(json.loads((output_dir / "tasks" / task_id / arm / "scorecard.json").read_text()))
+            scorecard = json.loads((output_dir / "tasks" / task_id / arm / "scorecard.json").read_text())
+            scorecard.update({key: task_factors[task_id][key] for key in ("operation_factor", "authority_factor", "distractor_factor")})
+            rows[arm].append(scorecard)
     def summarize(values: list[dict[str, Any]]) -> dict[str, Any]:
         def subset(**filters: Any) -> list[dict[str, Any]]:
             return [row for row in values if all(row[key] == value for key, value in filters.items())]
@@ -308,9 +311,26 @@ def aggregate(output_dir: Path, manifest: dict[str, Any], idle: dict[str, Any]) 
     return {"schema": "zth_qwen3_1_7b_boolean_exemplar_scope_isolation_aggregate_v1", "exploratory_not_confirmatory": True, "candidate": {"model_id": EXPECTED_MODEL_ID, "operative_parameters": EXPECTED_PARAMS, "artifact_sha256": EXPECTED_MODEL_SHA}, "arms": per_arm, "transitions": transitions, "exemplar_flip_count": sum(item["T_to_F"] == "FLIPPED_WITH_EXEMPLAR" for item in transitions.values()), "exemplar_flip_rate": sum(item["T_to_F"] == "FLIPPED_WITH_EXEMPLAR" for item in transitions.values()) / 16, "idle_power": idle, "execution": {"supplier_model_calls": 48, "teacher_calls": 0, "retries": 0, "escalations": 0}}
 
 
+def closeout(output_dir: Path) -> None:
+    manifest = json.loads((output_dir / "probe_manifest.json").read_text())
+    if manifest["manifest_sha256"] != sha_bytes(canonical({**manifest, "manifest_sha256": None})):
+        raise RuntimeError("prepared manifest hash mismatch")
+    response_count = len(list(output_dir.glob("tasks/*/*/response.json")))
+    scorecard_count = len(list(output_dir.glob("tasks/*/*/scorecard.json")))
+    validation_count = len(list(output_dir.glob("tasks/*/*/validation.json")))
+    if (response_count, scorecard_count, validation_count) != (48, 48, 48):
+        raise RuntimeError(f"incomplete terminal evidence: responses={response_count}, scorecards={scorecard_count}, validations={validation_count}")
+    idle = json.loads((output_dir / "idle_power_samples.json").read_text())["summary"]
+    summary = aggregate(output_dir, manifest, idle)
+    summary["post_run_aggregation_repair"] = {"model_calls": 0, "reason": "factor labels were restored from the frozen manifest during model-free closeout; raw responses, validators, and scorecards were unchanged"}
+    write_json(output_dir / "aggregate.json", summary)
+    write_json(output_dir / "lifecycle.json", {"status": "terminal", "completed_at": now(), "model_calls_made": True, "supplier_model_calls": 48, "teacher_calls": 0, "retries": 0, "escalations": 0, "aggregation_closeout_repaired": True})
+    print(json.dumps({"status": "terminal", "responses": response_count, "scorecards": scorecard_count, "validations": validation_count, "model_calls": 0}, indent=2))
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(); group = parser.add_mutually_exclusive_group(required=True); group.add_argument("--prepare", action="store_true"); group.add_argument("--execute", action="store_true"); parser.add_argument("--output-dir", type=Path, required=True); args = parser.parse_args()
-    prepare(args.output_dir) if args.prepare else execute(args.output_dir)
+    parser = argparse.ArgumentParser(); group = parser.add_mutually_exclusive_group(required=True); group.add_argument("--prepare", action="store_true"); group.add_argument("--execute", action="store_true"); group.add_argument("--closeout", action="store_true"); parser.add_argument("--output-dir", type=Path, required=True); args = parser.parse_args()
+    prepare(args.output_dir) if args.prepare else closeout(args.output_dir) if args.closeout else execute(args.output_dir)
     return 0
 
 

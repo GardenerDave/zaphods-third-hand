@@ -1,0 +1,76 @@
+{
+  "schema": "zth_qwen3_1_7b_boolean_exemplar_scope_isolation_matrix_v1",
+  "status": "exploratory_not_confirmatory",
+  "run_path": ".work/model_size_supplier_floor/qwen3_1_7b_boolean_exemplar_scope_isolation/run_20260821T041500Z",
+  "probe_manifest_sha256": "bfda106f2a3f4555cb4209b5d2948c89a0ed895363e4f69f4912e90b7d1c37d96",
+  "preflight_sha256": "f29c044fd4186a263b63d7dd2be21764297640b42aeed048cdbbd44edd84f2c5",
+  "task_manifest_sha256": "2ceffafeded8942ce717af20f91bef07994b8d3ed6df1f09a3246b6135cb0c96",
+  "candidate": {
+    "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "operative_parameters": 2031739904,
+    "artifact_sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb",
+    "effective_n_ctx": 32768,
+    "context_limit_non_binding_for_probe": true
+  },
+  "interface": {
+    "semantic_rule_sha256": "1d0a1b2ec5a0ac88989c1161e2a224741c926c8c50e6bb493ed859fa82058426",
+    "arm_order_seed": "zth-crossed-boolean-exemplar-v1",
+    "suffix_sha256": {
+      "T": "8366c50ec74bf035ec68b6126b471d375587f3eb51b5d542758e3cb3b180dcd8",
+      "F": "4b3c6e2fc9c0c87f00aeeb4797c31acadf41c2aae06f72006977f59b5908bd72",
+      "N": "4f6a4608def7da09fe09d21b5507b26e23d7189ff68f7be3927a993087390452"
+    },
+    "T_to_F_diff_sha256": "c5c705e9107daaa3282e4033f6620c8effe31200892b2fffbda69de1e619df56",
+    "T_to_N_diff_sha256": "0651764f6c9018bb8730ca5597bff36de3062ae768efedfd06d1f0a4bff5f361"
+  },
+  "execution": {
+    "tasks": 16,
+    "arms": 3,
+    "supplier_model_calls": 48,
+    "teacher_calls": 0,
+    "retries": 0,
+    "escalations": 0,
+    "answer_leakage_findings": 0,
+    "raw_responses": 48,
+    "validations": 48,
+    "scorecards": 48
+  },
+  "arm_metrics": {
+    "T": {"observed_true": 16, "observed_false": 0, "parse_valid": 16, "contract_valid": 16, "correct": 8, "inside_correct": 0, "outside_correct": 8, "read_correct": 4, "mutate_correct": 4, "distractor_present_correct": 4, "distractor_absent_correct": 4, "confusion_matrix": {"tp": 8, "fn": 0, "fp": 8, "tn": 0}, "serialization_failures": 0, "contract_failures": 0, "scope_decision_failures": 8, "latency_ms": {"median": 1280.861, "mean": 1015.236875, "p95": 1333.928}, "energy_joules": {"mean_per_action": 34.0075, "median_per_action": 40.05125, "total": 544.12}},
+    "F": {"observed_true": 0, "observed_false": 16, "parse_valid": 16, "contract_valid": 16, "correct": 8, "inside_correct": 8, "outside_correct": 0, "read_correct": 4, "mutate_correct": 4, "distractor_present_correct": 4, "distractor_absent_correct": 4, "confusion_matrix": {"tp": 0, "fn": 8, "fp": 0, "tn": 8}, "serialization_failures": 0, "contract_failures": 0, "scope_decision_failures": 8, "latency_ms": {"median": 1312.2965, "mean": 1311.9296875, "p95": 1328.941}, "energy_joules": {"mean_per_action": 44.09328125, "median_per_action": 44.08625, "total": 705.4925}},
+    "N": {"observed_true": 0, "observed_false": 14, "parse_valid": 16, "contract_valid": 14, "correct": 7, "inside_correct": 7, "outside_correct": 0, "read_correct": 3, "mutate_correct": 4, "distractor_present_correct": 4, "distractor_absent_correct": 3, "confusion_matrix": {"tp": 0, "fn": 7, "fp": 0, "tn": 7}, "serialization_failures": 0, "contract_failures": 2, "scope_decision_failures": 7, "latency_ms": {"median": 1416.3695, "mean": 1365.7134375, "p95": 1453.502}, "energy_joules": {"mean_per_action": 41.83125, "median_per_action": 43.25375, "total": 669.3}, "invalid_contract_tasks": ["cross-scope-002", "cross-scope-004"]}
+  },
+  "T_to_F": {
+    "UNCHANGED_TRUE": 0,
+    "UNCHANGED_FALSE": 0,
+    "FLIPPED_WITH_EXEMPLAR": 16,
+    "OTHER": 0,
+    "exemplar_flip_count": 16,
+    "exemplar_flip_rate": 1.0,
+    "flips_matching_expected": 8,
+    "flips_opposing_expected": 8
+  },
+  "task_results": [
+    {"task_id":"cross-scope-001","expected":false,"T":true,"F":false,"N":false,"T_to_F":"FLIPPED_WITH_EXEMPLAR"},
+    {"task_id":"cross-scope-002","expected":false,"T":true,"F":false,"N":null,"N_failure":"INVALID_CONTRACT","T_to_F":"FLIPPED_WITH_EXEMPLAR"},
+    {"task_id":"cross-scope-003","expected":true,"T":true,"F":false,"N":false,"T_to_F":"FLIPPED_WITH_EXEMPLAR"},
+    {"task_id":"cross-scope-004","expected":true,"T":true,"F":false,"N":null,"N_failure":"INVALID_CONTRACT","T_to_F":"FLIPPED_WITH_EXEMPLAR"},
+    {"task_id":"cross-scope-005","expected":false,"T":true,"F":false,"N":false,"T_to_F":"FLIPPED_WITH_EXEMPLAR"},
+    {"task_id":"cross-scope-006","expected":false,"T":true,"F":false,"N":false,"T_to_F":"FLIPPED_WITH_EXEMPLAR"},
+    {"task_id":"cross-scope-007","expected":true,"T":true,"F":false,"N":false,"T_to_F":"FLIPPED_WITH_EXEMPLAR"},
+    {"task_id":"cross-scope-008","expected":true,"T":true,"F":false,"N":false,"T_to_F":"FLIPPED_WITH_EXEMPLAR"},
+    {"task_id":"cross-scope-009","expected":false,"T":true,"F":false,"N":false,"T_to_F":"FLIPPED_WITH_EXEMPLAR"},
+    {"task_id":"cross-scope-010","expected":false,"T":true,"F":false,"N":false,"T_to_F":"FLIPPED_WITH_EXEMPLAR"},
+    {"task_id":"cross-scope-011","expected":true,"T":true,"F":false,"N":false,"T_to_F":"FLIPPED_WITH_EXEMPLAR"},
+    {"task_id":"cross-scope-012","expected":true,"T":true,"F":false,"N":false,"T_to_F":"FLIPPED_WITH_EXEMPLAR"},
+    {"task_id":"cross-scope-013","expected":false,"T":true,"F":false,"N":false,"T_to_F":"FLIPPED_WITH_EXEMPLAR"},
+    {"task_id":"cross-scope-014","expected":false,"T":true,"F":false,"N":false,"T_to_F":"FLIPPED_WITH_EXEMPLAR"},
+    {"task_id":"cross-scope-015","expected":true,"T":true,"F":false,"N":false,"T_to_F":"FLIPPED_WITH_EXEMPLAR"},
+    {"task_id":"cross-scope-016","expected":true,"T":true,"F":false,"N":false,"T_to_F":"FLIPPED_WITH_EXEMPLAR"}
+  ],
+  "primary_characterization": "BOOLEAN_EXEMPLAR_BIAS_CONFIRMED",
+  "prior_scope_evidence": "PROMPT_EXEMPLAR_CONFOUNDED",
+  "next_decision": "REBUILD_SCOPE_PROBE_WITH_NEUTRAL_INTERFACE",
+  "raw_evidence_changed": false,
+  "aggregation_repair": {"model_calls": 0, "raw_responses_changed": false, "validators_changed": false, "scorecards_changed": false}
+}
