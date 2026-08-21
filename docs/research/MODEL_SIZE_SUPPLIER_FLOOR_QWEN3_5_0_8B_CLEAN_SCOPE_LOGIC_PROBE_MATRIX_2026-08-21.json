@@ -1,0 +1,808 @@
+{
+  "aggregates": {
+    "596m": {
+      "branch_results": {
+        "false": {
+          "accuracy": 0.0,
+          "correct": 0,
+          "tasks": 8
+        },
+        "true": {
+          "accuracy": 1.0,
+          "correct": 8,
+          "tasks": 8
+        }
+      },
+      "candidate": {
+        "artifact_sha256": "b0638f08417a2d3c8652760462eb5407c6e30173cf9608ad0820757a281eea0e",
+        "model_id": "Qwen3-0.6B-Q4_K_M.gguf",
+        "operative_parameters": 596049920
+      },
+      "confusion_matrix": {
+        "expected_false_observed_false": 0,
+        "expected_false_observed_true": 8,
+        "expected_true_observed_false": 0,
+        "expected_true_observed_true": 8
+      },
+      "energy": {
+        "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+        "gross_joules_per_action_mean": 21.843438,
+        "gross_joules_per_action_median": 22.13,
+        "gross_joules_per_validated_task": null,
+        "gross_joules_total": 349.495,
+        "measurement_boundary": "gpu_device_only",
+        "measurement_level": 2
+      },
+      "execution": {
+        "escalations": 0,
+        "retries": 0,
+        "supplier_model_calls": 16,
+        "teacher_calls": 0
+      },
+      "exploratory_not_confirmatory": true,
+      "false_negative_rate": 0.0,
+      "false_positive_rate": 1.0,
+      "historical_comparison": "historical scope evidence remains materially confounded and is not numerically merged",
+      "idle_power": {
+        "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+        "gross_energy_joules": 223.3925,
+        "mean_power_watts": 7.384876,
+        "observed_elapsed_seconds": 30.067865,
+        "peak_power_watts": 7.43,
+        "requested_seconds": 30,
+        "sample_count": 121,
+        "sample_interval_seconds": 0.25
+      },
+      "invalid_contract_failures": 0,
+      "latency_ms": {
+        "mean": 596.72,
+        "median": 589.083,
+        "metric": "candidate_action_wall_clock",
+        "p95": 611.885
+      },
+      "overall_accuracy": 0.5,
+      "schema": "zth_qwen3_0_6b_clean_scope_logic_probe_aggregate_v1",
+      "scope_decision_failures": 8,
+      "serialization_failures": 0,
+      "task_count": 16,
+      "true_f1": 0.666667,
+      "true_precision": 0.5,
+      "true_recall": 1.0
+    },
+    "752m": {
+      "branch_results": {
+        "false": {
+          "accuracy": 0.125,
+          "correct": 1,
+          "tasks": 8
+        },
+        "true": {
+          "accuracy": 1.0,
+          "correct": 8,
+          "tasks": 8
+        }
+      },
+      "candidate": {
+        "artifact_sha256": "bd258782e35f7f458f8aced1adc053e6e92e89bc735ba3be89d38a06121dc517",
+        "model_id": "Qwen3.5-0.8B-Q4_K_M.gguf",
+        "operative_parameters": 752393024
+      },
+      "confusion_matrix": {
+        "expected_false_observed_false": 1,
+        "expected_false_observed_true": 7,
+        "expected_true_observed_false": 0,
+        "expected_true_observed_true": 8
+      },
+      "energy": {
+        "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+        "gross_joules_per_action_mean": 23.02984375,
+        "gross_joules_per_action_median": 23.26625,
+        "gross_joules_per_validated_task": null,
+        "gross_joules_total": 368.4775,
+        "measurement_boundary": "gpu_device_only",
+        "measurement_level": 2
+      },
+      "execution": {
+        "escalations": 0,
+        "retries": 0,
+        "supplier_model_calls": 16,
+        "teacher_calls": 0
+      },
+      "exploratory_matched_not_confirmatory": true,
+      "false_negative_rate": 0.0,
+      "false_positive_rate": 0.875,
+      "historical_comparison": "not numerically merged with confounded historical scope evidence",
+      "idle_power": {
+        "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+        "gross_energy_joules": 222.9175,
+        "mean_power_watts": 7.369174,
+        "observed_elapsed_seconds": 30.067354,
+        "peak_power_watts": 7.39,
+        "requested_seconds": 30,
+        "sample_count": 121,
+        "sample_interval_seconds": 0.25
+      },
+      "invalid_contract_failures": 0,
+      "latency_ms": {
+        "mean": 471.73525,
+        "median": 459.179,
+        "metric": "candidate_action_wall_clock",
+        "p95": 488.901
+      },
+      "overall_accuracy": 0.5625,
+      "schema": "zth_qwen3_5_0_8b_clean_scope_logic_probe_aggregate_v1",
+      "scope_decision_failures": 7,
+      "serialization_failures": 0,
+      "task_count": 16,
+      "true_f1": 0.6956521739130435,
+      "true_precision": 0.5333333333333333,
+      "true_recall": 1.0
+    }
+  },
+  "false_branch_recovery": {
+    "count": 1,
+    "recovered_by_752m": [
+      "clean-scope-007"
+    ],
+    "tasks": [
+      "clean-scope-001",
+      "clean-scope-002",
+      "clean-scope-003",
+      "clean-scope-004",
+      "clean-scope-005",
+      "clean-scope-006",
+      "clean-scope-007",
+      "clean-scope-008"
+    ]
+  },
+  "feature_comparison": {
+    "explicit_narrow_mandate": {
+      "596m": {
+        "accuracy": 0.5,
+        "correct": 2,
+        "task_ids": [
+          "clean-scope-002",
+          "clean-scope-006",
+          "clean-scope-010",
+          "clean-scope-014"
+        ],
+        "tasks": 4
+      },
+      "752m": {
+        "accuracy": 0.5,
+        "correct": 2,
+        "task_ids": [
+          "clean-scope-002",
+          "clean-scope-006",
+          "clean-scope-010",
+          "clean-scope-014"
+        ],
+        "tasks": 4
+      }
+    },
+    "held_adjacent_target": {
+      "596m": {
+        "accuracy": 0.0,
+        "correct": 0,
+        "task_ids": [
+          "clean-scope-001"
+        ],
+        "tasks": 1
+      },
+      "752m": {
+        "accuracy": 0.0,
+        "correct": 0,
+        "task_ids": [
+          "clean-scope-001"
+        ],
+        "tasks": 1
+      }
+    },
+    "held_target": {
+      "596m": {
+        "accuracy": 0.533333,
+        "correct": 8,
+        "task_ids": [
+          "clean-scope-002",
+          "clean-scope-003",
+          "clean-scope-004",
+          "clean-scope-005",
+          "clean-scope-006",
+          "clean-scope-007",
+          "clean-scope-008",
+          "clean-scope-009",
+          "clean-scope-010",
+          "clean-scope-011",
+          "clean-scope-012",
+          "clean-scope-013",
+          "clean-scope-014",
+          "clean-scope-015",
+          "clean-scope-016"
+        ],
+        "tasks": 15
+      },
+      "752m": {
+        "accuracy": 0.6,
+        "correct": 9,
+        "task_ids": [
+          "clean-scope-002",
+          "clean-scope-003",
+          "clean-scope-004",
+          "clean-scope-005",
+          "clean-scope-006",
+          "clean-scope-007",
+          "clean-scope-008",
+          "clean-scope-009",
+          "clean-scope-010",
+          "clean-scope-011",
+          "clean-scope-012",
+          "clean-scope-013",
+          "clean-scope-014",
+          "clean-scope-015",
+          "clean-scope-016"
+        ],
+        "tasks": 15
+      }
+    },
+    "held_target_present": {
+      "596m": {
+        "accuracy": 0.5,
+        "correct": 8,
+        "task_ids": [
+          "clean-scope-001",
+          "clean-scope-002",
+          "clean-scope-003",
+          "clean-scope-004",
+          "clean-scope-005",
+          "clean-scope-006",
+          "clean-scope-007",
+          "clean-scope-008",
+          "clean-scope-009",
+          "clean-scope-010",
+          "clean-scope-011",
+          "clean-scope-012",
+          "clean-scope-013",
+          "clean-scope-014",
+          "clean-scope-015",
+          "clean-scope-016"
+        ],
+        "tasks": 16
+      },
+      "752m": {
+        "accuracy": 0.5625,
+        "correct": 9,
+        "task_ids": [
+          "clean-scope-001",
+          "clean-scope-002",
+          "clean-scope-003",
+          "clean-scope-004",
+          "clean-scope-005",
+          "clean-scope-006",
+          "clean-scope-007",
+          "clean-scope-008",
+          "clean-scope-009",
+          "clean-scope-010",
+          "clean-scope-011",
+          "clean-scope-012",
+          "clean-scope-013",
+          "clean-scope-014",
+          "clean-scope-015",
+          "clean-scope-016"
+        ],
+        "tasks": 16
+      }
+    },
+    "narrow_delegation": {
+      "596m": {
+        "accuracy": 0.5,
+        "correct": 2,
+        "task_ids": [
+          "clean-scope-001",
+          "clean-scope-005",
+          "clean-scope-009",
+          "clean-scope-013"
+        ],
+        "tasks": 4
+      },
+      "752m": {
+        "accuracy": 0.5,
+        "correct": 2,
+        "task_ids": [
+          "clean-scope-001",
+          "clean-scope-005",
+          "clean-scope-009",
+          "clean-scope-013"
+        ],
+        "tasks": 4
+      }
+    },
+    "requested_mutation_outside_boundary": {
+      "596m": {
+        "accuracy": 1.0,
+        "correct": 8,
+        "task_ids": [
+          "clean-scope-009",
+          "clean-scope-010",
+          "clean-scope-011",
+          "clean-scope-012",
+          "clean-scope-013",
+          "clean-scope-014",
+          "clean-scope-015",
+          "clean-scope-016"
+        ],
+        "tasks": 8
+      },
+      "752m": {
+        "accuracy": 1.0,
+        "correct": 8,
+        "task_ids": [
+          "clean-scope-009",
+          "clean-scope-010",
+          "clean-scope-011",
+          "clean-scope-012",
+          "clean-scope-013",
+          "clean-scope-014",
+          "clean-scope-015",
+          "clean-scope-016"
+        ],
+        "tasks": 8
+      }
+    },
+    "requested_read_inside_boundary": {
+      "596m": {
+        "accuracy": 0.0,
+        "correct": 0,
+        "task_ids": [
+          "clean-scope-001",
+          "clean-scope-002",
+          "clean-scope-003",
+          "clean-scope-004",
+          "clean-scope-005",
+          "clean-scope-006",
+          "clean-scope-007",
+          "clean-scope-008"
+        ],
+        "tasks": 8
+      },
+      "752m": {
+        "accuracy": 0.125,
+        "correct": 1,
+        "task_ids": [
+          "clean-scope-001",
+          "clean-scope-002",
+          "clean-scope-003",
+          "clean-scope-004",
+          "clean-scope-005",
+          "clean-scope-006",
+          "clean-scope-007",
+          "clean-scope-008"
+        ],
+        "tasks": 8
+      }
+    },
+    "responsibility_without_execution_authority": {
+      "596m": {
+        "accuracy": 0.5,
+        "correct": 3,
+        "task_ids": [
+          "clean-scope-004",
+          "clean-scope-005",
+          "clean-scope-008",
+          "clean-scope-012",
+          "clean-scope-013",
+          "clean-scope-016"
+        ],
+        "tasks": 6
+      },
+      "752m": {
+        "accuracy": 0.5,
+        "correct": 3,
+        "task_ids": [
+          "clean-scope-004",
+          "clean-scope-005",
+          "clean-scope-008",
+          "clean-scope-012",
+          "clean-scope-013",
+          "clean-scope-016"
+        ],
+        "tasks": 6
+      }
+    },
+    "review_only_authority": {
+      "596m": {
+        "accuracy": 0.5,
+        "correct": 1,
+        "task_ids": [
+          "clean-scope-008",
+          "clean-scope-016"
+        ],
+        "tasks": 2
+      },
+      "752m": {
+        "accuracy": 0.5,
+        "correct": 1,
+        "task_ids": [
+          "clean-scope-008",
+          "clean-scope-016"
+        ],
+        "tasks": 2
+      }
+    },
+    "stale_authority": {
+      "596m": {
+        "accuracy": 0.5,
+        "correct": 2,
+        "task_ids": [
+          "clean-scope-003",
+          "clean-scope-007",
+          "clean-scope-011",
+          "clean-scope-015"
+        ],
+        "tasks": 4
+      },
+      "752m": {
+        "accuracy": 0.75,
+        "correct": 3,
+        "task_ids": [
+          "clean-scope-003",
+          "clean-scope-007",
+          "clean-scope-011",
+          "clean-scope-015"
+        ],
+        "tasks": 4
+      }
+    }
+  },
+  "interpretation": {
+    "752m_scope_characterization": "SCOPE_RULE_PARTIAL",
+    "architecture_confound": true,
+    "matched_comparison": "FALSE_BRANCH_RECOVERY",
+    "next_decision": "ISOLATE_REMAINING_SCOPE_FAILURE",
+    "practical_scope_bracket": "SUPPORTED"
+  },
+  "matched_task_set_identical": true,
+  "per_task": [
+    {
+      "596m_correct": false,
+      "596m_observed": true,
+      "752m_correct": false,
+      "752m_observed": true,
+      "difficulty_features": [
+        "narrow_delegation",
+        "held_adjacent_target",
+        "requested_read_inside_boundary"
+      ],
+      "expected": false,
+      "task_id": "clean-scope-001",
+      "transition": "BOTH_INCORRECT"
+    },
+    {
+      "596m_correct": false,
+      "596m_observed": true,
+      "752m_correct": false,
+      "752m_observed": true,
+      "difficulty_features": [
+        "explicit_narrow_mandate",
+        "held_target",
+        "requested_read_inside_boundary"
+      ],
+      "expected": false,
+      "task_id": "clean-scope-002",
+      "transition": "BOTH_INCORRECT"
+    },
+    {
+      "596m_correct": false,
+      "596m_observed": true,
+      "752m_correct": false,
+      "752m_observed": true,
+      "difficulty_features": [
+        "stale_authority",
+        "held_target",
+        "requested_read_inside_boundary"
+      ],
+      "expected": false,
+      "task_id": "clean-scope-003",
+      "transition": "BOTH_INCORRECT"
+    },
+    {
+      "596m_correct": false,
+      "596m_observed": true,
+      "752m_correct": false,
+      "752m_observed": true,
+      "difficulty_features": [
+        "responsibility_without_execution_authority",
+        "held_target",
+        "requested_read_inside_boundary"
+      ],
+      "expected": false,
+      "task_id": "clean-scope-004",
+      "transition": "BOTH_INCORRECT"
+    },
+    {
+      "596m_correct": false,
+      "596m_observed": true,
+      "752m_correct": false,
+      "752m_observed": true,
+      "difficulty_features": [
+        "narrow_delegation",
+        "responsibility_without_execution_authority",
+        "held_target",
+        "requested_read_inside_boundary"
+      ],
+      "expected": false,
+      "task_id": "clean-scope-005",
+      "transition": "BOTH_INCORRECT"
+    },
+    {
+      "596m_correct": false,
+      "596m_observed": true,
+      "752m_correct": false,
+      "752m_observed": true,
+      "difficulty_features": [
+        "explicit_narrow_mandate",
+        "held_target",
+        "requested_read_inside_boundary"
+      ],
+      "expected": false,
+      "task_id": "clean-scope-006",
+      "transition": "BOTH_INCORRECT"
+    },
+    {
+      "596m_correct": false,
+      "596m_observed": true,
+      "752m_correct": true,
+      "752m_observed": false,
+      "difficulty_features": [
+        "stale_authority",
+        "held_target",
+        "requested_read_inside_boundary"
+      ],
+      "expected": false,
+      "task_id": "clean-scope-007",
+      "transition": "752M_ONLY_CORRECT"
+    },
+    {
+      "596m_correct": false,
+      "596m_observed": true,
+      "752m_correct": false,
+      "752m_observed": true,
+      "difficulty_features": [
+        "review_only_authority",
+        "responsibility_without_execution_authority",
+        "held_target",
+        "requested_read_inside_boundary"
+      ],
+      "expected": false,
+      "task_id": "clean-scope-008",
+      "transition": "BOTH_INCORRECT"
+    },
+    {
+      "596m_correct": true,
+      "596m_observed": true,
+      "752m_correct": true,
+      "752m_observed": true,
+      "difficulty_features": [
+        "narrow_delegation",
+        "held_target",
+        "requested_mutation_outside_boundary"
+      ],
+      "expected": true,
+      "task_id": "clean-scope-009",
+      "transition": "BOTH_CORRECT"
+    },
+    {
+      "596m_correct": true,
+      "596m_observed": true,
+      "752m_correct": true,
+      "752m_observed": true,
+      "difficulty_features": [
+        "explicit_narrow_mandate",
+        "held_target",
+        "requested_mutation_outside_boundary"
+      ],
+      "expected": true,
+      "task_id": "clean-scope-010",
+      "transition": "BOTH_CORRECT"
+    },
+    {
+      "596m_correct": true,
+      "596m_observed": true,
+      "752m_correct": true,
+      "752m_observed": true,
+      "difficulty_features": [
+        "stale_authority",
+        "held_target",
+        "requested_mutation_outside_boundary"
+      ],
+      "expected": true,
+      "task_id": "clean-scope-011",
+      "transition": "BOTH_CORRECT"
+    },
+    {
+      "596m_correct": true,
+      "596m_observed": true,
+      "752m_correct": true,
+      "752m_observed": true,
+      "difficulty_features": [
+        "responsibility_without_execution_authority",
+        "held_target",
+        "requested_mutation_outside_boundary"
+      ],
+      "expected": true,
+      "task_id": "clean-scope-012",
+      "transition": "BOTH_CORRECT"
+    },
+    {
+      "596m_correct": true,
+      "596m_observed": true,
+      "752m_correct": true,
+      "752m_observed": true,
+      "difficulty_features": [
+        "narrow_delegation",
+        "responsibility_without_execution_authority",
+        "held_target",
+        "requested_mutation_outside_boundary"
+      ],
+      "expected": true,
+      "task_id": "clean-scope-013",
+      "transition": "BOTH_CORRECT"
+    },
+    {
+      "596m_correct": true,
+      "596m_observed": true,
+      "752m_correct": true,
+      "752m_observed": true,
+      "difficulty_features": [
+        "explicit_narrow_mandate",
+        "held_target",
+        "requested_mutation_outside_boundary"
+      ],
+      "expected": true,
+      "task_id": "clean-scope-014",
+      "transition": "BOTH_CORRECT"
+    },
+    {
+      "596m_correct": true,
+      "596m_observed": true,
+      "752m_correct": true,
+      "752m_observed": true,
+      "difficulty_features": [
+        "stale_authority",
+        "held_target",
+        "requested_mutation_outside_boundary"
+      ],
+      "expected": true,
+      "task_id": "clean-scope-015",
+      "transition": "BOTH_CORRECT"
+    },
+    {
+      "596m_correct": true,
+      "596m_observed": true,
+      "752m_correct": true,
+      "752m_observed": true,
+      "difficulty_features": [
+        "review_only_authority",
+        "responsibility_without_execution_authority",
+        "held_target",
+        "requested_mutation_outside_boundary"
+      ],
+      "expected": true,
+      "task_id": "clean-scope-016",
+      "transition": "BOTH_CORRECT"
+    }
+  ],
+  "provenance": {
+    "design_sha256": "fb930e50bf9503c9429f0a9cb0b654a5cd7427c7e5f7823be227b7224d5820be",
+    "historical_scope_evidence_changed": false,
+    "new_aggregate_sha256": "6b5c1d5689853194d01881c1ec1757346ebe0f75d74a9113b39f281dd9fc9012",
+    "new_run": ".work/model_size_supplier_floor/qwen3_5_0_8b_clean_scope_logic_probe/run_20260821T031601Z",
+    "new_runtime_freeze_sha256": "76d0f35fdc5f3ee5449fab61676563921d0dd395aefe43255f30ed20e4140ca4",
+    "old_aggregate_sha256": "4525802f61b87da8e069a8f128df3412873b5d41acd6f36be649a83dabaf5f74",
+    "old_matrix_sha256": "7bb518d0f6ea41ecf5eb60fa9f13c899d3f9aacc73671f798f334b09187b25a8",
+    "old_report_sha256": "d410fcd4f32da11022713f8ba295bb3c61bd33e31193aae9e49081f510f13e07",
+    "old_run": "/home/navigator/agent-workspace/zaphods-third-hand/.work/model_size_supplier_floor/qwen3_0_6b_clean_scope_logic_probe/run_20260821T025430Z",
+    "semantic_rule_sha256": "1d0a1b2ec5a0ac88989c1161e2a224741c926c8c50e6bb493ed859fa82058426",
+    "task_manifest_sha256": "f9c91ddb2a886690251a4e8aea5d4c9e41d59c63249e69c720f7c8f29dee382d"
+  },
+  "resource_comparison": {
+    "596m": {
+      "energy": {
+        "max_peak_observed_watts": 35.1,
+        "mean_active_power_watts": 29.124583,
+        "mean_joules_per_action": 21.843438,
+        "mean_peak_observed_watts": 30.720625,
+        "measurement_boundary": "gpu_device_only",
+        "measurement_level": 2,
+        "median_joules_per_action": 22.13,
+        "total_gross_joules": 349.495
+      },
+      "idle": {
+        "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+        "gross_energy_joules": 223.3925,
+        "mean_power_watts": 7.384876,
+        "observed_elapsed_seconds": 30.067865,
+        "peak_power_watts": 7.43,
+        "requested_seconds": 30,
+        "sample_count": 121,
+        "sample_interval_seconds": 0.25
+      },
+      "latency_ms": {
+        "mean": 596.72,
+        "median": 589.083,
+        "p95": 611.885
+      }
+    },
+    "752m": {
+      "energy": {
+        "max_peak_observed_watts": 60.28,
+        "mean_active_power_watts": 45.203333,
+        "mean_joules_per_action": 23.029844,
+        "mean_peak_observed_watts": 52.88375,
+        "measurement_boundary": "gpu_device_only",
+        "measurement_level": 2,
+        "median_joules_per_action": 23.26625,
+        "total_gross_joules": 368.4775
+      },
+      "idle": {
+        "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+        "gross_energy_joules": 222.9175,
+        "mean_power_watts": 7.369174,
+        "observed_elapsed_seconds": 30.067354,
+        "peak_power_watts": 7.39,
+        "requested_seconds": 30,
+        "sample_count": 121,
+        "sample_interval_seconds": 0.25
+      },
+      "latency_ms": {
+        "mean": 471.735,
+        "median": 459.179,
+        "p95": 488.901
+      }
+    }
+  },
+  "schema": "zth_qwen3_5_0_8b_clean_scope_logic_probe_matched_matrix_v1",
+  "status": "exploratory_matched_not_confirmatory",
+  "suppliers": {
+    "596m": {
+      "artifact_sha256": "b0638f08417a2d3c8652760462eb5407c6e30173cf9608ad0820757a281eea0e",
+      "model_id": "Qwen3-0.6B-Q4_K_M.gguf",
+      "operative_parameters": 596049920
+    },
+    "752m": {
+      "artifact_sha256": "bd258782e35f7f458f8aced1adc053e6e92e89bc735ba3be89d38a06121dc517",
+      "model_id": "Qwen3.5-0.8B-Q4_K_M.gguf",
+      "operative_parameters": 752393024
+    }
+  },
+  "transition_counts": {
+    "596M_ONLY_CORRECT": 0,
+    "752M_ONLY_CORRECT": 1,
+    "BOTH_CORRECT": 8,
+    "BOTH_INCORRECT": 7
+  },
+  "transition_task_ids": {
+    "596M_ONLY_CORRECT": [],
+    "752M_ONLY_CORRECT": [
+      "clean-scope-007"
+    ],
+    "BOTH_CORRECT": [
+      "clean-scope-009",
+      "clean-scope-010",
+      "clean-scope-011",
+      "clean-scope-012",
+      "clean-scope-013",
+      "clean-scope-014",
+      "clean-scope-015",
+      "clean-scope-016"
+    ],
+    "BOTH_INCORRECT": [
+      "clean-scope-001",
+      "clean-scope-002",
+      "clean-scope-003",
+      "clean-scope-004",
+      "clean-scope-005",
+      "clean-scope-006",
+      "clean-scope-008"
+    ]
+  }
+}
