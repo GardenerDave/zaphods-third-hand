@@ -1,0 +1,261 @@
+{
+  "aggregates": {
+    "17b": {
+      "branch_results": {
+        "false": {
+          "accuracy": 0.0,
+          "correct": 0,
+          "tasks": 8
+        },
+        "true": {
+          "accuracy": 1.0,
+          "correct": 8,
+          "tasks": 8
+        }
+      },
+      "candidate": {
+        "artifact_sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb",
+        "effective_n_ctx": 32768,
+        "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+        "n_ctx_train": 32768,
+        "operative_parameters": 2031739904
+      },
+      "confusion_matrix": {
+        "expected_false_observed_false": 0,
+        "expected_false_observed_true": 8,
+        "expected_true_observed_false": 0,
+        "expected_true_observed_true": 8
+      },
+      "context_limit_non_binding_for_probe": true,
+      "energy": {
+        "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+        "gross_joules_per_action_mean": 44.176874999999995,
+        "gross_joules_per_action_median": 44.19625,
+        "gross_joules_per_validated_task": null,
+        "gross_joules_total": 706.8299999999999,
+        "measurement_boundary": "gpu_device_only",
+        "measurement_level": 2
+      },
+      "execution": {
+        "escalations": 0,
+        "retries": 0,
+        "supplier_model_calls": 16,
+        "teacher_calls": 0
+      },
+      "exploratory_matched_not_confirmatory": true,
+      "false_negative_rate": 0.0,
+      "false_positive_rate": 1.0,
+      "historical_comparison": "not numerically merged with confounded historical scope evidence",
+      "idle_power": {
+        "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+        "gross_energy_joules": 222.8975,
+        "mean_power_watts": 7.368512,
+        "observed_elapsed_seconds": 30.06665,
+        "peak_power_watts": 7.38,
+        "requested_seconds": 30,
+        "sample_count": 121,
+        "sample_interval_seconds": 0.25
+      },
+      "invalid_contract_failures": 0,
+      "latency_ms": {
+        "mean": 1485.856125,
+        "median": 1457.539,
+        "metric": "candidate_action_wall_clock",
+        "p95": 1500.378
+      },
+      "overall_accuracy": 0.5,
+      "schema": "zth_qwen3_1_7b_clean_scope_logic_probe_aggregate_v1",
+      "scope_decision_failures": 8,
+      "serialization_failures": 0,
+      "task_count": 16,
+      "true_f1": 0.6666666666666666,
+      "true_precision": 0.5,
+      "true_recall": 1.0
+    },
+    "596m": {
+      "branch_results": {
+        "false": {
+          "accuracy": 0.0,
+          "correct": 0,
+          "tasks": 8
+        },
+        "true": {
+          "accuracy": 1.0,
+          "correct": 8,
+          "tasks": 8
+        }
+      },
+      "candidate": {
+        "artifact_sha256": "b0638f08417a2d3c8652760462eb5407c6e30173cf9608ad0820757a281eea0e",
+        "model_id": "Qwen3-0.6B-Q4_K_M.gguf",
+        "operative_parameters": 596049920
+      },
+      "confusion_matrix": {
+        "expected_false_observed_false": 0,
+        "expected_false_observed_true": 8,
+        "expected_true_observed_false": 0,
+        "expected_true_observed_true": 8
+      },
+      "energy": {
+        "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+        "gross_joules_per_action_mean": 21.843438,
+        "gross_joules_per_action_median": 22.13,
+        "gross_joules_per_validated_task": null,
+        "gross_joules_total": 349.495,
+        "measurement_boundary": "gpu_device_only",
+        "measurement_level": 2
+      },
+      "execution": {
+        "escalations": 0,
+        "retries": 0,
+        "supplier_model_calls": 16,
+        "teacher_calls": 0
+      },
+      "exploratory_not_confirmatory": true,
+      "false_negative_rate": 0.0,
+      "false_positive_rate": 1.0,
+      "historical_comparison": "historical scope evidence remains materially confounded and is not numerically merged",
+      "idle_power": {
+        "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+        "gross_energy_joules": 223.3925,
+        "mean_power_watts": 7.384876,
+        "observed_elapsed_seconds": 30.067865,
+        "peak_power_watts": 7.43,
+        "requested_seconds": 30,
+        "sample_count": 121,
+        "sample_interval_seconds": 0.25
+      },
+      "invalid_contract_failures": 0,
+      "latency_ms": {
+        "mean": 596.72,
+        "median": 589.083,
+        "metric": "candidate_action_wall_clock",
+        "p95": 611.885
+      },
+      "overall_accuracy": 0.5,
+      "schema": "zth_qwen3_0_6b_clean_scope_logic_probe_aggregate_v1",
+      "scope_decision_failures": 8,
+      "serialization_failures": 0,
+      "task_count": 16,
+      "true_f1": 0.666667,
+      "true_precision": 0.5,
+      "true_recall": 1.0
+    },
+    "752m": {
+      "branch_results": {
+        "false": {
+          "accuracy": 0.125,
+          "correct": 1,
+          "tasks": 8
+        },
+        "true": {
+          "accuracy": 1.0,
+          "correct": 8,
+          "tasks": 8
+        }
+      },
+      "candidate": {
+        "artifact_sha256": "bd258782e35f7f458f8aced1adc053e6e92e89bc735ba3be89d38a06121dc517",
+        "model_id": "Qwen3.5-0.8B-Q4_K_M.gguf",
+        "operative_parameters": 752393024
+      },
+      "confusion_matrix": {
+        "expected_false_observed_false": 1,
+        "expected_false_observed_true": 7,
+        "expected_true_observed_false": 0,
+        "expected_true_observed_true": 8
+      },
+      "energy": {
+        "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+        "gross_joules_per_action_mean": 23.02984375,
+        "gross_joules_per_action_median": 23.26625,
+        "gross_joules_per_validated_task": null,
+        "gross_joules_total": 368.4775,
+        "measurement_boundary": "gpu_device_only",
+        "measurement_level": 2
+      },
+      "execution": {
+        "escalations": 0,
+        "retries": 0,
+        "supplier_model_calls": 16,
+        "teacher_calls": 0
+      },
+      "exploratory_matched_not_confirmatory": true,
+      "false_negative_rate": 0.0,
+      "false_positive_rate": 0.875,
+      "historical_comparison": "not numerically merged with confounded historical scope evidence",
+      "idle_power": {
+        "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+        "gross_energy_joules": 222.9175,
+        "mean_power_watts": 7.369174,
+        "observed_elapsed_seconds": 30.067354,
+        "peak_power_watts": 7.39,
+        "requested_seconds": 30,
+        "sample_count": 121,
+        "sample_interval_seconds": 0.25
+      },
+      "invalid_contract_failures": 0,
+      "latency_ms": {
+        "mean": 471.73525,
+        "median": 459.179,
+        "metric": "candidate_action_wall_clock",
+        "p95": 488.901
+      },
+      "overall_accuracy": 0.5625,
+      "schema": "zth_qwen3_5_0_8b_clean_scope_logic_probe_aggregate_v1",
+      "scope_decision_failures": 7,
+      "serialization_failures": 0,
+      "task_count": 16,
+      "true_f1": 0.6956521739130435,
+      "true_precision": 0.5333333333333333,
+      "true_recall": 1.0
+    }
+  },
+  "false_branch_categories": {
+    "failed_by_all_three": [
+      "clean-scope-001",
+      "clean-scope-002",
+      "clean-scope-003",
+      "clean-scope-004",
+      "clean-scope-005",
+      "clean-scope-006",
+      "clean-scope-008"
+    ],
+    "recovered_at_752m": [
+      "clean-scope-007"
+    ],
+    "recovered_by_both_752m_and_17b": [],
+    "recovered_only_at_17b": []
+  },
+  "interpretation": {
+    "architecture_generation_confound": true,
+    "clean_scope_ladder": "NO_OBSERVED_SCOPE_LADDER",
+    "context_limit_non_binding_for_probe": true,
+    "next_decision": "SCOPE_RULE_NOT_SIZE_RESOLVED",
+    "practical_scope_bracket": "NOT_SUPPORTED",
+    "scope_characterization_17b": "SCOPE_RULE_SYSTEMATIC_TRUE_BIAS"
+  },
+  "matched_task_set_identical": true,
+  "schema": "zth_clean_scope_three_supplier_comparison_v1",
+  "suppliers": {
+    "17b": {
+      "effective_n_ctx": 32768,
+      "n_ctx_train": 32768,
+      "operative_parameters": 2031739904,
+      "requested_n_ctx": 40960
+    },
+    "596m": {
+      "effective_n_ctx": 40960,
+      "operative_parameters": 596049920
+    },
+    "752m": {
+      "effective_n_ctx": 40960,
+      "operative_parameters": 752393024
+    }
+  },
+  "true_branch_retained": {
+    "17b": "8/8",
+    "596m": "8/8",
+    "752m": "8/8"
+  }
+}
