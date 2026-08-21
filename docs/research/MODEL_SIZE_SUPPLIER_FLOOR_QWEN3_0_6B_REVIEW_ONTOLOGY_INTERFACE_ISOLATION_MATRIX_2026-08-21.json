@@ -1,0 +1,961 @@
+{
+  "corrected_raw_aggregate": {
+    "allowed_targets_exact": 4,
+    "authority_separation_observed_and_correct": 6,
+    "candidate": "Qwen3-0.6B-Q4_K_M.gguf",
+    "energy": {
+      "gross_joules_per_action_mean": 67.761667,
+      "gross_joules_per_action_median": 67.985,
+      "gross_joules_per_validated_task": 203.285,
+      "measurement_boundary": "gpu_device_only",
+      "measurement_level": 2
+    },
+    "execution": {
+      "escalation_count": 0,
+      "retry_count": 0,
+      "supplier_model_calls": 12,
+      "teacher_calls": 0
+    },
+    "full_validator_passes": 4,
+    "held_targets_exact": 5,
+    "historical_runs_changed": false,
+    "idle_power": {
+      "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+      "gross_energy_joules": 223.0975,
+      "mean_power_watts": 7.375124,
+      "observed_elapsed_seconds": 30.082941,
+      "peak_power_watts": 7.39,
+      "requested_seconds": 30,
+      "sample_count": 121,
+      "sample_interval_seconds": 0.25
+    },
+    "latency_ms": {
+      "mean": 2197.724,
+      "median": 2148.464,
+      "metric": "candidate_action_wall_clock",
+      "p95": 2442.516
+    },
+    "operative_supplier_parameter_count": 596049920,
+    "protocol_compliance_isolation": true,
+    "raw_contract_valid": 6,
+    "raw_parse_valid": 8,
+    "reference_fact_valid": 4,
+    "review_status_exact": 8,
+    "schema": "zth_qwen3_0_6b_review_ontology_isolation_aggregate_v1",
+    "scope_expansion": {
+      "correct": 8,
+      "false_branch": {
+        "correct": 0,
+        "tasks": 0
+      },
+      "false_negative": 0,
+      "false_positive": 0,
+      "true_branch": {
+        "correct": 8,
+        "tasks": 12
+      }
+    },
+    "screening_only_not_confirmatory": true,
+    "semantic_fields_correct_distribution": {
+      "0": 4,
+      "1": 0,
+      "2": 3,
+      "3": 1,
+      "4": 4
+    },
+    "tasks": 12,
+    "three_of_four_tasks": [
+      "run7-scope-005"
+    ],
+    "transport_valid": 12
+  },
+  "cross_bracket_reference": {
+    "confounds": [
+      "different architecture/generation",
+      "different task populations",
+      "different stochastic generations",
+      "596M population exercises positive scope branch only"
+    ],
+    "qwen35_loaded_752m_ontology_explicit": {
+      "false_scope": "1/8",
+      "full_validated": 3,
+      "raw_contract": 13,
+      "raw_parse": 16,
+      "review_exact": 16,
+      "semantic_4_of_4": 3,
+      "true_scope": "8/8"
+    },
+    "qwen3_loaded_596m_corrected": {
+      "full_validated": 4,
+      "raw_contract": 6,
+      "raw_parse": 8,
+      "review_exact": 8
+    }
+  },
+  "original_normalized_explicit_interface_aggregate": {
+    "allowed_exact": 6,
+    "allowed_micro": {
+      "f1": 0.6060606060606061,
+      "false_negatives": 4,
+      "false_positives": 9,
+      "precision": 0.5263157894736842,
+      "recall": 0.7142857142857143,
+      "true_positives": 10
+    },
+    "contract_usable": 10,
+    "error_cluster_tags": {
+      "allowed_held_overlap": 2,
+      "allowed_target_mismatch": 6,
+      "held_target_mismatch": 6,
+      "review_status_mismatch": 12
+    },
+    "field_types_all_correct": 12,
+    "fully_validator_valid": 0,
+    "held_exact": 6,
+    "held_micro": {
+      "f1": 0.5652173913043478,
+      "false_negatives": 11,
+      "false_positives": 9,
+      "precision": 0.5909090909090909,
+      "recall": 0.5416666666666666,
+      "true_positives": 13
+    },
+    "mechanically_recoverable": 12,
+    "no_overlap": 10,
+    "raw_parse_valid": null,
+    "reference_semantic_all_fields": 0,
+    "review_status_exact": 0,
+    "review_status_observed": {
+      "allowed": 3,
+      "approved": 5,
+      "hold": 2,
+      "ready": 1,
+      "required": 1
+    },
+    "scope_expansion_correct": 12,
+    "scope_expansion_type_correct": 12,
+    "semantic_fields_3_of_4": 5,
+    "semantic_fields_distribution": {
+      "1": 5,
+      "2": 2,
+      "3": 5
+    },
+    "task_count": 12
+  },
+  "original_raw_explicit_interface_aggregate": {
+    "allowed_exact": 3,
+    "allowed_micro": {
+      "f1": 0.5,
+      "false_negatives": 8,
+      "false_positives": 4,
+      "precision": 0.6,
+      "recall": 0.42857142857142855,
+      "true_positives": 6
+    },
+    "contract_usable": 4,
+    "error_cluster_tags": {
+      "allowed_held_overlap": 2,
+      "allowed_target_mismatch": 9,
+      "held_target_mismatch": 8,
+      "missing_structured_object": 6,
+      "review_status_mismatch": 12,
+      "scope_expansion_uninterpretable": 6
+    },
+    "field_types_all_correct": 6,
+    "fully_validator_valid": 0,
+    "held_exact": 4,
+    "held_micro": {
+      "f1": 0.5142857142857142,
+      "false_negatives": 15,
+      "false_positives": 2,
+      "precision": 0.8181818181818182,
+      "recall": 0.375,
+      "true_positives": 9
+    },
+    "mechanically_recoverable": null,
+    "no_overlap": 10,
+    "raw_parse_valid": 6,
+    "reference_semantic_all_fields": 0,
+    "review_status_exact": 0,
+    "review_status_observed": {
+      "None": 6,
+      "allowed": 3,
+      "approved": 1,
+      "hold": 1,
+      "required": 1
+    },
+    "scope_expansion_correct": 6,
+    "scope_expansion_type_correct": 6,
+    "semantic_fields_3_of_4": 3,
+    "semantic_fields_distribution": {
+      "0": 6,
+      "1": 2,
+      "2": 1,
+      "3": 3
+    },
+    "task_count": 12
+  },
+  "paired_summary": {
+    "all_observable_corrected_review_tokens": 8,
+    "classification_counts": {
+      "IMPROVED": 8,
+      "MIXED": 0,
+      "REGRESSED": 4,
+      "UNCHANGED": 0
+    },
+    "non_review_changed_task_ids": [
+      "run7-scope-001",
+      "run7-scope-002",
+      "run7-scope-007",
+      "run7-scope-010"
+    ],
+    "original_prompt_blocked_full_validation_task_ids": [
+      "run7-scope-006",
+      "run7-scope-008",
+      "run7-scope-011",
+      "run7-scope-012"
+    ],
+    "original_three_of_four_became_four_of_four": [
+      "run7-scope-006",
+      "run7-scope-008",
+      "run7-scope-011",
+      "run7-scope-012"
+    ],
+    "original_three_of_four_task_ids": [
+      "run7-scope-002",
+      "run7-scope-006",
+      "run7-scope-008",
+      "run7-scope-011",
+      "run7-scope-012"
+    ]
+  },
+  "paired_tasks": [
+    {
+      "after_raw_corrected_interface": {
+        "allowed_exact": false,
+        "authority_separation": null,
+        "contract_valid": false,
+        "full_validator_valid": false,
+        "held_exact": false,
+        "raw_parse_valid": false,
+        "review_exact": null,
+        "review_status": null,
+        "scope_correct": null,
+        "semantic_fields_correct": 0
+      },
+      "before_normalized_explicit_interface": {
+        "allowed_exact": false,
+        "authority_separation": true,
+        "contract_valid": true,
+        "full_validator_valid": false,
+        "held_exact": false,
+        "mechanically_exposed": true,
+        "raw_parse_valid": true,
+        "review_exact": false,
+        "review_status": "ready",
+        "scope_correct": true,
+        "semantic_fields_correct": 1
+      },
+      "component_delta": {
+        "after": {
+          "allowed_held_separation": null,
+          "allowed_target_correctness": null,
+          "held_target_correctness": null,
+          "required_field_types": null,
+          "review_status_correctness": null,
+          "scope_expansion_correctness": null,
+          "semantic_fields_correct": 0,
+          "serialization": false
+        },
+        "before": {
+          "allowed_held_separation": true,
+          "allowed_target_correctness": false,
+          "held_target_correctness": false,
+          "required_field_types": true,
+          "review_status_correctness": false,
+          "scope_expansion_correctness": true,
+          "semantic_fields_correct": 1,
+          "serialization": true
+        },
+        "classification": "REGRESSED",
+        "improvements": [],
+        "regressions": [
+          "serialization",
+          "semantic_fields_correct"
+        ]
+      },
+      "non_review_improvements": [],
+      "non_review_regressions": [
+        "serialization"
+      ],
+      "task_id": "run7-scope-001"
+    },
+    {
+      "after_raw_corrected_interface": {
+        "allowed_exact": false,
+        "authority_separation": null,
+        "contract_valid": false,
+        "full_validator_valid": false,
+        "held_exact": false,
+        "raw_parse_valid": false,
+        "review_exact": null,
+        "review_status": null,
+        "scope_correct": null,
+        "semantic_fields_correct": 0
+      },
+      "before_normalized_explicit_interface": {
+        "allowed_exact": true,
+        "authority_separation": true,
+        "contract_valid": true,
+        "full_validator_valid": false,
+        "held_exact": true,
+        "mechanically_exposed": true,
+        "raw_parse_valid": true,
+        "review_exact": false,
+        "review_status": "approved",
+        "scope_correct": true,
+        "semantic_fields_correct": 3
+      },
+      "component_delta": {
+        "after": {
+          "allowed_held_separation": null,
+          "allowed_target_correctness": null,
+          "held_target_correctness": null,
+          "required_field_types": null,
+          "review_status_correctness": null,
+          "scope_expansion_correctness": null,
+          "semantic_fields_correct": 0,
+          "serialization": false
+        },
+        "before": {
+          "allowed_held_separation": true,
+          "allowed_target_correctness": true,
+          "held_target_correctness": true,
+          "required_field_types": true,
+          "review_status_correctness": false,
+          "scope_expansion_correctness": true,
+          "semantic_fields_correct": 3,
+          "serialization": true
+        },
+        "classification": "REGRESSED",
+        "improvements": [],
+        "regressions": [
+          "serialization",
+          "semantic_fields_correct"
+        ]
+      },
+      "non_review_improvements": [],
+      "non_review_regressions": [
+        "serialization"
+      ],
+      "task_id": "run7-scope-002"
+    },
+    {
+      "after_raw_corrected_interface": {
+        "allowed_exact": false,
+        "authority_separation": false,
+        "contract_valid": false,
+        "full_validator_valid": false,
+        "held_exact": false,
+        "raw_parse_valid": true,
+        "review_exact": true,
+        "review_status": "ready_for_review",
+        "scope_correct": true,
+        "semantic_fields_correct": 2
+      },
+      "before_normalized_explicit_interface": {
+        "allowed_exact": false,
+        "authority_separation": false,
+        "contract_valid": false,
+        "full_validator_valid": false,
+        "held_exact": false,
+        "mechanically_exposed": true,
+        "raw_parse_valid": true,
+        "review_exact": false,
+        "review_status": "required",
+        "scope_correct": true,
+        "semantic_fields_correct": 1
+      },
+      "component_delta": {
+        "after": {
+          "allowed_held_separation": false,
+          "allowed_target_correctness": false,
+          "held_target_correctness": false,
+          "required_field_types": true,
+          "review_status_correctness": true,
+          "scope_expansion_correctness": true,
+          "semantic_fields_correct": 2,
+          "serialization": true
+        },
+        "before": {
+          "allowed_held_separation": false,
+          "allowed_target_correctness": false,
+          "held_target_correctness": false,
+          "required_field_types": true,
+          "review_status_correctness": false,
+          "scope_expansion_correctness": true,
+          "semantic_fields_correct": 1,
+          "serialization": true
+        },
+        "classification": "IMPROVED",
+        "improvements": [
+          "review_status_correctness",
+          "semantic_fields_correct"
+        ],
+        "regressions": []
+      },
+      "non_review_improvements": [],
+      "non_review_regressions": [],
+      "task_id": "run7-scope-003"
+    },
+    {
+      "after_raw_corrected_interface": {
+        "allowed_exact": false,
+        "authority_separation": true,
+        "contract_valid": true,
+        "full_validator_valid": false,
+        "held_exact": false,
+        "raw_parse_valid": true,
+        "review_exact": true,
+        "review_status": "ready_for_review",
+        "scope_correct": true,
+        "semantic_fields_correct": 2
+      },
+      "before_normalized_explicit_interface": {
+        "allowed_exact": false,
+        "authority_separation": true,
+        "contract_valid": true,
+        "full_validator_valid": false,
+        "held_exact": false,
+        "mechanically_exposed": true,
+        "raw_parse_valid": true,
+        "review_exact": false,
+        "review_status": "approved",
+        "scope_correct": true,
+        "semantic_fields_correct": 1
+      },
+      "component_delta": {
+        "after": {
+          "allowed_held_separation": true,
+          "allowed_target_correctness": false,
+          "held_target_correctness": false,
+          "required_field_types": true,
+          "review_status_correctness": true,
+          "scope_expansion_correctness": true,
+          "semantic_fields_correct": 2,
+          "serialization": true
+        },
+        "before": {
+          "allowed_held_separation": true,
+          "allowed_target_correctness": false,
+          "held_target_correctness": false,
+          "required_field_types": true,
+          "review_status_correctness": false,
+          "scope_expansion_correctness": true,
+          "semantic_fields_correct": 1,
+          "serialization": true
+        },
+        "classification": "IMPROVED",
+        "improvements": [
+          "review_status_correctness",
+          "semantic_fields_correct"
+        ],
+        "regressions": []
+      },
+      "non_review_improvements": [],
+      "non_review_regressions": [],
+      "task_id": "run7-scope-004"
+    },
+    {
+      "after_raw_corrected_interface": {
+        "allowed_exact": false,
+        "authority_separation": true,
+        "contract_valid": true,
+        "full_validator_valid": false,
+        "held_exact": true,
+        "raw_parse_valid": true,
+        "review_exact": true,
+        "review_status": "ready_for_review",
+        "scope_correct": true,
+        "semantic_fields_correct": 3
+      },
+      "before_normalized_explicit_interface": {
+        "allowed_exact": false,
+        "authority_separation": true,
+        "contract_valid": true,
+        "full_validator_valid": false,
+        "held_exact": true,
+        "mechanically_exposed": true,
+        "raw_parse_valid": true,
+        "review_exact": false,
+        "review_status": "approved",
+        "scope_correct": true,
+        "semantic_fields_correct": 2
+      },
+      "component_delta": {
+        "after": {
+          "allowed_held_separation": true,
+          "allowed_target_correctness": false,
+          "held_target_correctness": true,
+          "required_field_types": true,
+          "review_status_correctness": true,
+          "scope_expansion_correctness": true,
+          "semantic_fields_correct": 3,
+          "serialization": true
+        },
+        "before": {
+          "allowed_held_separation": true,
+          "allowed_target_correctness": false,
+          "held_target_correctness": true,
+          "required_field_types": true,
+          "review_status_correctness": false,
+          "scope_expansion_correctness": true,
+          "semantic_fields_correct": 2,
+          "serialization": true
+        },
+        "classification": "IMPROVED",
+        "improvements": [
+          "review_status_correctness",
+          "semantic_fields_correct"
+        ],
+        "regressions": []
+      },
+      "non_review_improvements": [],
+      "non_review_regressions": [],
+      "task_id": "run7-scope-005"
+    },
+    {
+      "after_raw_corrected_interface": {
+        "allowed_exact": true,
+        "authority_separation": true,
+        "contract_valid": true,
+        "full_validator_valid": true,
+        "held_exact": true,
+        "raw_parse_valid": true,
+        "review_exact": true,
+        "review_status": "ready_for_review",
+        "scope_correct": true,
+        "semantic_fields_correct": 4
+      },
+      "before_normalized_explicit_interface": {
+        "allowed_exact": true,
+        "authority_separation": true,
+        "contract_valid": true,
+        "full_validator_valid": false,
+        "held_exact": true,
+        "mechanically_exposed": true,
+        "raw_parse_valid": true,
+        "review_exact": false,
+        "review_status": "allowed",
+        "scope_correct": true,
+        "semantic_fields_correct": 3
+      },
+      "component_delta": {
+        "after": {
+          "allowed_held_separation": true,
+          "allowed_target_correctness": true,
+          "held_target_correctness": true,
+          "required_field_types": true,
+          "review_status_correctness": true,
+          "scope_expansion_correctness": true,
+          "semantic_fields_correct": 4,
+          "serialization": true
+        },
+        "before": {
+          "allowed_held_separation": true,
+          "allowed_target_correctness": true,
+          "held_target_correctness": true,
+          "required_field_types": true,
+          "review_status_correctness": false,
+          "scope_expansion_correctness": true,
+          "semantic_fields_correct": 3,
+          "serialization": true
+        },
+        "classification": "IMPROVED",
+        "improvements": [
+          "review_status_correctness",
+          "semantic_fields_correct"
+        ],
+        "regressions": []
+      },
+      "non_review_improvements": [],
+      "non_review_regressions": [],
+      "task_id": "run7-scope-006"
+    },
+    {
+      "after_raw_corrected_interface": {
+        "allowed_exact": false,
+        "authority_separation": null,
+        "contract_valid": false,
+        "full_validator_valid": false,
+        "held_exact": false,
+        "raw_parse_valid": false,
+        "review_exact": null,
+        "review_status": null,
+        "scope_correct": null,
+        "semantic_fields_correct": 0
+      },
+      "before_normalized_explicit_interface": {
+        "allowed_exact": false,
+        "authority_separation": true,
+        "contract_valid": true,
+        "full_validator_valid": false,
+        "held_exact": false,
+        "mechanically_exposed": true,
+        "raw_parse_valid": true,
+        "review_exact": false,
+        "review_status": "approved",
+        "scope_correct": true,
+        "semantic_fields_correct": 1
+      },
+      "component_delta": {
+        "after": {
+          "allowed_held_separation": null,
+          "allowed_target_correctness": null,
+          "held_target_correctness": null,
+          "required_field_types": null,
+          "review_status_correctness": null,
+          "scope_expansion_correctness": null,
+          "semantic_fields_correct": 0,
+          "serialization": false
+        },
+        "before": {
+          "allowed_held_separation": true,
+          "allowed_target_correctness": false,
+          "held_target_correctness": false,
+          "required_field_types": true,
+          "review_status_correctness": false,
+          "scope_expansion_correctness": true,
+          "semantic_fields_correct": 1,
+          "serialization": true
+        },
+        "classification": "REGRESSED",
+        "improvements": [],
+        "regressions": [
+          "serialization",
+          "semantic_fields_correct"
+        ]
+      },
+      "non_review_improvements": [],
+      "non_review_regressions": [
+        "serialization"
+      ],
+      "task_id": "run7-scope-007"
+    },
+    {
+      "after_raw_corrected_interface": {
+        "allowed_exact": true,
+        "authority_separation": true,
+        "contract_valid": true,
+        "full_validator_valid": true,
+        "held_exact": true,
+        "raw_parse_valid": true,
+        "review_exact": true,
+        "review_status": "ready_for_review",
+        "scope_correct": true,
+        "semantic_fields_correct": 4
+      },
+      "before_normalized_explicit_interface": {
+        "allowed_exact": true,
+        "authority_separation": true,
+        "contract_valid": true,
+        "full_validator_valid": false,
+        "held_exact": true,
+        "mechanically_exposed": true,
+        "raw_parse_valid": true,
+        "review_exact": false,
+        "review_status": "hold",
+        "scope_correct": true,
+        "semantic_fields_correct": 3
+      },
+      "component_delta": {
+        "after": {
+          "allowed_held_separation": true,
+          "allowed_target_correctness": true,
+          "held_target_correctness": true,
+          "required_field_types": true,
+          "review_status_correctness": true,
+          "scope_expansion_correctness": true,
+          "semantic_fields_correct": 4,
+          "serialization": true
+        },
+        "before": {
+          "allowed_held_separation": true,
+          "allowed_target_correctness": true,
+          "held_target_correctness": true,
+          "required_field_types": true,
+          "review_status_correctness": false,
+          "scope_expansion_correctness": true,
+          "semantic_fields_correct": 3,
+          "serialization": true
+        },
+        "classification": "IMPROVED",
+        "improvements": [
+          "review_status_correctness",
+          "semantic_fields_correct"
+        ],
+        "regressions": []
+      },
+      "non_review_improvements": [],
+      "non_review_regressions": [],
+      "task_id": "run7-scope-008"
+    },
+    {
+      "after_raw_corrected_interface": {
+        "allowed_exact": false,
+        "authority_separation": false,
+        "contract_valid": false,
+        "full_validator_valid": false,
+        "held_exact": false,
+        "raw_parse_valid": true,
+        "review_exact": true,
+        "review_status": "ready_for_review",
+        "scope_correct": true,
+        "semantic_fields_correct": 2
+      },
+      "before_normalized_explicit_interface": {
+        "allowed_exact": false,
+        "authority_separation": false,
+        "contract_valid": false,
+        "full_validator_valid": false,
+        "held_exact": false,
+        "mechanically_exposed": true,
+        "raw_parse_valid": true,
+        "review_exact": false,
+        "review_status": "allowed",
+        "scope_correct": true,
+        "semantic_fields_correct": 1
+      },
+      "component_delta": {
+        "after": {
+          "allowed_held_separation": false,
+          "allowed_target_correctness": false,
+          "held_target_correctness": false,
+          "required_field_types": true,
+          "review_status_correctness": true,
+          "scope_expansion_correctness": true,
+          "semantic_fields_correct": 2,
+          "serialization": true
+        },
+        "before": {
+          "allowed_held_separation": false,
+          "allowed_target_correctness": false,
+          "held_target_correctness": false,
+          "required_field_types": true,
+          "review_status_correctness": false,
+          "scope_expansion_correctness": true,
+          "semantic_fields_correct": 1,
+          "serialization": true
+        },
+        "classification": "IMPROVED",
+        "improvements": [
+          "review_status_correctness",
+          "semantic_fields_correct"
+        ],
+        "regressions": []
+      },
+      "non_review_improvements": [],
+      "non_review_regressions": [],
+      "task_id": "run7-scope-009"
+    },
+    {
+      "after_raw_corrected_interface": {
+        "allowed_exact": false,
+        "authority_separation": null,
+        "contract_valid": false,
+        "full_validator_valid": false,
+        "held_exact": false,
+        "raw_parse_valid": false,
+        "review_exact": null,
+        "review_status": null,
+        "scope_correct": null,
+        "semantic_fields_correct": 0
+      },
+      "before_normalized_explicit_interface": {
+        "allowed_exact": true,
+        "authority_separation": true,
+        "contract_valid": true,
+        "full_validator_valid": false,
+        "held_exact": false,
+        "mechanically_exposed": true,
+        "raw_parse_valid": true,
+        "review_exact": false,
+        "review_status": "approved",
+        "scope_correct": true,
+        "semantic_fields_correct": 2
+      },
+      "component_delta": {
+        "after": {
+          "allowed_held_separation": null,
+          "allowed_target_correctness": null,
+          "held_target_correctness": null,
+          "required_field_types": null,
+          "review_status_correctness": null,
+          "scope_expansion_correctness": null,
+          "semantic_fields_correct": 0,
+          "serialization": false
+        },
+        "before": {
+          "allowed_held_separation": true,
+          "allowed_target_correctness": true,
+          "held_target_correctness": false,
+          "required_field_types": true,
+          "review_status_correctness": false,
+          "scope_expansion_correctness": true,
+          "semantic_fields_correct": 2,
+          "serialization": true
+        },
+        "classification": "REGRESSED",
+        "improvements": [],
+        "regressions": [
+          "serialization",
+          "semantic_fields_correct"
+        ]
+      },
+      "non_review_improvements": [],
+      "non_review_regressions": [
+        "serialization"
+      ],
+      "task_id": "run7-scope-010"
+    },
+    {
+      "after_raw_corrected_interface": {
+        "allowed_exact": true,
+        "authority_separation": true,
+        "contract_valid": true,
+        "full_validator_valid": true,
+        "held_exact": true,
+        "raw_parse_valid": true,
+        "review_exact": true,
+        "review_status": "ready_for_review",
+        "scope_correct": true,
+        "semantic_fields_correct": 4
+      },
+      "before_normalized_explicit_interface": {
+        "allowed_exact": true,
+        "authority_separation": true,
+        "contract_valid": true,
+        "full_validator_valid": false,
+        "held_exact": true,
+        "mechanically_exposed": true,
+        "raw_parse_valid": true,
+        "review_exact": false,
+        "review_status": "allowed",
+        "scope_correct": true,
+        "semantic_fields_correct": 3
+      },
+      "component_delta": {
+        "after": {
+          "allowed_held_separation": true,
+          "allowed_target_correctness": true,
+          "held_target_correctness": true,
+          "required_field_types": true,
+          "review_status_correctness": true,
+          "scope_expansion_correctness": true,
+          "semantic_fields_correct": 4,
+          "serialization": true
+        },
+        "before": {
+          "allowed_held_separation": true,
+          "allowed_target_correctness": true,
+          "held_target_correctness": true,
+          "required_field_types": true,
+          "review_status_correctness": false,
+          "scope_expansion_correctness": true,
+          "semantic_fields_correct": 3,
+          "serialization": true
+        },
+        "classification": "IMPROVED",
+        "improvements": [
+          "review_status_correctness",
+          "semantic_fields_correct"
+        ],
+        "regressions": []
+      },
+      "non_review_improvements": [],
+      "non_review_regressions": [],
+      "task_id": "run7-scope-011"
+    },
+    {
+      "after_raw_corrected_interface": {
+        "allowed_exact": true,
+        "authority_separation": true,
+        "contract_valid": true,
+        "full_validator_valid": true,
+        "held_exact": true,
+        "raw_parse_valid": true,
+        "review_exact": true,
+        "review_status": "ready_for_review",
+        "scope_correct": true,
+        "semantic_fields_correct": 4
+      },
+      "before_normalized_explicit_interface": {
+        "allowed_exact": true,
+        "authority_separation": true,
+        "contract_valid": true,
+        "full_validator_valid": false,
+        "held_exact": true,
+        "mechanically_exposed": true,
+        "raw_parse_valid": true,
+        "review_exact": false,
+        "review_status": "hold",
+        "scope_correct": true,
+        "semantic_fields_correct": 3
+      },
+      "component_delta": {
+        "after": {
+          "allowed_held_separation": true,
+          "allowed_target_correctness": true,
+          "held_target_correctness": true,
+          "required_field_types": true,
+          "review_status_correctness": true,
+          "scope_expansion_correctness": true,
+          "semantic_fields_correct": 4,
+          "serialization": true
+        },
+        "before": {
+          "allowed_held_separation": true,
+          "allowed_target_correctness": true,
+          "held_target_correctness": true,
+          "required_field_types": true,
+          "review_status_correctness": false,
+          "scope_expansion_correctness": true,
+          "semantic_fields_correct": 3,
+          "serialization": true
+        },
+        "classification": "IMPROVED",
+        "improvements": [
+          "review_status_correctness",
+          "semantic_fields_correct"
+        ],
+        "regressions": []
+      },
+      "non_review_improvements": [],
+      "non_review_regressions": [],
+      "task_id": "run7-scope-012"
+    }
+  ],
+  "prompt_interface": {
+    "corrected_suffix_sha256": "75dc7be7a5e782b3858276d28fd90ba9a7620a951a4b3e1d308b904d6d12b7cc",
+    "diff": "--- original_explicit_interface_suffix\n+++ corrected_review_ontology_suffix\n@@ -17,6 +17,10 @@\n - held_targets must be a JSON array of strings.\n - scope_expansion_required must be a JSON boolean: true or false.\n - review_status must be a JSON string.\n+- For this task family, the valid review_status protocol value is:\n+  \"ready_for_review\"\n+- Use \"ready_for_review\" when the bounded result is ready to be returned for review.\n+- Do not invent alternative status labels.\n - Use the task evidence to determine the values.\n - Do not copy the example values unless they are correct.\n - Return the object only.\n",
+    "diff_sha256": "42c089dbed6563071950fc653ef8a4a4b6d2e561bc3837ebfff56da04a9882df",
+    "only_change": "explicit ready_for_review protocol token and prohibition on alternative status labels",
+    "original_suffix_sha256": "8386cb934c15b3a07b6a668075961c505a2c5ecd2d57980a5509c885c67ff4bc"
+  },
+  "protocol_compliance_isolation": true,
+  "provenance": {
+    "analysis_model_calls": 0,
+    "corrected_aggregate_sha256": "c3d317e1cf19fab1017b9fee48160839e35738ffef877182cc4ab06e728a00c0",
+    "corrected_manifest_sha256": "c76dbc39459ba219dee4c0c6b2d6b69332cd49ebfdc0d8bf1e7a5977ad2b380d",
+    "corrected_run": ".work/model_size_supplier_floor/qwen3_0_6b_review_ontology_interface_isolation/run_20260821T022334Z",
+    "historical_evidence_changed": false,
+    "original_aggregate_sha256": "3d4807e5079f079664333e23320f27c7fea9caac52be475aecb64777c4be68c7",
+    "original_atomic_matrix_sha256": "b9d804d4ff1b874003bc35987504a4a507583d155d42831631b08b9a9156d1ed",
+    "original_manifest_sha256": "5cbb191ca44318bb105980be489d9f9fda49c934ce601463a81cb73cc4b72f49",
+    "original_report_sha256": "303496298d725ba95b74952e2d7844f4997249a6eafe920b397dc09777bdd1bd",
+    "original_run": ".work/model_size_supplier_floor/qwen3_0_6b_interface_disambiguation/run_20260820T181000Z",
+    "original_run_unchanged": true
+  },
+  "schema": "zth_qwen3_0_6b_review_ontology_interface_isolation_matrix_v1",
+  "screening_only_not_confirmatory": true
+}
