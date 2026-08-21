@@ -1,0 +1,105 @@
+{
+  "schema": "model_size_supplier_floor_qwen3_5_0_8b_runtime_freeze_v1",
+  "status": "exploratory_audition_runtime_freeze",
+  "authority": "screening_only_no_capability_evidence",
+  "candidate": {
+    "model_identity": "Qwen/Qwen3.5-0.8B",
+    "role": "upward_bracket_atomic_supplier_audition",
+    "artifact_repository": "unsloth/Qwen3.5-0.8B-GGUF",
+    "artifact_revision": "cb02287e2172232d38d9eb470061351961ce1ba6",
+    "upstream_revision": "2fc06364715b967f1860aea9cf38778875588b17",
+    "filename": "Qwen3.5-0.8B-Q4_K_M.gguf",
+    "local_path": "/home/navigator/ai/models/small-auditions/qwen3.5-0.8b/Qwen3.5-0.8B-Q4_K_M.gguf",
+    "sha256": "bd258782e35f7f458f8aced1adc053e6e92e89bc735ba3be89d38a06121dc517",
+    "size_bytes": 532517120,
+    "quantization": "Q4_K_M",
+    "operative_supplier_parameter_count": 752393024,
+    "upstream_total_parameter_count": 873438784,
+    "artifact_load_evidence": "operator_verified_and_endpoint_exposed",
+    "architecture_confound": "Qwen3.5 hybrid multimodal generation differs from Qwen3-0.6B and Qwen3-1.7B"
+  },
+  "llama_cpp_exposed_metadata": {
+    "model_id": "Qwen3.5-0.8B-Q4_K_M.gguf",
+    "n_params": 752393024,
+    "n_ctx": 40960,
+    "n_ctx_train": 262144,
+    "n_embd": 1024,
+    "model_data_size_bytes": 521555200,
+    "thinking": 0
+  },
+  "runtime": {
+    "llama_cpp_version": "9314",
+    "build_revision": "d55fb9717",
+    "binary": "/home/navigator/llama.cpp/build-cuda-v100/bin/llama-server",
+    "context": 40960,
+    "native_context": 262144,
+    "parallel": 1,
+    "threads": 2,
+    "threads_batch": 4,
+    "split_mode": "none",
+    "fit": "on",
+    "fit_target": 512,
+    "reasoning": "off",
+    "max_output_tokens": 768,
+    "timeout_seconds": 900,
+    "endpoint_model_id": "Qwen3.5-0.8B-Q4_K_M.gguf"
+  },
+  "hardware": {
+    "gpu_class": "NVIDIA GeForce GTX 1650",
+    "gpu_memory_mib": 4096,
+    "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+    "observed_loaded_memory_mib": 1552,
+    "same_hardware_reference_required": true,
+    "exclusive_one_model_at_a_time_required": true,
+    "reference_1_7b_unloaded_during_audition": true
+  },
+  "reference_1_7b": {
+    "model_identity": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb",
+    "size_bytes": 1282439584,
+    "hardware": "same NVIDIA GeForce GTX 1650",
+    "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+    "llama_cpp_version": "9314",
+    "build_revision": "d55fb9717"
+  },
+  "telemetry": {
+    "transport": "remote_read_only_http",
+    "public_alias": "JARVIS_LOCAL",
+    "measurement_level": 2,
+    "measurement_boundary": "gpu_device_only",
+    "sample_interval_seconds": 0.25,
+    "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+    "energy_formula": "sum(power_watts * sample_interval_seconds)",
+    "gross_energy_retained": true
+  },
+  "teacher_runtime": {
+    "hardware": "Tesla V100-SXM2-16GB",
+    "independent_residency": true,
+    "touched": false,
+    "teacher_calls_authorized": false
+  },
+  "comparison_flags": {
+    "same_context_as_qwen3_reference": true,
+    "same_llama_cpp_build_as_qwen3_reference": true,
+    "same_hardware_as_qwen3_reference": true,
+    "no_simultaneous_candidate_and_reference_residency": true,
+    "raw_response_authoritative": true,
+    "wrapper_only_diagnostics_secondary": true
+  },
+  "bindings": {
+    "preparation_commit": "4dcdbac48b2b3e4e0a766950fd0fc9c7507ba1b4",
+    "task_manifest": "docs/research/MODEL_SIZE_SUPPLIER_FLOOR_QWEN3_5_0_8B_AUDITION_TASK_SET_2026-08-20.json",
+    "task_manifest_sha256": "bbed5fb16f379ffeecc71e768fc0961755b37c2f2e558932f779cac9760c5a03",
+    "scorecard_schema": "docs/research/ATOMIC_SUPPLIER_SCORECARD_SCHEMA_V1.json",
+    "scorecard_schema_sha256": "d484d012e8fe7bb6a5266864b3c8542a96a4e6391ca75145007b0a04eeefeea9",
+    "prompt_interface": "explicit_typed_bare_json_object_with_no_think"
+  },
+  "lifecycle": {
+    "runtime_frozen": true,
+    "screening_started": false,
+    "stage_b_preregistered": false,
+    "model_calls_made": false,
+    "production_routing_changed": false,
+    "capability_cards_updated": false
+  }
+}
