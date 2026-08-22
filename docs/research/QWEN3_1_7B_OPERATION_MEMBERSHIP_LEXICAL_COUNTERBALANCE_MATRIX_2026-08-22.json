@@ -1,0 +1,85 @@
+{
+  "schema": "zth_qwen3_1_7b_operation_membership_lexical_counterbalance_matrix_v1",
+  "exploratory_not_confirmatory": true,
+  "candidate": {
+    "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "operative_parameters": 2031739904,
+    "artifact_sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb"
+  },
+  "run": {
+    "path": ".work/model_size_supplier_floor/qwen3_1_7b_operation_membership_lexical_counterbalance/run_20260822T024500Z/",
+    "manifest_sha256": "33ab0e7640adc9df2990b05115b4bce662a375adf4746401e2c5f8c532b97cf4",
+    "aggregate_sha256": "36aa46923b35d02a7c0204e54003e8042321b4a31199ccf8254e34683b3a8567",
+    "response_count": 16,
+    "validator_count": 16,
+    "scorecard_count": 16,
+    "supplier_model_calls": 16,
+    "teacher_calls": 0,
+    "retries": 0,
+    "escalations": 0
+  },
+  "bindings": {
+    "task_manifest_sha256": "ff5f72fddea9d003ef7a1a92efc96048435eb94c0933073b058545267d7df29b",
+    "design_sha256": "ba706f8e00c37eb0521122b53112c21a9a8a578216e9ecb35d6837663850e8a5",
+    "correction_sha256": "3c8df5ac9ec36d777976bf29802b2007ffd627f1a8fddd4f62bb2875e118b176",
+    "schema_sha256": "9f812dd8b4e99918e769c76083b19eda9e9a4e9da9bc930ef1fc3c2e820d6885",
+    "previous_projection_report_sha256": "99d1fd94e4d3fc33c8122a0762f8e19cbc7c8218b53628089e893ced3f1b4adc",
+    "previous_projection_matrix_sha256": "341885941a3c9f4b5e2fc42995e9f9687598e847d3b16dcacea38896eee7a84d",
+    "pair_snapshot_sha256": "f94e49a3050852dc1bf18dd4864c23c95443017e79d64a0c2076a6a7ce414e7c"
+  },
+  "model_free_audit": {
+    "tasks": 16,
+    "pairs": 8,
+    "member": 8,
+    "non_member": 8,
+    "allowed_set_length": 2,
+    "requested_token_counts": {
+      "inspect": {"member": 2, "non_member": 2, "allowed_set": 8},
+      "update": {"member": 2, "non_member": 2, "allowed_set": 8},
+      "archive": {"member": 2, "non_member": 2, "allowed_set": 8},
+      "delete": {"member": 2, "non_member": 2, "allowed_set": 8}
+    },
+    "worked_boolean_exemplars": 0,
+    "target_evidence": false,
+    "distractor_evidence": false,
+    "scope_terminology": false,
+    "model_calls_before_inference": 0
+  },
+  "summary": {
+    "correct": 14,
+    "member_correct": 8,
+    "non_member_correct": 6,
+    "true_selected": 10,
+    "false_selected": 6,
+    "parse_valid": 16,
+    "contract_valid": 16,
+    "serialization_failures": 0,
+    "contract_failures": 0,
+    "confusion_matrix": {"TP": 8, "FN": 0, "FP": 2, "TN": 6},
+    "latency_ms": {"median": 964.1875, "mean": 828.669125, "p95": 1023.812},
+    "energy_joules": {"mean_per_action": 25.22578125, "median_per_action": 26.2575, "total": 403.6125}
+  },
+  "by_operation": {
+    "inspect": {"correct": 4, "member_correct": 2, "non_member_correct": 2, "observed_true": 2, "observed_false": 2},
+    "update": {"correct": 4, "member_correct": 2, "non_member_correct": 2, "observed_true": 2, "observed_false": 2},
+    "archive": {"correct": 2, "member_correct": 2, "non_member_correct": 0, "observed_true": 4, "observed_false": 0},
+    "delete": {"correct": 4, "member_correct": 2, "non_member_correct": 2, "observed_true": 2, "observed_false": 2}
+  },
+  "paired": [
+    {"pair_id": "op-pair-001", "requested_operation": "inspect", "member_observed": true, "non_member_observed": false, "classification": "BOTH_CORRECT"},
+    {"pair_id": "op-pair-002", "requested_operation": "inspect", "member_observed": true, "non_member_observed": false, "classification": "BOTH_CORRECT"},
+    {"pair_id": "op-pair-003", "requested_operation": "update", "member_observed": true, "non_member_observed": false, "classification": "BOTH_CORRECT"},
+    {"pair_id": "op-pair-004", "requested_operation": "update", "member_observed": true, "non_member_observed": false, "classification": "BOTH_CORRECT"},
+    {"pair_id": "op-pair-005", "requested_operation": "archive", "member_observed": true, "non_member_observed": true, "classification": "MEMBER_ONLY_CORRECT"},
+    {"pair_id": "op-pair-006", "requested_operation": "archive", "member_observed": true, "non_member_observed": true, "classification": "MEMBER_ONLY_CORRECT"},
+    {"pair_id": "op-pair-007", "requested_operation": "delete", "member_observed": true, "non_member_observed": false, "classification": "BOTH_CORRECT"},
+    {"pair_id": "op-pair-008", "requested_operation": "delete", "member_observed": true, "non_member_observed": false, "classification": "BOTH_CORRECT"}
+  ],
+  "interpretation": {
+    "primary_characterization": "OPERATION_LEXICAL_EFFECT_DETECTED",
+    "architectural_status": "ATOMIC_ARCHITECTURE_NOT_YET_DEMONSTRATED",
+    "next_decision": "REPAIR_OPERATION_MEMBERSHIP_QUERY",
+    "prior_raw_evidence_changed": false,
+    "stage_b_created": false
+  }
+}
