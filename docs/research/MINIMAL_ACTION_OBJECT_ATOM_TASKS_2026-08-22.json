@@ -1,0 +1,20 @@
+{
+  "schema":"zth_minimal_action_object_atom_tasks_v1",
+  "status":"frozen_exploratory_not_confirmatory",
+  "model_outputs_consulted":false,
+  "output_contract":{"fields":["action","direct_object"],"all_types":"string","additionalProperties":false},
+  "tasks":[
+    {"task_id":"minimal-atom-001","sentence":"Scan opal-register.json.","semantic_regime":"DIRECT_ENTITY_OBJECT","action_verb":"scan","mentioned_entity":"opal-register.json","requested_target":"opal-register.json","expected_action":"scan","expected_direct_object":"opal-register.json"},
+    {"task_id":"minimal-atom-002","sentence":"Scan the health line in opal-register.json.","semantic_regime":"SUBOBJECT_WITH_REFERENCE","action_verb":"scan","mentioned_entity":"opal-register.json","requested_target":"opal-register.json","expected_action":"scan","expected_direct_object":"health line"},
+    {"task_id":"minimal-atom-003","sentence":"Amend birch-dossier.json.","semantic_regime":"DIRECT_ENTITY_OBJECT","action_verb":"amend","mentioned_entity":"birch-dossier.json","requested_target":"birch-dossier.json","expected_action":"amend","expected_direct_object":"birch-dossier.json"},
+    {"task_id":"minimal-atom-004","sentence":"Amend the change note in birch-dossier.json.","semantic_regime":"SUBOBJECT_WITH_REFERENCE","action_verb":"amend","mentioned_entity":"birch-dossier.json","requested_target":"birch-dossier.json","expected_action":"amend","expected_direct_object":"change note"},
+    {"task_id":"minimal-atom-005","sentence":"Index cinder-log.json.","semantic_regime":"DIRECT_ENTITY_OBJECT","action_verb":"index","mentioned_entity":"cinder-log.json","requested_target":"cinder-log.json","expected_action":"index","expected_direct_object":"cinder-log.json"},
+    {"task_id":"minimal-atom-006","sentence":"Index the checksum row in cinder-log.json.","semantic_regime":"SUBOBJECT_WITH_REFERENCE","action_verb":"index","mentioned_entity":"cinder-log.json","requested_target":"cinder-log.json","expected_action":"index","expected_direct_object":"checksum row"},
+    {"task_id":"minimal-atom-007","sentence":"Dispatch violet-packet.json.","semantic_regime":"DIRECT_ENTITY_OBJECT","action_verb":"dispatch","mentioned_entity":"violet-packet.json","requested_target":"violet-packet.json","expected_action":"dispatch","expected_direct_object":"violet-packet.json"},
+    {"task_id":"minimal-atom-008","sentence":"Dispatch the cover memo in violet-packet.json.","semantic_regime":"SUBOBJECT_WITH_REFERENCE","action_verb":"dispatch","mentioned_entity":"violet-packet.json","requested_target":"violet-packet.json","expected_action":"dispatch","expected_direct_object":"cover memo"}
+  ],
+  "task_count":8,
+  "direct_entity_object_count":4,
+  "subobject_with_reference_count":4,
+  "model_calls_made":false
+}
