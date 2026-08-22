@@ -1,0 +1,65 @@
+{
+  "schema": "zth_qwen3_1_7b_minimal_action_object_atom_closeout_v1",
+  "authoritative_closeout": "98efdd944a427833aab09de8c8111f5bf6ed09b5",
+  "freeze_commit": "a5a2ae6c532f1f032ffb37b42238ec9bd8303cf3",
+  "run_directory": ".work/model_size_supplier_floor/qwen3_1_7b_minimal_action_object_atom/run_20260822T080000Z",
+  "supplier": {
+    "label": "Qwen3 1.7B-labeled / 2.032B operative",
+    "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "operative_parameters": 2031739904,
+    "artifact_sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb",
+    "effective_n_ctx": 32768,
+    "n_ctx_train": 32768,
+    "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85"
+  },
+  "freeze": {
+    "task_manifest_sha256": "61e890d33eee08f6879550d100219616df9150bcd73166757c819f6ae6fd4319",
+    "schema_sha256": "01223efc8daa32d8a3e11bb77b9d836bd6783bcf0e1e99c89f3e70a71d1ea7ac",
+    "response_format_sha256": "5a37e47ccfe02ac5d5bb9bba7a30156fb09525bbdec7ff767dadbd153bd0a88a",
+    "driver_sha256": "6d5fe8c8c70d4f4c446069e46ab30fa47d63de9b83a94cf3111ea4b73aeed871",
+    "task_count": 8,
+    "direct_entity_object": 4,
+    "subobject_with_reference": 4,
+    "worked_boolean_exemplars": 0
+  },
+  "metrics": {
+    "parse_valid": "8/8",
+    "contract_valid": "8/8",
+    "action_exact": "8/8",
+    "direct_object_exact": "4/8",
+    "both_fields_exact": "4/8",
+    "deterministic_binding_correct": "8/8",
+    "mentioned_entity_exactly_substituted": "0/8",
+    "instruction_verb_as_action": "0/8"
+  },
+  "by_regime": {
+    "DIRECT_ENTITY_OBJECT": {"tasks": 4, "action": "4/4", "direct_object": "4/4", "both": "4/4", "binding": "4/4"},
+    "SUBOBJECT_WITH_REFERENCE": {"tasks": 4, "action": "4/4", "direct_object": "0/4", "both": "0/4", "binding": "4/4"}
+  },
+  "failure_counts": {
+    "ACTION_EXTRACTION_FAILURE": 0,
+    "DIRECT_OBJECT_EXTRACTION_FAILURE": 4,
+    "MENTIONED_ENTITY_SUBSTITUTED_FOR_DIRECT_OBJECT": 0,
+    "INSTRUCTION_VERB_AS_ACTION": 0,
+    "INVALID_CONTRACT": 0
+  },
+  "resources": {
+    "latency_ms": {"mean": 1946.8635, "median": 1969.144, "p95": 2128.008},
+    "gross_energy_joules_total": 458.8125,
+    "energy_joules_per_correct_two_field_extraction": 114.703125
+  },
+  "interpretation": {
+    "primary_characterization": "MINIMAL_ACTION_OBJECT_ATOM_PARTIAL",
+    "reference_entity_required_for_direct_target_selection": false,
+    "instruction_verb_contamination_candidate": true,
+    "next_decision": "ISOLATE_DIRECT_OBJECT_BINDING"
+  },
+  "execution": {
+    "supplier_model_calls": 8,
+    "teacher_calls": 0,
+    "retries": 0,
+    "escalations": 0,
+    "adaptations": 0,
+    "duplicate_called_tasks": 0
+  }
+}
