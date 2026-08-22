@@ -161,6 +161,7 @@ def validate_model_free() -> dict[str, Any]:
         "tasks": tasks,
         "expected_rows": expected_rows,
         "derived": derived,
+        "derived_by_id": {row["task_id"]: row for row in derived},
         "prompts": prompts,
         "schema": schema(),
         "format": response_format(),
@@ -315,7 +316,7 @@ def execute(output_dir: Path) -> None:
         write_json(task_dir / "response.json", raw)
         transport = metadata.get("transport_classification") == "model_response"
         parsed, parse_valid, contract_valid, diagnostics = parse_extraction(response.content) if transport else (None, False, False, ["transport failure"])
-        scored = score_extraction(parsed, binding["derived"][tid], parse_valid, contract_valid)
+        scored = score_extraction(parsed, binding["derived_by_id"][tid], parse_valid, contract_valid)
         scored["task_id"] = tid
         scored["transport_valid"] = transport
         scored["diagnostics"] = diagnostics
