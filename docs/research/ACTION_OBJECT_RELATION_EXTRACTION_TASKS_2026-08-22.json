@@ -1,0 +1,19 @@
+{
+  "schema": "zth_action_object_relation_extraction_tasks_v1",
+  "status": "frozen_exploratory_not_confirmatory",
+  "model_outputs_consulted": false,
+  "output_contract": {"fields":["action_1","object_1","action_2","object_2"],"all_types":"string","additionalProperties":false},
+  "tasks": [
+    {"task_id":"relation-001","pair_id":"relation-pair-001","sentence":"Inspect beacon-record.json, then document its expiration detail.","requested_target":"beacon-record.json","action_1":"inspect","object_1":"beacon-record.json","action_2":"document","object_2":"expiration detail","expected_selected_operation":"inspect","expected_selected_position":"first","secondary_action":"document"},
+    {"task_id":"relation-002","pair_id":"relation-pair-001","sentence":"After you inspect its expiration detail in beacon-record.json, document beacon-record.json.","requested_target":"beacon-record.json","action_1":"inspect","object_1":"expiration detail","action_2":"document","object_2":"beacon-record.json","expected_selected_operation":"document","expected_selected_position":"second","secondary_action":"inspect"},
+    {"task_id":"relation-003","pair_id":"relation-pair-002","sentence":"After you announce the revision note for cobalt.json, update cobalt.json.","requested_target":"cobalt.json","action_1":"announce","object_1":"revision note","action_2":"update","object_2":"cobalt.json","expected_selected_operation":"update","expected_selected_position":"second","secondary_action":"announce"},
+    {"task_id":"relation-004","pair_id":"relation-pair-002","sentence":"Announce cobalt.json after you update its revision note.","requested_target":"cobalt.json","action_1":"announce","object_1":"cobalt.json","action_2":"update","object_2":"revision note","expected_selected_operation":"announce","expected_selected_position":"first","secondary_action":"update"},
+    {"task_id":"relation-005","pair_id":"relation-pair-003","sentence":"Read delta.json, then catalog its checksum ledger.","requested_target":"delta.json","action_1":"read","object_1":"delta.json","action_2":"catalog","object_2":"checksum ledger","expected_selected_operation":"read","expected_selected_position":"first","secondary_action":"catalog"},
+    {"task_id":"relation-006","pair_id":"relation-pair-003","sentence":"After you read the checksum ledger for delta.json, catalog delta.json.","requested_target":"delta.json","action_1":"read","object_1":"checksum ledger","action_2":"catalog","object_2":"delta.json","expected_selected_operation":"catalog","expected_selected_position":"second","secondary_action":"read"},
+    {"task_id":"relation-007","pair_id":"relation-pair-004","sentence":"After you submit the change package for echo.json, alter echo.json.","requested_target":"echo.json","action_1":"submit","object_1":"change package","action_2":"alter","object_2":"echo.json","expected_selected_operation":"alter","expected_selected_position":"second","secondary_action":"submit"},
+    {"task_id":"relation-008","pair_id":"relation-pair-004","sentence":"Submit echo.json after you alter its change package.","requested_target":"echo.json","action_1":"submit","object_1":"echo.json","action_2":"alter","object_2":"change package","expected_selected_operation":"submit","expected_selected_position":"first","secondary_action":"alter"}
+  ],
+  "task_count":8,
+  "pair_count":4,
+  "model_calls_made":false
+}
