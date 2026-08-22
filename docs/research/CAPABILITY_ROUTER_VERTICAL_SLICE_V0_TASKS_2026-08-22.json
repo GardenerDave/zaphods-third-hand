@@ -1,0 +1,100 @@
+{
+  "schema": "zth_capability_router_vertical_slice_v0_tasks_v1",
+  "status": "frozen_exploratory_not_production",
+  "tasks": [
+    {
+      "task_id": "router-v0-001",
+      "input_request": "Compare the canonical token cedar.txt with the requested target cedar.txt.",
+      "packet_facts": {"target_match": true, "operation_match": true},
+      "required_capabilities": ["deterministic.boolean_composition"],
+      "expected_supplier_type": "DETERMINISTIC_CODE",
+      "expected_supplier_id": "python_deterministic_policy_v0",
+      "expected_model_call_count": 0,
+      "expected_terminal_state": "terminal_success",
+      "expected_validation_result": "passed",
+      "expected_policy_result": false
+    },
+    {
+      "task_id": "router-v0-002",
+      "input_request": "Compose the canonical flags target_match=true and operation_match=false.",
+      "packet_facts": {"target_match": true, "operation_match": false},
+      "required_capabilities": ["deterministic.boolean_composition"],
+      "expected_supplier_type": "DETERMINISTIC_CODE",
+      "expected_supplier_id": "python_deterministic_policy_v0",
+      "expected_model_call_count": 0,
+      "expected_terminal_state": "terminal_success",
+      "expected_validation_result": "passed",
+      "expected_policy_result": true
+    },
+    {
+      "task_id": "router-v0-003",
+      "input_request": "Inspect amber-ledger.json.",
+      "packet_facts": {"requested_target": "amber-ledger.json", "expected_action": "inspect", "expected_object_expression": "amber-ledger.json"},
+      "required_capabilities": ["semantic.minimal_action_object_extraction", "deterministic.direct_target_binding"],
+      "expected_supplier_type": "MODEL",
+      "expected_supplier_id": "qwen3_1_7b_labeled_2_032b_minimal_atom",
+      "expected_model_call_count": 1,
+      "expected_terminal_state": "terminal_success",
+      "expected_validation_result": "passed",
+      "expected_policy_result": true
+    },
+    {
+      "task_id": "router-v0-004",
+      "input_request": "Amend cobalt-batch.json.",
+      "packet_facts": {"requested_target": "cobalt-batch.json", "expected_action": "amend", "expected_object_expression": "cobalt-batch.json"},
+      "required_capabilities": ["semantic.minimal_action_object_extraction", "deterministic.direct_target_binding"],
+      "expected_supplier_type": "MODEL",
+      "expected_supplier_id": "qwen3_1_7b_labeled_2_032b_minimal_atom",
+      "expected_model_call_count": 1,
+      "expected_terminal_state": "terminal_success",
+      "expected_validation_result": "passed",
+      "expected_policy_result": true
+    },
+    {
+      "task_id": "router-v0-005",
+      "input_request": "Index fennel-register.json.",
+      "packet_facts": {"requested_target": "fennel-register.json", "expected_action": "index", "expected_object_expression": "fennel-register.json"},
+      "required_capabilities": ["semantic.minimal_action_object_extraction", "deterministic.direct_target_binding"],
+      "expected_supplier_type": "MODEL",
+      "expected_supplier_id": "qwen3_1_7b_labeled_2_032b_minimal_atom",
+      "expected_model_call_count": 1,
+      "expected_terminal_state": "terminal_success",
+      "expected_validation_result": "passed",
+      "expected_policy_result": true
+    },
+    {
+      "task_id": "router-v0-006",
+      "input_request": "Dispatch granite-packet.json.",
+      "packet_facts": {"requested_target": "granite-packet.json", "expected_action": "dispatch", "expected_object_expression": "granite-packet.json"},
+      "required_capabilities": ["semantic.minimal_action_object_extraction", "deterministic.direct_target_binding"],
+      "expected_supplier_type": "MODEL",
+      "expected_supplier_id": "qwen3_1_7b_labeled_2_032b_minimal_atom",
+      "expected_model_call_count": 1,
+      "expected_terminal_state": "terminal_success",
+      "expected_validation_result": "passed",
+      "expected_policy_result": true
+    },
+    {
+      "task_id": "router-v0-007",
+      "input_request": "Separate the reference entity from the requested object in a compound relation.",
+      "packet_facts": {"requested_target": "reference-entity"},
+      "required_capabilities": ["semantic.reference_entity_extraction"],
+      "expected_supplier_type": "REVIEW_OR_ESCALATION",
+      "expected_supplier_id": "review_queue_v0",
+      "expected_model_call_count": 0,
+      "expected_terminal_state": "ready_for_review",
+      "expected_validation_result": "not_attempted_fail_closed"
+    },
+    {
+      "task_id": "router-v0-008",
+      "input_request": "Resolve two action relations and emit the complete six-field relation graph.",
+      "packet_facts": {"requested_target": "relation-graph"},
+      "required_capabilities": ["semantic.multi_relation_ir_extraction"],
+      "expected_supplier_type": "REVIEW_OR_ESCALATION",
+      "expected_supplier_id": "review_queue_v0",
+      "expected_model_call_count": 0,
+      "expected_terminal_state": "ready_for_review",
+      "expected_validation_result": "not_attempted_fail_closed"
+    }
+  ]
+}

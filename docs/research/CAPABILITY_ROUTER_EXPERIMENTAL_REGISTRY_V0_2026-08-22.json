@@ -1,0 +1,57 @@
+{
+  "schema": "zth_experimental_capability_registry_v0",
+  "status": "frozen_exploratory_not_production",
+  "automatic_promotion": false,
+  "entries": [
+    {
+      "capability_id": "deterministic.boolean_composition",
+      "supplier_id": "python_deterministic_policy_v0",
+      "supplier_type": "DETERMINISTIC_CODE",
+      "interface_id": "normalized_equality_boolean_composition_v1",
+      "status": "QUALIFIED_EXPLORATORY",
+      "evidence_artifact": "docs/research/QWEN3_1B_MINIMAL_ACTION_OBJECT_ATOM_2026-08-22.md",
+      "evidence_scope": "model-free normalized equality and boolean policy composition used by the probe",
+      "qualification_decision": "frozen exploratory registry entry; supervised review required for reuse"
+    },
+    {
+      "capability_id": "semantic.minimal_action_object_extraction",
+      "supplier_id": "qwen3_1_7b_labeled_2_032b_minimal_atom",
+      "supplier_type": "MODEL",
+      "interface_id": "minimal_action_object_v0",
+      "status": "QUALIFIED_EXPLORATORY",
+      "evidence_artifact": "docs/research/QWEN3_1B_MINIMAL_ACTION_OBJECT_ATOM_2026-08-22.md",
+      "evidence_scope": "fresh 8-task probe: action exact 8/8; two-field exact 4/8; direct-entity regime 4/4",
+      "qualification_decision": "bounded to this semantic atom and exploratory evidence scope"
+    },
+    {
+      "capability_id": "deterministic.direct_target_binding",
+      "supplier_id": "python_deterministic_policy_v0",
+      "supplier_type": "DETERMINISTIC_CODE",
+      "interface_id": "normalized_object_target_equality_v1",
+      "status": "QUALIFIED_EXPLORATORY",
+      "evidence_artifact": "docs/research/QWEN3_1B_MINIMAL_ACTION_OBJECT_ATOM_2026-08-22.md",
+      "evidence_scope": "8/8 expected direct-target binding classifications on the fresh probe",
+      "qualification_decision": "deterministic equality only; no fuzzy or substring matching"
+    },
+    {
+      "capability_id": "semantic.reference_entity_extraction",
+      "supplier_id": "qwen3_1_7b_labeled_2_032b_minimal_atom",
+      "supplier_type": "MODEL",
+      "interface_id": "single_relation_three_field_v0",
+      "status": "NOT_QUALIFIED",
+      "evidence_artifact": "docs/research/QWEN3_1_7B_SINGLE_RELATION_EXTRACTION_2026-08-22.md",
+      "evidence_scope": "reference_entity exact 4/8 and 0/4 non-empty reference entities in subobject cases",
+      "qualification_decision": "fail closed; no automatic supplier promotion"
+    },
+    {
+      "capability_id": "semantic.multi_relation_ir_extraction",
+      "supplier_id": "qwen3_1_7b_labeled_2_032b_minimal_atom",
+      "supplier_type": "MODEL",
+      "interface_id": "six_field_multi_relation_v0",
+      "status": "NOT_QUALIFIED",
+      "evidence_artifact": "docs/research/QWEN3_1_7B_RELATION_OBJECT_IR_EXTRACTION_2026-08-22.md",
+      "evidence_scope": "fresh 8-task probe: all six fields exact 0/8 and selected operation 5/8",
+      "qualification_decision": "fail closed; review is the next supplier state"
+    }
+  ]
+}
