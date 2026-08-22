@@ -1,0 +1,19 @@
+{
+  "schema": "zth_target_bound_action_extraction_isolation_tasks_v1",
+  "status": "frozen_exploratory_not_confirmatory",
+  "model_outputs_consulted": false,
+  "output_contract": {"field": "target_bound_operation", "type": "string", "additionalProperties": false},
+  "tasks": [
+    {"task_id":"action-head-001","pair_id":"action-pair-001","sentence":"Inspect atlas.json, then document its expiry information.","requested_target":"atlas.json","verb_a":"inspect","verb_b":"document","first_action":"inspect","second_action":"document","expected_target_bound_operation":"inspect","secondary_action":"document","expected_answer_position":"first"},
+    {"task_id":"action-head-002","pair_id":"action-pair-001","sentence":"After inspecting its expiry information, document atlas.json.","requested_target":"atlas.json","verb_a":"inspect","verb_b":"document","first_action":"inspect","second_action":"document","expected_target_bound_operation":"document","secondary_action":"inspect","expected_answer_position":"second"},
+    {"task_id":"action-head-003","pair_id":"action-pair-002","sentence":"After announcing its new version, update beacon.json.","requested_target":"beacon.json","verb_a":"update","verb_b":"announce","first_action":"announce","second_action":"update","expected_target_bound_operation":"update","secondary_action":"announce","expected_answer_position":"second"},
+    {"task_id":"action-head-004","pair_id":"action-pair-002","sentence":"Announce beacon.json after updating its version.","requested_target":"beacon.json","verb_a":"update","verb_b":"announce","first_action":"announce","second_action":"update","expected_target_bound_operation":"announce","secondary_action":"update","expected_answer_position":"first"},
+    {"task_id":"action-head-005","pair_id":"action-pair-003","sentence":"After cataloging its checksum, read cipher.json.","requested_target":"cipher.json","verb_a":"read","verb_b":"catalog","first_action":"catalog","second_action":"read","expected_target_bound_operation":"read","secondary_action":"catalog","expected_answer_position":"second"},
+    {"task_id":"action-head-006","pair_id":"action-pair-003","sentence":"Catalog cipher.json after reading its checksum.","requested_target":"cipher.json","verb_a":"read","verb_b":"catalog","first_action":"catalog","second_action":"read","expected_target_bound_operation":"catalog","secondary_action":"read","expected_answer_position":"first"},
+    {"task_id":"action-head-007","pair_id":"action-pair-004","sentence":"Alter delta.json, then submit the resulting change.","requested_target":"delta.json","verb_a":"alter","verb_b":"submit","first_action":"alter","second_action":"submit","expected_target_bound_operation":"alter","secondary_action":"submit","expected_answer_position":"first"},
+    {"task_id":"action-head-008","pair_id":"action-pair-004","sentence":"After altering the resulting change, submit delta.json.","requested_target":"delta.json","verb_a":"alter","verb_b":"submit","first_action":"alter","second_action":"submit","expected_target_bound_operation":"submit","secondary_action":"alter","expected_answer_position":"second"}
+  ],
+  "task_count": 8,
+  "pair_count": 4,
+  "model_calls_made": false
+}
