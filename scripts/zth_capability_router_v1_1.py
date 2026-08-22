@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
+from local_harness.stage_a_power_telemetry import PowerSampler, integrate_energy_joules, read_gpu_power
 from scripts import zth_capability_router_v1 as v1
 from scripts import zth_qwen3_0_6b_clean_scope_logic_probe as base
 from scripts import zth_qwen3_1_7b_atomic_scope_relation_decomposition as decomposition
