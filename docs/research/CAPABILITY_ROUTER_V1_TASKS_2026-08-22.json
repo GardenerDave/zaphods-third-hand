@@ -1,0 +1,113 @@
+{
+  "schema": "zth_capability_router_v1_tasks_v1",
+  "status": "frozen_exploratory_not_production",
+  "tasks": [
+    {
+      "task_id": "router-v1-001",
+      "input_request": "Compare canonical token cedar-v1.txt with requested target cedar-v1.txt.",
+      "packet_inputs": {"canonical_target_match": true, "canonical_operation_match": true},
+      "expected_required_capabilities": ["deterministic.boolean_composition"],
+      "expected_capability_assignments": [{"capability_id": "deterministic.boolean_composition", "supplier_id": "python_deterministic_policy_v0"}],
+      "expected_terminal_state": "terminal_success",
+      "expected_policy_result": false,
+      "expected_model_call_count": 0,
+      "expected_tool_call_count": 0
+    },
+    {
+      "task_id": "router-v1-002",
+      "input_request": "Compose canonical flags target_match=true and operation_match=false.",
+      "packet_inputs": {"canonical_target_match": true, "canonical_operation_match": false},
+      "expected_required_capabilities": ["deterministic.boolean_composition"],
+      "expected_capability_assignments": [{"capability_id": "deterministic.boolean_composition", "supplier_id": "python_deterministic_policy_v0"}],
+      "expected_terminal_state": "terminal_success",
+      "expected_policy_result": true,
+      "expected_model_call_count": 0,
+      "expected_tool_call_count": 0
+    },
+    {
+      "task_id": "router-v1-003",
+      "input_request": "Inspect amber-v1-ledger.json.",
+      "packet_inputs": {"semantic_request_shape": "single_action_object", "requested_target": "amber-v1-ledger.json", "requires_target_binding": true},
+      "expected_required_capabilities": ["semantic.minimal_action_object_extraction", "deterministic.direct_target_binding"],
+      "expected_capability_assignments": [{"capability_id": "semantic.minimal_action_object_extraction", "supplier_id": "qwen3_1_7b_labeled_2_032b_minimal_atom"}, {"capability_id": "deterministic.direct_target_binding", "supplier_id": "python_deterministic_policy_v0"}],
+      "expected_terminal_state": "terminal_success",
+      "expected_model_result": {"action": "inspect", "object_expression": "amber-v1-ledger.json"},
+      "expected_model_call_count": 1,
+      "expected_tool_call_count": 0
+    },
+    {
+      "task_id": "router-v1-004",
+      "input_request": "Amend cobalt-v1-batch.json.",
+      "packet_inputs": {"semantic_request_shape": "single_action_object", "requested_target": "cobalt-v1-batch.json", "requires_target_binding": true},
+      "expected_required_capabilities": ["semantic.minimal_action_object_extraction", "deterministic.direct_target_binding"],
+      "expected_capability_assignments": [{"capability_id": "semantic.minimal_action_object_extraction", "supplier_id": "qwen3_1_7b_labeled_2_032b_minimal_atom"}, {"capability_id": "deterministic.direct_target_binding", "supplier_id": "python_deterministic_policy_v0"}],
+      "expected_terminal_state": "terminal_success",
+      "expected_model_result": {"action": "amend", "object_expression": "cobalt-v1-batch.json"},
+      "expected_model_call_count": 1,
+      "expected_tool_call_count": 0
+    },
+    {
+      "task_id": "router-v1-005",
+      "input_request": "Index fennel-v1-register.json.",
+      "packet_inputs": {"semantic_request_shape": "single_action_object", "requested_target": "fennel-v1-register.json", "requires_target_binding": true},
+      "expected_required_capabilities": ["semantic.minimal_action_object_extraction", "deterministic.direct_target_binding"],
+      "expected_capability_assignments": [{"capability_id": "semantic.minimal_action_object_extraction", "supplier_id": "qwen3_1_7b_labeled_2_032b_minimal_atom"}, {"capability_id": "deterministic.direct_target_binding", "supplier_id": "python_deterministic_policy_v0"}],
+      "expected_terminal_state": "terminal_success",
+      "expected_model_result": {"action": "index", "object_expression": "fennel-v1-register.json"},
+      "expected_model_call_count": 1,
+      "expected_tool_call_count": 0
+    },
+    {
+      "task_id": "router-v1-006",
+      "input_request": "Dispatch granite-v1-packet.json.",
+      "packet_inputs": {"semantic_request_shape": "single_action_object", "requested_target": "granite-v1-packet.json", "requires_target_binding": true},
+      "expected_required_capabilities": ["semantic.minimal_action_object_extraction", "deterministic.direct_target_binding"],
+      "expected_capability_assignments": [{"capability_id": "semantic.minimal_action_object_extraction", "supplier_id": "qwen3_1_7b_labeled_2_032b_minimal_atom"}, {"capability_id": "deterministic.direct_target_binding", "supplier_id": "python_deterministic_policy_v0"}],
+      "expected_terminal_state": "terminal_success",
+      "expected_model_result": {"action": "dispatch", "object_expression": "granite-v1-packet.json"},
+      "expected_model_call_count": 1,
+      "expected_tool_call_count": 0
+    },
+    {
+      "task_id": "router-v1-007",
+      "input_request": "Separate a reference entity from a requested object in one relation.",
+      "packet_inputs": {"semantic_request_shape": "reference_entity_relation", "requested_target": "reference-v1-entity"},
+      "expected_required_capabilities": ["semantic.reference_entity_extraction"],
+      "expected_capability_assignments": [],
+      "expected_terminal_state": "ready_for_review",
+      "expected_model_call_count": 0,
+      "expected_tool_call_count": 0
+    },
+    {
+      "task_id": "router-v1-008",
+      "input_request": "Inspect jade-v1-ledger.json.",
+      "packet_inputs": {"semantic_request_shape": "single_action_object", "requested_target": "jade-v1-ledger.json", "requires_target_binding": true},
+      "expected_required_capabilities": ["semantic.minimal_action_object_extraction", "deterministic.direct_target_binding"],
+      "expected_capability_assignments": [{"capability_id": "semantic.minimal_action_object_extraction", "supplier_id": "qwen3_1_7b_labeled_2_032b_minimal_atom"}, {"capability_id": "deterministic.direct_target_binding", "supplier_id": "python_deterministic_policy_v0"}],
+      "expected_terminal_state": "terminal_success",
+      "expected_model_result": {"action": "inspect", "object_expression": "jade-v1-ledger.json"},
+      "expected_model_call_count": 1,
+      "expected_tool_call_count": 0
+    },
+    {
+      "task_id": "router-v1-009",
+      "input_request": "Extract a reference-bearing relation from an amber-v1 record.",
+      "packet_inputs": {"semantic_request_shape": "single_action_object", "requested_target": "amber-v1-record.json", "requires_target_binding": true, "requires_reference_entity": true},
+      "expected_required_capabilities": ["semantic.minimal_action_object_extraction", "deterministic.direct_target_binding", "semantic.reference_entity_extraction"],
+      "expected_capability_assignments": [],
+      "expected_terminal_state": "ready_for_review",
+      "expected_model_call_count": 0,
+      "expected_tool_call_count": 0
+    },
+    {
+      "task_id": "router-v1-010",
+      "input_request": "Observe a read-only repository fact through the bounded tool interface.",
+      "packet_inputs": {"requires_tool_observation": true, "tool_capability_id": "tool.read_only_repository_observation"},
+      "expected_required_capabilities": ["tool.read_only_repository_observation"],
+      "expected_capability_assignments": [],
+      "expected_terminal_state": "ready_for_review",
+      "expected_model_call_count": 0,
+      "expected_tool_call_count": 0
+    }
+  ]
+}
