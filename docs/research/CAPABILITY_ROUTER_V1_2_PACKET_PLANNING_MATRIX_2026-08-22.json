@@ -1,0 +1,58 @@
+{
+  "schema": "zth_router_v1_2_closeout_v1",
+  "v1_1_authoritative_closeout": "91a3fdf5dc6be9aafc63426a99b964dbbea6ba5f",
+  "v1_2_freeze_commit": "904820514c4103fc3c6acf4cdd90aec33fe09970",
+  "run_directory": ".work/model_size_supplier_floor/capability_router_v1_2_packet_planning/run_20260822T161315Z/",
+  "run_manifest_sha256": "472de9470c7a61ffd8eb379991da78018c914c621216dbd1d02c89461be42b75",
+  "task_manifest": {"path": "docs/research/CAPABILITY_ROUTER_V1_2_TASKS_2026-08-22.json", "sha256": "df202387c05bc7a4a971e74c782f8e51f232e8b440ed5aebdfd752d6cf71138f"},
+  "registry": {"path": "docs/research/CAPABILITY_ROUTER_EXPERIMENTAL_REGISTRY_V1_2026-08-22.json", "sha256": "9bd6fe1b8a049553fd2bc0fbc0ae6ce0fabb78f458f17a9aa49a06ebeb108d9b"},
+  "driver_sha256": "7a75fed87842b114e358205bbbea742da417a7d5eedb651f33f9dc1d97102014",
+  "runtime_controls": {
+    "planner_hint_input_fields": 0,
+    "runtime_expected_field_reads": 0,
+    "packet_content_used_by_planner": true,
+    "success_contract_contains_worked_answer": false,
+    "oracle_corruption_invariant_tasks": "8/8"
+  },
+  "metrics": {
+    "capability_requirements_matched": "8/8",
+    "complete_coverage_plans": "6/6",
+    "incomplete_coverage_plans": "2/2",
+    "capability_assignments_matched_on_complete_plans": "6/6",
+    "terminal_successes": "3/8",
+    "review_states": "5/8",
+    "final_runtime_results_matched": "5/8",
+    "deterministic_packet_derivations": 6,
+    "semantic_interpretations": 5,
+    "environmental_requirements": 1,
+    "unresolved_derivations": 0,
+    "model_calls": 4,
+    "deterministic_steps": 6,
+    "tool_steps": 0,
+    "packet_content_affected_planning_test": true
+  },
+  "resources": {
+    "latency_ms": {"mean": 2156.96725, "median": 2121.127, "p95_inclusive": 2366.7308},
+    "gross_energy_joules": {"total": 242.5775, "mean": 60.644375, "median": 61.8675}
+  },
+  "execution": {
+    "teacher_calls": 0,
+    "retries": 0,
+    "escalations": 0,
+    "v100_30b_touched": false,
+    "tool_supplier_branch_demonstrated": false,
+    "production_routing_changed": false,
+    "automatic_qualification_promotion": false
+  },
+  "task_results": [
+    {"task_id": "router-v1-2-001", "coverage": "COMPLETE", "terminal_state": "terminal_success", "model_calls": 0, "task_correct": true},
+    {"task_id": "router-v1-2-002", "coverage": "COMPLETE", "terminal_state": "terminal_success", "model_calls": 0, "task_correct": true},
+    {"task_id": "router-v1-2-003", "coverage": "COMPLETE", "terminal_state": "terminal_success", "model_calls": 1, "task_correct": true},
+    {"task_id": "router-v1-2-004", "coverage": "COMPLETE", "terminal_state": "ready_for_review", "model_calls": 1, "task_correct": false},
+    {"task_id": "router-v1-2-005", "coverage": "COMPLETE", "terminal_state": "ready_for_review", "model_calls": 1, "task_correct": false},
+    {"task_id": "router-v1-2-006", "coverage": "COMPLETE", "terminal_state": "ready_for_review", "model_calls": 1, "task_correct": false},
+    {"task_id": "router-v1-2-007", "coverage": "INCOMPLETE", "terminal_state": "ready_for_review", "model_calls": 0, "task_correct": true},
+    {"task_id": "router-v1-2-008", "coverage": "INCOMPLETE", "terminal_state": "ready_for_review", "model_calls": 0, "task_correct": true}
+  ],
+  "next_decision": "ADD_BOUNDED_TOOL_SUPPLIER_AND_ITERATIVE_OBSERVATION"
+}
