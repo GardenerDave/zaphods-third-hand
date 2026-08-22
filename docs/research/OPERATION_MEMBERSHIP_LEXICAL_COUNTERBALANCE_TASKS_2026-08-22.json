@@ -1,0 +1,37 @@
+{
+  "schema":"zth_operation_membership_lexical_counterbalance_tasks_v1",
+  "status":"frozen_exploratory_not_confirmatory",
+  "model_outputs_consulted":false,
+  "operation_tokens":["inspect","update","archive","delete"],
+  "allowed_set_length":2,
+  "output_field":"operation_allowed",
+  "expected_rule":"requested operation is a member of allowed_operations",
+  "pair_manifest":[
+    {"pair_id":"op-pair-001","requested_operation":"inspect","member_task_id":"op-lex-001-member","non_member_task_id":"op-lex-001-nonmember"},
+    {"pair_id":"op-pair-002","requested_operation":"inspect","member_task_id":"op-lex-002-member","non_member_task_id":"op-lex-002-nonmember"},
+    {"pair_id":"op-pair-003","requested_operation":"update","member_task_id":"op-lex-003-member","non_member_task_id":"op-lex-003-nonmember"},
+    {"pair_id":"op-pair-004","requested_operation":"update","member_task_id":"op-lex-004-member","non_member_task_id":"op-lex-004-nonmember"},
+    {"pair_id":"op-pair-005","requested_operation":"archive","member_task_id":"op-lex-005-member","non_member_task_id":"op-lex-005-nonmember"},
+    {"pair_id":"op-pair-006","requested_operation":"archive","member_task_id":"op-lex-006-member","non_member_task_id":"op-lex-006-nonmember"},
+    {"pair_id":"op-pair-007","requested_operation":"delete","member_task_id":"op-lex-007-member","non_member_task_id":"op-lex-007-nonmember"},
+    {"pair_id":"op-pair-008","requested_operation":"delete","member_task_id":"op-lex-008-member","non_member_task_id":"op-lex-008-nonmember"}
+  ],
+  "tasks":[
+    {"task_id":"op-lex-001-member","pair_id":"op-pair-001","membership_factor":"MEMBER","allowed_operations":["inspect","update"],"requested_operation":"inspect","expected_operation_allowed":true,"derivation_note":"inspect is listed."},
+    {"task_id":"op-lex-001-nonmember","pair_id":"op-pair-001","membership_factor":"NON_MEMBER","allowed_operations":["update","archive"],"requested_operation":"inspect","expected_operation_allowed":false,"derivation_note":"inspect is absent."},
+    {"task_id":"op-lex-002-member","pair_id":"op-pair-002","membership_factor":"MEMBER","allowed_operations":["inspect","update"],"requested_operation":"inspect","expected_operation_allowed":true,"derivation_note":"inspect is listed."},
+    {"task_id":"op-lex-002-nonmember","pair_id":"op-pair-002","membership_factor":"NON_MEMBER","allowed_operations":["update","archive"],"requested_operation":"inspect","expected_operation_allowed":false,"derivation_note":"inspect is absent."},
+    {"task_id":"op-lex-003-member","pair_id":"op-pair-003","membership_factor":"MEMBER","allowed_operations":["inspect","update"],"requested_operation":"update","expected_operation_allowed":true,"derivation_note":"update is listed."},
+    {"task_id":"op-lex-003-nonmember","pair_id":"op-pair-003","membership_factor":"NON_MEMBER","allowed_operations":["inspect","archive"],"requested_operation":"update","expected_operation_allowed":false,"derivation_note":"update is absent."},
+    {"task_id":"op-lex-004-member","pair_id":"op-pair-004","membership_factor":"MEMBER","allowed_operations":["update","delete"],"requested_operation":"update","expected_operation_allowed":true,"derivation_note":"update is listed."},
+    {"task_id":"op-lex-004-nonmember","pair_id":"op-pair-004","membership_factor":"NON_MEMBER","allowed_operations":["inspect","delete"],"requested_operation":"update","expected_operation_allowed":false,"derivation_note":"update is absent."},
+    {"task_id":"op-lex-005-member","pair_id":"op-pair-005","membership_factor":"MEMBER","allowed_operations":["archive","delete"],"requested_operation":"archive","expected_operation_allowed":true,"derivation_note":"archive is listed."},
+    {"task_id":"op-lex-005-nonmember","pair_id":"op-pair-005","membership_factor":"NON_MEMBER","allowed_operations":["inspect","delete"],"requested_operation":"archive","expected_operation_allowed":false,"derivation_note":"archive is absent."},
+    {"task_id":"op-lex-006-member","pair_id":"op-pair-006","membership_factor":"MEMBER","allowed_operations":["archive","delete"],"requested_operation":"archive","expected_operation_allowed":true,"derivation_note":"archive is listed."},
+    {"task_id":"op-lex-006-nonmember","pair_id":"op-pair-006","membership_factor":"NON_MEMBER","allowed_operations":["inspect","delete"],"requested_operation":"archive","expected_operation_allowed":false,"derivation_note":"archive is absent."},
+    {"task_id":"op-lex-007-member","pair_id":"op-pair-007","membership_factor":"MEMBER","allowed_operations":["inspect","delete"],"requested_operation":"delete","expected_operation_allowed":true,"derivation_note":"delete is listed."},
+    {"task_id":"op-lex-007-nonmember","pair_id":"op-pair-007","membership_factor":"NON_MEMBER","allowed_operations":["update","archive"],"requested_operation":"delete","expected_operation_allowed":false,"derivation_note":"delete is absent."},
+    {"task_id":"op-lex-008-member","pair_id":"op-pair-008","membership_factor":"MEMBER","allowed_operations":["archive","delete"],"requested_operation":"delete","expected_operation_allowed":true,"derivation_note":"delete is listed."},
+    {"task_id":"op-lex-008-nonmember","pair_id":"op-pair-008","membership_factor":"NON_MEMBER","allowed_operations":["update","archive"],"requested_operation":"delete","expected_operation_allowed":false,"derivation_note":"delete is absent."}
+  ]
+}
