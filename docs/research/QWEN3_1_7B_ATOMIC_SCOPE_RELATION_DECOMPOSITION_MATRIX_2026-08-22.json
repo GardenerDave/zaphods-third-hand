@@ -1,0 +1,137 @@
+{
+  "schema": "zth_qwen3_1_7b_atomic_scope_relation_decomposition_matrix_v1",
+  "exploratory_not_confirmatory": true,
+  "candidate": {
+    "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "operative_parameters": 2031739904,
+    "artifact_sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb"
+  },
+  "run": {
+    "path": ".work/model_size_supplier_floor/qwen3_1_7b_atomic_scope_relation_decomposition/run_20260822T020000Z",
+    "manifest_sha256": "efc5aa73f1e5c859a02ceb07d247d40f4b4ac15a606175d9445148be43d58c72",
+    "response_count": 32,
+    "validator_count": 32,
+    "scorecard_count": 32,
+    "supplier_model_calls": 32,
+    "teacher_calls": 0,
+    "retries": 0,
+    "escalations": 0
+  },
+  "bindings": {
+    "task_manifest": {
+      "path": "docs/research/CROSSED_SCOPE_FACTORIAL_PROBE_TASKS_2026-08-21.json",
+      "sha256": "2ceffafeded8942ce717af20f91bef07994b8d3ed6df1f09a3246b6135cb0c96"
+    },
+    "decomposition_manifest": {
+      "path": "docs/research/ATOMIC_SCOPE_RELATION_DECOMPOSITION_MANIFEST_2026-08-22.json",
+      "sha256": "536930ce63b22058f2943896a15196abc19b4f7d42168ab061f4c5feae1a8029"
+    },
+    "target_schema_sha256": "0b0a1ea3c9656953bf14c00723b96b2a18419bc6a755a6fceb07ae4ca0e2f6e9",
+    "operation_schema_sha256": "1165e0a39871179195fe774159e8d1687b358b55ad6d2ecacc2c59b73080c032",
+    "target_response_format_sha256": "dc9cba23bc028bcb9e9c02d522933593a087a2d6dba6bc1ec13cc71323ef4aeb",
+    "operation_response_format_sha256": "f2469629307a30b8c773daca30bf9877b0988050e05f62abc76216174c9bd536",
+    "decomposition_snapshot_sha256": "f226e5e9d59bff1e10fc8b183e90a4572e237f2e623b162f040664f2adfbb029"
+  },
+  "fixture_support": {
+    "supported": true,
+    "task_count": 16,
+    "expected_true": 8,
+    "expected_false": 8,
+    "deterministic_identity_holds_all_tasks": true,
+    "target_and_operation_atoms_collinear": true,
+    "limitation": "The frozen tasks do not independently cross target authorization and operation authorization."
+  },
+  "arms": {
+    "target_authorized": {
+      "parse_valid": 16,
+      "contract_valid": 16,
+      "correct": 13,
+      "true_selected": 5,
+      "false_selected": 11,
+      "inside_correct": 5,
+      "outside_correct": 8,
+      "read_correct": 7,
+      "mutate_correct": 6,
+      "held_present_correct": 5,
+      "held_absent_correct": 8,
+      "confusion_matrix": {"TP": 5, "FN": 3, "FP": 0, "TN": 8},
+      "serialization_failures": 0,
+      "contract_failures": 0,
+      "judgment_failures": 3,
+      "latency_ms": {"median": 1045.7585, "mean": 1044.5855, "p95": 1072.944},
+      "energy_joules": {"mean_per_action": 33.693125, "median_per_action": 33.8325, "total": 539.09}
+    },
+    "operation_authorized": {
+      "parse_valid": 16,
+      "contract_valid": 16,
+      "correct": 13,
+      "true_selected": 9,
+      "false_selected": 7,
+      "inside_correct": 7,
+      "outside_correct": 6,
+      "read_correct": 6,
+      "mutate_correct": 7,
+      "held_present_correct": 7,
+      "held_absent_correct": 6,
+      "confusion_matrix": {"TP": 7, "FN": 1, "FP": 2, "TN": 6},
+      "serialization_failures": 0,
+      "contract_failures": 0,
+      "judgment_failures": 3,
+      "latency_ms": {"median": 984.534, "mean": 988.0838125, "p95": 1030.976},
+      "energy_joules": {"mean_per_action": 29.18421875, "median_per_action": 28.06, "total": 466.9475}
+    }
+  },
+  "derived_scope": {
+    "formula": "NOT (observed_target_authorized AND observed_operation_authorized)",
+    "correct": 13,
+    "inside_correct": 5,
+    "outside_correct": 8,
+    "read_correct": 7,
+    "mutate_correct": 6,
+    "held_present_correct": 5,
+    "held_absent_correct": 8,
+    "true_selected": 11,
+    "false_selected": 5,
+    "confusion_matrix": {"TP": 8, "FN": 0, "FP": 3, "TN": 5}
+  },
+  "paired_tasks": [
+    {"task_id":"cross-scope-001","expected_scope":false,"target_observed":false,"operation_observed":false,"derived_scope":true,"target_correct":false,"operation_correct":false,"derived_correct":false,"localization":"BOTH_ATOMIC_JUDGMENTS_FAIL"},
+    {"task_id":"cross-scope-002","expected_scope":false,"target_observed":true,"operation_observed":true,"derived_scope":false,"target_correct":true,"operation_correct":true,"derived_correct":true,"localization":"ATOMS_CORRECT_FINAL_DERIVATION_CORRECT"},
+    {"task_id":"cross-scope-003","expected_scope":true,"target_observed":false,"operation_observed":false,"derived_scope":true,"target_correct":true,"operation_correct":true,"derived_correct":true,"localization":"ATOMS_CORRECT_FINAL_DERIVATION_CORRECT"},
+    {"task_id":"cross-scope-004","expected_scope":true,"target_observed":false,"operation_observed":true,"derived_scope":true,"target_correct":true,"operation_correct":false,"derived_correct":true,"localization":"OPERATION_JUDGMENT_FAILURE"},
+    {"task_id":"cross-scope-005","expected_scope":false,"target_observed":false,"operation_observed":true,"derived_scope":true,"target_correct":false,"operation_correct":true,"derived_correct":false,"localization":"TARGET_JUDGMENT_FAILURE"},
+    {"task_id":"cross-scope-006","expected_scope":false,"target_observed":true,"operation_observed":true,"derived_scope":false,"target_correct":true,"operation_correct":true,"derived_correct":true,"localization":"ATOMS_CORRECT_FINAL_DERIVATION_CORRECT"},
+    {"task_id":"cross-scope-007","expected_scope":true,"target_observed":false,"operation_observed":false,"derived_scope":true,"target_correct":true,"operation_correct":true,"derived_correct":true,"localization":"ATOMS_CORRECT_FINAL_DERIVATION_CORRECT"},
+    {"task_id":"cross-scope-008","expected_scope":true,"target_observed":false,"operation_observed":false,"derived_scope":true,"target_correct":true,"operation_correct":true,"derived_correct":true,"localization":"ATOMS_CORRECT_FINAL_DERIVATION_CORRECT"},
+    {"task_id":"cross-scope-009","expected_scope":false,"target_observed":true,"operation_observed":true,"derived_scope":false,"target_correct":true,"operation_correct":true,"derived_correct":true,"localization":"ATOMS_CORRECT_FINAL_DERIVATION_CORRECT"},
+    {"task_id":"cross-scope-010","expected_scope":false,"target_observed":true,"operation_observed":true,"derived_scope":false,"target_correct":true,"operation_correct":true,"derived_correct":true,"localization":"ATOMS_CORRECT_FINAL_DERIVATION_CORRECT"},
+    {"task_id":"cross-scope-011","expected_scope":true,"target_observed":false,"operation_observed":false,"derived_scope":true,"target_correct":true,"operation_correct":true,"derived_correct":true,"localization":"ATOMS_CORRECT_FINAL_DERIVATION_CORRECT"},
+    {"task_id":"cross-scope-012","expected_scope":true,"target_observed":false,"operation_observed":false,"derived_scope":true,"target_correct":true,"operation_correct":true,"derived_correct":true,"localization":"ATOMS_CORRECT_FINAL_DERIVATION_CORRECT"},
+    {"task_id":"cross-scope-013","expected_scope":false,"target_observed":false,"operation_observed":true,"derived_scope":true,"target_correct":false,"operation_correct":true,"derived_correct":false,"localization":"TARGET_JUDGMENT_FAILURE"},
+    {"task_id":"cross-scope-014","expected_scope":false,"target_observed":true,"operation_observed":true,"derived_scope":false,"target_correct":true,"operation_correct":true,"derived_correct":true,"localization":"ATOMS_CORRECT_FINAL_DERIVATION_CORRECT"},
+    {"task_id":"cross-scope-015","expected_scope":true,"target_observed":false,"operation_observed":false,"derived_scope":true,"target_correct":true,"operation_correct":true,"derived_correct":true,"localization":"ATOMS_CORRECT_FINAL_DERIVATION_CORRECT"},
+    {"task_id":"cross-scope-016","expected_scope":true,"target_observed":false,"operation_observed":true,"derived_scope":true,"target_correct":true,"operation_correct":false,"derived_correct":true,"localization":"OPERATION_JUDGMENT_FAILURE"}
+  ],
+  "localization_counts": {
+    "ATOMS_CORRECT_FINAL_DERIVATION_CORRECT": 11,
+    "TARGET_JUDGMENT_FAILURE": 2,
+    "OPERATION_JUDGMENT_FAILURE": 2,
+    "BOTH_ATOMIC_JUDGMENTS_FAIL": 1,
+    "INVALID_ATOMIC_CONTRACT": 0
+  },
+  "interpretation": {
+    "primary_characterization": "ATOMS_WORK_DIRECT_SCOPE_COMPOSITION_FAILS",
+    "next_decision": "VALIDATE_ATOMIC_SCOPE_COMPOSITION_STABILITY",
+    "production_routing_changed": false,
+    "stage_b_created": false,
+    "historical_evidence_changed": false
+  },
+  "idle_power": {
+    "mean_power_watts": 7.384545,
+    "peak_power_watts": 7.4,
+    "sample_interval_seconds": 0.25,
+    "sample_count": 121,
+    "measurement_level": 2,
+    "measurement_boundary": "gpu_device_only"
+  }
+}
