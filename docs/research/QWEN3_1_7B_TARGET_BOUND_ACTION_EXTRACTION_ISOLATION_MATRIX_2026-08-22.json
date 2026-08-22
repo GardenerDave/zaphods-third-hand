@@ -1,0 +1,33 @@
+{
+  "schema": "zth_qwen3_1_7b_target_bound_action_extraction_isolation_matrix_v1",
+  "exploratory_not_confirmatory": true,
+  "candidate": {"model_id":"Qwen_Qwen3-1.7B-Q4_K_M.gguf","operative_parameters":2031739904,"artifact_sha256":"72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb"},
+  "bindings": {
+    "audit_commit":"ddd34bfa9b8015042e376bb3a570d56150ab6178",
+    "audit_sha256":"3c3a494f8de17bd1c5d06c201f6686afce2e996145aeb27143580b0716ae28e4",
+    "design_sha256":"1037b1754912aa3513147ba813930cd3db15278e0240413900029eae6bffe147",
+    "task_manifest_sha256":"869ad935f4fafcceb0d2ebd3b2266fa239f49ce9786dd5e7de421fe26a1fe409",
+    "run_path":".work/model_size_supplier_floor/qwen3_1_7b_target_bound_action_extraction_isolation/run_20260822T034500Z/",
+    "probe_manifest_sha256":"d198aad13e6d34a678d08df840f5c438ec5979386dcacff0453b80c789a83718",
+    "aggregate_sha256":"53124d32394b37e9b0c31a6cbd7d7b91ca6f7f23c5d1cda90d63bfa2b476a54b"
+  },
+  "counts": {"tasks":8,"pairs":4,"parse_valid":8,"contract_valid":8,"correct":5,"secondary_action_selections":1,"expected_position_first_correct":"3/4","expected_position_second_correct":"2/4","first_action_correct":3,"second_action_correct":2},
+  "by_pair": {
+    "action-pair-001":{"verbs":["inspect","document"],"correct":"1/2","classification":"ONE_DIRECTION_CORRECT","observed_errors":[{"task_id":"action-head-002","expected":"document","observed":"update"}]},
+    "action-pair-002":{"verbs":["update","announce"],"correct":"1/2","classification":"ONE_DIRECTION_CORRECT","observed_errors":[{"task_id":"action-head-004","expected":"announce","observed":"update","secondary_selection":true}]},
+    "action-pair-003":{"verbs":["read","catalog"],"correct":"2/2","classification":"BOTH_RELATIONS_CORRECT","observed_errors":[]},
+    "action-pair-004":{"verbs":["alter","submit"],"correct":"1/2","classification":"ONE_DIRECTION_CORRECT","observed_errors":[{"task_id":"action-head-008","expected":"submit","observed":"delta"}]}
+  },
+  "paired_task_results": [
+    {"task_id":"action-head-001","pair_id":"action-pair-001","expected":"inspect","observed":"inspect","correct":true,"expected_answer_position":"first"},
+    {"task_id":"action-head-002","pair_id":"action-pair-001","expected":"document","observed":"update","correct":false,"expected_answer_position":"second"},
+    {"task_id":"action-head-003","pair_id":"action-pair-002","expected":"update","observed":"update","correct":true,"expected_answer_position":"second"},
+    {"task_id":"action-head-004","pair_id":"action-pair-002","expected":"announce","observed":"update","correct":false,"expected_answer_position":"first","secondary_action_selection":true},
+    {"task_id":"action-head-005","pair_id":"action-pair-003","expected":"read","observed":"read","correct":true,"expected_answer_position":"second"},
+    {"task_id":"action-head-006","pair_id":"action-pair-003","expected":"catalog","observed":"catalog","correct":true,"expected_answer_position":"first"},
+    {"task_id":"action-head-007","pair_id":"action-pair-004","expected":"alter","observed":"alter","correct":true,"expected_answer_position":"first"},
+    {"task_id":"action-head-008","pair_id":"action-pair-004","expected":"submit","observed":"delta","correct":false,"expected_answer_position":"second"}
+  ],
+  "resources": {"latency_ms":{"median":1332.3575,"mean":1334.740125,"p95":1416.081},"energy_joules":{"mean_per_action":40.0925,"median_per_action":40.7375,"total":320.74}},
+  "interpretation": {"primary_characterization":"TARGET_BOUND_ACTION_EXTRACTION_PARTIAL","model_role":"SEMANTIC_RELATION_EXTRACTION","next_decision":"REPAIR_TARGET_ACTION_BINDING_INTERFACE","supplier_calls":8,"teacher_calls":0,"retries":0,"escalations":0}
+}
