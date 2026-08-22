@@ -1,0 +1,47 @@
+{
+  "schema": "zth_capability_router_tool_registry_v0",
+  "status": "frozen_exploratory_not_production",
+  "automatic_promotion": false,
+  "entries": [
+    {
+      "capability_id": "tool.read_only_repository_observation",
+      "supplier_id": "python_read_only_repository_observer_v0",
+      "supplier_type": "TOOL",
+      "interface_id": "repository_relative_metadata_observation_v0",
+      "status": "QUALIFIED_EXPLORATORY",
+      "evidence_artifact": "docs/research/CAPABILITY_ROUTER_TOOL_OBSERVATION_V0_DESIGN_2026-08-22.md",
+      "evidence_scope": "exact-target repository-relative metadata; no contents or mutation",
+      "qualification_decision": "model-free contract tests only; supervised exploratory reuse"
+    },
+    {
+      "capability_id": "deterministic.observation_exists_policy",
+      "supplier_id": "python_deterministic_observation_policy_v0",
+      "supplier_type": "DETERMINISTIC_CODE",
+      "interface_id": "validated_repository_observation_exists_v0",
+      "status": "QUALIFIED_EXPLORATORY",
+      "evidence_artifact": "docs/research/CAPABILITY_ROUTER_TOOL_OBSERVATION_V0_DESIGN_2026-08-22.md",
+      "evidence_scope": "deterministic post-observation terminal validation",
+      "qualification_decision": "model-free bounded slice only"
+    },
+    {
+      "capability_id": "deterministic.observation_absence_policy",
+      "supplier_id": "python_deterministic_observation_policy_v0",
+      "supplier_type": "DETERMINISTIC_CODE",
+      "interface_id": "validated_repository_observation_absence_v0",
+      "status": "QUALIFIED_EXPLORATORY",
+      "evidence_artifact": "docs/research/CAPABILITY_ROUTER_TOOL_OBSERVATION_V0_DESIGN_2026-08-22.md",
+      "evidence_scope": "deterministic handling of validated absent target",
+      "qualification_decision": "model-free bounded slice only"
+    },
+    {
+      "capability_id": "deterministic.boolean_composition",
+      "supplier_id": "python_deterministic_policy_v0",
+      "supplier_type": "DETERMINISTIC_CODE",
+      "interface_id": "normalized_equality_boolean_composition_v1",
+      "status": "QUALIFIED_EXPLORATORY",
+      "evidence_artifact": "docs/research/CAPABILITY_ROUTER_V1_2_PACKET_PLANNING_2026-08-22.md",
+      "evidence_scope": "preserved deterministic control path",
+      "qualification_decision": "supervised exploratory reuse"
+    }
+  ]
+}

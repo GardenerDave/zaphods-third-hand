@@ -1,0 +1,68 @@
+{
+  "schema": "zth_capability_router_tool_observation_v0_tasks_v1",
+  "status": "frozen_exploratory_not_production",
+  "runtime_input_policy": "request_packet_and_exact_authority_record_only",
+  "forbidden_runtime_fields": ["observation_requirement", "requires_tool_observation", "tool_capability_id", "required_capabilities", "expected_supplier", "expected_route"],
+  "tasks": [
+    {
+      "task_id": "tool-observe-001",
+      "input_request": "Check whether docs/README.md currently exists in the repository.",
+      "environment_facts": {"authority_record": {"allowed_targets": ["docs/README.md"]}},
+      "expected_required_capabilities": ["tool.read_only_repository_observation", "deterministic.observation_exists_policy"],
+      "expected_terminal_state": "terminal_success",
+      "expected_model_call_count": 0,
+      "expected_tool_call_count": 1,
+      "expected_replans": 1
+    },
+    {
+      "task_id": "tool-observe-002",
+      "input_request": "Verify that README.md is present right now without reading its contents.",
+      "environment_facts": {"authority_record": {"allowed_targets": ["README.md"]}},
+      "expected_required_capabilities": ["tool.read_only_repository_observation", "deterministic.observation_exists_policy"],
+      "expected_terminal_state": "terminal_success",
+      "expected_model_call_count": 0,
+      "expected_tool_call_count": 1,
+      "expected_replans": 1
+    },
+    {
+      "task_id": "tool-observe-003",
+      "input_request": "Check whether docs/never-created-tool-observation-file.txt exists.",
+      "environment_facts": {"authority_record": {"allowed_targets": ["docs/never-created-tool-observation-file.txt"]}},
+      "expected_required_capabilities": ["tool.read_only_repository_observation", "deterministic.observation_absence_policy"],
+      "expected_terminal_state": "terminal_success",
+      "expected_model_call_count": 0,
+      "expected_tool_call_count": 1,
+      "expected_replans": 1
+    },
+    {
+      "task_id": "tool-observe-004",
+      "input_request": "Check whether docs/README.md currently exists.",
+      "environment_facts": {"authority_record": {"allowed_targets": ["docs/ARCHITECTURE.md"]}},
+      "expected_required_capabilities": ["tool.read_only_repository_observation"],
+      "expected_terminal_state": "ready_for_review",
+      "expected_model_call_count": 0,
+      "expected_tool_call_count": 0,
+      "expected_replans": 0
+    },
+    {
+      "task_id": "tool-observe-005",
+      "input_request": "Evaluate the canonical target and operation operands without observing repository state.",
+      "environment_facts": {"canonical_operands": {"target_match": true, "operation_match": true}},
+      "expected_required_capabilities": ["deterministic.boolean_composition"],
+      "expected_terminal_state": "terminal_success",
+      "expected_model_call_count": 0,
+      "expected_tool_call_count": 0,
+      "expected_replans": 0
+    },
+    {
+      "task_id": "tool-observe-006",
+      "input_request": "Observe the current external service status for the bounded unsupported capability check.",
+      "environment_facts": {"authority_record": {"allowed_targets": ["docs/README.md"]}},
+      "expected_required_capabilities": ["tool.current_service_observation"],
+      "expected_terminal_state": "ready_for_review",
+      "expected_model_call_count": 0,
+      "expected_tool_call_count": 0,
+      "expected_replans": 0
+    }
+  ]
+}
