@@ -1,0 +1,92 @@
+{
+  "schema": "zth_capability_router_v1_1_tasks_v1",
+  "status": "frozen_exploratory_not_production",
+  "tasks": [
+    {
+      "task_id": "router-v1-1-001",
+      "input_request": "Compare canonical token cedar-ground.txt with requested target cedar-ground.txt.",
+      "world_facts": {"canonical_target_match": true, "canonical_operation_match": true},
+      "expected_required_capabilities": ["deterministic.boolean_composition"],
+      "expected_capability_assignments": [{"capability_id": "deterministic.boolean_composition", "supplier_id": "python_deterministic_policy_v0"}],
+      "expected_terminal_state": "terminal_success",
+      "expected_model_call_count": 0,
+      "expected_tool_call_count": 0,
+      "expected_policy_result": false
+    },
+    {
+      "task_id": "router-v1-1-002",
+      "input_request": "Compose canonical flags target_match=true and operation_match=false.",
+      "world_facts": {"canonical_target_match": true, "canonical_operation_match": false},
+      "expected_required_capabilities": ["deterministic.boolean_composition"],
+      "expected_capability_assignments": [{"capability_id": "deterministic.boolean_composition", "supplier_id": "python_deterministic_policy_v0"}],
+      "expected_terminal_state": "terminal_success",
+      "expected_model_call_count": 0,
+      "expected_tool_call_count": 0,
+      "expected_policy_result": true
+    },
+    {
+      "task_id": "router-v1-1-003",
+      "input_request": "Inspect amber-ground-ledger.json.",
+      "world_facts": {"semantic_request_shape": "single_action_object", "requested_target": "amber-ground-ledger.json", "allowed_operations": ["inspect"], "requires_target_binding": true},
+      "expected_required_capabilities": ["semantic.minimal_action_object_extraction", "deterministic.direct_target_binding"],
+      "expected_capability_assignments": [{"capability_id": "semantic.minimal_action_object_extraction", "supplier_id": "qwen3_1_7b_labeled_2_032b_minimal_atom"}, {"capability_id": "deterministic.direct_target_binding", "supplier_id": "python_deterministic_policy_v0"}],
+      "expected_model_result": {"action": "inspect", "object_expression": "amber-ground-ledger.json"},
+      "expected_terminal_state": "terminal_success",
+      "expected_model_call_count": 1,
+      "expected_tool_call_count": 0
+    },
+    {
+      "task_id": "router-v1-1-004",
+      "input_request": "Amend cobalt-ground-batch.json.",
+      "world_facts": {"semantic_request_shape": "single_action_object", "requested_target": "cobalt-ground-batch.json", "allowed_operations": ["amend"], "requires_target_binding": true},
+      "expected_required_capabilities": ["semantic.minimal_action_object_extraction", "deterministic.direct_target_binding"],
+      "expected_capability_assignments": [{"capability_id": "semantic.minimal_action_object_extraction", "supplier_id": "qwen3_1_7b_labeled_2_032b_minimal_atom"}, {"capability_id": "deterministic.direct_target_binding", "supplier_id": "python_deterministic_policy_v0"}],
+      "expected_model_result": {"action": "amend", "object_expression": "cobalt-ground-batch.json"},
+      "expected_terminal_state": "terminal_success",
+      "expected_model_call_count": 1,
+      "expected_tool_call_count": 0
+    },
+    {
+      "task_id": "router-v1-1-005",
+      "input_request": "Index fennel-ground-register.json.",
+      "world_facts": {"semantic_request_shape": "single_action_object", "requested_target": "fennel-ground-register.json", "allowed_operations": ["index"], "requires_target_binding": true},
+      "expected_required_capabilities": ["semantic.minimal_action_object_extraction", "deterministic.direct_target_binding"],
+      "expected_capability_assignments": [{"capability_id": "semantic.minimal_action_object_extraction", "supplier_id": "qwen3_1_7b_labeled_2_032b_minimal_atom"}, {"capability_id": "deterministic.direct_target_binding", "supplier_id": "python_deterministic_policy_v0"}],
+      "expected_model_result": {"action": "index", "object_expression": "fennel-ground-register.json"},
+      "expected_terminal_state": "terminal_success",
+      "expected_model_call_count": 1,
+      "expected_tool_call_count": 0
+    },
+    {
+      "task_id": "router-v1-1-006",
+      "input_request": "Dispatch granite-ground-packet.json.",
+      "world_facts": {"semantic_request_shape": "single_action_object", "requested_target": "granite-ground-packet.json", "allowed_operations": ["dispatch"], "requires_target_binding": true},
+      "expected_required_capabilities": ["semantic.minimal_action_object_extraction", "deterministic.direct_target_binding"],
+      "expected_capability_assignments": [{"capability_id": "semantic.minimal_action_object_extraction", "supplier_id": "qwen3_1_7b_labeled_2_032b_minimal_atom"}, {"capability_id": "deterministic.direct_target_binding", "supplier_id": "python_deterministic_policy_v0"}],
+      "expected_model_result": {"action": "dispatch", "object_expression": "granite-ground-packet.json"},
+      "expected_terminal_state": "terminal_success",
+      "expected_model_call_count": 1,
+      "expected_tool_call_count": 0
+    },
+    {
+      "task_id": "router-v1-1-007",
+      "input_request": "Separate a reference entity from a grounded object relation.",
+      "world_facts": {"semantic_request_shape": "reference_entity_relation", "requested_target": "ground-reference-entity"},
+      "expected_required_capabilities": ["semantic.reference_entity_extraction"],
+      "expected_capability_assignments": [],
+      "expected_terminal_state": "ready_for_review",
+      "expected_model_call_count": 0,
+      "expected_tool_call_count": 0
+    },
+    {
+      "task_id": "router-v1-1-008",
+      "input_request": "Observe a read-only repository fact through the bounded tool interface.",
+      "world_facts": {"requires_tool_observation": true, "tool_capability_id": "tool.read_only_repository_observation"},
+      "expected_required_capabilities": ["tool.read_only_repository_observation"],
+      "expected_capability_assignments": [],
+      "expected_terminal_state": "ready_for_review",
+      "expected_model_call_count": 0,
+      "expected_tool_call_count": 0
+    }
+  ]
+}
