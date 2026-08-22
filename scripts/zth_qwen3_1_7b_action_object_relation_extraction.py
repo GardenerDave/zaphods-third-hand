@@ -219,7 +219,7 @@ def execute(output_dir: Path) -> None:
     telemetry = base.telemetry_preflight(telemetry_url)
     idle_samples, idle_summary = base.sample_window(IDLE_SECONDS, telemetry_url)
     write_json(output_dir / "preflight.json", {"schema": "zth_qwen3_1_7b_action_object_relation_execution_v1", "prepared_manifest_sha256": sha_file(output_dir / "probe_manifest.json"), "model_meta": meta, "telemetry": telemetry, "task_manifest_sha256": binding["task_sha256"], "execution_policy": manifest["execution_policy"]})
-    write_json(output_dir / "idle_power_samples.json", {"measurement_level": 2, "measurement_boundary": "gpu_device_only", "summary": idle_summary, "samples": [{"timestamp_utc": sample.timestamp_utc, "monotonic_seconds": sample.monotonic_seconds, "gpu_uuid": sample.gpu_uuid, "power_watts": sample.power_watts, "sequence": sample.sequence} for sample in idle_samples]})
+    write_json(output_dir / "idle_power_samples.json", {"measurement_level": 2, "measurement_boundary": "gpu_device_only", "summary": idle_summary, "samples": idle_samples})
     write_json(output_dir / "lifecycle.json", {"status": "running", "started_at": now(), "model_calls_made": False})
     rows: list[dict[str, Any]] = []
     for task in binding["tasks"]:
