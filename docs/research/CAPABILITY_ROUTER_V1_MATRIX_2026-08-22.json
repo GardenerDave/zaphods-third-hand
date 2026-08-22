@@ -1,0 +1,64 @@
+{
+  "schema": "zth_router_v1_closeout_v1",
+  "v0_authoritative_closeout": "ba2da0864d4ba29d5826ebe08edbcb039dd13bf8",
+  "freeze_commit": "47bb46655b8e87bc6d7fffd906928f68b0062869",
+  "run_directory": ".work/capability_router_v1/run_20260822T110000Z",
+  "run_manifest_sha256": "6ed9d36e20290b3f26ea52e2fdfe42be3ec806a177442dfd33ea53acca64e111",
+  "task_manifest_sha256": "9d222bfdf48864856fd390e2b7539330216bfaaabc0b4f06b8b5a9951512fb80",
+  "registry_sha256": "9bd6fe1b8a049553fd2bc0fbc0ae6ce0fabb78f458f17a9aa49a06ebeb108d9b",
+  "supplier": {
+    "supplier_id": "qwen3_1_7b_labeled_2_032b_minimal_atom",
+    "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "operative_parameters": 2031739904,
+    "artifact_sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb",
+    "effective_n_ctx": 32768,
+    "n_ctx_train": 32768,
+    "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85"
+  },
+  "metrics": {
+    "tasks_correct": "10/10",
+    "capability_plans_correct": "10/10",
+    "individual_assignments_correct_on_complete_plans": "7/7",
+    "complete_coverage_tasks_executed": "7/7",
+    "incomplete_coverage_tasks_failed_closed": "3/3",
+    "deterministic_steps": 7,
+    "model_steps": 5,
+    "tool_steps": 0,
+    "model_calls_avoided": 3,
+    "unnecessary_model_calls": 0,
+    "unnecessary_escalations": 0,
+    "duplicate_supplier_calls": 0,
+    "review_states": 3,
+    "tasks_with_multiple_supplier_types": 5
+  },
+  "resources": {
+    "model_calls": 5,
+    "model_30b_calls": 0,
+    "external_calls": 0,
+    "latency_ms": {"mean": 2020.9458, "median": 2001.261, "p95": 2199.958},
+    "gross_energy_joules": {"total": 291.9275, "mean": 58.3855, "median": 57.0875}
+  },
+  "execution": {
+    "teacher_calls": 0,
+    "retries": 0,
+    "escalations": 0,
+    "adaptations": 0,
+    "automatic_qualification_promotion": false,
+    "production_routing_changed": false,
+    "v100_30b_touched": false,
+    "tool_supplier_branch_demonstrated": false
+  },
+  "task_results": [
+    {"task_id": "router-v1-001", "coverage": "COMPLETE", "model_calls": 0, "terminal_state": "terminal_success", "task_correct": true},
+    {"task_id": "router-v1-002", "coverage": "COMPLETE", "model_calls": 0, "terminal_state": "terminal_success", "task_correct": true},
+    {"task_id": "router-v1-003", "coverage": "COMPLETE", "supplier_types": ["MODEL", "DETERMINISTIC_CODE"], "model_calls": 1, "terminal_state": "terminal_success", "task_correct": true},
+    {"task_id": "router-v1-004", "coverage": "COMPLETE", "supplier_types": ["MODEL", "DETERMINISTIC_CODE"], "model_calls": 1, "terminal_state": "terminal_success", "task_correct": true},
+    {"task_id": "router-v1-005", "coverage": "COMPLETE", "supplier_types": ["MODEL", "DETERMINISTIC_CODE"], "model_calls": 1, "terminal_state": "terminal_success", "task_correct": true},
+    {"task_id": "router-v1-006", "coverage": "COMPLETE", "supplier_types": ["MODEL", "DETERMINISTIC_CODE"], "model_calls": 1, "terminal_state": "terminal_success", "task_correct": true},
+    {"task_id": "router-v1-007", "coverage": "INCOMPLETE", "model_calls": 0, "terminal_state": "ready_for_review", "task_correct": true},
+    {"task_id": "router-v1-008", "coverage": "COMPLETE", "supplier_types": ["MODEL", "DETERMINISTIC_CODE"], "model_calls": 1, "terminal_state": "terminal_success", "task_correct": true},
+    {"task_id": "router-v1-009", "coverage": "INCOMPLETE", "model_calls": 0, "terminal_state": "ready_for_review", "task_correct": true},
+    {"task_id": "router-v1-010", "coverage": "INCOMPLETE", "model_calls": 0, "terminal_state": "ready_for_review", "task_correct": true}
+  ],
+  "next_decision": "ADD_BOUNDED_TOOL_SUPPLIER_AND_ITERATIVE_OBSERVATION"
+}

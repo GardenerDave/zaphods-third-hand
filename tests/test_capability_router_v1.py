@@ -5,6 +5,7 @@ from scripts.zth_capability_router_v1 import (
     index_registry,
     load_registry,
     load_tasks,
+    lazy_model_backend_gate,
     plan_capabilities,
     validate_model_free,
 )
@@ -50,3 +51,11 @@ def test_all_deterministic_and_review_workloads_are_lazy_model_free():
     selected = {"router-v1-001", "router-v1-002", "router-v1-007", "router-v1-009", "router-v1-010"}
     assert all(plan["planned_model_calls"] == 0 for task, _, plan in binding["plans"] if task["task_id"] in selected)
     assert len(load_tasks()) == 10
+
+
+def test_lazy_backend_gate_does_not_touch_unavailable_endpoint_for_no_model_plans():
+    binding = validate_model_free()
+    no_model_plans = [plan for task, _, plan in binding["plans"] if task["task_id"] in {"router-v1-001", "router-v1-002", "router-v1-007", "router-v1-009", "router-v1-010"}]
+    def unavailable_endpoint():
+        raise AssertionError("unavailable model endpoint was touched")
+    assert lazy_model_backend_gate(no_model_plans, unavailable_endpoint) is False

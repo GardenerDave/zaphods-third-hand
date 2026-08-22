@@ -196,6 +196,14 @@ def plan_capabilities(runtime_packet: dict[str, Any], registry_index: dict[str, 
     }
 
 
+def lazy_model_backend_gate(plans: list[dict[str, Any]], initializer: Any) -> bool:
+    """Initialize a model backend only when an executable plan needs one."""
+    if not any(plan["planned_model_calls"] > 0 for plan in plans):
+        return False
+    initializer()
+    return True
+
+
 def validate_model_free() -> dict[str, Any]:
     tasks = load_tasks()
     registry = load_registry()
