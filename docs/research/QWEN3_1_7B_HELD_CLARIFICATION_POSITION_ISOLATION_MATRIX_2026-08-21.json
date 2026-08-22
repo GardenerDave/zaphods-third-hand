@@ -1,0 +1,133 @@
+{
+  "schema": "zth_qwen3_1_7b_held_clarification_position_isolation_matrix_v1",
+  "status": "exploratory_not_confirmatory",
+  "candidate": {
+    "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "operative_parameters": 2031739904,
+    "artifact_sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb"
+  },
+  "run": {
+    "path": ".work/model_size_supplier_floor/qwen3_1_7b_held_clarification_position_isolation/run_20260822T004908Z/",
+    "tree_sha256": "dc0e53e13fe5521c144b49990c592407aaea300da8dde07537784022c7906b57",
+    "probe_manifest_sha256": "741634b30d558bb375356a7017697f8f4c540185bab06b3bbd12fd1921a45eb5",
+    "preflight_sha256": "8ca770da5b2185260c04768a35e36c9da64681b5e46ecbe37cb6d319ec862859",
+    "aggregate_sha256": "681ed4d6a4c6d58a3cbc57aaa5602adbf4236cf709bb14482040818701c051b1"
+  },
+  "bindings": {
+    "task_manifest_sha256": "2ceffafeded8942ce717af20f91bef07994b8d3ed6df1f09a3246b6135cb0c96",
+    "main_predicate_sha256": "6374ed0659f09f20ee33377f5da145035d8bbeadddf7d66e998d24bb3a61af0c",
+    "mapping_sha256": "a2dc46ba3dd2394963bd7f9cf9cc591ce8866e3108e2e11172109ffbef05c8af",
+    "clarification_sha256": "6a9cc9d36dd7001af8342650c19caf33268568deca4321f2c93d0627e4410950",
+    "schema_sha256": "5b9aef0b84726bd3ad42147d84d73d332e69241966301aeb5b4f0dc5881193c5",
+    "diff_sha256": {
+      "L_to_M": "e37f67e9c8ccb527b311d088df775a375a448b657a9353aae596e5a907866c92",
+      "M_to_A": "24eb92a1fdeaf387fc2ae1e39a65c8ebb74f6eb1ed61e9c8c63d68b9ec16596d",
+      "L_to_A": "e045e380aec1b3cae550f98ac2560a4dbd316200425696ea67fae6356a740aad"
+    },
+    "tasks_identical": true,
+    "main_predicate_identical": true,
+    "output_mapping_identical": true,
+    "schema_identical": true,
+    "worked_boolean_exemplars": 0,
+    "permutation_counts": {"L-M-A": 3, "L-A-M": 3, "M-L-A": 3, "M-A-L": 3, "A-L-M": 2, "A-M-L": 2}
+  },
+  "runtime": {
+    "effective_n_ctx": 32768,
+    "n_ctx_train": 32768,
+    "context_limit_non_binding": true,
+    "telemetry_level": 2,
+    "measurement_boundary": "gpu_device_only",
+    "sample_interval_seconds": 0.25,
+    "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85"
+  },
+  "arms": {
+    "L": {
+      "description": "clarification last",
+      "true_selected": 0,
+      "false_selected": 16,
+      "correct": 8,
+      "inside_correct": 8,
+      "outside_correct": 0,
+      "read_correct": 4,
+      "mutate_correct": 4,
+      "distractor_present_correct": 4,
+      "distractor_absent_correct": 4,
+      "cells": {"READ_INSIDE": {"correct": 4, "total": 4}, "READ_OUTSIDE": {"correct": 0, "total": 4}, "MUTATE_INSIDE": {"correct": 4, "total": 4}, "MUTATE_OUTSIDE": {"correct": 0, "total": 4}},
+      "parse_valid": 16,
+      "contract_valid": 16,
+      "confusion_matrix": {"TP": 0, "FN": 8, "FP": 0, "TN": 8},
+      "failures": {"serialization": 0, "contract": 0, "scope_decision": 8},
+      "latency_ms": {"median": 1004.053, "mean": 885.8020625, "p95": 1035.181},
+      "energy_joules": {"mean_per_action": 28.56734375, "median_per_action": 32.66625, "total": 457.0775}
+    },
+    "M": {
+      "description": "clarification before output mapping",
+      "true_selected": 0,
+      "false_selected": 16,
+      "correct": 8,
+      "inside_correct": 8,
+      "outside_correct": 0,
+      "read_correct": 4,
+      "mutate_correct": 4,
+      "distractor_present_correct": 4,
+      "distractor_absent_correct": 4,
+      "cells": {"READ_INSIDE": {"correct": 4, "total": 4}, "READ_OUTSIDE": {"correct": 0, "total": 4}, "MUTATE_INSIDE": {"correct": 4, "total": 4}, "MUTATE_OUTSIDE": {"correct": 0, "total": 4}},
+      "parse_valid": 16,
+      "contract_valid": 16,
+      "confusion_matrix": {"TP": 0, "FN": 8, "FP": 0, "TN": 8},
+      "failures": {"serialization": 0, "contract": 0, "scope_decision": 8},
+      "latency_ms": {"median": 1056.424, "mean": 1060.876625, "p95": 1083.062},
+      "energy_joules": {"mean_per_action": 33.2825, "median_per_action": 33.63, "total": 532.52}
+    },
+    "A": {
+      "description": "clarification absent",
+      "true_selected": 1,
+      "false_selected": 15,
+      "correct": 9,
+      "inside_correct": 8,
+      "outside_correct": 1,
+      "read_correct": 4,
+      "mutate_correct": 5,
+      "distractor_present_correct": 5,
+      "distractor_absent_correct": 4,
+      "cells": {"READ_INSIDE": {"correct": 4, "total": 4}, "READ_OUTSIDE": {"correct": 0, "total": 4}, "MUTATE_INSIDE": {"correct": 4, "total": 4}, "MUTATE_OUTSIDE": {"correct": 1, "total": 4}},
+      "parse_valid": 16,
+      "contract_valid": 16,
+      "confusion_matrix": {"TP": 1, "FN": 7, "FP": 0, "TN": 8},
+      "failures": {"serialization": 0, "contract": 0, "scope_decision": 7},
+      "latency_ms": {"median": 864.987, "mean": 944.2513125, "p95": 1122.133},
+      "energy_joules": {"mean_per_action": 28.00203125, "median_per_action": 28.06625, "total": 448.0325}
+    }
+  },
+  "paired": {
+    "output_flips": {"L_to_M": 0, "M_to_A": 1, "L_to_A": 1},
+    "single_recovery_task": "cross-scope-007",
+    "single_recovery_was_outside_authority": true,
+    "single_recovery_had_held_distractor": true,
+    "observations": [
+      {"task_id":"cross-scope-001","expected":false,"L":false,"M":false,"A":false},
+      {"task_id":"cross-scope-002","expected":false,"L":false,"M":false,"A":false},
+      {"task_id":"cross-scope-003","expected":true,"L":false,"M":false,"A":false},
+      {"task_id":"cross-scope-004","expected":true,"L":false,"M":false,"A":false},
+      {"task_id":"cross-scope-005","expected":false,"L":false,"M":false,"A":false},
+      {"task_id":"cross-scope-006","expected":false,"L":false,"M":false,"A":false},
+      {"task_id":"cross-scope-007","expected":true,"L":false,"M":false,"A":true},
+      {"task_id":"cross-scope-008","expected":true,"L":false,"M":false,"A":false},
+      {"task_id":"cross-scope-009","expected":false,"L":false,"M":false,"A":false},
+      {"task_id":"cross-scope-010","expected":false,"L":false,"M":false,"A":false},
+      {"task_id":"cross-scope-011","expected":true,"L":false,"M":false,"A":false},
+      {"task_id":"cross-scope-012","expected":true,"L":false,"M":false,"A":false},
+      {"task_id":"cross-scope-013","expected":false,"L":false,"M":false,"A":false},
+      {"task_id":"cross-scope-014","expected":false,"L":false,"M":false,"A":false},
+      {"task_id":"cross-scope-015","expected":true,"L":false,"M":false,"A":false},
+      {"task_id":"cross-scope-016","expected":true,"L":false,"M":false,"A":false}
+    ]
+  },
+  "interpretation": {
+    "primary_characterization": "HELD_CLARIFICATION_EFFECT_PARTIAL",
+    "scope_interface_candidate_found": false,
+    "next_decision": "REPAIR_HELD_CLARIFICATION_WORDING"
+  },
+  "execution": {"supplier_model_calls": 48, "teacher_calls": 0, "retries": 0, "escalations": 0},
+  "historical_evidence_changed": false
+}
