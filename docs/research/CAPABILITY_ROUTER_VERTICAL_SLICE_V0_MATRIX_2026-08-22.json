@@ -1,0 +1,67 @@
+{
+  "schema": "zth_router_v0_closeout_v1",
+  "authoritative_prior_closeout": "caa0c6ac8921b33708fe22c6837a5786139c5fe8",
+  "freeze_commit": "41b3d34b14cd7e1e5558444844a57a99bde8a875",
+  "run_directory": ".work/capability_router_vertical_slice_v0/run_20260822T101000Z",
+  "run_manifest_sha256": "5521320326760b48ec289798ea700c9d29231126e06d0e9cb217a37f8657f4e1",
+  "task_manifest_sha256": "ee66fa6e7ddea303e498eaf6d48621e55a7c0339e8818bee3efb579f25b09a42",
+  "registry_sha256": "f332d303b42de2c4cba3756210baf26c04dce1d33a724a2ebd59726914a5499f",
+  "semantic_schema_sha256": "485cfbe70878c4f33f08b7ed71ddade9b75c8d6f5b0e3258bb280b38b313f320",
+  "supplier": {
+    "supplier_id": "qwen3_1_7b_labeled_2_032b_minimal_atom",
+    "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "operative_parameters": 2031739904,
+    "artifact_sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb",
+    "effective_n_ctx": 32768,
+    "n_ctx_train": 32768,
+    "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85"
+  },
+  "fixtures": {
+    "task_count": 8,
+    "deterministic_no_model": 2,
+    "semantic_model": 4,
+    "unsupported_review": 2
+  },
+  "metrics": {
+    "tasks_terminally_correct": "8/8",
+    "router_supplier_choice_correct": "8/8",
+    "no_model_opportunities_correctly_avoided": "2/2",
+    "semantic_routes_correct": "4/4",
+    "unsupported_failed_closed": "2/2",
+    "unnecessary_model_calls": 0,
+    "unnecessary_escalations": 0,
+    "duplicate_calls": 0,
+    "validator_disagreements": 0,
+    "final_review_states": 2
+  },
+  "resources": {
+    "total_model_calls": 4,
+    "model_calls_avoided": 4,
+    "model_1_7b_calls": 4,
+    "model_30b_calls": 0,
+    "external_calls": 0,
+    "model_route_latency_ms": {"mean": 1968.58425, "median": 1946.151, "p95": 2136.724},
+    "model_route_gross_energy_joules": {"total": 233.5925, "mean": 58.398125, "median": 60.25125},
+    "idle_baseline_gross_energy_joules": 220.78
+  },
+  "execution": {
+    "supplier_model_calls": 4,
+    "teacher_calls": 0,
+    "retries": 0,
+    "escalations": 0,
+    "adaptations": 0,
+    "production_routing_changed": false,
+    "automatic_qualification_promotion": false,
+    "v100_30b_touched": false
+  },
+  "task_results": [
+    {"task_id": "router-v0-001", "selected_supplier_type": "DETERMINISTIC_CODE", "model_calls": 0, "terminal_state": "terminal_success", "task_correct": true},
+    {"task_id": "router-v0-002", "selected_supplier_type": "DETERMINISTIC_CODE", "model_calls": 0, "terminal_state": "terminal_success", "task_correct": true},
+    {"task_id": "router-v0-003", "selected_supplier_type": "MODEL", "model_calls": 1, "terminal_state": "terminal_success", "task_correct": true},
+    {"task_id": "router-v0-004", "selected_supplier_type": "MODEL", "model_calls": 1, "terminal_state": "terminal_success", "task_correct": true},
+    {"task_id": "router-v0-005", "selected_supplier_type": "MODEL", "model_calls": 1, "terminal_state": "terminal_success", "task_correct": true},
+    {"task_id": "router-v0-006", "selected_supplier_type": "MODEL", "model_calls": 1, "terminal_state": "terminal_success", "task_correct": true},
+    {"task_id": "router-v0-007", "selected_supplier_type": "REVIEW_OR_ESCALATION", "model_calls": 0, "terminal_state": "ready_for_review", "task_correct": true},
+    {"task_id": "router-v0-008", "selected_supplier_type": "REVIEW_OR_ESCALATION", "model_calls": 0, "terminal_state": "ready_for_review", "task_correct": true}
+  ]
+}
