@@ -1,0 +1,89 @@
+{
+  "schema": "zth_router_v1_1_closeout_v1",
+  "v1_closeout": "2d97310f54db3ea5bcee825419f9f2359d2afd3f",
+  "v1_interpretation_erratum": "docs/research/CAPABILITY_ROUTER_V1_INTERPRETATION_ERRATUM_2026-08-22.md",
+  "freeze_commit": "2f2b2e8",
+  "telemetry_harness_correction_commit": "567770f38f69715642d26d96e54de29d4c8188ef",
+  "run_directory": ".work/model_size_supplier_floor/capability_router_v1_1_grounding/run_20260822T154500Z/",
+  "run_manifest_sha256": "824b1f3454ff04444cec6fce0c440845912c95763f3266c3810f9c694361b294",
+  "task_manifest": {
+    "path": "docs/research/CAPABILITY_ROUTER_V1_1_TASKS_2026-08-22.json",
+    "sha256": "c50bec3b8ea73e1b5c80c1f8627afe5e4bc565f6c86baf15b32760425e29c205"
+  },
+  "registry": {
+    "path": "docs/research/CAPABILITY_ROUTER_EXPERIMENTAL_REGISTRY_V1_2026-08-22.json",
+    "sha256": "9bd6fe1b8a049553fd2bc0fbc0ae6ce0fabb78f458f17a9aa49a06ebeb108d9b"
+  },
+  "driver_sha256": "b881958cd510199292e15bd4a74401c948f06f6102dbd72273bb629fd4c0a786",
+  "interfaces": {
+    "minimal_schema_sha256": "2599b0b31321b118d0f155fbbaadc817b5fba54a45b4a81d680738ee42bdff97",
+    "response_format_sha256": "d5754d893a2b8f4ab58c68d3fb0239e9f9557761c0e9269ca4008b02add313fd",
+    "runtime_expected_field_reads": 0,
+    "success_contract_contains_worked_answer": false
+  },
+  "supplier": {
+    "supplier_id": "qwen3_1_7b_labeled_2_032b_minimal_atom",
+    "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "operative_parameters": 2031739904,
+    "artifact_sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb",
+    "effective_n_ctx": 32768,
+    "n_ctx_train": 32768,
+    "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85"
+  },
+  "metrics": {
+    "tasks_correct": "8/8",
+    "capability_plans_correct": "8/8",
+    "complete_plan_assignment_sets_correct": "6/6",
+    "individual_capability_assignments_correct": "10/10",
+    "complete_coverage_tasks_executed": "6/6",
+    "incomplete_coverage_tasks_failed_closed": "2/2",
+    "deterministic_steps": 6,
+    "model_steps": 4,
+    "tool_steps": 0,
+    "model_calls_avoided": 4,
+    "unnecessary_model_calls": 0,
+    "unnecessary_escalations": 0,
+    "duplicate_supplier_calls": 0,
+    "review_states": 2,
+    "tasks_with_multiple_supplier_types": 4,
+    "runtime_validator_results": "8/8 passed-or-correctly-failed-closed",
+    "oracle_field_reads": 0
+  },
+  "resources": {
+    "model_calls": 4,
+    "model_30b_calls": 0,
+    "tool_calls": 0,
+    "external_calls": 0,
+    "latency_ms": {
+      "mean": 1926.21125,
+      "median": 1913.944,
+      "p95_inclusive": 2112.0779
+    },
+    "gross_energy_joules": {
+      "total": 216.4775,
+      "mean": 54.119375,
+      "median": 52.9475
+    }
+  },
+  "execution": {
+    "teacher_calls": 0,
+    "retries": 0,
+    "escalations": 0,
+    "adaptations": 0,
+    "automatic_qualification_promotion": false,
+    "production_routing_changed": false,
+    "v100_30b_touched": false,
+    "tool_supplier_branch_demonstrated": false
+  },
+  "task_results": [
+    {"task_id": "router-v1-1-001", "coverage": "COMPLETE", "supplier_types": ["DETERMINISTIC_CODE"], "model_calls": 0, "terminal_state": "terminal_success", "task_correct": true},
+    {"task_id": "router-v1-1-002", "coverage": "COMPLETE", "supplier_types": ["DETERMINISTIC_CODE"], "model_calls": 0, "terminal_state": "terminal_success", "task_correct": true},
+    {"task_id": "router-v1-1-003", "coverage": "COMPLETE", "supplier_types": ["MODEL", "DETERMINISTIC_CODE"], "model_calls": 1, "terminal_state": "terminal_success", "task_correct": true},
+    {"task_id": "router-v1-1-004", "coverage": "COMPLETE", "supplier_types": ["MODEL", "DETERMINISTIC_CODE"], "model_calls": 1, "terminal_state": "terminal_success", "task_correct": true},
+    {"task_id": "router-v1-1-005", "coverage": "COMPLETE", "supplier_types": ["MODEL", "DETERMINISTIC_CODE"], "model_calls": 1, "terminal_state": "terminal_success", "task_correct": true},
+    {"task_id": "router-v1-1-006", "coverage": "COMPLETE", "supplier_types": ["MODEL", "DETERMINISTIC_CODE"], "model_calls": 1, "terminal_state": "terminal_success", "task_correct": true},
+    {"task_id": "router-v1-1-007", "coverage": "INCOMPLETE", "supplier_types": [], "model_calls": 0, "terminal_state": "ready_for_review", "task_correct": true},
+    {"task_id": "router-v1-1-008", "coverage": "INCOMPLETE", "supplier_types": [], "model_calls": 0, "terminal_state": "ready_for_review", "task_correct": true}
+  ],
+  "next_decision": "ADD_BOUNDED_TOOL_SUPPLIER_AND_ITERATIVE_OBSERVATION"
+}

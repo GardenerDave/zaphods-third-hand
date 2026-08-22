@@ -3,12 +3,16 @@ from __future__ import annotations
 from copy import deepcopy
 
 from scripts.zth_capability_router_v1_1 import (
+    build_planner_facts,
     build_success_contract,
     derive_required_capabilities,
     execute_runtime_task,
     lazy_model_backend_gate,
+    plan_capabilities,
+    registry_index,
     validate_model_free,
 )
+from scripts import zth_capability_router_v1 as v1
 
 
 def test_planner_facts_and_contracts_are_runtime_grounded():
@@ -42,12 +46,20 @@ def test_oracle_corruption_does_not_change_runtime_result_or_calls():
         return {"content": '{"action":"inspect","object_expression":"amber-ground-ledger.json"}'}
 
     before = execute_runtime_task(runtime_task, deepcopy(plan), deepcopy(contract), fake_model)
-    wrong_evaluator = {"expected_required_capabilities": ["wrong"], "expected_terminal_state": "ready_for_review", "expected_model_result": {"action": "wrong", "object_expression": "wrong"}}
-    after = execute_runtime_task(runtime_task, deepcopy(plan), deepcopy(contract), fake_model)
+    corrupted_task = deepcopy(task)
+    for key in list(corrupted_task):
+        if key.startswith("expected_"):
+            corrupted_task[key] = "deliberately wrong"
+    triage, orchestration = v1.make_packets({"task_id": corrupted_task["task_id"], "input_request": corrupted_task["input_request"]})
+    corrupted_facts = build_planner_facts(corrupted_task, triage, orchestration)
+    corrupted_plan = plan_capabilities(corrupted_facts, registry_index())
+    corrupted_contract = build_success_contract(corrupted_facts, corrupted_plan["derived_required_capabilities"], True)
+    after = execute_runtime_task(runtime_task, corrupted_plan, corrupted_contract, fake_model)
     assert before == after
     assert before["terminal_state"] == "terminal_success"
     assert len(calls) == 2
-    assert wrong_evaluator["expected_terminal_state"] != before["terminal_state"]
+    assert corrupted_task["expected_terminal_state"] != before["terminal_state"]
+    assert corrupted_plan == plan
 
 
 def test_no_model_workload_does_not_touch_unavailable_backend():
