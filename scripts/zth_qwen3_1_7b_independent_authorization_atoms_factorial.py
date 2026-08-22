@@ -15,6 +15,7 @@ from typing import Any
 
 from local_harness.icm_call import list_models
 from local_harness.stage_a_power_telemetry import PowerSampler, integrate_energy_joules, read_gpu_power
+from scripts import zth_qwen3_0_6b_clean_scope_logic_probe as base
 from scripts import zth_qwen3_1_7b_clean_scope_logic_probe as clean
 from scripts.zth_qwen3_1_7b_atomic_scope_relation_decomposition import structured_call, validate_raw
 
@@ -221,9 +222,9 @@ def execute(out: Path) -> None:
     meta = candidate.get("meta") if candidate else {}
     if candidate is None or meta.get("n_params") != EXPECTED_PARAMS or meta.get("n_ctx") != EXPECTED_EFFECTIVE_CTX:
         raise RuntimeError("candidate endpoint binding mismatch")
-    telemetry_url = clean.telemetry_base_url()
-    telemetry = clean.telemetry_preflight(telemetry_url)
-    idle_samples, idle_summary = clean.sample_window(IDLE_SECONDS, telemetry_url)
+    telemetry_url = base.telemetry_base_url()
+    telemetry = base.telemetry_preflight(telemetry_url)
+    idle_samples, idle_summary = base.sample_window(IDLE_SECONDS, telemetry_url)
     write_json(out / "preflight.json", {"model_meta": meta, "telemetry": telemetry, "task_manifest_sha256": manifest["task_manifest_sha256"], "execution_policy": manifest["execution_policy"], "model_calls": 0})
     write_json(out / "idle_power_samples.json", {"measurement_level": 2, "measurement_boundary": "gpu_device_only", "summary": idle_summary, "samples": idle_samples})
     write_json(out / "lifecycle.json", {"status": "running", "started_at": now(), "model_calls_made": False})
