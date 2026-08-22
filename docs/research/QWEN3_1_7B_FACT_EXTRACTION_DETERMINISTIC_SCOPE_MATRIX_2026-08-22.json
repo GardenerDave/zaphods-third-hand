@@ -1,0 +1,104 @@
+{
+  "schema": "zth_qwen3_1_7b_fact_extraction_deterministic_scope_matrix_v1",
+  "exploratory_not_confirmatory": true,
+  "candidate": {
+    "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "operative_parameters": 2031739904,
+    "artifact_sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb"
+  },
+  "bindings": {
+    "task_manifest_sha256": "2ceffafeded8942ce717af20f91bef07994b8d3ed6df1f09a3246b6135cb0c96",
+    "expected_manifest_sha256": "770ed89f450b5cbeb92f23762da0f0fbd414a4bf48b9f37bc3337b7f53a64367",
+    "design_sha256": "63d7c4563776fd2b2711d7cd39a2b488f0fdc6cf1335df64f9570eff4c794fb5",
+    "architectural_note_sha256": "d5e4ae8724d60d010d7425f46e6dc702b0ecc6260966fa440e6ab5158013d7f6",
+    "run_path": ".work/model_size_supplier_floor/qwen3_1_7b_fact_extraction_deterministic_scope/run_20260822T040000Z/",
+    "prepared_manifest_sha256": "077bef8a5733973421e00e9c48374c8696073f45b09752526d6b811eb1856c35",
+    "recovery_state_pre_fix_sha256": "31deeac462a2e721732ece1cae44b41eebb446d7d44435d71a6c50c1be434ab9",
+    "aggregate_sha256": "2d02fd28087e47b4cc80f9bca825ffb389ad62cb2d19e796eea17ef6f31a7ea6"
+  },
+  "recovery": {
+    "initial_responses": 9,
+    "initial_validators": 8,
+    "initial_scorecards": 8,
+    "model_free_recovered_validators": 9,
+    "model_free_recovered_scorecards": 9,
+    "continuation_task_ids": ["cross-scope-010", "cross-scope-011", "cross-scope-012", "cross-scope-013", "cross-scope-014", "cross-scope-015", "cross-scope-016"],
+    "supplier_model_calls": 16,
+    "unique_called_tasks": 16,
+    "duplicate_called_tasks": 0,
+    "teacher_calls": 0,
+    "retries": 0,
+    "escalations": 0,
+    "partial_lifecycle_stale_after_harness_crash": true,
+    "unsupported_operation_preserved": true,
+    "action_head_ambiguity_candidate_count": 4
+  },
+  "extraction": {
+    "tasks": 16,
+    "parse_valid": 16,
+    "contract_valid": 16,
+    "authorized_target_correct": 16,
+    "requested_target_correct": 15,
+    "authorized_operation_correct": 16,
+    "requested_operation_correct": 12,
+    "all_four_fields_correct": 12,
+    "failure_localization": {
+      "authorized_target": 0,
+      "requested_target": 0,
+      "authorized_operation": 0,
+      "requested_operation": 3,
+      "multiple": 1,
+      "all_facts_correct": 12,
+      "invalid_contract": 0
+    }
+  },
+  "deterministic_policy": {
+    "correct": 15,
+    "unevaluable": 0,
+    "inside_correct": "7/8",
+    "outside_correct": "8/8",
+    "read_correct": "7/8",
+    "mutate_correct": "8/8",
+    "held_present_correct": "7/8",
+    "held_absent_correct": "8/8",
+    "confusion_matrix": {"TP": 8, "FN": 0, "FP": 1, "TN": 7},
+    "policy_classification": {
+      "facts_correct_policy_correct": 12,
+      "extraction_error_policy_still_correct": 3,
+      "extraction_error_policy_incorrect": 1,
+      "extraction_error_policy_unevaluable": 0,
+      "invalid_extraction_contract": 0
+    }
+  },
+  "paired_task_results": [
+    {"task_id":"cross-scope-001","all_four_fields_correct":true,"derived_scope":false,"derived_correct":true,"failure_localization":"ALL_FACTS_CORRECT","policy_class":"FACTS_CORRECT_POLICY_CORRECT"},
+    {"task_id":"cross-scope-002","all_four_fields_correct":true,"derived_scope":false,"derived_correct":true,"failure_localization":"ALL_FACTS_CORRECT","policy_class":"FACTS_CORRECT_POLICY_CORRECT"},
+    {"task_id":"cross-scope-003","all_four_fields_correct":true,"derived_scope":true,"derived_correct":true,"failure_localization":"ALL_FACTS_CORRECT","policy_class":"FACTS_CORRECT_POLICY_CORRECT"},
+    {"task_id":"cross-scope-004","all_four_fields_correct":true,"derived_scope":true,"derived_correct":true,"failure_localization":"ALL_FACTS_CORRECT","policy_class":"FACTS_CORRECT_POLICY_CORRECT"},
+    {"task_id":"cross-scope-005","all_four_fields_correct":true,"derived_scope":false,"derived_correct":true,"failure_localization":"ALL_FACTS_CORRECT","policy_class":"FACTS_CORRECT_POLICY_CORRECT"},
+    {"task_id":"cross-scope-006","all_four_fields_correct":true,"derived_scope":false,"derived_correct":true,"failure_localization":"ALL_FACTS_CORRECT","policy_class":"FACTS_CORRECT_POLICY_CORRECT"},
+    {"task_id":"cross-scope-007","all_four_fields_correct":true,"derived_scope":true,"derived_correct":true,"failure_localization":"ALL_FACTS_CORRECT","policy_class":"FACTS_CORRECT_POLICY_CORRECT"},
+    {"task_id":"cross-scope-008","all_four_fields_correct":true,"derived_scope":true,"derived_correct":true,"failure_localization":"ALL_FACTS_CORRECT","policy_class":"FACTS_CORRECT_POLICY_CORRECT"},
+    {"task_id":"cross-scope-009","all_four_fields_correct":false,"derived_scope":true,"derived_correct":false,"failure_localization":"MULTIPLE_EXTRACTION_FAILURES","policy_class":"EXTRACTION_ERROR_POLICY_INCORRECT","action_head_ambiguity_candidate":true},
+    {"task_id":"cross-scope-010","all_four_fields_correct":true,"derived_scope":false,"derived_correct":true,"failure_localization":"ALL_FACTS_CORRECT","policy_class":"FACTS_CORRECT_POLICY_CORRECT"},
+    {"task_id":"cross-scope-011","all_four_fields_correct":false,"derived_scope":true,"derived_correct":true,"failure_localization":"REQUESTED_OPERATION_EXTRACTION_FAILURE","policy_class":"EXTRACTION_ERROR_POLICY_STILL_CORRECT","action_head_ambiguity_candidate":true},
+    {"task_id":"cross-scope-012","all_four_fields_correct":false,"derived_scope":true,"derived_correct":true,"failure_localization":"REQUESTED_OPERATION_EXTRACTION_FAILURE","policy_class":"EXTRACTION_ERROR_POLICY_STILL_CORRECT","action_head_ambiguity_candidate":true},
+    {"task_id":"cross-scope-013","all_four_fields_correct":true,"derived_scope":false,"derived_correct":true,"failure_localization":"ALL_FACTS_CORRECT","policy_class":"FACTS_CORRECT_POLICY_CORRECT"},
+    {"task_id":"cross-scope-014","all_four_fields_correct":true,"derived_scope":false,"derived_correct":true,"failure_localization":"ALL_FACTS_CORRECT","policy_class":"FACTS_CORRECT_POLICY_CORRECT"},
+    {"task_id":"cross-scope-015","all_four_fields_correct":false,"derived_scope":true,"derived_correct":true,"failure_localization":"REQUESTED_OPERATION_EXTRACTION_FAILURE","policy_class":"EXTRACTION_ERROR_POLICY_STILL_CORRECT","action_head_ambiguity_candidate":true},
+    {"task_id":"cross-scope-016","all_four_fields_correct":true,"derived_scope":true,"derived_correct":true,"failure_localization":"ALL_FACTS_CORRECT","policy_class":"FACTS_CORRECT_POLICY_CORRECT"}
+  ],
+  "resources": {
+    "latency_ms": {"median": 3272.5665,"mean":3268.42575,"p95":3523.658},
+    "energy": {"measured_actions":15,"total_joules":1272.8275,"mean_joules_per_measured_action":84.8551667,"median_joules_per_measured_action":83.59,"j_per_correct_four_field_extraction":106.0689583,"j_per_correct_deterministic_scope":84.8551667}
+  },
+  "interpretation": {
+    "primary_characterization": "FACT_EXTRACTION_POLICY_PIPELINE_PARTIAL",
+    "model_role": "FACT_EXTRACTION",
+    "policy_role": "DETERMINISTIC",
+    "model_free_membership_available": true,
+    "next_decision": "ISOLATE_OPERATION_FACT_EXTRACTION",
+    "historical_raw_evidence_changed": false,
+    "stage_b_created": false
+  }
+}
