@@ -1,0 +1,66 @@
+{
+  "schema": "zth_qwen3_1_7b_action_object_relation_extraction_matrix_v1",
+  "exploratory_not_confirmatory": true,
+  "supplier": {
+    "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "label": "Qwen3 1.7B-labeled / 2.032B operative",
+    "operative_parameters": 2031739904,
+    "artifact_sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb",
+    "effective_n_ctx": 32768,
+    "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85"
+  },
+  "bindings": {
+    "task_manifest_sha256": "0f4f8dd2191eed6067fa2af411fb17317cf20e5f7e2c65868e39f35c44368734",
+    "schema_sha256": "9b821473a876e8aedf733bb99918f9c0629c8c5e58d7732df4a3614045948271",
+    "run_manifest_sha256": "6a9e129f287b5600202ff98ce65e0b691858830f8aa3037894938f433b66957a",
+    "aggregate_sha256": "761278e7b4fdbe11790938f004192c268339852e2bebe7bc6f747befd22c74ad",
+    "prior_target_bound_report_sha256": "c3c0625676c89054dc29a680879bcd0883c109b18de084a1dbd941ffcd054c55",
+    "prior_target_bound_matrix_sha256": "f50a1418abae92d3e220e6fa515fb76bd5f8f2fb03a16b18f60097dee02b9bd7"
+  },
+  "metrics": {
+    "tasks": 8,
+    "parse_valid": 8,
+    "contract_valid": 8,
+    "fields_correct": {"action_1": 8, "object_1": 4, "action_2": 8, "object_2": 8},
+    "all_relations_correct": 4,
+    "selected_operation_correct": 7,
+    "evaluable": 7,
+    "unevaluable": 0,
+    "ambiguous": 1,
+    "secondary_action_selections": 0,
+    "fully_correct_pairs": 3,
+    "pair_count": 4,
+    "expected_selected_position": {"first": 4, "second": 4},
+    "selected_operation_correct_by_position": {"first": 4, "second": 3},
+    "all_relations_correct_by_position": {"first": 4, "second": 0}
+  },
+  "pair_results": {
+    "relation-pair-001": "ONE_DIRECTION_CORRECT",
+    "relation-pair-002": "BOTH_RELATIONS_CORRECT",
+    "relation-pair-003": "BOTH_RELATIONS_CORRECT",
+    "relation-pair-004": "BOTH_RELATIONS_CORRECT"
+  },
+  "tasks": [
+    {"task_id":"relation-001","pair_id":"relation-pair-001","expected_selected_operation":"inspect","observed_relations":{"action_1":"inspect","object_1":"beacon-record.json","action_2":"document","object_2":"expiration detail"},"selected_operation":"inspect","selected_correct":true,"all_relations_correct":true,"failure_class":"RELATIONS_CORRECT_SELECTION_CORRECT"},
+    {"task_id":"relation-002","pair_id":"relation-pair-001","expected_selected_operation":"document","observed_relations":{"action_1":"inspect","object_1":"beacon-record.json","action_2":"document","object_2":"beacon-record.json"},"selected_operation":null,"selected_correct":false,"all_relations_correct":false,"failure_class":"RELATION_EXTRACTION_ERROR_SELECTION_UNEVALUABLE","binding":"AMBIGUOUS_RELATION_BINDING"},
+    {"task_id":"relation-003","pair_id":"relation-pair-002","expected_selected_operation":"update","observed_relations":{"action_1":"announce","object_1":"revision note for cobalt.json","action_2":"update","object_2":"cobalt.json"},"selected_operation":"update","selected_correct":true,"all_relations_correct":false,"failure_class":"RELATION_EXTRACTION_ERROR_SELECTION_STILL_CORRECT"},
+    {"task_id":"relation-004","pair_id":"relation-pair-002","expected_selected_operation":"announce","observed_relations":{"action_1":"announce","object_1":"cobalt.json","action_2":"update","object_2":"revision note"},"selected_operation":"announce","selected_correct":true,"all_relations_correct":true,"failure_class":"RELATIONS_CORRECT_SELECTION_CORRECT"},
+    {"task_id":"relation-005","pair_id":"relation-pair-003","expected_selected_operation":"read","observed_relations":{"action_1":"read","object_1":"delta.json","action_2":"catalog","object_2":"checksum ledger"},"selected_operation":"read","selected_correct":true,"all_relations_correct":true,"failure_class":"RELATIONS_CORRECT_SELECTION_CORRECT"},
+    {"task_id":"relation-006","pair_id":"relation-pair-003","expected_selected_operation":"catalog","observed_relations":{"action_1":"read","object_1":"checksum ledger for delta.json","action_2":"catalog","object_2":"delta.json"},"selected_operation":"catalog","selected_correct":true,"all_relations_correct":false,"failure_class":"RELATION_EXTRACTION_ERROR_SELECTION_STILL_CORRECT"},
+    {"task_id":"relation-007","pair_id":"relation-pair-004","expected_selected_operation":"alter","observed_relations":{"action_1":"submit","object_1":"change package for echo.json","action_2":"alter","object_2":"echo.json"},"selected_operation":"alter","selected_correct":true,"all_relations_correct":false,"failure_class":"RELATION_EXTRACTION_ERROR_SELECTION_STILL_CORRECT"},
+    {"task_id":"relation-008","pair_id":"relation-pair-004","expected_selected_operation":"submit","observed_relations":{"action_1":"submit","object_1":"echo.json","action_2":"alter","object_2":"change package"},"selected_operation":"submit","selected_correct":true,"all_relations_correct":true,"failure_class":"RELATIONS_CORRECT_SELECTION_CORRECT"}
+  ],
+  "resources": {
+    "measurement_level": 2,
+    "measurement_boundary": "gpu_device_only",
+    "latency_ms": {"median": 2764.4785,"mean": 2743.5935,"p95": 2945.141},
+    "gross_energy_joules": {"mean_per_action": 76.22125,"median_per_action": 75.15625,"total": 609.77}
+  },
+  "interpretation": {
+    "primary_characterization": "ACTION_OBJECT_RELATION_PIPELINE_PARTIAL",
+    "model_role": "SEMANTIC_RELATION_EXTRACTION",
+    "policy_role": "DETERMINISTIC",
+    "next_decision": "REPAIR_TARGET_ACTION_BINDING_INTERFACE"
+  },
+  "execution": {"supplier_model_calls":8,"teacher_calls":0,"retries":0,"escalations":0,"adaptations":0}
+}
