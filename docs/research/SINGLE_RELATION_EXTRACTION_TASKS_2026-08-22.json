@@ -1,0 +1,20 @@
+{
+  "schema":"zth_single_relation_extraction_tasks_v1",
+  "status":"frozen_exploratory_not_confirmatory",
+  "model_outputs_consulted":false,
+  "output_contract":{"fields":["action","direct_object","reference_entity"],"all_types":"string","additionalProperties":false},
+  "tasks":[
+    {"task_id":"single-relation-001","sentence":"Inspect quartz-ledger.json.","semantic_regime":"DIRECT_ENTITY_OBJECT","action_verb":"inspect","expected_action":"inspect","expected_direct_object":"quartz-ledger.json","expected_reference_entity":""},
+    {"task_id":"single-relation-002","sentence":"Inspect the expiry note in quartz-ledger.json.","semantic_regime":"SUBOBJECT_WITH_REFERENCE","action_verb":"inspect","expected_action":"inspect","expected_direct_object":"expiry note","expected_reference_entity":"quartz-ledger.json"},
+    {"task_id":"single-relation-003","sentence":"Update amber-plan.json.","semantic_regime":"DIRECT_ENTITY_OBJECT","action_verb":"update","expected_action":"update","expected_direct_object":"amber-plan.json","expected_reference_entity":""},
+    {"task_id":"single-relation-004","sentence":"Update the revision note in amber-plan.json.","semantic_regime":"SUBOBJECT_WITH_REFERENCE","action_verb":"update","expected_action":"update","expected_direct_object":"revision note","expected_reference_entity":"amber-plan.json"},
+    {"task_id":"single-relation-005","sentence":"Catalog river-index.json.","semantic_regime":"DIRECT_ENTITY_OBJECT","action_verb":"catalog","expected_action":"catalog","expected_direct_object":"river-index.json","expected_reference_entity":""},
+    {"task_id":"single-relation-006","sentence":"Catalog the checksum entry in river-index.json.","semantic_regime":"SUBOBJECT_WITH_REFERENCE","action_verb":"catalog","expected_action":"catalog","expected_direct_object":"checksum entry","expected_reference_entity":"river-index.json"},
+    {"task_id":"single-relation-007","sentence":"Submit cedar-packet.json.","semantic_regime":"DIRECT_ENTITY_OBJECT","action_verb":"submit","expected_action":"submit","expected_direct_object":"cedar-packet.json","expected_reference_entity":""},
+    {"task_id":"single-relation-008","sentence":"Submit the cover sheet in cedar-packet.json.","semantic_regime":"SUBOBJECT_WITH_REFERENCE","action_verb":"submit","expected_action":"submit","expected_direct_object":"cover sheet","expected_reference_entity":"cedar-packet.json"}
+  ],
+  "task_count":8,
+  "direct_entity_object_count":4,
+  "subobject_with_reference_count":4,
+  "model_calls_made":false
+}
