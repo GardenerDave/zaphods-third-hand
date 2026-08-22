@@ -1,0 +1,17 @@
+{
+  "schema": "zth_relation_object_ir_projection_v1",
+  "model_calls_made": 0,
+  "historical_supplier_responses_rescored": false,
+  "selection_rule": "normalized(direct_object) equals normalized(requested_target); reference_entity alone never binds",
+  "rows": [
+    {"task_id":"relation-001","requested_target":"beacon-record.json","relations":[{"action":"inspect","direct_object":"beacon-record.json","reference_entity":""},{"action":"document","direct_object":"expiration detail","reference_entity":"beacon-record.json"}],"selected_operation":"inspect","expected_selected_operation":"inspect","classification":"DIRECT_TARGET_BINDING","correct":true},
+    {"task_id":"relation-002","requested_target":"beacon-record.json","relations":[{"action":"inspect","direct_object":"expiration detail","reference_entity":"beacon-record.json"},{"action":"document","direct_object":"beacon-record.json","reference_entity":""}],"selected_operation":"document","expected_selected_operation":"document","classification":"DIRECT_TARGET_BINDING","correct":true},
+    {"task_id":"relation-003","requested_target":"cobalt.json","relations":[{"action":"announce","direct_object":"revision note","reference_entity":"cobalt.json"},{"action":"update","direct_object":"cobalt.json","reference_entity":""}],"selected_operation":"update","expected_selected_operation":"update","classification":"DIRECT_TARGET_BINDING","correct":true},
+    {"task_id":"relation-004","requested_target":"cobalt.json","relations":[{"action":"announce","direct_object":"cobalt.json","reference_entity":""},{"action":"update","direct_object":"revision note","reference_entity":"cobalt.json"}],"selected_operation":"announce","expected_selected_operation":"announce","classification":"DIRECT_TARGET_BINDING","correct":true},
+    {"task_id":"relation-005","requested_target":"delta.json","relations":[{"action":"read","direct_object":"delta.json","reference_entity":""},{"action":"catalog","direct_object":"checksum ledger","reference_entity":"delta.json"}],"selected_operation":"read","expected_selected_operation":"read","classification":"DIRECT_TARGET_BINDING","correct":true},
+    {"task_id":"relation-006","requested_target":"delta.json","relations":[{"action":"read","direct_object":"checksum ledger","reference_entity":"delta.json"},{"action":"catalog","direct_object":"delta.json","reference_entity":""}],"selected_operation":"catalog","expected_selected_operation":"catalog","classification":"DIRECT_TARGET_BINDING","correct":true},
+    {"task_id":"relation-007","requested_target":"echo.json","relations":[{"action":"submit","direct_object":"change package","reference_entity":"echo.json"},{"action":"alter","direct_object":"echo.json","reference_entity":""}],"selected_operation":"alter","expected_selected_operation":"alter","classification":"DIRECT_TARGET_BINDING","correct":true},
+    {"task_id":"relation-008","requested_target":"echo.json","relations":[{"action":"submit","direct_object":"echo.json","reference_entity":""},{"action":"alter","direct_object":"change package","reference_entity":"echo.json"}],"selected_operation":"submit","expected_selected_operation":"submit","classification":"DIRECT_TARGET_BINDING","correct":true}
+  ],
+  "summary": {"task_count":8,"expected_selection_reproduced":8,"expected_selection_total":8}
+}
