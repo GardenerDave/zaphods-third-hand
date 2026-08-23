@@ -1,0 +1,24 @@
+{
+  "automatic_promotion": false,
+  "entries": [
+    {
+      "capability_id": "semantic.bounded_operation_classification",
+      "evidence_scope": "fresh two-class true semantic operation classification",
+      "interface_id": "bounded_operation_class_candidate_v0",
+      "qualification_decision": "no promotion",
+      "status": "EXPERIMENTAL_CANDIDATE",
+      "supplier_id": "qwen3_1_7b_bounded_operation_class_candidate_supplier",
+      "supplier_type": "MODEL"
+    },
+    {
+      "capability_id": "tool.read_only_repository_observation",
+      "evidence_scope": "prior exact-target read-only metadata observation",
+      "interface_id": "repository_relative_metadata_observation_v0",
+      "qualification_decision": "preserved prior evidence",
+      "status": "QUALIFIED_EXPLORATORY",
+      "supplier_id": "python_read_only_repository_observer_v0",
+      "supplier_type": "TOOL"
+    }
+  ],
+  "schema": "zth_true_semantic_fallback_v2_registry_v0"
+}

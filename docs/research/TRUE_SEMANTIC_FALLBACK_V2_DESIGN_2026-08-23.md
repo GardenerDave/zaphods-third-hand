@@ -1,7 +1,9 @@
 # True semantic fallback V2 successor design
 
-This is a design-only successor to the partially executed V1 run. It is not a
-freeze and is not executed by this closeout.
+This design originated as a design-only successor to the partially executed V1
+run. It is now implemented by `scripts/true_semantic_fallback_v2.py` and
+frozen model-free by the successor freeze commit. It is not executed by this
+closeout.
 
 ## Purpose
 
@@ -69,3 +71,17 @@ completion and task terminal success. V2 should only claim
 classification completes the bounded transition without a harness failure.
 
 `NEXT_DECISION=RUN_FRESH_TRUE_SEMANTIC_FALLBACK_BASELINE_WITH_REPAIRED_HARNESS`
+
+## V2 frozen implementation profile
+
+The frozen matrix contains ten neutral-ID tasks: six genuinely unresolved
+semantic tasks in presence/inspect/presence/inspect/presence/inspect order, two
+deterministic controls, and two fail-closed controls. Runtime cases contain
+only request text and environment authority; expected semantic classes and
+terminal expectations are evaluator-only. The V2 prompt and enum are the V1
+enum-only baseline interface without V1 failure-specific examples or wording.
+
+V2 directly imports telemetry helpers from
+`scripts.zth_qwen3_0_6b_clean_scope_logic_probe`; no compatibility wrapper is
+part of the execution path. Supplier-counting uses explicit non-null boolean
+predicates, including the uncovered `actuator.inspect` record.
