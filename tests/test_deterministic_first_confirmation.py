@@ -63,3 +63,72 @@ def test_evaluator_corruption_cannot_change_runtime_cases_or_plans():
         repeated.append((case["task_id"], derivation, confirmation.plan(case["task_id"], derivation, case["environment_facts"]["authority_record"])))
     assert original == repeated
     assert evaluator_cases != corrupted
+
+
+def test_pre_actuation_authority_allows_authorized_operation_and_target_without_real_observer():
+    calls = []
+
+    def stub_observer(request, authority):
+        calls.append((request, authority))
+        return {"status": "VALID_OBSERVATION", "repository_relative_path": request["repository_relative_path"]}
+
+    authority = {"allowed_observation_operations": ["observe_presence"], "allowed_targets": ["docs/research/DETERMINISTIC_FIRST_CONFIRMATION_DESIGN_2026-08-23.md"]}
+    result, request, tool_authority, observation, count = confirmation.execute_read_only_observation(
+        "observe_presence", authority["allowed_targets"][0], authority, observer=stub_observer
+    )
+    assert result["status"] == "AUTHORIZED"
+    assert tool_authority["status"] == "AUTHORIZED"
+    assert observation["status"] == "VALID_OBSERVATION"
+    assert count == 1
+    assert len(calls) == 1
+
+
+def test_pre_actuation_denies_unauthorized_operation_before_observer():
+    calls = []
+    authority = {"allowed_observation_operations": [], "allowed_targets": ["docs/research/DETERMINISTIC_FIRST_CONFIRMATION_DESIGN_2026-08-23.md"]}
+    result, _, _, _, count = confirmation.execute_read_only_observation(
+        "observe_presence", authority["allowed_targets"][0], authority, observer=lambda *_: calls.append(True)
+    )
+    assert result["status"] == "OPERATION_AUTHORITY_DENIED"
+    assert count == 0
+    assert calls == []
+
+
+def test_pre_actuation_denies_unauthorized_target_before_observer():
+    calls = []
+    authority = {"allowed_observation_operations": ["observe_presence"], "allowed_targets": []}
+    result, _, _, _, count = confirmation.execute_read_only_observation(
+        "observe_presence", "docs/research/DETERMINISTIC_FIRST_CONFIRMATION_DESIGN_2026-08-23.md", authority, observer=lambda *_: calls.append(True)
+    )
+    assert result["status"] == "TARGET_AUTHORITY_DENIED"
+    assert count == 0
+    assert calls == []
+
+
+def test_model_output_cannot_grant_operation_or_target_authority():
+    authority = {"allowed_observation_operations": ["observe_presence"], "allowed_targets": ["docs/research/DETERMINISTIC_FIRST_CONFIRMATION_DESIGN_2026-08-23.md"]}
+    operation_denied = confirmation.validate_execution_authority("amend", authority["allowed_targets"][0], authority)
+    target_denied = confirmation.validate_execution_authority("observe_presence", "docs/research/not-authorized.md", authority)
+    assert operation_denied["status"] == "OPERATION_AUTHORITY_DENIED"
+    assert target_denied["status"] == "TARGET_AUTHORITY_DENIED"
+    assert operation_denied["authority_source"] == target_denied["authority_source"] == "ENVIRONMENT_AUTHORITY_RECORD"
+
+
+def test_coverage_uses_latest_plan_and_separates_stage_zero():
+    stage_zero = {"overall_coverage": "COMPLETE"}
+    final_incomplete = {"overall_coverage": "INCOMPLETE"}
+    coverage = confirmation.coverage_state(stage_zero, final_incomplete)
+    assert coverage == {"stage_0_coverage": "COMPLETE", "final_execution_coverage": "INCOMPLETE", "execution_path_complete": False}
+    unresolved = confirmation.coverage_state(stage_zero, unresolved_after_plan_0=True)
+    assert unresolved["stage_0_coverage"] == "COMPLETE"
+    assert unresolved["execution_path_complete"] is False
+
+
+def test_fail_closed_requests_are_correct_routing_but_not_complete_execution_paths():
+    for task_id in ("dfc-007", "dfc-008"):
+        case = next(x for x in confirmation.runtime_cases() if x["task_id"] == task_id)
+        derivation = confirmation.derive(case["input_request"])
+        plan = confirmation.plan(task_id, derivation, case["environment_facts"]["authority_record"])
+        coverage = confirmation.coverage_state(plan)
+        assert plan["routing_success"] is False
+        assert coverage["execution_path_complete"] is False

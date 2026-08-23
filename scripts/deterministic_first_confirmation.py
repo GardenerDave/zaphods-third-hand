@@ -89,6 +89,62 @@ def derive(request: str, model: dict[str, Any] | None = None) -> dict[str, Any]:
     return dff.operation_derivation(request, model_evidence=model)
 
 
+def validate_execution_authority(canonical_operation: str | None, requested_target: str | None, authority_record: dict[str, Any]) -> dict[str, Any]:
+    """Validate both operation and target before any actuator/tool call."""
+    operation_authorized = canonical_operation in authority_record.get("allowed_observation_operations", [])
+    target_authorized = requested_target in authority_record.get("allowed_targets", [])
+    status = "AUTHORIZED"
+    if not operation_authorized:
+        status = "OPERATION_AUTHORITY_DENIED"
+    elif not target_authorized:
+        status = "TARGET_AUTHORITY_DENIED"
+    return {
+        "status": status,
+        "canonical_operation": canonical_operation,
+        "requested_target": requested_target,
+        "operation_authorized": operation_authorized,
+        "target_authorized": target_authorized,
+        "authority_source": "ENVIRONMENT_AUTHORITY_RECORD",
+    }
+
+
+def execute_read_only_observation(canonical_operation: str | None, requested_target: str | None, authority_record: dict[str, Any], observer=None):
+    """Shared pre-actuation gate used by runtime execution and model-free tests."""
+    execution_authority = validate_execution_authority(canonical_operation, requested_target, authority_record)
+    request = {
+        "schema": "zth_tool_request_v0",
+        "capability_id": TOOL_CAPABILITY,
+        "supplier_id": tool.TOOL_SUPPLIER,
+        "repository_relative_path": requested_target,
+        "authorized_targets": authority_record.get("allowed_targets", []),
+        "authority_source": "ENVIRONMENT_AUTHORITY_RECORD",
+    }
+    if execution_authority["status"] != "AUTHORIZED":
+        return execution_authority, request, None, None, 0
+    tool_authority = tool.validate_tool_request(request)
+    if tool_authority["status"] != "AUTHORIZED":
+        return {**execution_authority, "status": "TARGET_AUTHORITY_DENIED"}, request, tool_authority, None, 0
+    observe = observer or tool.observe_repository
+    observation = observe(request, tool_authority)
+    return execution_authority, request, tool_authority, observation, 1
+
+
+def coverage_state(plan_0: dict[str, Any], latest_plan: dict[str, Any] | None = None, *, unresolved_after_plan_0: bool = False) -> dict[str, Any]:
+    """Separate initial stage coverage from the final execution-path coverage."""
+    final_plan = latest_plan
+    if final_plan is None and unresolved_after_plan_0:
+        final_plan = {"overall_coverage": "INCOMPLETE", "incomplete_reason": "NO_ROUTABLE_CAPABILITY"}
+    if final_plan is None:
+        final_plan = plan_0
+    stage_0 = plan_0.get("overall_coverage") == "COMPLETE"
+    final = final_plan.get("overall_coverage") == "COMPLETE"
+    return {
+        "stage_0_coverage": "COMPLETE" if stage_0 else "INCOMPLETE",
+        "final_execution_coverage": "COMPLETE" if final else "INCOMPLETE",
+        "execution_path_complete": final,
+    }
+
+
 def plan(task_id: str, derivation: dict[str, Any], authority: dict[str, Any], *, model_step: bool = False, observed: dict[str, Any] | None = None) -> dict[str, Any]:
     canonical_op = derivation.get("canonical_operation")
     if observed is not None:
@@ -179,10 +235,13 @@ def execute(out: Path) -> None:
             deriv_final=derive(rt["input_request"],semantic); p_final=plan(rt["task_id"],deriv_final,rt["environment_facts"]["authority_record"]); write_json(td/"operation_derivation_1.json",deriv_final); write_json(td/"capability_plan_1.json",p_final)
             if p_final["overall_coverage"]!="COMPLETE":
                 result={"routing_success":True,"task_terminal_success":False,"terminal_state":"ready_for_review","reason":"SEMANTIC_BINDING_FAILURE","model_calls":1,"tool_calls":0}; write_json(td/"runtime_result.json",result); trace["terminal_state"]=result["terminal_state"]; write_json(td/"route_trace.json",trace); continue
-        target=deriv_final.get("target"); auth=rt["environment_facts"]["authority_record"]; tool_request={"schema":"zth_tool_request_v0","capability_id":TOOL_CAPABILITY,"supplier_id":tool.TOOL_SUPPLIER,"repository_relative_path":target,"authorized_targets":auth["allowed_targets"],"authority_source":"ENVIRONMENT_AUTHORITY_RECORD"}; write_json(td/"tool_request.json",tool_request); auth_result=tool.validate_tool_request(tool_request); write_json(td/"tool_authority_validation.json",auth_result)
-        if auth_result["status"]!="AUTHORIZED":
-            result={"routing_success":True,"task_terminal_success":False,"terminal_state":"ready_for_review","reason":"TOOL_AUTHORITY_DENIED","model_calls":1 if semantic else 0,"tool_calls":0}; write_json(td/"runtime_result.json",result); trace["terminal_state"]=result["terminal_state"]; write_json(td/"route_trace.json",trace); continue
-        observation=tool.observe_repository(tool_request,auth_result); tool_calls+=1; write_json(td/"tool_observation.json",observation); validation=tool.validate_observation(observation,tool_request,auth_result); write_json(td/"tool_result_validation.json",validation); trace["tool_calls"].append({"authority":auth_result,"validation":validation})
+        target=deriv_final.get("target"); auth=rt["environment_facts"]["authority_record"]
+        execution_authority, tool_request, auth_result, observation, call_count = execute_read_only_observation(deriv_final.get("canonical_operation"), target, auth)
+        write_json(td/"tool_request.json",tool_request); write_json(td/"execution_authority_validation.json",execution_authority)
+        if auth_result is not None: write_json(td/"tool_authority_validation.json",auth_result)
+        if execution_authority["status"] != "AUTHORIZED":
+            result={"routing_success":True,"task_terminal_success":False,"terminal_state":"ready_for_review","reason":execution_authority["status"],"model_calls":1 if semantic else 0,"tool_calls":0}; write_json(td/"runtime_result.json",result); trace["terminal_state"]=result["terminal_state"]; write_json(td/"route_trace.json",trace); continue
+        tool_calls += call_count; write_json(td/"tool_observation.json",observation); validation=tool.validate_observation(observation,tool_request,auth_result); write_json(td/"tool_result_validation.json",validation); trace["tool_calls"].append({"execution_authority":execution_authority,"authority":auth_result,"validation":validation})
         if validation["status"]!="VALID": result={"routing_success":True,"task_terminal_success":False,"terminal_state":"ready_for_review","reason":"TOOL_INTERFACE_FAILURE","model_calls":1 if semantic else 0,"tool_calls":1}
         else:
             state={"operation_resolved":deriv_final["status"]=="RESOLVED","operation_authorized":deriv_final["canonical_operation"] in auth["allowed_observation_operations"],"target_bound":target in auth["allowed_targets"],"coverage_complete":True,"observation_valid":True}; evaluation=evaluate_contract(state); write_json(td/"success_contract_evaluation.json",evaluation); result={"routing_success":True,"task_terminal_success":evaluation["passed"],"terminal_state":"terminal_success" if evaluation["passed"] else "ready_for_review","reason":"SUCCESS_CONTRACT_EVALUATED","model_calls":1 if semantic else 0,"tool_calls":1,"observation_status":observation["status"]}
@@ -193,11 +252,15 @@ def execute(out: Path) -> None:
 def closeout(out: Path) -> None:
     evaluators={x["task_id"]:x for x in read_json(EVALUATOR_CASES)["cases"]}; rows=[]; lat=[]; energy=[]
     for td in sorted((out/"tasks").glob("*")):
-        rt=read_json(td/"runtime_task.json"); ev=evaluators[td.name]; result=read_json(td/"runtime_result.json"); p0=read_json(td/"capability_plan_0.json"); obs=read_json(td/"tool_observation.json") if (td/"tool_observation.json").exists() else None; raw=read_json(td/"response.json") if (td/"response.json").exists() else None
+        rt=read_json(td/"runtime_task.json"); ev=evaluators[td.name]; result=read_json(td/"runtime_result.json"); p0=read_json(td/"capability_plan_0.json"); latest_plan=None
+        for plan_number in (1, 2):
+            candidate=td/f"capability_plan_{plan_number}.json"
+            if candidate.exists(): latest_plan=read_json(candidate)
+        coverage=coverage_state(p0, latest_plan, unresolved_after_plan_0=bool(result.get("model_calls") and latest_plan is None)); obs=read_json(td/"tool_observation.json") if (td/"tool_observation.json").exists() else None; raw=read_json(td/"response.json") if (td/"response.json").exists() else None
         if raw: lat.append(raw.get("wall_elapsed_ms")); energy.append(raw.get("gross_energy_joules"))
-        row={"task_id":td.name,"regime":ev["regime"],"frozen_evaluator_routing_success":ev["expected_routing_success"],"runtime_routing_success":result["routing_success"],"routing_decision_correct":result["routing_success"]==ev["expected_routing_success"],"required_execution_supplier_present":p0["overall_coverage"]=="COMPLETE","operation_actually_executed":bool(obs and obs.get("status")=="VALID_OBSERVATION"),"task_terminal_success":result["task_terminal_success"],"task_terminal_success_correct":result["task_terminal_success"]==ev["expected_task_terminal_success"],"runtime_terminal_state":result["terminal_state"],"model_calls":result.get("model_calls",0),"tool_calls":result.get("tool_calls",0),"response_sha256":None if not raw else sha_file(td/"response.json")}
+        row={"task_id":td.name,"regime":ev["regime"],"frozen_evaluator_routing_success":ev["expected_routing_success"],"runtime_routing_success":result["routing_success"],"routing_decision_correct":result["routing_success"]==ev["expected_routing_success"],**coverage,"required_execution_supplier_present":coverage["execution_path_complete"],"operation_actually_executed":bool(obs and obs.get("status")=="VALID_OBSERVATION"),"task_terminal_success":result["task_terminal_success"],"task_terminal_success_correct":result["task_terminal_success"]==ev["expected_task_terminal_success"],"runtime_terminal_state":result["terminal_state"],"model_calls":result.get("model_calls",0),"tool_calls":result.get("tool_calls",0),"response_sha256":None if not raw else sha_file(td/"response.json")}
         rows.append(row); write_json(td/"evaluator_scorecard.json",row)
-    agg={"schema":"zth_corrected_confirmation_aggregate_v0","tasks_correct_routing":sum(r["routing_decision_correct"] for r in rows),"routing_decisions_total":len(rows),"task_terminal_success_correct":sum(r["task_terminal_success_correct"] for r in rows),"model_calls_avoided":sum(r["model_calls"]==0 and r["regime"]=="DETERMINISTIC_PRESENCE" for r in rows),"fallback_calls_planned":2,"fallback_calls_made":sum(r["model_calls"] for r in rows),"fallback_operations_normalized":sum(r["regime"].startswith("SEMANTIC_FALLBACK") and r["operation_actually_executed"] for r in rows),"complete_capability_coverage":sum(r["required_execution_supplier_present"] for r in rows),"incomplete_capability_coverage":sum(not r["required_execution_supplier_present"] for r in rows),"actual_tool_operations_executed":sum(r["operation_actually_executed"] for r in rows),"validated_observations":sum(r["operation_actually_executed"] for r in rows),"routing_success":sum(r["runtime_routing_success"] for r in rows),"task_terminal_success":sum(r["task_terminal_success"] for r in rows),"ready_for_review":sum(r["runtime_terminal_state"]=="ready_for_review" for r in rows),"runtime_expected_field_reads":0,"evaluator_runtime_influence":0,"MODEL_OUTPUT_GRANTED_AUTHORITY":0,"model_calls":sum(r["model_calls"] for r in rows),"tool_calls":sum(r["tool_calls"] for r in rows),"teacher_calls":0,"30b_calls":0,"external_calls":0,"retries":0,"qualification_change":False,"model_latency_ms":{"mean":statistics.mean(lat) if lat else None,"median":statistics.median(lat) if lat else None,"p95":sorted(lat)[min(len(lat)-1,round((len(lat)-1)*.95))] if lat else None},"model_energy_joules":{"total":sum(energy),"mean":statistics.mean(energy) if energy else None,"median":statistics.median(energy) if energy else None},"rows":rows,"INDEPENDENT_RUNTIME_AUTHORITY_PROVENANCE_DEMONSTRATED":True,"ROUTING_SUCCESS_TASK_SUCCESS_SEPARATION_DEMONSTRATED":True,"COMPLETE_EXECUTION_CAPABILITY_COVERAGE_ENFORCED":True,"DETERMINISTIC_FIRST_CAPABILITY_ROUTING_DEMONSTRATED":True,"MODEL_CALL_AVOIDANCE_FROM_CAPABILITY_DECOMPOSITION_DEMONSTRATED":True,"SEMANTIC_MODEL_FALLBACK_DEMONSTRATED":sum(r["operation_actually_executed"] for r in rows if r["regime"].startswith("SEMANTIC_FALLBACK"))>0,"DYNAMIC_INTELLIGENCE_SURFACE_MINIMIZATION_DEMONSTRATED":True,"next_decision":"DIAGNOSE_SEMANTIC_FALLBACK_INTERFACE"}
+    agg={"schema":"zth_corrected_confirmation_aggregate_v0","tasks_correct_routing":sum(r["routing_decision_correct"] for r in rows),"routing_decisions_total":len(rows),"task_terminal_success_correct":sum(r["task_terminal_success_correct"] for r in rows),"model_calls_avoided":sum(r["model_calls"]==0 and r["regime"]=="DETERMINISTIC_PRESENCE" for r in rows),"fallback_calls_planned":2,"fallback_calls_made":sum(r["model_calls"] for r in rows),"fallback_operations_normalized":sum(r["regime"].startswith("SEMANTIC_FALLBACK") and r["operation_actually_executed"] for r in rows),"complete_capability_coverage":sum(r["execution_path_complete"] for r in rows),"incomplete_capability_coverage":sum(not r["execution_path_complete"] for r in rows),"actual_tool_operations_executed":sum(r["operation_actually_executed"] for r in rows),"validated_observations":sum(r["operation_actually_executed"] for r in rows),"routing_success":sum(r["runtime_routing_success"] for r in rows),"task_terminal_success":sum(r["task_terminal_success"] for r in rows),"ready_for_review":sum(r["runtime_terminal_state"]=="ready_for_review" for r in rows),"runtime_expected_field_reads":0,"evaluator_runtime_influence":0,"MODEL_OUTPUT_GRANTED_AUTHORITY":0,"model_calls":sum(r["model_calls"] for r in rows),"tool_calls":sum(r["tool_calls"] for r in rows),"teacher_calls":0,"30b_calls":0,"external_calls":0,"retries":0,"qualification_change":False,"model_latency_ms":{"mean":statistics.mean(lat) if lat else None,"median":statistics.median(lat) if lat else None,"p95":sorted(lat)[min(len(lat)-1,round((len(lat)-1)*.95))] if lat else None},"model_energy_joules":{"total":sum(energy),"mean":statistics.mean(energy) if energy else None,"median":statistics.median(energy) if energy else None},"rows":rows,"INDEPENDENT_RUNTIME_AUTHORITY_PROVENANCE_DEMONSTRATED":True,"ROUTING_SUCCESS_TASK_SUCCESS_SEPARATION_DEMONSTRATED":True,"NO_ACTUATOR_INCOMPLETE_COVERAGE_ENFORCED":True,"COMPLETE_EXECUTION_CAPABILITY_COVERAGE_ENFORCED":False,"COMPLETE_EXECUTION_CAPABILITY_COVERAGE_MARKER_SCOPE":"NO_ACTUATOR_FAIL_CLOSED_ONLY","FINAL_EXECUTION_COVERAGE_ACCOUNTING_DEMONSTRATED":True,"DETERMINISTIC_FIRST_CAPABILITY_ROUTING_DEMONSTRATED":True,"MODEL_CALL_AVOIDANCE_FROM_CAPABILITY_DECOMPOSITION_DEMONSTRATED":True,"SEMANTIC_MODEL_FALLBACK_DEMONSTRATED":sum(r["operation_actually_executed"] for r in rows if r["regime"].startswith("SEMANTIC_FALLBACK"))>0,"DYNAMIC_INTELLIGENCE_SURFACE_MINIMIZATION_DEMONSTRATED":True,"next_decision":"DIAGNOSE_SEMANTIC_FALLBACK_INTERFACE"}
     matrix={"schema":"zth_corrected_confirmation_matrix_v0","rows":rows,"aggregate":agg,"execution_driver_sha256":read_json(out/"router_manifest.json")["driver_sha256"],"closeout_driver_sha256":sha_file(Path(__file__))}; write_json(out/"aggregate.json",agg); write_json(out/"matrix.json",matrix); write_json(ROOT/"docs/research/DETERMINISTIC_FIRST_CONFIRMATION_MATRIX_2026-08-23.json",matrix); write_json(out/"lifecycle.json",{"status":"closeout_complete","model_calls":agg["model_calls"],"tool_calls":agg["tool_calls"],"teacher_calls":0,"retries":0,"external_calls":0,"runtime_expected_field_reads":0,"planner_hint_input_fields":0}); print(json.dumps(agg,indent=2,sort_keys=True))
 
 

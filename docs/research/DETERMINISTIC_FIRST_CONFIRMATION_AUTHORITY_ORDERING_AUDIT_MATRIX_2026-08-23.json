@@ -1,0 +1,47 @@
+{
+  "schema": "zth_deterministic_first_confirmation_authority_ordering_audit_v0",
+  "source_closeout_commit": "1243a3b69513f32c06578bb9e849fb4f9171b08c",
+  "historical_markers_preserved": {
+    "INDEPENDENT_RUNTIME_AUTHORITY_PROVENANCE_DEMONSTRATED": true,
+    "ROUTING_SUCCESS_TASK_SUCCESS_SEPARATION_DEMONSTRATED": true,
+    "DETERMINISTIC_FIRST_CAPABILITY_ROUTING_DEMONSTRATED": true,
+    "MODEL_CALL_AVOIDANCE_FROM_CAPABILITY_DECOMPOSITION_DEMONSTRATED": true,
+    "SEMANTIC_MODEL_FALLBACK_DEMONSTRATED": true,
+    "DYNAMIC_INTELLIGENCE_SURFACE_MINIMIZATION_DEMONSTRATED": true
+  },
+  "authority_audit": {
+    "TARGET_AUTHORITY_PRE_EXECUTION_ENFORCEMENT_DEMONSTRATED": true,
+    "OPERATION_AUTHORITY_PRE_EXECUTION_ENFORCEMENT_DEMONSTRATED": false,
+    "OPERATION_AUTHORITY_CURRENTLY_PARTICIPATES_IN_TERMINAL_VALIDATION": true,
+    "OPERATION_AUTHORITY_PRE_EXECUTION_ENFORCEMENT_IMPLEMENTED": true,
+    "TARGET_AND_OPERATION_AUTHORITY_FAIL_BEFORE_ACT": true,
+    "authority_source": "ENVIRONMENT_AUTHORITY_RECORD",
+    "historical_observation_cases_had_legitimate_operation_authority": true
+  },
+  "coverage_audit": {
+    "PLAN0_COVERAGE_IS_STAGE_LOCAL": true,
+    "PLAN0_COVERAGE_USED_AS_FINAL_EXECUTION_COVERAGE_METRIC": true,
+    "FINAL_EXECUTION_COVERAGE_ACCOUNTING_DEMONSTRATED": false,
+    "FINAL_EXECUTION_COVERAGE_ACCOUNTING_IMPLEMENTED": true,
+    "NO_ACTUATOR_INCOMPLETE_COVERAGE_ENFORCED": true,
+    "COMPLETE_EXECUTION_CAPABILITY_COVERAGE_MARKER_SCOPE": "NO_ACTUATOR_FAIL_CLOSED_ONLY"
+  },
+  "rows": [
+    {"task_id":"dfc-001","regime":"DETERMINISTIC_PRESENCE","routing_decision_correct":true,"stage_0_coverage":"COMPLETE","final_execution_coverage":"COMPLETE","execution_path_complete":true,"task_terminal_success":true,"operation_actually_executed":true,"historical_operation_authority_pre_actuation_checked":false},
+    {"task_id":"dfc-002","regime":"DETERMINISTIC_PRESENCE","routing_decision_correct":true,"stage_0_coverage":"COMPLETE","final_execution_coverage":"COMPLETE","execution_path_complete":true,"task_terminal_success":true,"operation_actually_executed":true,"historical_operation_authority_pre_actuation_checked":false},
+    {"task_id":"dfc-003","regime":"SEMANTIC_FALLBACK_PRESENCE","routing_decision_correct":true,"stage_0_coverage":"COMPLETE","final_execution_coverage":"INCOMPLETE","execution_path_complete":false,"task_terminal_success":false,"operation_actually_executed":false,"historical_operation_authority_pre_actuation_checked":false},
+    {"task_id":"dfc-004","regime":"SEMANTIC_FALLBACK_PRESENCE","routing_decision_correct":true,"stage_0_coverage":"COMPLETE","final_execution_coverage":"COMPLETE","execution_path_complete":true,"task_terminal_success":true,"operation_actually_executed":true,"historical_operation_authority_pre_actuation_checked":false},
+    {"task_id":"dfc-005","regime":"NO_QUALIFIED_ACTUATOR","routing_decision_correct":true,"stage_0_coverage":"INCOMPLETE","final_execution_coverage":"INCOMPLETE","execution_path_complete":false,"task_terminal_success":false,"operation_actually_executed":false,"historical_operation_authority_pre_actuation_checked":false},
+    {"task_id":"dfc-006","regime":"NO_QUALIFIED_ACTUATOR","routing_decision_correct":true,"stage_0_coverage":"INCOMPLETE","final_execution_coverage":"INCOMPLETE","execution_path_complete":false,"task_terminal_success":false,"operation_actually_executed":false,"historical_operation_authority_pre_actuation_checked":false},
+    {"task_id":"dfc-007","regime":"AMBIGUOUS","routing_decision_correct":true,"stage_0_coverage":"INCOMPLETE","final_execution_coverage":"INCOMPLETE","execution_path_complete":false,"task_terminal_success":false,"operation_actually_executed":false,"historical_operation_authority_pre_actuation_checked":false},
+    {"task_id":"dfc-008","regime":"UNSUPPORTED","routing_decision_correct":true,"stage_0_coverage":"INCOMPLETE","final_execution_coverage":"INCOMPLETE","execution_path_complete":false,"task_terminal_success":false,"operation_actually_executed":false,"historical_operation_authority_pre_actuation_checked":false}
+  ],
+  "additive_characterization": {
+    "OPERATION_AUTHORITY_PRE_EXECUTION_ENFORCEMENT_IMPLEMENTED": true,
+    "TARGET_AND_OPERATION_AUTHORITY_FAIL_BEFORE_ACT": true,
+    "FINAL_EXECUTION_COVERAGE_ACCOUNTING_IMPLEMENTED": true,
+    "ROUTING_DECISION_EXECUTION_PATH_TASK_SUCCESS_SEPARATION_DEMONSTRATED": true
+  },
+  "audit_calls": {"model":0,"teacher":0,"tool":0,"external":0,"retries":0},
+  "next_decision": "DIAGNOSE_SEMANTIC_FALLBACK_INTERFACE"
+}
