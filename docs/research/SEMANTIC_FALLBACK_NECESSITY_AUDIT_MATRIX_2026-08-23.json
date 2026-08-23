@@ -1,0 +1,465 @@
+{
+  "additional_model_calls_counterfactually_avoidable": 6,
+  "authoritative_commit": "1ee8d3a7919b2ad6e0a80ed1ff140ab4671428ee",
+  "calls_during_audit": {
+    "external": 0,
+    "model": 0,
+    "retries": 0,
+    "teacher": 0,
+    "tool": 0
+  },
+  "deterministic_context_sufficient_rows": 6,
+  "future_fallback_boundary": {
+    "deterministic_first": true,
+    "model_must_supply": "smallest genuinely unresolved semantic operation fact",
+    "model_only_if": [
+      "exactly_one_safe_target",
+      "no_ambiguity",
+      "no_unsupported_or_risky_operation",
+      "canonical_operation_not_uniquely_resolved"
+    ],
+    "otherwise": "ready_for_review"
+  },
+  "historical_evidence_preserved": true,
+  "historical_fallback_calls": 6,
+  "markers": {
+    "DETERMINISTIC_PRESENCE_CONTEXT_SUFFICIENCY_DEMONSTRATED": true,
+    "FALLBACK_BRANCH_EXECUTION_DEMONSTRATED": true,
+    "MODEL_CALL_AVOIDANCE_BOUNDARY_EXPANDED": true,
+    "POLITE_WRAPPER_MODEL_CALLS_UNNECESSARY": true,
+    "POLITE_WRAPPER_PRESENCE_MODEL_NECESSITY": false,
+    "SEMANTIC_FALLBACK_REQUIREMENT_WAS_SYNTACTICALLY_INDUCED": true,
+    "TRUE_SEMANTIC_FALLBACK_NOT_YET_DEMONSTRATED": true
+  },
+  "negative_case_safety_audit": [
+    {
+      "case": "multi_operation",
+      "context": "AMBIGUOUS_CONTEXT",
+      "projection": {
+        "canonical_operation": null,
+        "reason": "ambiguity has precedence",
+        "risky_tail_operations": [],
+        "status": "AMBIGUOUS",
+        "target": null,
+        "target_count": 1
+      },
+      "request": "Check and inspect docs/negative-a.md.",
+      "safe": true
+    },
+    {
+      "case": "amend",
+      "context": "DIRECT_OPERATION_CONTEXT",
+      "projection": {
+        "canonical_operation": null,
+        "reason": "not a bounded presence context",
+        "risky_tail_operations": [
+          "amend"
+        ],
+        "status": "UNRESOLVED",
+        "target": "docs/negative-b.md",
+        "target_count": 1
+      },
+      "request": "Amend docs/negative-b.md.",
+      "safe": true
+    },
+    {
+      "case": "dispatch",
+      "context": "DIRECT_OPERATION_CONTEXT",
+      "projection": {
+        "canonical_operation": null,
+        "reason": "not a bounded presence context",
+        "risky_tail_operations": [
+          "dispatch"
+        ],
+        "status": "UNRESOLVED",
+        "target": "docs/negative-c.md",
+        "target_count": 1
+      },
+      "request": "Dispatch docs/negative-c.md.",
+      "safe": true
+    },
+    {
+      "case": "archive",
+      "context": "UNSUPPORTED_OR_UNKNOWN_CONTEXT",
+      "projection": {
+        "canonical_operation": null,
+        "reason": "not a bounded presence context",
+        "risky_tail_operations": [
+          "archive"
+        ],
+        "status": "UNRESOLVED",
+        "target": "docs/negative-d.md",
+        "target_count": 1
+      },
+      "request": "Archive docs/negative-d.md.",
+      "safe": true
+    },
+    {
+      "case": "delete",
+      "context": "UNSUPPORTED_OR_UNKNOWN_CONTEXT",
+      "projection": {
+        "canonical_operation": null,
+        "reason": "not a bounded presence context",
+        "risky_tail_operations": [
+          "delete"
+        ],
+        "status": "UNRESOLVED",
+        "target": "docs/negative-e.md",
+        "target_count": 1
+      },
+      "request": "Delete docs/negative-e.md.",
+      "safe": true
+    },
+    {
+      "case": "presence_with_mutation_tail",
+      "context": "PRESENCE_OBSERVATION_CONTEXT",
+      "projection": {
+        "canonical_operation": null,
+        "reason": "risky operation language has precedence over presence context",
+        "risky_tail_operations": [
+          "amended"
+        ],
+        "status": "UNRESOLVED",
+        "target": "docs/negative-f.md",
+        "target_count": 1
+      },
+      "request": "Check whether docs/negative-f.md should be amended.",
+      "safe": true
+    },
+    {
+      "case": "inspect_presence_clause",
+      "context": "DIRECT_OPERATION_CONTEXT",
+      "projection": {
+        "canonical_operation": null,
+        "reason": "not a bounded presence context",
+        "risky_tail_operations": [
+          "amended"
+        ],
+        "status": "UNRESOLVED",
+        "target": "docs/negative-g.md",
+        "target_count": 1
+      },
+      "request": "Inspect whether docs/negative-g.md should be amended.",
+      "safe": true
+    },
+    {
+      "case": "multiple_targets",
+      "context": "AMBIGUOUS_CONTEXT",
+      "projection": {
+        "canonical_operation": null,
+        "reason": "ambiguity has precedence",
+        "risky_tail_operations": [],
+        "status": "AMBIGUOUS",
+        "target": null,
+        "target_count": 2
+      },
+      "request": "Check whether docs/negative-h.md and docs/negative-i.md exist.",
+      "safe": true
+    },
+    {
+      "case": "no_safe_target",
+      "context": "PRESENCE_OBSERVATION_CONTEXT",
+      "projection": {
+        "canonical_operation": null,
+        "reason": "exactly one safe target is required",
+        "risky_tail_operations": [],
+        "status": "UNRESOLVED",
+        "target": null,
+        "target_count": 0
+      },
+      "request": "Check whether the requested artifact exists.",
+      "safe": true
+    },
+    {
+      "case": "unsupported_context",
+      "context": "UNSUPPORTED_OR_UNKNOWN_CONTEXT",
+      "projection": {
+        "canonical_operation": null,
+        "reason": "not a bounded presence context",
+        "risky_tail_operations": [],
+        "status": "UNRESOLVED",
+        "target": "docs/negative-j.md",
+        "target_count": 1
+      },
+      "request": "Ask about docs/negative-j.md.",
+      "safe": true
+    }
+  ],
+  "negative_case_safety_pass": true,
+  "next_decision": "TEST_TRUE_SEMANTIC_FALLBACK_ON_GENUINELY_UNRESOLVED_OPERATION_LANGUAGE",
+  "qualification_change": false,
+  "rows": [
+    {
+      "counterfactual_authority_result": {
+        "authority_source": "ENVIRONMENT_AUTHORITY_RECORD",
+        "canonical_operation": "observe_presence",
+        "operation_authorized": true,
+        "requested_target": "docs/research/QWEN3_1_7B_ACTION_INTERFACE_ATTRIBUTION_DESIGN_2026-08-23.md",
+        "status": "AUTHORIZED",
+        "target_authorized": true
+      },
+      "counterfactual_deterministic_projection": {
+        "canonical_operation": "observe_presence",
+        "reason": "presence context plus one target uniquely determines the bounded observation class",
+        "risky_tail_operations": [],
+        "status": "RESOLVED",
+        "target": "docs/research/QWEN3_1_7B_ACTION_INTERFACE_ATTRIBUTION_DESIGN_2026-08-23.md",
+        "target_count": 1
+      },
+      "counterfactual_downstream_behavior_bounded": true,
+      "counterfactual_model_call_would_be_avoided": true,
+      "derive_normalization_context": "PRESENCE_OBSERVATION_CONTEXT",
+      "embedded_operation_phrase": "check",
+      "exact_requested_target": "docs/research/QWEN3_1_7B_ACTION_INTERFACE_ATTRIBUTION_DESIGN_2026-08-23.md",
+      "first_lexical_token": "could",
+      "historical_model_calls": 1,
+      "historical_terminal_result": "ready_for_review",
+      "historical_tool_calls": 0,
+      "model_contribution_classification": "REDUNDANT_RESTATEMENT_OF_DETERMINISTIC_FACT",
+      "post_model_derivation_status": "UNRESOLVED",
+      "post_model_normalization": {
+        "action_expression": "check availability",
+        "canonical_operation": null,
+        "reason": "no exact frozen rule or unknown request context",
+        "rule_id": null,
+        "status": "UNRESOLVED"
+      },
+      "pre_model_derivation_status": "UNRESOLVED",
+      "pre_model_derivation_type": "SEMANTIC_INTERPRETATION_REQUIRED",
+      "pre_model_model_required": true,
+      "pre_model_reason": "presence context is clear but operation expression is not a frozen deterministic lead",
+      "raw_model_action": "check availability",
+      "raw_model_object_expression": "docs/research/QWEN3_1_7B_ACTION_INTERFACE_ATTRIBUTION_DESIGN_2026-08-23.md",
+      "raw_request": "Could you check whether docs/research/QWEN3_1_7B_ACTION_INTERFACE_ATTRIBUTION_DESIGN_2026-08-23.md is available in the tree?",
+      "raw_response_artifact": ".work/model_size_supplier_floor/deterministic_first_semantic_fallback/run_20260823T120100Z/tasks/dff-007/response.json",
+      "raw_response_sha256": "c34dd3091b224ee5de2396f2c3480b71596a6468bcb81b8d76ec13f463cbf09b",
+      "source_run": "dff",
+      "task_id": "dff-007"
+    },
+    {
+      "counterfactual_authority_result": {
+        "authority_source": "ENVIRONMENT_AUTHORITY_RECORD",
+        "canonical_operation": "observe_presence",
+        "operation_authorized": true,
+        "requested_target": "docs/research/QWEN3_1_7B_ACTION_INTERFACE_ATTRIBUTION_MATRIX_2026-08-23.json",
+        "status": "AUTHORIZED",
+        "target_authorized": true
+      },
+      "counterfactual_deterministic_projection": {
+        "canonical_operation": "observe_presence",
+        "reason": "presence context plus one target uniquely determines the bounded observation class",
+        "risky_tail_operations": [],
+        "status": "RESOLVED",
+        "target": "docs/research/QWEN3_1_7B_ACTION_INTERFACE_ATTRIBUTION_MATRIX_2026-08-23.json",
+        "target_count": 1
+      },
+      "counterfactual_downstream_behavior_bounded": true,
+      "counterfactual_model_call_would_be_avoided": true,
+      "derive_normalization_context": "PRESENCE_OBSERVATION_CONTEXT",
+      "embedded_operation_phrase": "verify",
+      "exact_requested_target": "docs/research/QWEN3_1_7B_ACTION_INTERFACE_ATTRIBUTION_MATRIX_2026-08-23.json",
+      "first_lexical_token": "please",
+      "historical_model_calls": 1,
+      "historical_terminal_result": "terminal_success",
+      "historical_tool_calls": 1,
+      "model_contribution_classification": "REDUNDANT_RESTATEMENT_OF_DETERMINISTIC_FACT",
+      "post_model_derivation_status": "RESOLVED",
+      "post_model_normalization": null,
+      "pre_model_derivation_status": "UNRESOLVED",
+      "pre_model_derivation_type": "SEMANTIC_INTERPRETATION_REQUIRED",
+      "pre_model_model_required": true,
+      "pre_model_reason": "presence context is clear but operation expression is not a frozen deterministic lead",
+      "raw_model_action": "verify",
+      "raw_model_object_expression": "docs/research/QWEN3_1_7B_ACTION_INTERFACE_ATTRIBUTION_MATRIX_2026-08-23.json",
+      "raw_request": "Please verify that docs/research/QWEN3_1_7B_ACTION_INTERFACE_ATTRIBUTION_MATRIX_2026-08-23.json can be found here.",
+      "raw_response_artifact": ".work/model_size_supplier_floor/deterministic_first_semantic_fallback/run_20260823T120100Z/tasks/dff-008/response.json",
+      "raw_response_sha256": "8b4de55ba002cacabd83d8d2e4e408fb17eb5abd848ba18c4e2834c89bc8c8f0",
+      "source_run": "dff",
+      "task_id": "dff-008"
+    },
+    {
+      "counterfactual_authority_result": {
+        "authority_source": "ENVIRONMENT_AUTHORITY_RECORD",
+        "canonical_operation": "observe_presence",
+        "operation_authorized": true,
+        "requested_target": "docs/research/QWEN3_1_7B_OPERATION_NORMALIZATION_RULES_V0_2026-08-23.json",
+        "status": "AUTHORIZED",
+        "target_authorized": true
+      },
+      "counterfactual_deterministic_projection": {
+        "canonical_operation": "observe_presence",
+        "reason": "presence context plus one target uniquely determines the bounded observation class",
+        "risky_tail_operations": [],
+        "status": "RESOLVED",
+        "target": "docs/research/QWEN3_1_7B_OPERATION_NORMALIZATION_RULES_V0_2026-08-23.json",
+        "target_count": 1
+      },
+      "counterfactual_downstream_behavior_bounded": true,
+      "counterfactual_model_call_would_be_avoided": true,
+      "derive_normalization_context": "PRESENCE_OBSERVATION_CONTEXT",
+      "embedded_operation_phrase": "confirm",
+      "exact_requested_target": "docs/research/QWEN3_1_7B_OPERATION_NORMALIZATION_RULES_V0_2026-08-23.json",
+      "first_lexical_token": "can",
+      "historical_model_calls": 1,
+      "historical_terminal_result": "terminal_success",
+      "historical_tool_calls": 1,
+      "model_contribution_classification": "REDUNDANT_RESTATEMENT_OF_DETERMINISTIC_FACT",
+      "post_model_derivation_status": "RESOLVED",
+      "post_model_normalization": null,
+      "pre_model_derivation_status": "UNRESOLVED",
+      "pre_model_derivation_type": "SEMANTIC_INTERPRETATION_REQUIRED",
+      "pre_model_model_required": true,
+      "pre_model_reason": "presence context is clear but operation expression is not a frozen deterministic lead",
+      "raw_model_action": "confirm",
+      "raw_model_object_expression": "docs/research/QWEN3_1_7B_OPERATION_NORMALIZATION_RULES_V0_2026-08-23.json",
+      "raw_request": "Can you confirm whether docs/research/QWEN3_1_7B_OPERATION_NORMALIZATION_RULES_V0_2026-08-23.json is present right now?",
+      "raw_response_artifact": ".work/model_size_supplier_floor/deterministic_first_semantic_fallback/run_20260823T120100Z/tasks/dff-009/response.json",
+      "raw_response_sha256": "42240d35102c14f8c93e7927c1c8647130280c4d6d37bba7268995451925e908",
+      "source_run": "dff",
+      "task_id": "dff-009"
+    },
+    {
+      "counterfactual_authority_result": {
+        "authority_source": "ENVIRONMENT_AUTHORITY_RECORD",
+        "canonical_operation": "observe_presence",
+        "operation_authorized": true,
+        "requested_target": "docs/research/QWEN3_1_7B_ACTION_EXPRESSION_NORMALIZATION_CONTEXT_ERRATUM_2026-08-23.md",
+        "status": "AUTHORIZED",
+        "target_authorized": true
+      },
+      "counterfactual_deterministic_projection": {
+        "canonical_operation": "observe_presence",
+        "reason": "presence context plus one target uniquely determines the bounded observation class",
+        "risky_tail_operations": [],
+        "status": "RESOLVED",
+        "target": "docs/research/QWEN3_1_7B_ACTION_EXPRESSION_NORMALIZATION_CONTEXT_ERRATUM_2026-08-23.md",
+        "target_count": 1
+      },
+      "counterfactual_downstream_behavior_bounded": true,
+      "counterfactual_model_call_would_be_avoided": true,
+      "derive_normalization_context": "PRESENCE_OBSERVATION_CONTEXT",
+      "embedded_operation_phrase": "determine",
+      "exact_requested_target": "docs/research/QWEN3_1_7B_ACTION_EXPRESSION_NORMALIZATION_CONTEXT_ERRATUM_2026-08-23.md",
+      "first_lexical_token": "would",
+      "historical_model_calls": 1,
+      "historical_terminal_result": "ready_for_review",
+      "historical_tool_calls": 0,
+      "model_contribution_classification": "REDUNDANT_RESTATEMENT_OF_DETERMINISTIC_FACT",
+      "post_model_derivation_status": "UNRESOLVED",
+      "post_model_normalization": {
+        "action_expression": "check existence",
+        "canonical_operation": null,
+        "reason": "no exact frozen rule or unknown request context",
+        "rule_id": null,
+        "status": "UNRESOLVED"
+      },
+      "pre_model_derivation_status": "UNRESOLVED",
+      "pre_model_derivation_type": "SEMANTIC_INTERPRETATION_REQUIRED",
+      "pre_model_model_required": true,
+      "pre_model_reason": "presence context is clear but operation expression is not a frozen deterministic lead",
+      "raw_model_action": "check existence",
+      "raw_model_object_expression": "docs/research/QWEN3_1_7B_ACTION_EXPRESSION_NORMALIZATION_CONTEXT_ERRATUM_2026-08-23.md",
+      "raw_request": "Would you determine whether docs/research/QWEN3_1_7B_ACTION_EXPRESSION_NORMALIZATION_CONTEXT_ERRATUM_2026-08-23.md exists at this time?",
+      "raw_response_artifact": ".work/model_size_supplier_floor/deterministic_first_semantic_fallback/run_20260823T120100Z/tasks/dff-010/response.json",
+      "raw_response_sha256": "9b80088f0708e1cd0fa01504931ac15a9e058a339fd8462b553f64f6fbaf864f",
+      "source_run": "dff",
+      "task_id": "dff-010"
+    },
+    {
+      "counterfactual_authority_result": {
+        "authority_source": "ENVIRONMENT_AUTHORITY_RECORD",
+        "canonical_operation": "observe_presence",
+        "operation_authorized": true,
+        "requested_target": "docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_REGISTRY_2026-08-23.json",
+        "status": "AUTHORIZED",
+        "target_authorized": true
+      },
+      "counterfactual_deterministic_projection": {
+        "canonical_operation": "observe_presence",
+        "reason": "presence context plus one target uniquely determines the bounded observation class",
+        "risky_tail_operations": [],
+        "status": "RESOLVED",
+        "target": "docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_REGISTRY_2026-08-23.json",
+        "target_count": 1
+      },
+      "counterfactual_downstream_behavior_bounded": true,
+      "counterfactual_model_call_would_be_avoided": true,
+      "derive_normalization_context": "PRESENCE_OBSERVATION_CONTEXT",
+      "embedded_operation_phrase": "check",
+      "exact_requested_target": "docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_REGISTRY_2026-08-23.json",
+      "first_lexical_token": "could",
+      "historical_model_calls": 1,
+      "historical_terminal_result": "ready_for_review",
+      "historical_tool_calls": 0,
+      "model_contribution_classification": "REDUNDANT_RESTATEMENT_OF_DETERMINISTIC_FACT",
+      "post_model_derivation_status": "UNRESOLVED",
+      "post_model_normalization": {
+        "action_expression": "check availability",
+        "canonical_operation": null,
+        "reason": "no exact frozen rule or unknown request context",
+        "rule_id": null,
+        "status": "UNRESOLVED"
+      },
+      "pre_model_derivation_status": "UNRESOLVED",
+      "pre_model_derivation_type": "SEMANTIC_INTERPRETATION_REQUIRED",
+      "pre_model_model_required": true,
+      "pre_model_reason": "presence context is clear but operation expression is not a frozen deterministic lead",
+      "raw_model_action": "check availability",
+      "raw_model_object_expression": "docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_REGISTRY_2026-08-23.json",
+      "raw_request": "Could you check whether docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_REGISTRY_2026-08-23.json is available in the tree?",
+      "raw_response_artifact": ".work/model_size_supplier_floor/deterministic_first_confirmation/run_20260823T130000Z/tasks/dfc-003/response.json",
+      "raw_response_sha256": "2791e149a25c8ff379dd4ee379f189e84bc85c0215b167e7cdaac160efed2a3d",
+      "source_run": "dfc",
+      "task_id": "dfc-003"
+    },
+    {
+      "counterfactual_authority_result": {
+        "authority_source": "ENVIRONMENT_AUTHORITY_RECORD",
+        "canonical_operation": "observe_presence",
+        "operation_authorized": true,
+        "requested_target": "docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_CONTROL_PLANE_AUDIT_MATRIX_2026-08-23.json",
+        "status": "AUTHORIZED",
+        "target_authorized": true
+      },
+      "counterfactual_deterministic_projection": {
+        "canonical_operation": "observe_presence",
+        "reason": "presence context plus one target uniquely determines the bounded observation class",
+        "risky_tail_operations": [],
+        "status": "RESOLVED",
+        "target": "docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_CONTROL_PLANE_AUDIT_MATRIX_2026-08-23.json",
+        "target_count": 1
+      },
+      "counterfactual_downstream_behavior_bounded": true,
+      "counterfactual_model_call_would_be_avoided": true,
+      "derive_normalization_context": "PRESENCE_OBSERVATION_CONTEXT",
+      "embedded_operation_phrase": "verify",
+      "exact_requested_target": "docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_CONTROL_PLANE_AUDIT_MATRIX_2026-08-23.json",
+      "first_lexical_token": "please",
+      "historical_model_calls": 1,
+      "historical_terminal_result": "terminal_success",
+      "historical_tool_calls": 1,
+      "model_contribution_classification": "REDUNDANT_RESTATEMENT_OF_DETERMINISTIC_FACT",
+      "post_model_derivation_status": "RESOLVED",
+      "post_model_normalization": {
+        "action_expression": "verify",
+        "canonical_operation": "observe_presence",
+        "reason": "A bounded verification of target presence is the same downstream observation.",
+        "rule_id": "presence_verify",
+        "status": "NORMALIZED"
+      },
+      "pre_model_derivation_status": "UNRESOLVED",
+      "pre_model_derivation_type": "SEMANTIC_INTERPRETATION_REQUIRED",
+      "pre_model_model_required": true,
+      "pre_model_reason": "presence context is clear but operation expression is not a frozen deterministic lead",
+      "raw_model_action": "verify",
+      "raw_model_object_expression": "docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_CONTROL_PLANE_AUDIT_MATRIX_2026-08-23.json",
+      "raw_request": "Please verify that docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_CONTROL_PLANE_AUDIT_MATRIX_2026-08-23.json can be found here.",
+      "raw_response_artifact": ".work/model_size_supplier_floor/deterministic_first_confirmation/run_20260823T130000Z/tasks/dfc-004/response.json",
+      "raw_response_sha256": "ad97ae1c3db673dab9333ea5af466763c233c9d02b64daeb68ce5b63a441378f",
+      "source_run": "dfc",
+      "task_id": "dfc-004"
+    }
+  ],
+  "schema": "zth_semantic_fallback_necessity_audit_v0",
+  "true_semantic_necessity_rows": 0
+}
