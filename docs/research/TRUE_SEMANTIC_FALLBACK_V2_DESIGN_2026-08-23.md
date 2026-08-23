@@ -85,3 +85,25 @@ V2 directly imports telemetry helpers from
 `scripts.zth_qwen3_0_6b_clean_scope_logic_probe`; no compatibility wrapper is
 part of the execution path. Supplier-counting uses explicit non-null boolean
 predicates, including the uncovered `actuator.inspect` record.
+
+## Superseding provenance correction
+
+The unexecuted predecessor freeze `770db0ef2a5e870a9972af827ed5144e5488fac5`
+is preserved and superseded before inference. Its `runtime_cases()` constructed
+allowed targets from request parsing and selected some control operation
+authority from request wording. This is recorded as a
+`PRE_INFERENCE_CONTROL_PLANE_PROVENANCE_DEFECT`, not semantic contamination:
+
+```text
+V2_REQUEST_DERIVED_TARGET_AUTHORITY=true
+V2_INDEPENDENT_TARGET_AUTHORITY_PROVENANCE=false
+V2_CONTROL_OPERATION_AUTHORITY_REQUEST_DERIVED=true
+SEMANTIC_CLASS_ANSWER_LEAK_FROM_AUTHORITY=false
+SCIENTIFIC_MODEL_EVIDENCE_CONTAMINATED=false
+```
+
+The successor uses an explicit task-keyed runtime authority fixture table.
+Requests, evaluator classes, regimes, and model output cannot construct or
+mutate that table. The six semantic authority values remain the same shared
+`["observe_presence", "inspect"]` set. The fresh prepared run is
+`.work/model_size_supplier_floor/true_semantic_fallback_v2/run_20260823T190000Z`.

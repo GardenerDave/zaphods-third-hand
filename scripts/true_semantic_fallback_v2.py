@@ -23,7 +23,7 @@ from scripts import zth_qwen3_1_7b_atomic_scope_relation_decomposition as decomp
 from scripts import zth_qwen3_1_7b_clean_scope_logic_probe as runtime
 
 ROOT = runtime.ROOT
-RUN = ROOT / ".work/model_size_supplier_floor/true_semantic_fallback_v2/run_20260823T184000Z"
+RUN = ROOT / ".work/model_size_supplier_floor/true_semantic_fallback_v2/run_20260823T190000Z"
 RUNTIME_CASES = ROOT / "docs/research/TRUE_SEMANTIC_FALLBACK_V2_RUNTIME_CASES_2026-08-23.json"
 EVALUATOR_CASES = ROOT / "docs/research/TRUE_SEMANTIC_FALLBACK_V2_EVALUATOR_CASES_2026-08-23.json"
 REGISTRY = ROOT / "docs/research/TRUE_SEMANTIC_FALLBACK_V2_REGISTRY_2026-08-23.json"
@@ -44,6 +44,18 @@ SHARED_AUTHORITY = ["observe_presence", "inspect"]
 RISKY_WORDS = {"amend", "amended", "dispatch", "dispatched", "archive", "archived", "delete", "deleted"}
 FORBIDDEN_LABELS = {"presence", "inspect", "observe", "check", "verify", "look", "available", "exists", "fallback", "class", "operation", "control", "ambiguous", "unsupported"}
 V1_RUNTIME = ROOT / "docs/research/TRUE_SEMANTIC_FALLBACK_V1_RUNTIME_CASES_2026-08-23.json"
+RUNTIME_AUTHORITY_FIXTURES = {
+    "tsfv2-001": {"allowed_targets": ["docs/research/V2_AURORA_2026-08-23.md"], "allowed_observation_operations": ["observe_presence", "inspect"]},
+    "tsfv2-002": {"allowed_targets": ["docs/research/V2_BASALT_2026-08-23.json"], "allowed_observation_operations": ["observe_presence", "inspect"]},
+    "tsfv2-003": {"allowed_targets": ["docs/research/V2_CEDAR_2026-08-23.txt"], "allowed_observation_operations": ["observe_presence", "inspect"]},
+    "tsfv2-004": {"allowed_targets": ["docs/research/V2_DUSK_2026-08-23.md"], "allowed_observation_operations": ["observe_presence", "inspect"]},
+    "tsfv2-005": {"allowed_targets": ["docs/research/V2_FLINT_2026-08-23.json"], "allowed_observation_operations": ["observe_presence", "inspect"]},
+    "tsfv2-006": {"allowed_targets": ["docs/research/V2_GARNET_2026-08-23.txt"], "allowed_observation_operations": ["observe_presence", "inspect"]},
+    "tsfv2-007": {"allowed_targets": ["docs/research/V2_HARBOR_2026-08-23.py"], "allowed_observation_operations": ["observe_presence"]},
+    "tsfv2-008": {"allowed_targets": ["docs/research/V2_IVORY_2026-08-23.py"], "allowed_observation_operations": ["inspect"]},
+    "tsfv2-009": {"allowed_targets": ["docs/research/V2_JUNIPER_2026-08-23.md"], "allowed_observation_operations": ["observe_presence", "inspect"]},
+    "tsfv2-010": {"allowed_targets": ["docs/research/V2_KITE_2026-08-23.json"], "allowed_observation_operations": ["observe_presence", "inspect"]},
+}
 
 
 def now() -> str:
@@ -118,13 +130,14 @@ def fixture_specs() -> list[tuple[str, str, str, str | None]]:
 
 def runtime_cases() -> list[dict[str, Any]]:
     cases = []
-    for task_id, regime, request, _ in fixture_specs():
-        targets = TARGET_RE.findall(request)
-        if len(targets) != 1:
-            raise RuntimeError(f"target extraction failed for {task_id}")
-        operations = SHARED_AUTHORITY if regime == "TRUE_FALLBACK" else (["observe_presence"] if "Determine" in request else (["inspect"] if request.startswith("Inspect") else SHARED_AUTHORITY))
-        cases.append({"task_id": task_id, "input_request": request, "environment_facts": {"authority_record": {"allowed_targets": [targets[0]], "allowed_observation_operations": operations}}})
+    for task_id, _, request, _ in fixture_specs():
+        authority_record = RUNTIME_AUTHORITY_FIXTURES[task_id]
+        cases.append({"task_id": task_id, "input_request": request, "environment_facts": {"authority_record": json.loads(json.dumps(authority_record))}})
     return cases
+
+
+def authority_record(task_id: str) -> dict[str, Any]:
+    return json.loads(json.dumps(RUNTIME_AUTHORITY_FIXTURES[task_id]))
 
 
 def evaluator_cases() -> list[dict[str, Any]]:
@@ -253,13 +266,26 @@ def prepare(out: Path) -> None:
     assert all(plans[i]["planned_model_calls"] == 1 for i in range(6))
     assert all(plans[i]["planned_model_calls"] == 0 for i in range(6, 10))
     assert hasattr(telemetry_provider, "telemetry_base_url") and hasattr(telemetry_provider, "telemetry_preflight")
+    original_authority = {case["task_id"]: json.dumps(case["environment_facts"]["authority_record"], sort_keys=True) for case in cases}
+    mutated_request_authority = {case["task_id"]: json.dumps(authority_record(case["task_id"]), sort_keys=True) for case in cases}
+    assert original_authority == mutated_request_authority
+    target_mutation = dict(cases[0], input_request="Could you tell me whether docs/research/V2_OTHER_2026-08-23.md is part of this repository?")
+    assert preflight(target_mutation["input_request"])["target"] != authority_record("tsfv2-001")["allowed_targets"][0]
+    assert json.dumps(target_mutation["environment_facts"]["authority_record"], sort_keys=True) == original_authority["tsfv2-001"]
+    operation_mutation = dict(cases[6], input_request="Inspect docs/research/V2_HARBOR_2026-08-23.py.")
+    assert json.dumps(operation_mutation["environment_facts"]["authority_record"], sort_keys=True) == original_authority["tsfv2-007"]
+    mutated_authority = dict(authority_record("tsfv2-001"), allowed_targets=["docs/research/V2_OTHER_2026-08-23.md"])
+    denied, _, _, _, observer_count = confirmation.execute_read_only_observation("observe_presence", "docs/research/V2_OTHER_2026-08-23.md", authority_record("tsfv2-001"), observer=lambda *_: {"status": "UNEXPECTED"})
+    assert denied["status"] == "TARGET_AUTHORITY_DENIED" and observer_count == 0 and mutated_authority != authority_record("tsfv2-001")
+    authority_provenance = {"schema": "zth_true_semantic_fallback_v2_authority_provenance_v0", "request_target_mutation_authority_invariance": True, "request_operation_mutation_authority_invariance": True, "target_authority_fail_before_act_regression": True, "v2_request_derived_target_authority": False, "v2_independent_target_authority_provenance": True, "v2_control_operation_authority_request_derived": False, "semantic_class_answer_leak_from_authority": False}
+    write_json(out / "authority_provenance_invariance.json", authority_provenance)
     before = {"runtime_cases": sha_file(RUNTIME_CASES), "authority": sha_bytes(canonical([case["environment_facts"]["authority_record"] for case in cases])), "leakage": sha_file(LEAKAGE_AUDIT), "preflights": sha_bytes(canonical(preflights)), "gaps": sha_bytes(canonical(gaps)), "plans": sha_bytes(canonical(plans)), "prompts": sha_bytes(canonical({case["task_id"]: prompt(case["input_request"]) for case in cases[:6]})), "schemas": sha_bytes(canonical(schema())), "execution_order": sha_bytes(canonical(execution_order))}
     corrupted = [{**item, "expected_semantic_class": "inspect" if item["expected_semantic_class"] == "observe_presence" else "observe_presence", "expected_task_terminal_success": not item["expected_task_terminal_success"], "expected_execution_path_complete": not item["expected_execution_path_complete"], "regime": "CORRUPTED"} for item in evaluators]
     after = {"runtime_cases": sha_file(RUNTIME_CASES), "authority": sha_bytes(canonical([case["environment_facts"]["authority_record"] for case in cases])), "leakage": sha_file(LEAKAGE_AUDIT), "preflights": sha_bytes(canonical([preflight(case["input_request"]) for case in cases])), "gaps": sha_bytes(canonical(gaps)), "plans": sha_bytes(canonical([plan(case["task_id"], preflight(case["input_request"])) for case in cases])), "prompts": sha_bytes(canonical({case["task_id"]: prompt(case["input_request"]) for case in cases[:6]})), "schemas": sha_bytes(canonical(schema())), "execution_order": sha_bytes(canonical(execution_order))}
     assert before == after
     write_json(out / "evaluator_corruption_invariance.json", {"before_hashes": before, "after_hashes": after, "corrupted_evaluator": corrupted, "pass": True})
     write_json(out / "execution_order.json", {"order": execution_order, "counterbalanced": True, "class_labels_runtime_visible": False})
-    manifest = {"schema": "zth_true_semantic_fallback_v2_manifest_v0", "status": "prepared_model_free", "prepared_from_git_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(), "driver_sha256": sha_file(Path(__file__).resolve()), "runtime_cases_sha256": sha_file(RUNTIME_CASES), "evaluator_cases_sha256": sha_file(EVALUATOR_CASES), "registry_sha256": sha_file(REGISTRY), "leakage_audit_sha256": sha_file(LEAKAGE_AUDIT), "task_count": 10, "true_fallback_eligibility": 6, "planned_model_calls": 6, "planned_tool_calls": sum(p["planned_tool_calls"] for p in plans), "control_model_calls": 0, "model_calls_made": 0, "tool_calls_made": 0, "response_files": 0, "target_path_predicts_semantic_class": False, "runtime_authority_independent_of_expected_class": True, "evaluator_class_corruption_runtime_invariance": True, "v1_holdout_reuse_count": 0, "runtime_evaluator_influence": 0, "model_output_granted_authority": 0, "retries": 0, "teacher_calls": 0, "30b_calls": 0, "external_calls": 0, "qualification_change": False, "model_id": MODEL_ID, "model_sha256": MODEL_SHA, "operative_parameters": PARAMS, "gpu_uuid": GPU_UUID, "prompt_template_relationship": "V1 enum-only meanings and instruction style preserved; no V1 failure-specific content", "telemetry_provider": "scripts.zth_qwen3_0_6b_clean_scope_logic_probe"}
+    manifest = {"schema": "zth_true_semantic_fallback_v2_manifest_v1", "status": "prepared_model_free", "supersedes_unexecuted_freeze": "770db0ef2a5e870a9972af827ed5144e5488fac5", "prepared_from_git_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(), "driver_sha256": sha_file(Path(__file__).resolve()), "runtime_cases_sha256": sha_file(RUNTIME_CASES), "evaluator_cases_sha256": sha_file(EVALUATOR_CASES), "registry_sha256": sha_file(REGISTRY), "leakage_audit_sha256": sha_file(LEAKAGE_AUDIT), "task_count": 10, "true_fallback_eligibility": 6, "planned_model_calls": 6, "planned_tool_calls": sum(p["planned_tool_calls"] for p in plans), "control_model_calls": 0, "model_calls_made": 0, "tool_calls_made": 0, "response_files": 0, "target_path_predicts_semantic_class": False, "runtime_authority_independent_of_expected_class": True, "runtime_target_authority_independent_of_request_parsing": True, "evaluator_class_corruption_runtime_invariance": True, "request_target_mutation_authority_invariance": True, "request_operation_mutation_authority_invariance": True, "target_authority_fail_before_act_regression": True, "v1_holdout_reuse_count": 0, "runtime_evaluator_influence": 0, "model_output_granted_authority": 0, "retries": 0, "teacher_calls": 0, "30b_calls": 0, "external_calls": 0, "qualification_change": False, "model_id": MODEL_ID, "model_sha256": MODEL_SHA, "operative_parameters": PARAMS, "gpu_uuid": GPU_UUID, "prompt_template_relationship": "V1 enum-only meanings and instruction style preserved; no V1 failure-specific content", "telemetry_provider": "scripts.zth_qwen3_0_6b_clean_scope_logic_probe"}
     manifest["manifest_sha256"] = sha_bytes(canonical({**manifest, "manifest_sha256": None}))
     write_json(out / "router_manifest.json", manifest)
     write_json(out / "lifecycle.json", {"status": "prepared", "model_calls": 0, "tool_calls": 0, "teacher_calls": 0, "retries": 0})

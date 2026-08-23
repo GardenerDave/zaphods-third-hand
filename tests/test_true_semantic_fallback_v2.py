@@ -62,3 +62,27 @@ def test_v2_leakage_audit_has_no_runtime_answer_channels():
     assert all(not row["runtime_regime_label_present"] for row in rows)
     assert all(not row["evaluator_fields_present"] for row in rows)
     assert all(not row["task_id_class_leak"] for row in rows)
+
+
+def test_v2_request_target_mutation_does_not_mutate_independent_authority():
+    original = next(case for case in probe.runtime_cases() if case["task_id"] == "tsfv2-001")
+    mutated = dict(original, input_request="Could you tell me whether docs/research/V2_OTHER_2026-08-23.md is part of this repository?")
+    assert probe.preflight(mutated["input_request"])["target"] != probe.authority_record("tsfv2-001")["allowed_targets"][0]
+    assert mutated["environment_facts"]["authority_record"] == original["environment_facts"]["authority_record"]
+
+
+def test_v2_request_operation_mutation_does_not_mutate_independent_authority():
+    original = next(case for case in probe.runtime_cases() if case["task_id"] == "tsfv2-007")
+    mutated = dict(original, input_request="Inspect docs/research/V2_HARBOR_2026-08-23.py.")
+    assert mutated["environment_facts"]["authority_record"] == original["environment_facts"]["authority_record"]
+
+
+def test_v2_target_authority_denies_before_stubbed_observer_actuation():
+    case = probe.authority_record("tsfv2-001")
+    calls = []
+    result, _, _, _, count = __import__("scripts.deterministic_first_confirmation", fromlist=["execute_read_only_observation"]).execute_read_only_observation(
+        "observe_presence", "docs/research/V2_OTHER_2026-08-23.md", case, observer=lambda *_: calls.append(True)
+    )
+    assert result["status"] == "TARGET_AUTHORITY_DENIED"
+    assert count == 0
+    assert calls == []
