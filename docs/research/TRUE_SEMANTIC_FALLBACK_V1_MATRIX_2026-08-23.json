@@ -1,0 +1,155 @@
+{
+  "aggregate": {
+    "30b_calls": 0,
+    "MODEL_OUTPUT_GRANTED_AUTHORITY": 0,
+    "external_calls": 0,
+    "model_calls_made": 0,
+    "model_calls_planned": 6,
+    "preflight_failure_class": "LOCAL_ENDPOINT_DNS_RESOLUTION_FAILURE",
+    "preflight_failure_classes": [
+      "LOCAL_ENDPOINT_DNS_RESOLUTION_FAILURE",
+      "LOCAL_ENDPOINT_NO_ROUTE_TO_HOST"
+    ],
+    "qualification_change": false,
+    "raw_response_files": 0,
+    "retries": 0,
+    "rows": [
+      {
+        "execution_status": "NOT_EXECUTED_PRE_MODEL_PREFLIGHT",
+        "model_calls": 0,
+        "task_id": "tsfv1-001",
+        "tool_calls": 0
+      },
+      {
+        "execution_status": "NOT_EXECUTED_PRE_MODEL_PREFLIGHT",
+        "model_calls": 0,
+        "task_id": "tsfv1-002",
+        "tool_calls": 0
+      },
+      {
+        "execution_status": "NOT_EXECUTED_PRE_MODEL_PREFLIGHT",
+        "model_calls": 0,
+        "task_id": "tsfv1-003",
+        "tool_calls": 0
+      },
+      {
+        "execution_status": "NOT_EXECUTED_PRE_MODEL_PREFLIGHT",
+        "model_calls": 0,
+        "task_id": "tsfv1-004",
+        "tool_calls": 0
+      },
+      {
+        "execution_status": "NOT_EXECUTED_PRE_MODEL_PREFLIGHT",
+        "model_calls": 0,
+        "task_id": "tsfv1-005",
+        "tool_calls": 0
+      },
+      {
+        "execution_status": "NOT_EXECUTED_PRE_MODEL_PREFLIGHT",
+        "model_calls": 0,
+        "task_id": "tsfv1-006",
+        "tool_calls": 0
+      },
+      {
+        "execution_status": "NOT_EXECUTED_PRE_MODEL_PREFLIGHT",
+        "model_calls": 0,
+        "task_id": "tsfv1-007",
+        "tool_calls": 0
+      },
+      {
+        "execution_status": "NOT_EXECUTED_PRE_MODEL_PREFLIGHT",
+        "model_calls": 0,
+        "task_id": "tsfv1-008",
+        "tool_calls": 0
+      },
+      {
+        "execution_status": "NOT_EXECUTED_PRE_MODEL_PREFLIGHT",
+        "model_calls": 0,
+        "task_id": "tsfv1-009",
+        "tool_calls": 0
+      },
+      {
+        "execution_status": "NOT_EXECUTED_PRE_MODEL_PREFLIGHT",
+        "model_calls": 0,
+        "task_id": "tsfv1-010",
+        "tool_calls": 0
+      }
+    ],
+    "runtime_evaluator_influence": 0,
+    "schema": "zth_true_semantic_fallback_v1_blocked_aggregate_v0",
+    "scientific_evidence_contaminated": false,
+    "semantic_evidence_available": false,
+    "status": "PRE_INFERENCE_BLOCKED",
+    "task_count": 10,
+    "teacher_calls": 0,
+    "tool_calls_made": 0,
+    "true_fallback_opportunities": 6,
+    "zero_call_preflight_failure": true
+  },
+  "closeout_driver_sha256": "a7430ff69e97fb0fe289f5e97d0811c1503d89f886e8a7c09f5e78aab87bebdf",
+  "execution_driver_sha256": "03697a2dc201b5d1281a1b5a01d6fcb6101b1df772d283d85083b907853ea559",
+  "rows": [
+    {
+      "execution_status": "NOT_EXECUTED_PRE_MODEL_PREFLIGHT",
+      "model_calls": 0,
+      "task_id": "tsfv1-001",
+      "tool_calls": 0
+    },
+    {
+      "execution_status": "NOT_EXECUTED_PRE_MODEL_PREFLIGHT",
+      "model_calls": 0,
+      "task_id": "tsfv1-002",
+      "tool_calls": 0
+    },
+    {
+      "execution_status": "NOT_EXECUTED_PRE_MODEL_PREFLIGHT",
+      "model_calls": 0,
+      "task_id": "tsfv1-003",
+      "tool_calls": 0
+    },
+    {
+      "execution_status": "NOT_EXECUTED_PRE_MODEL_PREFLIGHT",
+      "model_calls": 0,
+      "task_id": "tsfv1-004",
+      "tool_calls": 0
+    },
+    {
+      "execution_status": "NOT_EXECUTED_PRE_MODEL_PREFLIGHT",
+      "model_calls": 0,
+      "task_id": "tsfv1-005",
+      "tool_calls": 0
+    },
+    {
+      "execution_status": "NOT_EXECUTED_PRE_MODEL_PREFLIGHT",
+      "model_calls": 0,
+      "task_id": "tsfv1-006",
+      "tool_calls": 0
+    },
+    {
+      "execution_status": "NOT_EXECUTED_PRE_MODEL_PREFLIGHT",
+      "model_calls": 0,
+      "task_id": "tsfv1-007",
+      "tool_calls": 0
+    },
+    {
+      "execution_status": "NOT_EXECUTED_PRE_MODEL_PREFLIGHT",
+      "model_calls": 0,
+      "task_id": "tsfv1-008",
+      "tool_calls": 0
+    },
+    {
+      "execution_status": "NOT_EXECUTED_PRE_MODEL_PREFLIGHT",
+      "model_calls": 0,
+      "task_id": "tsfv1-009",
+      "tool_calls": 0
+    },
+    {
+      "execution_status": "NOT_EXECUTED_PRE_MODEL_PREFLIGHT",
+      "model_calls": 0,
+      "task_id": "tsfv1-010",
+      "tool_calls": 0
+    }
+  ],
+  "schema": "zth_true_semantic_fallback_v1_blocked_matrix_v0",
+  "superseded_v0_freeze": "abbb0c1d44b1eadfdc8b23cbeaa33e8da7d994f6"
+}
