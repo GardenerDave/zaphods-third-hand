@@ -1,0 +1,79 @@
+{
+  "schema": "zth_model_tool_composition_v0_tasks_v1",
+  "status": "frozen_exploratory_not_production",
+  "runtime_forbidden_fields": ["expected_", "required_capabilities", "expected_supplier", "tool_capability_id", "observation_requirement"],
+  "tasks": [
+    {
+      "task_id": "composition-v0-001",
+      "input_request": "Could you inspect the repository and confirm that docs/README.md exists right now?",
+      "environment_facts": {"authority_record": {"allowed_targets": ["docs/README.md"], "allowed_observation_operations": ["inspect"]}},
+      "expected_required_capabilities": ["semantic.minimal_action_object_extraction"],
+      "expected_plan_1_required_capabilities": ["tool.read_only_repository_observation"],
+      "expected_plan_2_required_capabilities": ["deterministic.observation_exists_policy"],
+      "expected_terminal_state": "terminal_success",
+      "expected_model_call_count": 1,
+      "expected_tool_call_count": 1,
+      "expected_replans": 2
+    },
+    {
+      "task_id": "composition-v0-002",
+      "input_request": "Please check whether docs/research/CAPABILITY_ROUTER_V1_2_PACKET_PLANNING_DESIGN_2026-08-22.md is currently present.",
+      "environment_facts": {"authority_record": {"allowed_targets": ["docs/research/CAPABILITY_ROUTER_V1_2_PACKET_PLANNING_DESIGN_2026-08-22.md"], "allowed_observation_operations": ["check"]}},
+      "expected_required_capabilities": ["semantic.minimal_action_object_extraction"],
+      "expected_plan_1_required_capabilities": ["tool.read_only_repository_observation"],
+      "expected_plan_2_required_capabilities": ["deterministic.observation_exists_policy"],
+      "expected_terminal_state": "terminal_success",
+      "expected_model_call_count": 1,
+      "expected_tool_call_count": 1,
+      "expected_replans": 2
+    },
+    {
+      "task_id": "composition-v0-003",
+      "input_request": "Determine whether docs/not-created-composition-observation.txt is present in the current tree.",
+      "environment_facts": {"authority_record": {"allowed_targets": ["docs/not-created-composition-observation.txt"], "allowed_observation_operations": ["determine"]}},
+      "expected_required_capabilities": ["semantic.minimal_action_object_extraction"],
+      "expected_plan_1_required_capabilities": ["tool.read_only_repository_observation"],
+      "expected_plan_2_required_capabilities": ["deterministic.observation_absence_policy"],
+      "expected_terminal_state": "terminal_success",
+      "expected_model_call_count": 1,
+      "expected_tool_call_count": 1,
+      "expected_replans": 2
+    },
+    {
+      "task_id": "composition-v0-004",
+      "input_request": "Inspect docs/README.md and report whether it exists.",
+      "environment_facts": {"authority_record": {"allowed_targets": ["docs/ARCHITECTURE.md"], "allowed_observation_operations": ["inspect"]}},
+      "expected_required_capabilities": ["semantic.minimal_action_object_extraction"],
+      "expected_plan_1_required_capabilities": [],
+      "expected_plan_2_required_capabilities": [],
+      "expected_terminal_state": "ready_for_review",
+      "expected_model_call_count": 1,
+      "expected_tool_call_count": 0,
+      "expected_replans": 1
+    },
+    {
+      "task_id": "composition-v0-005",
+      "input_request": "Compute the bounded boolean result from the already canonical target and operation operands.",
+      "environment_facts": {"canonical_operands": {"target_match": false, "operation_match": true}},
+      "expected_required_capabilities": ["deterministic.boolean_composition"],
+      "expected_plan_1_required_capabilities": [],
+      "expected_plan_2_required_capabilities": [],
+      "expected_terminal_state": "terminal_success",
+      "expected_model_call_count": 0,
+      "expected_tool_call_count": 0,
+      "expected_replans": 0
+    },
+    {
+      "task_id": "composition-v0-006",
+      "input_request": "Find the current status of the external service called archive-gateway.",
+      "environment_facts": {"authority_record": {"allowed_targets": ["archive-gateway"], "allowed_observation_operations": ["query"]}},
+      "expected_required_capabilities": ["semantic.external_service_observation"],
+      "expected_plan_1_required_capabilities": [],
+      "expected_plan_2_required_capabilities": [],
+      "expected_terminal_state": "ready_for_review",
+      "expected_model_call_count": 0,
+      "expected_tool_call_count": 0,
+      "expected_replans": 0
+    }
+  ]
+}
