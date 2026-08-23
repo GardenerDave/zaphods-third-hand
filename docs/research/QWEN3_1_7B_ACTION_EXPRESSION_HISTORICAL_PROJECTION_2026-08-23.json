@@ -1,0 +1,24 @@
+{
+  "schema": "zth_action_expression_historical_projection_v0",
+  "historical_scores_unchanged": true,
+  "source_run": ".work/model_size_supplier_floor/capability_router_failure_teaching_v0/stage_b/run_20260823T070000Z",
+  "baseline_canonical_correct": "8/8",
+  "patched_canonical_correct": "4/8",
+  "rows": [
+    {"task_id":"teach-holdout-001","request":"Determine if docs/teaching-presence-alpha.txt exists in the current repository.","expected_historical_surface_action":"determine","observed_historical_action":"exists","proposed_action_expression":"exists","normalized_canonical_operation":"observe_presence","expected_canonical_operation":"observe_presence","canonical_operation_correct":true,"object_expression":"docs/teaching-presence-alpha.txt","object_expression_exact":true,"would_downstream_binding_succeed":true,"classification":"SEMANTICALLY_EQUIVALENT_OPERATION"},
+    {"task_id":"teach-holdout-002","request":"Check whether docs/teaching-presence-beta.txt is present right now.","expected_historical_surface_action":"check","observed_historical_action":"check","proposed_action_expression":"check","normalized_canonical_operation":"observe_presence","expected_canonical_operation":"observe_presence","canonical_operation_correct":true,"object_expression":"docs/teaching-presence-beta.txt","object_expression_exact":true,"would_downstream_binding_succeed":true,"classification":"SEMANTICALLY_EQUIVALENT_OPERATION"},
+    {"task_id":"teach-holdout-003","request":"Verify that docs/teaching-presence-gamma.txt can be found in the tree.","expected_historical_surface_action":"verify","observed_historical_action":"find","proposed_action_expression":"find","normalized_canonical_operation":"observe_presence","expected_canonical_operation":"observe_presence","canonical_operation_correct":true,"object_expression":"docs/teaching-presence-gamma.txt","object_expression_exact":true,"would_downstream_binding_succeed":true,"classification":"SEMANTICALLY_EQUIVALENT_OPERATION"},
+    {"task_id":"teach-holdout-004","request":"Confirm whether docs/teaching-presence-delta.txt exists at this time.","expected_historical_surface_action":"confirm","observed_historical_action":"confirm","proposed_action_expression":"confirm","normalized_canonical_operation":"observe_presence","expected_canonical_operation":"observe_presence","canonical_operation_correct":true,"object_expression":"docs/teaching-presence-delta.txt","object_expression_exact":true,"would_downstream_binding_succeed":true,"classification":"SEMANTICALLY_EQUIVALENT_OPERATION"},
+    {"task_id":"teach-holdout-005","request":"Inspect docs/teaching-control-epsilon.md.","expected_historical_surface_action":"inspect","observed_historical_action":"inspect","proposed_action_expression":"inspect","normalized_canonical_operation":"inspect","expected_canonical_operation":"inspect","canonical_operation_correct":true,"object_expression":"docs/teaching-control-epsilon.md","object_expression_exact":true,"would_downstream_binding_succeed":true,"classification":"SEMANTICALLY_EQUIVALENT_OPERATION"},
+    {"task_id":"teach-holdout-006","request":"Amend docs/teaching-control-zeta.md.","expected_historical_surface_action":"amend","observed_historical_action":"Amend","proposed_action_expression":"Amend","normalized_canonical_operation":"amend","expected_canonical_operation":"amend","canonical_operation_correct":true,"object_expression":"docs/teaching-control-zeta.md","object_expression_exact":true,"would_downstream_binding_succeed":true,"classification":"LEXICAL_ONLY_VARIATION"},
+    {"task_id":"teach-holdout-007","request":"Index docs/teaching-control-eta.md.","expected_historical_surface_action":"index","observed_historical_action":"Index","proposed_action_expression":"Index","normalized_canonical_operation":"index","expected_canonical_operation":"index","canonical_operation_correct":true,"object_expression":"docs/teaching-control-eta.md","object_expression_exact":true,"would_downstream_binding_succeed":true,"classification":"LEXICAL_ONLY_VARIATION"},
+    {"task_id":"teach-holdout-008","request":"Dispatch docs/teaching-control-theta.md.","expected_historical_surface_action":"dispatch","observed_historical_action":"Dispatch","proposed_action_expression":"Dispatch","normalized_canonical_operation":"dispatch","expected_canonical_operation":"dispatch","canonical_operation_correct":true,"object_expression":"docs/teaching-control-theta.md","object_expression_exact":true,"would_downstream_binding_succeed":true,"classification":"LEXICAL_ONLY_VARIATION"}
+  ],
+  "patched_projection": {
+    "observed_action":"check",
+    "presence_tasks_canonical_correct":"4/4",
+    "direct_control_tasks_canonical_correct":"0/4",
+    "canonical_correct":"4/8",
+    "historical_patched_scores_unchanged":true
+  }
+}

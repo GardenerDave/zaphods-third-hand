@@ -1,0 +1,31 @@
+{
+  "schema": "zth_operation_normalization_rules_v0",
+  "status": "FROZEN_EXPLORATORY",
+  "canonical_operations": [
+    "observe_presence",
+    "inspect",
+    "amend",
+    "index",
+    "dispatch"
+  ],
+  "rules": [
+    {"rule_id":"presence_determine","expressions":["determine"],"canonical_operation":"observe_presence","semantic_rationale":"A bounded request to determine whether a target exists requires a presence observation."},
+    {"rule_id":"presence_check","expressions":["check"],"canonical_operation":"observe_presence","semantic_rationale":"A bounded check for target presence is the same downstream observation."},
+    {"rule_id":"presence_verify","expressions":["verify"],"canonical_operation":"observe_presence","semantic_rationale":"A bounded verification of target presence is the same downstream observation."},
+    {"rule_id":"presence_confirm","expressions":["confirm"],"canonical_operation":"observe_presence","semantic_rationale":"A bounded confirmation of target presence is the same downstream observation."},
+    {"rule_id":"presence_find","expressions":["find"],"canonical_operation":"observe_presence","semantic_rationale":"In the frozen presence-query family, finding whether a target can be found is a presence observation."},
+    {"rule_id":"presence_exists_state_predicate","expressions":["exists"],"canonical_operation":"observe_presence","semantic_rationale":"The state predicate reports the same bounded presence fact; it is not treated as the authority token."},
+    {"rule_id":"direct_inspect","expressions":["inspect"],"canonical_operation":"inspect","semantic_rationale":"Inspect remains a distinct direct operation."},
+    {"rule_id":"direct_amend","expressions":["amend"],"canonical_operation":"amend","semantic_rationale":"Amend remains a distinct direct operation."},
+    {"rule_id":"direct_index","expressions":["index"],"canonical_operation":"index","semantic_rationale":"Index remains a distinct direct operation."},
+    {"rule_id":"direct_dispatch","expressions":["dispatch"],"canonical_operation":"dispatch","semantic_rationale":"Dispatch remains a distinct direct operation."}
+  ],
+  "ambiguous_exact_expressions": [
+    "check and inspect",
+    "verify or confirm"
+  ],
+  "unknown_policy": "UNRESOLVED",
+  "authority_policy": "only canonical_operation is checked against independent allowed_canonical_operations",
+  "fuzzy_matching": false,
+  "model_output_grants_authority": false
+}
