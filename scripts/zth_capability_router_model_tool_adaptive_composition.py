@@ -362,9 +362,16 @@ def execute(out: Path) -> None:
             write_json(td / "route_trace.json", trace)
             continue
         semantic: dict[str, str] | None = None
-        if plan0["planned_model_calls"]:
+        prompt = (td / "semantic_prompt.txt").read_text(encoding="utf-8")
+        response_path = td / "response.json"
+        if response_path.exists():
+            # A response artifact spends the supplier call. Recovery must never replay it.
             total_model += 1
-            prompt = (td / "semantic_prompt.txt").read_text(encoding="utf-8")
+            raw = json.loads(response_path.read_text(encoding="utf-8"))
+            semantic, parse_valid, contract_valid, diagnostics = parse_model_output(raw.get("content", ""))
+            trace["model_calls"].append({"supplier_id": MODEL_SUPPLIER, "prompt_sha256": sha_bytes(prompt.encode()), "parse_valid": parse_valid, "contract_valid": contract_valid, "latency_ms": raw.get("wall_elapsed_ms"), "gross_energy_joules": None, "recovered_existing_response": True})
+        else:
+            total_model += 1
             started = time.monotonic()
             sampler = PowerSampler(lambda: read_gpu_power(EXPECTED_GPU_UUID, base_url=telemetry_url), expected_gpu_uuid=EXPECTED_GPU_UUID, sample_interval_seconds=POWER_INTERVAL_SECONDS)
             sampler.start()
@@ -373,24 +380,24 @@ def execute(out: Path) -> None:
             samples = sampler.stop()
             energy = integrate_energy_joules(samples, sample_interval_seconds=POWER_INTERVAL_SECONDS, expected_gpu_uuid=EXPECTED_GPU_UUID)
             raw = {"status": response.status, "content": response.content, "metadata": response.metadata(), "wall_elapsed_ms": round((captured - started) * 1000, 3), "response_captured_at": now()}
-            write_json(td / "response.json", raw)
+            write_json(response_path, raw)
             write_json(td / "power_samples.json", {"measurement_level": 2, "measurement_boundary": "gpu_device_only", "gpu_uuid": EXPECTED_GPU_UUID, "samples": [{"timestamp_utc": s.timestamp_utc, "monotonic_seconds": s.monotonic_seconds, "gpu_uuid": s.gpu_uuid, "power_watts": s.power_watts, "sequence": s.sequence} for s in samples]})
             semantic, parse_valid, contract_valid, diagnostics = parse_model_output(response.content)
-            state.update({"semantic_contract_valid": contract_valid, "action": semantic.get("action") if semantic else None, "object_expression": semantic.get("object_expression") if semantic else None})
-            trace["model_calls"].append({"supplier_id": MODEL_SUPPLIER, "prompt_sha256": sha_bytes(prompt.encode()), "parse_valid": parse_valid, "contract_valid": contract_valid, "latency_ms": raw["wall_elapsed_ms"], "gross_energy_joules": energy})
-            write_json(td / "semantic_validation.json", {"schema": "zth_model_tool_adaptive_semantic_validation_v1", "parse_valid": parse_valid, "contract_valid": contract_valid, "diagnostics": diagnostics, "observed": semantic})
-            contract_eval0 = evaluate_success_contract(contract0, {**state, "coverage_complete": True})
-            write_json(td / "success_contract_evaluation_0.json", contract_eval0)
-            if not contract_eval0["passed"]:
-                facts1 = build_planner_facts(runtime_task, triage, orchestration, semantic=semantic or {})
-                plan1, derivation1 = plan_capabilities(facts1, registry_index())
-                contract1 = build_success_contract(facts1, plan1)
-                write_json(td / "planner_facts_1.json", facts1); write_json(td / "capability_requirement_derivation_1.json", derivation1); write_json(td / "capability_plan_1.json", plan1); write_json(td / "success_contract_1.json", contract1)
-                write_json(td / "replan_delta_0_1.json", {"previous_required_capabilities": plan0["derived_required_capabilities"], "new_required_capabilities": plan1["derived_required_capabilities"], "observation_consumed": False, "capabilities_satisfied": [], "capabilities_added": [x for x in plan1["derived_required_capabilities"] if x not in plan0["derived_required_capabilities"]], "capabilities_removed": [x for x in plan0["derived_required_capabilities"] if x not in plan1["derived_required_capabilities"]], "reason": "Validated semantic step either derived the tool requirement or failed closed before tool authorization."})
-                total_replans += 1
-                result = {"terminal_state": "ready_for_review", "reason": "semantic binding or contract failed", "model_calls": 1, "tool_calls": 0, "replans": 1, "deterministic_steps": 0, "validator": contract_eval0}
-                write_json(td / "runtime_result.json", result); trace.update({"planner_facts_1": "planner_facts_1.json", "capability_plan_1": "capability_plan_1.json", "replan_delta_0_1": "replan_delta_0_1.json", "terminal_state": result["terminal_state"]}); write_json(td / "route_trace.json", trace)
-                continue
+            trace["model_calls"].append({"supplier_id": MODEL_SUPPLIER, "prompt_sha256": sha_bytes(prompt.encode()), "parse_valid": parse_valid, "contract_valid": contract_valid, "latency_ms": raw["wall_elapsed_ms"], "gross_energy_joules": energy, "recovered_existing_response": False})
+        state.update({"semantic_contract_valid": contract_valid, "action": semantic.get("action") if semantic else None, "object_expression": semantic.get("object_expression") if semantic else None})
+        write_json(td / "semantic_validation.json", {"schema": "zth_model_tool_adaptive_semantic_validation_v1", "parse_valid": parse_valid, "contract_valid": contract_valid, "diagnostics": diagnostics, "observed": semantic})
+        contract_eval0 = evaluate_success_contract(contract0, {**state, "coverage_complete": True})
+        write_json(td / "success_contract_evaluation_0.json", contract_eval0)
+        facts1 = build_planner_facts(runtime_task, triage, orchestration, semantic=semantic or {})
+        plan1, derivation1 = plan_capabilities(facts1, registry_index())
+        contract1 = build_success_contract(facts1, plan1)
+        write_json(td / "planner_facts_1.json", facts1); write_json(td / "capability_requirement_derivation_1.json", derivation1); write_json(td / "capability_plan_1.json", plan1); write_json(td / "success_contract_1.json", contract1)
+        write_json(td / "replan_delta_0_1.json", {"previous_required_capabilities": plan0["derived_required_capabilities"], "new_required_capabilities": plan1["derived_required_capabilities"], "observation_consumed": False, "capabilities_satisfied": [MODEL_CAPABILITY] if contract_eval0["passed"] else [], "capabilities_added": [x for x in plan1["derived_required_capabilities"] if x not in plan0["derived_required_capabilities"]], "capabilities_removed": [x for x in plan0["derived_required_capabilities"] if x not in plan1["derived_required_capabilities"]], "reason": "Re-derived after the semantic model step; only a safely bound target can expose the tool requirement."})
+        if not contract_eval0["passed"]:
+            total_replans += 1
+            result = {"terminal_state": "ready_for_review", "reason": "semantic binding or contract failed", "model_calls": 1, "tool_calls": 0, "replans": 1, "deterministic_steps": 0, "validator": contract_eval0}
+            write_json(td / "runtime_result.json", result); trace.update({"planner_facts_1": "planner_facts_1.json", "capability_plan_1": "capability_plan_1.json", "replan_delta_0_1": "replan_delta_0_1.json", "terminal_state": result["terminal_state"]}); write_json(td / "route_trace.json", trace)
+            continue
         else:
             state.update({"policy_computed": True})
             evaluation = evaluate_success_contract(contract0, {**state, "coverage_complete": True})
