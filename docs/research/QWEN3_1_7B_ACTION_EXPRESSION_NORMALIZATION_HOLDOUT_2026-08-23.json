@@ -1,0 +1,143 @@
+{
+  "evaluator_separate": true,
+  "schema": "zth_action_expression_normalization_holdout_v0",
+  "tasks": [
+    {
+      "allowed_canonical_operations": [
+        "observe_presence"
+      ],
+      "expected_canonical_operation": "observe_presence",
+      "expected_status": "NORMALIZED",
+      "expected_surface_expression": "determine",
+      "input_request": "Determine whether docs/normalization-presence-alpha.txt exists in the current tree.",
+      "regime": "PRESENCE_OBSERVATION",
+      "requested_target": "docs/normalization-presence-alpha.txt",
+      "task_id": "norm-holdout-001"
+    },
+    {
+      "allowed_canonical_operations": [
+        "observe_presence"
+      ],
+      "expected_canonical_operation": "observe_presence",
+      "expected_status": "NORMALIZED",
+      "expected_surface_expression": "check",
+      "input_request": "Check if docs/normalization-presence-beta.txt is present right now.",
+      "regime": "PRESENCE_OBSERVATION",
+      "requested_target": "docs/normalization-presence-beta.txt",
+      "task_id": "norm-holdout-002"
+    },
+    {
+      "allowed_canonical_operations": [
+        "observe_presence"
+      ],
+      "expected_canonical_operation": "observe_presence",
+      "expected_status": "NORMALIZED",
+      "expected_surface_expression": "verify",
+      "input_request": "Verify that docs/normalization-presence-gamma.txt can be found in the repository.",
+      "regime": "PRESENCE_OBSERVATION",
+      "requested_target": "docs/normalization-presence-gamma.txt",
+      "task_id": "norm-holdout-003"
+    },
+    {
+      "allowed_canonical_operations": [
+        "observe_presence"
+      ],
+      "expected_canonical_operation": "observe_presence",
+      "expected_status": "NORMALIZED",
+      "expected_surface_expression": "confirm",
+      "input_request": "Confirm whether docs/normalization-presence-delta.txt exists at this time.",
+      "regime": "PRESENCE_OBSERVATION",
+      "requested_target": "docs/normalization-presence-delta.txt",
+      "task_id": "norm-holdout-004"
+    },
+    {
+      "allowed_canonical_operations": [
+        "inspect"
+      ],
+      "expected_canonical_operation": "inspect",
+      "expected_status": "NORMALIZED",
+      "expected_surface_expression": "inspect",
+      "input_request": "Inspect docs/normalization-control-epsilon.md.",
+      "regime": "DIRECT_INSPECT",
+      "requested_target": "docs/normalization-control-epsilon.md",
+      "task_id": "norm-holdout-005"
+    },
+    {
+      "allowed_canonical_operations": [
+        "amend"
+      ],
+      "expected_canonical_operation": "amend",
+      "expected_status": "NORMALIZED",
+      "expected_surface_expression": "amend",
+      "input_request": "Amend docs/normalization-control-zeta.md.",
+      "regime": "DIRECT_AMEND",
+      "requested_target": "docs/normalization-control-zeta.md",
+      "task_id": "norm-holdout-006"
+    },
+    {
+      "allowed_canonical_operations": [
+        "index"
+      ],
+      "expected_canonical_operation": "index",
+      "expected_status": "NORMALIZED",
+      "expected_surface_expression": "index",
+      "input_request": "Index docs/normalization-control-eta.md.",
+      "regime": "DIRECT_INDEX",
+      "requested_target": "docs/normalization-control-eta.md",
+      "task_id": "norm-holdout-007"
+    },
+    {
+      "allowed_canonical_operations": [
+        "dispatch"
+      ],
+      "expected_canonical_operation": "dispatch",
+      "expected_status": "NORMALIZED",
+      "expected_surface_expression": "dispatch",
+      "input_request": "Dispatch docs/normalization-control-theta.md.",
+      "regime": "DIRECT_DISPATCH",
+      "requested_target": "docs/normalization-control-theta.md",
+      "task_id": "norm-holdout-008"
+    },
+    {
+      "allowed_canonical_operations": [],
+      "expected_canonical_operation": null,
+      "expected_status": "AMBIGUOUS",
+      "expected_surface_expression": null,
+      "input_request": "Check and inspect docs/normalization-ambiguous-iota.md.",
+      "regime": "AMBIGUOUS",
+      "requested_target": "docs/normalization-ambiguous-iota.md",
+      "task_id": "norm-holdout-009"
+    },
+    {
+      "allowed_canonical_operations": [],
+      "expected_canonical_operation": null,
+      "expected_status": "AMBIGUOUS",
+      "expected_surface_expression": null,
+      "input_request": "Verify or confirm docs/normalization-ambiguous-kappa.md.",
+      "regime": "AMBIGUOUS",
+      "requested_target": "docs/normalization-ambiguous-kappa.md",
+      "task_id": "norm-holdout-010"
+    },
+    {
+      "allowed_canonical_operations": [],
+      "expected_canonical_operation": null,
+      "expected_status": "UNRESOLVED",
+      "expected_surface_expression": "archive",
+      "input_request": "Archive docs/normalization-unsupported-lambda.md.",
+      "regime": "UNSUPPORTED",
+      "requested_target": "docs/normalization-unsupported-lambda.md",
+      "task_id": "norm-holdout-011"
+    },
+    {
+      "allowed_canonical_operations": [],
+      "expected_canonical_operation": null,
+      "expected_status": "UNRESOLVED",
+      "expected_surface_expression": "delete",
+      "input_request": "Delete docs/normalization-unsupported-mu.md.",
+      "regime": "UNSUPPORTED",
+      "requested_target": "docs/normalization-unsupported-mu.md",
+      "task_id": "norm-holdout-012"
+    }
+  ],
+  "teacher_visible": false
+}
