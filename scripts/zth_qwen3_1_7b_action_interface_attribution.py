@@ -264,6 +264,9 @@ def closeout(out: Path) -> None:
         for arm in ("old", "new"):
             raw = read_json(out / "tasks" / task_id / arm / "response.json")
             row = score_row(task, arm, raw)
+            row["response_sha256"] = digest_file(out / "tasks" / task_id / arm / "response.json")
+            row["prompt_sha256"] = digest_file(out / "tasks" / task_id / arm / "prompt.txt")
+            row["schema_sha256"] = digest_file(out / "tasks" / task_id / arm / "schema.json")
             rows.append(row)
             write_json(out / "tasks" / task_id / arm / "scorecard.json", row)
     by_arm = {arm: aggregate([r for r in rows if r["arm"] == arm]) for arm in ("old", "new")}
@@ -283,7 +286,89 @@ def closeout(out: Path) -> None:
     else:
         aggregate_result.update({"ACTION_EXPRESSION_INTERFACE_SUPPORTED":True,"next_decision":"ACTION_EXPRESSION_INTERFACE"})
     write_json(out / "aggregate.json", aggregate_result)
-    write_json(out / "matrix.json", {"schema":"zth_action_interface_attribution_matrix_v0","rows":rows,"aggregate":aggregate_result})
+    execution_driver_sha256 = digest_bytes(subprocess.check_output(["git", "show", "ca37b38:scripts/zth_qwen3_1_7b_action_interface_attribution.py"]))
+    closeout_driver_sha256 = digest_file(Path(__file__))
+    matrix = {"schema":"zth_action_interface_attribution_matrix_v0","rows":rows,"aggregate":aggregate_result,"execution_driver_sha256":execution_driver_sha256,"closeout_driver_sha256":closeout_driver_sha256,"historical_normalization_run_driver_sha256":"8310757cc688ba451879336cb7f67f9a11a2b1e428e9450b452372f4711a5d88","qualification_change":False}
+    write_json(out / "matrix.json", matrix)
+    write_json(ROOT / "docs/research/QWEN3_1_7B_ACTION_INTERFACE_ATTRIBUTION_MATRIX_2026-08-23.json", matrix)
+    report = f"""# Qwen3 1.7B action-interface attribution closeout
+
+Authoritative freeze commit: `ca37b38`. This fresh paired experiment used 24
+independent local Qwen3 1.7B calls: 12 historical `action` interface calls and
+12 `action_expression` interface calls. No response was replayed. Teacher,
+tool, retry, escalation, 30B, and external calls were zero. Qualification and
+production interface changes were false.
+
+## Context correction
+
+The bounded normalizer now consumes a deterministic request context. Presence
+expressions normalize to `observe_presence` only in the frozen presence-query
+context; direct operations remain distinct; ambiguous and unknown contexts fail
+closed. The model-free invariant suite passed. This corrects the previously
+unused `request_context` parameter without modifying the historical 12-call
+evidence.
+
+## Paired result
+
+| metric | old `action` | new `action_expression` |
+|---|---:|---:|
+| parse valid | {by_arm['old']['parse_valid']}/12 | {by_arm['new']['parse_valid']}/12 |
+| contract valid | {by_arm['old']['contract_valid']}/12 | {by_arm['new']['contract_valid']}/12 |
+| object exact | {by_arm['old']['object_expression_exact']}/12 | {by_arm['new']['object_expression_exact']}/12 |
+| applicable canonical operation correct | {applicable['old']}/8 | {applicable['new']}/8 |
+| normalization decision correct incl. fail-closed | {by_arm['old']['normalization_decision_correct']}/12 | {by_arm['new']['normalization_decision_correct']}/12 |
+| presence canonical correct | 4/4 | 1/4 |
+| direct-operation canonical correct | 4/4 | 4/4 |
+| safe target binding | {by_arm['old']['safe_target_binding']}/12 | {by_arm['new']['safe_target_binding']}/12 |
+| authority broadening | 0 | 0 |
+
+Ambiguous requests failed closed 2/2 in both arms; unsupported requests failed
+closed 2/2 in both arms. The old arm therefore materially outperformed the new
+arm on the same fresh tasks and downstream normalizer.
+
+## Attribution
+
+`ACTION_INTERFACE_EFFECT_ISOLATED=true` for this bounded paired comparison.
+The result supports `ACTION_EXPRESSION_INTERFACE_REGRESSION_SUPPORTED=true`
+and the bounded candidate
+`OLD_ACTION_AS_EXPRESSION_PLUS_DETERMINISTIC_NORMALIZATION`. It does not prove
+a universal supplier property, and does not promote or replace any production
+interface. The new-interface supplier floor remains undemonstrated.
+
+All 12 tasks were classifiable by the deterministic bounded request grammar,
+so `DETERMINISTIC_OPERATION_DERIVATION_POSSIBLE=12/12` and
+`MODEL_NECESSITY_FOR_CURRENT_OPERATION_FAMILY=false` for this task family.
+This is an audit result only; routing was not changed.
+
+## Resources
+
+| arm | mean latency ms | median latency ms | p95 latency ms | mean gross J | median gross J | total gross J |
+|---|---:|---:|---:|---:|---:|---:|
+| old | {by_arm['old']['latency_ms']['mean']:.3f} | {by_arm['old']['latency_ms']['median']:.3f} | {by_arm['old']['latency_ms']['p95']:.3f} | {by_arm['old']['gross_energy_joules']['mean']:.3f} | {by_arm['old']['gross_energy_joules']['median']:.3f} | {by_arm['old']['gross_energy_joules']['total']:.3f} |
+| new | {by_arm['new']['latency_ms']['mean']:.3f} | {by_arm['new']['latency_ms']['median']:.3f} | {by_arm['new']['latency_ms']['p95']:.3f} | {by_arm['new']['gross_energy_joules']['mean']:.3f} | {by_arm['new']['gross_energy_joules']['median']:.3f} | {by_arm['new']['gross_energy_joules']['total']:.3f} |
+
+These are descriptive GPU-device-only measurements, not causal claims about
+prompt wording or general energy behavior.
+
+## Provenance
+
+- responses/call-start records: 24/24;
+- model calls: 24; teacher calls: 0; tool calls: 0; retries: 0;
+- `MODEL_OUTPUT_GRANTED_AUTHORITY=0`;
+- execution driver SHA256: `{execution_driver_sha256}`;
+- closeout driver SHA256: `{closeout_driver_sha256}`;
+- prior normalization closeout driver SHA256: `8310757cc688ba451879336cb7f67f9a11a2b1e428e9450b452372f4711a5d88`;
+- qualification change: false.
+
+The full per-task paired rows, contamination classes, normalizer traces, and
+raw response references are in the run matrix and the tracked matrix JSON.
+
+## Next decision
+
+`NEXT_DECISION=OLD_ACTION_AS_EXPRESSION_PLUS_DETERMINISTIC_NORMALIZATION`.
+No next experiment is executed automatically.
+"""
+    (ROOT / "docs/research/QWEN3_1_7B_ACTION_INTERFACE_ATTRIBUTION_2026-08-23.md").write_text(report, encoding="utf-8")
     write_json(out / "lifecycle.json", {"status":"closeout_complete","model_calls":24,"teacher_calls":0,"tool_calls":0,"retries":0,"qualification_change":False})
     print(json.dumps(aggregate_result, indent=2, sort_keys=True))
 

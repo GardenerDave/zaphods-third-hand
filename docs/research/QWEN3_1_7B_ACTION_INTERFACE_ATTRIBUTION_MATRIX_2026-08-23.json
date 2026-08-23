@@ -1,0 +1,1805 @@
+{
+  "aggregate": {
+    "ACTION_EXPRESSION_INTERFACE_REGRESSION_SUPPORTED": true,
+    "ACTION_EXPRESSION_SUPPLIER_FLOOR_DEMONSTRATED": false,
+    "ACTION_INTERFACE_EFFECT_ISOLATED": true,
+    "MODEL_NECESSITY_FOR_CURRENT_OPERATION_FAMILY": false,
+    "MODEL_OUTPUT_GRANTED_AUTHORITY": 0,
+    "PREFERRED_BOUNDED_SEMANTIC_INTERFACE_CANDIDATE": "OLD_ACTION_AS_EXPRESSION_PLUS_DETERMINISTIC_NORMALIZATION",
+    "authority_broadening": 0,
+    "by_arm": {
+      "new": {
+        "applicable_rows": 8,
+        "authority_broadening": 0,
+        "canonical_operation_applicable": 5,
+        "canonical_operation_correct": 5,
+        "contract_valid": 12,
+        "failed_closed": 4,
+        "gross_energy_joules": {
+          "mean": 70.60270833333334,
+          "median": 69.775,
+          "total": 847.2325
+        },
+        "latency_ms": {
+          "mean": 2401.9049999999997,
+          "median": 2324.2375,
+          "p95": 2701.656
+        },
+        "normalization_decision_correct": 9,
+        "normalizer_ambiguous": 2,
+        "normalizer_normalized": 5,
+        "normalizer_unresolved": 5,
+        "object_expression_exact": 11,
+        "parse_valid": 12,
+        "raw_operation_field_populated": 12,
+        "safe_target_binding": 5,
+        "surface_action_exact": 7,
+        "tasks": 12
+      },
+      "old": {
+        "applicable_rows": 8,
+        "authority_broadening": 0,
+        "canonical_operation_applicable": 8,
+        "canonical_operation_correct": 8,
+        "contract_valid": 12,
+        "failed_closed": 4,
+        "gross_energy_joules": {
+          "mean": 58.46895833333333,
+          "median": 56.0225,
+          "total": 701.6275
+        },
+        "latency_ms": {
+          "mean": 2060.986,
+          "median": 2033.2815,
+          "p95": 2198.01
+        },
+        "normalization_decision_correct": 12,
+        "normalizer_ambiguous": 2,
+        "normalizer_normalized": 8,
+        "normalizer_unresolved": 2,
+        "object_expression_exact": 12,
+        "parse_valid": 12,
+        "raw_operation_field_populated": 12,
+        "safe_target_binding": 8,
+        "surface_action_exact": 9,
+        "tasks": 12
+      }
+    },
+    "by_regime_arm": {
+      "new:AMBIGUOUS": {
+        "applicable_rows": 0,
+        "authority_broadening": 0,
+        "canonical_operation_applicable": 0,
+        "canonical_operation_correct": 0,
+        "contract_valid": 2,
+        "failed_closed": 2,
+        "gross_energy_joules": {
+          "mean": 69.295,
+          "median": 69.295,
+          "total": 138.59
+        },
+        "latency_ms": {
+          "mean": 2350.3845,
+          "median": 2350.3845,
+          "p95": 2421.404
+        },
+        "normalization_decision_correct": 2,
+        "normalizer_ambiguous": 2,
+        "normalizer_normalized": 0,
+        "normalizer_unresolved": 0,
+        "object_expression_exact": 2,
+        "parse_valid": 2,
+        "raw_operation_field_populated": 2,
+        "safe_target_binding": 0,
+        "surface_action_exact": 0,
+        "tasks": 2
+      },
+      "new:DIRECT_AMEND": {
+        "applicable_rows": 1,
+        "authority_broadening": 0,
+        "canonical_operation_applicable": 1,
+        "canonical_operation_correct": 1,
+        "contract_valid": 1,
+        "failed_closed": 0,
+        "gross_energy_joules": {
+          "mean": 74.015,
+          "median": 74.015,
+          "total": 74.015
+        },
+        "latency_ms": {
+          "mean": 2330.812,
+          "median": 2330.812,
+          "p95": 2330.812
+        },
+        "normalization_decision_correct": 1,
+        "normalizer_ambiguous": 0,
+        "normalizer_normalized": 1,
+        "normalizer_unresolved": 0,
+        "object_expression_exact": 1,
+        "parse_valid": 1,
+        "raw_operation_field_populated": 1,
+        "safe_target_binding": 1,
+        "surface_action_exact": 1,
+        "tasks": 1
+      },
+      "new:DIRECT_DISPATCH": {
+        "applicable_rows": 1,
+        "authority_broadening": 0,
+        "canonical_operation_applicable": 1,
+        "canonical_operation_correct": 1,
+        "contract_valid": 1,
+        "failed_closed": 0,
+        "gross_energy_joules": {
+          "mean": 70.475,
+          "median": 70.475,
+          "total": 70.475
+        },
+        "latency_ms": {
+          "mean": 2314.43,
+          "median": 2314.43,
+          "p95": 2314.43
+        },
+        "normalization_decision_correct": 1,
+        "normalizer_ambiguous": 0,
+        "normalizer_normalized": 1,
+        "normalizer_unresolved": 0,
+        "object_expression_exact": 1,
+        "parse_valid": 1,
+        "raw_operation_field_populated": 1,
+        "safe_target_binding": 1,
+        "surface_action_exact": 1,
+        "tasks": 1
+      },
+      "new:DIRECT_INDEX": {
+        "applicable_rows": 1,
+        "authority_broadening": 0,
+        "canonical_operation_applicable": 1,
+        "canonical_operation_correct": 1,
+        "contract_valid": 1,
+        "failed_closed": 0,
+        "gross_energy_joules": {
+          "mean": 64.4425,
+          "median": 64.4425,
+          "total": 64.4425
+        },
+        "latency_ms": {
+          "mean": 2235.661,
+          "median": 2235.661,
+          "p95": 2235.661
+        },
+        "normalization_decision_correct": 1,
+        "normalizer_ambiguous": 0,
+        "normalizer_normalized": 1,
+        "normalizer_unresolved": 0,
+        "object_expression_exact": 1,
+        "parse_valid": 1,
+        "raw_operation_field_populated": 1,
+        "safe_target_binding": 1,
+        "surface_action_exact": 1,
+        "tasks": 1
+      },
+      "new:DIRECT_INSPECT": {
+        "applicable_rows": 1,
+        "authority_broadening": 0,
+        "canonical_operation_applicable": 1,
+        "canonical_operation_correct": 1,
+        "contract_valid": 1,
+        "failed_closed": 0,
+        "gross_energy_joules": {
+          "mean": 65.0225,
+          "median": 65.0225,
+          "total": 65.0225
+        },
+        "latency_ms": {
+          "mean": 2244.865,
+          "median": 2244.865,
+          "p95": 2244.865
+        },
+        "normalization_decision_correct": 1,
+        "normalizer_ambiguous": 0,
+        "normalizer_normalized": 1,
+        "normalizer_unresolved": 0,
+        "object_expression_exact": 1,
+        "parse_valid": 1,
+        "raw_operation_field_populated": 1,
+        "safe_target_binding": 1,
+        "surface_action_exact": 1,
+        "tasks": 1
+      },
+      "new:PRESENCE_OBSERVATION": {
+        "applicable_rows": 4,
+        "authority_broadening": 0,
+        "canonical_operation_applicable": 1,
+        "canonical_operation_correct": 1,
+        "contract_valid": 4,
+        "failed_closed": 0,
+        "gross_energy_joules": {
+          "mean": 74.044375,
+          "median": 72.42625000000001,
+          "total": 296.1775
+        },
+        "latency_ms": {
+          "mean": 2566.8554999999997,
+          "median": 2600.4494999999997,
+          "p95": 3003.363
+        },
+        "normalization_decision_correct": 1,
+        "normalizer_ambiguous": 0,
+        "normalizer_normalized": 1,
+        "normalizer_unresolved": 3,
+        "object_expression_exact": 3,
+        "parse_valid": 4,
+        "raw_operation_field_populated": 4,
+        "safe_target_binding": 1,
+        "surface_action_exact": 1,
+        "tasks": 4
+      },
+      "new:UNSUPPORTED": {
+        "applicable_rows": 0,
+        "authority_broadening": 0,
+        "canonical_operation_applicable": 0,
+        "canonical_operation_correct": 0,
+        "contract_valid": 2,
+        "failed_closed": 2,
+        "gross_energy_joules": {
+          "mean": 69.255,
+          "median": 69.255,
+          "total": 138.51
+        },
+        "latency_ms": {
+          "mean": 2364.4505,
+          "median": 2364.4505,
+          "p95": 2411.238
+        },
+        "normalization_decision_correct": 2,
+        "normalizer_ambiguous": 0,
+        "normalizer_normalized": 0,
+        "normalizer_unresolved": 2,
+        "object_expression_exact": 2,
+        "parse_valid": 2,
+        "raw_operation_field_populated": 2,
+        "safe_target_binding": 0,
+        "surface_action_exact": 2,
+        "tasks": 2
+      },
+      "old:AMBIGUOUS": {
+        "applicable_rows": 0,
+        "authority_broadening": 0,
+        "canonical_operation_applicable": 0,
+        "canonical_operation_correct": 0,
+        "contract_valid": 2,
+        "failed_closed": 2,
+        "gross_energy_joules": {
+          "mean": 63.56125,
+          "median": 63.56125,
+          "total": 127.1225
+        },
+        "latency_ms": {
+          "mean": 2134.61,
+          "median": 2134.61,
+          "p95": 2155.534
+        },
+        "normalization_decision_correct": 2,
+        "normalizer_ambiguous": 2,
+        "normalizer_normalized": 0,
+        "normalizer_unresolved": 0,
+        "object_expression_exact": 2,
+        "parse_valid": 2,
+        "raw_operation_field_populated": 2,
+        "safe_target_binding": 0,
+        "surface_action_exact": 0,
+        "tasks": 2
+      },
+      "old:DIRECT_AMEND": {
+        "applicable_rows": 1,
+        "authority_broadening": 0,
+        "canonical_operation_applicable": 1,
+        "canonical_operation_correct": 1,
+        "contract_valid": 1,
+        "failed_closed": 0,
+        "gross_energy_joules": {
+          "mean": 56.155,
+          "median": 56.155,
+          "total": 56.155
+        },
+        "latency_ms": {
+          "mean": 1997.874,
+          "median": 1997.874,
+          "p95": 1997.874
+        },
+        "normalization_decision_correct": 1,
+        "normalizer_ambiguous": 0,
+        "normalizer_normalized": 1,
+        "normalizer_unresolved": 0,
+        "object_expression_exact": 1,
+        "parse_valid": 1,
+        "raw_operation_field_populated": 1,
+        "safe_target_binding": 1,
+        "surface_action_exact": 1,
+        "tasks": 1
+      },
+      "old:DIRECT_DISPATCH": {
+        "applicable_rows": 1,
+        "authority_broadening": 0,
+        "canonical_operation_applicable": 1,
+        "canonical_operation_correct": 1,
+        "contract_valid": 1,
+        "failed_closed": 0,
+        "gross_energy_joules": {
+          "mean": 55.275,
+          "median": 55.275,
+          "total": 55.275
+        },
+        "latency_ms": {
+          "mean": 1922.466,
+          "median": 1922.466,
+          "p95": 1922.466
+        },
+        "normalization_decision_correct": 1,
+        "normalizer_ambiguous": 0,
+        "normalizer_normalized": 1,
+        "normalizer_unresolved": 0,
+        "object_expression_exact": 1,
+        "parse_valid": 1,
+        "raw_operation_field_populated": 1,
+        "safe_target_binding": 1,
+        "surface_action_exact": 1,
+        "tasks": 1
+      },
+      "old:DIRECT_INDEX": {
+        "applicable_rows": 1,
+        "authority_broadening": 0,
+        "canonical_operation_applicable": 1,
+        "canonical_operation_correct": 1,
+        "contract_valid": 1,
+        "failed_closed": 0,
+        "gross_energy_joules": {
+          "mean": 64.8275,
+          "median": 64.8275,
+          "total": 64.8275
+        },
+        "latency_ms": {
+          "mean": 2214.007,
+          "median": 2214.007,
+          "p95": 2214.007
+        },
+        "normalization_decision_correct": 1,
+        "normalizer_ambiguous": 0,
+        "normalizer_normalized": 1,
+        "normalizer_unresolved": 0,
+        "object_expression_exact": 1,
+        "parse_valid": 1,
+        "raw_operation_field_populated": 1,
+        "safe_target_binding": 1,
+        "surface_action_exact": 1,
+        "tasks": 1
+      },
+      "old:DIRECT_INSPECT": {
+        "applicable_rows": 1,
+        "authority_broadening": 0,
+        "canonical_operation_applicable": 1,
+        "canonical_operation_correct": 1,
+        "contract_valid": 1,
+        "failed_closed": 0,
+        "gross_energy_joules": {
+          "mean": 63.39,
+          "median": 63.39,
+          "total": 63.39
+        },
+        "latency_ms": {
+          "mean": 2198.01,
+          "median": 2198.01,
+          "p95": 2198.01
+        },
+        "normalization_decision_correct": 1,
+        "normalizer_ambiguous": 0,
+        "normalizer_normalized": 1,
+        "normalizer_unresolved": 0,
+        "object_expression_exact": 1,
+        "parse_valid": 1,
+        "raw_operation_field_populated": 1,
+        "safe_target_binding": 1,
+        "surface_action_exact": 1,
+        "tasks": 1
+      },
+      "old:PRESENCE_OBSERVATION": {
+        "applicable_rows": 4,
+        "authority_broadening": 0,
+        "canonical_operation_applicable": 4,
+        "canonical_operation_correct": 4,
+        "contract_valid": 4,
+        "failed_closed": 0,
+        "gross_energy_joules": {
+          "mean": 55.86625,
+          "median": 53.185,
+          "total": 223.465
+        },
+        "latency_ms": {
+          "mean": 2023.55825,
+          "median": 2024.403,
+          "p95": 2078.798
+        },
+        "normalization_decision_correct": 4,
+        "normalizer_ambiguous": 0,
+        "normalizer_normalized": 4,
+        "normalizer_unresolved": 0,
+        "object_expression_exact": 4,
+        "parse_valid": 4,
+        "raw_operation_field_populated": 4,
+        "safe_target_binding": 4,
+        "surface_action_exact": 3,
+        "tasks": 4
+      },
+      "old:UNSUPPORTED": {
+        "applicable_rows": 0,
+        "authority_broadening": 0,
+        "canonical_operation_applicable": 0,
+        "canonical_operation_correct": 0,
+        "contract_valid": 2,
+        "failed_closed": 2,
+        "gross_energy_joules": {
+          "mean": 55.69625,
+          "median": 55.69625,
+          "total": 111.3925
+        },
+        "latency_ms": {
+          "mean": 2018.011,
+          "median": 2018.011,
+          "p95": 2035.702
+        },
+        "normalization_decision_correct": 2,
+        "normalizer_ambiguous": 0,
+        "normalizer_normalized": 0,
+        "normalizer_unresolved": 2,
+        "object_expression_exact": 2,
+        "parse_valid": 2,
+        "raw_operation_field_populated": 2,
+        "safe_target_binding": 0,
+        "surface_action_exact": 2,
+        "tasks": 2
+      }
+    },
+    "deterministic_operation_derivation_possible": 12,
+    "external_calls": 0,
+    "model_calls": 24,
+    "next_decision": "OLD_ACTION_AS_EXPRESSION_PLUS_DETERMINISTIC_NORMALIZATION",
+    "paired": [
+      {
+        "new": {
+          "canonical_operation": null,
+          "canonical_operation_correct": false,
+          "contamination_classes": [
+            "TARGET_IN_OPERATION_FIELD"
+          ],
+          "normalization_decision_correct": false,
+          "normalizer_status": "UNRESOLVED",
+          "object_expression_exact": false,
+          "observed": {
+            "action_expression": "docs/attribution-presence-alpha.txt",
+            "object_expression": "exists in the current tree"
+          },
+          "safe_target_binding": false
+        },
+        "old": {
+          "canonical_operation": "observe_presence",
+          "canonical_operation_correct": true,
+          "contamination_classes": [
+            "STATE_PHRASE_IN_OPERATION_FIELD"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "NORMALIZED",
+          "object_expression_exact": true,
+          "observed": {
+            "action": "exists",
+            "object_expression": "docs/attribution-presence-alpha.txt"
+          },
+          "safe_target_binding": true
+        },
+        "regime": "PRESENCE_OBSERVATION",
+        "task_id": "attr-holdout-001"
+      },
+      {
+        "new": {
+          "canonical_operation": null,
+          "canonical_operation_correct": false,
+          "contamination_classes": [
+            "TARGET_IN_OPERATION_FIELD",
+            "STATE_PHRASE_IN_OPERATION_FIELD"
+          ],
+          "normalization_decision_correct": false,
+          "normalizer_status": "UNRESOLVED",
+          "object_expression_exact": true,
+          "observed": {
+            "action_expression": "Check if docs/attribution-presence-beta.txt is present",
+            "object_expression": "docs/attribution-presence-beta.txt"
+          },
+          "safe_target_binding": false
+        },
+        "old": {
+          "canonical_operation": "observe_presence",
+          "canonical_operation_correct": true,
+          "contamination_classes": [
+            "OTHER"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "NORMALIZED",
+          "object_expression_exact": true,
+          "observed": {
+            "action": "check",
+            "object_expression": "docs/attribution-presence-beta.txt"
+          },
+          "safe_target_binding": true
+        },
+        "regime": "PRESENCE_OBSERVATION",
+        "task_id": "attr-holdout-002"
+      },
+      {
+        "new": {
+          "canonical_operation": "observe_presence",
+          "canonical_operation_correct": true,
+          "contamination_classes": [
+            "OTHER"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "NORMALIZED",
+          "object_expression_exact": true,
+          "observed": {
+            "action_expression": "verify",
+            "object_expression": "docs/attribution-presence-gamma.txt"
+          },
+          "safe_target_binding": true
+        },
+        "old": {
+          "canonical_operation": "observe_presence",
+          "canonical_operation_correct": true,
+          "contamination_classes": [
+            "OTHER"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "NORMALIZED",
+          "object_expression_exact": true,
+          "observed": {
+            "action": "verify",
+            "object_expression": "docs/attribution-presence-gamma.txt"
+          },
+          "safe_target_binding": true
+        },
+        "regime": "PRESENCE_OBSERVATION",
+        "task_id": "attr-holdout-003"
+      },
+      {
+        "new": {
+          "canonical_operation": null,
+          "canonical_operation_correct": false,
+          "contamination_classes": [
+            "TARGET_IN_OPERATION_FIELD",
+            "STATE_PHRASE_IN_OPERATION_FIELD"
+          ],
+          "normalization_decision_correct": false,
+          "normalizer_status": "UNRESOLVED",
+          "object_expression_exact": true,
+          "observed": {
+            "action_expression": "Confirm whether docs/attribution-presence-delta.txt exists",
+            "object_expression": "docs/attribution-presence-delta.txt"
+          },
+          "safe_target_binding": false
+        },
+        "old": {
+          "canonical_operation": "observe_presence",
+          "canonical_operation_correct": true,
+          "contamination_classes": [
+            "OTHER"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "NORMALIZED",
+          "object_expression_exact": true,
+          "observed": {
+            "action": "confirm",
+            "object_expression": "docs/attribution-presence-delta.txt"
+          },
+          "safe_target_binding": true
+        },
+        "regime": "PRESENCE_OBSERVATION",
+        "task_id": "attr-holdout-004"
+      },
+      {
+        "new": {
+          "canonical_operation": "inspect",
+          "canonical_operation_correct": true,
+          "contamination_classes": [
+            "OTHER"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "NORMALIZED",
+          "object_expression_exact": true,
+          "observed": {
+            "action_expression": "inspect",
+            "object_expression": "docs/attribution-control-epsilon.md"
+          },
+          "safe_target_binding": true
+        },
+        "old": {
+          "canonical_operation": "inspect",
+          "canonical_operation_correct": true,
+          "contamination_classes": [
+            "OTHER"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "NORMALIZED",
+          "object_expression_exact": true,
+          "observed": {
+            "action": "inspect",
+            "object_expression": "docs/attribution-control-epsilon.md"
+          },
+          "safe_target_binding": true
+        },
+        "regime": "DIRECT_INSPECT",
+        "task_id": "attr-holdout-005"
+      },
+      {
+        "new": {
+          "canonical_operation": "amend",
+          "canonical_operation_correct": true,
+          "contamination_classes": [
+            "OTHER"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "NORMALIZED",
+          "object_expression_exact": true,
+          "observed": {
+            "action_expression": "Amend",
+            "object_expression": "docs/attribution-control-zeta.md"
+          },
+          "safe_target_binding": true
+        },
+        "old": {
+          "canonical_operation": "amend",
+          "canonical_operation_correct": true,
+          "contamination_classes": [
+            "OTHER"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "NORMALIZED",
+          "object_expression_exact": true,
+          "observed": {
+            "action": "Amend",
+            "object_expression": "docs/attribution-control-zeta.md"
+          },
+          "safe_target_binding": true
+        },
+        "regime": "DIRECT_AMEND",
+        "task_id": "attr-holdout-006"
+      },
+      {
+        "new": {
+          "canonical_operation": "index",
+          "canonical_operation_correct": true,
+          "contamination_classes": [
+            "OTHER"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "NORMALIZED",
+          "object_expression_exact": true,
+          "observed": {
+            "action_expression": "Index",
+            "object_expression": "docs/attribution-control-eta.md"
+          },
+          "safe_target_binding": true
+        },
+        "old": {
+          "canonical_operation": "index",
+          "canonical_operation_correct": true,
+          "contamination_classes": [
+            "OTHER"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "NORMALIZED",
+          "object_expression_exact": true,
+          "observed": {
+            "action": "Index",
+            "object_expression": "docs/attribution-control-eta.md"
+          },
+          "safe_target_binding": true
+        },
+        "regime": "DIRECT_INDEX",
+        "task_id": "attr-holdout-007"
+      },
+      {
+        "new": {
+          "canonical_operation": "dispatch",
+          "canonical_operation_correct": true,
+          "contamination_classes": [
+            "OTHER"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "NORMALIZED",
+          "object_expression_exact": true,
+          "observed": {
+            "action_expression": "dispatch",
+            "object_expression": "docs/attribution-control-theta.md"
+          },
+          "safe_target_binding": true
+        },
+        "old": {
+          "canonical_operation": "dispatch",
+          "canonical_operation_correct": true,
+          "contamination_classes": [
+            "OTHER"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "NORMALIZED",
+          "object_expression_exact": true,
+          "observed": {
+            "action": "Dispatch",
+            "object_expression": "docs/attribution-control-theta.md"
+          },
+          "safe_target_binding": true
+        },
+        "regime": "DIRECT_DISPATCH",
+        "task_id": "attr-holdout-008"
+      },
+      {
+        "new": {
+          "canonical_operation": null,
+          "canonical_operation_correct": false,
+          "contamination_classes": [
+            "AMBIGUOUS_OPERATION"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "AMBIGUOUS",
+          "object_expression_exact": true,
+          "observed": {
+            "action_expression": "Check and inspect",
+            "object_expression": "docs/attribution-ambiguous-iota.md"
+          },
+          "safe_target_binding": false
+        },
+        "old": {
+          "canonical_operation": null,
+          "canonical_operation_correct": false,
+          "contamination_classes": [
+            "AMBIGUOUS_OPERATION"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "AMBIGUOUS",
+          "object_expression_exact": true,
+          "observed": {
+            "action": "Check and inspect",
+            "object_expression": "docs/attribution-ambiguous-iota.md"
+          },
+          "safe_target_binding": false
+        },
+        "regime": "AMBIGUOUS",
+        "task_id": "attr-holdout-009"
+      },
+      {
+        "new": {
+          "canonical_operation": null,
+          "canonical_operation_correct": false,
+          "contamination_classes": [
+            "AMBIGUOUS_OPERATION"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "AMBIGUOUS",
+          "object_expression_exact": true,
+          "observed": {
+            "action_expression": "Verify or confirm",
+            "object_expression": "docs/attribution-ambiguous-kappa.md"
+          },
+          "safe_target_binding": false
+        },
+        "old": {
+          "canonical_operation": null,
+          "canonical_operation_correct": false,
+          "contamination_classes": [
+            "AMBIGUOUS_OPERATION"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "AMBIGUOUS",
+          "object_expression_exact": true,
+          "observed": {
+            "action": "verify or confirm",
+            "object_expression": "docs/attribution-ambiguous-kappa.md"
+          },
+          "safe_target_binding": false
+        },
+        "regime": "AMBIGUOUS",
+        "task_id": "attr-holdout-010"
+      },
+      {
+        "new": {
+          "canonical_operation": null,
+          "canonical_operation_correct": false,
+          "contamination_classes": [
+            "UNSUPPORTED_OPERATION"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "UNRESOLVED",
+          "object_expression_exact": true,
+          "observed": {
+            "action_expression": "Archive",
+            "object_expression": "docs/attribution-unsupported-lambda.md"
+          },
+          "safe_target_binding": false
+        },
+        "old": {
+          "canonical_operation": null,
+          "canonical_operation_correct": false,
+          "contamination_classes": [
+            "UNSUPPORTED_OPERATION"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "UNRESOLVED",
+          "object_expression_exact": true,
+          "observed": {
+            "action": "Archive",
+            "object_expression": "docs/attribution-unsupported-lambda.md"
+          },
+          "safe_target_binding": false
+        },
+        "regime": "UNSUPPORTED",
+        "task_id": "attr-holdout-011"
+      },
+      {
+        "new": {
+          "canonical_operation": null,
+          "canonical_operation_correct": false,
+          "contamination_classes": [
+            "UNSUPPORTED_OPERATION"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "UNRESOLVED",
+          "object_expression_exact": true,
+          "observed": {
+            "action_expression": "delete",
+            "object_expression": "docs/attribution-unsupported-mu.md"
+          },
+          "safe_target_binding": false
+        },
+        "old": {
+          "canonical_operation": null,
+          "canonical_operation_correct": false,
+          "contamination_classes": [
+            "UNSUPPORTED_OPERATION"
+          ],
+          "normalization_decision_correct": true,
+          "normalizer_status": "UNRESOLVED",
+          "object_expression_exact": true,
+          "observed": {
+            "action": "delete",
+            "object_expression": "docs/attribution-unsupported-mu.md"
+          },
+          "safe_target_binding": false
+        },
+        "regime": "UNSUPPORTED",
+        "task_id": "attr-holdout-012"
+      }
+    ],
+    "qualification_change": false,
+    "retries": 0,
+    "schema": "zth_action_interface_attribution_aggregate_v0",
+    "teacher_calls": 0,
+    "tool_calls": 0
+  },
+  "closeout_driver_sha256": "e47673dfd8c995a5a669e666d75441e4ea0735cf6e9fa2894b231545bcb81082",
+  "execution_driver_sha256": "07d538916ff2c5cec521d6045bb861c4ea38bf4fa242df36866e471fc5c5213f",
+  "historical_normalization_run_driver_sha256": "8310757cc688ba451879336cb7f67f9a11a2b1e428e9450b452372f4711a5d88",
+  "qualification_change": false,
+  "rows": [
+    {
+      "arm": "old",
+      "authority_broadening": false,
+      "canonical_operation_correct": true,
+      "contamination_classes": [
+        "STATE_PHRASE_IN_OPERATION_FIELD"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": "determine",
+      "failed_closed": false,
+      "gross_energy_joules": 54.1575,
+      "latency_ms": 2078.798,
+      "normalization_context": "PRESENCE_OBSERVATION_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "exists",
+        "canonical_operation": "observe_presence",
+        "reason": "The state predicate reports the same bounded presence fact; it is not treated as the authority token.",
+        "rule_id": "presence_exists_state_predicate",
+        "status": "NORMALIZED"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action": "exists",
+        "object_expression": "docs/attribution-presence-alpha.txt"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "dc6a65cd908dbf6caf0c0a631e3cd34719da8f47278ca5d84c961cfb0267d3f8",
+      "raw_operation_field_populated": true,
+      "regime": "PRESENCE_OBSERVATION",
+      "request": "Determine whether docs/attribution-presence-alpha.txt exists in the current tree.",
+      "response_sha256": "4766e89da143584775f243f122b203f5d01cfeeb39f3750d820c6203fff59294",
+      "safe_target_binding": true,
+      "schema_sha256": "05d1be58afd503dcf8af276b2181e44631bf57f6935b9acce4e9dadcd5f88843",
+      "surface_action_exact": false,
+      "task_id": "attr-holdout-001"
+    },
+    {
+      "arm": "new",
+      "authority_broadening": false,
+      "canonical_operation_correct": false,
+      "contamination_classes": [
+        "TARGET_IN_OPERATION_FIELD"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": "determine",
+      "failed_closed": false,
+      "gross_energy_joules": 70.985,
+      "latency_ms": 2499.243,
+      "normalization_context": "PRESENCE_OBSERVATION_CONTEXT",
+      "normalization_decision_correct": false,
+      "normalizer": {
+        "action_expression": "docs/attribution-presence-alpha.txt",
+        "canonical_operation": null,
+        "reason": "no exact frozen rule or unknown request context",
+        "rule_id": null,
+        "status": "UNRESOLVED"
+      },
+      "object_expression_exact": false,
+      "observed": {
+        "action_expression": "docs/attribution-presence-alpha.txt",
+        "object_expression": "exists in the current tree"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "6c1a4d4a75fdaf19a3c64f81b0b710ed2d67c867ad54f8f0e66b89e7768792a2",
+      "raw_operation_field_populated": true,
+      "regime": "PRESENCE_OBSERVATION",
+      "request": "Determine whether docs/attribution-presence-alpha.txt exists in the current tree.",
+      "response_sha256": "6346d0460a25b1085b36b4192297648db5ecf21dfcfc60f444b36f139b521492",
+      "safe_target_binding": false,
+      "schema_sha256": "7772b2956cf0d0874000ee0fd96f1265067ec4df80a6e760208981e0e84d5ef6",
+      "surface_action_exact": false,
+      "task_id": "attr-holdout-001"
+    },
+    {
+      "arm": "old",
+      "authority_broadening": false,
+      "canonical_operation_correct": true,
+      "contamination_classes": [
+        "OTHER"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": "check",
+      "failed_closed": false,
+      "gross_energy_joules": 51.975,
+      "latency_ms": 1966.629,
+      "normalization_context": "PRESENCE_OBSERVATION_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "check",
+        "canonical_operation": "observe_presence",
+        "reason": "A bounded check for target presence is the same downstream observation.",
+        "rule_id": "presence_check",
+        "status": "NORMALIZED"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action": "check",
+        "object_expression": "docs/attribution-presence-beta.txt"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "5a615df41c883050bcb030e2ff26debc80ee9f54c190dcb2f434c08f18ba9c93",
+      "raw_operation_field_populated": true,
+      "regime": "PRESENCE_OBSERVATION",
+      "request": "Check if docs/attribution-presence-beta.txt is present right now.",
+      "response_sha256": "9574c39d20a720caaa60133c6a69bf3c6dab8bf59e56a2130de16c934fc45187",
+      "safe_target_binding": true,
+      "schema_sha256": "05d1be58afd503dcf8af276b2181e44631bf57f6935b9acce4e9dadcd5f88843",
+      "surface_action_exact": true,
+      "task_id": "attr-holdout-002"
+    },
+    {
+      "arm": "new",
+      "authority_broadening": false,
+      "canonical_operation_correct": false,
+      "contamination_classes": [
+        "TARGET_IN_OPERATION_FIELD",
+        "STATE_PHRASE_IN_OPERATION_FIELD"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": "check",
+      "failed_closed": false,
+      "gross_energy_joules": 73.8675,
+      "latency_ms": 2701.656,
+      "normalization_context": "PRESENCE_OBSERVATION_CONTEXT",
+      "normalization_decision_correct": false,
+      "normalizer": {
+        "action_expression": "Check if docs/attribution-presence-beta.txt is present",
+        "canonical_operation": null,
+        "reason": "no exact frozen rule or unknown request context",
+        "rule_id": null,
+        "status": "UNRESOLVED"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action_expression": "Check if docs/attribution-presence-beta.txt is present",
+        "object_expression": "docs/attribution-presence-beta.txt"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "e654710de5af7c7b936f4b5e628ae76a0220c625132a60dcc8138889f24896c7",
+      "raw_operation_field_populated": true,
+      "regime": "PRESENCE_OBSERVATION",
+      "request": "Check if docs/attribution-presence-beta.txt is present right now.",
+      "response_sha256": "6ef1068b8cd07d6256c6fe4f303b4f9464ac81bea8b93ebd0d8753d212659671",
+      "safe_target_binding": false,
+      "schema_sha256": "7772b2956cf0d0874000ee0fd96f1265067ec4df80a6e760208981e0e84d5ef6",
+      "surface_action_exact": false,
+      "task_id": "attr-holdout-002"
+    },
+    {
+      "arm": "old",
+      "authority_broadening": false,
+      "canonical_operation_correct": true,
+      "contamination_classes": [
+        "OTHER"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": "verify",
+      "failed_closed": false,
+      "gross_energy_joules": 65.12,
+      "latency_ms": 2030.861,
+      "normalization_context": "PRESENCE_OBSERVATION_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "verify",
+        "canonical_operation": "observe_presence",
+        "reason": "A bounded verification of target presence is the same downstream observation.",
+        "rule_id": "presence_verify",
+        "status": "NORMALIZED"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action": "verify",
+        "object_expression": "docs/attribution-presence-gamma.txt"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "be2938ddfe8b194134d6a4faf024e7b8fe71c04db1950ec998661a8b66787abd",
+      "raw_operation_field_populated": true,
+      "regime": "PRESENCE_OBSERVATION",
+      "request": "Verify that docs/attribution-presence-gamma.txt can be found in the repository.",
+      "response_sha256": "a0ecc6ca65ea8e44850a6f44231c45f49d6fcfb082ecbeb50bce6f12ead356e6",
+      "safe_target_binding": true,
+      "schema_sha256": "05d1be58afd503dcf8af276b2181e44631bf57f6935b9acce4e9dadcd5f88843",
+      "surface_action_exact": true,
+      "task_id": "attr-holdout-003"
+    },
+    {
+      "arm": "new",
+      "authority_broadening": false,
+      "canonical_operation_correct": true,
+      "contamination_classes": [
+        "OTHER"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": "verify",
+      "failed_closed": false,
+      "gross_energy_joules": 63.605,
+      "latency_ms": 2063.16,
+      "normalization_context": "PRESENCE_OBSERVATION_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "verify",
+        "canonical_operation": "observe_presence",
+        "reason": "A bounded verification of target presence is the same downstream observation.",
+        "rule_id": "presence_verify",
+        "status": "NORMALIZED"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action_expression": "verify",
+        "object_expression": "docs/attribution-presence-gamma.txt"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "2a6a13538d93d70ca0496aa906ede359e3caf78d0141faf4203b1671a9184802",
+      "raw_operation_field_populated": true,
+      "regime": "PRESENCE_OBSERVATION",
+      "request": "Verify that docs/attribution-presence-gamma.txt can be found in the repository.",
+      "response_sha256": "42a7de157c2c2aa2dfcf19aabb898dba8a508a92b379511df77b559d6fa2718c",
+      "safe_target_binding": true,
+      "schema_sha256": "7772b2956cf0d0874000ee0fd96f1265067ec4df80a6e760208981e0e84d5ef6",
+      "surface_action_exact": true,
+      "task_id": "attr-holdout-003"
+    },
+    {
+      "arm": "old",
+      "authority_broadening": false,
+      "canonical_operation_correct": true,
+      "contamination_classes": [
+        "OTHER"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": "confirm",
+      "failed_closed": false,
+      "gross_energy_joules": 52.2125,
+      "latency_ms": 2017.945,
+      "normalization_context": "PRESENCE_OBSERVATION_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "confirm",
+        "canonical_operation": "observe_presence",
+        "reason": "A bounded confirmation of target presence is the same downstream observation.",
+        "rule_id": "presence_confirm",
+        "status": "NORMALIZED"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action": "confirm",
+        "object_expression": "docs/attribution-presence-delta.txt"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "6a9058caeb8e97badd13f17604c5a0bb28636565d8d9e21438e293db233a3332",
+      "raw_operation_field_populated": true,
+      "regime": "PRESENCE_OBSERVATION",
+      "request": "Confirm whether docs/attribution-presence-delta.txt exists at this time.",
+      "response_sha256": "5d93e728c93c1dd05bd6e2ed9d9d1cd36ddd8275bdd29ee3cb8335ab60e15367",
+      "safe_target_binding": true,
+      "schema_sha256": "05d1be58afd503dcf8af276b2181e44631bf57f6935b9acce4e9dadcd5f88843",
+      "surface_action_exact": true,
+      "task_id": "attr-holdout-004"
+    },
+    {
+      "arm": "new",
+      "authority_broadening": false,
+      "canonical_operation_correct": false,
+      "contamination_classes": [
+        "TARGET_IN_OPERATION_FIELD",
+        "STATE_PHRASE_IN_OPERATION_FIELD"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": "confirm",
+      "failed_closed": false,
+      "gross_energy_joules": 87.72,
+      "latency_ms": 3003.363,
+      "normalization_context": "PRESENCE_OBSERVATION_CONTEXT",
+      "normalization_decision_correct": false,
+      "normalizer": {
+        "action_expression": "Confirm whether docs/attribution-presence-delta.txt exists",
+        "canonical_operation": null,
+        "reason": "no exact frozen rule or unknown request context",
+        "rule_id": null,
+        "status": "UNRESOLVED"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action_expression": "Confirm whether docs/attribution-presence-delta.txt exists",
+        "object_expression": "docs/attribution-presence-delta.txt"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "1803441ab82fb38d1952fdb53f1244fa01acf07f878ee9ecbf5456c5763bce53",
+      "raw_operation_field_populated": true,
+      "regime": "PRESENCE_OBSERVATION",
+      "request": "Confirm whether docs/attribution-presence-delta.txt exists at this time.",
+      "response_sha256": "0498e844cf96dc08c8b18b6c1ff9531dd07531bdbc545bf7cc567252ce9eca5a",
+      "safe_target_binding": false,
+      "schema_sha256": "7772b2956cf0d0874000ee0fd96f1265067ec4df80a6e760208981e0e84d5ef6",
+      "surface_action_exact": false,
+      "task_id": "attr-holdout-004"
+    },
+    {
+      "arm": "old",
+      "authority_broadening": false,
+      "canonical_operation_correct": true,
+      "contamination_classes": [
+        "OTHER"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": "inspect",
+      "failed_closed": false,
+      "gross_energy_joules": 63.39,
+      "latency_ms": 2198.01,
+      "normalization_context": "DIRECT_OPERATION_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "inspect",
+        "canonical_operation": "inspect",
+        "reason": "Inspect remains a distinct direct operation.",
+        "rule_id": "direct_inspect",
+        "status": "NORMALIZED"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action": "inspect",
+        "object_expression": "docs/attribution-control-epsilon.md"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "65dca8ed74b593cb1f5dc40b03acd087ba949c3afe2109e156a48ac5ca792378",
+      "raw_operation_field_populated": true,
+      "regime": "DIRECT_INSPECT",
+      "request": "Inspect docs/attribution-control-epsilon.md.",
+      "response_sha256": "7390f1a0cf0b8ad4e0406cb726b0b8eb4cf8e437974144ad50d3607af528a32e",
+      "safe_target_binding": true,
+      "schema_sha256": "05d1be58afd503dcf8af276b2181e44631bf57f6935b9acce4e9dadcd5f88843",
+      "surface_action_exact": true,
+      "task_id": "attr-holdout-005"
+    },
+    {
+      "arm": "new",
+      "authority_broadening": false,
+      "canonical_operation_correct": true,
+      "contamination_classes": [
+        "OTHER"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": "inspect",
+      "failed_closed": false,
+      "gross_energy_joules": 65.0225,
+      "latency_ms": 2244.865,
+      "normalization_context": "DIRECT_OPERATION_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "inspect",
+        "canonical_operation": "inspect",
+        "reason": "Inspect remains a distinct direct operation.",
+        "rule_id": "direct_inspect",
+        "status": "NORMALIZED"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action_expression": "inspect",
+        "object_expression": "docs/attribution-control-epsilon.md"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "691e3dc3cd1132bfcf5d97cf883010f51473522d37ba84bbae7f8bee9eba284b",
+      "raw_operation_field_populated": true,
+      "regime": "DIRECT_INSPECT",
+      "request": "Inspect docs/attribution-control-epsilon.md.",
+      "response_sha256": "cd0b2e28e4ed64530829993bfbbb420eeff023f9ea3e76ef0d8ac563c036b3d7",
+      "safe_target_binding": true,
+      "schema_sha256": "7772b2956cf0d0874000ee0fd96f1265067ec4df80a6e760208981e0e84d5ef6",
+      "surface_action_exact": true,
+      "task_id": "attr-holdout-005"
+    },
+    {
+      "arm": "old",
+      "authority_broadening": false,
+      "canonical_operation_correct": true,
+      "contamination_classes": [
+        "OTHER"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": "amend",
+      "failed_closed": false,
+      "gross_energy_joules": 56.155,
+      "latency_ms": 1997.874,
+      "normalization_context": "DIRECT_OPERATION_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "Amend",
+        "canonical_operation": "amend",
+        "reason": "Amend remains a distinct direct operation.",
+        "rule_id": "direct_amend",
+        "status": "NORMALIZED"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action": "Amend",
+        "object_expression": "docs/attribution-control-zeta.md"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "0c959bb4db5906c3512f4c1a0c4d0ce814f9d69f64f326b8e756f20cec1c5336",
+      "raw_operation_field_populated": true,
+      "regime": "DIRECT_AMEND",
+      "request": "Amend docs/attribution-control-zeta.md.",
+      "response_sha256": "67d58f4420a24631d4f1e9c9ae8f877306b24ab294a22825aeb665613226e4e0",
+      "safe_target_binding": true,
+      "schema_sha256": "05d1be58afd503dcf8af276b2181e44631bf57f6935b9acce4e9dadcd5f88843",
+      "surface_action_exact": true,
+      "task_id": "attr-holdout-006"
+    },
+    {
+      "arm": "new",
+      "authority_broadening": false,
+      "canonical_operation_correct": true,
+      "contamination_classes": [
+        "OTHER"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": "amend",
+      "failed_closed": false,
+      "gross_energy_joules": 74.015,
+      "latency_ms": 2330.812,
+      "normalization_context": "DIRECT_OPERATION_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "Amend",
+        "canonical_operation": "amend",
+        "reason": "Amend remains a distinct direct operation.",
+        "rule_id": "direct_amend",
+        "status": "NORMALIZED"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action_expression": "Amend",
+        "object_expression": "docs/attribution-control-zeta.md"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "33d472c33c469902f0ec1b80c8cbbce5331869c689b2517115a984bd15d42698",
+      "raw_operation_field_populated": true,
+      "regime": "DIRECT_AMEND",
+      "request": "Amend docs/attribution-control-zeta.md.",
+      "response_sha256": "f305ad739ec25462cf0ec454ed66ad02d5a31e12718391411942cf4ddead80d1",
+      "safe_target_binding": true,
+      "schema_sha256": "7772b2956cf0d0874000ee0fd96f1265067ec4df80a6e760208981e0e84d5ef6",
+      "surface_action_exact": true,
+      "task_id": "attr-holdout-006"
+    },
+    {
+      "arm": "old",
+      "authority_broadening": false,
+      "canonical_operation_correct": true,
+      "contamination_classes": [
+        "OTHER"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": "index",
+      "failed_closed": false,
+      "gross_energy_joules": 64.8275,
+      "latency_ms": 2214.007,
+      "normalization_context": "DIRECT_OPERATION_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "Index",
+        "canonical_operation": "index",
+        "reason": "Index remains a distinct direct operation.",
+        "rule_id": "direct_index",
+        "status": "NORMALIZED"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action": "Index",
+        "object_expression": "docs/attribution-control-eta.md"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "444c557d6953c0def5a621fc2113d580bd94ab77579b47f4fc28c15b3fbc193b",
+      "raw_operation_field_populated": true,
+      "regime": "DIRECT_INDEX",
+      "request": "Index docs/attribution-control-eta.md.",
+      "response_sha256": "c44a5e1b3d868b704cf48135bceb0d1ba698be475be9acb81c61050b309fb1ee",
+      "safe_target_binding": true,
+      "schema_sha256": "05d1be58afd503dcf8af276b2181e44631bf57f6935b9acce4e9dadcd5f88843",
+      "surface_action_exact": true,
+      "task_id": "attr-holdout-007"
+    },
+    {
+      "arm": "new",
+      "authority_broadening": false,
+      "canonical_operation_correct": true,
+      "contamination_classes": [
+        "OTHER"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": "index",
+      "failed_closed": false,
+      "gross_energy_joules": 64.4425,
+      "latency_ms": 2235.661,
+      "normalization_context": "DIRECT_OPERATION_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "Index",
+        "canonical_operation": "index",
+        "reason": "Index remains a distinct direct operation.",
+        "rule_id": "direct_index",
+        "status": "NORMALIZED"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action_expression": "Index",
+        "object_expression": "docs/attribution-control-eta.md"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "aa6779d0eefb030e6c644ecbeb21e829163208bba007b92364112e6c405d438a",
+      "raw_operation_field_populated": true,
+      "regime": "DIRECT_INDEX",
+      "request": "Index docs/attribution-control-eta.md.",
+      "response_sha256": "dad0729eeaa73ea9f72dfc23aa6d9f7b8390fdbff5b2b973363ae3d99f447129",
+      "safe_target_binding": true,
+      "schema_sha256": "7772b2956cf0d0874000ee0fd96f1265067ec4df80a6e760208981e0e84d5ef6",
+      "surface_action_exact": true,
+      "task_id": "attr-holdout-007"
+    },
+    {
+      "arm": "old",
+      "authority_broadening": false,
+      "canonical_operation_correct": true,
+      "contamination_classes": [
+        "OTHER"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": "dispatch",
+      "failed_closed": false,
+      "gross_energy_joules": 55.275,
+      "latency_ms": 1922.466,
+      "normalization_context": "DIRECT_OPERATION_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "Dispatch",
+        "canonical_operation": "dispatch",
+        "reason": "Dispatch remains a distinct direct operation.",
+        "rule_id": "direct_dispatch",
+        "status": "NORMALIZED"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action": "Dispatch",
+        "object_expression": "docs/attribution-control-theta.md"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "a861139ff82015fff961cfef9b4481bead639ecc18f065f6d200cb0fa1206fbb",
+      "raw_operation_field_populated": true,
+      "regime": "DIRECT_DISPATCH",
+      "request": "Dispatch docs/attribution-control-theta.md.",
+      "response_sha256": "c897eea20a47c58b43a6fbd38fde83dd55c8dfff64ea90a816daa57b11ba518e",
+      "safe_target_binding": true,
+      "schema_sha256": "05d1be58afd503dcf8af276b2181e44631bf57f6935b9acce4e9dadcd5f88843",
+      "surface_action_exact": true,
+      "task_id": "attr-holdout-008"
+    },
+    {
+      "arm": "new",
+      "authority_broadening": false,
+      "canonical_operation_correct": true,
+      "contamination_classes": [
+        "OTHER"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": "dispatch",
+      "failed_closed": false,
+      "gross_energy_joules": 70.475,
+      "latency_ms": 2314.43,
+      "normalization_context": "DIRECT_OPERATION_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "dispatch",
+        "canonical_operation": "dispatch",
+        "reason": "Dispatch remains a distinct direct operation.",
+        "rule_id": "direct_dispatch",
+        "status": "NORMALIZED"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action_expression": "dispatch",
+        "object_expression": "docs/attribution-control-theta.md"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "bc70f529d5623139e32f0e13fd3a974de6973abe1bd53da1f288abecc71db0af",
+      "raw_operation_field_populated": true,
+      "regime": "DIRECT_DISPATCH",
+      "request": "Dispatch docs/attribution-control-theta.md.",
+      "response_sha256": "d1e998dafd389ef491a1ec0b5a4e8585b71911bebd9e9e92ccefedd4d5efee8c",
+      "safe_target_binding": true,
+      "schema_sha256": "7772b2956cf0d0874000ee0fd96f1265067ec4df80a6e760208981e0e84d5ef6",
+      "surface_action_exact": true,
+      "task_id": "attr-holdout-008"
+    },
+    {
+      "arm": "old",
+      "authority_broadening": false,
+      "canonical_operation_correct": false,
+      "contamination_classes": [
+        "AMBIGUOUS_OPERATION"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": null,
+      "failed_closed": true,
+      "gross_energy_joules": 63.74,
+      "latency_ms": 2155.534,
+      "normalization_context": "AMBIGUOUS_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "Check and inspect",
+        "canonical_operation": null,
+        "reason": "expression names multiple operations",
+        "rule_id": null,
+        "status": "AMBIGUOUS"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action": "Check and inspect",
+        "object_expression": "docs/attribution-ambiguous-iota.md"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "91971c60ac16df43310382edba1a316554bb4d035e882792945312aeca47228e",
+      "raw_operation_field_populated": true,
+      "regime": "AMBIGUOUS",
+      "request": "Check and inspect docs/attribution-ambiguous-iota.md.",
+      "response_sha256": "badcfa52ce33ade3cf24ff2f4b9a1c04346346f72d63418e3f82b2bd5158cbdc",
+      "safe_target_binding": false,
+      "schema_sha256": "05d1be58afd503dcf8af276b2181e44631bf57f6935b9acce4e9dadcd5f88843",
+      "surface_action_exact": false,
+      "task_id": "attr-holdout-009"
+    },
+    {
+      "arm": "new",
+      "authority_broadening": false,
+      "canonical_operation_correct": false,
+      "contamination_classes": [
+        "AMBIGUOUS_OPERATION"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": null,
+      "failed_closed": true,
+      "gross_energy_joules": 69.26,
+      "latency_ms": 2421.404,
+      "normalization_context": "AMBIGUOUS_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "Check and inspect",
+        "canonical_operation": null,
+        "reason": "expression names multiple operations",
+        "rule_id": null,
+        "status": "AMBIGUOUS"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action_expression": "Check and inspect",
+        "object_expression": "docs/attribution-ambiguous-iota.md"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "304a41e19d79e6b83fb7fddd73b35c0b634238b8912e93b9fec262dfa9d8ba1e",
+      "raw_operation_field_populated": true,
+      "regime": "AMBIGUOUS",
+      "request": "Check and inspect docs/attribution-ambiguous-iota.md.",
+      "response_sha256": "f6449af3f307e0da295270feca66cd985d8f9f865400b4518d722ca91d2df310",
+      "safe_target_binding": false,
+      "schema_sha256": "7772b2956cf0d0874000ee0fd96f1265067ec4df80a6e760208981e0e84d5ef6",
+      "surface_action_exact": false,
+      "task_id": "attr-holdout-009"
+    },
+    {
+      "arm": "old",
+      "authority_broadening": false,
+      "canonical_operation_correct": false,
+      "contamination_classes": [
+        "AMBIGUOUS_OPERATION"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": null,
+      "failed_closed": true,
+      "gross_energy_joules": 63.3825,
+      "latency_ms": 2113.686,
+      "normalization_context": "AMBIGUOUS_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "verify or confirm",
+        "canonical_operation": null,
+        "reason": "expression names multiple operations",
+        "rule_id": null,
+        "status": "AMBIGUOUS"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action": "verify or confirm",
+        "object_expression": "docs/attribution-ambiguous-kappa.md"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "dce4fd8664c6377c2664b59c4a912649988b8a3d121aedc6f3a5fb55a49973d6",
+      "raw_operation_field_populated": true,
+      "regime": "AMBIGUOUS",
+      "request": "Verify or confirm docs/attribution-ambiguous-kappa.md.",
+      "response_sha256": "a3d506893b82913e2983f9da3f249a5a4d7b40920fb98a7a095b1be7c21461bb",
+      "safe_target_binding": false,
+      "schema_sha256": "05d1be58afd503dcf8af276b2181e44631bf57f6935b9acce4e9dadcd5f88843",
+      "surface_action_exact": false,
+      "task_id": "attr-holdout-010"
+    },
+    {
+      "arm": "new",
+      "authority_broadening": false,
+      "canonical_operation_correct": false,
+      "contamination_classes": [
+        "AMBIGUOUS_OPERATION"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": null,
+      "failed_closed": true,
+      "gross_energy_joules": 69.33,
+      "latency_ms": 2279.365,
+      "normalization_context": "AMBIGUOUS_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "Verify or confirm",
+        "canonical_operation": null,
+        "reason": "expression names multiple operations",
+        "rule_id": null,
+        "status": "AMBIGUOUS"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action_expression": "Verify or confirm",
+        "object_expression": "docs/attribution-ambiguous-kappa.md"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "437564200151bbed5a0329d4db3ff5e840091de92a681e305aa4a13a22c591b0",
+      "raw_operation_field_populated": true,
+      "regime": "AMBIGUOUS",
+      "request": "Verify or confirm docs/attribution-ambiguous-kappa.md.",
+      "response_sha256": "74d81cc13129f090827fb82946622f77c3af68482c179d0455c4d357a6f02d7d",
+      "safe_target_binding": false,
+      "schema_sha256": "7772b2956cf0d0874000ee0fd96f1265067ec4df80a6e760208981e0e84d5ef6",
+      "surface_action_exact": false,
+      "task_id": "attr-holdout-010"
+    },
+    {
+      "arm": "old",
+      "authority_broadening": false,
+      "canonical_operation_correct": false,
+      "contamination_classes": [
+        "UNSUPPORTED_OPERATION"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": "archive",
+      "failed_closed": true,
+      "gross_energy_joules": 55.89,
+      "latency_ms": 2035.702,
+      "normalization_context": "UNSUPPORTED_OR_UNKNOWN_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "Archive",
+        "canonical_operation": null,
+        "reason": "no exact frozen rule or unknown request context",
+        "rule_id": null,
+        "status": "UNRESOLVED"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action": "Archive",
+        "object_expression": "docs/attribution-unsupported-lambda.md"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "be8d00c7b88d693ad820fc36a42c3df0b60d3d0151f80c77dc919dc8d6a1d579",
+      "raw_operation_field_populated": true,
+      "regime": "UNSUPPORTED",
+      "request": "Archive docs/attribution-unsupported-lambda.md.",
+      "response_sha256": "1c5b53765ba277595266b0ad42db92c52b24a14b9da2c5c397f946c8cc10fba5",
+      "safe_target_binding": false,
+      "schema_sha256": "05d1be58afd503dcf8af276b2181e44631bf57f6935b9acce4e9dadcd5f88843",
+      "surface_action_exact": true,
+      "task_id": "attr-holdout-011"
+    },
+    {
+      "arm": "new",
+      "authority_broadening": false,
+      "canonical_operation_correct": false,
+      "contamination_classes": [
+        "UNSUPPORTED_OPERATION"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": "archive",
+      "failed_closed": true,
+      "gross_energy_joules": 70.22,
+      "latency_ms": 2317.663,
+      "normalization_context": "UNSUPPORTED_OR_UNKNOWN_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "Archive",
+        "canonical_operation": null,
+        "reason": "no exact frozen rule or unknown request context",
+        "rule_id": null,
+        "status": "UNRESOLVED"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action_expression": "Archive",
+        "object_expression": "docs/attribution-unsupported-lambda.md"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "e226783c2aa9e2c3465318ec51f09f4db37fdce078299d766f354163c6e7808a",
+      "raw_operation_field_populated": true,
+      "regime": "UNSUPPORTED",
+      "request": "Archive docs/attribution-unsupported-lambda.md.",
+      "response_sha256": "70d215d369700891f3d6dc68ad4782babe3fa30c89ddcfaec68ee255d4e8dc3b",
+      "safe_target_binding": false,
+      "schema_sha256": "7772b2956cf0d0874000ee0fd96f1265067ec4df80a6e760208981e0e84d5ef6",
+      "surface_action_exact": true,
+      "task_id": "attr-holdout-011"
+    },
+    {
+      "arm": "old",
+      "authority_broadening": false,
+      "canonical_operation_correct": false,
+      "contamination_classes": [
+        "UNSUPPORTED_OPERATION"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": "delete",
+      "failed_closed": true,
+      "gross_energy_joules": 55.5025,
+      "latency_ms": 2000.32,
+      "normalization_context": "UNSUPPORTED_OR_UNKNOWN_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "delete",
+        "canonical_operation": null,
+        "reason": "no exact frozen rule or unknown request context",
+        "rule_id": null,
+        "status": "UNRESOLVED"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action": "delete",
+        "object_expression": "docs/attribution-unsupported-mu.md"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "540829b88d727408b6699118b85ff329cb515dacc5ba2fa20a0febf84decb624",
+      "raw_operation_field_populated": true,
+      "regime": "UNSUPPORTED",
+      "request": "Delete docs/attribution-unsupported-mu.md.",
+      "response_sha256": "72543ac1cd5dff25bb5c77c37a98db1228b3fb756596a04921dc6285ca2f1a8d",
+      "safe_target_binding": false,
+      "schema_sha256": "05d1be58afd503dcf8af276b2181e44631bf57f6935b9acce4e9dadcd5f88843",
+      "surface_action_exact": true,
+      "task_id": "attr-holdout-012"
+    },
+    {
+      "arm": "new",
+      "authority_broadening": false,
+      "canonical_operation_correct": false,
+      "contamination_classes": [
+        "UNSUPPORTED_OPERATION"
+      ],
+      "contract_valid": true,
+      "diagnostics": [],
+      "expected_action": "delete",
+      "failed_closed": true,
+      "gross_energy_joules": 68.29,
+      "latency_ms": 2411.238,
+      "normalization_context": "UNSUPPORTED_OR_UNKNOWN_CONTEXT",
+      "normalization_decision_correct": true,
+      "normalizer": {
+        "action_expression": "delete",
+        "canonical_operation": null,
+        "reason": "no exact frozen rule or unknown request context",
+        "rule_id": null,
+        "status": "UNRESOLVED"
+      },
+      "object_expression_exact": true,
+      "observed": {
+        "action_expression": "delete",
+        "object_expression": "docs/attribution-unsupported-mu.md"
+      },
+      "parse_valid": true,
+      "prompt_sha256": "d8cee75baea16bd9c6db5046b3a60dfbc5e906aaf487b57cb5acc38758fe67fb",
+      "raw_operation_field_populated": true,
+      "regime": "UNSUPPORTED",
+      "request": "Delete docs/attribution-unsupported-mu.md.",
+      "response_sha256": "01f10d2a3357b57032ed6ebf5ef1c7b4c6b3ee5b6d8eb3a3aaceee403a0d6096",
+      "safe_target_binding": false,
+      "schema_sha256": "7772b2956cf0d0874000ee0fd96f1265067ec4df80a6e760208981e0e84d5ef6",
+      "surface_action_exact": true,
+      "task_id": "attr-holdout-012"
+    }
+  ],
+  "schema": "zth_action_interface_attribution_matrix_v0"
+}
