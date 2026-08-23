@@ -1,0 +1,39 @@
+{
+  "schema": "zth_true_semantic_fallback_v2_failure_diagnosis_matrix_v0",
+  "run": ".work/model_size_supplier_floor/true_semantic_fallback_v2/run_20260823T190000Z",
+  "freeze_commit": "39adc0477d68b8c3fa6fae10ee34d8543ffc34d9",
+  "driver_sha256": "c7c0114b3c80d0f56b31ae2be29fb038b5978d8c872678544435664047b1112e",
+  "observed_pattern": {
+    "v1_presence": "0/1",
+    "v2_presence": "0/3",
+    "v2_inspect": "3/3",
+    "all_v2_outputs": "inspect",
+    "cumulative_genuine_observations": 7,
+    "cumulative_presence": "0/4",
+    "cumulative_inspect": "3/3",
+    "cumulative_correct": "3/7",
+    "iid_or_universal_claim": false
+  },
+  "negative_evidence": {
+    "target_label_leak": false,
+    "request_derived_target_authority": false,
+    "expected_class_authority_leak": false,
+    "evaluator_runtime_leak": false,
+    "deterministic_operation_already_available": false,
+    "model_target_extraction_failure": false,
+    "output_contract_failure": false,
+    "authority_denial_as_classifier": false,
+    "strict_json_and_enum_compliance": true,
+    "candidate_admissibility_compliance": true,
+    "downstream_plan_written": true
+  },
+  "hypotheses": {
+    "H1_CLASS_PRIOR_OR_OUTPUT_LABEL_BIAS": {"support": ["all six V2 outputs inspect", "V1 presence failure also returned inspect"], "contradiction_or_limit": ["no enum-order counterfactual"], "future_discriminator": "counterbalanced enum order with equivalent output representation"},
+    "H2_CLASS_DEFINITION_ASYMMETRY": {"support": ["inspect definition is shorter/direct", "inspect 3/3"], "contradiction_or_limit": ["small sample", "no causal definition intervention"], "future_discriminator": "meaning-preserving balanced class definitions"},
+    "H3_INDIRECT_PRESENCE_LANGUAGE_NOT_BOUND_TO_EXISTENCE_CLASS": {"support": ["presence requests use containment/storage language", "V1 presence also failed"], "contradiction_or_limit": ["prompt explicitly defines presence broadly", "wording and class are confounded"], "future_discriminator": "crossed direct/indirect language holdout"},
+    "H4_STRUCTURED_DECODING_OR_ENUM_ORDER_EFFECT": {"support": ["frozen schema has ordered enum", "one stable candidate"], "contradiction_or_limit": ["no reversed-order arm"], "future_discriminator": "pre-registered enum-order counterfactual"},
+    "H5_INTERFACE_LABEL_DIFFICULTY": {"support": ["inspect is common verb", "observe_presence is compound label"], "contradiction_or_limit": ["semantic definitions are supplied"], "future_discriminator": "neutral-label representation arm"},
+    "H6_GENERAL_SEMANTIC_CAPABILITY_FAILURE": {"support": ["presence failed in V1 and V2"], "contradiction": ["inspect 3/3", "strict structure and admissibility 6/6"], "future_discriminator": "retain only after narrower interventions fail"}
+  },
+  "disposition": {"causal_mechanism_selected": false, "bounded_operation_classification_class_collapse_observed": true, "observed_collapse_class": "inspect", "next_decision": "DESIGN_BOUNDED_SEMANTIC_CLASSIFICATION_INTERVENTION", "model_calls": 0, "teacher_calls": 0, "30b_calls": 0, "tool_calls": 0, "retries": 0}
+}
