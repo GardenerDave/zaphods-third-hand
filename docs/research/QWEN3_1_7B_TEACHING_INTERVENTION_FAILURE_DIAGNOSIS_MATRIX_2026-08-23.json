@@ -1,0 +1,88 @@
+{
+  "schema": "zth_teaching_intervention_failure_diagnosis_v0",
+  "authoritative_closeout": "9d031192a1d96b9acb9c7ea503e139a1e304cb0e",
+  "calls_made_in_this_diagnosis": {
+    "model": 0,
+    "teacher": 0,
+    "tool": 0,
+    "retries": 0
+  },
+  "classification": {
+    "teacher_diagnosis_supported": true,
+    "teacher_diagnosis_error": false,
+    "teacher_intervention_supported": false,
+    "intervention_design_error": true,
+    "intervention_overgeneralization_demonstrated": true,
+    "interface_ontology_error": true,
+    "action_field_role_overload": true,
+    "evaluator_or_scorer_error": false,
+    "evaluator_action_expectations_valid": true,
+    "evaluator_consistent_with_frozen_test_design": true,
+    "student_variance_or_instability_remains_possible": true,
+    "mixed": true,
+    "primary_failure_mechanism": "INTERVENTION_DESIGN_ERROR_WITH_ACTION_FIELD_ROLE_OVERLOAD",
+    "secondary_failure_mechanisms": [
+      "STUDENT_VARIANCE_OR_INSTABILITY",
+      "TEACHER_DIAGNOSIS_UNDERSPECIFIED_CANONICAL_OPERATION_SEMANTICS"
+    ]
+  },
+  "metrics": {
+    "safe_semantic_binding": {"baseline": "3/8", "patched": "6/8", "interpretation": "coarse boundedness metric"},
+    "action_exact": {"baseline": "3/8", "patched": "1/8"},
+    "both_fields_exact": {"baseline": "3/8", "patched": "1/8"},
+    "object_expression_exact": {"baseline": "8/8", "patched": "6/8"},
+    "state_predicate_as_action": {"baseline": "1/8", "patched": "0/8"}
+  },
+  "task_rows": [
+    {"task_id":"teach-holdout-001","regime":"OPERATION_VS_STATE_PREDICATE","request":"Determine if docs/teaching-presence-alpha.txt exists in the current repository.","expected_action":"determine","baseline_action":"exists","patched_action":"check","baseline_object_expression":"docs/teaching-presence-alpha.txt","patched_object_expression":"docs/teaching-presence-alpha.txt","baseline_action_exact":false,"patched_action_exact":false,"baseline_object_exact":true,"patched_object_exact":true,"baseline_failure_class":"STATE_PREDICATE_AS_ACTION","patched_failure_class":"OTHER_ACTION_FAILURE","baseline_safe_binding":false,"patched_safe_binding":true},
+    {"task_id":"teach-holdout-002","regime":"OPERATION_VS_STATE_PREDICATE","request":"Check whether docs/teaching-presence-beta.txt is present right now.","expected_action":"check","baseline_action":"check","patched_action":"check","baseline_object_expression":"docs/teaching-presence-beta.txt","patched_object_expression":"docs/teaching-presence-beta.txt","baseline_action_exact":true,"patched_action_exact":true,"baseline_object_exact":true,"patched_object_exact":true,"baseline_failure_class":null,"patched_failure_class":null,"baseline_safe_binding":true,"patched_safe_binding":true},
+    {"task_id":"teach-holdout-003","regime":"OPERATION_VS_STATE_PREDICATE","request":"Verify that docs/teaching-presence-gamma.txt can be found in the tree.","expected_action":"verify","baseline_action":"find","patched_action":"check","baseline_object_expression":"docs/teaching-presence-gamma.txt","patched_object_expression":"docs/teaching-presence-gamma.txt","baseline_action_exact":false,"patched_action_exact":false,"baseline_object_exact":true,"patched_object_exact":true,"baseline_failure_class":"OTHER_ACTION_FAILURE","patched_failure_class":"OTHER_ACTION_FAILURE","baseline_safe_binding":false,"patched_safe_binding":true},
+    {"task_id":"teach-holdout-004","regime":"OPERATION_VS_STATE_PREDICATE","request":"Confirm whether docs/teaching-presence-delta.txt exists at this time.","expected_action":"confirm","baseline_action":"confirm","patched_action":"check","baseline_object_expression":"docs/teaching-presence-delta.txt","patched_object_expression":"docs/teaching-presence-delta.txt","baseline_action_exact":true,"patched_action_exact":false,"baseline_object_exact":true,"patched_object_exact":true,"baseline_failure_class":null,"patched_failure_class":"OTHER_ACTION_FAILURE","baseline_safe_binding":true,"patched_safe_binding":true},
+    {"task_id":"teach-holdout-005","regime":"DIRECT_OPERATION_CONTROL","request":"Inspect docs/teaching-control-epsilon.md.","expected_action":"inspect","baseline_action":"inspect","patched_action":"check","baseline_object_expression":"docs/teaching-control-epsilon.md","patched_object_expression":"file path","baseline_action_exact":true,"patched_action_exact":false,"baseline_object_exact":true,"patched_object_exact":false,"baseline_failure_class":null,"patched_failure_class":"OBJECT_EXPRESSION_FAILURE","baseline_safe_binding":true,"patched_safe_binding":false},
+    {"task_id":"teach-holdout-006","regime":"DIRECT_OPERATION_CONTROL","request":"Amend docs/teaching-control-zeta.md.","expected_action":"amend","baseline_action":"Amend","patched_action":"check","baseline_object_expression":"docs/teaching-control-zeta.md","patched_object_expression":"file path","baseline_action_exact":false,"patched_action_exact":false,"baseline_object_exact":true,"patched_object_exact":false,"baseline_failure_class":"OTHER_ACTION_FAILURE","patched_failure_class":"OBJECT_EXPRESSION_FAILURE","baseline_safe_binding":false,"patched_safe_binding":false},
+    {"task_id":"teach-holdout-007","regime":"DIRECT_OPERATION_CONTROL","request":"Index docs/teaching-control-eta.md.","expected_action":"index","baseline_action":"Index","patched_action":"check","baseline_object_expression":"docs/teaching-control-eta.md","patched_object_expression":"docs/teaching-control-eta.md","baseline_action_exact":false,"patched_action_exact":false,"baseline_object_exact":true,"patched_object_exact":true,"baseline_failure_class":"OTHER_ACTION_FAILURE","patched_failure_class":"OTHER_ACTION_FAILURE","baseline_safe_binding":false,"patched_safe_binding":true},
+    {"task_id":"teach-holdout-008","regime":"DIRECT_OPERATION_CONTROL","request":"Dispatch docs/teaching-control-theta.md.","expected_action":"dispatch","baseline_action":"Dispatch","patched_action":"check","baseline_object_expression":"docs/teaching-control-theta.md","patched_object_expression":"docs/teaching-control-theta.md","baseline_action_exact":false,"patched_action_exact":false,"baseline_object_exact":true,"patched_object_exact":true,"baseline_failure_class":"OTHER_ACTION_FAILURE","patched_failure_class":"OTHER_ACTION_FAILURE","baseline_safe_binding":false,"patched_safe_binding":true}
+  ],
+  "action_transition_counts": [
+    {"expected":"determine","baseline":"exists","patched":"check","count":1},
+    {"expected":"check","baseline":"check","patched":"check","count":1},
+    {"expected":"verify","baseline":"find","patched":"check","count":1},
+    {"expected":"confirm","baseline":"confirm","patched":"check","count":1},
+    {"expected":"inspect","baseline":"inspect","patched":"check","count":1},
+    {"expected":"amend","baseline":"Amend","patched":"check","count":1},
+    {"expected":"index","baseline":"Index","patched":"check","count":1},
+    {"expected":"dispatch","baseline":"Dispatch","patched":"check","count":1}
+  ],
+  "validation": {
+    "intervention_safety_validation_passed": true,
+    "intervention_semantic_invariant_validation_demonstrated": false,
+    "safe_binding_is_coarse_metric": true,
+    "replication_required_for_stable_effect_estimate": true
+  },
+  "architecture": {
+    "action_field_role_overload": true,
+    "action_representation_refinement_candidate": true,
+    "candidate_flow": "action_expression -> deterministic.operation_normalization -> canonical_operation"
+  },
+  "next_decision": "TEST_ACTION_EXPRESSION_PLUS_DETERMINISTIC_OPERATION_NORMALIZATION",
+  "source_artifacts": {
+    "failure_localization": {"path":".work/model_size_supplier_floor/capability_router_failure_teaching_v0/stage_a/failure_localization.json","sha256":"9f48200333dff67d02b2214a214be7adcff1eb58489c7f38eae1250cf46b1f93"},
+    "teacher_diagnostic_packet": {"path":".work/model_size_supplier_floor/capability_router_failure_teaching_v0/stage_a/teacher_diagnostic_packet.json","sha256":"1d624da4a895d2c6452420996c2b310f0ca212a1ba3316ecbd104730d7f2cbf5"},
+    "teacher_response": {"path":".work/model_size_supplier_floor/capability_router_failure_teaching_v0/stage_a/teacher_response.json","sha256":"7585df80a28f71f3579c687c56b096d5411f8474f1e00e95aab7d0719cd08cbb"},
+    "candidate_patch": {"path":"docs/research/QWEN3_1_7B_ACTION_OPERATION_TEACHING_PATCH_V0_2026-08-23.json","sha256":"c028350177dacf6ae23cacbb940b3eaf9cc0ac530cdb28ca0f0b2b47e06e4b17"},
+    "intervention_validation": {"path":".work/model_size_supplier_floor/capability_router_failure_teaching_v0/stage_a/intervention_validation.json","sha256":"6101ed11b8f636b4abe593f131003d3930328ce175b69bc7c82d58a77b14c226"},
+    "holdout": {"path":"docs/research/CAPABILITY_ROUTER_FAILURE_TEACHING_HOLDOUT_V0_TASKS_2026-08-23.json","sha256":"1b539e34c632fb28aa10e470a07191a3168c95a869edb7f2d5db608508bd3574"},
+    "comparison": {"path":".work/model_size_supplier_floor/capability_router_failure_teaching_v0/stage_b/run_20260823T070000Z/teaching_effect_comparison.json","sha256":"9c6fad4ec0fe5e16dcd87a451ddcfee9e573a7a6a1acf43adcde34d691c15bde"},
+    "stage_b_matrix": {"path":".work/model_size_supplier_floor/capability_router_failure_teaching_v0/stage_b/run_20260823T070000Z/matrix.json","sha256":"830861c79daa5f8b371e7a0a8a5089636bab9ddd4196dc926798abbab21ce527"}
+  },
+  "historical_markers_preserved": {
+    "FAILURE_LOCALIZATION_TO_CAPABILITY_INTERFACE_DEMONSTRATED": true,
+    "BOUNDED_TEACHER_INTERVENTION_LOOP_DEMONSTRATED": true,
+    "TEACHER_PROPOSED_INTERVENTION_IMPROVED_FRESH_HOLDOUT": false,
+    "SUPPLIER_CAPABILITY_IMPROVEMENT_EVIDENCE_DEMONSTRATED": false,
+    "SELF_TEACHING_DEMONSTRATED": false,
+    "QUALIFICATION_PROMOTED": false,
+    "INTERVENTION_SUPPORTED": false,
+    "PRIMARY_CHARACTERIZATION": "BOUNDED_TEACHER_INTERVENTION_COMPLETED_INTERVENTION_NOT_SUPPORTED"
+  }
+}
