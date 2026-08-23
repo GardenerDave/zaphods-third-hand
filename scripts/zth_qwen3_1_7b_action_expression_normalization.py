@@ -88,7 +88,11 @@ def derive_normalization_context(request: Any) -> str:
     if first in {"inspect", "amend", "index", "dispatch"}:
         return "DIRECT_OPERATION_CONTEXT"
     presence_cues = ("whether", "exists", "present", "can be found", "right now", "currently")
-    if first in {"determine", "check", "verify", "confirm", "find", "exists"} and any(cue in text for cue in presence_cues):
+    # Polite/request wrappers are context cues only. They do not resolve the
+    # operation; the deterministic-first planner still sends them to the
+    # bounded semantic fallback because their leading operation is not one of
+    # the frozen canonical request forms.
+    if first in {"determine", "check", "verify", "confirm", "find", "exists", "could", "please", "can", "would"} and any(cue in text for cue in presence_cues):
         return "PRESENCE_OBSERVATION_CONTEXT"
     return "UNSUPPORTED_OR_UNKNOWN_CONTEXT"
 

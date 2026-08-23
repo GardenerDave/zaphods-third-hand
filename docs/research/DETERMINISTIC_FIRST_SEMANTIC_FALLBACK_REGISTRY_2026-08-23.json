@@ -1,0 +1,57 @@
+{
+  "automatic_promotion": false,
+  "entries": [
+    {
+      "capability_id": "semantic.minimal_action_extraction_old_interface",
+      "evidence_artifact": "docs/research/QWEN3_1_7B_ACTION_INTERFACE_ATTRIBUTION_2026-08-23.md",
+      "evidence_scope": "old action plus object_expression interface; fresh paired attribution; deterministic downstream normalization",
+      "interface_id": "router_v1_action_object_expression_v1",
+      "qualification_decision": "preserved exploratory evidence; no promotion",
+      "status": "QUALIFIED_EXPLORATORY",
+      "supplier_id": "qwen3_1_7b_old_action_as_expression_supplier",
+      "supplier_type": "MODEL"
+    },
+    {
+      "capability_id": "tool.read_only_repository_observation",
+      "evidence_artifact": "docs/research/CAPABILITY_ROUTER_TOOL_OBSERVATION_V0_DESIGN_2026-08-22.md",
+      "evidence_scope": "exact-target repository metadata; no contents or mutation",
+      "interface_id": "repository_relative_metadata_observation_v0",
+      "qualification_decision": "model-free bounded contract evidence",
+      "status": "QUALIFIED_EXPLORATORY",
+      "supplier_id": "python_read_only_repository_observer_v0",
+      "supplier_type": "TOOL"
+    },
+    {
+      "capability_id": "deterministic.operation_resolution",
+      "evidence_artifact": "docs/research/QWEN3_1_7B_ACTION_INTERFACE_ATTRIBUTION_2026-08-23.md",
+      "evidence_scope": "bounded frozen request grammar only",
+      "interface_id": "context_gated_operation_derivation_v0",
+      "qualification_decision": "model-free grammar evidence",
+      "status": "QUALIFIED_EXPLORATORY",
+      "supplier_id": "python_bounded_operation_deriver_v0",
+      "supplier_type": "DETERMINISTIC_CODE"
+    },
+    {
+      "capability_id": "deterministic.authority_validation",
+      "evidence_artifact": "docs/research/CAPABILITY_ROUTER_TOOL_OBSERVATION_V0_DESIGN_2026-08-22.md",
+      "evidence_scope": "independent canonical authority and exact target equality",
+      "interface_id": "canonical_operation_and_exact_target_membership_v0",
+      "qualification_decision": "bounded exploratory reuse",
+      "status": "QUALIFIED_EXPLORATORY",
+      "supplier_id": "python_deterministic_authority_v0",
+      "supplier_type": "DETERMINISTIC_CODE"
+    },
+    {
+      "capability_id": "deterministic.post_observation_policy",
+      "evidence_artifact": "docs/research/CAPABILITY_ROUTER_TOOL_OBSERVATION_V0_DESIGN_2026-08-22.md",
+      "evidence_scope": "validated observation becomes terminal factual result",
+      "interface_id": "validated_repository_observation_policy_v0",
+      "qualification_decision": "bounded exploratory reuse",
+      "status": "QUALIFIED_EXPLORATORY",
+      "supplier_id": "python_deterministic_observation_policy_v0",
+      "supplier_type": "DETERMINISTIC_CODE"
+    }
+  ],
+  "schema": "zth_deterministic_first_semantic_fallback_registry_v0",
+  "status": "FROZEN_EXPLORATORY_NOT_PRODUCTION"
+}
