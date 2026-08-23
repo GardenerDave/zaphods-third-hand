@@ -1,0 +1,116 @@
+{
+  "pass": true,
+  "rows": [
+    {
+      "evaluator_fields_present": false,
+      "expected_class_evaluator_only": "observe_presence",
+      "input_request": "Is docs/research/TSF_AMBER_2026-08-23.md around in this tree?",
+      "prompt_classification_specification_allowed": true,
+      "runtime_authority_class_leak": false,
+      "runtime_regime_label_present": false,
+      "target": "docs/research/TSF_AMBER_2026-08-23.md",
+      "target_semantic_label_leak": false,
+      "task_id": "tsfv1-001"
+    },
+    {
+      "evaluator_fields_present": false,
+      "expected_class_evaluator_only": "inspect",
+      "input_request": "Take a look at docs/research/TSF_BRONZE_2026-08-23.json.",
+      "prompt_classification_specification_allowed": true,
+      "runtime_authority_class_leak": false,
+      "runtime_regime_label_present": false,
+      "target": "docs/research/TSF_BRONZE_2026-08-23.json",
+      "target_semantic_label_leak": false,
+      "task_id": "tsfv1-002"
+    },
+    {
+      "evaluator_fields_present": false,
+      "expected_class_evaluator_only": "observe_presence",
+      "input_request": "Do we have docs/research/TSF_CITRINE_2026-08-23.txt here?",
+      "prompt_classification_specification_allowed": true,
+      "runtime_authority_class_leak": false,
+      "runtime_regime_label_present": false,
+      "target": "docs/research/TSF_CITRINE_2026-08-23.txt",
+      "target_semantic_label_leak": false,
+      "task_id": "tsfv1-003"
+    },
+    {
+      "evaluator_fields_present": false,
+      "expected_class_evaluator_only": "inspect",
+      "input_request": "Give docs/research/TSF_DAWN_2026-08-23.md a quick look.",
+      "prompt_classification_specification_allowed": true,
+      "runtime_authority_class_leak": false,
+      "runtime_regime_label_present": false,
+      "target": "docs/research/TSF_DAWN_2026-08-23.md",
+      "target_semantic_label_leak": false,
+      "task_id": "tsfv1-004"
+    },
+    {
+      "evaluator_fields_present": false,
+      "expected_class_evaluator_only": "observe_presence",
+      "input_request": "Tell me if docs/research/TSF_EMBER_2026-08-23.json is available.",
+      "prompt_classification_specification_allowed": true,
+      "runtime_authority_class_leak": false,
+      "runtime_regime_label_present": false,
+      "target": "docs/research/TSF_EMBER_2026-08-23.json",
+      "target_semantic_label_leak": false,
+      "task_id": "tsfv1-005"
+    },
+    {
+      "evaluator_fields_present": false,
+      "expected_class_evaluator_only": "inspect",
+      "input_request": "Have a look at docs/research/TSF_FROST_2026-08-23.txt.",
+      "prompt_classification_specification_allowed": true,
+      "runtime_authority_class_leak": false,
+      "runtime_regime_label_present": false,
+      "target": "docs/research/TSF_FROST_2026-08-23.txt",
+      "target_semantic_label_leak": false,
+      "task_id": "tsfv1-006"
+    },
+    {
+      "evaluator_fields_present": false,
+      "expected_class_evaluator_only": null,
+      "input_request": "Determine whether docs/research/TSF_JADE_2026-08-23.md exists right now.",
+      "prompt_classification_specification_allowed": true,
+      "runtime_authority_class_leak": false,
+      "runtime_regime_label_present": false,
+      "target": "docs/research/TSF_JADE_2026-08-23.md",
+      "target_semantic_label_leak": false,
+      "task_id": "tsfv1-007"
+    },
+    {
+      "evaluator_fields_present": false,
+      "expected_class_evaluator_only": null,
+      "input_request": "Inspect docs/research/TSF_KELP_2026-08-23.json.",
+      "prompt_classification_specification_allowed": true,
+      "runtime_authority_class_leak": false,
+      "runtime_regime_label_present": false,
+      "target": "docs/research/TSF_KELP_2026-08-23.json",
+      "target_semantic_label_leak": false,
+      "task_id": "tsfv1-008"
+    },
+    {
+      "evaluator_fields_present": false,
+      "expected_class_evaluator_only": null,
+      "input_request": "Check and inspect docs/research/TSF_LUNA_2026-08-23.txt.",
+      "prompt_classification_specification_allowed": true,
+      "runtime_authority_class_leak": false,
+      "runtime_regime_label_present": false,
+      "target": "docs/research/TSF_LUNA_2026-08-23.txt",
+      "target_semantic_label_leak": false,
+      "task_id": "tsfv1-009"
+    },
+    {
+      "evaluator_fields_present": false,
+      "expected_class_evaluator_only": null,
+      "input_request": "Delete docs/research/TSF_MICA_2026-08-23.md.",
+      "prompt_classification_specification_allowed": true,
+      "runtime_authority_class_leak": false,
+      "runtime_regime_label_present": false,
+      "target": "docs/research/TSF_MICA_2026-08-23.md",
+      "target_semantic_label_leak": false,
+      "task_id": "tsfv1-010"
+    }
+  ],
+  "schema": "zth_true_semantic_fallback_v1_model_input_leakage_audit_v0"
+}
