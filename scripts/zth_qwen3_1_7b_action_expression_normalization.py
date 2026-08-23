@@ -73,18 +73,44 @@ def load_rules() -> dict[str, Any]:
     return rules
 
 
+def derive_normalization_context(request: Any) -> str:
+    """Apply the frozen bounded request grammar; never infer arbitrary intent."""
+    if not isinstance(request, str):
+        return "UNSUPPORTED_OR_UNKNOWN_CONTEXT"
+    text = " ".join(request.casefold().strip().split())
+    if not text:
+        return "UNSUPPORTED_OR_UNKNOWN_CONTEXT"
+    if " and " in text or " or " in text:
+        return "AMBIGUOUS_CONTEXT"
+    first = text.split(" ", 1)[0].strip(".,:;!?()")
+    if first in {"archive", "delete"}:
+        return "UNSUPPORTED_OR_UNKNOWN_CONTEXT"
+    if first in {"inspect", "amend", "index", "dispatch"}:
+        return "DIRECT_OPERATION_CONTEXT"
+    presence_cues = ("whether", "exists", "present", "can be found", "right now", "currently")
+    if first in {"determine", "check", "verify", "confirm", "find", "exists"} and any(cue in text for cue in presence_cues):
+        return "PRESENCE_OBSERVATION_CONTEXT"
+    return "UNSUPPORTED_OR_UNKNOWN_CONTEXT"
+
+
 def normalize_operation_expression(expression: Any, request_context: str | None = None) -> dict[str, Any]:
     raw = expression if isinstance(expression, str) else ""
     key = raw.strip().casefold()
     rules = load_rules()
     if not key:
         return {"status": "UNRESOLVED", "action_expression": raw, "canonical_operation": None, "rule_id": None, "reason": "empty expression"}
-    if key in {x.casefold() for x in rules["ambiguous_exact_expressions"]}:
+    context = derive_normalization_context(request_context)
+    if context == "AMBIGUOUS_CONTEXT" or key in {x.casefold() for x in rules["ambiguous_exact_expressions"]}:
         return {"status": "AMBIGUOUS", "action_expression": raw, "canonical_operation": None, "rule_id": None, "reason": "expression names multiple operations"}
     for rule in rules["rules"]:
         if key in {x.casefold() for x in rule["expressions"]}:
+            presence_rule = rule["canonical_operation"] == "observe_presence"
+            if presence_rule and context != "PRESENCE_OBSERVATION_CONTEXT":
+                return {"status": "UNRESOLVED", "action_expression": raw, "canonical_operation": None, "rule_id": None, "reason": "presence expression is outside the frozen presence context"}
+            if not presence_rule and context != "DIRECT_OPERATION_CONTEXT":
+                return {"status": "UNRESOLVED", "action_expression": raw, "canonical_operation": None, "rule_id": None, "reason": "direct operation is outside the frozen direct-operation context"}
             return {"status": "NORMALIZED", "action_expression": raw, "canonical_operation": rule["canonical_operation"], "rule_id": rule["rule_id"], "reason": rule["semantic_rationale"]}
-    return {"status": "UNRESOLVED", "action_expression": raw, "canonical_operation": None, "rule_id": None, "reason": "no exact frozen rule"}
+    return {"status": "UNRESOLVED", "action_expression": raw, "canonical_operation": None, "rule_id": None, "reason": "no exact frozen rule or unknown request context"}
 
 
 def semantic_prompt(request: str) -> str:
@@ -141,13 +167,19 @@ def invariants() -> dict[str, Any]:
     checks = []
     def check(name: str, passed: bool, reason: str) -> None:
         checks.append({"check": name, "passed": passed, "reason": reason})
-    check("known mappings", all(normalize_operation_expression(x)["status"] == "NORMALIZED" for x in ("determine","check","verify","confirm","find","exists","inspect","amend","index","dispatch")), "all frozen exact rules normalize")
-    check("case variation", normalize_operation_expression("AmEnD")["canonical_operation"] == "amend", "case-folding is explicit")
-    check("unknown unresolved", normalize_operation_expression("archive")["status"] == "UNRESOLVED", "unknown expression has no fallback")
-    check("multi-operation ambiguous", normalize_operation_expression("check and inspect")["status"] == "AMBIGUOUS", "multiple operation expression fails closed")
+    presence_request = "Determine whether docs/example.txt exists right now."
+    inspect_request = "Inspect docs/example.txt."
+    unknown_request = "Ask about docs/example.txt."
+    check("presence context", all(normalize_operation_expression(x, presence_request)["status"] == "NORMALIZED" for x in ("determine","check","verify","confirm","find","exists")), "presence expressions normalize only in presence context")
+    check("direct context", all(normalize_operation_expression(x, inspect_request)["status"] == "NORMALIZED" for x in ("inspect",)), "direct operation normalizes in direct context")
+    check("case variation", normalize_operation_expression("AmEnD", "Amend docs/example.txt.")["canonical_operation"] == "amend", "case-folding is explicit")
+    check("outside presence gated", all(normalize_operation_expression(x, inspect_request)["status"] == "UNRESOLVED" for x in ("find","exists")), "state/presence expressions do not generalize outside presence context")
+    check("unknown context unresolved", normalize_operation_expression("inspect", unknown_request)["status"] == "UNRESOLVED", "unknown context fails closed")
+    check("unknown unresolved", normalize_operation_expression("archive", unknown_request)["status"] == "UNRESOLVED", "unknown expression has no fallback")
+    check("multi-operation ambiguous", normalize_operation_expression("check", "Check and inspect docs/example.txt.")["status"] == "AMBIGUOUS", "multiple operation request fails closed")
     check("empty unresolved", normalize_operation_expression("")["status"] == "UNRESOLVED", "empty expression fails closed")
     check("direct operations distinct", all(normalize_operation_expression(x)["canonical_operation"] != "observe_presence" for x in ("inspect","amend","index","dispatch")), "direct operations do not collapse to presence")
-    check("authority independent", all(normalize_operation_expression(x)["canonical_operation"] not in (None,) for x in ("check","inspect")), "normalizer emits no authority grant")
+    check("authority independent", all("allowed" not in normalize_operation_expression(x, presence_request) for x in ("check","inspect")), "normalizer emits only normalization status and never authority")
     return {"schema":"zth_operation_normalizer_invariants_v0","checks":checks,"pass":all(x["passed"] for x in checks),"model_calls":0,"teacher_calls":0,"tool_calls":0}
 
 

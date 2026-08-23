@@ -25,6 +25,13 @@
     "verify or confirm"
   ],
   "unknown_policy": "UNRESOLVED",
+  "context_gating": true,
+  "context_grammar": {
+    "presence_context": "bounded request contains a presence cue and begins with determine/check/verify/confirm/find/exists",
+    "direct_operation_context": "bounded request begins with inspect/amend/index/dispatch",
+    "ambiguous_context": "request contains a coordinated and/or operation expression",
+    "unknown_context": "all other requests fail closed"
+  },
   "authority_policy": "only canonical_operation is checked against independent allowed_canonical_operations",
   "fuzzy_matching": false,
   "model_output_grants_authority": false
