@@ -1,0 +1,70 @@
+{
+  "schema": "zth_model_tool_composition_v0_closeout_v1",
+  "authoritative_prior_closeout": "c53396addf97a50ec92d1c63b930703a725648bd",
+  "run_directory": ".work/model_size_supplier_floor/capability_router_model_tool_composition_v0/run_20260823T052541Z/",
+  "metrics": {
+    "tasks": 6,
+    "tasks_correct": 5,
+    "plan_0_requirements_correct": "6/6",
+    "plan_1_requirements_correct": "5/5 applicable",
+    "plan_2_requirements_correct": "5/5 applicable",
+    "model_calls": 4,
+    "model_parse_valid": "4/4",
+    "model_contract_valid": "4/4",
+    "semantic_outputs_safely_bound": "2/4",
+    "model_to_tool_transitions": "2/3 successful routes",
+    "authorized_tool_calls": "2/2 planned",
+    "valid_observations": "2/2",
+    "tool_to_deterministic_transitions": "2/2",
+    "full_chains": 2,
+    "success_contracts_evaluated": "6/6",
+    "success_contract_predicate_failures": 2,
+    "terminal_successes": 3,
+    "ready_for_review": 3,
+    "semantic_binding_failures": 2,
+    "tool_authority_denials_reached": 0,
+    "unsafe_downstream_tool_calls_prevented": "2/2",
+    "replan_stalled": 0,
+    "duplicate_model_calls": 0,
+    "duplicate_tool_calls": 0,
+    "unnecessary_model_calls": 0,
+    "unnecessary_tool_calls": 0,
+    "thirty_b_calls": 0,
+    "external_calls": 0,
+    "runtime_expected_field_reads": 0,
+    "planner_hint_input_fields": 0,
+    "model_output_granted_authority": 0
+  },
+  "task_rows": [
+    {"task_id": "composition-v0-001", "terminal_state": "terminal_success", "model_calls": 1, "tool_calls": 1, "replans": 2, "observation": "VALID_OBSERVATION_EXISTING"},
+    {"task_id": "composition-v0-002", "terminal_state": "terminal_success", "model_calls": 1, "tool_calls": 1, "replans": 2, "observation": "VALID_OBSERVATION_EXISTING"},
+    {"task_id": "composition-v0-003", "terminal_state": "ready_for_review", "model_calls": 1, "tool_calls": 0, "replans": 1, "failure": "SEMANTIC_BINDING_FAILURE", "observed_action": "exists"},
+    {"task_id": "composition-v0-004", "terminal_state": "ready_for_review", "model_calls": 1, "tool_calls": 0, "replans": 1, "failure": "SEMANTIC_BINDING_FAILURE", "authority_target_not_reached": true},
+    {"task_id": "composition-v0-005", "terminal_state": "terminal_success", "model_calls": 0, "tool_calls": 0, "replans": 0, "branch": "DETERMINISTIC_CONTROL"},
+    {"task_id": "composition-v0-006", "terminal_state": "ready_for_review", "model_calls": 0, "tool_calls": 0, "replans": 0, "branch": "UNSUPPORTED_CAPABILITY"}
+  ],
+  "resource": {
+    "measurement_level": 2,
+    "measurement_boundary": "gpu_device_only",
+    "model_latency_ms": {"median": 1952.93, "mean": 2348.80775, "p95": 3678.144},
+    "model_gross_device_energy_joules_total": 262.52,
+    "tool_energy_measured": false
+  },
+  "markers": {
+    "MODEL_TO_TOOL_CAPABILITY_TRANSITION_DEMONSTRATED": true,
+    "TOOL_TO_DETERMINISTIC_REPLAN_DEMONSTRATED": true,
+    "SUCCESS_CONTRACT_RUNTIME_ENFORCEMENT_DEMONSTRATED": true,
+    "FIRST_MODEL_TOOL_ADAPTIVE_COMPOSITION_LOOP": true,
+    "NEXT_DECISION": "ADD_FAILURE_DIAGNOSIS_AND_BOUNDED_TEACHING_INTERVENTION"
+  },
+  "execution": {
+    "freeze_commit": "51c9cb2",
+    "teacher_calls": 0,
+    "retries": 0,
+    "escalations": 0,
+    "raw_evidence_modified": false,
+    "production_routing_changed": false,
+    "automatic_promotion": false,
+    "v100_touched": false
+  }
+}
