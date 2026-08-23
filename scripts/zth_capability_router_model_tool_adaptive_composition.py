@@ -332,7 +332,7 @@ def model_preflight(out: Path) -> tuple[Any, str, dict[str, Any]]:
     telemetry = base.telemetry_preflight(telemetry_url)
     idle_samples, idle_summary = base.sample_window(IDLE_SECONDS, telemetry_url)
     write_json(out / "preflight.json", {"model_meta": meta, "telemetry": telemetry, "idle_power": idle_summary, "planned_model_calls": 4, "model_id": EXPECTED_MODEL_ID})
-    write_json(out / "idle_power_samples.json", {"measurement_level": 2, "measurement_boundary": "gpu_device_only", "samples": [{"timestamp_utc": s.timestamp_utc, "monotonic_seconds": s.monotonic_seconds, "gpu_uuid": s.gpu_uuid, "power_watts": s.power_watts, "sequence": s.sequence} for s in idle_samples]})
+    write_json(out / "idle_power_samples.json", {"measurement_level": 2, "measurement_boundary": "gpu_device_only", "samples": idle_samples})
     return spec, telemetry_url, meta
 
 
