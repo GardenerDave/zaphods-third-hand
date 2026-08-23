@@ -361,6 +361,14 @@ def execute(out: Path) -> None:
             trace.update({"validator_result": "success_contract_evaluation_0.json", "terminal_state": result["terminal_state"]})
             write_json(td / "route_trace.json", trace)
             continue
+        if not plan0["planned_model_calls"]:
+            state.update({"policy_computed": True})
+            evaluation = evaluate_success_contract(contract0, {**state, "coverage_complete": True})
+            write_json(td / "success_contract_evaluation_0.json", evaluation)
+            result = {"terminal_state": "terminal_success" if evaluation["passed"] else "ready_for_review", "reason": "deterministic control", "model_calls": 0, "tool_calls": 0, "replans": 0, "deterministic_steps": 1, "validator": evaluation}
+            total_det += 1
+            write_json(td / "runtime_result.json", result); trace.update({"terminal_state": result["terminal_state"]}); write_json(td / "route_trace.json", trace)
+            continue
         semantic: dict[str, str] | None = None
         prompt = (td / "semantic_prompt.txt").read_text(encoding="utf-8")
         response_path = td / "response.json"
@@ -397,14 +405,6 @@ def execute(out: Path) -> None:
             total_replans += 1
             result = {"terminal_state": "ready_for_review", "reason": "semantic binding or contract failed", "model_calls": 1, "tool_calls": 0, "replans": 1, "deterministic_steps": 0, "validator": contract_eval0}
             write_json(td / "runtime_result.json", result); trace.update({"planner_facts_1": "planner_facts_1.json", "capability_plan_1": "capability_plan_1.json", "replan_delta_0_1": "replan_delta_0_1.json", "terminal_state": result["terminal_state"]}); write_json(td / "route_trace.json", trace)
-            continue
-        else:
-            state.update({"policy_computed": True})
-            evaluation = evaluate_success_contract(contract0, {**state, "coverage_complete": True})
-            write_json(td / "success_contract_evaluation_0.json", evaluation)
-            result = {"terminal_state": "terminal_success" if evaluation["passed"] else "ready_for_review", "reason": "deterministic control", "model_calls": 0, "tool_calls": 0, "replans": 0, "deterministic_steps": 1, "validator": evaluation}
-            total_det += 1
-            write_json(td / "runtime_result.json", result); trace.update({"terminal_state": result["terminal_state"]}); write_json(td / "route_trace.json", trace)
             continue
         facts1 = json.loads((td / "planner_facts_1.json").read_text(encoding="utf-8"))
         plan1 = json.loads((td / "capability_plan_1.json").read_text(encoding="utf-8"))
