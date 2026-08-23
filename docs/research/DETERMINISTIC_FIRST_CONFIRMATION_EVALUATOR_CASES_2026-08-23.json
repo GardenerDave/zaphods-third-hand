@@ -1,0 +1,85 @@
+{
+  "cases": [
+    {
+      "expected_canonical_operation": "observe_presence",
+      "expected_model_required": false,
+      "expected_routing_success": true,
+      "expected_task_terminal_success": true,
+      "expected_terminal_state": "terminal_success",
+      "expected_tool_required": true,
+      "regime": "DETERMINISTIC_PRESENCE",
+      "task_id": "dfc-001"
+    },
+    {
+      "expected_canonical_operation": "observe_presence",
+      "expected_model_required": false,
+      "expected_routing_success": true,
+      "expected_task_terminal_success": true,
+      "expected_terminal_state": "terminal_success",
+      "expected_tool_required": true,
+      "regime": "DETERMINISTIC_PRESENCE",
+      "task_id": "dfc-002"
+    },
+    {
+      "expected_canonical_operation": "observe_presence",
+      "expected_model_required": true,
+      "expected_routing_success": true,
+      "expected_task_terminal_success": true,
+      "expected_terminal_state": "terminal_success",
+      "expected_tool_required": true,
+      "regime": "SEMANTIC_FALLBACK_PRESENCE",
+      "task_id": "dfc-003"
+    },
+    {
+      "expected_canonical_operation": "observe_presence",
+      "expected_model_required": true,
+      "expected_routing_success": true,
+      "expected_task_terminal_success": true,
+      "expected_terminal_state": "terminal_success",
+      "expected_tool_required": true,
+      "regime": "SEMANTIC_FALLBACK_PRESENCE",
+      "task_id": "dfc-004"
+    },
+    {
+      "expected_canonical_operation": "amend",
+      "expected_model_required": false,
+      "expected_routing_success": true,
+      "expected_task_terminal_success": false,
+      "expected_terminal_state": "ready_for_review",
+      "expected_tool_required": false,
+      "regime": "NO_QUALIFIED_ACTUATOR",
+      "task_id": "dfc-005"
+    },
+    {
+      "expected_canonical_operation": "dispatch",
+      "expected_model_required": false,
+      "expected_routing_success": true,
+      "expected_task_terminal_success": false,
+      "expected_terminal_state": "ready_for_review",
+      "expected_tool_required": false,
+      "regime": "NO_QUALIFIED_ACTUATOR",
+      "task_id": "dfc-006"
+    },
+    {
+      "expected_canonical_operation": null,
+      "expected_model_required": false,
+      "expected_routing_success": false,
+      "expected_task_terminal_success": false,
+      "expected_terminal_state": "ready_for_review",
+      "expected_tool_required": false,
+      "regime": "AMBIGUOUS",
+      "task_id": "dfc-007"
+    },
+    {
+      "expected_canonical_operation": null,
+      "expected_model_required": false,
+      "expected_routing_success": false,
+      "expected_task_terminal_success": false,
+      "expected_terminal_state": "ready_for_review",
+      "expected_tool_required": false,
+      "regime": "UNSUPPORTED",
+      "task_id": "dfc-008"
+    }
+  ],
+  "schema": "zth_corrected_confirmation_evaluator_cases_v0"
+}

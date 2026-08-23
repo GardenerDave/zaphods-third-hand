@@ -1,0 +1,113 @@
+{
+  "cases": [
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "observe_presence"
+          ],
+          "allowed_targets": [
+            "docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_CONTROL_PLANE_AUDIT_2026-08-23.md"
+          ]
+        }
+      },
+      "input_request": "Check whether docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_CONTROL_PLANE_AUDIT_2026-08-23.md exists currently.",
+      "task_id": "dfc-001"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "observe_presence"
+          ],
+          "allowed_targets": [
+            "docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_DESIGN_2026-08-23.md"
+          ]
+        }
+      },
+      "input_request": "Determine whether docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_DESIGN_2026-08-23.md is present right now.",
+      "task_id": "dfc-002"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "observe_presence"
+          ],
+          "allowed_targets": [
+            "docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_REGISTRY_2026-08-23.json"
+          ]
+        }
+      },
+      "input_request": "Could you check whether docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_REGISTRY_2026-08-23.json is available in the tree?",
+      "task_id": "dfc-003"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "observe_presence"
+          ],
+          "allowed_targets": [
+            "docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_CONTROL_PLANE_AUDIT_MATRIX_2026-08-23.json"
+          ]
+        }
+      },
+      "input_request": "Please verify that docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_CONTROL_PLANE_AUDIT_MATRIX_2026-08-23.json can be found here.",
+      "task_id": "dfc-004"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "amend"
+          ],
+          "allowed_targets": [
+            "docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_DESIGN_2026-08-23.md"
+          ]
+        }
+      },
+      "input_request": "Amend docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_DESIGN_2026-08-23.md.",
+      "task_id": "dfc-005"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "dispatch"
+          ],
+          "allowed_targets": [
+            "docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_CONTROL_PLANE_AUDIT_2026-08-23.md"
+          ]
+        }
+      },
+      "input_request": "Dispatch docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_CONTROL_PLANE_AUDIT_2026-08-23.md.",
+      "task_id": "dfc-006"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [],
+          "allowed_targets": [
+            "docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_REGISTRY_2026-08-23.json"
+          ]
+        }
+      },
+      "input_request": "Check and inspect docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_REGISTRY_2026-08-23.json.",
+      "task_id": "dfc-007"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [],
+          "allowed_targets": [
+            "docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_DESIGN_2026-08-23.md"
+          ]
+        }
+      },
+      "input_request": "Archive docs/research/DETERMINISTIC_FIRST_SEMANTIC_FALLBACK_DESIGN_2026-08-23.md.",
+      "task_id": "dfc-008"
+    }
+  ],
+  "schema": "zth_corrected_confirmation_runtime_cases_v0"
+}
