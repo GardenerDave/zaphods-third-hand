@@ -1,0 +1,64 @@
+{
+  "qualification_change": false,
+  "schema": "zth_failure_teaching_holdout_v0",
+  "tasks": [
+    {
+      "expected_action": "determine",
+      "expected_object_expression": "docs/teaching-presence-alpha.txt",
+      "input_request": "Determine if docs/teaching-presence-alpha.txt exists in the current repository.",
+      "regime": "OPERATION_VS_STATE_PREDICATE",
+      "task_id": "teach-holdout-001"
+    },
+    {
+      "expected_action": "check",
+      "expected_object_expression": "docs/teaching-presence-beta.txt",
+      "input_request": "Check whether docs/teaching-presence-beta.txt is present right now.",
+      "regime": "OPERATION_VS_STATE_PREDICATE",
+      "task_id": "teach-holdout-002"
+    },
+    {
+      "expected_action": "verify",
+      "expected_object_expression": "docs/teaching-presence-gamma.txt",
+      "input_request": "Verify that docs/teaching-presence-gamma.txt can be found in the tree.",
+      "regime": "OPERATION_VS_STATE_PREDICATE",
+      "task_id": "teach-holdout-003"
+    },
+    {
+      "expected_action": "confirm",
+      "expected_object_expression": "docs/teaching-presence-delta.txt",
+      "input_request": "Confirm whether docs/teaching-presence-delta.txt exists at this time.",
+      "regime": "OPERATION_VS_STATE_PREDICATE",
+      "task_id": "teach-holdout-004"
+    },
+    {
+      "expected_action": "inspect",
+      "expected_object_expression": "docs/teaching-control-epsilon.md",
+      "input_request": "Inspect docs/teaching-control-epsilon.md.",
+      "regime": "DIRECT_OPERATION_CONTROL",
+      "task_id": "teach-holdout-005"
+    },
+    {
+      "expected_action": "amend",
+      "expected_object_expression": "docs/teaching-control-zeta.md",
+      "input_request": "Amend docs/teaching-control-zeta.md.",
+      "regime": "DIRECT_OPERATION_CONTROL",
+      "task_id": "teach-holdout-006"
+    },
+    {
+      "expected_action": "index",
+      "expected_object_expression": "docs/teaching-control-eta.md",
+      "input_request": "Index docs/teaching-control-eta.md.",
+      "regime": "DIRECT_OPERATION_CONTROL",
+      "task_id": "teach-holdout-007"
+    },
+    {
+      "expected_action": "dispatch",
+      "expected_object_expression": "docs/teaching-control-theta.md",
+      "input_request": "Dispatch docs/teaching-control-theta.md.",
+      "regime": "DIRECT_OPERATION_CONTROL",
+      "task_id": "teach-holdout-008"
+    }
+  ],
+  "teacher_calls_complete": true,
+  "teacher_visible": false
+}

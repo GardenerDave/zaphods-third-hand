@@ -1,0 +1,25 @@
+{
+  "capability_id": "semantic.minimal_action_object_extraction",
+  "intended_effect": "The prompt patch will guide the supplier to correctly map the 'determine' operation to an allowed action like 'check' when the object expression refers to a file path, preserving the interface's allowed semantics.",
+  "interface_id": "router_v1_minimal_semantic_atom",
+  "must_not_change": [
+    "interface_id",
+    "allowed_action_semantics",
+    "capability_definition",
+    "failing_request",
+    "failure_localization"
+  ],
+  "patch_id": "qwen3_1_7b_action_operation_teaching_patch_v0",
+  "patch_instruction": "When the request clause involves checking for the presence of a file path, the action must be 'check' instead of 'exists'. Update the instruction to explicitly map 'determine' to 'check' for file path object expressions.",
+  "qualification_change": false,
+  "regression_risks": [
+    "The patch may misclassify other 'determine' operations that should use 'exists'",
+    "The patch may not cover all variations of file path expressions"
+  ],
+  "schema": "zth_experimental_prompt_patch_v0",
+  "status": "CANDIDATE_EXPERIMENTAL",
+  "supplier_id": "qwen3_1_7b_minimal_action_object_supplier",
+  "teacher_parsed_sha256": "30dbefb9eabe69afd6180a86265672205a7bc56afc2c67092191be42ef1f7141",
+  "teacher_response_sha256": "7585df80a28f71f3579c687c56b096d5411f8474f1e00e95aab7d0719cd08cbb",
+  "teacher_supplier": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"
+}

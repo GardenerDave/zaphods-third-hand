@@ -179,9 +179,11 @@ def validate_patch(patch: dict[str, Any], holdout: list[dict[str, Any]] | None =
     text = json.dumps(patch, sort_keys=True).casefold()
     forbidden = ("holdout", "authority", "tool", "scope", "policy", "evaluator", "production", "registry", "fuzzy", "substring", "success-result", "success result", "answer key")
     findings = [term for term in forbidden if term in text]
-    if patch["target_capability"] != CAPABILITY or patch["target_interface"] != INTERFACE:
+    if patch.get("target_capability", patch.get("capability_id")) != CAPABILITY or patch.get("target_interface", patch.get("interface_id")) != INTERFACE:
         findings.append("target binding mismatch")
-    if len(patch["patch_instruction"]) > 1800:
+    if not isinstance(patch.get("patch_instruction"), str) or not patch["patch_instruction"].strip():
+        findings.append("patch instruction missing")
+    elif len(patch["patch_instruction"]) > 1800:
         findings.append("patch exceeds bounded size")
     if holdout:
         holdout_text = json.dumps(holdout, sort_keys=True).casefold()
@@ -189,7 +191,7 @@ def validate_patch(patch: dict[str, Any], holdout: list[dict[str, Any]] | None =
             findings.append("holdout request leaked into patch")
         if any(task["expected_action"].casefold() in text for task in holdout if task["expected_action"]):
             findings.append("holdout expected action leaked into patch")
-    return {"schema": "zth_intervention_validation_v0", "valid": not findings, "findings": findings, "target_capability": patch["target_capability"], "target_interface": patch["target_interface"], "qualification_change": False}
+    return {"schema": "zth_intervention_validation_v0", "valid": not findings, "findings": findings, "target_capability": patch.get("target_capability", patch.get("capability_id")), "target_interface": patch.get("target_interface", patch.get("interface_id")), "qualification_change": False}
 
 
 def fresh_holdout() -> list[dict[str, Any]]:
