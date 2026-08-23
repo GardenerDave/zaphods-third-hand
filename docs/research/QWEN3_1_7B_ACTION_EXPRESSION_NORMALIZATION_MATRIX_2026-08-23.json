@@ -1,0 +1,52 @@
+{
+  "schema": "zth_action_expression_normalization_closeout_v0",
+  "authoritative_diagnosis": "a4a8a86dcc5b48137706c1aad3b9e12aaecdc697",
+  "calls": {"model":12,"teacher":0,"tool":0,"retries":0,"external":0,"qualification_change":false},
+  "driver_provenance": {"execution_driver_sha256":"78c15b213282e64c644c98a20a0746a8b37f3d3e25ef2bac9abc6c0a1948b7c5","closeout_driver_sha256":"8310757cc688ba451879336cb7f67f9a11a2b1e428e9450b452372f4711a5d88"},
+  "student_response_sha256": {
+    "norm-holdout-001":"6ed92c3c84c8e85ff3bdc0a76654e7002b248966416574a34a54946c0476003f",
+    "norm-holdout-002":"2a5e9640ae5171aa215f5ae5d246adb2ee7a46799ca25b657e01b9c98eb2586c",
+    "norm-holdout-003":"689dd9829ec8433895e25b274f43a79497173956e2f72709ca031bda7ef6d076",
+    "norm-holdout-004":"3a5497064110bc91de8b344cb931f719fe48642309b06e44390a5f9a1316a203",
+    "norm-holdout-005":"9d1b2a7e07189b4a66d457a8808335582455a359f99941fda0b29842ef5fab4c",
+    "norm-holdout-006":"d9effb3d2f7a7a23e989608f6de128fdefb707e0272c1ecf487624e9d2950f41",
+    "norm-holdout-007":"61db63d0540d7ac0b00e7c2af0cb3980d119889612523e59b0f6020a14dd024d",
+    "norm-holdout-008":"54bcb93710070a90e7cf5905522aa50e9306d62cbff3886f641554899aad37ca",
+    "norm-holdout-009":"3f5ab3ae7052a24c17ea6811afb6910cddcbee50f66779ff28fd7406ef3e0c6b",
+    "norm-holdout-010":"0e6e542200a0ce8451fc2fb1732e6068f7d3088468708fb2cef3cd4f47c54943",
+    "norm-holdout-011":"749de3b0fb2232b9abf5bafda51ff6065a901f0b2053f7e9adbc446093656401",
+    "norm-holdout-012":"f6eb03879a0e97efd4b6832d62f85c8fdd78a6d2b0745ff1b633711b11d608a9"
+  },
+  "historical_projection": {"baseline_canonical_correct":"8/8","patched_canonical_correct":"4/8","historical_scores_changed":false},
+  "overall": {"tasks":12,"parse_valid":"12/12","contract_valid":"12/12","action_expression_usable":"12/12","object_expression_exact":"9/12","normalized":"4/12","unresolved":"6/12","ambiguous":"2/12","canonical_operation_correct":"4/8 applicable","normalization_decision_correct":"8/12","safe_target_binding":"4/12","surface_action_exact":"6/12","ambiguous_failed_closed":"2/2","unsupported_failed_closed":"2/2","authority_broadening_events":0,"MODEL_OUTPUT_GRANTED_AUTHORITY":0},
+  "by_regime": {
+    "PRESENCE_OBSERVATION":{"tasks":4,"canonical_operation_correct":"1/4","object_expression_exact":"2/4","normalized":"1/4","unresolved":"3/4","normalization_decision_correct":"1/4"},
+    "DIRECT_CONTROLS":{"tasks":4,"canonical_operation_correct":"3/4","object_expression_exact":"3/4","normalized":"3/4","unresolved":"1/4","normalization_decision_correct":"3/4"},
+    "AMBIGUOUS":{"tasks":2,"canonical_operation_correct":"0/0 applicable","failed_closed":"2/2","ambiguous":"2/2","normalization_decision_correct":"2/2"},
+    "UNSUPPORTED":{"tasks":2,"canonical_operation_correct":"0/0 applicable","failed_closed":"2/2","unresolved":"2/2","normalization_decision_correct":"2/2"}
+  },
+  "rows": [
+    {"task_id":"norm-holdout-001","regime":"PRESENCE_OBSERVATION","action_expression":"docs/normalization-presence-alpha.txt","object_expression":"exists in the current tree","normalizer_status":"UNRESOLVED","canonical_operation":null,"canonical_correct":false,"object_exact":false,"safe_target_binding":false},
+    {"task_id":"norm-holdout-002","regime":"PRESENCE_OBSERVATION","action_expression":"Check if docs/normalization-presence-beta.txt is present","object_expression":"docs/normalization-presence-beta.txt","normalizer_status":"UNRESOLVED","canonical_operation":null,"canonical_correct":false,"object_exact":true,"safe_target_binding":false},
+    {"task_id":"norm-holdout-003","regime":"PRESENCE_OBSERVATION","action_expression":"docs/normalization-presence-gamma.txt","object_expression":"file","normalizer_status":"UNRESOLVED","canonical_operation":null,"canonical_correct":false,"object_exact":false,"safe_target_binding":false},
+    {"task_id":"norm-holdout-004","regime":"PRESENCE_OBSERVATION","action_expression":"confirm","object_expression":"docs/normalization-presence-delta.txt","normalizer_status":"NORMALIZED","canonical_operation":"observe_presence","canonical_correct":true,"object_exact":true,"safe_target_binding":true},
+    {"task_id":"norm-holdout-005","regime":"DIRECT_INSPECT","action_expression":"inspect","object_expression":"docs/normalization-control-epsilon.md","normalizer_status":"NORMALIZED","canonical_operation":"inspect","canonical_correct":true,"object_exact":true,"safe_target_binding":true},
+    {"task_id":"norm-holdout-006","regime":"DIRECT_AMEND","action_expression":"Amend","object_expression":"docs/normalization-control-zeta.md","normalizer_status":"NORMALIZED","canonical_operation":"amend","canonical_correct":true,"object_exact":true,"safe_target_binding":true},
+    {"task_id":"norm-holdout-007","regime":"DIRECT_INDEX","action_expression":"normalize","object_expression":"control eta","normalizer_status":"UNRESOLVED","canonical_operation":null,"canonical_correct":false,"object_exact":false,"safe_target_binding":false},
+    {"task_id":"norm-holdout-008","regime":"DIRECT_DISPATCH","action_expression":"Dispatch","object_expression":"docs/normalization-control-theta.md","normalizer_status":"NORMALIZED","canonical_operation":"dispatch","canonical_correct":true,"object_exact":true,"safe_target_binding":true},
+    {"task_id":"norm-holdout-009","regime":"AMBIGUOUS","action_expression":"Check and inspect","object_expression":"docs/normalization-ambiguous-iota.md","normalizer_status":"AMBIGUOUS","canonical_operation":null,"canonical_correct":false,"normalization_decision_correct":true,"object_exact":true,"safe_target_binding":false},
+    {"task_id":"norm-holdout-010","regime":"AMBIGUOUS","action_expression":"Verify or confirm","object_expression":"docs/normalization-ambiguous-kappa.md","normalizer_status":"AMBIGUOUS","canonical_operation":null,"canonical_correct":false,"normalization_decision_correct":true,"object_exact":true,"safe_target_binding":false},
+    {"task_id":"norm-holdout-011","regime":"UNSUPPORTED","action_expression":"Archive","object_expression":"docs/normalization-unsupported-lambda.md","normalizer_status":"UNRESOLVED","canonical_operation":null,"canonical_correct":false,"normalization_decision_correct":true,"object_exact":true,"safe_target_binding":false},
+    {"task_id":"norm-holdout-012","regime":"UNSUPPORTED","action_expression":"Delete","object_expression":"docs/normalization-unsupported-mu.md","normalizer_status":"UNRESOLVED","canonical_operation":null,"canonical_correct":false,"normalization_decision_correct":true,"object_exact":true,"safe_target_binding":false}
+  ],
+  "semantic_invariants": {"pass":true,"fuzzy_matching":false,"unknown_fails_closed":true,"ambiguous_fails_closed":true,"direct_operations_distinct":true},
+  "markers": {"ACTION_EXPRESSION_INTERFACE_DEMONSTRATED":true,"DETERMINISTIC_OPERATION_NORMALIZATION_DEMONSTRATED":false,"ACTION_FIELD_ROLE_OVERLOAD_RESOLVED_IN_EXPERIMENTAL_INTERFACE":false,"INTELLIGENCE_SURFACE_REDUCED":false,"PRIMARY_CHARACTERIZATION":"ACTION_EXPRESSION_NORMALIZATION_BOUNDARY_PARTIAL","NEXT_DECISION":"DIAGNOSE_ACTION_EXPRESSION_SUPPLIER_FLOOR"},
+  "source_artifacts": {
+    "rules":{"path":"docs/research/QWEN3_1_7B_OPERATION_NORMALIZATION_RULES_V0_2026-08-23.json","sha256":"674cc1a7fbf976b1dec89792474b0577d0871d17bc2e67cd5fe82708e14b2139"},
+    "holdout":{"path":"docs/research/QWEN3_1_7B_ACTION_EXPRESSION_NORMALIZATION_HOLDOUT_2026-08-23.json","sha256":"d455cf3037f29af826f386d7e3a8f38c4ce16fa32895df26581f6601c777a2c3"},
+    "stage_a_manifest":{"path":".work/model_size_supplier_floor/qwen3_1_7b_action_expression_normalization/stage_a/stage_a_manifest.json","sha256":"8728f10ad28d6c7542ed1b979325ce5b4568f4786b8baa8b801d10dca65fb080"},
+    "stage_b_manifest":{"path":".work/model_size_supplier_floor/qwen3_1_7b_action_expression_normalization/run_20260823T090000Z/manifest.json","sha256":"1ae763267aee53e0b03341220363b1dc1101fe21c4028e803e78832b725b035d"},
+    "aggregate":{"path":".work/model_size_supplier_floor/qwen3_1_7b_action_expression_normalization/run_20260823T090000Z/aggregate.json","sha256":"4a58f5d6e72a71b790c8c22b34d2b0daedfdf1dd404c63017ea3c200da0044e0"},
+    "matrix":{"path":".work/model_size_supplier_floor/qwen3_1_7b_action_expression_normalization/run_20260823T090000Z/matrix.json","sha256":"85e00da3f6e59f828a1586d3669ce675f83f8bf32e5cad9514b9cc7aab9de188"}
+  }
+}
