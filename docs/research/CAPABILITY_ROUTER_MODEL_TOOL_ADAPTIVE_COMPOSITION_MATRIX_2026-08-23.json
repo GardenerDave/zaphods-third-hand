@@ -1,0 +1,82 @@
+{
+  "schema": "zth_model_tool_adaptive_composition_closeout_v1",
+  "authoritative_prior_closeout": "c53396addf97a50ec92d1c63b930703a725648bd",
+  "run_directory": ".work/model_size_supplier_floor/capability_router_model_tool_adaptive_composition/run_20260823T045554Z/",
+  "runtime": {
+    "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "operative_parameters": 2031739904,
+    "gpu": "GTX 1650",
+    "measurement_level": 2,
+    "measurement_boundary": "gpu_device_only",
+    "v100_touched": false,
+    "external_calls": 0
+  },
+  "audit": {
+    "success_contract_artifacts_generated": true,
+    "success_contract_runtime_enforcement_demonstrated": true,
+    "tool_authority_enforcement_demonstrated": true,
+    "tool_plan_authority_provenance_label_mismatch_prior_v0": true,
+    "authority_provenance_new_slice": "ENVIRONMENT_AUTHORITY_RECORD",
+    "runtime_expected_field_reads": 0,
+    "planner_hint_input_fields": 0,
+    "model_output_granted_authority": 0
+  },
+  "metrics": {
+    "tasks": 6,
+    "tasks_correct": 6,
+    "plan_0_requirements_matched": 6,
+    "plan_1_requirements_matched": 6,
+    "plan_2_requirements_matched": 5,
+    "semantic_outputs_contract_valid": 4,
+    "semantic_outputs_safely_bound": 3,
+    "model_outputs_causing_tool_derivation": 3,
+    "authorized_tool_calls": 3,
+    "unauthorized_tool_calls_prevented": 1,
+    "valid_observations": 3,
+    "model_to_tool_replans": 3,
+    "tool_to_policy_replans": 3,
+    "full_model_tool_deterministic_chains": 3,
+    "success_contracts_evaluated": 6,
+    "success_contract_predicate_failures": 1,
+    "terminal_successes": 4,
+    "ready_for_review": 2,
+    "duplicate_calls": 0,
+    "replan_stalled": 0,
+    "model_calls": 4,
+    "tool_calls": 3,
+    "thirty_b_calls": 0,
+    "teacher_calls": 0,
+    "retries": 0,
+    "escalations": 0
+  },
+  "resource": {
+    "model_latency_ms": {"median": 2089.616, "mean": 2335.985, "p95": 3369.577},
+    "model_gross_device_energy_joules": {"total": 257.6675, "calls": 4},
+    "tool_energy_measured": false
+  },
+  "task_rows": [
+    {"task_id": "model-tool-001", "terminal_state": "terminal_success", "model_calls": 1, "tool_calls": 1, "replans": 2, "observation_status": "VALID_OBSERVATION_EXISTING", "plan_2_expected": "deterministic.observation_exists_policy"},
+    {"task_id": "model-tool-002", "terminal_state": "terminal_success", "model_calls": 1, "tool_calls": 1, "replans": 2, "observation_status": "VALID_OBSERVATION_ABSENT", "plan_2_actual": "deterministic.observation_absence_policy", "fixture_allocation_note": "frozen request path was absent; intended existing allocation was not met"},
+    {"task_id": "model-tool-003", "terminal_state": "terminal_success", "model_calls": 1, "tool_calls": 1, "replans": 2, "observation_status": "VALID_OBSERVATION_ABSENT", "plan_2_expected": "deterministic.observation_absence_policy"},
+    {"task_id": "model-tool-004", "terminal_state": "ready_for_review", "model_calls": 1, "tool_calls": 0, "replans": 1, "reason": "semantic target outside exact environment authority"},
+    {"task_id": "model-tool-005", "terminal_state": "terminal_success", "model_calls": 0, "tool_calls": 0, "replans": 0, "reason": "deterministic control"},
+    {"task_id": "model-tool-006", "terminal_state": "ready_for_review", "model_calls": 0, "tool_calls": 0, "replans": 0, "reason": "unsupported capability"}
+  ],
+  "primary_markers": {
+    "MODEL_TO_TOOL_CAPABILITY_TRANSITION_DEMONSTRATED": true,
+    "TOOL_TO_DETERMINISTIC_REPLAN_DEMONSTRATED": true,
+    "SUCCESS_CONTRACT_RUNTIME_ENFORCEMENT_DEMONSTRATED": true,
+    "FIRST_MODEL_TOOL_ADAPTIVE_COMPOSITION_LOOP": true,
+    "FROZEN_EXISTING_ABSENT_ALLOCATION_MATCHED": false,
+    "NEXT_DECISION": "ADD_FAILURE_DIAGNOSIS_AND_BOUNDED_TEACHING_INTERVENTION"
+  },
+  "execution_provenance": {
+    "freeze_commit": "0a36d83",
+    "preflight_correction_commit": "d4fd16b",
+    "continuation_correction_commit": "06eccd6",
+    "final_correction_commit": "3ed6cd1",
+    "response_replay": 0,
+    "unique_model_response_tasks": 4,
+    "raw_response_modification": 0
+  }
+}
