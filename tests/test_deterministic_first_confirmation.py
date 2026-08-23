@@ -9,14 +9,15 @@ def test_runtime_and_evaluator_manifests_are_independent():
 
 
 def test_missing_actuator_is_incomplete_and_read_only_tool_is_not_an_actuator():
-    case = next(x for x in confirmation.runtime_cases() if x["task_id"] == "dfc-005")
-    derivation = confirmation.derive(case["input_request"])
-    plan = confirmation.plan(case["task_id"], derivation, case["environment_facts"]["authority_record"])
-    assert derivation["canonical_operation"] == "amend"
-    assert plan["routing_success"] is True
-    assert plan["overall_coverage"] == "INCOMPLETE"
-    assert plan["incomplete_reason"] == "NO_QUALIFIED_EXECUTION_SUPPLIER"
-    assert plan["planned_tool_calls"] == 0
+    for task_id, operation in (("dfc-005", "amend"), ("dfc-006", "dispatch")):
+        case = next(x for x in confirmation.runtime_cases() if x["task_id"] == task_id)
+        derivation = confirmation.derive(case["input_request"])
+        plan = confirmation.plan(case["task_id"], derivation, case["environment_facts"]["authority_record"])
+        assert derivation["canonical_operation"] == operation
+        assert plan["routing_success"] is True
+        assert plan["overall_coverage"] == "INCOMPLETE"
+        assert plan["incomplete_reason"] == "NO_QUALIFIED_EXECUTION_SUPPLIER"
+        assert plan["planned_tool_calls"] == 0
 
 
 def test_ambiguous_and_unsupported_fail_closed_without_execution_supplier():
@@ -35,3 +36,30 @@ def test_model_output_cannot_grant_authority():
     derivation = confirmation.derive(case["input_request"], altered)
     assert derivation["status"] == "RESOLVED"
     assert case["environment_facts"]["authority_record"]["allowed_targets"] != [altered["object_expression"]]
+    plan = confirmation.plan(case["task_id"], derivation, case["environment_facts"]["authority_record"])
+    assert plan["overall_coverage"] == "COMPLETE"
+    request = {
+        "schema": "zth_tool_request_v0",
+        "capability_id": confirmation.TOOL_CAPABILITY,
+        "supplier_id": confirmation.tool.TOOL_SUPPLIER,
+        "repository_relative_path": altered["object_expression"],
+        "authorized_targets": case["environment_facts"]["authority_record"]["allowed_targets"],
+        "authority_source": "ENVIRONMENT_AUTHORITY_RECORD",
+    }
+    assert confirmation.tool.validate_tool_request(request)["status"] == "DENIED"
+
+
+def test_evaluator_corruption_cannot_change_runtime_cases_or_plans():
+    runtime_cases, evaluator_cases = confirmation.runtime_and_evaluator()
+    original = []
+    for case in runtime_cases:
+        derivation = confirmation.derive(case["input_request"])
+        original.append((case["task_id"], derivation, confirmation.plan(case["task_id"], derivation, case["environment_facts"]["authority_record"])))
+    corrupted = [{**case, "expected_canonical_operation":"delete", "expected_terminal_state":"terminal_success", "expected_model_required":True, "expected_tool_required":False} for case in evaluator_cases]
+    assert [case["task_id"] for case in corrupted] == [case["task_id"] for case in evaluator_cases]
+    repeated = []
+    for case in runtime_cases:
+        derivation = confirmation.derive(case["input_request"])
+        repeated.append((case["task_id"], derivation, confirmation.plan(case["task_id"], derivation, case["environment_facts"]["authority_record"])))
+    assert original == repeated
+    assert evaluator_cases != corrupted
