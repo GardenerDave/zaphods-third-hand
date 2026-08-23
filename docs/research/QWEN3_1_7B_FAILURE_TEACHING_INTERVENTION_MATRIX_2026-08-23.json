@@ -1,0 +1,80 @@
+{
+  "schema": "zth_failure_teaching_intervention_matrix_v0",
+  "authoritative_prior_closeout": "3079327",
+  "preserved_seed": {
+    "task_id": "composition-v0-003",
+    "failure_class": "ACTION_OPERATION_STATE_PREDICATE_CONFUSION",
+    "failed_field": "action",
+    "observed_action": "exists",
+    "tool_calls": 0,
+    "replayed": false
+  },
+  "diagnosis": {
+    "failure_localized": true,
+    "capability_id": "semantic.minimal_action_object_extraction",
+    "interface_id": "router_v1_minimal_semantic_atom",
+    "failed_predicate": "action_allowed"
+  },
+  "teacher": {
+    "supplier": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "calls": 1,
+    "contract_valid": true,
+    "intervention_type": "PROMPT_PATCH",
+    "intervention_valid": true,
+    "holdout_visible": false,
+    "qualification_change": false,
+    "latency_ms": 13752.167,
+    "energy_joules": null
+  },
+  "fresh_retest": {
+    "tasks": 8,
+    "baseline_calls": 8,
+    "patched_calls": 8,
+    "tool_calls": 0,
+    "retries": 0,
+    "escalations": 0,
+    "baseline": {
+      "parse_valid": "8/8",
+      "contract_valid": "8/8",
+      "action_exact": "3/8",
+      "object_expression_exact": "8/8",
+      "both_fields_exact": "3/8",
+      "safe_semantic_binding": "3/8",
+      "state_predicate_as_action": "1/8",
+      "invalid_contract": "0/8",
+      "targeted_action_exact": "2/4",
+      "control_action_exact": "1/4",
+      "energy_total_joules": 426.2075,
+      "latency_mean_ms": 2048.991875,
+      "latency_median_ms": 2080.861,
+      "latency_p95_ms": 2292.678
+    },
+    "patched": {
+      "parse_valid": "8/8",
+      "contract_valid": "8/8",
+      "action_exact": "1/8",
+      "object_expression_exact": "6/8",
+      "both_fields_exact": "1/8",
+      "safe_semantic_binding": "6/8",
+      "state_predicate_as_action": "0/8",
+      "invalid_contract": "0/8",
+      "targeted_action_exact": "1/4",
+      "control_action_exact": "0/4",
+      "energy_total_joules": 544.755,
+      "latency_mean_ms": 2290.476375,
+      "latency_median_ms": 2342.253,
+      "latency_p95_ms": 2497.251
+    }
+  },
+  "interpretation": {
+    "FAILURE_LOCALIZATION_TO_CAPABILITY_INTERFACE_DEMONSTRATED": true,
+    "BOUNDED_TEACHER_INTERVENTION_LOOP_DEMONSTRATED": true,
+    "TEACHER_PROPOSED_INTERVENTION_IMPROVED_FRESH_HOLDOUT": false,
+    "SUPPLIER_CAPABILITY_IMPROVEMENT_EVIDENCE_DEMONSTRATED": false,
+    "INTERVENTION_SUPPORTED": false,
+    "SELF_TEACHING_DEMONSTRATED": false,
+    "QUALIFICATION_PROMOTED": false,
+    "PRIMARY_CHARACTERIZATION": "BOUNDED_TEACHER_INTERVENTION_COMPLETED_INTERVENTION_NOT_SUPPORTED",
+    "NEXT_DECISION": "DIAGNOSE_INTERVENTION_FAILURE"
+  }
+}
