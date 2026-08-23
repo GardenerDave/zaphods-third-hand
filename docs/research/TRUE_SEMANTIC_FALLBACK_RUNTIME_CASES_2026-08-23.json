@@ -1,0 +1,141 @@
+{
+  "cases": [
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "observe_presence"
+          ],
+          "allowed_targets": [
+            "docs/research/TRUE_FALLBACK_PRESENCE_AMBER_2026-08-23.md"
+          ]
+        }
+      },
+      "input_request": "Is docs/research/TRUE_FALLBACK_PRESENCE_AMBER_2026-08-23.md around in this tree?",
+      "task_id": "tsf-001"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "observe_presence"
+          ],
+          "allowed_targets": [
+            "docs/research/TRUE_FALLBACK_PRESENCE_BRONZE_2026-08-23.json"
+          ]
+        }
+      },
+      "input_request": "Do we have docs/research/TRUE_FALLBACK_PRESENCE_BRONZE_2026-08-23.json here?",
+      "task_id": "tsf-002"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "observe_presence"
+          ],
+          "allowed_targets": [
+            "docs/research/TRUE_FALLBACK_PRESENCE_CITRINE_2026-08-23.txt"
+          ]
+        }
+      },
+      "input_request": "Tell me if docs/research/TRUE_FALLBACK_PRESENCE_CITRINE_2026-08-23.txt is available.",
+      "task_id": "tsf-003"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "inspect"
+          ],
+          "allowed_targets": [
+            "docs/research/TRUE_FALLBACK_INSPECT_DAWN_2026-08-23.md"
+          ]
+        }
+      },
+      "input_request": "Take a look at docs/research/TRUE_FALLBACK_INSPECT_DAWN_2026-08-23.md.",
+      "task_id": "tsf-004"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "inspect"
+          ],
+          "allowed_targets": [
+            "docs/research/TRUE_FALLBACK_INSPECT_EMBER_2026-08-23.json"
+          ]
+        }
+      },
+      "input_request": "Give docs/research/TRUE_FALLBACK_INSPECT_EMBER_2026-08-23.json a quick look.",
+      "task_id": "tsf-005"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "inspect"
+          ],
+          "allowed_targets": [
+            "docs/research/TRUE_FALLBACK_INSPECT_FROST_2026-08-23.txt"
+          ]
+        }
+      },
+      "input_request": "Have a look at docs/research/TRUE_FALLBACK_INSPECT_FROST_2026-08-23.txt.",
+      "task_id": "tsf-006"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "observe_presence"
+          ],
+          "allowed_targets": [
+            "docs/research/TRUE_FALLBACK_CONTROL_EXISTING_2026-08-23.md"
+          ]
+        }
+      },
+      "input_request": "Determine whether docs/research/TRUE_FALLBACK_CONTROL_EXISTING_2026-08-23.md exists right now.",
+      "task_id": "tsf-007"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "inspect"
+          ],
+          "allowed_targets": [
+            "docs/research/TRUE_FALLBACK_CONTROL_INSPECT_2026-08-23.md"
+          ]
+        }
+      },
+      "input_request": "Inspect docs/research/TRUE_FALLBACK_CONTROL_INSPECT_2026-08-23.md.",
+      "task_id": "tsf-008"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [],
+          "allowed_targets": [
+            "docs/research/TRUE_FALLBACK_AMBIGUOUS_2026-08-23.md"
+          ]
+        }
+      },
+      "input_request": "Check and inspect docs/research/TRUE_FALLBACK_AMBIGUOUS_2026-08-23.md.",
+      "task_id": "tsf-009"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [],
+          "allowed_targets": [
+            "docs/research/TRUE_FALLBACK_UNSUPPORTED_2026-08-23.md"
+          ]
+        }
+      },
+      "input_request": "Delete docs/research/TRUE_FALLBACK_UNSUPPORTED_2026-08-23.md.",
+      "task_id": "tsf-010"
+    }
+  ],
+  "schema": "zth_true_semantic_fallback_runtime_cases_v0"
+}

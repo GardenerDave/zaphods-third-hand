@@ -1,0 +1,95 @@
+{
+  "cases": [
+    {
+      "expected_execution_path_complete": true,
+      "expected_model_required": true,
+      "expected_routing_decision_correct": true,
+      "expected_semantic_class": "observe_presence",
+      "expected_task_terminal_success": true,
+      "regime": "TRUE_FALLBACK_PRESENCE",
+      "task_id": "tsf-001"
+    },
+    {
+      "expected_execution_path_complete": true,
+      "expected_model_required": true,
+      "expected_routing_decision_correct": true,
+      "expected_semantic_class": "observe_presence",
+      "expected_task_terminal_success": true,
+      "regime": "TRUE_FALLBACK_PRESENCE",
+      "task_id": "tsf-002"
+    },
+    {
+      "expected_execution_path_complete": true,
+      "expected_model_required": true,
+      "expected_routing_decision_correct": true,
+      "expected_semantic_class": "observe_presence",
+      "expected_task_terminal_success": true,
+      "regime": "TRUE_FALLBACK_PRESENCE",
+      "task_id": "tsf-003"
+    },
+    {
+      "expected_execution_path_complete": false,
+      "expected_model_required": true,
+      "expected_routing_decision_correct": true,
+      "expected_semantic_class": "inspect",
+      "expected_task_terminal_success": false,
+      "regime": "TRUE_FALLBACK_INSPECT",
+      "task_id": "tsf-004"
+    },
+    {
+      "expected_execution_path_complete": false,
+      "expected_model_required": true,
+      "expected_routing_decision_correct": true,
+      "expected_semantic_class": "inspect",
+      "expected_task_terminal_success": false,
+      "regime": "TRUE_FALLBACK_INSPECT",
+      "task_id": "tsf-005"
+    },
+    {
+      "expected_execution_path_complete": false,
+      "expected_model_required": true,
+      "expected_routing_decision_correct": true,
+      "expected_semantic_class": "inspect",
+      "expected_task_terminal_success": false,
+      "regime": "TRUE_FALLBACK_INSPECT",
+      "task_id": "tsf-006"
+    },
+    {
+      "expected_execution_path_complete": true,
+      "expected_model_required": false,
+      "expected_routing_decision_correct": true,
+      "expected_semantic_class": "observe_presence",
+      "expected_task_terminal_success": true,
+      "regime": "DETERMINISTIC_CONTROL",
+      "task_id": "tsf-007"
+    },
+    {
+      "expected_execution_path_complete": false,
+      "expected_model_required": false,
+      "expected_routing_decision_correct": true,
+      "expected_semantic_class": "inspect",
+      "expected_task_terminal_success": false,
+      "regime": "DETERMINISTIC_CONTROL",
+      "task_id": "tsf-008"
+    },
+    {
+      "expected_execution_path_complete": false,
+      "expected_model_required": false,
+      "expected_routing_decision_correct": true,
+      "expected_semantic_class": null,
+      "expected_task_terminal_success": false,
+      "regime": "FAIL_CLOSED_AMBIGUOUS",
+      "task_id": "tsf-009"
+    },
+    {
+      "expected_execution_path_complete": false,
+      "expected_model_required": false,
+      "expected_routing_decision_correct": true,
+      "expected_semantic_class": null,
+      "expected_task_terminal_success": false,
+      "regime": "FAIL_CLOSED_UNSUPPORTED",
+      "task_id": "tsf-010"
+    }
+  ],
+  "schema": "zth_true_semantic_fallback_evaluator_cases_v0"
+}
