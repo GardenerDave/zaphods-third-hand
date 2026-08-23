@@ -64,3 +64,25 @@ def test_v1_neutral_target_extensions_are_balanced():
     for task_id, regime, request, operation in probe.fixture_specs()[:6]:
         by_class[operation].append(request.rsplit(".", 1)[-1])
     assert len(by_class["observe_presence"]) == len(by_class["inspect"]) == 3
+
+
+def test_v1_missing_inspect_actuator_has_integer_zero_counts_and_incomplete_coverage():
+    case = next(x for x in probe.runtime_cases() if x["task_id"] == "tsfv1-002")
+    plan = probe.plan(case["task_id"], probe.preflight(case["input_request"]), "inspect")
+    assert plan["overall_coverage"] == "INCOMPLETE"
+    assert plan["execution_path_complete"] is False
+    assert plan["planned_model_calls"] == 0
+    assert plan["planned_tool_calls"] == 0
+    assert plan["planned_deterministic_steps"] == 2
+    assert all(isinstance(plan[key], int) for key in ("planned_model_calls", "planned_tool_calls", "planned_deterministic_steps"))
+
+
+def test_v1_supplier_counts_treat_missing_supplier_as_zero():
+    records = [
+        {"selected_supplier": {"supplier_type": "MODEL"}},
+        {"selected_supplier": {"supplier_type": "TOOL"}},
+        {"selected_supplier": {"supplier_type": "DETERMINISTIC_CODE"}},
+        {"selected_supplier": None},
+    ]
+    counts = probe.supplier_counts(records)
+    assert counts == {"planned_model_calls": 1, "planned_tool_calls": 1, "planned_deterministic_steps": 1}

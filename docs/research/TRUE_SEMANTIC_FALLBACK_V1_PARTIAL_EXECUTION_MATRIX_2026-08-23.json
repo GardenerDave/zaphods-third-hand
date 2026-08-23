@@ -1,0 +1,65 @@
+{
+  "schema": "zth_true_semantic_fallback_v1_partial_execution_matrix_v0",
+  "freeze_commit": "25b6051b910acece9dcc192533e86f0bf8db4cdb",
+  "prior_repository_closeout": "3da279086a1864244f26bc09c9e527eb4f92fbce",
+  "operator_run": ".work/model_size_supplier_floor/true_semantic_fallback_v1/run_20260823T160000Z_operator1",
+  "frozen_execution_driver_sha256": "03697a2dc201b5d1281a1b5a01d6fcb6101b1df772d283d85083b907853ea559",
+  "compatibility_shim": {
+    "operator_compatibility_shim_infrastructure_only": true,
+    "wrapper_hash_unavailable": true,
+    "stated_behavior": "supplied telemetry_base_url and telemetry_preflight from the existing 0.6B telemetry module"
+  },
+  "counts": {
+    "response_count": 1,
+    "observed_semantic_classifications": 1,
+    "semantic_classifications_correct": 0,
+    "semantic_classifications_denominator": 1,
+    "remaining_frozen_tasks_not_executed": 5,
+    "runtime_result_count": 0,
+    "tool_observation_count": 0,
+    "model_calls_made": 1,
+    "tool_calls_made": 0,
+    "teacher_calls_made": 0,
+    "30b_calls_made": 0,
+    "external_calls_made": 0,
+    "retries": 0
+  },
+  "task": {
+    "task_id": "tsfv1-001",
+    "request": "Is docs/research/TSF_AMBER_2026-08-23.md around in this tree?",
+    "expected_semantic_class_evaluator_only": "observe_presence",
+    "observed_operation_class": "inspect",
+    "parse_valid": true,
+    "contract_valid": true,
+    "candidate_valid": true,
+    "candidate_admissible": true,
+    "semantic_classification_correct": false,
+    "semantic_information_genuinely_unresolved_pre_model": true,
+    "tool_call": false,
+    "runtime_result": false
+  },
+  "artifact_hashes": {
+    "response_json": "c163eb949e077b0c28a5b6395af4ad1b1e6abd91aaf51cd3ac0001cdbd9768ed",
+    "candidate_validation_json": "fea442f3b28d086f7ec92bc17c19d1040b9b0ce9a9a855fb4ab902d153ee8422",
+    "call_started_json": "1a6500b16b11407142fc6beb64aea6077f1785c440323c9d20b0bfbff00de556",
+    "power_samples_json": "16f5b604ab5865b7f2775f37a32449ed64366d086211cf6b81d8cfd009881420",
+    "operation_derivation_1_json": "e3c78fb4937ea993f0cd07647eca843ac7add4677d4245dec4fcdf253b8a53ff"
+  },
+  "diagnosis": {
+    "post_model_planning_defect_demonstrated": true,
+    "post_model_planning_defect_class": "OPTIONAL_SUPPLIER_BOOLEAN_SUM_NONE",
+    "semantic_response_preserved_before_planning_failure": true,
+    "planning_failure_caused_model_error": false,
+    "frozen_driver_modified": false,
+    "remaining_v1_tasks_replayed": false
+  },
+  "markers": {
+    "TRUE_SEMANTIC_FALLBACK_EXECUTION_BEGUN": true,
+    "GENUINE_SEMANTIC_FALLBACK_RESPONSE_CAPTURED": true,
+    "DECISION_CRITICAL_MODEL_SEMANTIC_RESPONSIBILITY_EXERCISED": true,
+    "FIRST_GENUINE_SEMANTIC_OPERATION_CLASSIFICATION_FAILURE_PRESERVED": true,
+    "TRUE_SEMANTIC_FALLBACK_DEMONSTRATED": false,
+    "MODEL_OUTPUT_TO_CAPABILITY_PLAN_TRANSITION_DEMONSTRATED": false
+  },
+  "next_decision": "RUN_FRESH_TRUE_SEMANTIC_FALLBACK_BASELINE_WITH_REPAIRED_HARNESS"
+}

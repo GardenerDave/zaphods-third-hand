@@ -162,7 +162,8 @@ def plan(task_id: str, pre: dict[str, Any], operation: str | None = None) -> dic
             else: supplier = {"supplier_id": "python_deterministic_v0", "supplier_type": "DETERMINISTIC_CODE", "interface_id": cap}
             records.append({"capability_id": cap, "selected_supplier": supplier, "coverage_status": "COVERED" if supplier else "UNCOVERED"})
     complete = bool(required) and all(x["coverage_status"] == "COVERED" for x in records)
-    return {"schema": "zth_true_semantic_fallback_v1_capability_plan_v0", "task_id": task_id, "derived_required_capabilities": required, "capabilities": records, "overall_coverage": "COMPLETE" if complete else "INCOMPLETE", "execution_path_complete": complete, "routing_success": bool(operation in {"observe_presence", "inspect"} or (not pre["model_required"] and not required)), "planned_model_calls": sum(x["selected_supplier"] and x["selected_supplier"]["supplier_type"] == "MODEL" for x in records), "planned_tool_calls": sum(x["selected_supplier"] and x["selected_supplier"]["supplier_type"] == "TOOL" for x in records), "planned_deterministic_steps": sum(x["selected_supplier"] and x["selected_supplier"]["supplier_type"] == "DETERMINISTIC_CODE" for x in records)}
+    counts = supplier_counts(records)
+    return {"schema": "zth_true_semantic_fallback_v1_capability_plan_v0", "task_id": task_id, "derived_required_capabilities": required, "capabilities": records, "overall_coverage": "COMPLETE" if complete else "INCOMPLETE", "execution_path_complete": complete, "routing_success": bool(operation in {"observe_presence", "inspect"} or (not pre["model_required"] and not required)), **counts}
 
 
 def leakage_audit(cases: list[dict[str, Any]], evaluators: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -173,6 +174,27 @@ def leakage_audit(cases: list[dict[str, Any]], evaluators: list[dict[str, Any]])
         basename = Path(target).name.casefold()
         rows.append({"task_id": case["task_id"], "input_request": case["input_request"], "target": target, "expected_class_evaluator_only": expected[case["task_id"]], "target_semantic_label_leak": any(label in basename for label in FORBIDDEN_TARGET_LABELS), "runtime_authority_class_leak": case["environment_facts"]["authority_record"]["allowed_observation_operations"] != SHARED_RUNTIME_AUTHORITY, "runtime_regime_label_present": any(label in json.dumps(case).casefold() for label in ("true_fallback", "deterministic_control", "fail_closed")), "evaluator_fields_present": any(k.startswith("expected_") for k in case), "prompt_classification_specification_allowed": True})
     return rows
+
+
+def supplier_counts(records: list[dict[str, Any]]) -> dict[str, int]:
+    """Count only selected suppliers; uncovered capabilities are valid records."""
+    return {
+        "planned_model_calls": sum(
+            record["selected_supplier"] is not None
+            and record["selected_supplier"]["supplier_type"] == "MODEL"
+            for record in records
+        ),
+        "planned_tool_calls": sum(
+            record["selected_supplier"] is not None
+            and record["selected_supplier"]["supplier_type"] == "TOOL"
+            for record in records
+        ),
+        "planned_deterministic_steps": sum(
+            record["selected_supplier"] is not None
+            and record["selected_supplier"]["supplier_type"] == "DETERMINISTIC_CODE"
+            for record in records
+        ),
+    }
 
 
 def prepare(out: Path) -> None:
