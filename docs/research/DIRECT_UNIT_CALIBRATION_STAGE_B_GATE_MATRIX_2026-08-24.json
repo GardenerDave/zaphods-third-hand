@@ -1,0 +1,191 @@
+{
+  "schema": "zth_direct_unit_calibration_stage_b_gate_v1",
+  "date": "2026-08-24",
+  "authoritative_commits": {
+    "semantic_audit": "fb21f019e08e9f7d312fa37439396e0ee509641b",
+    "stage_a_result": "6b1ec1ec3649276c3f846507cd3bb71e558ee14c"
+  },
+  "source_hashes": {
+    "stage_a_semantic_validity_matrix": "3706bf0a0620a2c1b5833c88c1550672275bfa31b1775c4cdf031d573fd2b45c",
+    "stage_a_results_matrix": "2967b1fb562a7399b0805b09f62382de3186f3fd1158ea26bb0e40895da349cb",
+    "stage_a_atomic_evidence": "02b2d3d87c4f0d63f7e257d2ae1001f4874207a8f9c0e6ce3a95b97420b14d40",
+    "stage_a_raw_response_manifest": "a5f9eb5fb75adc56af78fa0e5207c6c9a406e35368ac3eabfadddb1724060dd0",
+    "stage_a_lifecycle": "cd4e9daca5090a4f6dd3896bf8f6d2d4a25add605bc340f179d5da313e64f4f",
+    "scope_v0_raw_response_manifest": "54d06b4c9a221eb8a98bcb5f6d2db5cf2246c57c14058ba4ae9f655696e04173",
+    "prospective_predictors": "1fcdf91d9cae4be6bb8182aa982896528745e664883e74695972ce15506b7a9c",
+    "run3_routing_policy_freeze": "cf6728e51e5b5e1ce5ed24539f83bbacd4f9a07dd818f26106c333cc7e543fe8",
+    "run4a_preregistration": "a9418fe1e45a05e46b4fd183a6345333893192305fbf767461f3b280b26d748b",
+    "run4a_comparative_evidence_freeze": "c48a97000fbf85b7ea3919a8269009d3200d3c2369924c456ec9dcc8736baf7b",
+    "run4_economic_policy_freeze": "60732b15f0547ba51e66aaa134c26b86aeb089d23e44029b88b659f21cda12ed",
+    "atomic_supplier_scorecard_schema": "d484d012e8fe7bb6a5266864b3c8542a96a4e6391ca75145007b0a04eeefeea9",
+    "run4_resource_weights": "8f7820a6a3e5734e071452f643374d8c6c769d4d149bcec3f2f82b88ee6530c2"
+  },
+  "starting_state": {
+    "stage_a_measurement_valid": true,
+    "semantic_classification": "STAGE_A_SEMANTIC_FAILURE_RESULT_SUPPORTED",
+    "validator_gap_supported": false,
+    "raw_hashes_unchanged": true,
+    "atomic_direct_observations": 64,
+    "scope_v0_historical_observations": 32,
+    "new_stage_a_observations": 32,
+    "all_new_evidence_direct_responder": true,
+    "compound_rescue_observations_in_rates": false,
+    "stage_b_target_outcomes": 0
+  },
+  "direct_evidence_recomputed": {
+    "local_teacher": {
+      "scope-authority-boundary": {"successes": 5, "opportunities": 16, "rate": 0.3125},
+      "triage-routing": {"successes": 0, "opportunities": 8, "rate": 0.0},
+      "unsupported-certainty": {"successes": 0, "opportunities": 8, "rate": 0.0},
+      "micro": {"successes": 5, "opportunities": 32, "rate": 0.15625},
+      "family_macro": {"rate": 0.10416666666666667}
+    },
+    "external_teacher": {
+      "scope-authority-boundary": {"successes": 16, "opportunities": 16, "rate": 1.0},
+      "triage-routing": {"successes": 0, "opportunities": 8, "rate": 0.0},
+      "unsupported-certainty": {"successes": 0, "opportunities": 8, "rate": 0.0},
+      "micro": {"successes": 16, "opportunities": 32, "rate": 0.5},
+      "family_macro": {"rate": 0.3333333333333333}
+    }
+  },
+  "policy_form_audit": {
+    "preexisting_generalized_policy_form_available": true,
+    "generalized_source": "DELEGATION_PREDICTION_PROSPECTIVE_PREDICTORS_2026-08-24.json / RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1",
+    "generalized_rule": "choose higher existing broad score; delegate when score exists; tie or missing abstains",
+    "preexisting_bounded_policy_form_available": true,
+    "bounded_source": "DELEGATION_PREDICTION_PROSPECTIVE_PREDICTORS_2026-08-24.json / SCOPE_INTERFACE_PROFILE_RUN4A_V1 and RUN_4_ECONOMIC_ROUTING_POLICY_FREEZE_2026-08-19.json",
+    "bounded_rule": "require matched unit and supported-positive evidence; choose frozen cost order; no supported-positive evidence abstains/fails closed",
+    "target_outcomes_used_to_define_forms": false
+  },
+  "broad_aggregation_adjudication": {
+    "micro_rule_principled": true,
+    "micro_basis": "historical broad aggregate is opportunity-weighted across all families",
+    "family_macro_rule_retained_descriptively": true,
+    "micro_rank": "external_teacher > local_teacher",
+    "family_macro_rank": "external_teacher > local_teacher",
+    "broad_policy_not_identifiable_without_post_outcome_choice": false,
+    "selected_stage_b_broad_comparator": "MICRO_AGGREGATE_DIRECT"
+  },
+  "evidence_state_adjudication": {
+    "provenance": [
+      "RUN_3_ROUTING_POLICY_FREEZE_2026-08-18.json",
+      "RUN_4A_PREREGISTRATION_2026-08-19.json",
+      "RUN_4_ECONOMIC_ROUTING_POLICY_FREEZE_2026-08-19.json",
+      "local_harness/capability_cards.py",
+      "local_harness/run4_economic_policy.py"
+    ],
+    "minimum_comparable_opportunities": 3,
+    "positive_rate_floor": 0.5,
+    "existing_mapping": "n>=3 and rate>=0.5 => SUPPORTED_POSITIVE; n>=3 and rate<0.5 => SUPPORTED_NEGATIVE; no supported-positive candidate => abstain/fail closed",
+    "stage_a_unit_states": {
+      "scope-authority-boundary": {
+        "local_teacher": "SUPPORTED_NEGATIVE",
+        "external_teacher": "SUPPORTED_POSITIVE"
+      },
+      "triage-routing": {
+        "local_teacher": "SUPPORTED_NEGATIVE",
+        "external_teacher": "SUPPORTED_NEGATIVE"
+      },
+      "unsupported-certainty": {
+        "local_teacher": "SUPPORTED_NEGATIVE",
+        "external_teacher": "SUPPORTED_NEGATIVE"
+      }
+    },
+    "coverage_absence_treated_as_negative": false,
+    "new_threshold_or_fallback_fitted": false,
+    "bounded_policy_actionability_identifiable": true
+  },
+  "family_policy_matrix": [
+    {
+      "family": "scope-authority-boundary",
+      "generalized_decision": "delegate external_teacher",
+      "bounded_decision": "delegate external_teacher",
+      "disagreement_type": "NONE",
+      "provenance": "micro broad rank; exact-family direct supported-positive evidence and frozen cost rule"
+    },
+    {
+      "family": "triage-routing",
+      "generalized_decision": "delegate external_teacher",
+      "bounded_decision": "abstain",
+      "disagreement_type": "DELEGATE_VS_ABSTAIN",
+      "provenance": "micro broad rank; both direct bounded units supported-negative; no supported-positive candidate abstains"
+    },
+    {
+      "family": "unsupported-certainty",
+      "generalized_decision": "delegate external_teacher",
+      "bounded_decision": "abstain",
+      "disagreement_type": "DELEGATE_VS_ABSTAIN",
+      "provenance": "micro broad rank; both direct bounded units supported-negative; no supported-positive candidate abstains"
+    }
+  ],
+  "natural_pre_target_policy_disagreement_exists": true,
+  "disagreement_types": {
+    "supplier_selection": 0,
+    "delegate_vs_abstain": 2,
+    "none": 1,
+    "unresolved": 0
+  },
+  "estimand": "On fresh direct capability-family tasks where broad cross-family evidence recommends external delegation but matched responsibility/interface evidence has no supported-positive supplier, compare delegate-versus-abstain decision quality.",
+  "fresh_holdout_audit": {
+    "fresh_stage_b_holdout_space_available": true,
+    "actual_stage_b_targets_created": false,
+    "stage_a_ids_or_text_reused": false,
+    "model_outcomes_consulted": false,
+    "available_generation_basis": [
+      "reviewed_v4a deterministic triage and unsupported-certainty fixture families",
+      "preserved novelty audits and source-anchor process",
+      "additional reviewed family fixture packs and repository source anchors"
+    ],
+    "future_requirement": "author new source-anchor cases and independently hash/verify freshness before Stage B freeze"
+  },
+  "supplier_interface_usability": {
+    "usable_for_stage_b": true,
+    "local": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf via JARVIS_LOCAL",
+    "external": "codex-cli-0.146.0 via preserved service mechanism",
+    "observed_external_native_model": "gpt-5.6-luna",
+    "native_continuity_claim": false,
+    "native_state_control": "BEST_AVAILABLE_OBSERVATION"
+  },
+  "proposed_stage_b_budget": {
+    "status": "proposal_only_not_frozen",
+    "triage_cases": 8,
+    "unsupported_certainty_cases": 8,
+    "fresh_tasks": 16,
+    "local_calls": 16,
+    "external_calls": 16,
+    "supplier_calls": 32
+  },
+  "scoring": {
+    "frozen_order": ["false_positive_avoidance", "successful_delegation", "abstention_quality", "cost_only_if_capability_equivalent"],
+    "counterfactual_arm_execution_required": true,
+    "future_eligible_matched_arm_definition_required_before_targets": true,
+    "expected_winner_used_in_gate": false
+  },
+  "readiness_conditions": {
+    "stage_a_measurement_valid": true,
+    "competence_units_aligned": true,
+    "broad_policy_independently_identifiable": true,
+    "bounded_policy_independently_identifiable": true,
+    "natural_pre_target_disagreement": true,
+    "no_manufactured_threshold": true,
+    "fresh_holdout_space": true,
+    "supplier_interface_identities_usable": true,
+    "scoring_freezable_before_outcomes": true,
+    "readiness_independent_of_expected_winner": true,
+    "clean_granularity_replication_ready": true
+  },
+  "controls": {
+    "model_calls": 0,
+    "external_inference_calls": 0,
+    "tool_calls": 0,
+    "retries": 0,
+    "replays": 0,
+    "stage_b_target_outcomes": 0,
+    "stage_b_started": false,
+    "policy_changes": 0,
+    "qualification_changes": 0,
+    "production_routing_changes": 0
+  },
+  "decision": "CLEAN_GRANULARITY_REPLICATION_READY",
+  "next_decision": "FREEZE_CLEAN_GRANULARITY_REPLICATION_STAGE_B"
+}
