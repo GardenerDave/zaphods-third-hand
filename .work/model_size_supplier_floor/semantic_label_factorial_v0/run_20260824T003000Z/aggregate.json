@@ -1,0 +1,529 @@
+{
+  "arm_metrics": {
+    "A": {
+      "candidate_admissible": 6,
+      "candidate_valid": 6,
+      "contract_valid": 6,
+      "inspect_correct": 3,
+      "inspect_outputs": 4,
+      "inspect_total": 3,
+      "observe_presence_outputs": 2,
+      "parse_valid": 6,
+      "presence_correct": 2,
+      "presence_total": 3,
+      "semantic_correct": 5,
+      "semantic_total": 6,
+      "unresolved_or_rejected_outputs": 0
+    },
+    "B": {
+      "candidate_admissible": 6,
+      "candidate_valid": 6,
+      "contract_valid": 6,
+      "inspect_correct": 3,
+      "inspect_outputs": 3,
+      "inspect_total": 3,
+      "observe_presence_outputs": 3,
+      "parse_valid": 6,
+      "presence_correct": 3,
+      "presence_total": 3,
+      "semantic_correct": 6,
+      "semantic_total": 6,
+      "unresolved_or_rejected_outputs": 0
+    },
+    "C": {
+      "candidate_admissible": 6,
+      "candidate_valid": 6,
+      "contract_valid": 6,
+      "inspect_correct": 3,
+      "inspect_outputs": 6,
+      "inspect_total": 3,
+      "observe_presence_outputs": 0,
+      "parse_valid": 6,
+      "presence_correct": 0,
+      "presence_total": 3,
+      "semantic_correct": 3,
+      "semantic_total": 6,
+      "unresolved_or_rejected_outputs": 0
+    },
+    "D": {
+      "candidate_admissible": 6,
+      "candidate_valid": 6,
+      "contract_valid": 6,
+      "inspect_correct": 3,
+      "inspect_outputs": 3,
+      "inspect_total": 3,
+      "observe_presence_outputs": 3,
+      "parse_valid": 6,
+      "presence_correct": 3,
+      "presence_total": 3,
+      "semantic_correct": 6,
+      "semantic_total": 6,
+      "unresolved_or_rejected_outputs": 0
+    }
+  },
+  "evaluator_source": "/home/navigator/agent-workspace/zaphods-third-hand/docs/research/SEMANTIC_LABEL_FACTORIAL_V0_HARDENED_EVALUATOR_CASES_2026-08-23.json",
+  "factor_mapping": {
+    "A": {
+      "inspect_label": "ORIGINAL",
+      "presence_label": "ORIGINAL"
+    },
+    "B": {
+      "inspect_label": "NEUTRAL",
+      "presence_label": "NEUTRAL"
+    },
+    "C": {
+      "inspect_label": "ORIGINAL",
+      "presence_label": "NEUTRAL"
+    },
+    "D": {
+      "inspect_label": "NEUTRAL",
+      "presence_label": "ORIGINAL"
+    }
+  },
+  "factorial_contrasts": {
+    "inspect": {
+      "inspect_label_main_effect": 0.0,
+      "label_interaction_contrast": 0.0,
+      "presence_label_main_effect": 0.0,
+      "rates": {
+        "A": 1.0,
+        "B": 1.0,
+        "C": 1.0,
+        "D": 1.0
+      }
+    },
+    "overall": {
+      "inspect_label_main_effect": 0.33333333333333326,
+      "label_interaction_contrast": 0.33333333333333337,
+      "presence_label_main_effect": -0.16666666666666674,
+      "rates": {
+        "A": 0.8333333333333334,
+        "B": 1.0,
+        "C": 0.5,
+        "D": 1.0
+      }
+    },
+    "presence": {
+      "inspect_label_main_effect": 0.6666666666666667,
+      "label_interaction_contrast": 0.6666666666666666,
+      "presence_label_main_effect": -0.33333333333333326,
+      "rates": {
+        "A": 0.6666666666666666,
+        "B": 1.0,
+        "C": 0.0,
+        "D": 1.0
+      }
+    }
+  },
+  "interpretation": {
+    "contrasts": {
+      "inspect": {
+        "inspect_label_main_effect": 0.0,
+        "label_interaction_contrast": 0.0,
+        "presence_label_main_effect": 0.0,
+        "rates": {
+          "A": 1.0,
+          "B": 1.0,
+          "C": 1.0,
+          "D": 1.0
+        }
+      },
+      "overall": {
+        "inspect_label_main_effect": 0.33333333333333326,
+        "label_interaction_contrast": 0.33333333333333337,
+        "presence_label_main_effect": -0.16666666666666674,
+        "rates": {
+          "A": 0.8333333333333334,
+          "B": 1.0,
+          "C": 0.5,
+          "D": 1.0
+        }
+      },
+      "presence": {
+        "inspect_label_main_effect": 0.6666666666666667,
+        "label_interaction_contrast": 0.6666666666666666,
+        "presence_label_main_effect": -0.33333333333333326,
+        "rates": {
+          "A": 0.6666666666666666,
+          "B": 1.0,
+          "C": 0.0,
+          "D": 1.0
+        }
+      }
+    },
+    "factor_mapping": {
+      "A": {
+        "inspect_label": "ORIGINAL",
+        "presence_label": "ORIGINAL"
+      },
+      "B": {
+        "inspect_label": "NEUTRAL",
+        "presence_label": "NEUTRAL"
+      },
+      "C": {
+        "inspect_label": "ORIGINAL",
+        "presence_label": "NEUTRAL"
+      },
+      "D": {
+        "inspect_label": "NEUTRAL",
+        "presence_label": "ORIGINAL"
+      }
+    },
+    "markers": {
+      "EITHER_SINGLE_LABEL_SUBSTITUTION_RECOVERY_OBSERVED": false,
+      "INSPECT_LABEL_ATTRACTOR_EFFECT_SUPPORTED": false,
+      "INSPECT_LABEL_MAIN_EFFECT_OBSERVED": true,
+      "JOINT_NEUTRAL_LABEL_DEPENDENCE_OBSERVED": false,
+      "LABEL_INTERACTION_CONTRAST_NONZERO": true,
+      "LABEL_INTERACTION_EFFECT_PLAUSIBLE": false,
+      "OBSERVE_PRESENCE_LABEL_INTERFERENCE_SUPPORTED": false,
+      "PRESENCE_LABEL_MAIN_EFFECT_OBSERVED": true
+    }
+  },
+  "pairwise_contrasts": {
+    "A_vs_C": {
+      "accuracy_delta_inspect": 0,
+      "accuracy_delta_inspect_rate": 0.0,
+      "accuracy_delta_overall": -2,
+      "accuracy_delta_overall_rate": -0.3333333333333333,
+      "accuracy_delta_presence": -2,
+      "accuracy_delta_presence_rate": -0.6666666666666666,
+      "canonical_output_changed_count": 2,
+      "inspect_task_changed_count": 0,
+      "left": "A",
+      "presence_task_changed_count": 2,
+      "right": "C"
+    },
+    "A_vs_D": {
+      "accuracy_delta_inspect": 0,
+      "accuracy_delta_inspect_rate": 0.0,
+      "accuracy_delta_overall": 1,
+      "accuracy_delta_overall_rate": 0.16666666666666666,
+      "accuracy_delta_presence": 1,
+      "accuracy_delta_presence_rate": 0.3333333333333333,
+      "canonical_output_changed_count": 1,
+      "inspect_task_changed_count": 0,
+      "left": "A",
+      "presence_task_changed_count": 1,
+      "right": "D"
+    },
+    "B_vs_C": {
+      "accuracy_delta_inspect": 0,
+      "accuracy_delta_inspect_rate": 0.0,
+      "accuracy_delta_overall": -3,
+      "accuracy_delta_overall_rate": -0.5,
+      "accuracy_delta_presence": -3,
+      "accuracy_delta_presence_rate": -1.0,
+      "canonical_output_changed_count": 3,
+      "inspect_task_changed_count": 0,
+      "left": "B",
+      "presence_task_changed_count": 3,
+      "right": "C"
+    },
+    "B_vs_D": {
+      "accuracy_delta_inspect": 0,
+      "accuracy_delta_inspect_rate": 0.0,
+      "accuracy_delta_overall": 0,
+      "accuracy_delta_overall_rate": 0.0,
+      "accuracy_delta_presence": 0,
+      "accuracy_delta_presence_rate": 0.0,
+      "canonical_output_changed_count": 0,
+      "inspect_task_changed_count": 0,
+      "left": "B",
+      "presence_task_changed_count": 0,
+      "right": "D"
+    }
+  },
+  "rows": [
+    {
+      "arm": "A",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected": "observe_presence",
+      "parse_valid": true,
+      "semantic_correct": false,
+      "surface_label": "inspect",
+      "task_id": "slff-001"
+    },
+    {
+      "arm": "B",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "observe_presence",
+      "contract_valid": true,
+      "expected": "observe_presence",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "class_alpha",
+      "task_id": "slff-001"
+    },
+    {
+      "arm": "C",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected": "observe_presence",
+      "parse_valid": true,
+      "semantic_correct": false,
+      "surface_label": "inspect",
+      "task_id": "slff-001"
+    },
+    {
+      "arm": "D",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "observe_presence",
+      "contract_valid": true,
+      "expected": "observe_presence",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "observe_presence",
+      "task_id": "slff-001"
+    },
+    {
+      "arm": "A",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected": "inspect",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "inspect",
+      "task_id": "slff-002"
+    },
+    {
+      "arm": "B",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected": "inspect",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "class_beta",
+      "task_id": "slff-002"
+    },
+    {
+      "arm": "C",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected": "inspect",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "inspect",
+      "task_id": "slff-002"
+    },
+    {
+      "arm": "D",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected": "inspect",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "class_beta",
+      "task_id": "slff-002"
+    },
+    {
+      "arm": "A",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "observe_presence",
+      "contract_valid": true,
+      "expected": "observe_presence",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "observe_presence",
+      "task_id": "slff-003"
+    },
+    {
+      "arm": "B",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "observe_presence",
+      "contract_valid": true,
+      "expected": "observe_presence",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "class_alpha",
+      "task_id": "slff-003"
+    },
+    {
+      "arm": "C",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected": "observe_presence",
+      "parse_valid": true,
+      "semantic_correct": false,
+      "surface_label": "inspect",
+      "task_id": "slff-003"
+    },
+    {
+      "arm": "D",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "observe_presence",
+      "contract_valid": true,
+      "expected": "observe_presence",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "observe_presence",
+      "task_id": "slff-003"
+    },
+    {
+      "arm": "A",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected": "inspect",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "inspect",
+      "task_id": "slff-004"
+    },
+    {
+      "arm": "B",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected": "inspect",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "class_beta",
+      "task_id": "slff-004"
+    },
+    {
+      "arm": "C",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected": "inspect",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "inspect",
+      "task_id": "slff-004"
+    },
+    {
+      "arm": "D",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected": "inspect",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "class_beta",
+      "task_id": "slff-004"
+    },
+    {
+      "arm": "A",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "observe_presence",
+      "contract_valid": true,
+      "expected": "observe_presence",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "observe_presence",
+      "task_id": "slff-005"
+    },
+    {
+      "arm": "B",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "observe_presence",
+      "contract_valid": true,
+      "expected": "observe_presence",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "class_alpha",
+      "task_id": "slff-005"
+    },
+    {
+      "arm": "C",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected": "observe_presence",
+      "parse_valid": true,
+      "semantic_correct": false,
+      "surface_label": "inspect",
+      "task_id": "slff-005"
+    },
+    {
+      "arm": "D",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "observe_presence",
+      "contract_valid": true,
+      "expected": "observe_presence",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "observe_presence",
+      "task_id": "slff-005"
+    },
+    {
+      "arm": "A",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected": "inspect",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "inspect",
+      "task_id": "slff-006"
+    },
+    {
+      "arm": "B",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected": "inspect",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "class_beta",
+      "task_id": "slff-006"
+    },
+    {
+      "arm": "C",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected": "inspect",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "inspect",
+      "task_id": "slff-006"
+    },
+    {
+      "arm": "D",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected": "inspect",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "class_beta",
+      "task_id": "slff-006"
+    }
+  ],
+  "schema": "zth_semantic_label_factorial_v0_final_aggregate",
+  "specs_expected_class_used_for_closeout": false
+}

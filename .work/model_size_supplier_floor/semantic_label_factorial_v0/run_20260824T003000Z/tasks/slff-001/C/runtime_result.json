@@ -1,0 +1,6 @@
+{
+  "canonical_operation": "inspect",
+  "model_calls": 1,
+  "terminal_state": "review_or_deferred_execution",
+  "tool_calls": 0
+}

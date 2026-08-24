@@ -1,0 +1,8 @@
+{
+  "arm": "C",
+  "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+  "prompt_sha256": "94c24c397f792315bf9f554d5ac737e94f4d5e67b34fd7803e4b13a3233323c7",
+  "schema_sha256": "c30d5c99024f83ea6a55e0b4e156d8fd1fad903aef66ef1ba253abcb7d317174",
+  "started_at": 1787572950.1750853,
+  "task_id": "slff-001"
+}

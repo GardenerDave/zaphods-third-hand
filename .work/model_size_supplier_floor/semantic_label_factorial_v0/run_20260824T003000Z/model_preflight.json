@@ -1,0 +1,23 @@
+{
+  "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+  "model_meta": {
+    "n_ctx": 32768,
+    "n_ctx_train": 32768,
+    "n_embd": 2048,
+    "n_params": 2031739904,
+    "n_vocab": 151936,
+    "size": 1276487680,
+    "vocab_type": 2
+  },
+  "telemetry": {
+    "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+    "health_received": true,
+    "measurement_boundary": "gpu_device_only",
+    "measurement_level": 2,
+    "process_level_remote_exclusivity_verified": false,
+    "public_alias": "JARVIS_LOCAL",
+    "sample_interval_seconds": 0.25,
+    "transport": "remote_read_only_http"
+  },
+  "telemetry_provider": "scripts.zth_qwen3_0_6b_clean_scope_logic_probe"
+}

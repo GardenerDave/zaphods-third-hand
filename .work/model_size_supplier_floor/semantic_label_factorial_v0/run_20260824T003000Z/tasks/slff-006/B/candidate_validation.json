@@ -1,0 +1,9 @@
+{
+  "candidate": "class_beta",
+  "candidate_admissible": true,
+  "candidate_valid": true,
+  "canonical_operation": "inspect",
+  "contract_valid": true,
+  "diagnostics": [],
+  "parse_valid": true
+}

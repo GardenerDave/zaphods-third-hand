@@ -1,0 +1,780 @@
+{
+  "arm_metrics": {
+    "A": {
+      "candidate_admissible": 6,
+      "candidate_valid": 6,
+      "contract_valid": 6,
+      "inspect_correct": 3,
+      "inspect_outputs": 4,
+      "inspect_total": 3,
+      "observe_presence_outputs": 2,
+      "parse_valid": 6,
+      "presence_correct": 2,
+      "presence_total": 3,
+      "semantic_correct": 5,
+      "semantic_total": 6,
+      "unresolved_or_rejected_outputs": 0
+    },
+    "B": {
+      "candidate_admissible": 6,
+      "candidate_valid": 6,
+      "contract_valid": 6,
+      "inspect_correct": 3,
+      "inspect_outputs": 3,
+      "inspect_total": 3,
+      "observe_presence_outputs": 3,
+      "parse_valid": 6,
+      "presence_correct": 3,
+      "presence_total": 3,
+      "semantic_correct": 6,
+      "semantic_total": 6,
+      "unresolved_or_rejected_outputs": 0
+    },
+    "C": {
+      "candidate_admissible": 6,
+      "candidate_valid": 6,
+      "contract_valid": 6,
+      "inspect_correct": 3,
+      "inspect_outputs": 6,
+      "inspect_total": 3,
+      "observe_presence_outputs": 0,
+      "parse_valid": 6,
+      "presence_correct": 0,
+      "presence_total": 3,
+      "semantic_correct": 3,
+      "semantic_total": 6,
+      "unresolved_or_rejected_outputs": 0
+    },
+    "D": {
+      "candidate_admissible": 6,
+      "candidate_valid": 6,
+      "contract_valid": 6,
+      "inspect_correct": 3,
+      "inspect_outputs": 3,
+      "inspect_total": 3,
+      "observe_presence_outputs": 3,
+      "parse_valid": 6,
+      "presence_correct": 3,
+      "presence_total": 3,
+      "semantic_correct": 6,
+      "semantic_total": 6,
+      "unresolved_or_rejected_outputs": 0
+    }
+  },
+  "driver_sha256": "263c2f3c55e9831587b5ee8a85446bd605c47f9d4b4f5bf57166bddb29285509",
+  "factorial_contrasts": {
+    "inspect": {
+      "inspect_label_main_effect": 0.0,
+      "label_interaction_contrast": 0.0,
+      "presence_label_main_effect": 0.0,
+      "rates": {
+        "A": 1.0,
+        "B": 1.0,
+        "C": 1.0,
+        "D": 1.0
+      }
+    },
+    "overall": {
+      "inspect_label_main_effect": 0.33333333333333326,
+      "label_interaction_contrast": 0.33333333333333337,
+      "presence_label_main_effect": -0.16666666666666674,
+      "rates": {
+        "A": 0.8333333333333334,
+        "B": 1.0,
+        "C": 0.5,
+        "D": 1.0
+      }
+    },
+    "presence": {
+      "inspect_label_main_effect": 0.6666666666666667,
+      "label_interaction_contrast": 0.6666666666666666,
+      "presence_label_main_effect": -0.33333333333333326,
+      "rates": {
+        "A": 0.6666666666666666,
+        "B": 1.0,
+        "C": 0.0,
+        "D": 1.0
+      }
+    }
+  },
+  "freeze_commit": "29a3eb0cde307266a575cd1b16ca4b682e2c089c",
+  "integrity_counts": {
+    "call_started.json": 24,
+    "candidate_validation.json": 24,
+    "power_samples.json": 24,
+    "response.json": 24,
+    "runtime_result.json": 24
+  },
+  "lifecycle": {
+    "model_calls": 24,
+    "model_output_granted_authority": 0,
+    "retries": 0,
+    "runtime_evaluator_influence": 0,
+    "status": "terminal_runtime",
+    "tool_calls": 0
+  },
+  "pairwise_contrasts": {
+    "A_vs_C": {
+      "accuracy_delta_inspect": 0,
+      "accuracy_delta_inspect_rate": 0.0,
+      "accuracy_delta_overall": -2,
+      "accuracy_delta_overall_rate": -0.3333333333333333,
+      "accuracy_delta_presence": -2,
+      "accuracy_delta_presence_rate": -0.6666666666666666,
+      "canonical_output_changed_count": 2,
+      "inspect_task_changed_count": 0,
+      "left": "A",
+      "presence_task_changed_count": 2,
+      "right": "C"
+    },
+    "A_vs_D": {
+      "accuracy_delta_inspect": 0,
+      "accuracy_delta_inspect_rate": 0.0,
+      "accuracy_delta_overall": 1,
+      "accuracy_delta_overall_rate": 0.16666666666666666,
+      "accuracy_delta_presence": 1,
+      "accuracy_delta_presence_rate": 0.3333333333333333,
+      "canonical_output_changed_count": 1,
+      "inspect_task_changed_count": 0,
+      "left": "A",
+      "presence_task_changed_count": 1,
+      "right": "D"
+    },
+    "B_vs_C": {
+      "accuracy_delta_inspect": 0,
+      "accuracy_delta_inspect_rate": 0.0,
+      "accuracy_delta_overall": -3,
+      "accuracy_delta_overall_rate": -0.5,
+      "accuracy_delta_presence": -3,
+      "accuracy_delta_presence_rate": -1.0,
+      "canonical_output_changed_count": 3,
+      "inspect_task_changed_count": 0,
+      "left": "B",
+      "presence_task_changed_count": 3,
+      "right": "C"
+    },
+    "B_vs_D": {
+      "accuracy_delta_inspect": 0,
+      "accuracy_delta_inspect_rate": 0.0,
+      "accuracy_delta_overall": 0,
+      "accuracy_delta_overall_rate": 0.0,
+      "accuracy_delta_presence": 0,
+      "accuracy_delta_presence_rate": 0.0,
+      "canonical_output_changed_count": 0,
+      "inspect_task_changed_count": 0,
+      "left": "B",
+      "presence_task_changed_count": 0,
+      "right": "D"
+    }
+  },
+  "prior_label_counterfactual_comparison": {
+    "current_labels": {
+      "inspect": "3/3",
+      "presence": "0/3"
+    },
+    "neutral_labels": {
+      "inspect": "3/3",
+      "presence": "3/3"
+    }
+  },
+  "rows": [
+    {
+      "arm": "A",
+      "artifact_hashes": {
+        "call_started.json": "dee407a80854c1b44906f13ed2dcc3162d674f092bd9ff1a50633e639b8c0bc5",
+        "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+        "power_samples.json": "09cc8d94c856f66c0ebd02e9cc877412898b9b81a444d4fbdf83964baa1ac037",
+        "response.json": "ec575e1e563aacc1cc4bd557c3bb492ab8564df092a16055e7f7aefdc3f63fc9",
+        "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected_semantic_class": "observe_presence",
+      "gross_energy_joules": 29.19,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\":\"inspect\"}",
+      "semantic_correct": false,
+      "surface_label": "inspect",
+      "task_id": "slff-001",
+      "wall_elapsed_ms": 1221.756
+    },
+    {
+      "arm": "B",
+      "artifact_hashes": {
+        "call_started.json": "5352434dd2d67d4757a9346fb62a613932d12a8c4000add6884b8a87a543ebdf",
+        "candidate_validation.json": "43639c543dc2bc45d341704ba39b0c7525a8e8c152785a4bfcc7495169ba3efa",
+        "power_samples.json": "991e7f62da1bf79e499ce2cf0253ab4e2714addbe9e59583dd866df1130c2d3b",
+        "response.json": "90f6f8e9404a8aecac6288e598464e8726a79abd78c7bfb15f4c8e22af37e725",
+        "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "observe_presence",
+      "contract_valid": true,
+      "expected_semantic_class": "observe_presence",
+      "gross_energy_joules": 34.195,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\": \"class_alpha\"}",
+      "semantic_correct": true,
+      "surface_label": "class_alpha",
+      "task_id": "slff-001",
+      "wall_elapsed_ms": 1222.953
+    },
+    {
+      "arm": "C",
+      "artifact_hashes": {
+        "call_started.json": "a268b9b5ec7eebc8f8950ef34e40175670d4b231dd80ee6f41770e6a0411c7a9",
+        "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+        "power_samples.json": "34f2a5ca4134ff019cbf37166bac72d360231b731f28b3691699147ddd00e057",
+        "response.json": "e10effb228f4574acd700a859eb43034cd8a813f6504fa7d317e4efe6d8f0306",
+        "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected_semantic_class": "observe_presence",
+      "gross_energy_joules": 33.0525,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\":\"inspect\"}",
+      "semantic_correct": false,
+      "surface_label": "inspect",
+      "task_id": "slff-001",
+      "wall_elapsed_ms": 1021.843
+    },
+    {
+      "arm": "D",
+      "artifact_hashes": {
+        "call_started.json": "b5133475ebd2575d67ae85aae71a5c83296dd28cb5785b9592bbdddf167fee4a",
+        "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+        "power_samples.json": "9466b36f94e6454d8b4ad8515cede141ac0b6db1ded4d54872f7fe79a12f5e42",
+        "response.json": "366633dc296792e2f2125cc785e9b32867fabdeda229bfb679fc05237ae2a7e0",
+        "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "observe_presence",
+      "contract_valid": true,
+      "expected_semantic_class": "observe_presence",
+      "gross_energy_joules": 32.02,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\":\"observe_presence\"}",
+      "semantic_correct": true,
+      "surface_label": "observe_presence",
+      "task_id": "slff-001",
+      "wall_elapsed_ms": 1090.172
+    },
+    {
+      "arm": "D",
+      "artifact_hashes": {
+        "call_started.json": "9bf610956052a96bc96c1b98d084a758ff147cc8693d46eaa96a9b0b302a454c",
+        "candidate_validation.json": "05f6e8573fa112a8921c64efa3ff996919b38972059558366e2186907bc20a95",
+        "power_samples.json": "f8b3d8400dff1f692358918bca5b2b1ed81636cb51a3df0f291a1d3f0daa45d7",
+        "response.json": "54f5c5ded3eabf94283ad5d784a4a6322ed792a32f5df3590bffde0dd5d280ff",
+        "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected_semantic_class": "inspect",
+      "gross_energy_joules": 43.2875,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\": \"class_beta\"}",
+      "semantic_correct": true,
+      "surface_label": "class_beta",
+      "task_id": "slff-002",
+      "wall_elapsed_ms": 1281.824
+    },
+    {
+      "arm": "C",
+      "artifact_hashes": {
+        "call_started.json": "f7aec954897f3f8fee6b13204fc04dad0e6dd1b9783826383ac604963d253181",
+        "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+        "power_samples.json": "ba047f084ea9274d5dfd1d7375f62d3dc19a5d489a34ff08e2e72485aac5d72c",
+        "response.json": "464c826283365c46e98f760680884a042b4addd17e8ebc580a980901d96ccc1f",
+        "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected_semantic_class": "inspect",
+      "gross_energy_joules": 34.82,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\": \"inspect\"}",
+      "semantic_correct": true,
+      "surface_label": "inspect",
+      "task_id": "slff-002",
+      "wall_elapsed_ms": 1136.796
+    },
+    {
+      "arm": "B",
+      "artifact_hashes": {
+        "call_started.json": "4bfeeba2862fcbaae67f07546f42d18a6cd11aa5b80b614e5430f67f1cba7958",
+        "candidate_validation.json": "05f6e8573fa112a8921c64efa3ff996919b38972059558366e2186907bc20a95",
+        "power_samples.json": "3dc78659505c7bfc6f52d792f87748cd0b8585bbede0ad9eca35e48cae7c9a93",
+        "response.json": "247dd5af3463ba21c8fd612d80c0947173c81d8a9c9652228e5fe0417deb1509",
+        "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected_semantic_class": "inspect",
+      "gross_energy_joules": 34.305,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\": \"class_beta\"}",
+      "semantic_correct": true,
+      "surface_label": "class_beta",
+      "task_id": "slff-002",
+      "wall_elapsed_ms": 1148.688
+    },
+    {
+      "arm": "A",
+      "artifact_hashes": {
+        "call_started.json": "a5bea7ebbc890d61e3def34f86070150876cf6ee58755b1c382815e8c9bd96ec",
+        "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+        "power_samples.json": "c76b9aeb42e38a64477697f22b364067718a03daf1fe870fed0524fe9aa0b83d",
+        "response.json": "c47ed7290336adda5a4f1e2a2179262139e17fc6ee69e668824c3224b4a9e252",
+        "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected_semantic_class": "inspect",
+      "gross_energy_joules": 32.7425,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\": \"inspect\"}",
+      "semantic_correct": true,
+      "surface_label": "inspect",
+      "task_id": "slff-002",
+      "wall_elapsed_ms": 1117.483
+    },
+    {
+      "arm": "B",
+      "artifact_hashes": {
+        "call_started.json": "e82b19c2fb90b4f0eaa8d26c4fe16f5cbd67e8b85422637baa1fe9d5ef41b918",
+        "candidate_validation.json": "43639c543dc2bc45d341704ba39b0c7525a8e8c152785a4bfcc7495169ba3efa",
+        "power_samples.json": "a02126b776cf7f238ac722444a38fc55986728af30e488d15ffd0839912bfebd",
+        "response.json": "9989c3cbdde68182649c4ef9073ef836fd250b90bca351000cd8c3cac50d40f1",
+        "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "observe_presence",
+      "contract_valid": true,
+      "expected_semantic_class": "observe_presence",
+      "gross_energy_joules": 41.7325,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\": \"class_alpha\"}",
+      "semantic_correct": true,
+      "surface_label": "class_alpha",
+      "task_id": "slff-003",
+      "wall_elapsed_ms": 1316.172
+    },
+    {
+      "arm": "C",
+      "artifact_hashes": {
+        "call_started.json": "7b2973215d0d21ae4be47f35ccf1f5f28e93dfe9e80e42040b39225fba359340",
+        "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+        "power_samples.json": "b51d603426fbe47b5658dfbf3f452935628ebe6741be94bc396afd8e0c397df3",
+        "response.json": "18edde175ec06d6b189b6d41abb9202d385e99e19d9a63c4fe44b036c67af0bd",
+        "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected_semantic_class": "observe_presence",
+      "gross_energy_joules": 34.2975,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\":\"inspect\"}",
+      "semantic_correct": false,
+      "surface_label": "inspect",
+      "task_id": "slff-003",
+      "wall_elapsed_ms": 1071.876
+    },
+    {
+      "arm": "D",
+      "artifact_hashes": {
+        "call_started.json": "f57c16e058b0f924461631be3a43c183f1447df1b5feccdf637af637b86bf34f",
+        "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+        "power_samples.json": "7fa803e93204b301edf57a6be5b420bd4825a8a8eb27e4240c73a055e5444f81",
+        "response.json": "d9f91c199e32d5501d9003636fb0e81368fe067670dc7a9ed1c765d1783af2e9",
+        "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "observe_presence",
+      "contract_valid": true,
+      "expected_semantic_class": "observe_presence",
+      "gross_energy_joules": 35.4375,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\":\"observe_presence\"}",
+      "semantic_correct": true,
+      "surface_label": "observe_presence",
+      "task_id": "slff-003",
+      "wall_elapsed_ms": 1187.842
+    },
+    {
+      "arm": "A",
+      "artifact_hashes": {
+        "call_started.json": "6f411568fbcce0cd542f300c4f342db08c0e7f8f8d4045929d7ec6a333bc8813",
+        "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+        "power_samples.json": "cb3adb391b5d5f3b008002adc8b3364dc6be53d94129c85d3c9f779b0c5ae26d",
+        "response.json": "c40038cecc682be49d243d4fd783aa851f193e45abc93229d449ce6de8ff08c9",
+        "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "observe_presence",
+      "contract_valid": true,
+      "expected_semantic_class": "observe_presence",
+      "gross_energy_joules": 36.5525,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\":\"observe_presence\"}",
+      "semantic_correct": true,
+      "surface_label": "observe_presence",
+      "task_id": "slff-003",
+      "wall_elapsed_ms": 1100.455
+    },
+    {
+      "arm": "C",
+      "artifact_hashes": {
+        "call_started.json": "51d96818e2489ac14197fc0acbc2ca60449e5c10607ef749493166329d590b41",
+        "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+        "power_samples.json": "e5710e8bc7d57a1d7576b0374f68230856af85018dd2676c574151913c7ff38b",
+        "response.json": "5cf3d5e6088f428ebd3fbdaa4b0d661ab81b04416ab4cb0c153eac9be9442fc7",
+        "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected_semantic_class": "inspect",
+      "gross_energy_joules": 35.975,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\": \"inspect\"}",
+      "semantic_correct": true,
+      "surface_label": "inspect",
+      "task_id": "slff-004",
+      "wall_elapsed_ms": 1209.229
+    },
+    {
+      "arm": "B",
+      "artifact_hashes": {
+        "call_started.json": "a74d07996562c7ca97feab2fef6035b350c57860cf5a89176443f8346310bd81",
+        "candidate_validation.json": "05f6e8573fa112a8921c64efa3ff996919b38972059558366e2186907bc20a95",
+        "power_samples.json": "a8b7be2d3534da197b049aabd7116e98e62f77f9e9449b3f122fd7e629c13861",
+        "response.json": "7bccd038480ac6dab71f75fcd15c577ff372890f054a2856eaab396d13dfa003",
+        "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected_semantic_class": "inspect",
+      "gross_energy_joules": 36.025,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\": \"class_beta\"}",
+      "semantic_correct": true,
+      "surface_label": "class_beta",
+      "task_id": "slff-004",
+      "wall_elapsed_ms": 1147.738
+    },
+    {
+      "arm": "A",
+      "artifact_hashes": {
+        "call_started.json": "9605caed50b466d9cbdad61da1421d3cee9a0e84148def47020176e090235f68",
+        "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+        "power_samples.json": "1c2dcd887472b1f993717ea5c2021f6936cb0f8bfc90c9e51f4078ad73e6b2fa",
+        "response.json": "4da66df0fb77c22617f9fa4b51715f2a64a950d33b37a64b25656e2d0f30a417",
+        "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected_semantic_class": "inspect",
+      "gross_energy_joules": 34.4625,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\": \"inspect\"}",
+      "semantic_correct": true,
+      "surface_label": "inspect",
+      "task_id": "slff-004",
+      "wall_elapsed_ms": 1141.407
+    },
+    {
+      "arm": "D",
+      "artifact_hashes": {
+        "call_started.json": "ea97b5f39cf937f521248045559aba60fad7ff2944fea1752d1cac7e042c45aa",
+        "candidate_validation.json": "05f6e8573fa112a8921c64efa3ff996919b38972059558366e2186907bc20a95",
+        "power_samples.json": "75a6205eb581397d054b59d915687d7da17ee888bcf734e4b05b0816b37f31ea",
+        "response.json": "8a765b8cf98e5b733118888a0439425e93d5dfd5baef9f3cf0c6f79c10f18221",
+        "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected_semantic_class": "inspect",
+      "gross_energy_joules": 34.3075,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\": \"class_beta\"}",
+      "semantic_correct": true,
+      "surface_label": "class_beta",
+      "task_id": "slff-004",
+      "wall_elapsed_ms": 1167.218
+    },
+    {
+      "arm": "C",
+      "artifact_hashes": {
+        "call_started.json": "f9badaa3a4d6a09b240c783eabe314d3e2435c86d3644bd9db6e5f27701d74db",
+        "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+        "power_samples.json": "82c9807dcdde11b93c66cdbd1167f5a1e85b575986a23db9a7d3898ba67b9772",
+        "response.json": "347f4542b521cafb992ff0a193bdc4800f5b123cb01b168b4d455fe395924909",
+        "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected_semantic_class": "observe_presence",
+      "gross_energy_joules": 35.2175,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\":\"inspect\"}",
+      "semantic_correct": false,
+      "surface_label": "inspect",
+      "task_id": "slff-005",
+      "wall_elapsed_ms": 1134.092
+    },
+    {
+      "arm": "D",
+      "artifact_hashes": {
+        "call_started.json": "7a6286a9efb4dacc9a1b43b1373e8e808790d29b31ee3035a6079e1bd75173c5",
+        "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+        "power_samples.json": "5744c7411d68a1c21dc0ebf918750b0e66f55f78d927d4ae46b788c50cb66e46",
+        "response.json": "25e1bf969c8032883064a9db2814cab0036630e8750a997f3aafbc2f98d79e1e",
+        "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "observe_presence",
+      "contract_valid": true,
+      "expected_semantic_class": "observe_presence",
+      "gross_energy_joules": 36.14,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\":\"observe_presence\"}",
+      "semantic_correct": true,
+      "surface_label": "observe_presence",
+      "task_id": "slff-005",
+      "wall_elapsed_ms": 1118.863
+    },
+    {
+      "arm": "A",
+      "artifact_hashes": {
+        "call_started.json": "c529a727a51f74c6ad1cb5498162a0b09b148234dc1ba114f28408f312700ea4",
+        "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+        "power_samples.json": "6feaa93d28420535e1836a2256383848b7a1a5ca12f2ffece7cfd3fd792b4af0",
+        "response.json": "b462124abb45f220cfb3e0ae619f302dc972e0e3b09dd84b1b431a46c5532c33",
+        "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "observe_presence",
+      "contract_valid": true,
+      "expected_semantic_class": "observe_presence",
+      "gross_energy_joules": 36.9975,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\":\"observe_presence\"}",
+      "semantic_correct": true,
+      "surface_label": "observe_presence",
+      "task_id": "slff-005",
+      "wall_elapsed_ms": 1085.181
+    },
+    {
+      "arm": "B",
+      "artifact_hashes": {
+        "call_started.json": "54945f238f91577fecb12b4a96a2999560396bed519310becef31e3bad11b4d7",
+        "candidate_validation.json": "43639c543dc2bc45d341704ba39b0c7525a8e8c152785a4bfcc7495169ba3efa",
+        "power_samples.json": "88c70b66b4e8af9c8f26640213b337aaa1d88cab8ff0a034acf0ee146a53610c",
+        "response.json": "5bd52a0690f43e834fde541b3fd3ab0e485f9ef2d61b54c1c5dccc74ae024391",
+        "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "observe_presence",
+      "contract_valid": true,
+      "expected_semantic_class": "observe_presence",
+      "gross_energy_joules": 34.45,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\": \"class_alpha\"}",
+      "semantic_correct": true,
+      "surface_label": "class_alpha",
+      "task_id": "slff-005",
+      "wall_elapsed_ms": 1185.737
+    },
+    {
+      "arm": "B",
+      "artifact_hashes": {
+        "call_started.json": "bad5395054a5ea9d1bf7e768714ed248310d4a3ed048dc4064576ee1a75ee26c",
+        "candidate_validation.json": "05f6e8573fa112a8921c64efa3ff996919b38972059558366e2186907bc20a95",
+        "power_samples.json": "c600eb4fdf0aa14921b882503ba1caee0a947751e24a199487d769b20d3b4e7b",
+        "response.json": "6758baefb56d74b59c92c0b0d24c45ea4291f139f464b3395b873aa1ee37a7ff",
+        "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected_semantic_class": "inspect",
+      "gross_energy_joules": 44.585,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\": \"class_beta\"}",
+      "semantic_correct": true,
+      "surface_label": "class_beta",
+      "task_id": "slff-006",
+      "wall_elapsed_ms": 1281.781
+    },
+    {
+      "arm": "A",
+      "artifact_hashes": {
+        "call_started.json": "c2f926ea378ab2137f9e4e8a4336463f4bbcad0e909642728cb2bde1625aae35",
+        "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+        "power_samples.json": "d77679dfa6737109acf8779c862929968f69485d84dc01ad6ce245b7ef632725",
+        "response.json": "507e151c268a7d5344cf8d9167f66b92a12a89b7784b886b063454bd3776b988",
+        "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected_semantic_class": "inspect",
+      "gross_energy_joules": 34.565,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\": \"inspect\"}",
+      "semantic_correct": true,
+      "surface_label": "inspect",
+      "task_id": "slff-006",
+      "wall_elapsed_ms": 1136.121
+    },
+    {
+      "arm": "D",
+      "artifact_hashes": {
+        "call_started.json": "6f3cfeca6f5b604ae53c02582b1fa49318151bed087dc6df39282588684432bf",
+        "candidate_validation.json": "05f6e8573fa112a8921c64efa3ff996919b38972059558366e2186907bc20a95",
+        "power_samples.json": "b9839fd3daa6292eb5ab3c9f19682360c9b0bdc341186411a18233b43e5d039b",
+        "response.json": "a90c9418bfae7af750fdde6db60b77034af0ef3433f3bbb6a56967033d237f82",
+        "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected_semantic_class": "inspect",
+      "gross_energy_joules": 35.075,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\": \"class_beta\"}",
+      "semantic_correct": true,
+      "surface_label": "class_beta",
+      "task_id": "slff-006",
+      "wall_elapsed_ms": 1136.185
+    },
+    {
+      "arm": "C",
+      "artifact_hashes": {
+        "call_started.json": "6c0e518cad3434a53ba4e5407c854f9fa7eec1061b02ff79cd868ab3518e2e98",
+        "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+        "power_samples.json": "cfdf6afc1812e68a49f424c96dd72951bb98992053c937bd7dede41d5892b774",
+        "response.json": "b4e566b41b5e560b8398305e881ce25e0da45b15515cd6e8f463ab6df255d370",
+        "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+      },
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "canonical_operation": "inspect",
+      "contract_valid": true,
+      "expected_semantic_class": "inspect",
+      "gross_energy_joules": 35.165,
+      "parse_valid": true,
+      "raw_response_content": "{\"operation_class_candidate\": \"inspect\"}",
+      "semantic_correct": true,
+      "surface_label": "inspect",
+      "task_id": "slff-006",
+      "wall_elapsed_ms": 1092.279
+    }
+  ],
+  "run_directory": ".work/model_size_supplier_floor/semantic_label_factorial_v0/run_20260824T003000Z",
+  "schema": "zth_semantic_label_factorial_v0_closeout_matrix_2026-08-24",
+  "supported_markers": {
+    "FACTORIAL_EFFECT_LOCALIZED_TO_PRESENCE_CLASS": true,
+    "INSPECT_CLASS_STABILITY": "12/12",
+    "INSPECT_LABEL_MAIN_EFFECT_OBSERVED": true,
+    "INTERFACE_DEPENDENT_OBSERVABLE_COMPETENCE_DEMONSTRATED": true,
+    "LABEL_INTERACTION_CONTRAST_NONZERO": true,
+    "LITERAL_INSPECT_LABEL_INTERFERENCE_SUPPORTED": true,
+    "PRESENCE_TASK_LABEL_INTERACTION_CONTRAST_NONZERO": true,
+    "UNDERLYING_BOUNDED_SEMANTIC_DISTINCTION_DEMONSTRATED": true,
+    "qualification_change": false
+  },
+  "telemetry": {
+    "A": {
+      "energy_mean_joules": 34.085,
+      "energy_median_joules": 34.51375,
+      "energy_total_joules": 204.51,
+      "latency_mean_ms": 1133.7338333333332,
+      "latency_median_ms": 1126.8020000000001,
+      "latency_p95_ms": 1201.66875,
+      "measurement_boundary": "gpu_device_only",
+      "measurement_level": 2,
+      "measurement_note": "p95 uses inclusive sample quantile"
+    },
+    "B": {
+      "energy_mean_joules": 37.54875,
+      "energy_median_joules": 35.2375,
+      "energy_total_joules": 225.29250000000002,
+      "latency_mean_ms": 1217.1781666666666,
+      "latency_median_ms": 1204.345,
+      "latency_p95_ms": 1307.5742500000001,
+      "measurement_boundary": "gpu_device_only",
+      "measurement_level": 2,
+      "measurement_note": "p95 uses inclusive sample quantile"
+    },
+    "C": {
+      "energy_mean_joules": 34.754583333333336,
+      "energy_median_joules": 34.9925,
+      "energy_total_joules": 208.5275,
+      "latency_mean_ms": 1111.0191666666667,
+      "latency_median_ms": 1113.1855,
+      "latency_p95_ms": 1191.12075,
+      "measurement_boundary": "gpu_device_only",
+      "measurement_level": 2,
+      "measurement_note": "p95 uses inclusive sample quantile"
+    },
+    "D": {
+      "energy_mean_joules": 36.044583333333335,
+      "energy_median_joules": 35.25625,
+      "energy_total_joules": 216.2675,
+      "latency_mean_ms": 1163.684,
+      "latency_median_ms": 1151.7015000000001,
+      "latency_p95_ms": 1258.3285,
+      "measurement_boundary": "gpu_device_only",
+      "measurement_level": 2,
+      "measurement_note": "p95 uses inclusive sample quantile"
+    },
+    "overall": {
+      "energy_mean_joules": 35.60822916666667,
+      "energy_median_joules": 34.947500000000005,
+      "energy_total_joules": 854.5975,
+      "latency_mean_ms": 1156.4037916666666,
+      "latency_median_ms": 1139.1015,
+      "latency_p95_ms": 1281.8175500000002,
+      "measurement_boundary": "gpu_device_only",
+      "measurement_level": 2,
+      "measurement_note": "p95 uses inclusive sample quantile"
+    }
+  }
+}
