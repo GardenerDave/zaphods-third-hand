@@ -1,7 +1,7 @@
 # Prospective Matched Delegation-Prediction Test
 
-Status: design/preregistration only. No target execution or outcome evidence
-exists.
+Status: hardened design/preregistration only. No target execution or outcome
+evidence exists.
 
 Authoritative design basis: `e4d5b48efed683f1265a7fb3799abe8c4b598f5f`.
 
@@ -44,9 +44,19 @@ Two existing suppliers are evaluated on every fresh target task:
 | local | `Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf`, `JARVIS_LOCAL` | bounded scope-response supplier |
 | external | `codex-cli-0.146.0` | bounded scope-response supplier |
 
-Both receive the same frozen request, output schema, target authority context,
-and deterministic evaluator. Supplier identity is the only execution-arm
-difference. Neither supplier can grant authority, change the evaluator, or
+Historical identity is verified from the Run 4A preregistration and resource
+freeze: local is `Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf` via `JARVIS_LOCAL`,
+and external is `codex-cli-0.146.0` via the Codex service class. The
+prospective arms use those same identities, so the supplier transfer is
+`EXACT` for the preserved identity/version fields.
+
+The experiment-authored payload is held constant across arms: request, output
+schema, target authority facts, and bounded contract. The supplier-native
+envelope is not byte-identical: native system/client/runtime metadata belongs
+to each supplier/interface configuration. This is therefore not a claim of
+identical full model-visible bytes. The future freeze must record those native
+interfaces, disable/omit tools and evaluator access, and require zero tool
+calls. Neither supplier can grant authority, change the evaluator, or
 self-qualify.
 
 The matched design executes both supplier arms for each task. This makes the
@@ -54,7 +64,30 @@ outcome for either frozen predictor's selected supplier observable without
 letting either predictor inspect the target result. It is an experimental
 paired-delegation design, not production routing.
 
-## C. Generalized predictor
+## C. Primary estimand and decision representation
+
+The primary estimand is delegation-decision quality, not ordinary binary label
+accuracy. Each frozen policy emits the tuple:
+
+`selected_supplier = local | external | null`
+
+`delegation_decision = delegate | abstain`
+`expected_success = true | false/unsupported`
+
+The design contains two distinct disagreement types:
+
+- `SUPPLIER_SELECTION_DISAGREEMENT_COUNT=8`: both policies delegate, but one
+  selects local and the other external;
+- `DELEGATE_VS_ABSTAIN_DISAGREEMENT_COUNT=8`: the broad policy delegates
+  external while the bounded policy abstains;
+- `BINARY_EXPECTED_SUCCESS_DISAGREEMENT_COUNT=8`: the corresponding expected
+  success values are true versus false/unsupported.
+
+These are not interchangeable primary opportunities. Supplier selection is
+scored against matched arm validation; abstention is scored against the
+counterfactual matched arms.
+
+## D. Generalized predictor
 
 `GENERALIZED_PREDICTOR_ID=RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1`
 
@@ -76,10 +109,13 @@ Prediction rule, frozen before target execution:
 
 1. restrict candidates to local and external;
 2. select the higher broad aggregate score;
-3. delegate when the selected score is at least the existing 0.50
-   supported-positive floor;
-4. otherwise abstain;
-5. ties or missing scores abstain.
+3. delegate when the selected score exists;
+4. ties or missing scores abstain.
+
+The Run 4A `0.50` support threshold is retained as provenance for the
+historical block-level `supported_positive` status, but it is not applied to
+the all-family aggregate. The aggregate policy uses the higher existing score;
+no new threshold is introduced.
 
 Therefore this predictor selects external and predicts
 `DELEGATION_EXPECTED_TO_SUCCEED=true` for the in-scope target stratum and
@@ -88,7 +124,7 @@ also selects external for the out-of-profile expansion stratum.
 This is intentionally a broad comparison score. It does not inspect the target
 scope subcase.
 
-## D. Degeneralized predictor
+## E. Degeneralized predictor
 
 `DEGENERALIZED_PREDICTOR_ID=SCOPE_INTERFACE_PROFILE_RUN4A_V1`
 
@@ -106,14 +142,18 @@ Historical sources:
   `docs/research/ATOMIC_SUPPLIER_SCORECARD_SCHEMA_V1.json`
   SHA256 `d484d012e8fe7bb6a5266864b3c8542a96a4e6391ca75145007b0a04eeefeea9`.
 
-Evidence cutoff: the Run 4A execution evidence and frozen resource prior,
-before this prospective target cohort is generated or executed.
+The authoritative cutoff is the latest legitimate source actually used by this
+profile: the atomic scorecard schema at commit
+`13321742e87aedd090728e4cad741f80166f02d3` (2026-08-20), together with the
+earlier Run 4A execution, preregistration, Run 4B preregistration, and resource
+freeze. All sources predate target execution. The profile's source table is
+recorded in the predictor manifest.
 
 Profile fields:
 
 - supplier/version;
 - capability family `scope-authority-boundary`;
-- exact target interface version;
+- historical interface contract and prospective compatible-successor status;
 - review-only authority context;
 - supported scope subcase;
 - validated opportunity count and rescue rate;
@@ -125,8 +165,8 @@ Prediction rule, frozen before target execution:
 
 1. require exact family and compatible authority context;
 2. require the same non-expanding read-only scope interface version;
-3. require a supported-positive historical profile with at least three
-   opportunities and rescue rate at least 0.50;
+3. require the historical `supported_positive` evidence status; the Run 4A
+   preregistered support threshold is not reinterpreted as a new target rule;
 4. among supported suppliers, select the lower frozen expected action cost;
 5. abstain on unsupported scope subcases, interface/context mismatch,
    insufficient evidence, or ties.
@@ -139,13 +179,9 @@ abstains. It does not infer that expansion is unsafe; it reports
 
 This is transparent deterministic selection, not fitted weighting.
 
-## E. Exact prediction target
+## F. Decision outcomes and comparison rule
 
-Primary target:
-
-`DELEGATION_EXPECTED_TO_SUCCEED`
-
-For a supplier arm, success means that the supplier returns the required
+For a supplier arm, capability success means that the supplier returns the required
 bounded scope object and the independent deterministic evaluator validates:
 
 - exact allowed targets;
@@ -155,12 +191,33 @@ bounded scope object and the independent deterministic evaluator validates:
 - exact `ready_for_review` status;
 - valid structured output.
 
-A predictor's selected supplier is scored against that supplier's matched arm
-outcome. An abstention is scored as no delegation. The matched non-selected
-supplier outcome is retained only for the preregistered false-negative/
-counterfactual analysis; it does not alter the prediction.
+For each policy/task, record:
 
-Secondary targets:
+- `SUCCESSFUL_DELEGATION`: policy delegates and the selected supplier validates;
+- `FALSE_POSITIVE_DELEGATION`: policy delegates and the selected supplier fails;
+- `JUSTIFIED_ABSTENTION`: policy abstains and neither eligible matched supplier
+  validates;
+- `UNNECESSARY_ABSTENTION`: policy abstains while at least one eligible matched
+  supplier validates.
+
+When both policies delegate but choose different suppliers, both validating is
+a capability-level tie; resource cost is then a secondary descriptive
+comparison. If only one validates, that policy has the better decision for the
+task. If neither validates, both delegation decisions fail. Resource efficiency
+never rescues failed capability validation.
+
+The policy comparison is lexicographic and frozen before execution:
+
+1. fewer false-positive delegations;
+2. more successful delegations;
+3. fewer unnecessary abstentions;
+4. lower resource use only where capability outcomes are otherwise equivalent.
+
+No arbitrary weighted scalar is constructed. The matched non-selected supplier
+outcome is retained for the counterfactual abstention and supplier-selection
+analysis, but it cannot alter a frozen prediction.
+
+Secondary observations:
 
 - `FALSE_POSITIVE_DELEGATION`;
 - `FALSE_NEGATIVE_WITHHOLD`;
@@ -169,7 +226,7 @@ Secondary targets:
 
 Resource cost is never allowed to substitute for capability success.
 
-## F. Fresh matched cohort
+## G. Fresh matched cohort
 
 Minimum viable cohort: 16 tasks, each run once for both suppliers.
 
@@ -178,7 +235,8 @@ Minimum viable cohort: 16 tasks, each run once for both suppliers.
 - one safe bounded target packet per task;
 - fresh neutral repository-relative target names;
 - no exact reuse of Run 1/2/4A/4B/5/6/7/8 fixtures or wording;
-- same frozen prompt/schema/authority protocol across supplier arms.
+- same experiment-authored prompt/schema/authority protocol across supplier
+  arms; supplier-native envelopes remain arm-specific and are recorded.
 
 Planned task IDs are `dpt-scope-001` through `dpt-scope-016`. The evaluator
 case manifest records the fresh requests and expected scoring facts; those
@@ -191,16 +249,22 @@ The target strata are intentionally balanced:
 | profile-supported non-expanding | 001–008 | exact allowed/held read-only scope, no expansion | delegate external | delegate local |
 | profile-out-of-coverage expansion | 009–016 | expansion flag required by target authority | delegate external | abstain |
 
-This yields eight supplier-choice disagreements and eight
-generalized-only-delegation disagreements before outcomes exist. There is no
+This yields eight supplier-selection disagreements and eight
+delegate-versus-abstain disagreements before outcomes exist. There is no
 manufactured degeneralized-only delegation cell because the frozen historical
 profile does not support one; the design records that absence rather than
 inventing evidence.
 
+The fixed cases are intentionally disagreement-enriched. They are not an
+unbiased estimate of naturally occurring routing incidence. The valid question
+is which frozen policy makes better decisions when the two evidence
+representations disagree on fresh bounded opportunities. No predictor is tuned
+after case authoring.
+
 Optional stronger cohort: 24 tasks, 12 per stratum, using the same frozen
 predictors and evaluator. It is not required for the minimum design.
 
-## G. Independent evaluator
+## H. Independent evaluator
 
 The evaluator is a separate scoring artifact:
 
@@ -222,7 +286,7 @@ Required runtime influence marker:
 
 `runtime_evaluator_influence=0`.
 
-## H. Leakage and freshness controls
+## I. Leakage, interface, and freshness controls
 
 Before execution, the freeze must prove:
 
@@ -235,7 +299,13 @@ Before execution, the freeze must prove:
 - prediction rules and abstention rules are hashed before execution;
 - no target result is used to tune thresholds, weights, or strata;
 - no policy is changed after target execution begins;
-- both supplier arms receive byte-identical model-visible task inputs;
+- both supplier arms receive byte-identical experiment-authored payloads;
+- supplier-native envelopes are recorded as interface configuration and are not
+  misreported as identical;
+- Codex tools, repository access, and evaluator-artifact access are disabled or
+  absent; any inability to enforce this fails the freeze;
+- the prospective scope contract is hashed and classified as a compatible
+  interface successor, not exact prompt reuse;
 - all authority validation occurs before any action beyond the bounded supplier
   call.
 
@@ -243,14 +313,14 @@ The target fixture novelty audit must compare normalized requests, target names,
 and fixture IDs against the preserved historical fixture manifests. A match
 fails the freeze.
 
-## I. Expected execution budget
+## J. Expected execution budget
 
 Minimum cohort:
 
 - 16 fresh tasks;
 - 2 supplier arms per task;
 - 32 model calls total;
-- 0 tool calls required;
+- 0 tool calls required and `tool_calls=0` is a hard execution condition;
 - 0 teacher calls beyond the two declared supplier arms;
 - 0 retries unless separately frozen before execution;
 - 0 external inference outside the declared external supplier arm.
@@ -258,15 +328,16 @@ Minimum cohort:
 The execution driver must stop on any response/artifact mismatch and preserve
 partial evidence. No response repair or replay is permitted.
 
-## J. Primary descriptive metrics
+## K. Primary descriptive metrics
 
 For each predictor:
 
 - delegated opportunities;
 - abstentions;
-- correct predictions;
+- successful delegations;
 - false-positive delegations;
-- false-negative withholds;
+- justified abstentions;
+- unnecessary abstentions;
 - validated delegated solves;
 - coverage;
 - selected supplier distribution.
@@ -278,37 +349,39 @@ For each supplier arm:
 - authority-boundary failures;
 - latency and resource telemetry.
 
-The main comparison is not a scalar accuracy claim. It is the paired structure
-of:
+The main comparison is the paired decision structure of:
 
 `generalized_prediction`,
 `degeneralized_prediction`,
 `actual_validated_outcome`.
 
-## K. Interpretation markers
+## L. Interpretation markers
 
 Define before execution:
 
-- `DEGENERALIZED_PREDICTION_OUTPERFORMS_GENERALIZED`: degeneralized has
-  more correct primary predictions and no increase in false-positive
-  delegations, with at least one disagreement cell;
-- `GENERALIZED_PREDICTION_OUTPERFORMS_DEGENERALIZED`: generalized has more
-  correct primary predictions under the same rule;
-- `PREDICTORS_TIED`: equal correct predictions and equal false-positive
-  delegations;
-- `DEGENERALIZED_REDUCES_FALSE_POSITIVE_DELEGATION`: fewer false-positive
-  delegations, regardless of overall tie;
-- `DEGENERALIZED_RECOVERS_VALID_BOUNDED_DELEGATION`: at least one
-  degeneralized-selected supplier arm validates and the generalized predictor
-  either abstains or selects a supplier whose matched arm fails;
+- `DEGENERALIZED_MORE_SUCCESSFUL_DELEGATIONS`;
+- `GENERALIZED_MORE_SUCCESSFUL_DELEGATIONS`;
+- `DEGENERALIZED_FEWER_FALSE_POSITIVE_DELEGATIONS`;
+- `GENERALIZED_FEWER_FALSE_POSITIVE_DELEGATIONS`;
+- `DEGENERALIZED_FEWER_UNNECESSARY_ABSTENTIONS`;
+- `GENERALIZED_FEWER_UNNECESSARY_ABSTENTIONS`;
+- `DEGENERALIZED_SELECTS_LOWER_COST_VALID_SUPPLIER`;
+- `GENERALIZED_SELECTS_LOWER_COST_VALID_SUPPLIER`;
+- `DELEGATION_DECISION_QUALITY_FAVORS_DEGENERALIZED`;
+- `DELEGATION_DECISION_QUALITY_FAVORS_GENERALIZED`;
+- `NO_MEANINGFUL_DECISION_DIFFERENCE`;
 - `NO_MEANINGFUL_PREDICTOR_DISAGREEMENT`: fewer than two disagreement cells
   after frozen prediction;
 - `COHORT_INSUFFICIENT_FOR_COMPARISON`: fewer than four valid disagreement
-  opportunities or any unresolved evaluator/authority integrity failure.
+  opportunities, any unresolved evaluator/authority integrity failure, or any
+  supplier-native tool/evaluator-access violation.
+
+The favorable decision marker is derived only by the lexicographic ordering in
+Section F; no arbitrary weights or post-outcome rule changes are permitted.
 
 No marker qualifies a supplier or changes routing.
 
-## L. Major threats to validity
+## M. Major threats to validity
 
 1. Run 4A is small and the generalized aggregate spans only four capability
    families.
@@ -324,25 +397,27 @@ No marker qualifies a supplier or changes routing.
 6. A positive result is limited to this scope responsibility, interface,
    authority context, supplier pair, and evidence cutoff.
 
-## M. Does this test delegation prediction?
+## N. Does this test delegation prediction?
 
 Yes, if executed as frozen. It does not retest semantic label sensitivity:
-the interface is held constant across suppliers. It compares two pre-outcome
-supplier-selection rules on fresh bounded delegation opportunities, with
-independent paired outcomes and explicit abstention. The broad score and
+the experiment-authored payload is held constant across suppliers, while
+supplier-native envelopes are explicitly treated as part of the supplier /
+interface configuration. It compares two pre-outcome delegation policies on
+fresh bounded opportunities, with independent paired outcomes, explicit
+abstention, and a capability-first decision rule. The broad score and
 responsibility-specific profile disagree before target execution, which is the
 necessary condition for a meaningful comparison.
 
 A positive result would support only:
 
-> In this prospective bounded scope cohort, the responsibility/interface
-> evidence profile predicted delegated-arm validation outcomes better than the
-> selected generalized historical aggregate.
+> In this prospective, disagreement-enriched bounded scope cohort, the
+> responsibility/interface-conditioned evidence policy produced better
+> delegation decisions than the selected broad historical aggregate policy.
 
 It would not establish a general benchmark theory, universal benchmark
 insufficiency, or production qualification.
 
-## Design status
+## O. Design status
 
 `DESIGN_READY_TO_FREEZE`
 

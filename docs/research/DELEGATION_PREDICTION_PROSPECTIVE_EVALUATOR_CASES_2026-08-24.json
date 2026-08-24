@@ -4,6 +4,15 @@
   "status": "design_only_scoring_manifest",
   "runtime_visibility": "scoring_only",
   "runtime_evaluator_influence": 0,
+  "cohort_construction": {
+    "method": "fixed design-time cases",
+    "disagreement_enriched": true,
+    "not_unbiased_routing_incidence_sample": true,
+    "valid_question": "which frozen delegation policy makes better decisions when the evidence representations disagree on fresh bounded opportunities",
+    "predictor_tuning_after_case_authoring": false,
+    "predictor_snapshot_required_before_target_execution": true,
+    "runtime_expected_fields_excluded": true
+  },
   "case_count": 16,
   "cases": [
     {

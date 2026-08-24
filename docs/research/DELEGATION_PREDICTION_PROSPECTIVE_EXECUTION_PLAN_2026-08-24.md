@@ -6,18 +6,24 @@ This is a prepared plan only. It must not be executed from this design commit.
 
 ## Frozen sequence
 
-1. Freeze the predictor JSON and evaluator-case JSON.
-2. Generate a fresh runtime fixture pack from the 16 evaluator case IDs without
-   copying expected evaluator fields into runtime inputs.
+1. Freeze and hash the predictor JSON, evaluator-case JSON, experiment-authored
+   schema, and prompt template.
+2. Confirm the fixed 16 cases are disagreement-enriched design cases, not an
+   incidence sample, and generate a runtime fixture pack without copying
+   expected evaluator fields into runtime inputs.
 3. Run the model-free novelty, authority, evaluator-influence, and predictor
    snapshot checks.
-4. For every task, prepare one byte-identical request/schema/authority packet
-   for the local and external supplier arms.
+4. For every task, prepare one byte-identical experiment-authored
+   request/schema/authority payload for the local and external arms. Record
+   the supplier-native envelopes separately; do not claim full-byte identity.
+   Disable/omit Codex tools, repository context, and evaluator access.
 5. Compute both frozen predictions before any supplier call.
 6. Execute the local and external arms exactly once per task.
 7. Validate each response with the independent deterministic evaluator.
 8. Record raw responses and telemetry without repair or retry.
-9. Score each predictor against the matched supplier-arm outcome.
+9. Score each predictor as a delegation policy: successful delegation, false
+   positive, justified abstention, or unnecessary abstention. Treat different
+   valid supplier selections as a capability tie and compare cost only secondarily.
 10. Stop before any qualification, production routing, or policy promotion.
 
 ## Planned artifacts
@@ -50,11 +56,13 @@ created in this design pass.
 - `MODEL_CALLS_MADE=0`;
 - `TOOL_CALLS_MADE=0`;
 - `RESPONSE_FILES=0`;
-- predictor/evaluator hashes match the frozen manifest;
+- predictor/evaluator/schema/prompt hashes match the frozen manifest;
 - target fixture novelty audit passes;
 - evaluator expected fields are absent from runtime inputs;
 - runtime authority is independent of predictor and evaluator;
-- both arm inputs are identical except supplier identity;
+- both experiment-authored arm payloads are identical except supplier identity;
+- native envelopes are recorded and contain no tools, repository context, or
+  evaluator artifacts;
 - prediction snapshots predate every response;
 - `runtime_evaluator_influence=0`;
 - no target outcome has entered either predictor.
@@ -70,4 +78,5 @@ frozen predictors.
 
 Use only the pre-registered descriptive markers in the predictor manifest.
 Do not infer statistical significance from this minimum cohort. A positive result
-would support only this bounded scope/interface/supplier configuration.
+would support only this prospective, disagreement-enriched bounded
+scope/interface/supplier configuration and its frozen delegation-decision rule.

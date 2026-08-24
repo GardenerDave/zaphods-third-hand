@@ -1,11 +1,32 @@
 {
-  "schema": "zth_delegation_prediction_prospective_predictors_v1",
+  "schema": "zth_delegation_prediction_prospective_predictors_v2",
   "experiment_id": "DELEGATION_PREDICTION_TEST_SCOPE_V0",
-  "status": "design_only",
+  "status": "design_only_hardened",
   "authoritative_basis_commit": "e4d5b48efed683f1265a7fb3799abe8c4b598f5f",
   "no_target_outcomes_available": true,
+  "evidence_source_table": [
+    {"artifact": ".work/run4a_intervention_market_calibration/run_20260819T184835Z/aggregate.json", "commit": "15dd84cfa82d9c2cef47778111e811e11ecf7274", "timestamp": "2026-08-19T19:04:23.253595+00:00", "role": "Run 4A observed aggregate outcomes", "contains_target_outcome": true, "available_before_prospective_target": true},
+    {"artifact": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_4A_2026-08-19.md", "commit": "53bb70750dce1aeccfd96fa2f5e822f4fe324dd", "timestamp": "2026-08-19T15:06:44-04:00", "role": "Run 4A canonical observed-results report", "contains_target_outcome": true, "available_before_prospective_target": true},
+    {"artifact": "docs/research/RUN_4A_PREREGISTRATION_2026-08-19.json", "commit": "15dd84cfa82d9c2cef47778111e811e11ecf7274", "timestamp": "2026-08-19T14:12:18-04:00", "role": "historical predictor semantics and support threshold", "contains_target_outcome": false, "available_before_prospective_target": true},
+    {"artifact": "docs/research/RUN_4B_SCOPE_INTERVENTION_REPLICATION_PREREGISTRATION_2026-08-19.json", "commit": "b32ff64d0adef21f355baa41c7e9371946e63a18", "timestamp": "2026-08-19T19:02:51-04:00", "role": "scope replication contract and authority boundary", "contains_target_outcome": false, "available_before_prospective_target": true},
+    {"artifact": "docs/research/RUN_4_RESOURCE_WEIGHTS_FREEZE_2026-08-19.json", "commit": "28e531e43ed63d37f094240d162f30584d419255", "timestamp": "2026-08-19T10:26:19-04:00", "role": "historical resource prior", "contains_target_outcome": false, "available_before_prospective_target": true},
+    {"artifact": "docs/research/ATOMIC_SUPPLIER_SCORECARD_SCHEMA_V1.json", "commit": "13321742e87aedd090728e4cad741f80166f02d3", "timestamp": "2026-08-20T19:59:07-04:00", "role": "bounded evidence-record schema", "contains_target_outcome": false, "available_before_prospective_target": true}
+  ],
+  "primary_estimand": "delegation_decision_quality_on_fresh_bounded_tasks",
+  "target_cohort": {
+    "task_count": 16,
+    "supplier_arms_per_task": 2,
+    "planned_model_calls": 32,
+    "planned_tool_calls": 0,
+    "supplier_selection_disagreement_count": 8,
+    "delegate_vs_abstain_disagreement_count": 8,
+    "binary_expected_success_disagreement_count": 8,
+    "sampling": "fixed disagreement-enriched design-time cases; not an unbiased routing-incidence sample",
+    "target_outcomes_exist": false
+  },
   "generalized_predictor": {
     "id": "RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1",
+    "policy_type": "broad_aggregate_driven_delegation_policy",
     "score_type": "historical aggregate intervention rescue rate across four families",
     "source_artifacts": [
       {
@@ -22,32 +43,33 @@
       }
     ],
     "evidence_cutoff_commit": "15dd84cfa82d9c2cef47778111e811e11ecf7274",
-    "evidence_cutoff_artifact_timestamp": "2026-08-19",
+    "evidence_cutoff_artifact_timestamp": "2026-08-19T19:04:23.253595+00:00",
     "scores": {
-      "local_teacher": {
-        "validated_rescues": 8,
-        "opportunities": 16,
-        "score": 0.5
-      },
-      "external_teacher": {
-        "validated_rescues": 11,
-        "opportunities": 16,
-        "score": 0.6875
-      }
+      "local_teacher": {"validated_rescues": 8, "opportunities": 16, "score": 0.5},
+      "external_teacher": {"validated_rescues": 11, "opportunities": 16, "score": 0.6875}
+    },
+    "threshold_provenance": {
+      "historical_support_threshold": 0.5,
+      "source": "RUN_4A_PREREGISTRATION_2026-08-19.json metrics.support_threshold",
+      "meaning": "minimum comparable opportunities and rescue rate for block-level supported-positive intervention evidence",
+      "applies_to_broad_aggregate": false,
+      "broad_policy_reuses_no_new_threshold": true
     },
     "prediction_rule": {
-      "threshold": 0.5,
-      "choose": "higher_score",
-      "tie": "abstain",
-      "missing_score": "abstain"
-    },
-    "target_prediction": {
-      "selected_supplier": "external_teacher",
-      "delegation_expected_to_succeed": true
+      "decision_output": ["selected_supplier", "delegation_decision", "expected_success"],
+      "choose": "higher_existing_broad_score",
+      "delegate_if_selected_score_exists": true,
+      "tie_or_missing_score": "abstain",
+      "target_prediction": {
+        "selected_supplier": "external_teacher",
+        "delegation_decision": "delegate",
+        "expected_success": true
+      }
     }
   },
   "degeneralized_predictor": {
     "id": "SCOPE_INTERFACE_PROFILE_RUN4A_V1",
+    "policy_type": "bounded_responsibility_interface_evidence_driven_delegation_policy",
     "score_type": "bounded family/interface/context evidence profile",
     "source_artifacts": [
       {
@@ -65,50 +87,119 @@
       {
         "path": "docs/research/RUN_4B_SCOPE_INTERVENTION_REPLICATION_PREREGISTRATION_2026-08-19.json",
         "sha256": "59f02a1e23c9cbe7e91bfb9c464675ccbb7bbb54b779091ea11cef8846ce5771"
+      },
+      {
+        "path": "docs/research/ATOMIC_SUPPLIER_SCORECARD_SCHEMA_V1.json",
+        "sha256": "d484d012e8fe7bb6a5266864b3c8542a96a4e6391ca75145007b0a04eeefeea9"
       }
     ],
-    "evidence_cutoff_commit": "15dd84cfa82d9c2cef47778111e811e11ecf7274",
+    "evidence_cutoff": {
+      "latest_legitimate_source_artifact": "docs/research/ATOMIC_SUPPLIER_SCORECARD_SCHEMA_V1.json",
+      "latest_source_commit": "13321742e87aedd090728e4cad741f80166f02d3",
+      "latest_source_timestamp": "2026-08-20T19:59:07-04:00",
+      "all_sources_predate_target_execution": true
+    },
     "profile": {
       "family": "scope-authority-boundary",
-      "interface_version": "run4a_scope_json_contract_v1",
+      "historical_interface_status": "run4a_scope_json_contract_v1",
+      "prospective_interface_status": "COMPATIBLE_INTERFACE_SUCCESSOR",
+      "prospective_interface_note": "same four-field JSON contract and review-only authority semantics; fresh prompt wording and target bindings",
       "authority_context": "review-only; exact target/held scope; no mutation or expansion authority",
-      "supported_strata": [
-        "profile_supported_nonexpanding"
-      ],
-      "local_teacher": {
-        "validated_rescues": 4,
-        "opportunities": 4,
-        "rescue_rate": 1,
-        "expected_action_cost_ms": 21497.191
-      },
-      "external_teacher": {
-        "validated_rescues": 4,
-        "opportunities": 4,
-        "rescue_rate": 1,
-        "expected_action_cost_ms": 33980.579
-      },
-      "minimum_opportunities": 3,
-      "minimum_rescue_rate": 0.5
+      "supported_strata": ["profile_supported_nonexpanding"],
+      "evidence_status": "supported_positive",
+      "local_teacher": {"validated_rescues": 4, "opportunities": 4, "rescue_rate": 1, "expected_action_cost_ms": 21497.191},
+      "external_teacher": {"validated_rescues": 4, "opportunities": 4, "rescue_rate": 1, "expected_action_cost_ms": 33980.579}
     },
     "prediction_rule": {
+      "decision_output": ["selected_supplier", "delegation_decision", "expected_success"],
       "require_exact_family": true,
       "require_compatible_interface": true,
-      "require_supported_positive": true,
-      "choose": "lowest_expected_action_cost",
-      "tie": "abstain",
-      "unsupported_subcase": "abstain"
-    },
-    "target_predictions": {
-      "profile_supported_nonexpanding": {
-        "selected_supplier": "local_teacher",
-        "delegation_expected_to_succeed": true
-      },
-      "profile_out_of_coverage_expansion_required": {
-        "selected_supplier": null,
-        "delegation_expected_to_succeed": false
+      "require_historical_evidence_status": "supported_positive",
+      "choose": "lowest_expected_action_cost_among_capability_supported_suppliers",
+      "tie_or_insufficient_evidence": "abstain",
+      "unsupported_subcase": "abstain",
+      "target_predictions": {
+        "profile_supported_nonexpanding": {"selected_supplier": "local_teacher", "delegation_decision": "delegate", "expected_success": true},
+        "profile_out_of_coverage_expansion_required": {"selected_supplier": null, "delegation_decision": "abstain", "expected_success": false}
       }
     }
   },
-  "comparison_unit": "same fresh task, same interface, same authority, two supplier arms, one frozen prediction per predictor",
+  "decision_outcome_rules": {
+    "successful_delegation": "delegate and selected supplier validates",
+    "false_positive_delegation": "delegate and selected supplier fails validation",
+    "justified_abstention": "abstain and neither eligible matched supplier validates",
+    "unnecessary_abstention": "abstain while at least one eligible matched supplier validates",
+    "both_delegated_suppliers_validate": "capability-level tie; compare cost only as secondary",
+    "neither_delegated_supplier_validates": "both delegation decisions fail",
+    "lexicographic_comparison": [
+      "fewer false-positive delegations",
+      "more successful delegations",
+      "fewer unnecessary abstentions",
+      "lower resource use only when capability outcomes are otherwise equivalent"
+    ],
+    "no_arbitrary_weighted_score": true
+  },
+  "interpretation_rules": {
+    "DEGENERALIZED_MORE_SUCCESSFUL_DELEGATIONS": "degeneralized successful_delegation_count > generalized successful_delegation_count",
+    "GENERALIZED_MORE_SUCCESSFUL_DELEGATIONS": "generalized successful_delegation_count > degeneralized successful_delegation_count",
+    "DEGENERALIZED_FEWER_FALSE_POSITIVE_DELEGATIONS": "degeneralized false_positive_count < generalized false_positive_count",
+    "GENERALIZED_FEWER_FALSE_POSITIVE_DELEGATIONS": "generalized false_positive_count < degeneralized false_positive_count",
+    "DEGENERALIZED_FEWER_UNNECESSARY_ABSTENTIONS": "degeneralized unnecessary_abstention_count < generalized unnecessary_abstention_count",
+    "GENERALIZED_FEWER_UNNECESSARY_ABSTENTIONS": "generalized unnecessary_abstention_count < degeneralized unnecessary_abstention_count",
+    "DEGENERALIZED_SELECTS_LOWER_COST_VALID_SUPPLIER": "among tasks where both selected suppliers validate, degeneralized selected arm has lower realized cost",
+    "GENERALIZED_SELECTS_LOWER_COST_VALID_SUPPLIER": "among tasks where both selected suppliers validate, generalized selected arm has lower realized cost",
+    "DELEGATION_DECISION_QUALITY_FAVORS_DEGENERALIZED": "lexicographically better on false positives, then successful delegations, then unnecessary abstentions; cost only breaks capability-equivalent ties",
+    "DELEGATION_DECISION_QUALITY_FAVORS_GENERALIZED": "same lexicographic rule favors generalized",
+    "NO_MEANINGFUL_DECISION_DIFFERENCE": "equal false positives, successful delegations, and unnecessary abstentions; cost may still differ descriptively",
+    "COHORT_INSUFFICIENT_FOR_COMPARISON": "fewer than four valid disagreement opportunities or any evaluator, authority, native-tool, or outcome-integrity failure"
+  },
+  "pre_outcome_controls": {
+    "predictor_decisions_frozen_before_target_execution": true,
+    "evaluator_runtime_influence": 0,
+    "evaluator_mutation_changes_only_scores": true,
+    "runtime_authority_independent_of_predictors": true,
+    "target_outcomes_in_predictors": false,
+    "target_sampling_is_disagreement_enriched": true,
+    "incidence_estimate_claim": false
+  },
+  "comparison_unit": "same fresh task, same experiment-authored payload and authority, two supplier-native interface arms, one frozen delegation decision per predictor",
+  "supplier_identity_audit": {
+    "historical_local_teacher": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf via JARVIS_LOCAL",
+    "historical_external_teacher": "codex-cli-0.146.0 via codex-cli service class",
+    "prospective_local": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf via JARVIS_LOCAL",
+    "prospective_external": "codex-cli-0.146.0 via codex-cli service class",
+    "identity_status": "EXACT",
+    "source": "RUN_4A_PREREGISTRATION_2026-08-19.json and RUN_4_RESOURCE_WEIGHTS_FREEZE_2026-08-19.json"
+  },
+  "interface_audit": {
+    "experiment_authored_payload_identity": "same request/schema/authority contract across arms",
+    "supplier_native_envelope_identity": "not byte-identical; supplier-specific system/client/runtime envelopes are part of the configured supplier/interface",
+    "prospective_interface_hash_required_at_freeze": true,
+    "codex_tools_or_evaluator_access": "must be disabled/absent; otherwise freeze fails",
+    "tool_calls_required": 0
+  },
+  "target_construction": {
+    "method": "retain fixed 16 design-time cases",
+    "reason": "they are already fresh, deterministic, and outcome-free; changing to a generator is not required to establish temporal separation",
+    "disagreement_enriched": true,
+    "not_unbiased_incidence_sample": true,
+    "no_predictor_tuning_after_case_authoring": true
+  },
+  "interpretation_markers": [
+    "DEGENERALIZED_MORE_SUCCESSFUL_DELEGATIONS",
+    "GENERALIZED_MORE_SUCCESSFUL_DELEGATIONS",
+    "DEGENERALIZED_FEWER_FALSE_POSITIVE_DELEGATIONS",
+    "GENERALIZED_FEWER_FALSE_POSITIVE_DELEGATIONS",
+    "DEGENERALIZED_FEWER_UNNECESSARY_ABSTENTIONS",
+    "GENERALIZED_FEWER_UNNECESSARY_ABSTENTIONS",
+    "DEGENERALIZED_SELECTS_LOWER_COST_VALID_SUPPLIER",
+    "GENERALIZED_SELECTS_LOWER_COST_VALID_SUPPLIER",
+    "DELEGATION_DECISION_QUALITY_FAVORS_DEGENERALIZED",
+    "DELEGATION_DECISION_QUALITY_FAVORS_GENERALIZED",
+    "NO_MEANINGFUL_DECISION_DIFFERENCE",
+    "COHORT_INSUFFICIENT_FOR_COMPARISON"
+  ],
+  "qualification_change": false,
+  "production_routing_change": false,
   "predictor_feature_cutoff_before_target": true
 }
