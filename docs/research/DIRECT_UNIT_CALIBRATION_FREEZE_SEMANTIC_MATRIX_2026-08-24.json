@@ -97,7 +97,7 @@
     "triage_freeze_adds_new_experiment_semantics": true,
     "unsupported_certainty_freeze_adds_new_experiment_semantics": true,
     "freeze_adds_new_experiment_semantics": true,
-    "historical_extra_field_policy": "ALLOWED_OR_UNRESTRICTED",
+    "historical_extra_field_policy": "ALLOWED",
     "hardened_design_extra_field_policy": "UNSPECIFIED",
     "corrected_interface_adds_new_experiment_semantics": false
   },

@@ -28,7 +28,7 @@ semantic boundary. It does not require exact route labels or `more evidence`.
 - original freeze executed: `false`
 - original freeze outcome contamination: `false`
 - original freeze superseded before execution: `true`
-- historical extra-field policy: `ALLOWED_OR_UNRESTRICTED`
+- historical extra-field policy: `ALLOWED`
 - hardened design extra-field policy: `UNSPECIFIED`
 
 ## Field-level adjudication
