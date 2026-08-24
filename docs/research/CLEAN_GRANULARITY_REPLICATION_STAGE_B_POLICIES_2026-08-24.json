@@ -1,0 +1,326 @@
+{
+  "schema": "zth_clean_granularity_replication_stage_b_policies_v1",
+  "experiment_id": "CLEAN_GRANULARITY_REPLICATION_STAGE_B_2026-08-24",
+  "status": "frozen_pre_target_outcome",
+  "evidence_cutoff": "Stage A direct evidence sealed before Stage B target construction and before any Stage B outcome",
+  "evidence_provenance": {
+    "stage_b_gate_report": "73dd027047b00a3f93a8aaf61ff833beebd9cd14ffca596fe0ea40b9c8968e37",
+    "stage_b_gate_matrix": "c09654ddaef611292db26b9bd811bed60d9c06aa614759c45e28a3e46a96ad0d",
+    "stage_a_atomic_evidence": "bbe276e17bfd5881a3174a18297bdd7421cf88abefdb425142c5586d566c313e",
+    "stage_a_semantic_audit_matrix": "e040fbb1aed3d06ccff293a62d4dab66275a209d8f006b2db5e9fcdf9d3e747d",
+    "stage_a_v2_interface_contract": "d7eff33f17c7d5e833c8fed9bd5804d6dc5d813e92b009f261fc2071d6067bbd",
+    "stage_a_result_commit": "6b1ec1ec3649276c3f846507cd3bb71e558ee14c",
+    "stage_a_semantic_audit_commit": "fb21f019e08e9f7d312fa37439396e0ee509641b",
+    "stage_b_gate_commit": "96c7fe9a23bcfafd2e339e77a183090bc65464ea",
+    "accepted_stage_a_gate_source_hashes": {
+      "stage_a_semantic_validity_matrix": "3706bf0a0620a2c1b5833c88c1550672275bfa31b1775c4cdf031d573fd2b45c",
+      "stage_a_results_matrix": "2967b1fb562a7399b0805b09f62382de3186f3fd1158ea26bb0e40895da349cb",
+      "stage_a_atomic_evidence": "02b2d3d87c4f0d63f7e257d2ae1001f4874207a8f9c0e6ce3a95b97420b14d40",
+      "stage_a_raw_response_manifest": "a5f9eb5fb75adc56af78fa0e5207c6c9a406e35368ac3eabfadddb1724060dd0",
+      "stage_a_lifecycle": "cd4e9daca5090a4f6dd3896bf8f6d2d4a25add605bc340f179d5da313e64f4f",
+      "scope_v0_raw_response_manifest": "54d06b4c9a221eb8a98bcb5f6d2db5cf2246c57c14058ba4ae9f655696e04173",
+      "prospective_predictors": "1fcdf91d9cae4be6bb8182aa982896528745e664883e74695972ce15506b7a9c",
+      "run3_routing_policy_freeze": "cf6728e51e5b5e1ce5ed24539f83bbacd4f9a07dd818f26106c333cc7e543fe8",
+      "run4a_preregistration": "a9418fe1e45a05e46b4fd183a6345333893192305fbf767461f3b280b26d748b",
+      "run4a_comparative_evidence_freeze": "c48a97000fbf85b7ea3919a8269009d3200d3c2369924c456ec9dcc8736baf7b",
+      "run4_economic_policy_freeze": "60732b15f0547ba51e66aaa134c26b86aeb089d23e44029b88b659f21cda12ed",
+      "atomic_supplier_scorecard_schema": "d484d012e8fe7bb6a5266864b3c8542a96a4e6391ca75145007b0a04eeefeea9",
+      "run4_resource_weights": "8f7820a6a3e5734e071452f643374d8c6c769d4d149bcec3f2f82b88ee6530c2"
+    },
+    "stage_a_runtime_provenance": {
+      "raw_response_manifest": {
+        "path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/model_size_supplier_floor/direct_unit_calibration_2026-08-24/run_20260824T185745Z/raw_response_manifest.json",
+        "sha256": "a5f9eb5fb75adc56af78fa0e5207c6c9a406e35368ac3eabfadddb1724060dd0"
+      },
+      "lifecycle": {
+        "path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/model_size_supplier_floor/direct_unit_calibration_2026-08-24/run_20260824T185745Z/lifecycle.json",
+        "sha256": "cd4e9daca5090a4f6dd3896bf8f6d2d4a25add605bc340f179d5da313e64f4f1"
+      },
+      "atomic_direct_evidence": {
+        "path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/model_size_supplier_floor/direct_unit_calibration_2026-08-24/run_20260824T185745Z/atomic_direct_evidence.json",
+        "sha256": "02b2d3d87c4f0d63f7e257d2ae1001f4874207a8f9c0e6ce3a95b97420b14d40"
+      }
+    }
+  },
+  "generalized_policy": {
+    "id": "RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1",
+    "aggregation": "MICRO_AGGREGATE_DIRECT",
+    "local_score": {
+      "successes": 5,
+      "opportunities": 32,
+      "value": 0.15625
+    },
+    "external_score": {
+      "successes": 16,
+      "opportunities": 32,
+      "value": 0.5
+    },
+    "decision_rule": "higher broad direct aggregate selects supplier; tie/missing abstains",
+    "predictions": {
+      "triage-routing": {
+        "selected_supplier": "external_teacher",
+        "delegation_decision": "DELEGATE"
+      },
+      "unsupported-certainty": {
+        "selected_supplier": "external_teacher",
+        "delegation_decision": "DELEGATE"
+      }
+    }
+  },
+  "bounded_policy": {
+    "id": "STAGE_A_DIRECT_MATCHED_EVIDENCE_V1",
+    "matching_unit": "supplier x capability_family x interface x direct_responsibility",
+    "positive_rule": "n >= 3 and success_rate >= 0.50",
+    "negative_rule": "n >= 3 and success_rate < 0.50",
+    "selection_rule": "only supported-positive suppliers selectable; otherwise abstain/fail closed",
+    "evidence": {
+      "triage-routing": {
+        "local_teacher": {
+          "successes": 0,
+          "opportunities": 8,
+          "state": "SUPPORTED_NEGATIVE"
+        },
+        "external_teacher": {
+          "successes": 0,
+          "opportunities": 8,
+          "state": "SUPPORTED_NEGATIVE"
+        }
+      },
+      "unsupported-certainty": {
+        "local_teacher": {
+          "successes": 0,
+          "opportunities": 8,
+          "state": "SUPPORTED_NEGATIVE"
+        },
+        "external_teacher": {
+          "successes": 0,
+          "opportunities": 8,
+          "state": "SUPPORTED_NEGATIVE"
+        }
+      }
+    },
+    "predictions": {
+      "triage-routing": {
+        "selected_supplier": null,
+        "delegation_decision": "ABSTAIN"
+      },
+      "unsupported-certainty": {
+        "selected_supplier": null,
+        "delegation_decision": "ABSTAIN"
+      }
+    }
+  },
+  "decision_matrix": [
+    {
+      "case_id": "stageb-triage-001",
+      "family": "triage-routing",
+      "generalized_policy": {
+        "selected_supplier": "external_teacher",
+        "delegation_decision": "DELEGATE"
+      },
+      "bounded_policy": {
+        "selected_supplier": null,
+        "delegation_decision": "ABSTAIN"
+      },
+      "disagreement_type": "DELEGATE_VS_ABSTAIN"
+    },
+    {
+      "case_id": "stageb-triage-002",
+      "family": "triage-routing",
+      "generalized_policy": {
+        "selected_supplier": "external_teacher",
+        "delegation_decision": "DELEGATE"
+      },
+      "bounded_policy": {
+        "selected_supplier": null,
+        "delegation_decision": "ABSTAIN"
+      },
+      "disagreement_type": "DELEGATE_VS_ABSTAIN"
+    },
+    {
+      "case_id": "stageb-triage-003",
+      "family": "triage-routing",
+      "generalized_policy": {
+        "selected_supplier": "external_teacher",
+        "delegation_decision": "DELEGATE"
+      },
+      "bounded_policy": {
+        "selected_supplier": null,
+        "delegation_decision": "ABSTAIN"
+      },
+      "disagreement_type": "DELEGATE_VS_ABSTAIN"
+    },
+    {
+      "case_id": "stageb-triage-004",
+      "family": "triage-routing",
+      "generalized_policy": {
+        "selected_supplier": "external_teacher",
+        "delegation_decision": "DELEGATE"
+      },
+      "bounded_policy": {
+        "selected_supplier": null,
+        "delegation_decision": "ABSTAIN"
+      },
+      "disagreement_type": "DELEGATE_VS_ABSTAIN"
+    },
+    {
+      "case_id": "stageb-triage-005",
+      "family": "triage-routing",
+      "generalized_policy": {
+        "selected_supplier": "external_teacher",
+        "delegation_decision": "DELEGATE"
+      },
+      "bounded_policy": {
+        "selected_supplier": null,
+        "delegation_decision": "ABSTAIN"
+      },
+      "disagreement_type": "DELEGATE_VS_ABSTAIN"
+    },
+    {
+      "case_id": "stageb-triage-006",
+      "family": "triage-routing",
+      "generalized_policy": {
+        "selected_supplier": "external_teacher",
+        "delegation_decision": "DELEGATE"
+      },
+      "bounded_policy": {
+        "selected_supplier": null,
+        "delegation_decision": "ABSTAIN"
+      },
+      "disagreement_type": "DELEGATE_VS_ABSTAIN"
+    },
+    {
+      "case_id": "stageb-triage-007",
+      "family": "triage-routing",
+      "generalized_policy": {
+        "selected_supplier": "external_teacher",
+        "delegation_decision": "DELEGATE"
+      },
+      "bounded_policy": {
+        "selected_supplier": null,
+        "delegation_decision": "ABSTAIN"
+      },
+      "disagreement_type": "DELEGATE_VS_ABSTAIN"
+    },
+    {
+      "case_id": "stageb-triage-008",
+      "family": "triage-routing",
+      "generalized_policy": {
+        "selected_supplier": "external_teacher",
+        "delegation_decision": "DELEGATE"
+      },
+      "bounded_policy": {
+        "selected_supplier": null,
+        "delegation_decision": "ABSTAIN"
+      },
+      "disagreement_type": "DELEGATE_VS_ABSTAIN"
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-001",
+      "family": "unsupported-certainty",
+      "generalized_policy": {
+        "selected_supplier": "external_teacher",
+        "delegation_decision": "DELEGATE"
+      },
+      "bounded_policy": {
+        "selected_supplier": null,
+        "delegation_decision": "ABSTAIN"
+      },
+      "disagreement_type": "DELEGATE_VS_ABSTAIN"
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-002",
+      "family": "unsupported-certainty",
+      "generalized_policy": {
+        "selected_supplier": "external_teacher",
+        "delegation_decision": "DELEGATE"
+      },
+      "bounded_policy": {
+        "selected_supplier": null,
+        "delegation_decision": "ABSTAIN"
+      },
+      "disagreement_type": "DELEGATE_VS_ABSTAIN"
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-003",
+      "family": "unsupported-certainty",
+      "generalized_policy": {
+        "selected_supplier": "external_teacher",
+        "delegation_decision": "DELEGATE"
+      },
+      "bounded_policy": {
+        "selected_supplier": null,
+        "delegation_decision": "ABSTAIN"
+      },
+      "disagreement_type": "DELEGATE_VS_ABSTAIN"
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-004",
+      "family": "unsupported-certainty",
+      "generalized_policy": {
+        "selected_supplier": "external_teacher",
+        "delegation_decision": "DELEGATE"
+      },
+      "bounded_policy": {
+        "selected_supplier": null,
+        "delegation_decision": "ABSTAIN"
+      },
+      "disagreement_type": "DELEGATE_VS_ABSTAIN"
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-005",
+      "family": "unsupported-certainty",
+      "generalized_policy": {
+        "selected_supplier": "external_teacher",
+        "delegation_decision": "DELEGATE"
+      },
+      "bounded_policy": {
+        "selected_supplier": null,
+        "delegation_decision": "ABSTAIN"
+      },
+      "disagreement_type": "DELEGATE_VS_ABSTAIN"
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-006",
+      "family": "unsupported-certainty",
+      "generalized_policy": {
+        "selected_supplier": "external_teacher",
+        "delegation_decision": "DELEGATE"
+      },
+      "bounded_policy": {
+        "selected_supplier": null,
+        "delegation_decision": "ABSTAIN"
+      },
+      "disagreement_type": "DELEGATE_VS_ABSTAIN"
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-007",
+      "family": "unsupported-certainty",
+      "generalized_policy": {
+        "selected_supplier": "external_teacher",
+        "delegation_decision": "DELEGATE"
+      },
+      "bounded_policy": {
+        "selected_supplier": null,
+        "delegation_decision": "ABSTAIN"
+      },
+      "disagreement_type": "DELEGATE_VS_ABSTAIN"
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-008",
+      "family": "unsupported-certainty",
+      "generalized_policy": {
+        "selected_supplier": "external_teacher",
+        "delegation_decision": "DELEGATE"
+      },
+      "bounded_policy": {
+        "selected_supplier": null,
+        "delegation_decision": "ABSTAIN"
+      },
+      "disagreement_type": "DELEGATE_VS_ABSTAIN"
+    }
+  ],
+  "policy_decisions_frozen_pre_target_outcome": true,
+  "stage_b_outcome_influence_on_policy": 0,
+  "aggregation_rule_not_selected_for_future_broad_policy_beyond_this_comparator": false
+}

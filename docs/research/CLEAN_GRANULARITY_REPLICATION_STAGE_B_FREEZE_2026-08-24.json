@@ -1,0 +1,208 @@
+{
+  "schema": "zth_clean_granularity_replication_stage_b_freeze_v1",
+  "experiment_id": "CLEAN_GRANULARITY_REPLICATION_STAGE_B_2026-08-24",
+  "freeze_timestamp_utc": "2026-08-24T20:48:27Z",
+  "freeze_status": "frozen_unexecuted",
+  "base_gate_commit": "96c7fe9a23bcfafd2e339e77a183090bc65464ea",
+  "stage_a_semantic_audit_commit": "fb21f019e08e9f7d312fa37439396e0ee509641b",
+  "stage_a_result_commit": "6b1ec1ec3649276c3f846507cd3bb71e558ee14c",
+  "design_commit": "f55f677c46a0746ef4ba4dda4072c4e2f452b544",
+  "source_hashes": {
+    "stage_b_gate_report": "73dd027047b00a3f93a8aaf61ff833beebd9cd14ffca596fe0ea40b9c8968e37",
+    "stage_b_gate_matrix": "c09654ddaef611292db26b9bd811bed60d9c06aa614759c45e28a3e46a96ad0d",
+    "stage_a_atomic_evidence": "bbe276e17bfd5881a3174a18297bdd7421cf88abefdb425142c5586d566c313e",
+    "stage_a_semantic_audit_matrix": "e040fbb1aed3d06ccff293a62d4dab66275a209d8f006b2db5e9fcdf9d3e747d",
+    "stage_a_v2_interface_contract": "d7eff33f17c7d5e833c8fed9bd5804d6dc5d813e92b009f261fc2071d6067bbd",
+    "stage_a_result_commit": "6b1ec1ec3649276c3f846507cd3bb71e558ee14c",
+    "stage_a_semantic_audit_commit": "fb21f019e08e9f7d312fa37439396e0ee509641b",
+    "stage_b_gate_commit": "96c7fe9a23bcfafd2e339e77a183090bc65464ea",
+    "accepted_stage_a_gate_source_hashes": {
+      "stage_a_semantic_validity_matrix": "3706bf0a0620a2c1b5833c88c1550672275bfa31b1775c4cdf031d573fd2b45c",
+      "stage_a_results_matrix": "2967b1fb562a7399b0805b09f62382de3186f3fd1158ea26bb0e40895da349cb",
+      "stage_a_atomic_evidence": "02b2d3d87c4f0d63f7e257d2ae1001f4874207a8f9c0e6ce3a95b97420b14d40",
+      "stage_a_raw_response_manifest": "a5f9eb5fb75adc56af78fa0e5207c6c9a406e35368ac3eabfadddb1724060dd0",
+      "stage_a_lifecycle": "cd4e9daca5090a4f6dd3896bf8f6d2d4a25add605bc340f179d5da313e64f4f",
+      "scope_v0_raw_response_manifest": "54d06b4c9a221eb8a98bcb5f6d2db5cf2246c57c14058ba4ae9f655696e04173",
+      "prospective_predictors": "1fcdf91d9cae4be6bb8182aa982896528745e664883e74695972ce15506b7a9c",
+      "run3_routing_policy_freeze": "cf6728e51e5b5e1ce5ed24539f83bbacd4f9a07dd818f26106c333cc7e543fe8",
+      "run4a_preregistration": "a9418fe1e45a05e46b4fd183a6345333893192305fbf767461f3b280b26d748b",
+      "run4a_comparative_evidence_freeze": "c48a97000fbf85b7ea3919a8269009d3200d3c2369924c456ec9dcc8736baf7b",
+      "run4_economic_policy_freeze": "60732b15f0547ba51e66aaa134c26b86aeb089d23e44029b88b659f21cda12ed",
+      "atomic_supplier_scorecard_schema": "d484d012e8fe7bb6a5266864b3c8542a96a4e6391ca75145007b0a04eeefeea9",
+      "run4_resource_weights": "8f7820a6a3e5734e071452f643374d8c6c769d4d149bcec3f2f82b88ee6530c2"
+    },
+    "stage_a_runtime_provenance": {
+      "raw_response_manifest": {
+        "path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/model_size_supplier_floor/direct_unit_calibration_2026-08-24/run_20260824T185745Z/raw_response_manifest.json",
+        "sha256": "a5f9eb5fb75adc56af78fa0e5207c6c9a406e35368ac3eabfadddb1724060dd0"
+      },
+      "lifecycle": {
+        "path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/model_size_supplier_floor/direct_unit_calibration_2026-08-24/run_20260824T185745Z/lifecycle.json",
+        "sha256": "cd4e9daca5090a4f6dd3896bf8f6d2d4a25add605bc340f179d5da313e64f4f1"
+      },
+      "atomic_direct_evidence": {
+        "path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/model_size_supplier_floor/direct_unit_calibration_2026-08-24/run_20260824T185745Z/atomic_direct_evidence.json",
+        "sha256": "02b2d3d87c4f0d63f7e257d2ae1001f4874207a8f9c0e6ce3a95b97420b14d40"
+      }
+    }
+  },
+  "freeze_artifact_hashes": {
+    "policies": "47b776dcc68595ed7528409a8e8d4677f9112d1791d4653a5f1028f9dc2acb8c",
+    "runtime": "392135c60f48e99a242cc24b800973469ef97e4c55abcc36fbf8ce066ed0db89",
+    "evaluator": "084850fd575be5327d69f517766b6196701c3c7bc1d78b1b90cf4a162e0f6ae4",
+    "payload": "d4b165a27b0dad6026d73c78476a62cf35c1ada1e6e7157219cc79e597513bd5",
+    "freshness": "b0a0a3e690914aff5befce1d9aeda2a8fff9d9ebbd4aaecbfc1e8757a88e57e2"
+  },
+  "cohort": {
+    "case_count": 16,
+    "triage-routing": 8,
+    "unsupported-certainty": 8,
+    "case_order": [
+      "stageb-triage-001",
+      "stageb-triage-002",
+      "stageb-triage-003",
+      "stageb-triage-004",
+      "stageb-triage-005",
+      "stageb-triage-006",
+      "stageb-triage-007",
+      "stageb-triage-008",
+      "stageb-unsupported-certainty-001",
+      "stageb-unsupported-certainty-002",
+      "stageb-unsupported-certainty-003",
+      "stageb-unsupported-certainty-004",
+      "stageb-unsupported-certainty-005",
+      "stageb-unsupported-certainty-006",
+      "stageb-unsupported-certainty-007",
+      "stageb-unsupported-certainty-008"
+    ],
+    "future_supplier_calls": 32,
+    "target_outcomes": 0,
+    "disagreement_focused": true,
+    "incidence_representative": false
+  },
+  "supplier_identities": {
+    "local_teacher": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf via JARVIS_LOCAL",
+    "external_teacher": "codex-cli-0.146.0 via preserved service mechanism",
+    "stage_a_observed_native_model": "gpt-5.6-luna",
+    "supplier_native_envelope_control": "BEST_AVAILABLE_OBSERVATION"
+  },
+  "interfaces": {
+    "triage-routing": {
+      "interface_id": "duc_triage_direct_json_v2",
+      "interface_hash": "8814daeac6a3ddebe5589d3f9a8f192ae43dce72bfc53a68ce09ab4e9453af9f",
+      "lineage": "exact corrected Stage A direct V2 interface reuse"
+    },
+    "unsupported-certainty": {
+      "interface_id": "duc_unsupported_certainty_direct_json_v2",
+      "interface_hash": "8b0024e96d26e107905184b6f17acf4443b65594a0c9884911c81a36cd603a76",
+      "lineage": "exact corrected Stage A direct V2 interface reuse"
+    }
+  },
+  "policy_decision_matrix_frozen": true,
+  "eligibility_definition_frozen": "A supplier arm admitted for the same capability family, interface, direct responsibility, and authority context and executed under frozen experimental controls; eligibility does not depend on bounded SUPPORTED_POSITIVE evidence. Both local_teacher and external_teacher are eligible arms.",
+  "scoring_table": [
+    {
+      "external_valid": true,
+      "local_valid": true,
+      "generalized": "SUCCESSFUL_DELEGATION",
+      "bounded": "UNNECESSARY_ABSTENTION"
+    },
+    {
+      "external_valid": true,
+      "local_valid": false,
+      "generalized": "SUCCESSFUL_DELEGATION",
+      "bounded": "UNNECESSARY_ABSTENTION"
+    },
+    {
+      "external_valid": false,
+      "local_valid": true,
+      "generalized": "FALSE_POSITIVE_DELEGATION",
+      "bounded": "UNNECESSARY_ABSTENTION"
+    },
+    {
+      "external_valid": false,
+      "local_valid": false,
+      "generalized": "FALSE_POSITIVE_DELEGATION",
+      "bounded": "JUSTIFIED_ABSTENTION"
+    }
+  ],
+  "lexicographic_order": [
+    "fewer_false_positive_delegations",
+    "more_successful_delegations",
+    "fewer_unnecessary_abstentions",
+    "lower_cost_only_when_capability_equivalent"
+  ],
+  "execution_controls": {
+    "retries": 0,
+    "replays": 0,
+    "response_repair": false,
+    "teacher_intervention": false,
+    "downstream_model_repair": false,
+    "model_substitution": false,
+    "repository_access": false,
+    "evaluator_access": false,
+    "authority_changes": false,
+    "threshold_tuning": false,
+    "qualification_or_promotion": false,
+    "production_routing_change": false,
+    "second_acquisition_process_permitted": false,
+    "raw_responses_sealed_before_evaluation": true
+  },
+  "balanced_schedule": {
+    "local_first_cases": [
+      "stageb-triage-001",
+      "stageb-triage-002",
+      "stageb-triage-003",
+      "stageb-triage-004",
+      "stageb-unsupported-certainty-001",
+      "stageb-unsupported-certainty-002",
+      "stageb-unsupported-certainty-003",
+      "stageb-unsupported-certainty-004"
+    ],
+    "external_first_cases": [
+      "stageb-triage-005",
+      "stageb-triage-006",
+      "stageb-triage-007",
+      "stageb-triage-008",
+      "stageb-unsupported-certainty-005",
+      "stageb-unsupported-certainty-006",
+      "stageb-unsupported-certainty-007",
+      "stageb-unsupported-certainty-008"
+    ]
+  },
+  "runtime_evaluator_isolation": {
+    "runtime_manifest_evaluator_influence": 0,
+    "evaluator_information_in_runtime": false,
+    "exact_payload_matched_across_arms": true,
+    "payload_corruption_regression": "passed_model_free"
+  },
+  "freshness": {
+    "targets_fresh_relative_to_stage_a": true,
+    "selection_used_expected_supplier_weakness": false,
+    "model_authored": false
+  },
+  "pre_execution_contamination": {
+    "stage_b_supplier_calls": 0,
+    "stage_b_responses": 0,
+    "stage_b_results": 0,
+    "stage_b_target_outcomes": 0,
+    "stage_a_mutations": 0,
+    "policy_changed_after_target_generation": false,
+    "outcome_used_in_target_generation": false
+  },
+  "characterization": {
+    "CLEAN_GRANULARITY_REPLICATION_STAGE_B_FROZEN": true,
+    "STAGE_B_SAMPLE_SIZE_FROZEN_BEFORE_TARGET_OUTCOMES": true,
+    "OUTCOME_CONDITIONAL_STAGE_B_EXTENSION_PERMITTED": false,
+    "POLICY_DECISIONS_FROZEN_PRE_TARGET_OUTCOME": true,
+    "NATURAL_PRE_TARGET_POLICY_DISAGREEMENT_EXISTS": true,
+    "STAGE_B_EVALUATOR_KEYS_REGISTERED": true,
+    "STAGE_B_EVALUATOR_SYNTHETIC_SATISFIABILITY": "16/16",
+    "EXACT_STAGE_B_EXPERIMENT_PAYLOAD_FROZEN": true,
+    "MATCHED_CASE_PAYLOAD_HASH_ACROSS_ARMS": true,
+    "RUNTIME_EVALUATOR_INFLUENCE": 0,
+    "STAGE_B_FROZEN_WITH_ZERO_TARGET_OUTCOMES": true,
+    "PRIMARY_CHARACTERIZATION": "CLEAN_GRANULARITY_REPLICATION_STAGE_B_FROZEN_UNEXECUTED",
+    "NEXT_DECISION": "EXECUTE_CLEAN_GRANULARITY_REPLICATION_STAGE_B"
+  }
+}
