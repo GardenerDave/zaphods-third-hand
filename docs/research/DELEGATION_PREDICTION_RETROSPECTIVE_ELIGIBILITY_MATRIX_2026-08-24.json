@@ -11,12 +11,15 @@
     "run6": 24
   },
   "decision": {
-    "final_status": "RETROSPECTIVE_REPLAY_PARTIALLY_ELIGIBLE",
+    "final_status": "RETROSPECTIVE_REPLAY_NOT_ELIGIBLE",
+    "historical_policy_effectiveness_replay_available": true,
+    "historical_policy_effectiveness_replay_status": "descriptive_only; do not treat as independent prediction evidence",
     "strict_independent_prediction_rows": 0,
     "temporally_clean_rows": 60,
     "outcome_clean_rows": 60,
     "policy_independent_rows": 0,
     "family_compatible_policy_effectiveness_rows": 60,
+    "independent_prediction_comparison_available": false,
     "recommendation": "DESIGN_PROSPECTIVE_MATCHED_DELEGATION_COHORT"
   },
   "generalized_score_candidate": {

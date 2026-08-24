@@ -11,9 +11,9 @@ modified.
 
 ## Decision
 
-`RETROSPECTIVE_REPLAY_PARTIALLY_ELIGIBLE`
+`RETROSPECTIVE_REPLAY_NOT_ELIGIBLE`
 
-There is a useful 60-task retrospective cohort for a bounded,
+There is a useful 60-task historical cohort for a separately labeled,
 policy-effectiveness/descriptive replay:
 
 - Run 4: 12 selected triage tasks
@@ -35,8 +35,10 @@ Therefore there are:
 - 60/60 rows potentially usable for a clearly labeled historical
   policy-effectiveness replay.
 
-This cannot support an independent claim that a decomposed profile predicted
-delegation better than a generalized score. The recommended next decision is:
+This cannot support the intended independent comparison of a generalized score
+against a decomposed profile on later delegation prediction. The original
+decision rule therefore classifies the retrospective prediction replay as
+not eligible. The recommended next decision is:
 
 `DESIGN_PROSPECTIVE_MATCHED_DELEGATION_COHORT`
 
@@ -254,8 +256,8 @@ A bounded retrospective analysis could legitimately ask:
 > Given the prior evidence and the historically frozen policy, what policy
 > choice and policy-level outcome followed on these later tasks?
 
-That is a historical policy-effectiveness/descriptive replay. It can preserve
-the policy-entangled nature of the decision and compare runs/families without
+That is a `HISTORICAL_POLICY_EFFECTIVENESS_REPLAY`, not the proposed prediction
+test. It can preserve the policy-entangled nature of the decision and compare runs/families without
 pretending to estimate an independent predictor.
 
 The proposed benchmark thesis asks a stronger question:
@@ -271,11 +273,25 @@ provenance problem.
 
 ## 11. Final eligibility decision
 
-`RETROSPECTIVE_REPLAY_PARTIALLY_ELIGIBLE` is the correct status because a
-substantial, temporally ordered, independently validated, family-compatible
-cohort exists for a policy-effectiveness replay. It is not
-`RETROSPECTIVE_REPLAY_ELIGIBLE` for the stronger independent-prediction claim:
-the strict clean intersection is 0/60.
+`RETROSPECTIVE_REPLAY_NOT_ELIGIBLE` is the correct status for the proposed
+delegation-prediction replay. The strict clean intersection is 0/60: no row is
+both policy-independent and an acceptable exact-interface transfer for the
+intended comparison.
+
+The primary disqualifier is not temporal leakage or target-outcome
+contamination. The decomposed historical evidence was explicitly used to
+construct the later routing policies whose outcomes would be treated as
+targets. A comparison against those outcomes would conflate prediction quality
+with policy design and effectiveness. The changed interface is a second
+transfer limitation.
+
+The 60 rows remain available for the separate
+`HISTORICAL_POLICY_EFFECTIVENESS_REPLAY` question:
+
+> How did delegation policies explicitly derived from prior decomposed evidence
+> perform on later fresh tasks?
+
+That replay was not executed here.
 
 The correct next step is:
 
