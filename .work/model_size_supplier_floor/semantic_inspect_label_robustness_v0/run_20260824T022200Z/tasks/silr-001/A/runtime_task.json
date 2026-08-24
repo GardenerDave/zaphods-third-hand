@@ -1,0 +1,15 @@
+{
+  "environment_facts": {
+    "authority_record": {
+      "allowed_observation_operations": [
+        "observe_presence",
+        "inspect"
+      ],
+      "allowed_targets": [
+        "docs/research/RB_AMBER_2026-08-24.md"
+      ]
+    }
+  },
+  "input_request": "Could you establish if docs/research/RB_AMBER_2026-08-24.md is kept in this repository?",
+  "task_id": "silr-001"
+}

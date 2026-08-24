@@ -1,0 +1,10 @@
+Request clause:
+Is docs/research/RB_EMBER_2026-08-24.json somewhere in the repository?
+
+Classify only the requested operation class.
+observe_presence means determine whether the named target exists, is present, or is available.
+class_beta means examine or look at the named target.
+unresolved means the operation class is ambiguous, unsupported, or cannot be determined safely.
+
+Return only operation_class_candidate in the required structured object. Do not identify the target, choose a tool, decide authorization, or decide task success.
+/no_think

@@ -87,3 +87,50 @@ def test_evaluator_mutation_changes_score_but_not_runtime_inputs():
     assert probe.score_rows(observed, corrupted)[0]["semantic_correct"] is False
     runtime = probe.runtime_cases()[0]
     assert "expected_semantic_class" not in runtime
+
+
+def metric_fixture(values):
+    return {arm: {"presence_correct": values[arm][0], "inspect_correct": values[arm][1]} for arm in "ABCD"}
+
+
+def test_bounded_interpretation_markers_cover_preregistered_patterns():
+    robust = probe.robustness_markers_from_metrics(metric_fixture({"A": (3, 6), "B": (6, 6), "C": (6, 6), "D": (6, 6)}))
+    assert robust["LITERAL_INSPECT_LABEL_INTERFERENCE_REPLICATED"] is True
+    assert robust["MULTIPLE_INSPECT_LABEL_REPLACEMENTS_RECOVER_PRESENCE"] is True
+    assert robust["INSPECT_LABEL_REPLACEMENT_ROBUSTNESS_DEMONSTRATED"] is True
+
+    class_beta = probe.robustness_markers_from_metrics(metric_fixture({"A": (3, 6), "B": (6, 6), "C": (3, 6), "D": (3, 6)}))
+    assert class_beta["CLASS_BETA_SPECIFIC_EFFECT_PLAUSIBLE"] is True
+    assert class_beta["INSPECT_LABEL_REPLACEMENT_ROBUSTNESS_DEMONSTRATED"] is False
+
+    neutral = probe.robustness_markers_from_metrics(metric_fixture({"A": (3, 6), "B": (6, 6), "C": (6, 6), "D": (3, 6)}))
+    assert neutral["NEUTRAL_LABEL_REPLACEMENT_EFFECT_SUPPORTED"] is True
+    assert neutral["HUMAN_READABLE_INSPECT_REPLACEMENT_SUPPORTED"] is False
+
+    perfect = probe.robustness_markers_from_metrics(metric_fixture({arm: (6, 6) for arm in "ABCD"}))
+    assert perfect["ORIGINAL_CONTROL_PERFECT_ON_HOLDOUT"] is True
+    assert perfect["LITERAL_INSPECT_LABEL_INTERFERENCE_REPLICATED"] is False
+
+
+def test_all_six_pairwise_comparisons_and_rate_deltas_are_supported():
+    rows = [{"task_id": task_id, "arm": arm, "expected": expected, "canonical_operation": expected, "semantic_correct": True} for task_id, expected, _ in probe.specs() for arm in "ABCD"]
+    comparisons = {(left, right): probe.pairwise(rows, left, right) for left, right in (("A", "B"), ("A", "C"), ("A", "D"), ("B", "C"), ("B", "D"), ("C", "D"))}
+    assert len(comparisons) == 6
+    assert all(set(("overall_accuracy_delta_rate", "presence_accuracy_delta_rate", "inspect_accuracy_delta_rate")) <= set(value) for value in comparisons.values())
+
+
+def test_replacement_vectors_are_reportable():
+    rows = [{"task_id": task_id, "arm": arm, "canonical_operation": expected} for task_id, expected, _ in probe.specs() for arm in "ABCD"]
+    markers = probe.replacement_vector_markers(rows)
+    assert markers["B_C_CANONICAL_VECTOR_IDENTICAL"] is True
+    assert markers["B_D_CANONICAL_VECTOR_IDENTICAL"] is True
+    assert markers["C_D_CANONICAL_VECTOR_IDENTICAL"] is True
+    assert markers["ALL_REPLACEMENT_CANONICAL_VECTORS_IDENTICAL"] is True
+
+
+def test_replay_guard_detects_existing_response(tmp_path):
+    assert probe.has_existing_responses(tmp_path) is False
+    response_dir = tmp_path / "tasks" / "silr-001" / "A"
+    response_dir.mkdir(parents=True)
+    (response_dir / "response.json").write_text("{}", encoding="utf-8")
+    assert probe.has_existing_responses(tmp_path) is True

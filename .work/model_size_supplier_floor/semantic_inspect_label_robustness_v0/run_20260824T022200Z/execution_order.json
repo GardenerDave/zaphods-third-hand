@@ -1,0 +1,291 @@
+{
+  "arm_counts": {
+    "A": 12,
+    "B": 12,
+    "C": 12,
+    "D": 12
+  },
+  "class_stratified_balance": true,
+  "cross_arm_context": false,
+  "inspect_task_ids": [
+    "silr-002",
+    "silr-004",
+    "silr-006",
+    "silr-008",
+    "silr-010",
+    "silr-012"
+  ],
+  "presence_task_ids": [
+    "silr-001",
+    "silr-003",
+    "silr-005",
+    "silr-007",
+    "silr-009",
+    "silr-011"
+  ],
+  "schedule": [
+    {
+      "arm": "A",
+      "task_id": "silr-001"
+    },
+    {
+      "arm": "B",
+      "task_id": "silr-001"
+    },
+    {
+      "arm": "C",
+      "task_id": "silr-001"
+    },
+    {
+      "arm": "D",
+      "task_id": "silr-001"
+    },
+    {
+      "arm": "A",
+      "task_id": "silr-002"
+    },
+    {
+      "arm": "B",
+      "task_id": "silr-002"
+    },
+    {
+      "arm": "C",
+      "task_id": "silr-002"
+    },
+    {
+      "arm": "D",
+      "task_id": "silr-002"
+    },
+    {
+      "arm": "B",
+      "task_id": "silr-003"
+    },
+    {
+      "arm": "C",
+      "task_id": "silr-003"
+    },
+    {
+      "arm": "D",
+      "task_id": "silr-003"
+    },
+    {
+      "arm": "A",
+      "task_id": "silr-003"
+    },
+    {
+      "arm": "B",
+      "task_id": "silr-004"
+    },
+    {
+      "arm": "C",
+      "task_id": "silr-004"
+    },
+    {
+      "arm": "D",
+      "task_id": "silr-004"
+    },
+    {
+      "arm": "A",
+      "task_id": "silr-004"
+    },
+    {
+      "arm": "C",
+      "task_id": "silr-005"
+    },
+    {
+      "arm": "D",
+      "task_id": "silr-005"
+    },
+    {
+      "arm": "A",
+      "task_id": "silr-005"
+    },
+    {
+      "arm": "B",
+      "task_id": "silr-005"
+    },
+    {
+      "arm": "C",
+      "task_id": "silr-006"
+    },
+    {
+      "arm": "D",
+      "task_id": "silr-006"
+    },
+    {
+      "arm": "A",
+      "task_id": "silr-006"
+    },
+    {
+      "arm": "B",
+      "task_id": "silr-006"
+    },
+    {
+      "arm": "D",
+      "task_id": "silr-007"
+    },
+    {
+      "arm": "A",
+      "task_id": "silr-007"
+    },
+    {
+      "arm": "B",
+      "task_id": "silr-007"
+    },
+    {
+      "arm": "C",
+      "task_id": "silr-007"
+    },
+    {
+      "arm": "D",
+      "task_id": "silr-008"
+    },
+    {
+      "arm": "A",
+      "task_id": "silr-008"
+    },
+    {
+      "arm": "B",
+      "task_id": "silr-008"
+    },
+    {
+      "arm": "C",
+      "task_id": "silr-008"
+    },
+    {
+      "arm": "A",
+      "task_id": "silr-009"
+    },
+    {
+      "arm": "C",
+      "task_id": "silr-009"
+    },
+    {
+      "arm": "B",
+      "task_id": "silr-009"
+    },
+    {
+      "arm": "D",
+      "task_id": "silr-009"
+    },
+    {
+      "arm": "A",
+      "task_id": "silr-010"
+    },
+    {
+      "arm": "C",
+      "task_id": "silr-010"
+    },
+    {
+      "arm": "B",
+      "task_id": "silr-010"
+    },
+    {
+      "arm": "D",
+      "task_id": "silr-010"
+    },
+    {
+      "arm": "B",
+      "task_id": "silr-011"
+    },
+    {
+      "arm": "D",
+      "task_id": "silr-011"
+    },
+    {
+      "arm": "A",
+      "task_id": "silr-011"
+    },
+    {
+      "arm": "C",
+      "task_id": "silr-011"
+    },
+    {
+      "arm": "B",
+      "task_id": "silr-012"
+    },
+    {
+      "arm": "D",
+      "task_id": "silr-012"
+    },
+    {
+      "arm": "A",
+      "task_id": "silr-012"
+    },
+    {
+      "arm": "C",
+      "task_id": "silr-012"
+    }
+  ],
+  "schema": "zth_semantic_inspect_label_robustness_v0_schedule_audit",
+  "strata_positions": {
+    "inspect": {
+      "A": [
+        1,
+        1,
+        2,
+        3,
+        3,
+        4
+      ],
+      "B": [
+        1,
+        1,
+        2,
+        3,
+        3,
+        4
+      ],
+      "C": [
+        1,
+        2,
+        2,
+        3,
+        4,
+        4
+      ],
+      "D": [
+        1,
+        2,
+        2,
+        3,
+        4,
+        4
+      ]
+    },
+    "presence": {
+      "A": [
+        1,
+        1,
+        2,
+        3,
+        3,
+        4
+      ],
+      "B": [
+        1,
+        1,
+        2,
+        3,
+        3,
+        4
+      ],
+      "C": [
+        1,
+        2,
+        2,
+        3,
+        4,
+        4
+      ],
+      "D": [
+        1,
+        2,
+        2,
+        3,
+        4,
+        4
+      ]
+    }
+  }
+}

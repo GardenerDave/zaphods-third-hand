@@ -38,14 +38,20 @@ prepared run contains no responses, no model calls, and no tool calls.
 
 ## Preregistered interpretation
 
-The primary comparisons are A/B, A/C, and A/D, with B/C/D pair comparisons as
-stability checks. Presence and inspect denominators remain separate. The
+The primary comparisons are all six unordered arm pairs: A/B, A/C, A/D, B/C,
+B/D, and C/D. Presence and inspect denominators remain separate, with explicit
+replacement-vector identity checks and bounded interpretation markers. The
 confirmation does not qualify a supplier or change production routing.
+
+The predecessor freeze `e40ffca5ebaf0a56cbf242c1e5632a0a21197ad9` is preserved
+as an unexecuted superseded pre-inference freeze because its analysis omitted
+the three replacement-stability comparisons. Its zero-call state means no
+scientific model evidence was contaminated.
 
 Authoritative prepared run:
 
-`.work/model_size_supplier_floor/semantic_inspect_label_robustness_v0/run_20260824T021000Z`
+`.work/model_size_supplier_floor/semantic_inspect_label_robustness_v0/run_20260824T022200Z`
 
 Driver SHA256:
 
-`c6f5c16e8e418ffc1bbac346b1c5051b00417093e8d6f078603011c5243ae308`
+`2deff9cacf71c6d402b51c4347a5d2bb45c93b0cb9f98344c42be334c2d73bfd`

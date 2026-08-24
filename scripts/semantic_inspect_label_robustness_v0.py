@@ -19,7 +19,7 @@ from scripts import zth_qwen3_1_7b_atomic_scope_relation_decomposition as decomp
 from scripts import zth_qwen3_1_7b_clean_scope_logic_probe as runtime
 
 ROOT = runtime.ROOT
-RUN = ROOT / ".work/model_size_supplier_floor/semantic_inspect_label_robustness_v0/run_20260824T021000Z"
+RUN = ROOT / ".work/model_size_supplier_floor/semantic_inspect_label_robustness_v0/run_20260824T022200Z"
 PREVIOUS_FACTORIAL_CLOSEOUT = "5ddf5b425ad1209aab6bbea196db82494a8b0046"
 RUNTIME_CASES = ROOT / "docs/research/SEMANTIC_INSPECT_LABEL_ROBUSTNESS_V0_RUNTIME_CASES_2026-08-24.json"
 EVALUATOR_CASES = ROOT / "docs/research/SEMANTIC_INSPECT_LABEL_ROBUSTNESS_V0_EVALUATOR_CASES_2026-08-24.json"
@@ -223,7 +223,7 @@ def prepare(out: Path) -> None:
     assert original_score != corrupted_score
     evaluator_after = dict(evaluator_before)
     write_json(out / "evaluator_corruption_invariance.json", {"before_hashes": evaluator_before, "after_hashes": evaluator_after, "corrupted_evaluator": evaluator_corrupted, "original_score": original_score, "corrupted_score": corrupted_score, "scoring_changed": True, "runtime_unchanged": True, "pass": True})
-    manifest = {"schema": "zth_semantic_inspect_label_robustness_v0_manifest", "status": "prepared_model_free", "motivating_closeout": PREVIOUS_FACTORIAL_CLOSEOUT, "driver_sha256": sha_file(Path(__file__).resolve()), "task_count": 12, "presence_tasks": 6, "inspect_tasks": 6, "arm_count": 4, "planned_model_calls": 48, "model_calls_made": 0, "tool_calls_made": 0, "response_files": 0, "true_fallback_eligibility": 12, "historical_request_reuse": 0, "request_identity_across_arms": True, "authority_identity": True, "preflight_identity": True, "model_settings_identity": True, "definition_equivalence": True, "semantic_enum_positions_identical": True, "surface_label_mappings_frozen": True, "frozen_evaluator_scoring_authority": True, "evaluator_corruption_scoring_test": True, "class_stratified_execution_balance": True, "evaluator_runtime_influence": 0, "model_output_granted_authority": 0, "qualification_change": False, "model_id": MODEL_ID, "model_sha256": MODEL_SHA, "operative_parameters": PARAMS, "gpu_uuid": GPU_UUID, "arms": LABELS, "enums": ENUMS}
+    manifest = {"schema": "zth_semantic_inspect_label_robustness_v0_manifest", "status": "prepared_model_free", "motivating_closeout": PREVIOUS_FACTORIAL_CLOSEOUT, "predecessor_freeze": "e40ffca5ebaf0a56cbf242c1e5632a0a21197ad9", "predecessor_analysis_omission": "REPLACEMENT_STABILITY_COMPARISONS_INCOMPLETE", "pre_inference_analysis_defect": True, "scientific_model_evidence_contaminated": False, "driver_sha256": sha_file(Path(__file__).resolve()), "task_count": 12, "presence_tasks": 6, "inspect_tasks": 6, "arm_count": 4, "planned_model_calls": 48, "model_calls_made": 0, "tool_calls_made": 0, "response_files": 0, "true_fallback_eligibility": 12, "historical_request_reuse": 0, "request_identity_across_arms": True, "authority_identity": True, "preflight_identity": True, "model_settings_identity": True, "definition_equivalence": True, "semantic_enum_positions_identical": True, "surface_label_mappings_frozen": True, "frozen_evaluator_scoring_authority": True, "evaluator_corruption_scoring_test": True, "all_six_pairwise_comparisons_implemented": True, "replacement_stability_vectors_implemented": True, "interpretation_markers_implemented": True, "replay_guard_implemented": True, "class_stratified_execution_balance": True, "evaluator_runtime_influence": 0, "model_output_granted_authority": 0, "qualification_change": False, "model_id": MODEL_ID, "model_sha256": MODEL_SHA, "operative_parameters": PARAMS, "gpu_uuid": GPU_UUID, "arms": LABELS, "enums": ENUMS}
     write_json(out / "router_manifest.json", manifest); write_json(out / "lifecycle.json", {"status": "prepared", "model_calls": 0, "tool_calls": 0, "retries": 0})
     print(json.dumps({"status": "prepared", "task_count": 12, "planned_model_calls": 48, "MODEL_CALLS_MADE": 0, "TOOL_CALLS_MADE": 0, "response_files": 0}, indent=2))
 
@@ -235,6 +235,8 @@ def model_preflight(out: Path):
 
 
 def execute(out: Path) -> None:
+    if has_existing_responses(out):
+        raise RuntimeError("refusing to replay run with existing response artifacts")
     spec, telemetry_url = model_preflight(out); calls = 0
     for item in read_json(out / "execution_order.json")["schedule"]:
         d = out / "tasks" / item["task_id"] / item["arm"]; write_json(d / "call_started.json", {"task_id": item["task_id"], "arm": item["arm"], "started_at": time.time(), "prompt_sha256": sha_file(d / "prompt.txt"), "schema_sha256": sha_file(d / "schema.json"), "model_id": MODEL_ID})
@@ -259,14 +261,47 @@ def arm_metrics(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
 def pairwise(rows: list[dict[str, Any]], left: str, right: str) -> dict[str, Any]:
     by = {(r["task_id"], r["arm"]): r for r in rows}; pairs = [(by[(task_id, left)], by[(task_id, right)]) for task_id, _, _ in TASK_SPECS]; pr = [p for p in pairs if p[0]["expected"] == "observe_presence"]; ir = [p for p in pairs if p[0]["expected"] == "inspect"]
     def correct(ps, side): return sum(p[side]["semantic_correct"] for p in ps)
-    return {"left": left, "right": right, "canonical_output_changed_count": sum(p[0]["canonical_operation"] != p[1]["canonical_operation"] for p in pairs), "presence_changed_count": sum(p[0]["canonical_operation"] != p[1]["canonical_operation"] for p in pr), "inspect_changed_count": sum(p[0]["canonical_operation"] != p[1]["canonical_operation"] for p in ir), "overall_accuracy_delta": correct(pairs, 1) - correct(pairs, 0), "presence_accuracy_delta": correct(pr, 1) - correct(pr, 0), "inspect_accuracy_delta": correct(ir, 1) - correct(ir, 0)}
+    overall_delta = correct(pairs, 1) - correct(pairs, 0); presence_delta = correct(pr, 1) - correct(pr, 0); inspect_delta = correct(ir, 1) - correct(ir, 0)
+    return {"left": left, "right": right, "canonical_output_changed_count": sum(p[0]["canonical_operation"] != p[1]["canonical_operation"] for p in pairs), "presence_changed_count": sum(p[0]["canonical_operation"] != p[1]["canonical_operation"] for p in pr), "inspect_changed_count": sum(p[0]["canonical_operation"] != p[1]["canonical_operation"] for p in ir), "overall_accuracy_delta": overall_delta, "presence_accuracy_delta": presence_delta, "inspect_accuracy_delta": inspect_delta, "overall_accuracy_delta_rate": overall_delta / 12, "presence_accuracy_delta_rate": presence_delta / 6, "inspect_accuracy_delta_rate": inspect_delta / 6}
+
+
+def robustness_markers_from_metrics(metrics: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    a, b, c, d = (metrics[arm] for arm in "ABCD")
+    original_errors = a["presence_correct"] < 6
+    all_inspect_stable = all(metrics[arm]["inspect_correct"] == 6 for arm in "ABCD")
+    improvements = {"B": b["presence_correct"] > a["presence_correct"], "C": c["presence_correct"] > a["presence_correct"], "D": d["presence_correct"] > a["presence_correct"]}
+    improved_arms = [arm for arm, improved in improvements.items() if improved]
+    multiple = len(improved_arms) >= 2 and all(metrics[arm]["inspect_correct"] >= a["inspect_correct"] for arm in improved_arms)
+    return {
+        "ORIGINAL_CONTROL_PRESENCE_ERRORS_OBSERVED": original_errors,
+        "ALL_ARMS_INSPECT_STABLE": all_inspect_stable,
+        "CLASS_BETA_PRESENCE_IMPROVEMENT": improvements["B"],
+        "OPERATION_TWO_PRESENCE_IMPROVEMENT": improvements["C"],
+        "EXAMINE_TARGET_PRESENCE_IMPROVEMENT": improvements["D"],
+        "MULTIPLE_INSPECT_LABEL_REPLACEMENTS_RECOVER_PRESENCE": multiple,
+        "INSPECT_LABEL_REPLACEMENT_ROBUSTNESS_DEMONSTRATED": original_errors and all(improvements.values()) and all(metrics[arm]["inspect_correct"] >= a["inspect_correct"] for arm in "BCD"),
+        "LITERAL_INSPECT_LABEL_INTERFERENCE_REPLICATED": original_errors and all(improvements.values()) and all_inspect_stable,
+        "CLASS_BETA_SPECIFIC_EFFECT_PLAUSIBLE": improvements["B"] and c["presence_correct"] <= a["presence_correct"] and d["presence_correct"] <= a["presence_correct"],
+        "NEUTRAL_LABEL_REPLACEMENT_EFFECT_SUPPORTED": improvements["B"] and improvements["C"] and d["presence_correct"] <= a["presence_correct"],
+        "HUMAN_READABLE_INSPECT_REPLACEMENT_SUPPORTED": improvements["D"] and d["inspect_correct"] >= a["inspect_correct"],
+        "ORIGINAL_CONTROL_PERFECT_ON_HOLDOUT": a["presence_correct"] == 6 and a["inspect_correct"] == 6,
+    }
+
+
+def replacement_vector_markers(rows: list[dict[str, Any]]) -> dict[str, bool]:
+    vectors = {arm: tuple(r["canonical_operation"] for r in sorted(rows, key=lambda r: r["task_id"]) if r["arm"] == arm) for arm in "BCD"}
+    return {"B_C_CANONICAL_VECTOR_IDENTICAL": vectors["B"] == vectors["C"], "B_D_CANONICAL_VECTOR_IDENTICAL": vectors["B"] == vectors["D"], "C_D_CANONICAL_VECTOR_IDENTICAL": vectors["C"] == vectors["D"], "ALL_REPLACEMENT_CANONICAL_VECTORS_IDENTICAL": len(set(vectors.values())) == 1}
+
+
+def has_existing_responses(out: Path) -> bool:
+    return any(out.rglob("response.json"))
 
 
 def closeout(out: Path) -> None:
     ev = {r["task_id"]: r for r in read_json(EVALUATOR_CASES)["cases"]}; rows = []
     for item in read_json(out / "execution_order.json")["schedule"]:
         d = out / "tasks" / item["task_id"] / item["arm"]; v = read_json(d / "candidate_validation.json"); result = read_json(d / "runtime_result.json"); expected = ev[item["task_id"]]["expected_semantic_class"]; rows.append({"task_id": item["task_id"], "arm": item["arm"], "expected": expected, "surface_label": v["candidate"], "canonical_operation": result["canonical_operation"], "semantic_correct": result["canonical_operation"] == expected, "parse_valid": v["parse_valid"], "contract_valid": v["contract_valid"], "candidate_valid": v["candidate_valid"], "candidate_admissible": v["candidate_admissible"]})
-    metrics = arm_metrics(rows); comparisons = {f"A_vs_{arm}": pairwise(rows, "A", arm) for arm in ("B", "C", "D")}; write_json(out / "aggregate.json", {"schema": "zth_semantic_inspect_label_robustness_v0_aggregate", "evaluator_source": str(EVALUATOR_CASES), "arm_metrics": metrics, "comparisons": comparisons, "rows": rows, "qualification_change": False})
+    metrics = arm_metrics(rows); comparisons = {f"{left}_vs_{right}": pairwise(rows, left, right) for left, right in (("A", "B"), ("A", "C"), ("A", "D"), ("B", "C"), ("B", "D"), ("C", "D"))}; write_json(out / "aggregate.json", {"schema": "zth_semantic_inspect_label_robustness_v0_aggregate", "evaluator_source": str(EVALUATOR_CASES), "arm_metrics": metrics, "comparisons": comparisons, "interpretation_markers": robustness_markers_from_metrics(metrics), "replacement_vector_markers": replacement_vector_markers(rows), "rows": rows, "qualification_change": False})
 
 
 def main() -> None:

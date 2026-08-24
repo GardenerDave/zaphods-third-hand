@@ -1,0 +1,15 @@
+{
+  "environment_facts": {
+    "authority_record": {
+      "allowed_observation_operations": [
+        "observe_presence",
+        "inspect"
+      ],
+      "allowed_targets": [
+        "docs/research/RB_BRONZE_2026-08-24.json"
+      ]
+    }
+  },
+  "input_request": "Would you say whether docs/research/RB_BRONZE_2026-08-24.json is located here?",
+  "task_id": "silr-003"
+}
