@@ -19,7 +19,8 @@ from scripts import zth_qwen3_1_7b_atomic_scope_relation_decomposition as decomp
 from scripts import zth_qwen3_1_7b_clean_scope_logic_probe as runtime
 
 ROOT = runtime.ROOT
-RUN = ROOT / ".work/model_size_supplier_floor/semantic_enum_order_counterfactual_v0/run_20260823T203000Z"
+RUN = ROOT / ".work/model_size_supplier_floor/semantic_enum_order_counterfactual_v0/run_20260823T204600Z"
+PREDECESSOR_RUN = ROOT / ".work/model_size_supplier_floor/semantic_enum_order_counterfactual_v0/run_20260823T203000Z"
 RUNTIME_CASES = ROOT / "docs/research/SEMANTIC_ENUM_ORDER_COUNTERFACTUAL_V0_RUNTIME_CASES_2026-08-23.json"
 EVALUATOR_CASES = ROOT / "docs/research/SEMANTIC_ENUM_ORDER_COUNTERFACTUAL_V0_EVALUATOR_CASES_2026-08-23.json"
 PAIR_AUDIT = ROOT / "docs/research/SEMANTIC_ENUM_ORDER_COUNTERFACTUAL_V0_PAIR_AUDIT_2026-08-23.json"
@@ -107,6 +108,51 @@ def model_settings() -> dict[str, Any]:
     return {"model_id": MODEL_ID, "model_sha256": MODEL_SHA, "operative_parameters": PARAMS, "gpu_uuid": GPU_UUID, "max_tokens": MAX_TOKENS, "timeout_seconds": TIMEOUT, "power_interval_seconds": POWER_INTERVAL, "temperature": 0.2}
 
 
+def paired_execution_order(task_ids: list[str]) -> list[dict[str, str]]:
+    order = []
+    for index, task_id in enumerate(task_ids):
+        pair_order = ("A", "B") if index % 2 == 0 else ("B", "A")
+        for arm in pair_order:
+            order.append({"task_id": task_id, "arm": arm})
+    return order
+
+
+def counterbalance_audit(order: list[dict[str, str]], task_ids: list[str]) -> dict[str, Any]:
+    assert len(task_ids) == 6
+    assert len(order) == 12
+    assert all(sum(item["task_id"] == task_id for item in order) == 2 for task_id in task_ids)
+    assert all(sum(item["task_id"] == task_id and item["arm"] == arm for item in order) == 1 for task_id in task_ids for arm in ("A", "B"))
+    pairs = [order[index:index + 2] for index in range(0, len(order), 2)]
+    a_first = sum(pair[0]["arm"] == "A" for pair in pairs)
+    b_first = sum(pair[0]["arm"] == "B" for pair in pairs)
+    a_second = sum(pair[1]["arm"] == "A" for pair in pairs)
+    b_second = sum(pair[1]["arm"] == "B" for pair in pairs)
+    expected = []
+    for index, task_id in enumerate(task_ids):
+        for arm in (("A", "B") if index % 2 == 0 else ("B", "A")):
+            expected.append({"task_id": task_id, "arm": arm})
+    assert order == expected
+    assert (a_first, b_first, a_second, b_second) == (3, 3, 3, 3)
+    return {"pair_count": 6, "call_count": 12, "every_task_twice": True, "every_task_has_A_once": True, "every_task_has_B_once": True, "a_first_count": a_first, "b_first_count": b_first, "a_second_count": a_second, "b_second_count": b_second, "preregistered_pattern": expected, "pass": True}
+
+
+def predecessor_successor_equivalence(out: Path, cases: list[dict[str, Any]]) -> dict[str, Any]:
+    files = ("runtime_task.json", "preflight.json", "semantic_information_gap.json", "capability_plan_0.json", "model_settings.json", "prompt.txt", "schema.json")
+    rows = []
+    for case in cases:
+        task_id = case["task_id"]
+        for arm in ("A", "B"):
+            current = out / "tasks" / task_id / arm
+            predecessor = PREDECESSOR_RUN / "tasks" / task_id / arm
+            matches = {name: current.joinpath(name).read_bytes() == predecessor.joinpath(name).read_bytes() for name in files}
+            rows.append({"task_id": task_id, "arm": arm, "files": matches, "all_identical": all(matches.values())})
+    assert all(row["all_identical"] for row in rows)
+    current_evaluator = read_json(EVALUATOR_CASES)
+    predecessor_evaluator = json.loads(subprocess.check_output(["git", "show", "26c8a9342877dc2e8bec9a30e3fc0d39ff70fbd4:docs/research/SEMANTIC_ENUM_ORDER_COUNTERFACTUAL_V0_EVALUATOR_CASES_2026-08-23.json"], text=True))
+    assert current_evaluator == predecessor_evaluator
+    return {"predecessor_run": str(PREDECESSOR_RUN.relative_to(ROOT)), "rows": rows, "evaluator_expected_classes_identical": True, "model_input_files_identical": True, "enum_schema_intervention_unchanged": True, "pass": True}
+
+
 def prepare(out: Path) -> None:
     if out.exists() and any(out.iterdir()):
         raise RuntimeError("fresh counterfactual run required")
@@ -123,7 +169,7 @@ def prepare(out: Path) -> None:
     write_json(RUNTIME_CASES, {"schema": "zth_semantic_enum_order_counterfactual_v0_runtime_cases", "cases": cases})
     write_json(EVALUATOR_CASES, {"schema": "zth_semantic_enum_order_counterfactual_v0_evaluator_cases", "cases": evaluators})
     write_json(REGISTRY, {"schema": "zth_semantic_enum_order_counterfactual_v0_registry", "automatic_promotion": False, "entries": [{"capability_id": "semantic.bounded_operation_classification", "supplier_id": "qwen3_1_7b_bounded_operation_class_candidate_supplier", "supplier_type": "MODEL", "status": "EXPERIMENTAL_CANDIDATE", "qualification_decision": "no promotion"}]})
-    order = []
+    task_ids = [case["task_id"] for case in cases]
     for index, case in enumerate(cases):
         task_id = case["task_id"]
         task_dir = out / "tasks" / task_id
@@ -137,10 +183,8 @@ def prepare(out: Path) -> None:
             (arm_dir / "prompt.txt").write_text(v2.prompt(case["input_request"]), encoding="utf-8")
             write_json(arm_dir / "schema.json", schema(ARMS[arm]))
             write_json(arm_dir / "model_settings.json", model_settings())
-            order.append({"task_id": task_id, "arm": arm}) if ((index % 2 == 0 and arm == "A") or (index % 2 == 1 and arm == "B")) else None
-            order.append({"task_id": task_id, "arm": arm}) if ((index % 2 == 0 and arm == "B") or (index % 2 == 1 and arm == "A")) else None
-    # The two append expressions above deliberately produce A/B, B/A, ... order.
-    assert len(order) == 12
+    order = paired_execution_order(task_ids)
+    order_audit = counterbalance_audit(order, task_ids)
     identity_rows = []
     for case in cases:
         td = out / "tasks" / case["task_id"]
@@ -150,8 +194,10 @@ def prepare(out: Path) -> None:
         identity_rows.append(identity)
     assert all(all(row[key] for key in ("request_hash_equal", "prompt_hash_equal", "authority_hash_equal", "preflight_hash_equal", "gap_hash_equal", "model_settings_hash_equal", "only_intended_schema_difference")) for row in identity_rows)
     write_json(PAIR_AUDIT, {"schema": "zth_semantic_enum_order_counterfactual_v0_pair_audit", "paired_request_identity": True, "paired_prompt_identity": True, "paired_authority_identity": True, "paired_preflight_identity": True, "paired_model_settings_identity": True, "only_model_visible_intervention": "ENUM_ORDER", "rows": identity_rows})
-    write_json(out / "execution_order.json", {"order": order, "counterbalanced": True, "cross_arm_input": False})
-    manifest = {"schema": "zth_semantic_enum_order_counterfactual_v0_manifest", "status": "prepared_model_free", "prepared_from_git_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(), "driver_sha256": sha_file(Path(__file__).resolve()), "runtime_cases_sha256": sha_file(RUNTIME_CASES), "evaluator_cases_sha256": sha_file(EVALUATOR_CASES), "pair_audit_sha256": sha_file(PAIR_AUDIT), "task_count": 6, "paired_opportunities": 6, "planned_model_calls": 12, "model_calls_made": 0, "tool_calls_made": 0, "response_files": 0, "presence_expected": 3, "inspect_expected": 3, "true_fallback_eligibility": 6, "v1_v2_exact_request_reuse": 0, "authority_provenance_audit": True, "paired_identity_audit": True, "v2_first_enum_member": "inspect", "v2_output_matched_first_enum_member": "6/6", "enum_order_causal_effect_not_yet_demonstrated": True, "qualification_change": False, "teacher_calls": 0, "30b_calls": 0, "external_calls": 0, "retries": 0, "runtime_evaluator_influence": 0, "model_output_granted_authority": 0, "model_settings": model_settings()}
+    equivalence = predecessor_successor_equivalence(out, cases)
+    write_json(out / "execution_order.json", {"order": order, "counterbalanced": True, "cross_arm_input": False, "counterbalance_audit": order_audit})
+    write_json(out / "predecessor_successor_equivalence.json", equivalence)
+    manifest = {"schema": "zth_semantic_enum_order_counterfactual_v0_manifest", "status": "prepared_model_free", "supersedes_unexecuted_pre_inference_freeze": "26c8a9342877dc2e8bec9a30e3fc0d39ff70fbd4", "prepared_from_git_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(), "driver_sha256": sha_file(Path(__file__).resolve()), "runtime_cases_sha256": sha_file(RUNTIME_CASES), "evaluator_cases_sha256": sha_file(EVALUATOR_CASES), "pair_audit_sha256": sha_file(PAIR_AUDIT), "task_count": 6, "paired_opportunities": 6, "planned_model_calls": 12, "model_calls_made": 0, "tool_calls_made": 0, "response_files": 0, "presence_expected": 3, "inspect_expected": 3, "true_fallback_eligibility": 6, "v1_v2_exact_request_reuse": 0, "authority_provenance_audit": True, "paired_identity_audit": True, "paired_arm_order_counterbalanced": True, "arm_a_first_count": 3, "arm_b_first_count": 3, "arm_a_second_count": 3, "arm_b_second_count": 3, "predecessor_successor_model_inputs_identical": True, "enum_schema_intervention_unchanged": True, "v2_first_enum_member": "inspect", "v2_output_matched_first_enum_member": "6/6", "enum_order_causal_effect_not_yet_demonstrated": True, "qualification_change": False, "teacher_calls": 0, "30b_calls": 0, "external_calls": 0, "retries": 0, "runtime_evaluator_influence": 0, "model_output_granted_authority": 0, "model_settings": model_settings()}
     manifest["manifest_sha256"] = sha_bytes(canonical({**manifest, "manifest_sha256": None}))
     write_json(out / "router_manifest.json", manifest)
     write_json(out / "lifecycle.json", {"status": "prepared", "model_calls": 0, "tool_calls": 0, "retries": 0})

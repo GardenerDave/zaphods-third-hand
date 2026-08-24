@@ -2,6 +2,13 @@
 
 Status: frozen design; no inference has run.
 
+The predecessor freeze `26c8a9342877dc2e8bec9a30e3fc0d39ff70fbd4` is preserved
+as an unexecuted superseded pre-inference freeze. Its generated order was
+A-then-B for all six pairs despite the intended alternating declaration. No
+model call or response existed, so scientific model evidence was not
+contaminated. This successor changes only the execution-order construction and
+uses a fresh prepared run.
+
 This bounded interface experiment tests one hypothesis from the oracle-clean
 TRUE_SEMANTIC_FALLBACK_V2 baseline: whether the observed all-`inspect` output
 pattern is associated with the order of the two safe enum alternatives in the
@@ -40,6 +47,10 @@ safe classification. Evaluator expectations are in a separate manifest.
 The primary paired observation is whether each task's output changes between
 arms. Results must be reported per arm and as transitions, without treating a
 small paired sample as a universal causal estimate.
+
+The preregistered successor order is A/B, B/A, A/B, B/A, A/B, B/A. The
+prepared artifact contains an exact counterbalance audit and a predecessor /
+successor identity audit for all model-visible inputs.
 
 Preserved V2 markers:
 

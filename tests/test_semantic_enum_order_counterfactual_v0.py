@@ -8,6 +8,23 @@ def test_enum_orders_are_explicit_and_unresolved_is_last():
     assert probe.schema(probe.ARM_B)["properties"]["operation_class_candidate"]["enum"] == probe.ARM_B
 
 
+def test_exact_preregistered_counterbalanced_order():
+    task_ids = [task_id for task_id, _, _ in probe.specs()]
+    expected = [
+        {"task_id": "seof-001", "arm": "A"}, {"task_id": "seof-001", "arm": "B"},
+        {"task_id": "seof-002", "arm": "B"}, {"task_id": "seof-002", "arm": "A"},
+        {"task_id": "seof-003", "arm": "A"}, {"task_id": "seof-003", "arm": "B"},
+        {"task_id": "seof-004", "arm": "B"}, {"task_id": "seof-004", "arm": "A"},
+        {"task_id": "seof-005", "arm": "A"}, {"task_id": "seof-005", "arm": "B"},
+        {"task_id": "seof-006", "arm": "B"}, {"task_id": "seof-006", "arm": "A"},
+    ]
+    order = probe.paired_execution_order(task_ids)
+    assert order == expected
+    audit = probe.counterbalance_audit(order, task_ids)
+    assert audit["a_first_count"] == audit["b_first_count"] == 3
+    assert audit["a_second_count"] == audit["b_second_count"] == 3
+
+
 def test_fresh_tasks_are_interleaved_and_genuinely_unresolved():
     rows = probe.specs()
     assert len(rows) == 6

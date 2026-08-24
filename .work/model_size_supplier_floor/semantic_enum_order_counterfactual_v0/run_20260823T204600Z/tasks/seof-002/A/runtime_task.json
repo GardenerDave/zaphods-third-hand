@@ -1,0 +1,15 @@
+{
+  "environment_facts": {
+    "authority_record": {
+      "allowed_observation_operations": [
+        "observe_presence",
+        "inspect"
+      ],
+      "allowed_targets": [
+        "docs/research/E2_OPAL_2026-08-23.json"
+      ]
+    }
+  },
+  "input_request": "Give docs/research/E2_OPAL_2026-08-23.json a careful examination.",
+  "task_id": "seof-002"
+}

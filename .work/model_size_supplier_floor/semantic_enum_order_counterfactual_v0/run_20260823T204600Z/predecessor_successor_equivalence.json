@@ -1,0 +1,177 @@
+{
+  "enum_schema_intervention_unchanged": true,
+  "evaluator_expected_classes_identical": true,
+  "model_input_files_identical": true,
+  "pass": true,
+  "predecessor_run": ".work/model_size_supplier_floor/semantic_enum_order_counterfactual_v0/run_20260823T203000Z",
+  "rows": [
+    {
+      "all_identical": true,
+      "arm": "A",
+      "files": {
+        "capability_plan_0.json": true,
+        "model_settings.json": true,
+        "preflight.json": true,
+        "prompt.txt": true,
+        "runtime_task.json": true,
+        "schema.json": true,
+        "semantic_information_gap.json": true
+      },
+      "task_id": "seof-001"
+    },
+    {
+      "all_identical": true,
+      "arm": "B",
+      "files": {
+        "capability_plan_0.json": true,
+        "model_settings.json": true,
+        "preflight.json": true,
+        "prompt.txt": true,
+        "runtime_task.json": true,
+        "schema.json": true,
+        "semantic_information_gap.json": true
+      },
+      "task_id": "seof-001"
+    },
+    {
+      "all_identical": true,
+      "arm": "A",
+      "files": {
+        "capability_plan_0.json": true,
+        "model_settings.json": true,
+        "preflight.json": true,
+        "prompt.txt": true,
+        "runtime_task.json": true,
+        "schema.json": true,
+        "semantic_information_gap.json": true
+      },
+      "task_id": "seof-002"
+    },
+    {
+      "all_identical": true,
+      "arm": "B",
+      "files": {
+        "capability_plan_0.json": true,
+        "model_settings.json": true,
+        "preflight.json": true,
+        "prompt.txt": true,
+        "runtime_task.json": true,
+        "schema.json": true,
+        "semantic_information_gap.json": true
+      },
+      "task_id": "seof-002"
+    },
+    {
+      "all_identical": true,
+      "arm": "A",
+      "files": {
+        "capability_plan_0.json": true,
+        "model_settings.json": true,
+        "preflight.json": true,
+        "prompt.txt": true,
+        "runtime_task.json": true,
+        "schema.json": true,
+        "semantic_information_gap.json": true
+      },
+      "task_id": "seof-003"
+    },
+    {
+      "all_identical": true,
+      "arm": "B",
+      "files": {
+        "capability_plan_0.json": true,
+        "model_settings.json": true,
+        "preflight.json": true,
+        "prompt.txt": true,
+        "runtime_task.json": true,
+        "schema.json": true,
+        "semantic_information_gap.json": true
+      },
+      "task_id": "seof-003"
+    },
+    {
+      "all_identical": true,
+      "arm": "A",
+      "files": {
+        "capability_plan_0.json": true,
+        "model_settings.json": true,
+        "preflight.json": true,
+        "prompt.txt": true,
+        "runtime_task.json": true,
+        "schema.json": true,
+        "semantic_information_gap.json": true
+      },
+      "task_id": "seof-004"
+    },
+    {
+      "all_identical": true,
+      "arm": "B",
+      "files": {
+        "capability_plan_0.json": true,
+        "model_settings.json": true,
+        "preflight.json": true,
+        "prompt.txt": true,
+        "runtime_task.json": true,
+        "schema.json": true,
+        "semantic_information_gap.json": true
+      },
+      "task_id": "seof-004"
+    },
+    {
+      "all_identical": true,
+      "arm": "A",
+      "files": {
+        "capability_plan_0.json": true,
+        "model_settings.json": true,
+        "preflight.json": true,
+        "prompt.txt": true,
+        "runtime_task.json": true,
+        "schema.json": true,
+        "semantic_information_gap.json": true
+      },
+      "task_id": "seof-005"
+    },
+    {
+      "all_identical": true,
+      "arm": "B",
+      "files": {
+        "capability_plan_0.json": true,
+        "model_settings.json": true,
+        "preflight.json": true,
+        "prompt.txt": true,
+        "runtime_task.json": true,
+        "schema.json": true,
+        "semantic_information_gap.json": true
+      },
+      "task_id": "seof-005"
+    },
+    {
+      "all_identical": true,
+      "arm": "A",
+      "files": {
+        "capability_plan_0.json": true,
+        "model_settings.json": true,
+        "preflight.json": true,
+        "prompt.txt": true,
+        "runtime_task.json": true,
+        "schema.json": true,
+        "semantic_information_gap.json": true
+      },
+      "task_id": "seof-006"
+    },
+    {
+      "all_identical": true,
+      "arm": "B",
+      "files": {
+        "capability_plan_0.json": true,
+        "model_settings.json": true,
+        "preflight.json": true,
+        "prompt.txt": true,
+        "runtime_task.json": true,
+        "schema.json": true,
+        "semantic_information_gap.json": true
+      },
+      "task_id": "seof-006"
+    }
+  ]
+}

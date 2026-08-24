@@ -1,0 +1,10 @@
+{
+  "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+  "max_tokens": 512,
+  "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+  "model_sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb",
+  "operative_parameters": 2031739904,
+  "power_interval_seconds": 0.25,
+  "temperature": 0.2,
+  "timeout_seconds": 900
+}
