@@ -78,25 +78,28 @@ def ancestor(commit: str) -> None:
         raise RuntimeError(f"required commit is not an ancestor: {commit}")
 
 
-def verify_frozen_hashes(freeze: dict[str, Any]) -> None:
+def verify_frozen_hashes(freeze: dict[str, Any], *, include_scoring_artifacts: bool) -> None:
     artifact_paths = {
         "runtime": RUNTIME,
         "payload": PAYLOADS,
-        "evaluator": DOCS / "CLEAN_GRANULARITY_REPLICATION_STAGE_B_EVALUATOR_CASES_2026-08-24.json",
-        "policies": DOCS / "CLEAN_GRANULARITY_REPLICATION_STAGE_B_POLICIES_2026-08-24.json",
-        "freshness": DOCS / "CLEAN_GRANULARITY_REPLICATION_STAGE_B_FRESHNESS_AUDIT_2026-08-24.json",
     }
+    if include_scoring_artifacts:
+        artifact_paths.update({
+            "evaluator": DOCS / "CLEAN_GRANULARITY_REPLICATION_STAGE_B_EVALUATOR_CASES_2026-08-24.json",
+            "policies": DOCS / "CLEAN_GRANULARITY_REPLICATION_STAGE_B_POLICIES_2026-08-24.json",
+            "freshness": DOCS / "CLEAN_GRANULARITY_REPLICATION_STAGE_B_FRESHNESS_AUDIT_2026-08-24.json",
+        })
     for key, path in artifact_paths.items():
         if file_digest(path) != freeze.get("freeze_artifact_hashes", {}).get(key):
             raise RuntimeError(f"frozen artifact hash mismatch: {key}")
 
 
-def load_inputs() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+def load_inputs(*, include_scoring_artifacts: bool = False) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     ancestor(EXPECTED_ANCESTOR)
     freeze = read_json(FREEZE)
     runtime = read_json(RUNTIME)
     payloads = read_json(PAYLOADS)
-    verify_frozen_hashes(freeze)
+    verify_frozen_hashes(freeze, include_scoring_artifacts=include_scoring_artifacts)
     if freeze.get("freeze_status") != "frozen_unexecuted":
         raise RuntimeError("Stage B freeze is not frozen_unexecuted")
     if freeze.get("cohort", {}).get("target_outcomes") != 0:
@@ -138,7 +141,7 @@ def load_inputs() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
 
 
 def preflight() -> int:
-    freeze, runtime, payloads = load_inputs()
+    freeze, runtime, payloads = load_inputs(include_scoring_artifacts=True)
     policies = read_json(DOCS / "CLEAN_GRANULARITY_REPLICATION_STAGE_B_POLICIES_2026-08-24.json")
     if policies.get("policy_decisions_frozen_pre_target_outcome") is not True or policies.get("stage_b_outcome_influence_on_policy") != 0:
         raise RuntimeError("policy freeze marker mismatch")
