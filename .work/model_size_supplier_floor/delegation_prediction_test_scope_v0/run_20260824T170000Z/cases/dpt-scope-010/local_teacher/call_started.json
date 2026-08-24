@@ -1,0 +1,11 @@
+{
+  "case_id": "dpt-scope-010",
+  "evaluator_access": false,
+  "experiment_payload_sha256": "061188eab01f8bfc4f4108c4e4a755c6f9674cd75eefcc3df2ed83a1f978048a",
+  "repository_access": false,
+  "schema": "zth_delegation_prediction_supplier_call_started_v1",
+  "started_at": "2026-08-24T15:42:26.432749+00:00",
+  "supplier_id": "local_teacher",
+  "supplier_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "tool_calls": 0
+}

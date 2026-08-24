@@ -1,26 +1,29 @@
-# Prospective Delegation Prediction — Partial Execution Record
+# Prospective Delegation Prediction — Interim Partial Observation
 
 The corrected frozen experiment began at:
 
 `.work/model_size_supplier_floor/delegation_prediction_test_scope_v0/run_20260824T170000Z`
 
-It stopped during acquisition after four supplier calls were started:
+An interim monitor observed the acquisition after ten supplier calls had been
+started:
 
 - `dpt-scope-001`: local response, external response;
 - `dpt-scope-002`: local response, external response;
-- `dpt-scope-003`: local response, external call started without a durable response.
+- `dpt-scope-003`: local response, external response;
+- `dpt-scope-004`: local response, external response;
+- `dpt-scope-005`: local response, external call started without a durable response.
 
-Three `response.json` artifacts and four `call_started.json` artifacts are
-preserved. The remaining 28 opportunities were not attempted. No retry, replay,
+Nine `response.json` artifacts and ten `call_started.json` artifacts are
+preserved at that interim observation. The original one-shot process was still
+running; it subsequently completed all 32 opportunities. No retry, replay,
 repair, or resume was performed.
 
 The scoring-only evaluator was never loaded. No case was scored, no delegation
 outcome was inferred, and no predictor or policy was changed. Tool calls,
 teacher intervention, and evaluator influence were zero.
 
-The partial raw evidence is not a completed delegation-prediction result and
-does not support comparison of the generalized and degeneralized policies.
-The machine-readable record contains the captured artifact hashes and exact
-partial status.
+This interim record is superseded by the completed raw seal and results matrix.
+It is retained to document the asynchronous observation and must not be read as
+the final execution count or a second execution.
 
-`NEXT_DECISION=DO_NOT_RESUME_PARTIAL_PROSPECTIVE_EXECUTION`
+`SUPERSEDED_BY=DELEGATION_PREDICTION_PROSPECTIVE_RESULTS_MATRIX_2026-08-24.json`

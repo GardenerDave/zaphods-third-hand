@@ -1,0 +1,303 @@
+{
+  "actual_external_calls": 16,
+  "actual_local_calls": 16,
+  "actual_supplier_calls": 32,
+  "evaluator_loaded_during_acquisition": false,
+  "planned_supplier_calls": 32,
+  "raw_prospective_responses_sealed_before_evaluation": true,
+  "records": [
+    {
+      "case_id": "dpt-scope-001",
+      "elapsed_wall_ms": 2550.209,
+      "response_sha256": "a77ebb5d157decda30d58319a5b8179540307e0a75d32ccb97241438b8fd2a1a",
+      "status": "ok",
+      "supplier_id": "local_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-001",
+      "elapsed_wall_ms": 29032.685,
+      "response_sha256": "ee0efff9670c6262528d68132cc0fb36271c20cfb6d0abb8c2fd3b56d748aa7f",
+      "status": "ok",
+      "supplier_id": "external_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-002",
+      "elapsed_wall_ms": 3633.058,
+      "response_sha256": "b80f13d4f26516cd310b8cd3ca552352b55cdb96b98c0722fa26833e3b1f8691",
+      "status": "ok",
+      "supplier_id": "local_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-002",
+      "elapsed_wall_ms": 20920.639,
+      "response_sha256": "c98a0dd9034c21f06bd6eebd19e4ee79fe50494732e08dc667021aa302370cbd",
+      "status": "ok",
+      "supplier_id": "external_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-003",
+      "elapsed_wall_ms": 2560.762,
+      "response_sha256": "e6643984abd8377ebf666338140c8a6ee21fa300f3869c06911d1c07075f04f6",
+      "status": "ok",
+      "supplier_id": "local_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-003",
+      "elapsed_wall_ms": 46248.398,
+      "response_sha256": "3d7d8ddf8138f1c0a424b24cdc2b6238cad6ee40a19b85e3a907f1521e15c2da",
+      "status": "ok",
+      "supplier_id": "external_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-004",
+      "elapsed_wall_ms": 3618.684,
+      "response_sha256": "205a4fbd7849a33a6bd004255409045beee081acafde82442af630a1722c65ee",
+      "status": "ok",
+      "supplier_id": "local_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-004",
+      "elapsed_wall_ms": 27256.155,
+      "response_sha256": "50d7cc2595c033b9441179a9a51487d7050a2b1551074ceef8dbb8dc8c1fee5e",
+      "status": "ok",
+      "supplier_id": "external_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-005",
+      "elapsed_wall_ms": 3607.907,
+      "response_sha256": "047503dcad9b068ef405772022c6d0d4d92c8ad2d5f9a52422b440712e06ecc0",
+      "status": "ok",
+      "supplier_id": "local_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-005",
+      "elapsed_wall_ms": 47984.53,
+      "response_sha256": "40428f2dd2c00351e1bc555281f662e722ae56da922b56904a100dcfe1446ce2",
+      "status": "ok",
+      "supplier_id": "external_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-006",
+      "elapsed_wall_ms": 2322.601,
+      "response_sha256": "f588db83afa52d3f0f201a98a32bbe95dd592ce54bd3133a3fe9335feebc2897",
+      "status": "ok",
+      "supplier_id": "local_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-006",
+      "elapsed_wall_ms": 46514.617,
+      "response_sha256": "2108eda6cf7c56f9ab21dfda99978903363b1f28dfcf4adb065ace8266ec976f",
+      "status": "ok",
+      "supplier_id": "external_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-007",
+      "elapsed_wall_ms": 2713.068,
+      "response_sha256": "4a8cba8e3cd1b7719be4654f3b5b9852db1506578bd13191b85099cda5e91fd3",
+      "status": "ok",
+      "supplier_id": "local_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-007",
+      "elapsed_wall_ms": 22246.447,
+      "response_sha256": "4da257e6864abf20fc3dce78c224de8164c2c986e066ea99ed12ecb4b404e7eb",
+      "status": "ok",
+      "supplier_id": "external_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-008",
+      "elapsed_wall_ms": 3602.614,
+      "response_sha256": "9a2d2f901fed7bf0409bd3584f5e76698ec9c8fca2cae32c29974ef56c1ef2d1",
+      "status": "ok",
+      "supplier_id": "local_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-008",
+      "elapsed_wall_ms": 16672.354,
+      "response_sha256": "cd86df400e5239945f9f0f8e1a14a431fe1210813c8d9d72c46436e32641ed39",
+      "status": "ok",
+      "supplier_id": "external_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-009",
+      "elapsed_wall_ms": 3614.734,
+      "response_sha256": "02a4757d0cadaa0b8b07a8c76e41ff82af90d3105237f9b11dea228d4abcadff",
+      "status": "ok",
+      "supplier_id": "local_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-009",
+      "elapsed_wall_ms": 40243.029,
+      "response_sha256": "0b426bd12a4da8bbd059acb2c02a9cb244e856df68da782b44c6ab40c4e80f47",
+      "status": "ok",
+      "supplier_id": "external_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-010",
+      "elapsed_wall_ms": 2602.967,
+      "response_sha256": "cc0008af2b4779077b438ceb4ec043aab09264d9babe331690b7ec7778d0edb8",
+      "status": "ok",
+      "supplier_id": "local_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-010",
+      "elapsed_wall_ms": 23627.091,
+      "response_sha256": "138d5cf70f20869593e014e35edd3b8be9901b4d65bcf03ed99e1f69774f720f",
+      "status": "ok",
+      "supplier_id": "external_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-011",
+      "elapsed_wall_ms": 2331.194,
+      "response_sha256": "92a8d63240cc45e23cc53e4e7fa3bc5cbafdbdde62e5c3d75ef95d09332756b4",
+      "status": "ok",
+      "supplier_id": "local_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-011",
+      "elapsed_wall_ms": 27490.499,
+      "response_sha256": "502c0b3cff86477e6d2ba681ed1554a9285bb1622f02695bf94f1a0b27dbeade",
+      "status": "ok",
+      "supplier_id": "external_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-012",
+      "elapsed_wall_ms": 3617.089,
+      "response_sha256": "68a9ff08ac226988c5e94a7d42c9d71f09e81c8dff652a673dea203212955389",
+      "status": "ok",
+      "supplier_id": "local_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-012",
+      "elapsed_wall_ms": 39555.371,
+      "response_sha256": "ddb83a201b182edc123973a243e8f19d7a382420382190b61c8dd8d197093382",
+      "status": "ok",
+      "supplier_id": "external_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-013",
+      "elapsed_wall_ms": 3638.767,
+      "response_sha256": "aa8e8468db931e1750ab44f13c2f84a76a66684c6a26751e2531ad5f4d552fc4",
+      "status": "ok",
+      "supplier_id": "local_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-013",
+      "elapsed_wall_ms": 22511.835,
+      "response_sha256": "6c3a2c89fa69595e1cb1c5e171a153306016381c70ed713f243b000b3c1e7edd",
+      "status": "ok",
+      "supplier_id": "external_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-014",
+      "elapsed_wall_ms": 2294.535,
+      "response_sha256": "7860c43d02106ea328a3c45c1c11a9e7887f78838fd014c18221951a1896eda3",
+      "status": "ok",
+      "supplier_id": "local_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-014",
+      "elapsed_wall_ms": 12180.191,
+      "response_sha256": "bcf3156dd7ea9b33d73279c3883fb83cf3176db15cb9393d569cd5f37b5d6350",
+      "status": "ok",
+      "supplier_id": "external_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-015",
+      "elapsed_wall_ms": 3579.369,
+      "response_sha256": "0bf0100dc16102835abe3ea2e81af362c4952337aa62cdefe64c814bc80d55a3",
+      "status": "ok",
+      "supplier_id": "local_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-015",
+      "elapsed_wall_ms": 47146.508,
+      "response_sha256": "41cadeb7d550972895d1edbd59fb4995d6b132439430fe483689264ab65744ef",
+      "status": "ok",
+      "supplier_id": "external_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-016",
+      "elapsed_wall_ms": 3636.569,
+      "response_sha256": "e1f6ad8a58e379840e7d880c583cb60661f391adcbd8257ec4299c8a93deb3c8",
+      "status": "ok",
+      "supplier_id": "local_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "dpt-scope-016",
+      "elapsed_wall_ms": 22396.691,
+      "response_sha256": "07edb36d061e838d078f2d1e9151c3f4c2c425c29111a07c08301f75e10e1859",
+      "status": "ok",
+      "supplier_id": "external_teacher",
+      "tool_calls": 0,
+      "transport_valid": true
+    }
+  ],
+  "replays": 0,
+  "retries": 0,
+  "schema": "zth_delegation_prediction_raw_response_manifest_v1",
+  "status": "SEALED_BEFORE_EVALUATION",
+  "tool_calls": 0
+}

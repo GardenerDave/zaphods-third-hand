@@ -1,0 +1,11 @@
+{
+  "case_id": "dpt-scope-012",
+  "evaluator_access": false,
+  "experiment_payload_sha256": "f631edf36ed7300f257664e148519f9afa46b0538b7b2c53f945869e6dabd6f4",
+  "repository_access": false,
+  "schema": "zth_delegation_prediction_supplier_call_started_v1",
+  "started_at": "2026-08-24T15:43:26.102854+00:00",
+  "supplier_id": "external_teacher",
+  "supplier_identity": "codex-cli-0.146.0",
+  "tool_calls": 0
+}
