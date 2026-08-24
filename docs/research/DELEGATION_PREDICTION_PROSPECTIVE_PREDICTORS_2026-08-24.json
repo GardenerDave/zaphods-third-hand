@@ -1,0 +1,114 @@
+{
+  "schema": "zth_delegation_prediction_prospective_predictors_v1",
+  "experiment_id": "DELEGATION_PREDICTION_TEST_SCOPE_V0",
+  "status": "design_only",
+  "authoritative_basis_commit": "e4d5b48efed683f1265a7fb3799abe8c4b598f5f",
+  "no_target_outcomes_available": true,
+  "generalized_predictor": {
+    "id": "RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1",
+    "score_type": "historical aggregate intervention rescue rate across four families",
+    "source_artifacts": [
+      {
+        "path": ".work/run4a_intervention_market_calibration/run_20260819T184835Z/aggregate.json",
+        "sha256": "bee66dac025f40c964b207442e6dd232a9f39a4d18448e568b2b6430b34f3016"
+      },
+      {
+        "path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_4A_2026-08-19.md",
+        "sha256": "361faf4580c94455d61826ee5b293d8dcdb7cf3fa256c877b97965c014e7b512"
+      },
+      {
+        "path": "docs/research/RUN_4A_PREREGISTRATION_2026-08-19.json",
+        "sha256": "a9418fe1e45a05e46b4fd183a6345333893192305fbf767461f3b280b26d748b"
+      }
+    ],
+    "evidence_cutoff_commit": "15dd84cfa82d9c2cef47778111e811e11ecf7274",
+    "evidence_cutoff_artifact_timestamp": "2026-08-19",
+    "scores": {
+      "local_teacher": {
+        "validated_rescues": 8,
+        "opportunities": 16,
+        "score": 0.5
+      },
+      "external_teacher": {
+        "validated_rescues": 11,
+        "opportunities": 16,
+        "score": 0.6875
+      }
+    },
+    "prediction_rule": {
+      "threshold": 0.5,
+      "choose": "higher_score",
+      "tie": "abstain",
+      "missing_score": "abstain"
+    },
+    "target_prediction": {
+      "selected_supplier": "external_teacher",
+      "delegation_expected_to_succeed": true
+    }
+  },
+  "degeneralized_predictor": {
+    "id": "SCOPE_INTERFACE_PROFILE_RUN4A_V1",
+    "score_type": "bounded family/interface/context evidence profile",
+    "source_artifacts": [
+      {
+        "path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_4A_2026-08-19.md",
+        "sha256": "361faf4580c94455d61826ee5b293d8dcdb7cf3fa256c877b97965c014e7b512"
+      },
+      {
+        "path": "docs/research/RUN_4A_PREREGISTRATION_2026-08-19.json",
+        "sha256": "a9418fe1e45a05e46b4fd183a6345333893192305fbf767461f3b280b26d748b"
+      },
+      {
+        "path": "docs/research/RUN_4_RESOURCE_WEIGHTS_FREEZE_2026-08-19.json",
+        "sha256": "8f7820a6a3e5734e071452f643374d8c6c769d4d149bcec3f2f82b88ee6530c2"
+      },
+      {
+        "path": "docs/research/RUN_4B_SCOPE_INTERVENTION_REPLICATION_PREREGISTRATION_2026-08-19.json",
+        "sha256": "59f02a1e23c9cbe7e91bfb9c464675ccbb7bbb54b779091ea11cef8846ce5771"
+      }
+    ],
+    "evidence_cutoff_commit": "15dd84cfa82d9c2cef47778111e811e11ecf7274",
+    "profile": {
+      "family": "scope-authority-boundary",
+      "interface_version": "run4a_scope_json_contract_v1",
+      "authority_context": "review-only; exact target/held scope; no mutation or expansion authority",
+      "supported_strata": [
+        "profile_supported_nonexpanding"
+      ],
+      "local_teacher": {
+        "validated_rescues": 4,
+        "opportunities": 4,
+        "rescue_rate": 1,
+        "expected_action_cost_ms": 21497.191
+      },
+      "external_teacher": {
+        "validated_rescues": 4,
+        "opportunities": 4,
+        "rescue_rate": 1,
+        "expected_action_cost_ms": 33980.579
+      },
+      "minimum_opportunities": 3,
+      "minimum_rescue_rate": 0.5
+    },
+    "prediction_rule": {
+      "require_exact_family": true,
+      "require_compatible_interface": true,
+      "require_supported_positive": true,
+      "choose": "lowest_expected_action_cost",
+      "tie": "abstain",
+      "unsupported_subcase": "abstain"
+    },
+    "target_predictions": {
+      "profile_supported_nonexpanding": {
+        "selected_supplier": "local_teacher",
+        "delegation_expected_to_succeed": true
+      },
+      "profile_out_of_coverage_expansion_required": {
+        "selected_supplier": null,
+        "delegation_expected_to_succeed": false
+      }
+    }
+  },
+  "comparison_unit": "same fresh task, same interface, same authority, two supplier arms, one frozen prediction per predictor",
+  "predictor_feature_cutoff_before_target": true
+}
