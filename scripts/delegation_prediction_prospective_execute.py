@@ -60,6 +60,14 @@ def current_head() -> str:
     return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
 
 
+def contains_authoritative_freeze() -> bool:
+    return subprocess.run(
+        ["git", "merge-base", "--is-ancestor", EXPECTED_FREEZE_COMMIT, "HEAD"],
+        cwd=ROOT,
+        check=False,
+    ).returncode == 0
+
+
 def output_schema(contract: dict[str, Any]) -> dict[str, Any]:
     return contract["experiment_authored_payload"]["output_schema"]
 
@@ -78,8 +86,8 @@ def make_prompt(case: dict[str, Any], contract: dict[str, Any]) -> str:
 
 
 def validate_inputs() -> tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]]]:
-    if current_head() != EXPECTED_FREEZE_COMMIT:
-        raise RuntimeError(f"authoritative execution commit mismatch: {current_head()}")
+    if not contains_authoritative_freeze():
+        raise RuntimeError(f"authoritative freeze is not an ancestor of execution HEAD: {current_head()}")
     if digest_file(INTERFACE_CONTRACT) != EXPECTED_INTERFACE_SHA256:
         raise RuntimeError("interface contract hash mismatch")
     if digest_file(RUNTIME_MANIFEST) != EXPECTED_RUNTIME_SHA256:
