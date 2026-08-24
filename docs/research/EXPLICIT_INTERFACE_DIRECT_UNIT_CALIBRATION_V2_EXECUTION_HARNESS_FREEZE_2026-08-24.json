@@ -19,6 +19,20 @@
     "explicit-v2-unsupported-008"
   ],
   "evaluator_implementation_sha256": "db067b700711c91c8a22877a7b8170c517640b9f5e1723f8041d5b4a44f5d9fb",
+  "external_mechanism_enforcement": {
+    "configured_command": "/home/navigator/bin/zth-codex-teacher",
+    "cwd": "/tmp",
+    "cwd_outside_repository": true,
+    "identity_check": "configuration_only_no_inference",
+    "read_only_sandbox_enforced_by_wrapper": true,
+    "repository_access_observed": "BEST_AVAILABLE_OBSERVATION",
+    "service_identity": "codex-cli-0.146.0 via preserved service mechanism",
+    "skip_git_repo_check_enforced_by_wrapper": true,
+    "tool_calls_observed": "BEST_AVAILABLE_OBSERVATION",
+    "wrapper_path": "/home/navigator/bin/zth-codex-teacher",
+    "wrapper_sha256": "2c5fcaf0727bdf466e21d660c927e63d23ecb67857949b2ef21e7e599297ceab"
+  },
+  "fail_closed_terminalization": true,
   "firewall": {
     "evaluator_file_access_during_acquisition": false,
     "evaluator_hash_checked_only_in_preflight": true,
@@ -31,14 +45,34 @@
     "evaluator_implementation_imported_after_raw_seal": true,
     "evaluator_sha256_must_match": true
   },
-  "harness_sha256": "92f0c210afd2263baaf51f6d3dcd9d6c78f9373a55e6abdfba7b35ed2268347a",
+  "harness_sha256": "fa3b5b8f4a5029b91dca2231dbcd31f7718aa68abc3e0b7b092b0694d770338f",
+  "local_identity_enforcement": {
+    "configuration_only_no_inference": true,
+    "required_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "required_service_alias": "JARVIS_LOCAL"
+  },
+  "matched_runtime_message_bytes_across_arms": true,
   "matched_runtime_message_hash_across_arms": true,
+  "one_shot_acquisition": {
+    "guard_claimed_immediately_before_first_opportunity": true,
+    "prepare_only_does_not_claim": true,
+    "processes_started": 1,
+    "second_acquisition_process_started": false
+  },
   "planned_external_calls": 16,
   "planned_local_calls": 16,
   "planned_supplier_calls": 32,
-  "processes_started": 1,
   "raw_seal_before_evaluation": true,
   "replays": 0,
+  "resolved_local_identity_preflight": {
+    "endpoint_alias": "JARVIS_LOCAL",
+    "frozen_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf via JARVIS_LOCAL",
+    "identity_check": "configuration_only_no_inference",
+    "resolved_api": "openai-chat",
+    "resolved_base_url": "http://<LAN_HOST>:8083/v1",
+    "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "worker_name": "handoff"
+  },
   "retries": 0,
   "schedule": [
     {
@@ -331,8 +365,7 @@
     }
   ],
   "schedule_sha256": "6cd43015d5cdb40034c073bc6185ea70b24d77e75ad5623954ebbd8fe981e121",
-  "schema": "zth.explicit_interface_direct_unit_calibration.execution_harness_freeze.v1",
-  "second_acquisition_process_started": false,
+  "schema": "zth.explicit_interface_direct_unit_calibration.execution_harness_freeze.v2",
   "status": "frozen_pre_response",
   "supplier_identities": {
     "external_teacher": "codex-cli-0.146.0 via preserved service mechanism",
