@@ -1,0 +1,147 @@
+{
+  "schema": "zth_delegation_prediction_competence_unit_validity_matrix_v1",
+  "date": "2026-08-24",
+  "audit_type": "model_free_validity_analysis",
+  "authoritative_commits": {
+    "diagnosis": "e4cde306268eefb68b024919905f120e1b2081b3",
+    "closeout_hardening": "4401840247a225ce1b89d7bf0c3b9fd766e1f67f",
+    "corrected_freeze": "fc6902926a89d3572b457bea1d5cca5e4ba53f4d",
+    "run_directory": ".work/model_size_supplier_floor/delegation_prediction_test_scope_v0/run_20260824T170000Z"
+  },
+  "preserved_result": {
+    "generalized_successful_delegations": 16,
+    "generalized_false_positive_delegations": 0,
+    "degeneralized_successful_delegations": 3,
+    "degeneralized_false_positive_delegations": 5,
+    "degeneralized_unnecessary_abstentions": 8,
+    "local_direct_capability_valid": "5/16",
+    "external_direct_capability_valid": "16/16",
+    "winner": "DELEGATION_DECISION_QUALITY_FAVORS_GENERALIZED",
+    "policy_comparison_result_valid": true
+  },
+  "source_artifacts": [
+    {"path": "docs/research/RUN_4A_PREREGISTRATION_2026-08-19.json", "sha256": "a9418fe1e45a05e46b4fd183a6345333893192305fbf767461f3b280b26d748b", "role": "historical Run 4A design and supplier identities"},
+    {"path": "docs/research/RUN_4B_SCOPE_INTERVENTION_REPLICATION_PREREGISTRATION_2026-08-19.json", "sha256": "59f02a1e23c9cbe7e91bfb9c464675ccbb7bbb54b779091ea11cef8846ce5771", "role": "historical scope intervention design"},
+    {"path": "docs/research/RUN_3_ROUTING_POLICY_FREEZE_2026-08-18.json", "sha256": "cf6728e51e5b5e1ce5ed24539f83bbacd4f9a07dd818f26106c333cc7e543fe8", "role": "historical evidence-state and abstention semantics"},
+    {"path": "docs/research/RUN_4_ECONOMIC_ROUTING_POLICY_FREEZE_2026-08-19.json", "sha256": "60732b15f0547ba51e66aaa134c26b86aeb089d23e44029b88b659f21cda12ed", "role": "historical policy use of supported-positive evidence"},
+    {"path": "docs/research/ATOMIC_SUPPLIER_SCORECARD_SCHEMA_V1.json", "sha256": "d484d012e8fe7bb6a5266864b3c8542a96a4e6391ca75145007b0a04eeefeea9", "role": "historical scorecard/evidence representation"},
+    {"path": "local_harness/run4a_intervention_harness.py", "sha256": "a6125d4b9d32ca912da81fd0df316cd56eada60c825b02789b5496fd24590f88", "role": "authoritative Run 4A execution path"},
+    {"path": "docs/research/DELEGATION_PREDICTION_PROSPECTIVE_PREDICTORS_2026-08-24.json", "sha256": "1fcdf91d9cae4be6bb8182aa982896528745e664883e74695972ce15506b7a9c", "role": "frozen prospective predictors"},
+    {"path": "docs/research/DELEGATION_PREDICTION_PROSPECTIVE_RUNTIME_MANIFEST_2026-08-24.json", "sha256": "f10ff1ef98ecc0e452d59e842398a0b37a2760e4d7adf63a2be762d1d23f077c", "role": "frozen prospective runtime cases"},
+    {"path": "docs/research/DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_V2_2026-08-24.json", "sha256": "c6726c65a40df77c6e681226c90f48c16e00348b5727ab15a14c6b7e61cb3f93", "role": "prospective direct response contract"},
+    {"path": "docs/research/DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json", "sha256": "929edfc8a299998bc32faef4144b94f2f007cd511bca6ded4a6d7828cd5481e8", "role": "scoring-only evaluator"},
+    {"path": "docs/research/DELEGATION_PREDICTION_BOUNDED_EVIDENCE_FAILURE_DIAGNOSIS_MATRIX_2026-08-24.json", "sha256": "90cde38bba069230d55f5c49d8b06a5b681257910b499c415d9d93432304c413", "role": "preserved prospective failure taxonomy and diagnosis"},
+    {"path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_4A_2026-08-19.md", "sha256": "361faf4580c94455d61826ee5b293d8dcdb7cf3fa256c877b97965c014e7b512", "role": "canonical Run 4A report"},
+    {"path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_6_VALIDATION_GATED_2026-08-20.md", "sha256": "d4d41117f541720ccb9881a1ccd805608955fbd8b532342e80c88dd38fd58600", "role": "later compound-only evidence inventory"},
+    {"path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_7_VALIDATION_GATED_2026-08-20.md", "sha256": "985cc7935d529e9decae3efcea83d1e4d7fdd83a787c311d75896904f530606c", "role": "later compound-only evidence inventory"},
+    {"path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_8_VALIDATION_GATED_2026-08-20.md", "sha256": "dcbaf423fc4a4f6f0357fd65cf823a64ba3bfd4b1fb4bd1ba6079ec43a5359b9", "role": "later compound-only evidence inventory"}
+  ],
+  "historical_units": [
+    {
+      "id": "run4a_all_family_local",
+      "evidence": "Run 4A all-family local aggregate 8/16",
+      "supplier": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "capability": "all-family intervention rescue aggregate",
+      "interface": "Run 4A teacher intervention plus worker retry packet",
+      "role_responsibility": "teacher supplies intervention; worker produces final bounded output",
+      "downstream_dependencies": ["Qwen3 1.7B worker retry", "deterministic validator"],
+      "validated_artifact": "worker retry four-field response",
+      "unit_classification": "COMPOUND_ONLY"
+    },
+    {
+      "id": "run4a_all_family_external",
+      "evidence": "Run 4A all-family external aggregate 11/16",
+      "supplier": "codex-cli-0.146.0",
+      "capability": "all-family intervention rescue aggregate",
+      "interface": "Run 4A external teacher intervention plus worker retry packet",
+      "role_responsibility": "teacher supplies intervention; worker produces final bounded output",
+      "downstream_dependencies": ["Qwen3 1.7B worker retry", "deterministic validator"],
+      "validated_artifact": "worker retry four-field response",
+      "unit_classification": "COMPOUND_ONLY"
+    },
+    {
+      "id": "run4a_scope_local",
+      "evidence": "Run 4A scope-authority-boundary local 4/4",
+      "supplier": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "capability": "scope-authority-boundary rescue",
+      "interface": "Run 4A teacher intervention plus worker retry packet",
+      "role_responsibility": "teacher supplies intervention; worker produces final four-field scope output",
+      "downstream_dependencies": ["Qwen3 1.7B worker retry", "deterministic validator"],
+      "validated_artifact": "worker retry four-field response",
+      "unit_classification": "COMPOUND_ONLY"
+    },
+    {
+      "id": "run4a_scope_external",
+      "evidence": "Run 4A scope-authority-boundary external 4/4",
+      "supplier": "codex-cli-0.146.0",
+      "capability": "scope-authority-boundary rescue",
+      "interface": "Run 4A external teacher intervention plus worker retry packet",
+      "role_responsibility": "teacher supplies intervention; worker produces final four-field scope output",
+      "downstream_dependencies": ["Qwen3 1.7B worker retry", "deterministic validator"],
+      "validated_artifact": "worker retry four-field response",
+      "unit_classification": "COMPOUND_ONLY"
+    }
+  ],
+  "prospective_unit": {
+    "id": "dpt_scope_v0_direct_arm",
+    "supplier": ["Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf", "codex-cli-0.146.0"],
+    "capability": "direct scope-authority-boundary four-field output",
+    "interface": "prospective V2 direct response contract; compatible successor to Run 4A",
+    "role_responsibility": "supplier directly emits allowed/held targets, expansion flag, and review status",
+    "downstream_dependencies": [],
+    "validated_artifact": "direct supplier response",
+    "unit_classification": "EXACT_DIRECT_UNIT"
+  },
+  "alignment_matrix": [
+    {"historical_id": "run4a_all_family_local", "supplier_identity_match": "EXACT", "capability_family_match": "COMPATIBLE_TRANSFER", "interface_match": "COMPATIBLE_TRANSFER", "role_match": "CHANGED", "downstream_dependency_match": "CHANGED", "validated_artifact_match": "CHANGED", "overall": "NOT_COMPARABLE"},
+    {"historical_id": "run4a_all_family_external", "supplier_identity_match": "EXACT", "capability_family_match": "COMPATIBLE_TRANSFER", "interface_match": "COMPATIBLE_TRANSFER", "role_match": "CHANGED", "downstream_dependency_match": "CHANGED", "validated_artifact_match": "CHANGED", "overall": "NOT_COMPARABLE"},
+    {"historical_id": "run4a_scope_local", "supplier_identity_match": "EXACT", "capability_family_match": "EXACT", "interface_match": "COMPATIBLE_TRANSFER", "role_match": "CHANGED", "downstream_dependency_match": "CHANGED", "validated_artifact_match": "CHANGED", "overall": "NOT_COMPARABLE"},
+    {"historical_id": "run4a_scope_external", "supplier_identity_match": "EXACT", "capability_family_match": "EXACT", "interface_match": "COMPATIBLE_TRANSFER", "role_match": "CHANGED", "downstream_dependency_match": "CHANGED", "validated_artifact_match": "CHANGED", "overall": "NOT_COMPARABLE"}
+  ],
+  "direct_output_evidence_inventory": [
+    {"evidence": "Run 4A", "classification": "COMPOUND_ONLY", "reason": "teacher intervention followed by worker retry"},
+    {"evidence": "Run 4B", "classification": "COMPOUND_ONLY", "reason": "intervention/rescue path with downstream validated artifact"},
+    {"evidence": "Run 6", "classification": "COMPOUND_ONLY", "reason": "control and local-first scope paths include worker retry"},
+    {"evidence": "Run 7", "classification": "COMPOUND_ONLY", "reason": "control and treatment artifacts include worker retries"},
+    {"evidence": "Run 8", "classification": "COMPOUND_ONLY", "reason": "control/treatment explicitly use worker retry and deterministic validation"},
+    {"evidence": "Prospective Scope V0", "classification": "EXACT_DIRECT_UNIT", "reason": "held-out direct outcome evidence; not reusable as pre-outcome predictor evidence"}
+  ],
+  "coverage_state_audit": {
+    "coverage_absence_was_treated_as_negative_evidence": false,
+    "out_of_profile_state_distinguished_from_negative": true,
+    "coverage_absence_triggered_abstention_without_negative_capability_evidence": true,
+    "out_of_profile_fallback_evidence_policy_defined": false,
+    "evidence_state_semantic_collapse_supported": false,
+    "evidence_state_actionability_gap_supported": true,
+    "observed_unnecessary_abstentions": "8/8"
+  },
+  "validity_markers": {
+    "historical_to_prospective_competence_unit_match": false,
+    "generalized_predictor_unit_transfer_required": true,
+    "degeneralized_predictor_unit_transfer_required": true,
+    "prospective_policy_comparison_result_valid": true,
+    "benchmark_granularity_causal_interpretation_clean": false,
+    "direct_supplier_prospective_outcomes_observed": true,
+    "competence_unit_alignment_precedes_policy_uncertainty_tuning": true,
+    "retrospective_policy_tuning_performed": false,
+    "new_prospective_experiment_required": true
+  },
+  "next_experiment_concept": {
+    "selection": "DIRECT_UNIT_CALIBRATION_FIRST",
+    "next_decision": "DESIGN_DIRECT_UNIT_CALIBRATION_EXPERIMENT",
+    "purpose": "Collect matched direct-output evidence for local and external under one frozen scope-authority interface before another broad-versus-bounded policy comparison.",
+    "not_frozen_here": ["cohort", "thresholds", "weights", "fallback rules", "runtime directory", "execution schedule"]
+  },
+  "audit_boundaries": {
+    "model_calls": 0,
+    "teacher_calls": 0,
+    "tool_calls": 0,
+    "external_inference_calls": 0,
+    "raw_response_mutations": 0,
+    "historical_evidence_mutations": 0,
+    "policy_changes": 0,
+    "qualification_changes": 0,
+    "production_routing_changes": 0,
+    "push_performed": false
+  }
+}
