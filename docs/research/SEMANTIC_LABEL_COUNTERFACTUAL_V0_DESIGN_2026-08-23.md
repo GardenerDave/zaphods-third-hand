@@ -2,6 +2,8 @@
 
 Status: frozen design; no inference has run.
 
+This corrected successor supersedes the unexecuted `bc7aaa5f959bd362456f09b68f951f03dc58d86e` freeze. The predecessor had two pre-inference defects: Arm B admissibility used Arm A canonical labels, and two fixture requests did not match their preregistered semantic classes. No model response existed, so scientific evidence was not contaminated.
+
 This successor follows the enum-order closeout. The enum-order experiment
 produced `inspect` under both enum orders, with zero paired output changes;
 therefore the literal-label hypothesis is tested next.

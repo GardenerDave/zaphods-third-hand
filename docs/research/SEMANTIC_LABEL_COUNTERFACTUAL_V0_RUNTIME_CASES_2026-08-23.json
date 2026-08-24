@@ -27,7 +27,7 @@
           ]
         }
       },
-      "input_request": "Can you tell me whether docs/research/Q2_WILLOW_2026-08-23.json is currently stored here?",
+      "input_request": "Take a detailed look at docs/research/Q2_WILLOW_2026-08-23.json.",
       "task_id": "slcf-002"
     },
     {
@@ -72,7 +72,7 @@
           ]
         }
       },
-      "input_request": "Study docs/research/Q5_ALMOND_2026-08-23.json for a moment.",
+      "input_request": "Could you establish whether docs/research/Q5_ALMOND_2026-08-23.json is present in the repository?",
       "task_id": "slcf-005"
     },
     {

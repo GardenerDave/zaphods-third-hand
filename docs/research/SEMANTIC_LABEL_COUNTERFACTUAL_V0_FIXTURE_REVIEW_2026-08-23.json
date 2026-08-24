@@ -1,0 +1,54 @@
+{
+  "rows": [
+    {
+      "definition_supporting_intended_class": "observe_presence means determine whether the named target exists, is present, or is available.",
+      "intended_semantic_class": "observe_presence",
+      "preflight_status": "UNRESOLVED",
+      "request": "Would you be able to establish if docs/research/Q1_VELVET_2026-08-23.md is available within this workspace?",
+      "semantic_fallback_eligible": true,
+      "task_id": "slcf-001"
+    },
+    {
+      "definition_supporting_intended_class": "inspect means examine or look at the named target.",
+      "intended_semantic_class": "inspect",
+      "preflight_status": "UNRESOLVED",
+      "request": "Take a detailed look at docs/research/Q2_WILLOW_2026-08-23.json.",
+      "semantic_fallback_eligible": true,
+      "task_id": "slcf-002"
+    },
+    {
+      "definition_supporting_intended_class": "observe_presence means determine whether the named target exists, is present, or is available.",
+      "intended_semantic_class": "observe_presence",
+      "preflight_status": "UNRESOLVED",
+      "request": "Please say if docs/research/Q3_YONDER_2026-08-23.txt can be found in the repository.",
+      "semantic_fallback_eligible": true,
+      "task_id": "slcf-003"
+    },
+    {
+      "definition_supporting_intended_class": "inspect means examine or look at the named target.",
+      "intended_semantic_class": "inspect",
+      "preflight_status": "UNRESOLVED",
+      "request": "Please assess docs/research/Q4_ZEPHYR_2026-08-23.md.",
+      "semantic_fallback_eligible": true,
+      "task_id": "slcf-004"
+    },
+    {
+      "definition_supporting_intended_class": "observe_presence means determine whether the named target exists, is present, or is available.",
+      "intended_semantic_class": "observe_presence",
+      "preflight_status": "UNRESOLVED",
+      "request": "Could you establish whether docs/research/Q5_ALMOND_2026-08-23.json is present in the repository?",
+      "semantic_fallback_eligible": true,
+      "task_id": "slcf-005"
+    },
+    {
+      "definition_supporting_intended_class": "inspect means examine or look at the named target.",
+      "intended_semantic_class": "inspect",
+      "preflight_status": "UNRESOLVED",
+      "request": "Give docs/research/Q6_BRIGHT_2026-08-23.txt a close examination.",
+      "semantic_fallback_eligible": true,
+      "task_id": "slcf-006"
+    }
+  ],
+  "runtime_input": false,
+  "schema": "zth_semantic_label_counterfactual_v0_fixture_review"
+}

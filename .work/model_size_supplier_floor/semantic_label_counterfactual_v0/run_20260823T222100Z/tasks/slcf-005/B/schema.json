@@ -1,0 +1,17 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "operation_class_candidate": {
+      "enum": [
+        "class_beta",
+        "class_alpha",
+        "unresolved"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "operation_class_candidate"
+  ],
+  "type": "object"
+}

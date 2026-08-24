@@ -1,0 +1,15 @@
+{
+  "environment_facts": {
+    "authority_record": {
+      "allowed_observation_operations": [
+        "observe_presence",
+        "inspect"
+      ],
+      "allowed_targets": [
+        "docs/research/Q5_ALMOND_2026-08-23.json"
+      ]
+    }
+  },
+  "input_request": "Could you establish whether docs/research/Q5_ALMOND_2026-08-23.json is present in the repository?",
+  "task_id": "slcf-005"
+}

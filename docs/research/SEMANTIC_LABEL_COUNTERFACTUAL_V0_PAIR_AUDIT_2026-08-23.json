@@ -5,6 +5,141 @@
   "paired_model_settings_identity": true,
   "paired_preflight_identity": true,
   "paired_request_identity": true,
+  "predecessor_successor_audit": {
+    "arm_difference_remains_label_only": true,
+    "authority_independent": true,
+    "changed_task_ids": [
+      "slcf-002",
+      "slcf-005"
+    ],
+    "definitions_unchanged_except_labels": true,
+    "enum_positions_unchanged": true,
+    "four_unchanged_tasks_identical": true,
+    "model_settings_unchanged": true,
+    "pass": true,
+    "predecessor_freeze": "bc7aaa5f959bd362456f09b68f951f03dc58d86e",
+    "predecessor_run": ".work/model_size_supplier_floor/semantic_label_counterfactual_v0/run_20260823T220000Z",
+    "rows": [
+      {
+        "all_identical": true,
+        "arm": "A",
+        "files": {
+          "capability_plan_0.json": true,
+          "model_settings.json": true,
+          "preflight.json": true,
+          "prompt.txt": true,
+          "runtime_task.json": true,
+          "schema.json": true,
+          "semantic_information_gap.json": true
+        },
+        "task_id": "slcf-001"
+      },
+      {
+        "all_identical": true,
+        "arm": "B",
+        "files": {
+          "capability_plan_0.json": true,
+          "model_settings.json": true,
+          "preflight.json": true,
+          "prompt.txt": true,
+          "runtime_task.json": true,
+          "schema.json": true,
+          "semantic_information_gap.json": true
+        },
+        "task_id": "slcf-001"
+      },
+      {
+        "all_identical": true,
+        "arm": "A",
+        "files": {
+          "capability_plan_0.json": true,
+          "model_settings.json": true,
+          "preflight.json": true,
+          "prompt.txt": true,
+          "runtime_task.json": true,
+          "schema.json": true,
+          "semantic_information_gap.json": true
+        },
+        "task_id": "slcf-003"
+      },
+      {
+        "all_identical": true,
+        "arm": "B",
+        "files": {
+          "capability_plan_0.json": true,
+          "model_settings.json": true,
+          "preflight.json": true,
+          "prompt.txt": true,
+          "runtime_task.json": true,
+          "schema.json": true,
+          "semantic_information_gap.json": true
+        },
+        "task_id": "slcf-003"
+      },
+      {
+        "all_identical": true,
+        "arm": "A",
+        "files": {
+          "capability_plan_0.json": true,
+          "model_settings.json": true,
+          "preflight.json": true,
+          "prompt.txt": true,
+          "runtime_task.json": true,
+          "schema.json": true,
+          "semantic_information_gap.json": true
+        },
+        "task_id": "slcf-004"
+      },
+      {
+        "all_identical": true,
+        "arm": "B",
+        "files": {
+          "capability_plan_0.json": true,
+          "model_settings.json": true,
+          "preflight.json": true,
+          "prompt.txt": true,
+          "runtime_task.json": true,
+          "schema.json": true,
+          "semantic_information_gap.json": true
+        },
+        "task_id": "slcf-004"
+      },
+      {
+        "all_identical": true,
+        "arm": "A",
+        "files": {
+          "capability_plan_0.json": true,
+          "model_settings.json": true,
+          "preflight.json": true,
+          "prompt.txt": true,
+          "runtime_task.json": true,
+          "schema.json": true,
+          "semantic_information_gap.json": true
+        },
+        "task_id": "slcf-006"
+      },
+      {
+        "all_identical": true,
+        "arm": "B",
+        "files": {
+          "capability_plan_0.json": true,
+          "model_settings.json": true,
+          "preflight.json": true,
+          "prompt.txt": true,
+          "runtime_task.json": true,
+          "schema.json": true,
+          "semantic_information_gap.json": true
+        },
+        "task_id": "slcf-006"
+      }
+    ],
+    "unchanged_task_ids": [
+      "slcf-001",
+      "slcf-003",
+      "slcf-004",
+      "slcf-006"
+    ]
+  },
   "rows": [
     {
       "authority_identity": true,

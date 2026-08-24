@@ -39,6 +39,31 @@ def test_strict_parsing_and_neutral_mapping():
     assert not probe.parse_response('{"operation_class_candidate":"class_alpha","extra":1}', "B")[2]
 
 
+def test_arm_relative_admissibility_and_mapping():
+    for arm, candidate, expected in (("A", "observe_presence", "observe_presence"), ("A", "inspect", "inspect"), ("B", "class_alpha", "observe_presence"), ("B", "class_beta", "inspect")):
+        parsed, parse_valid, contract_valid, _ = probe.parse_response('{"operation_class_candidate":"' + candidate + '"}', arm)
+        validation = probe.validate_and_map_candidate(parsed, arm, parse_valid, contract_valid)
+        assert validation["candidate_valid"] is True
+        assert validation["candidate_admissible"] is True
+        assert validation["canonical_operation"] == expected
+    for arm, candidate in (("A", "unresolved"), ("B", "unresolved")):
+        parsed, parse_valid, contract_valid, _ = probe.parse_response('{"operation_class_candidate":"unresolved"}', arm)
+        validation = probe.validate_and_map_candidate(parsed, arm, parse_valid, contract_valid)
+        assert validation["candidate_valid"] is True
+        assert validation["candidate_admissible"] is False
+        assert validation["canonical_operation"] is None
+
+
+def test_corrected_fixture_semantics_and_eligibility():
+    rows = {task_id: (expected, request) for task_id, expected, request in probe.specs()}
+    assert rows["slcf-002"][0] == "inspect" and "look" in rows["slcf-002"][1].lower()
+    assert rows["slcf-005"][0] == "observe_presence" and "present" in rows["slcf-005"][1].lower()
+    for task_id, _, request in probe.specs():
+        pre = probe.base_v2.preflight(request)
+        assert pre["semantic_fallback_eligible"] is True
+        assert pre["model_required"] is True
+
+
 def test_exact_counterbalanced_order():
     ids = [task_id for task_id, _, _ in probe.specs()]
     assert probe.paired_execution_order(ids) == [
