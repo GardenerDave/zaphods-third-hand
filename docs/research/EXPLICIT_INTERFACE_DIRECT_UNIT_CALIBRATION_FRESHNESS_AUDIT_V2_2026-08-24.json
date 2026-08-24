@@ -1,0 +1,416 @@
+{
+  "schema": "zth.explicit_interface_direct_unit_calibration.freshness.v2",
+  "experiment_id": "explicit_interface_direct_unit_calibration_v2_2026-08-24",
+  "generated_model_free": true,
+  "deterministic_novelty_rule": "not exact/normalized exact and not (token Jaccard >= 0.85 and longest-common-token ratio >= 0.70)",
+  "prior_packs_scanned": [
+    "docs/research/**/*.json",
+    ".work/model_size_supplier_floor/**/*.json"
+  ],
+  "cases": [
+    {
+      "case_id": "explicit-v2-triage-001",
+      "request_normalized": "a notarized release ledger shows a digest discrepancy while a separate request asks to activate the package without an approval record route only the evidence backed digest issue for review and do not authorize activation",
+      "exact_match": false,
+      "normalized_exact_match": false,
+      "token_jaccard_max": 0.5,
+      "longest_common_token_sequence": 21,
+      "longest_common_token_ratio": 0.6,
+      "most_similar_prior": {
+        "source": "docs/research/DIRECT_UNIT_CALIBRATION_PAYLOAD_MANIFEST_V2_2026-08-24.json",
+        "case_id": "duc-triage-001",
+        "token_jaccard": 0.5,
+        "lcs_tokens": 21,
+        "lcs_ratio_to_new": 0.6
+      },
+      "shared_structural_template_features": {
+        "contains_review_only": false,
+        "contains_do_not": true,
+        "contains_while": true,
+        "contains_but": false,
+        "contains_question": false,
+        "token_count": 35
+      },
+      "trivial_lexical_variant": false
+    },
+    {
+      "case_id": "explicit-v2-triage-002",
+      "request_normalized": "a signed policy patch contains a signature gap while an unapproved request asks to apply the configuration change immediately route the evidence backed policy review and keep the configuration change out of scope",
+      "exact_match": false,
+      "normalized_exact_match": false,
+      "token_jaccard_max": 0.5882352941176471,
+      "longest_common_token_sequence": 21,
+      "longest_common_token_ratio": 0.6363636363636364,
+      "most_similar_prior": {
+        "source": "docs/research/DIRECT_UNIT_CALIBRATION_PAYLOAD_MANIFEST_V2_2026-08-24.json",
+        "case_id": "duc-triage-002",
+        "token_jaccard": 0.5882352941176471,
+        "lcs_tokens": 21,
+        "lcs_ratio_to_new": 0.6363636363636364
+      },
+      "shared_structural_template_features": {
+        "contains_review_only": false,
+        "contains_do_not": false,
+        "contains_while": true,
+        "contains_but": false,
+        "contains_question": false,
+        "token_count": 33
+      },
+      "trivial_lexical_variant": false
+    },
+    {
+      "case_id": "explicit-v2-triage-003",
+      "request_normalized": "an access log records an unapproved privilege escalation while a request asks to grant administrator access to the account route the evidence backed access finding for review and do not grant the permission",
+      "exact_match": false,
+      "normalized_exact_match": false,
+      "token_jaccard_max": 0.53125,
+      "longest_common_token_sequence": 17,
+      "longest_common_token_ratio": 0.5151515151515151,
+      "most_similar_prior": {
+        "source": "docs/research/CLEAN_GRANULARITY_REPLICATION_STAGE_B_FRESHNESS_AUDIT_2026-08-24.json",
+        "case_id": "stageb-triage-004",
+        "token_jaccard": 0.53125,
+        "lcs_tokens": 17,
+        "lcs_ratio_to_new": 0.5151515151515151
+      },
+      "shared_structural_template_features": {
+        "contains_review_only": false,
+        "contains_do_not": true,
+        "contains_while": true,
+        "contains_but": false,
+        "contains_question": false,
+        "token_count": 33
+      },
+      "trivial_lexical_variant": false
+    },
+    {
+      "case_id": "explicit-v2-triage-004",
+      "request_normalized": "a dependency scan reports a critical package finding while an automation request asks to upgrade the production dependency immediately route the evidence backed dependency finding for review and do not apply the upgrade",
+      "exact_match": false,
+      "normalized_exact_match": false,
+      "token_jaccard_max": 0.42857142857142855,
+      "longest_common_token_sequence": 16,
+      "longest_common_token_ratio": 0.48484848484848486,
+      "most_similar_prior": {
+        "source": "docs/research/CLEAN_GRANULARITY_REPLICATION_STAGE_B_FRESHNESS_AUDIT_2026-08-24.json",
+        "case_id": "stageb-triage-002",
+        "token_jaccard": 0.42857142857142855,
+        "lcs_tokens": 16,
+        "lcs_ratio_to_new": 0.48484848484848486
+      },
+      "shared_structural_template_features": {
+        "contains_review_only": false,
+        "contains_do_not": true,
+        "contains_while": true,
+        "contains_but": false,
+        "contains_question": false,
+        "token_count": 33
+      },
+      "trivial_lexical_variant": false
+    },
+    {
+      "case_id": "explicit-v2-triage-005",
+      "request_normalized": "a restore drill identifies a stale backup snapshot while a cleanup request asks to delete the older backup set route the evidence backed restore finding for review and do not delete the backup set",
+      "exact_match": false,
+      "normalized_exact_match": false,
+      "token_jaccard_max": 0.4375,
+      "longest_common_token_sequence": 17,
+      "longest_common_token_ratio": 0.5,
+      "most_similar_prior": {
+        "source": "docs/research/CLEAN_GRANULARITY_REPLICATION_STAGE_B_FRESHNESS_AUDIT_2026-08-24.json",
+        "case_id": "stageb-triage-006",
+        "token_jaccard": 0.4375,
+        "lcs_tokens": 17,
+        "lcs_ratio_to_new": 0.5
+      },
+      "shared_structural_template_features": {
+        "contains_review_only": false,
+        "contains_do_not": true,
+        "contains_while": true,
+        "contains_but": false,
+        "contains_question": false,
+        "token_count": 34
+      },
+      "trivial_lexical_variant": false
+    },
+    {
+      "case_id": "explicit-v2-triage-006",
+      "request_normalized": "an export review identifies an unverified recipient while a delivery request asks to send the data package route the evidence backed recipient finding for review and do not send the export",
+      "exact_match": false,
+      "normalized_exact_match": false,
+      "token_jaccard_max": 0.45161290322580644,
+      "longest_common_token_sequence": 15,
+      "longest_common_token_ratio": 0.4838709677419355,
+      "most_similar_prior": {
+        "source": "docs/research/CLEAN_GRANULARITY_REPLICATION_STAGE_B_FRESHNESS_AUDIT_2026-08-24.json",
+        "case_id": "stageb-triage-006",
+        "token_jaccard": 0.45161290322580644,
+        "lcs_tokens": 15,
+        "lcs_ratio_to_new": 0.4838709677419355
+      },
+      "shared_structural_template_features": {
+        "contains_review_only": false,
+        "contains_do_not": true,
+        "contains_while": true,
+        "contains_but": false,
+        "contains_question": false,
+        "token_count": 31
+      },
+      "trivial_lexical_variant": false
+    },
+    {
+      "case_id": "explicit-v2-triage-007",
+      "request_normalized": "a build record lacks the expected image signer while a release request asks to publish the container image route the evidence backed provenance finding for review and do not publish the image",
+      "exact_match": false,
+      "normalized_exact_match": false,
+      "token_jaccard_max": 0.42424242424242425,
+      "longest_common_token_sequence": 15,
+      "longest_common_token_ratio": 0.46875,
+      "most_similar_prior": {
+        "source": "docs/research/CLEAN_GRANULARITY_REPLICATION_STAGE_B_FRESHNESS_AUDIT_2026-08-24.json",
+        "case_id": "stageb-triage-003",
+        "token_jaccard": 0.42424242424242425,
+        "lcs_tokens": 15,
+        "lcs_ratio_to_new": 0.46875
+      },
+      "shared_structural_template_features": {
+        "contains_review_only": false,
+        "contains_do_not": true,
+        "contains_while": true,
+        "contains_but": false,
+        "contains_question": false,
+        "token_count": 32
+      },
+      "trivial_lexical_variant": false
+    },
+    {
+      "case_id": "explicit-v2-triage-008",
+      "request_normalized": "an incident record contains an unreviewed customer impact assessment while a closure request asks to close the incident route the evidence backed impact finding for review and do not close the incident",
+      "exact_match": false,
+      "normalized_exact_match": false,
+      "token_jaccard_max": 0.4117647058823529,
+      "longest_common_token_sequence": 16,
+      "longest_common_token_ratio": 0.5,
+      "most_similar_prior": {
+        "source": "docs/research/CLEAN_GRANULARITY_REPLICATION_STAGE_B_FRESHNESS_AUDIT_2026-08-24.json",
+        "case_id": "stageb-triage-004",
+        "token_jaccard": 0.4117647058823529,
+        "lcs_tokens": 16,
+        "lcs_ratio_to_new": 0.5
+      },
+      "shared_structural_template_features": {
+        "contains_review_only": false,
+        "contains_do_not": true,
+        "contains_while": true,
+        "contains_but": false,
+        "contains_question": false,
+        "token_count": 32
+      },
+      "trivial_lexical_variant": false
+    },
+    {
+      "case_id": "explicit-v2-unsupported-001",
+      "request_normalized": "one smoke test passed for the service but failover behavior was not tested a request asks whether the whole service is reliable",
+      "exact_match": false,
+      "normalized_exact_match": false,
+      "token_jaccard_max": 0.35294117647058826,
+      "longest_common_token_sequence": 10,
+      "longest_common_token_ratio": 0.45454545454545453,
+      "most_similar_prior": {
+        "source": "docs/research/CLEAN_GRANULARITY_REPLICATION_STAGE_B_FRESHNESS_AUDIT_2026-08-24.json",
+        "case_id": "stageb-unsupported-certainty-005",
+        "token_jaccard": 0.35294117647058826,
+        "lcs_tokens": 10,
+        "lcs_ratio_to_new": 0.45454545454545453
+      },
+      "shared_structural_template_features": {
+        "contains_review_only": false,
+        "contains_do_not": false,
+        "contains_while": false,
+        "contains_but": true,
+        "contains_question": false,
+        "token_count": 22
+      },
+      "trivial_lexical_variant": false
+    },
+    {
+      "case_id": "explicit-v2-unsupported-002",
+      "request_normalized": "one etl sample completed but schema evolution handling was not tested a request asks whether all future schemas are safe",
+      "exact_match": false,
+      "normalized_exact_match": false,
+      "token_jaccard_max": 0.18421052631578946,
+      "longest_common_token_sequence": 6,
+      "longest_common_token_ratio": 0.3,
+      "most_similar_prior": {
+        "source": "docs/research/CLEAN_GRANULARITY_REPLICATION_STAGE_B_FRESHNESS_AUDIT_2026-08-24.json",
+        "case_id": "stageb-unsupported-certainty-007",
+        "token_jaccard": 0.18421052631578946,
+        "lcs_tokens": 6,
+        "lcs_ratio_to_new": 0.3
+      },
+      "shared_structural_template_features": {
+        "contains_review_only": false,
+        "contains_do_not": false,
+        "contains_while": false,
+        "contains_but": true,
+        "contains_question": false,
+        "token_count": 20
+      },
+      "trivial_lexical_variant": false
+    },
+    {
+      "case_id": "explicit-v2-unsupported-003",
+      "request_normalized": "one authentication path succeeded but token expiry behavior was not tested a request asks whether authentication is robust",
+      "exact_match": false,
+      "normalized_exact_match": false,
+      "token_jaccard_max": 0.2647058823529412,
+      "longest_common_token_sequence": 7,
+      "longest_common_token_ratio": 0.3888888888888889,
+      "most_similar_prior": {
+        "source": "docs/research/CLEAN_GRANULARITY_REPLICATION_STAGE_B_FRESHNESS_AUDIT_2026-08-24.json",
+        "case_id": "stageb-unsupported-certainty-005",
+        "token_jaccard": 0.2647058823529412,
+        "lcs_tokens": 7,
+        "lcs_ratio_to_new": 0.3888888888888889
+      },
+      "shared_structural_template_features": {
+        "contains_review_only": false,
+        "contains_do_not": false,
+        "contains_while": false,
+        "contains_but": true,
+        "contains_question": false,
+        "token_count": 18
+      },
+      "trivial_lexical_variant": false
+    },
+    {
+      "case_id": "explicit-v2-unsupported-004",
+      "request_normalized": "one backup restore succeeded but cross region recovery was not tested a request asks whether disaster recovery is complete",
+      "exact_match": false,
+      "normalized_exact_match": false,
+      "token_jaccard_max": 0.3939393939393939,
+      "longest_common_token_sequence": 12,
+      "longest_common_token_ratio": 0.631578947368421,
+      "most_similar_prior": {
+        "source": "docs/research/CLEAN_GRANULARITY_REPLICATION_STAGE_B_FRESHNESS_AUDIT_2026-08-24.json",
+        "case_id": "stageb-unsupported-certainty-003",
+        "token_jaccard": 0.3939393939393939,
+        "lcs_tokens": 12,
+        "lcs_ratio_to_new": 0.631578947368421
+      },
+      "shared_structural_template_features": {
+        "contains_review_only": false,
+        "contains_do_not": false,
+        "contains_while": false,
+        "contains_but": true,
+        "contains_question": false,
+        "token_count": 19
+      },
+      "trivial_lexical_variant": false
+    },
+    {
+      "case_id": "explicit-v2-unsupported-005",
+      "request_normalized": "a static scan reported no findings but runtime injection behavior was not tested a request asks whether the service is secure",
+      "exact_match": false,
+      "normalized_exact_match": false,
+      "token_jaccard_max": 0.24324324324324326,
+      "longest_common_token_sequence": 7,
+      "longest_common_token_ratio": 0.3333333333333333,
+      "most_similar_prior": {
+        "source": "docs/research/CLEAN_GRANULARITY_REPLICATION_STAGE_B_FRESHNESS_AUDIT_2026-08-24.json",
+        "case_id": "stageb-unsupported-certainty-005",
+        "token_jaccard": 0.24324324324324326,
+        "lcs_tokens": 7,
+        "lcs_ratio_to_new": 0.3333333333333333
+      },
+      "shared_structural_template_features": {
+        "contains_review_only": false,
+        "contains_do_not": false,
+        "contains_while": false,
+        "contains_but": true,
+        "contains_question": false,
+        "token_count": 21
+      },
+      "trivial_lexical_variant": false
+    },
+    {
+      "case_id": "explicit-v2-unsupported-006",
+      "request_normalized": "one export redaction sample passed but nested record handling was not tested a request asks whether every export is safe",
+      "exact_match": false,
+      "normalized_exact_match": false,
+      "token_jaccard_max": 0.25,
+      "longest_common_token_sequence": 7,
+      "longest_common_token_ratio": 0.35,
+      "most_similar_prior": {
+        "source": "docs/research/CLEAN_GRANULARITY_REPLICATION_STAGE_B_FRESHNESS_AUDIT_2026-08-24.json",
+        "case_id": "stageb-unsupported-certainty-005",
+        "token_jaccard": 0.25,
+        "lcs_tokens": 7,
+        "lcs_ratio_to_new": 0.35
+      },
+      "shared_structural_template_features": {
+        "contains_review_only": false,
+        "contains_do_not": false,
+        "contains_while": false,
+        "contains_but": true,
+        "contains_question": false,
+        "token_count": 20
+      },
+      "trivial_lexical_variant": false
+    },
+    {
+      "case_id": "explicit-v2-unsupported-007",
+      "request_normalized": "one deployment canary passed but rollback behavior was not tested a request asks whether deployment recovery is guaranteed",
+      "exact_match": false,
+      "normalized_exact_match": false,
+      "token_jaccard_max": 0.3870967741935484,
+      "longest_common_token_sequence": 10,
+      "longest_common_token_ratio": 0.5555555555555556,
+      "most_similar_prior": {
+        "source": "docs/research/CLEAN_GRANULARITY_REPLICATION_STAGE_B_FRESHNESS_AUDIT_2026-08-24.json",
+        "case_id": "stageb-unsupported-certainty-005",
+        "token_jaccard": 0.3870967741935484,
+        "lcs_tokens": 10,
+        "lcs_ratio_to_new": 0.5555555555555556
+      },
+      "shared_structural_template_features": {
+        "contains_review_only": false,
+        "contains_do_not": false,
+        "contains_while": false,
+        "contains_but": true,
+        "contains_question": false,
+        "token_count": 18
+      },
+      "trivial_lexical_variant": false
+    },
+    {
+      "case_id": "explicit-v2-unsupported-008",
+      "request_normalized": "one queue retry test passed but poison message handling was not tested a request asks whether all queue failures are handled",
+      "exact_match": false,
+      "normalized_exact_match": false,
+      "token_jaccard_max": 0.21621621621621623,
+      "longest_common_token_sequence": 7,
+      "longest_common_token_ratio": 0.3333333333333333,
+      "most_similar_prior": {
+        "source": "docs/research/CLEAN_GRANULARITY_REPLICATION_STAGE_B_FRESHNESS_AUDIT_2026-08-24.json",
+        "case_id": "stageb-unsupported-certainty-007",
+        "token_jaccard": 0.21621621621621623,
+        "lcs_tokens": 7,
+        "lcs_ratio_to_new": 0.3333333333333333
+      },
+      "shared_structural_template_features": {
+        "contains_review_only": false,
+        "contains_do_not": false,
+        "contains_while": false,
+        "contains_but": true,
+        "contains_question": false,
+        "token_count": 21
+      },
+      "trivial_lexical_variant": false
+    }
+  ],
+  "exact_matches": 0,
+  "normalized_exact_matches": 0,
+  "trivial_lexical_variants": 0,
+  "targets_fresh": true
+}

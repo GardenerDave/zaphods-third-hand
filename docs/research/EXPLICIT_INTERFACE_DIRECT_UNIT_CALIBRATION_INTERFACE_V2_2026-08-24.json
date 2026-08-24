@@ -1,0 +1,78 @@
+{
+  "schema": "zth.explicit_interface_direct_unit_calibration.interface.v2",
+  "experiment_id": "explicit_interface_direct_unit_calibration_v2_2026-08-24",
+  "status": "frozen_unexecuted",
+  "new_interface_version": true,
+  "old_hidden_interface_evidence_transfer_permitted": false,
+  "interfaces": {
+    "triage-routing": {
+      "interface_id": "duc_explicit_triage_direct_json_v2",
+      "bounded_responsibility": "directly classify one evidence-backed review item without authorizing execution",
+      "required_fields": [
+        "route",
+        "rationale",
+        "review_status"
+      ],
+      "field_types": {
+        "route": "string",
+        "rationale": "string",
+        "review_status": "string"
+      },
+      "additional_properties": "allowed_and_ignored",
+      "authority_context": {
+        "mode": "review-only",
+        "mutation_authority": false,
+        "execution_authority": false
+      },
+      "matching_rule": "Unicode NFKC; casefold; replace every contiguous Unicode whitespace run with one ASCII space; strip leading/trailing spaces; no synonym expansion; no stemming",
+      "semantic_field_scopes": {
+        "required_rationale_facts": "rationale",
+        "rationale_forbidden_facts": "rationale"
+      },
+      "tool_authority": false,
+      "repository_access": false,
+      "evaluator_access": false,
+      "downstream_dependencies": [],
+      "interface_hash": "51598cc1e1da6c79cf61fd05eb69b9e956d6c40d52c4ead6e249fc649485025e"
+    },
+    "unsupported-certainty": {
+      "interface_id": "duc_explicit_unsupported_certainty_direct_json_v2",
+      "bounded_responsibility": "directly separate observed facts from untested uncertainty without making a broad reliability claim",
+      "required_fields": [
+        "known_facts",
+        "uncertainty",
+        "review_status",
+        "next_step"
+      ],
+      "field_types": {
+        "known_facts": "array_of_strings",
+        "uncertainty": "array_of_strings",
+        "review_status": "string",
+        "next_step": "string"
+      },
+      "additional_properties": "allowed_and_ignored",
+      "authority_context": {
+        "mode": "review-only",
+        "mutation_authority": false,
+        "execution_authority": false
+      },
+      "matching_rule": "Unicode NFKC; casefold; replace every contiguous Unicode whitespace run with one ASCII space; strip leading/trailing spaces; no synonym expansion; no stemming",
+      "semantic_field_scopes": {
+        "known_facts_required": "known_facts elements",
+        "uncertainty_required": "uncertainty elements",
+        "next_step_required": "next_step",
+        "prohibited_claims": "known_facts + uncertainty + next_step"
+      },
+      "tool_authority": false,
+      "repository_access": false,
+      "evaluator_access": false,
+      "downstream_dependencies": [],
+      "interface_hash": "644587df101b00756ffa287ba921447a015182570d96f5877f8aaccca1e10f15"
+    }
+  },
+  "normalization_rule": "Unicode NFKC; casefold; replace every contiguous Unicode whitespace run with one ASCII space; strip leading/trailing spaces; no synonym expansion; no stemming",
+  "scoring_only_semantic_predicates": 0,
+  "uncommunicated_literal_requirements": 0,
+  "uncommunicated_ontology_values": 0,
+  "uncommunicated_field_type_requirements": 0
+}

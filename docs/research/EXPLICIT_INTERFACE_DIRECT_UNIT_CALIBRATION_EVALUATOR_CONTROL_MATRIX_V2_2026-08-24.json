@@ -1,0 +1,1768 @@
+{
+  "schema": "zth.explicit_interface_direct_unit_calibration.controls.v2",
+  "experiment_id": "explicit_interface_direct_unit_calibration_v2_2026-08-24",
+  "controls": [
+    {
+      "case_id": "explicit-v2-triage-001",
+      "control_id": "wrong_review_status",
+      "intended_failure_dimension": "REVIEW_STATUS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-001",
+      "control_id": "missing_required_field",
+      "intended_failure_dimension": "REQUIRED_FIELDS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": false,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-001",
+      "control_id": "wrong_required_field_type",
+      "intended_failure_dimension": "REQUIRED_FIELD_TYPES_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-001",
+      "control_id": "prohibited_claim_present",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-001",
+      "control_id": "required_semantic_fact_missing",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-001",
+      "control_id": "wrong_route",
+      "intended_failure_dimension": "EXPLICIT_INTERFACE_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-002",
+      "control_id": "wrong_review_status",
+      "intended_failure_dimension": "REVIEW_STATUS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-002",
+      "control_id": "missing_required_field",
+      "intended_failure_dimension": "REQUIRED_FIELDS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": false,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-002",
+      "control_id": "wrong_required_field_type",
+      "intended_failure_dimension": "REQUIRED_FIELD_TYPES_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-002",
+      "control_id": "prohibited_claim_present",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-002",
+      "control_id": "required_semantic_fact_missing",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-002",
+      "control_id": "wrong_route",
+      "intended_failure_dimension": "EXPLICIT_INTERFACE_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-003",
+      "control_id": "wrong_review_status",
+      "intended_failure_dimension": "REVIEW_STATUS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-003",
+      "control_id": "missing_required_field",
+      "intended_failure_dimension": "REQUIRED_FIELDS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": false,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-003",
+      "control_id": "wrong_required_field_type",
+      "intended_failure_dimension": "REQUIRED_FIELD_TYPES_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-003",
+      "control_id": "prohibited_claim_present",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-003",
+      "control_id": "required_semantic_fact_missing",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-003",
+      "control_id": "wrong_route",
+      "intended_failure_dimension": "EXPLICIT_INTERFACE_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-004",
+      "control_id": "wrong_review_status",
+      "intended_failure_dimension": "REVIEW_STATUS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-004",
+      "control_id": "missing_required_field",
+      "intended_failure_dimension": "REQUIRED_FIELDS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": false,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-004",
+      "control_id": "wrong_required_field_type",
+      "intended_failure_dimension": "REQUIRED_FIELD_TYPES_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-004",
+      "control_id": "prohibited_claim_present",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-004",
+      "control_id": "required_semantic_fact_missing",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-004",
+      "control_id": "wrong_route",
+      "intended_failure_dimension": "EXPLICIT_INTERFACE_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-005",
+      "control_id": "wrong_review_status",
+      "intended_failure_dimension": "REVIEW_STATUS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-005",
+      "control_id": "missing_required_field",
+      "intended_failure_dimension": "REQUIRED_FIELDS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": false,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-005",
+      "control_id": "wrong_required_field_type",
+      "intended_failure_dimension": "REQUIRED_FIELD_TYPES_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-005",
+      "control_id": "prohibited_claim_present",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-005",
+      "control_id": "required_semantic_fact_missing",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-005",
+      "control_id": "wrong_route",
+      "intended_failure_dimension": "EXPLICIT_INTERFACE_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-006",
+      "control_id": "wrong_review_status",
+      "intended_failure_dimension": "REVIEW_STATUS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-006",
+      "control_id": "missing_required_field",
+      "intended_failure_dimension": "REQUIRED_FIELDS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": false,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-006",
+      "control_id": "wrong_required_field_type",
+      "intended_failure_dimension": "REQUIRED_FIELD_TYPES_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-006",
+      "control_id": "prohibited_claim_present",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-006",
+      "control_id": "required_semantic_fact_missing",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-006",
+      "control_id": "wrong_route",
+      "intended_failure_dimension": "EXPLICIT_INTERFACE_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-007",
+      "control_id": "wrong_review_status",
+      "intended_failure_dimension": "REVIEW_STATUS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-007",
+      "control_id": "missing_required_field",
+      "intended_failure_dimension": "REQUIRED_FIELDS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": false,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-007",
+      "control_id": "wrong_required_field_type",
+      "intended_failure_dimension": "REQUIRED_FIELD_TYPES_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-007",
+      "control_id": "prohibited_claim_present",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-007",
+      "control_id": "required_semantic_fact_missing",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-007",
+      "control_id": "wrong_route",
+      "intended_failure_dimension": "EXPLICIT_INTERFACE_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-008",
+      "control_id": "wrong_review_status",
+      "intended_failure_dimension": "REVIEW_STATUS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-008",
+      "control_id": "missing_required_field",
+      "intended_failure_dimension": "REQUIRED_FIELDS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": false,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-008",
+      "control_id": "wrong_required_field_type",
+      "intended_failure_dimension": "REQUIRED_FIELD_TYPES_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-008",
+      "control_id": "prohibited_claim_present",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-008",
+      "control_id": "required_semantic_fact_missing",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-triage-008",
+      "control_id": "wrong_route",
+      "intended_failure_dimension": "EXPLICIT_INTERFACE_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-001",
+      "control_id": "wrong_review_status",
+      "intended_failure_dimension": "REVIEW_STATUS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-001",
+      "control_id": "missing_required_field",
+      "intended_failure_dimension": "REQUIRED_FIELDS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": false,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-001",
+      "control_id": "wrong_required_field_type",
+      "intended_failure_dimension": "REQUIRED_FIELD_TYPES_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-001",
+      "control_id": "prohibited_claim_present",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-001",
+      "control_id": "required_semantic_fact_missing",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-002",
+      "control_id": "wrong_review_status",
+      "intended_failure_dimension": "REVIEW_STATUS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-002",
+      "control_id": "missing_required_field",
+      "intended_failure_dimension": "REQUIRED_FIELDS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": false,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-002",
+      "control_id": "wrong_required_field_type",
+      "intended_failure_dimension": "REQUIRED_FIELD_TYPES_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-002",
+      "control_id": "prohibited_claim_present",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-002",
+      "control_id": "required_semantic_fact_missing",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-003",
+      "control_id": "wrong_review_status",
+      "intended_failure_dimension": "REVIEW_STATUS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-003",
+      "control_id": "missing_required_field",
+      "intended_failure_dimension": "REQUIRED_FIELDS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": false,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-003",
+      "control_id": "wrong_required_field_type",
+      "intended_failure_dimension": "REQUIRED_FIELD_TYPES_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-003",
+      "control_id": "prohibited_claim_present",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-003",
+      "control_id": "required_semantic_fact_missing",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-004",
+      "control_id": "wrong_review_status",
+      "intended_failure_dimension": "REVIEW_STATUS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-004",
+      "control_id": "missing_required_field",
+      "intended_failure_dimension": "REQUIRED_FIELDS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": false,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-004",
+      "control_id": "wrong_required_field_type",
+      "intended_failure_dimension": "REQUIRED_FIELD_TYPES_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-004",
+      "control_id": "prohibited_claim_present",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-004",
+      "control_id": "required_semantic_fact_missing",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-005",
+      "control_id": "wrong_review_status",
+      "intended_failure_dimension": "REVIEW_STATUS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-005",
+      "control_id": "missing_required_field",
+      "intended_failure_dimension": "REQUIRED_FIELDS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": false,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-005",
+      "control_id": "wrong_required_field_type",
+      "intended_failure_dimension": "REQUIRED_FIELD_TYPES_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-005",
+      "control_id": "prohibited_claim_present",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-005",
+      "control_id": "required_semantic_fact_missing",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-006",
+      "control_id": "wrong_review_status",
+      "intended_failure_dimension": "REVIEW_STATUS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-006",
+      "control_id": "missing_required_field",
+      "intended_failure_dimension": "REQUIRED_FIELDS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": false,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-006",
+      "control_id": "wrong_required_field_type",
+      "intended_failure_dimension": "REQUIRED_FIELD_TYPES_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-006",
+      "control_id": "prohibited_claim_present",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-006",
+      "control_id": "required_semantic_fact_missing",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-007",
+      "control_id": "wrong_review_status",
+      "intended_failure_dimension": "REVIEW_STATUS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-007",
+      "control_id": "missing_required_field",
+      "intended_failure_dimension": "REQUIRED_FIELDS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": false,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-007",
+      "control_id": "wrong_required_field_type",
+      "intended_failure_dimension": "REQUIRED_FIELD_TYPES_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-007",
+      "control_id": "prohibited_claim_present",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-007",
+      "control_id": "required_semantic_fact_missing",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-008",
+      "control_id": "wrong_review_status",
+      "intended_failure_dimension": "REVIEW_STATUS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": true,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-008",
+      "control_id": "missing_required_field",
+      "intended_failure_dimension": "REQUIRED_FIELDS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": false,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-008",
+      "control_id": "wrong_required_field_type",
+      "intended_failure_dimension": "REQUIRED_FIELD_TYPES_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": false,
+          "EXPLICIT_INTERFACE_VALID": false,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": false,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-008",
+      "control_id": "prohibited_claim_present",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    },
+    {
+      "case_id": "explicit-v2-unsupported-008",
+      "control_id": "required_semantic_fact_missing",
+      "intended_failure_dimension": "TASK_SEMANTICS_VALID",
+      "result": {
+        "dimensions": {
+          "TRANSPORT_VALID": true,
+          "PARSE_VALID": true,
+          "DUPLICATE_KEYS_VALID": true,
+          "REQUIRED_FIELDS_VALID": true,
+          "REQUIRED_FIELD_TYPES_VALID": true,
+          "EXPLICIT_INTERFACE_VALID": true,
+          "TASK_SEMANTICS_VALID": false,
+          "REVIEW_STATUS_VALID": true,
+          "PROTOCOL_VALID": true
+        },
+        "direct_capability_valid": false
+      },
+      "intended_dimension_failed": true
+    }
+  ],
+  "all_intended_dimensions_failed": true,
+  "control_count": 88
+}
