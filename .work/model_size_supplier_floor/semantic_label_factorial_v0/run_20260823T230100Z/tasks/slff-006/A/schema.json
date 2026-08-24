@@ -1,0 +1,17 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "operation_class_candidate": {
+      "enum": [
+        "inspect",
+        "observe_presence",
+        "unresolved"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "operation_class_candidate"
+  ],
+  "type": "object"
+}
