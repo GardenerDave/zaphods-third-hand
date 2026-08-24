@@ -1,4 +1,12 @@
 {
+  "GENERIC_BENCHMARK_INSUFFICIENCY_HYPOTHESIS": {
+    "status": "emerging_hypothesis_not_general_conclusion",
+    "motivation": "The same supplier and bounded semantic distinction produced materially different observed competence when only interface representation changed.",
+    "research_direction": "DEGENERALIZING_BENCHMARKS",
+    "meaning": "Decompose broad benchmark or capability claims into bounded supplier, capability, interface, authority-context, and evidence units.",
+    "generic_benchmarks_declared_useless": false,
+    "complete_methodology_established": false
+  },
   "arm_metrics": {
     "A": {
       "candidate_admissible": 12,

@@ -80,6 +80,21 @@ Surface-label representation materially changed the semantic decision boundary. 
 
 The prior factorial Arm A was presence 2/3 and inspect 3/3; this fresh Arm A was presence 0/6 and inspect 6/6. This is descriptive task-set variability, not an IID pooled benchmark.
 
+## Emerging research hypothesis: generic benchmark insufficiency
+
+`GENERIC_BENCHMARK_INSUFFICIENCY_HYPOTHESIS` is an emerging hypothesis, not a
+demonstrated general conclusion. The same supplier and bounded semantic
+distinction produced materially different observed competence when only the
+interface representation changed. This suggests that a generalized
+supplier-level benchmark can conceal responsibility-specific and
+interface-specific competence.
+
+The candidate ZTH direction is **degeneralizing benchmarks**: progressively
+decompose broad benchmark or capability claims into bounded supplier,
+capability, interface, authority-context, and evidence units. This does not
+make generic benchmarks useless, and this experiment does not establish a
+complete benchmark methodology.
+
 ## Telemetry
 
 Supplementary descriptive telemetry only; measurement level 2 and boundary `gpu_device_only`. No causal performance inference is made.
