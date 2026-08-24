@@ -1,0 +1,1271 @@
+{
+  "arm_rows": [
+    {
+      "case_id": "stageb-triage-001",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REFERENCE_FACT_FAILURE",
+      "family": "triage-routing",
+      "native_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "parse_valid": true,
+      "payload_sha256": "08bfd8e9aa623d28181e708ee2c40a3ec718e03ac42feff6d19fc9201650a4ae",
+      "protocol_valid": true,
+      "raw_content_sha256": "1e769e0ff58628ef6e17af23083b7234fd9c2a0b1512aa1cea02cba54e791b6f",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "Response satisfied none of the configured positive requirements; Missing required phrase: confirmed manifest mismatch; Missing required phrase: review-only",
+          "status": "failed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": false,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "1db79c06b1d68d209b8696649a587e4dccddd0d53d9e45ed5118e9965a07a001",
+      "review_status_valid": false,
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-triage-001",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REFERENCE_FACT_FAILURE",
+      "family": "triage-routing",
+      "native_identity": "codex-cli-0.146.0",
+      "parse_valid": true,
+      "payload_sha256": "08bfd8e9aa623d28181e708ee2c40a3ec718e03ac42feff6d19fc9201650a4ae",
+      "protocol_valid": true,
+      "raw_content_sha256": "bd49b43dbbf2e5f94aa23924a64d408e185c008609cb0cd22a2d1cb17f03d73a",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "Response satisfied none of the configured positive requirements; Missing required phrase: confirmed manifest mismatch; Missing required phrase: review-only",
+          "status": "failed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": false,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "75af3681742422d744a956c5141c1067aade5a2dd2d0ea756255ef8248fe6e96",
+      "review_status_valid": false,
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-triage-002",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REFERENCE_FACT_FAILURE",
+      "family": "triage-routing",
+      "native_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "parse_valid": true,
+      "payload_sha256": "7d29dd20373f085624df92b9334200591cdda1a56aac7394e02bdba5ce330d65",
+      "protocol_valid": true,
+      "raw_content_sha256": "cdff93800cd2a0c30c5613e98e769697348526eaafca3cfe7e9251a44e3c45f5",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "Response satisfied none of the configured positive requirements; Missing required phrase: unreviewed dependency pin; Missing required phrase: review-only",
+          "status": "failed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": false,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "c19252a0ebb413861a82aaf1406e75efeca7e725d7221aca34926b9dc3176423",
+      "review_status_valid": false,
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-triage-002",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REFERENCE_FACT_FAILURE",
+      "family": "triage-routing",
+      "native_identity": "codex-cli-0.146.0",
+      "parse_valid": true,
+      "payload_sha256": "7d29dd20373f085624df92b9334200591cdda1a56aac7394e02bdba5ce330d65",
+      "protocol_valid": true,
+      "raw_content_sha256": "39efed41b7830633cbb64a5d182b13b60a61ac074f99da8cc29f57a296a903d5",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "Response satisfied none of the configured positive requirements; Missing required phrase: unreviewed dependency pin; Missing required phrase: review-only",
+          "status": "failed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": false,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "c5b36e9553dfe18f6b9edd0a965db5dc7d0152d8b0db972f56087510537012ac",
+      "review_status_valid": false,
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-triage-003",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REFERENCE_FACT_FAILURE",
+      "family": "triage-routing",
+      "native_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "parse_valid": true,
+      "payload_sha256": "51293060d2b8958f85bb77c816d07428bd64929d4460fee870a87aed9619d57d",
+      "protocol_valid": true,
+      "raw_content_sha256": "8295220a09eaa8bcc8c6f63a036f8f3ae06a9efaca92601ab292e803387829de",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "Response satisfied none of the configured positive requirements; Missing required phrase: missing signing statement; Missing required phrase: review-only",
+          "status": "failed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": false,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "a3b4eb4e246bf85e2eaa6a04a3c3a174d2e9cd38bbe8f6094ff52b5deb16c51f",
+      "review_status_valid": false,
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-triage-003",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REFERENCE_FACT_FAILURE",
+      "family": "triage-routing",
+      "native_identity": "codex-cli-0.146.0",
+      "parse_valid": true,
+      "payload_sha256": "51293060d2b8958f85bb77c816d07428bd64929d4460fee870a87aed9619d57d",
+      "protocol_valid": true,
+      "raw_content_sha256": "8d06d5e4341446ec2b03580b5220c21aee1af3267b9621d5c3bf3d9ee5c40258",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "Response satisfied none of the configured positive requirements; Missing required phrase: missing signing statement; Missing required phrase: review-only",
+          "status": "failed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": false,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "0eb2f56040788d6a5066eeda2baf2f042eff6ecfed2ef3b00f8c1b6e23a9f90d",
+      "review_status_valid": false,
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-triage-004",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REFERENCE_FACT_FAILURE",
+      "family": "triage-routing",
+      "native_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "parse_valid": true,
+      "payload_sha256": "5a880f7191b58fe07697b570dd2824bb4ee6b3a70f1abd4cec7400adff33fdb2",
+      "protocol_valid": true,
+      "raw_content_sha256": "4b4161cda2ba6d0777499a2675bd3e20bdec408cafa7b0d13cabdf8c143bf9a4",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "Missing required phrase: review-only",
+          "status": "failed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": false,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "fb921344bc868a99d6b8bcc53af603f6e7e1688b3aaf3a11507006158973218b",
+      "review_status_valid": false,
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-triage-004",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REFERENCE_FACT_FAILURE",
+      "family": "triage-routing",
+      "native_identity": "codex-cli-0.146.0",
+      "parse_valid": true,
+      "payload_sha256": "5a880f7191b58fe07697b570dd2824bb4ee6b3a70f1abd4cec7400adff33fdb2",
+      "protocol_valid": true,
+      "raw_content_sha256": "61e59e90297df5cc21489661db32be6837c05f03ee0ec53b9ca2809160532c7b",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "Missing required phrase: review-only",
+          "status": "failed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": false,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "bb9ea3c2449a133e79a1764aa5acb258c6fe1a16e4b6d14054ccf39a3fd522e2",
+      "review_status_valid": false,
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-triage-005",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REFERENCE_FACT_FAILURE",
+      "family": "triage-routing",
+      "native_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "parse_valid": true,
+      "payload_sha256": "2a63ea27f55bb1d1677dbf7246c754d2fb94409a6e5f0704e4a9b6845099418a",
+      "protocol_valid": true,
+      "raw_content_sha256": "9f9304e41260544591e84de3424d342a3c9e3eb19700b973a565fbca478cc003",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "Response satisfied none of the configured positive requirements; Missing required phrase: contradictory test evidence; Missing required phrase: review-only",
+          "status": "failed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": false,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "0011480d387253a41423d4d8b1242ad22a19dc0ddea0e566b8b71a0d727c2fc8",
+      "review_status_valid": false,
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-triage-005",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REFERENCE_FACT_FAILURE",
+      "family": "triage-routing",
+      "native_identity": "codex-cli-0.146.0",
+      "parse_valid": true,
+      "payload_sha256": "2a63ea27f55bb1d1677dbf7246c754d2fb94409a6e5f0704e4a9b6845099418a",
+      "protocol_valid": true,
+      "raw_content_sha256": "2c162f015a6b46a1fb1739930325cb1f34fae5500aadf14d1f593cc92b73239e",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "Missing required phrase: review-only",
+          "status": "failed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": false,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "bc267a97dcd67a83776ede32ab4d01ecd5726bc84aa8f649490eb475a42b2347",
+      "review_status_valid": false,
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-triage-006",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REFERENCE_FACT_FAILURE",
+      "family": "triage-routing",
+      "native_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "parse_valid": true,
+      "payload_sha256": "3c8cba6897623a0af2f2e774c0a5ed8424fc9dd75c77701f40d06d26560f39ad",
+      "protocol_valid": true,
+      "raw_content_sha256": "9f1b1480e82a8e10aff13ef55e802d7c127d76ce490e0d9dd4cf1161c7375e12",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "Response satisfied none of the configured positive requirements; Missing required phrase: incomplete retention evidence; Missing required phrase: review-only",
+          "status": "failed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": false,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "6e590876d6672dd97059c74fd8d907e042c3b82fe0830d989016a17710b2beb5",
+      "review_status_valid": false,
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-triage-006",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REFERENCE_FACT_FAILURE",
+      "family": "triage-routing",
+      "native_identity": "codex-cli-0.146.0",
+      "parse_valid": true,
+      "payload_sha256": "3c8cba6897623a0af2f2e774c0a5ed8424fc9dd75c77701f40d06d26560f39ad",
+      "protocol_valid": true,
+      "raw_content_sha256": "787cc56402b43026d57e787feab827e0fb0183fe7eb771d35063326829ecfb8e",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "Response satisfied none of the configured positive requirements; Missing required phrase: incomplete retention evidence; Missing required phrase: review-only",
+          "status": "failed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": false,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "139886da9d35d969a9f41bfcd32cb19379202209eb9d753072fef3348ea42db2",
+      "review_status_valid": false,
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-triage-007",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REFERENCE_FACT_FAILURE",
+      "family": "triage-routing",
+      "native_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "parse_valid": true,
+      "payload_sha256": "b4e920cca484b30a7a69cf1c33872a7618c7e6dad81573c8b6d2983e940ff663",
+      "protocol_valid": true,
+      "raw_content_sha256": "cfd1ca51e8d2d24233ce028720d93f9018a04f699b7f4102a4a0ff2675075204",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "Response satisfied none of the configured positive requirements; Missing required phrase: unapproved migration plan; Missing required phrase: review-only",
+          "status": "failed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": false,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "533687c4cb7d0b6e37ccc0008273022e9f83e77affc1fc983e69ea4ef3417419",
+      "review_status_valid": false,
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-triage-007",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REFERENCE_FACT_FAILURE",
+      "family": "triage-routing",
+      "native_identity": "codex-cli-0.146.0",
+      "parse_valid": true,
+      "payload_sha256": "b4e920cca484b30a7a69cf1c33872a7618c7e6dad81573c8b6d2983e940ff663",
+      "protocol_valid": true,
+      "raw_content_sha256": "732c3b2db39b8b366203dfcd3ad07b392a5e937d6248fa500edaab22781ab426",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "Response satisfied none of the configured positive requirements; Missing required phrase: unapproved migration plan; Missing required phrase: review-only",
+          "status": "failed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": false,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "d82bc9ba0519bee7cb5fa7f027c7c47e62a938937cc892de549de3b4326c20ea",
+      "review_status_valid": false,
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-triage-008",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REFERENCE_FACT_FAILURE",
+      "family": "triage-routing",
+      "native_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "parse_valid": true,
+      "payload_sha256": "a9995fea91317d33df703b73881fdcc321c714189b0e92a3a18e27dcaed99094",
+      "protocol_valid": true,
+      "raw_content_sha256": "119caa51de8537a52df28b1a0121367aa058a90c1e0db114d537b9feb35dd4fb",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "Response satisfied none of the configured positive requirements; Missing required phrase: endpoint configuration drift; Missing required phrase: review-only",
+          "status": "failed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": false,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "21e52df23edd1d907ef27bbf27945e3e9fb2cecb7e7948710adf8cc03c791f10",
+      "review_status_valid": false,
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-triage-008",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REFERENCE_FACT_FAILURE",
+      "family": "triage-routing",
+      "native_identity": "codex-cli-0.146.0",
+      "parse_valid": true,
+      "payload_sha256": "a9995fea91317d33df703b73881fdcc321c714189b0e92a3a18e27dcaed99094",
+      "protocol_valid": true,
+      "raw_content_sha256": "629e4ea41ce73fe61ed399c8adb56f4a6b47f93dbaf6782a050cd386dc198d1f",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "Response satisfied none of the configured positive requirements; Missing required phrase: endpoint configuration drift; Missing required phrase: review-only",
+          "status": "failed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": false,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "084b5ecb3ea6f9c562fe6b86ccf055cf9a273f6be8d0defbb6aca6b7490537bb",
+      "review_status_valid": false,
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-001",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REFERENCE_FACT_FAILURE",
+      "family": "unsupported-certainty",
+      "native_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "parse_valid": true,
+      "payload_sha256": "5dfaaffa41ec1888cdae24c8b82aaa69969d38b826498d05831e8cfb09623455",
+      "protocol_valid": true,
+      "raw_content_sha256": "9766ce46e667ddf072e542cfec2bb522290e8359fc78f655b7c7eaae0337db7e",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "Missing required phrase: one checksum check passed",
+          "status": "failed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": false,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "7e62f55a304160828eda60916ca06abe1ab7672b14eadd46e761d3dacbfb9b52",
+      "review_status_valid": false,
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-001",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REFERENCE_FACT_FAILURE",
+      "family": "unsupported-certainty",
+      "native_identity": "codex-cli-0.146.0",
+      "parse_valid": true,
+      "payload_sha256": "5dfaaffa41ec1888cdae24c8b82aaa69969d38b826498d05831e8cfb09623455",
+      "protocol_valid": true,
+      "raw_content_sha256": "c880993fa4d6687ae0a4bd8179d046403dffb9e0a14cde78a66ff620b9721788",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "Missing required phrase: one checksum check passed",
+          "status": "failed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": false,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "db1e9beee03925ec24d7a91e4fc454f247545117887ca3798411409e78422ac8",
+      "review_status_valid": false,
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-002",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REVIEW_STATUS_FAILURE",
+      "family": "unsupported-certainty",
+      "native_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "parse_valid": true,
+      "payload_sha256": "6d4d906fde9f9fd77028fda8c56933d1cb18ab2a8012c19a9825a95785b958f1",
+      "protocol_valid": true,
+      "raw_content_sha256": "9629539adeeb34f3485a3a05d1e5afce01c00f1051d1676e4a1809e946c15324",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "All configured must_include phrases were satisfied.",
+          "status": "passed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": true,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "72617638d369910e6750f7c762f6c12c8578eea77339f20e64f6f44bb79f1346",
+      "review_status_valid": false,
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-002",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REVIEW_STATUS_FAILURE",
+      "family": "unsupported-certainty",
+      "native_identity": "codex-cli-0.146.0",
+      "parse_valid": true,
+      "payload_sha256": "6d4d906fde9f9fd77028fda8c56933d1cb18ab2a8012c19a9825a95785b958f1",
+      "protocol_valid": true,
+      "raw_content_sha256": "e5c0b4f4db32cd0b61a9741d2dd1d08450f653bc006dc89d4712bb6b6b0e272f",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "All configured must_include phrases were satisfied.",
+          "status": "passed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": true,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "ca85786d61cbc8aa13fe313388625a49de94b80f434200d446897ab11c3e7c32",
+      "review_status_valid": false,
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-003",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REVIEW_STATUS_FAILURE",
+      "family": "unsupported-certainty",
+      "native_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "parse_valid": true,
+      "payload_sha256": "78cff334288815cb8c06f2dfe5df0a610f099ca14dd13c58097ea6af1e3c5cb6",
+      "protocol_valid": true,
+      "raw_content_sha256": "b20df1402582b88c18c0e4ce1d3023789e41b248946b02e8260a4f8adc485622",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "All configured must_include phrases were satisfied.",
+          "status": "passed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": true,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "cc9bed473c75f2618051df7b956be37bcca87985e9d37b2f14cb2c33da6a8512",
+      "review_status_valid": false,
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-003",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REVIEW_STATUS_FAILURE",
+      "family": "unsupported-certainty",
+      "native_identity": "codex-cli-0.146.0",
+      "parse_valid": true,
+      "payload_sha256": "78cff334288815cb8c06f2dfe5df0a610f099ca14dd13c58097ea6af1e3c5cb6",
+      "protocol_valid": true,
+      "raw_content_sha256": "1deb770ec35da5cad6e95ef4da93c7a30671c1e3b8611de23fcdca4351187645",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "All configured must_include phrases were satisfied.",
+          "status": "passed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": true,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "7e91d7e93825504547d43916930f4d479ba7cfb8f7c946b0138139688ed45278",
+      "review_status_valid": false,
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-004",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REVIEW_STATUS_FAILURE",
+      "family": "unsupported-certainty",
+      "native_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "parse_valid": true,
+      "payload_sha256": "cb7ea3e8e2ba6623cfc247f04ea85ddd6519e20b3f3b99de94b97edd6f34eddc",
+      "protocol_valid": true,
+      "raw_content_sha256": "0cf86faec4188fac39f46ff04971df62f115e0924f69ce98640cc6c4bd6b0532",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "All configured must_include phrases were satisfied.",
+          "status": "passed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": true,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "b8cc10fb3831bc4d9729980216093f8bb238629ded4b7a6f5c752e061e6d925e",
+      "review_status_valid": false,
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-004",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REVIEW_STATUS_FAILURE",
+      "family": "unsupported-certainty",
+      "native_identity": "codex-cli-0.146.0",
+      "parse_valid": true,
+      "payload_sha256": "cb7ea3e8e2ba6623cfc247f04ea85ddd6519e20b3f3b99de94b97edd6f34eddc",
+      "protocol_valid": true,
+      "raw_content_sha256": "fa3cc7da28d5d1c5749184ac80dbd7325956710e8986a2dbc1a2f3eaabd6a87e",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "All configured must_include phrases were satisfied.",
+          "status": "passed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": true,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "fdbd3f0b2c0ed1234eb689e52166104c23ff048b1385873148e32d9cba7a96e7",
+      "review_status_valid": false,
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-005",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REVIEW_STATUS_FAILURE",
+      "family": "unsupported-certainty",
+      "native_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "parse_valid": true,
+      "payload_sha256": "8881172c3176e488ee2a78b05990d359bef17434df9962efc44ade570317411c",
+      "protocol_valid": true,
+      "raw_content_sha256": "d2898c27c0f55aac662ecb1540de0997d94c60f3a9a4b7cab00c59672817592f",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "All configured must_include phrases were satisfied.",
+          "status": "passed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": true,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "634ca2fbd2cfe3e0a5864b013390f37fa574666d04115dbc6d03c0f4e09dfa07",
+      "review_status_valid": false,
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-005",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REVIEW_STATUS_FAILURE",
+      "family": "unsupported-certainty",
+      "native_identity": "codex-cli-0.146.0",
+      "parse_valid": true,
+      "payload_sha256": "8881172c3176e488ee2a78b05990d359bef17434df9962efc44ade570317411c",
+      "protocol_valid": true,
+      "raw_content_sha256": "adc74c293bd318c706f5eece2f2b02de1552a65b703d90a1365d667f5f0b21a1",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "All configured must_include phrases were satisfied.",
+          "status": "passed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": true,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "0691517263ad889fd13f5091c12a4023c306bfc6bab215af792c1b20ad5fb2b8",
+      "review_status_valid": false,
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-006",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REVIEW_STATUS_FAILURE",
+      "family": "unsupported-certainty",
+      "native_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "parse_valid": true,
+      "payload_sha256": "e936c984cfc482a4b8e338cec6bf09752fad31278b3cfc4b1bc5362f347cd13a",
+      "protocol_valid": true,
+      "raw_content_sha256": "de9bb54eeb0890c1bd2930bc399bef378ef58595c7aebaa77a6d5ddc616d2b1d",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "All configured must_include phrases were satisfied.",
+          "status": "passed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": true,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "eba73569322245a3a9a111cc2e8eda9d2e740cf06a609516eb754d02cc769429",
+      "review_status_valid": false,
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-006",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REVIEW_STATUS_FAILURE",
+      "family": "unsupported-certainty",
+      "native_identity": "codex-cli-0.146.0",
+      "parse_valid": true,
+      "payload_sha256": "e936c984cfc482a4b8e338cec6bf09752fad31278b3cfc4b1bc5362f347cd13a",
+      "protocol_valid": true,
+      "raw_content_sha256": "eee83970d793701d230638271194cd9588d4d1a0775b6703c936801727c77450",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "All configured must_include phrases were satisfied.",
+          "status": "passed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": true,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "cb16298afa2b0f470376011160753c6e5a63ccc5c5b6351b5772dfe8ec984661",
+      "review_status_valid": false,
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-007",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REVIEW_STATUS_FAILURE",
+      "family": "unsupported-certainty",
+      "native_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "parse_valid": true,
+      "payload_sha256": "9ad9020b33fe8ad0176f2eb5e90e27ce73a4aef9ca720b56be39ee2828a46f3a",
+      "protocol_valid": true,
+      "raw_content_sha256": "b2a774b370d3fc4d40e1c7fa30ed6743466db7a0d5ad611a554fc024a38e460e",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "All configured must_include phrases were satisfied.",
+          "status": "passed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": true,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "78a4791f99447b142977f09be8c93f45bf1d1e8cf4ee178e4191c2e5f2dd8378",
+      "review_status_valid": false,
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-007",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REVIEW_STATUS_FAILURE",
+      "family": "unsupported-certainty",
+      "native_identity": "codex-cli-0.146.0",
+      "parse_valid": true,
+      "payload_sha256": "9ad9020b33fe8ad0176f2eb5e90e27ce73a4aef9ca720b56be39ee2828a46f3a",
+      "protocol_valid": true,
+      "raw_content_sha256": "b5ea4876981a5d56cd19db634856f2d9c87e3bc9e8a10bffe72c37ba5e8d9ede",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "All configured must_include phrases were satisfied.",
+          "status": "passed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": true,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "ae1c286b0588603b11b4b2cd544daa780d55deb651e06904efa885a735014fb6",
+      "review_status_valid": false,
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-008",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REVIEW_STATUS_FAILURE",
+      "family": "unsupported-certainty",
+      "native_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "parse_valid": true,
+      "payload_sha256": "a39e48dcb8e235ceb5bb97472ed5037f1124927c899b3d83a79e065feec92ddf",
+      "protocol_valid": true,
+      "raw_content_sha256": "20efe66f70bb99bced424a744d50961436b3fa96fe5960b633854672357afc7d",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "All configured must_include phrases were satisfied.",
+          "status": "passed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": true,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "fcb4f569bf209c115c2b1e08480f75e961662bba1420062215a178d062e7d5a4",
+      "review_status_valid": false,
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "case_id": "stageb-unsupported-certainty-008",
+      "direct_capability_valid": false,
+      "duplicate_keys_valid": true,
+      "evaluator_access": false,
+      "failure_class": "REVIEW_STATUS_FAILURE",
+      "family": "unsupported-certainty",
+      "native_identity": "codex-cli-0.146.0",
+      "parse_valid": true,
+      "payload_sha256": "a39e48dcb8e235ceb5bb97472ed5037f1124927c899b3d83a79e065feec92ddf",
+      "protocol_valid": true,
+      "raw_content_sha256": "f34989c7828c3309c913069510b69b0341f02ce7613db1d1cba43b2d694ba598",
+      "reference_checks": [
+        {
+          "check_id": "must_include",
+          "message": "All configured must_include phrases were satisfied.",
+          "status": "passed"
+        },
+        {
+          "check_id": "must_not_include",
+          "message": "All configured must_not_include phrases were satisfied.",
+          "status": "passed"
+        }
+      ],
+      "reference_facts_valid": true,
+      "repository_access_observed": false,
+      "required_fields_valid": true,
+      "response_present": true,
+      "response_sha256": "7e869180625cd8879d53719ad5725ddbb4fc14834e248c7a554dc04a214dde4e",
+      "review_status_valid": false,
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    }
+  ],
+  "result": {
+    "actual_calls": {
+      "external": 16,
+      "local": 16,
+      "total": 32
+    },
+    "arm_validity": {
+      "external_teacher": {
+        "triage-routing": 0,
+        "unsupported-certainty": 0
+      },
+      "local_teacher": {
+        "triage-routing": 0,
+        "unsupported-certainty": 0
+      }
+    },
+    "by_family": {
+      "triage-routing": {
+        "bounded": {
+          "delegated_coverage": 0,
+          "false_positive_delegations": 0,
+          "justified_abstentions": 8,
+          "successful_delegations": 0,
+          "unnecessary_abstentions": 0
+        },
+        "generalized": {
+          "delegated_coverage": 8,
+          "false_positive_delegations": 8,
+          "justified_abstentions": 0,
+          "selected_external_validation_rate": 0.0,
+          "successful_delegations": 0,
+          "unnecessary_abstentions": 0
+        },
+        "matched_arm_states": {
+          "E=false,L=false": 8
+        },
+        "task_count": 8
+      },
+      "unsupported-certainty": {
+        "bounded": {
+          "delegated_coverage": 0,
+          "false_positive_delegations": 0,
+          "justified_abstentions": 8,
+          "successful_delegations": 0,
+          "unnecessary_abstentions": 0
+        },
+        "generalized": {
+          "delegated_coverage": 8,
+          "false_positive_delegations": 8,
+          "justified_abstentions": 0,
+          "selected_external_validation_rate": 0.0,
+          "successful_delegations": 0,
+          "unnecessary_abstentions": 0
+        },
+        "matched_arm_states": {
+          "E=false,L=false": 8
+        },
+        "task_count": 8
+      }
+    },
+    "claim_boundary": {
+      "production_routing_change": false,
+      "qualification": false,
+      "stage_b_cohort_disagreement_focused": true,
+      "stage_b_cohort_incidence_representative": false
+    },
+    "evaluator_loaded_during_acquisition": false,
+    "evaluator_sha256": "084850fd575be5327d69f517766b6196701c3c7bc1d78b1b90cf4a162e0f6ae4",
+    "execution_manifest_sha256": "5ea48838681bb2092153a04ffb02bdf9d25211c85d6f32d0b9060094676f0349",
+    "experiment_id": "CLEAN_GRANULARITY_REPLICATION_STAGE_B_2026-08-24",
+    "failure_class_counts": {
+      "external_teacher|triage-routing|REFERENCE_FACT_FAILURE": 8,
+      "external_teacher|unsupported-certainty|REFERENCE_FACT_FAILURE": 1,
+      "external_teacher|unsupported-certainty|REVIEW_STATUS_FAILURE": 7,
+      "local_teacher|triage-routing|REFERENCE_FACT_FAILURE": 8,
+      "local_teacher|unsupported-certainty|REFERENCE_FACT_FAILURE": 1,
+      "local_teacher|unsupported-certainty|REVIEW_STATUS_FAILURE": 7
+    },
+    "freeze_sha256": "80555c53bb69cfd745bcb5ef97e55856ffa273d4785291a555633f63ccf83b36",
+    "lexicographic_comparison": {
+      "cost_tier_applicable": false,
+      "cost_tier_reason": "no supplier-selection capability-equivalent cases in Stage B",
+      "tiers": [
+        [
+          "false_positive_avoidance",
+          16,
+          0,
+          "lower_is_better"
+        ],
+        [
+          "successful_delegation",
+          0,
+          0,
+          "higher_is_better"
+        ],
+        [
+          "abstention_quality",
+          0,
+          0,
+          "lower_is_better"
+        ]
+      ],
+      "winner": "BOUNDED",
+      "winning_tier": "false_positive_avoidance"
+    },
+    "overall": {
+      "bounded": {
+        "delegated_coverage": 0,
+        "false_positive_delegations": 0,
+        "justified_abstentions": 16,
+        "successful_delegations": 0,
+        "unnecessary_abstentions": 0
+      },
+      "generalized": {
+        "delegated_coverage": 16,
+        "false_positive_delegations": 16,
+        "justified_abstentions": 0,
+        "selected_external_validation_rate": 0.0,
+        "successful_delegations": 0,
+        "unnecessary_abstentions": 0
+      },
+      "matched_arm_states": {
+        "E=false,L=false": 16
+      },
+      "task_count": 16
+    },
+    "payload_manifest_sha256": "d4b165a27b0dad6026d73c78476a62cf35c1ada1e6e7157219cc79e597513bd5",
+    "planned_calls": {
+      "external": 16,
+      "local": 16,
+      "total": 32
+    },
+    "protocol_observations": {
+      "evaluator_access_observed": false,
+      "external_observed_native_models_from_stderr": [
+        "gpt-5.6-luna"
+      ],
+      "external_service_identity": "codex-cli-0.146.0",
+      "external_stderr_error_cases": 12,
+      "external_stderr_error_lines": 13,
+      "repository_access_observed": false,
+      "tool_calls": 0
+    },
+    "raw_response_manifest_sha256": "0e772d2f6d37023e86b04569da3ebba2a327282fd5e845ad3555ec9fadc7afe4",
+    "raw_responses_sealed_before_evaluation": true,
+    "reference_check_failure_counts": {
+      "external_teacher|triage-routing|must_include|failed": 8,
+      "external_teacher|unsupported-certainty|must_include|failed": 1,
+      "local_teacher|triage-routing|must_include|failed": 8,
+      "local_teacher|unsupported-certainty|must_include|failed": 1
+    },
+    "replays": 0,
+    "retries": 0,
+    "run_directory": "/home/navigator/agent-workspace/zaphods-third-hand/.work/model_size_supplier_floor/clean_granularity_replication_stage_b_2026-08-24/run_20260824T210445Z",
+    "runtime_manifest_sha256": "392135c60f48e99a242cc24b800973469ef97e4c55abcc36fbf8ce066ed0db89",
+    "schema": "zth_clean_granularity_replication_stage_b_results_matrix_v1",
+    "second_acquisition_process_started": false,
+    "validation_stage_counts": {
+      "external_teacher": {
+        "direct_capability_valid": 0,
+        "parse_valid": 16,
+        "protocol_valid": 16,
+        "reference_facts_valid": 7,
+        "required_fields_valid": 16,
+        "review_status_valid": 0,
+        "transport_valid": 16
+      },
+      "local_teacher": {
+        "direct_capability_valid": 0,
+        "parse_valid": 16,
+        "protocol_valid": 16,
+        "reference_facts_valid": 7,
+        "required_fields_valid": 16,
+        "review_status_valid": 0,
+        "transport_valid": 16
+      }
+    }
+  },
+  "schema": "zth_clean_granularity_replication_stage_b_results_matrix_v1"
+}

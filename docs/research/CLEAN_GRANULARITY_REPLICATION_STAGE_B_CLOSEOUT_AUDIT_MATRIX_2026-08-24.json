@@ -1,0 +1,42 @@
+{
+  "all_32_pairs_observed": true,
+  "closeout_implementation": "deterministic model-free evaluation over sealed raw responses; no supplier calls",
+  "downstream_model_repair": false,
+  "evaluator_influence_during_acquisition": 0,
+  "evaluator_loaded_after_raw_seal": true,
+  "evaluator_loaded_during_acquisition": false,
+  "exact_frozen_case_order_used": true,
+  "execution_manifest_status": "TERMINAL_COMPLETE",
+  "external_native_supplier_state": "codex-cli-0.146.0 service mechanism; provider-native state best-available observation",
+  "freeze_artifact_hashes": {
+    "evaluator": "084850fd575be5327d69f517766b6196701c3c7bc1d78b1b90cf4a162e0f6ae4",
+    "freshness": "b0a0a3e690914aff5befce1d9aeda2a8fff9d9ebbd4aaecbfc1e8757a88e57e2",
+    "payload": "d4b165a27b0dad6026d73c78476a62cf35c1ada1e6e7157219cc79e597513bd5",
+    "policies": "47b776dcc68595ed7528409a8e8d4677f9112d1791d4653a5f1028f9dc2acb8c",
+    "runtime": "392135c60f48e99a242cc24b800973469ef97e4c55abcc36fbf8ce066ed0db89"
+  },
+  "freeze_artifacts_unchanged": true,
+  "model_substitution": false,
+  "production_routing_change": false,
+  "qualification_or_promotion": false,
+  "raw_file_counts": {
+    "call_finished": 32,
+    "call_started": 32,
+    "infrastructure_failure": 0,
+    "response": 32
+  },
+  "raw_hashes_unchanged_by_closeout": true,
+  "raw_response_manifest_status": "SEALED_BEFORE_EVALUATION",
+  "raw_responses_sealed_before_evaluation": true,
+  "replays": 0,
+  "repository_access_observed": false,
+  "response_repair": false,
+  "retries": 0,
+  "run_directory": "/home/navigator/agent-workspace/zaphods-third-hand/.work/model_size_supplier_floor/clean_granularity_replication_stage_b_2026-08-24/run_20260824T210445Z",
+  "schema": "zth_clean_granularity_replication_stage_b_closeout_audit_v1",
+  "target_replacement": false,
+  "target_requests_unchanged": true,
+  "teacher_intervention": false,
+  "threshold_tuning": false,
+  "tool_calls": 0
+}
