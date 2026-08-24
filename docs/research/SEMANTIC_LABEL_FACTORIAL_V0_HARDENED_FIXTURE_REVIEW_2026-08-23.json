@@ -1,0 +1,54 @@
+{
+  "rows": [
+    {
+      "definition_supporting_intended_class": "observe_presence means determine whether the named target exists, is present, or is available.",
+      "intended_semantic_class": "observe_presence",
+      "preflight_status": "UNRESOLVED",
+      "request": "Would you determine if docs/research/R1_COPPER_2026-08-23.md is on hand in this repository?",
+      "semantic_fallback_eligible": true,
+      "task_id": "slff-001"
+    },
+    {
+      "definition_supporting_intended_class": "inspect means examine or look at the named target.",
+      "intended_semantic_class": "inspect",
+      "preflight_status": "UNRESOLVED",
+      "request": "Provide a close reading of docs/research/R2_DUSK_2026-08-23.json.",
+      "semantic_fallback_eligible": true,
+      "task_id": "slff-002"
+    },
+    {
+      "definition_supporting_intended_class": "observe_presence means determine whether the named target exists, is present, or is available.",
+      "intended_semantic_class": "observe_presence",
+      "preflight_status": "UNRESOLVED",
+      "request": "Can you establish whether docs/research/R3_FIR_2026-08-23.txt resides in this tree?",
+      "semantic_fallback_eligible": true,
+      "task_id": "slff-003"
+    },
+    {
+      "definition_supporting_intended_class": "inspect means examine or look at the named target.",
+      "intended_semantic_class": "inspect",
+      "preflight_status": "UNRESOLVED",
+      "request": "Take some time with docs/research/R4_MOSS_2026-08-23.md.",
+      "semantic_fallback_eligible": true,
+      "task_id": "slff-004"
+    },
+    {
+      "definition_supporting_intended_class": "observe_presence means determine whether the named target exists, is present, or is available.",
+      "intended_semantic_class": "observe_presence",
+      "preflight_status": "UNRESOLVED",
+      "request": "Please tell me whether docs/research/R5_PEPPER_2026-08-23.json is available here.",
+      "semantic_fallback_eligible": true,
+      "task_id": "slff-005"
+    },
+    {
+      "definition_supporting_intended_class": "inspect means examine or look at the named target.",
+      "intended_semantic_class": "inspect",
+      "preflight_status": "UNRESOLVED",
+      "request": "Give docs/research/R6_SUNSET_2026-08-23.txt your attention.",
+      "semantic_fallback_eligible": true,
+      "task_id": "slff-006"
+    }
+  ],
+  "runtime_input": false,
+  "schema": "zth_semantic_label_factorial_v0_fixture_review"
+}

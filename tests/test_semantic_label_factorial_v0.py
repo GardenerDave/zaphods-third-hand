@@ -54,7 +54,42 @@ def test_arm_relative_candidate_mapping_is_strict():
 def test_latin_style_schedule_has_24_calls_and_balanced_positions():
     schedule = probe.execution_schedule([row[0] for row in probe.specs()])
     assert len(schedule) == 24
+    assert schedule == probe.EXPECTED_SCHEDULE
     assert all(sum(item["arm"] == arm for item in schedule) == 6 for arm in ("A", "B", "C", "D"))
     for position in range(4):
         counts = {arm: sum(schedule[index * 4 + position]["arm"] == arm for index in range(6)) for arm in ("A", "B", "C", "D")}
         assert sorted(counts.values()) == [1, 1, 2, 2]
+
+
+def test_class_stratified_positions_are_unique_within_each_semantic_class():
+    audit = probe.schedule_audit(probe.execution_schedule([row[0] for row in probe.specs()]), [row[0] for row in probe.specs()])
+    assert audit["within_class_position_balance"] is True
+    assert audit["strata_positions"]["presence"] == {"A": [1, 3, 4], "B": [1, 2, 4], "C": [1, 2, 3], "D": [2, 3, 4]}
+    assert audit["strata_positions"]["inspect"] == {"A": [2, 3, 4], "B": [1, 2, 3], "C": [1, 2, 4], "D": [1, 3, 4]}
+
+
+def test_prepared_execution_order_artifact_is_exactly_class_stratified():
+    import json
+    from pathlib import Path
+
+    prepared = Path(probe.RUN) / "execution_order.json"
+    assert json.loads(prepared.read_text(encoding="utf-8"))["schedule"] == probe.EXPECTED_SCHEDULE
+
+
+def test_evaluator_manifest_is_the_closeout_scoring_authority():
+    runtime_rows = [{"task_id": "slff-001", "arm": "A", "canonical_operation": "observe_presence", "parse_valid": True, "contract_valid": True, "candidate_valid": True, "candidate_admissible": True}]
+    evaluator = [{"task_id": "slff-001", "expected_semantic_class": "observe_presence"}]
+    assert probe.score_rows(runtime_rows, evaluator)[0]["semantic_correct"] is True
+    evaluator[0]["expected_semantic_class"] = "inspect"
+    assert probe.score_rows(runtime_rows, evaluator)[0]["semantic_correct"] is False
+
+
+def test_factorial_metrics_keep_presence_and_inspect_denominators_visible():
+    rows = []
+    for arm in ("A", "B", "C", "D"):
+        rows.extend([
+            {"task_id": "slff-001", "arm": arm, "expected": "observe_presence", "canonical_operation": "observe_presence", "semantic_correct": True, "parse_valid": True, "contract_valid": True, "candidate_valid": True, "candidate_admissible": True},
+            {"task_id": "slff-002", "arm": arm, "expected": "inspect", "canonical_operation": "inspect", "semantic_correct": True, "parse_valid": True, "contract_valid": True, "candidate_valid": True, "candidate_admissible": True},
+        ])
+    metrics = probe.arm_metrics(rows)
+    assert all(metrics[arm]["presence_total"] == 1 and metrics[arm]["inspect_total"] == 1 for arm in ("A", "B", "C", "D"))

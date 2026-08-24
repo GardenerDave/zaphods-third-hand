@@ -18,12 +18,13 @@ from scripts import zth_qwen3_1_7b_atomic_scope_relation_decomposition as decomp
 from scripts import zth_qwen3_1_7b_clean_scope_logic_probe as runtime
 
 ROOT = runtime.ROOT
-RUN = ROOT / ".work/model_size_supplier_floor/semantic_label_factorial_v0/run_20260823T230100Z"
-RUNTIME_CASES = ROOT / "docs/research/SEMANTIC_LABEL_FACTORIAL_V0_RUNTIME_CASES_2026-08-23.json"
-EVALUATOR_CASES = ROOT / "docs/research/SEMANTIC_LABEL_FACTORIAL_V0_EVALUATOR_CASES_2026-08-23.json"
-PAIR_AUDIT = ROOT / "docs/research/SEMANTIC_LABEL_FACTORIAL_V0_PAIR_AUDIT_2026-08-23.json"
-REGISTRY = ROOT / "docs/research/SEMANTIC_LABEL_FACTORIAL_V0_REGISTRY_2026-08-23.json"
-FIXTURE_REVIEW = ROOT / "docs/research/SEMANTIC_LABEL_FACTORIAL_V0_FIXTURE_REVIEW_2026-08-23.json"
+RUN = ROOT / ".work/model_size_supplier_floor/semantic_label_factorial_v0/run_20260823T235000Z"
+PREDECESSOR_RUN = ROOT / ".work/model_size_supplier_floor/semantic_label_factorial_v0/run_20260823T230100Z"
+RUNTIME_CASES = ROOT / "docs/research/SEMANTIC_LABEL_FACTORIAL_V0_HARDENED_RUNTIME_CASES_2026-08-23.json"
+EVALUATOR_CASES = ROOT / "docs/research/SEMANTIC_LABEL_FACTORIAL_V0_HARDENED_EVALUATOR_CASES_2026-08-23.json"
+PAIR_AUDIT = ROOT / "docs/research/SEMANTIC_LABEL_FACTORIAL_V0_HARDENED_PAIR_AUDIT_2026-08-23.json"
+REGISTRY = ROOT / "docs/research/SEMANTIC_LABEL_FACTORIAL_V0_HARDENED_REGISTRY_2026-08-23.json"
+FIXTURE_REVIEW = ROOT / "docs/research/SEMANTIC_LABEL_FACTORIAL_V0_HARDENED_FIXTURE_REVIEW_2026-08-23.json"
 MODEL_ID = runtime.EXPECTED_MODEL_ID
 MODEL_SHA = runtime.EXPECTED_MODEL_SHA
 PARAMS = runtime.EXPECTED_PARAMS
@@ -138,8 +139,62 @@ def normalized_prompt(prompt_text: str, arm: str) -> str:
 
 
 def execution_schedule(task_ids: list[str]) -> list[dict[str, str]]:
-    rotations = [("A", "B", "C", "D"), ("B", "C", "D", "A"), ("C", "D", "A", "B"), ("D", "A", "B", "C"), ("A", "C", "B", "D"), ("B", "D", "A", "C")]
-    return [{"task_id": task_id, "arm": arm} for task_id, rotation in zip(task_ids, rotations) for arm in rotation]
+    rotations = {
+        "slff-001": ("A", "B", "C", "D"),
+        "slff-002": ("D", "C", "B", "A"),
+        "slff-003": ("B", "C", "D", "A"),
+        "slff-004": ("C", "B", "A", "D"),
+        "slff-005": ("C", "D", "A", "B"),
+        "slff-006": ("B", "A", "D", "C"),
+    }
+    return [{"task_id": task_id, "arm": arm} for task_id in task_ids for arm in rotations[task_id]]
+
+
+EXPECTED_SCHEDULE = [
+    {"task_id": "slff-001", "arm": arm} for arm in ("A", "B", "C", "D")
+] + [
+    {"task_id": "slff-002", "arm": arm} for arm in ("D", "C", "B", "A")
+] + [
+    {"task_id": "slff-003", "arm": arm} for arm in ("B", "C", "D", "A")
+] + [
+    {"task_id": "slff-004", "arm": arm} for arm in ("C", "B", "A", "D")
+] + [
+    {"task_id": "slff-005", "arm": arm} for arm in ("C", "D", "A", "B")
+] + [
+    {"task_id": "slff-006", "arm": arm} for arm in ("B", "A", "D", "C")
+]
+
+
+def schedule_audit(schedule: list[dict[str, str]], task_ids: list[str]) -> dict[str, Any]:
+    expected = list(EXPECTED_SCHEDULE)
+    assert schedule == expected
+    assert len(schedule) == 24
+    assert all(sum(item["task_id"] == task_id for item in schedule) == 4 for task_id in task_ids)
+    assert all(sum(item["arm"] == arm for item in schedule) == 6 for arm in ("A", "B", "C", "D"))
+    by_task = {task_id: [item["arm"] for item in schedule if item["task_id"] == task_id] for task_id in task_ids}
+    assert all(sorted(arms) == ["A", "B", "C", "D"] for arms in by_task.values())
+    all_position_counts = [{arm: sum(schedule[index * 4 + position]["arm"] == arm for index in range(6)) for arm in ("A", "B", "C", "D")} for position in range(4)]
+    strata = {"presence": ["slff-001", "slff-003", "slff-005"], "inspect": ["slff-002", "slff-004", "slff-006"]}
+    task_positions = {task_id: {item["arm"]: position + 1 for position, item in enumerate(schedule[index * 4:(index + 1) * 4])} for index, task_id in enumerate(task_ids)}
+    strata_positions: dict[str, dict[str, list[int]]] = {}
+    for name, stratum_tasks in strata.items():
+        strata_positions[name] = {arm: sorted(task_positions[task_id][arm] for task_id in stratum_tasks) for arm in ("A", "B", "C", "D")}
+        assert all(len(positions) == 3 and len(set(positions)) == 3 for positions in strata_positions[name].values())
+    assert all(sorted(counts.values()) == [1, 1, 2, 2] for counts in all_position_counts)
+    return {"exact_schedule": True, "arm_counts": {arm: 6 for arm in ("A", "B", "C", "D")}, "position_counts": all_position_counts, "strata_positions": strata_positions, "within_class_position_balance": True, "global_position_balance": True}
+
+
+def predecessor_successor_input_audit(out: Path) -> dict[str, Any]:
+    names = ("runtime_task.json", "preflight.json", "semantic_information_gap.json", "capability_plan_0.json", "prompt.txt", "schema.json", "model_settings.json")
+    rows = []
+    for task_id, _, _ in specs():
+        for arm in ("A", "B", "C", "D"):
+            predecessor = PREDECESSOR_RUN / "tasks" / task_id / arm
+            successor = out / "tasks" / task_id / arm
+            hashes = {name: (sha_file(predecessor / name), sha_file(successor / name)) for name in names}
+            rows.append({"task_id": task_id, "arm": arm, "files_identical": all(left == right for left, right in hashes.values()), "hashes": hashes})
+    assert all(row["files_identical"] for row in rows)
+    return {"predecessor_run": str(PREDECESSOR_RUN), "successor_run": str(out), "model_inputs_identical": True, "rows": rows}
 
 
 def historical_requests() -> set[str]:
@@ -166,9 +221,7 @@ def prepare(out: Path) -> None:
     assert all(pre["semantic_fallback_eligible"] and pre["model_required"] and pre["remaining_candidate_operation_classes"] == ["observe_presence", "inspect"] for pre in preflights)
     task_ids = [case["task_id"] for case in cases]
     schedule = execution_schedule(task_ids)
-    assert len(schedule) == 24
-    assert all(sum(item["arm"] == arm for item in schedule) == 6 for arm in ("A", "B", "C", "D"))
-    assert all(sum(schedule[index * 4 + position]["arm"] == arm for index in range(6)) in (1, 2) for arm in ("A", "B", "C", "D") for position in range(4))
+    schedule_audit_result = schedule_audit(schedule, task_ids)
     out.mkdir(parents=True, exist_ok=True)
     write_json(RUNTIME_CASES, {"schema": "zth_semantic_label_factorial_v0_runtime_cases", "cases": cases})
     write_json(EVALUATOR_CASES, {"schema": "zth_semantic_label_factorial_v0_evaluator_cases", "cases": evaluators})
@@ -187,8 +240,10 @@ def prepare(out: Path) -> None:
     assert all(all(row[key] for key in ("request_identity", "authority_identity", "preflight_identity", "model_settings_identity", "definition_equivalence", "semantic_positions_identical")) for row in pair_rows)
     write_json(FIXTURE_REVIEW, {"schema": "zth_semantic_label_factorial_v0_fixture_review", "runtime_input": False, "rows": fixture_rows})
     write_json(PAIR_AUDIT, {"schema": "zth_semantic_label_factorial_v0_pair_audit", "rows": pair_rows, "request_identity": True, "authority_identity": True, "preflight_identity": True, "model_settings_identity": True, "definitions_equivalent_after_label_normalization": True, "semantic_enum_positions_identical": True, "surface_label_mapping_frozen": True, "only_model_visible_intervention": "LABEL_TOKENS"})
-    write_json(out / "execution_order.json", {"schedule": schedule, "counterbalanced": True, "arm_counts": {arm: 6 for arm in ("A", "B", "C", "D")}, "position_counts": [{arm: sum(schedule[index * 4 + position]["arm"] == arm for index in range(6)) for arm in ("A", "B", "C", "D")} for position in range(4)], "cross_arm_input": False})
-    write_json(out / "router_manifest.json", {"schema": "zth_semantic_label_factorial_v0_manifest", "status": "prepared_model_free", "task_count": 6, "arm_count": 4, "planned_model_calls": 24, "model_calls_made": 0, "tool_calls_made": 0, "response_files": 0, "true_fallback_eligibility": 6, "historical_request_reuse": 0, "paired_input_identity_audit": True, "authority_provenance_audit": True, "definition_equivalence_audit": True, "semantic_enum_positions_identical": True, "surface_label_mapping_frozen": True, "balanced_schedule_audit": True, "runtime_evaluator_influence": 0, "model_output_granted_authority": 0, "qualification_change": False, "driver_sha256": sha_file(Path(__file__).resolve()), "model_settings": model_settings(), "arms": ARM_LABELS, "enums": ARM_ENUMS})
+    input_audit = predecessor_successor_input_audit(out)
+    write_json(out / "execution_order.json", {"schedule": schedule, "counterbalanced": True, "arm_counts": schedule_audit_result["arm_counts"], "position_counts": schedule_audit_result["position_counts"], "strata_positions": schedule_audit_result["strata_positions"], "within_class_position_balance": True, "global_position_balance": True, "cross_arm_input": False, "schedule_defect_repaired_from": "8e846966876625926e20eafa74ec25058155ed85"})
+    write_json(out / "predecessor_successor_input_audit.json", input_audit)
+    write_json(out / "router_manifest.json", {"schema": "zth_semantic_label_factorial_v0_hardened_manifest", "status": "prepared_model_free", "predecessor_freeze": "8e846966876625926e20eafa74ec25058155ed85", "task_count": 6, "arm_count": 4, "planned_model_calls": 24, "model_calls_made": 0, "tool_calls_made": 0, "response_files": 0, "true_fallback_eligibility": 6, "historical_request_reuse": 0, "paired_input_identity_audit": True, "predecessor_successor_model_inputs_identical": True, "authority_provenance_audit": True, "definition_equivalence_audit": True, "semantic_enum_positions_identical": True, "surface_label_mapping_frozen": True, "balanced_schedule_audit": True, "within_class_position_balance": True, "frozen_evaluator_is_scoring_authority": True, "specs_expected_class_used_for_closeout": False, "runtime_evaluator_influence": 0, "model_output_granted_authority": 0, "qualification_change": False, "driver_sha256": sha_file(Path(__file__).resolve()), "model_settings": model_settings(), "arms": ARM_LABELS, "enums": ARM_ENUMS})
     write_json(out / "lifecycle.json", {"status": "prepared", "model_calls": 0, "tool_calls": 0, "retries": 0})
     print(json.dumps({"status": "prepared", "fresh_tasks": 6, "arms": 4, "planned_model_calls": 24, "MODEL_CALLS_MADE": 0, "TOOL_CALLS_MADE": 0, "response_files": 0}, indent=2))
 
@@ -211,12 +266,85 @@ def execute(out: Path) -> None:
     write_json(out / "lifecycle.json", {"status": "terminal_runtime", "model_calls": calls, "tool_calls": 0, "retries": 0, "runtime_evaluator_influence": 0, "model_output_granted_authority": 0})
 
 
+def score_rows(runtime_rows: list[dict[str, Any]], evaluator_cases: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    evaluators = {item["task_id"]: item for item in evaluator_cases}
+    rows = []
+    for runtime_row in runtime_rows:
+        expected = evaluators[runtime_row["task_id"]]["expected_semantic_class"]
+        row = dict(runtime_row)
+        row["expected"] = expected
+        row["semantic_correct"] = row.get("canonical_operation") == expected
+        rows.append(row)
+    return rows
+
+
+def arm_metrics(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    metrics = {}
+    for arm in ("A", "B", "C", "D"):
+        arm_rows = [row for row in rows if row["arm"] == arm]
+        presence = [row for row in arm_rows if row["expected"] == "observe_presence"]
+        inspect = [row for row in arm_rows if row["expected"] == "inspect"]
+        metrics[arm] = {
+            "semantic_correct": sum(row["semantic_correct"] for row in arm_rows),
+            "semantic_total": len(arm_rows),
+            "presence_correct": sum(row["semantic_correct"] for row in presence),
+            "presence_total": len(presence),
+            "inspect_correct": sum(row["semantic_correct"] for row in inspect),
+            "inspect_total": len(inspect),
+            "observe_presence_outputs": sum(row.get("canonical_operation") == "observe_presence" for row in arm_rows),
+            "inspect_outputs": sum(row.get("canonical_operation") == "inspect" for row in arm_rows),
+            "unresolved_or_rejected_outputs": sum(not row.get("candidate_admissible") or row.get("canonical_operation") is None for row in arm_rows),
+            "parse_valid": sum(bool(row.get("parse_valid")) for row in arm_rows),
+            "contract_valid": sum(bool(row.get("contract_valid")) for row in arm_rows),
+            "candidate_valid": sum(bool(row.get("candidate_valid")) for row in arm_rows),
+            "candidate_admissible": sum(bool(row.get("candidate_admissible")) for row in arm_rows),
+        }
+    return metrics
+
+
+def pairwise_contrast(rows: list[dict[str, Any]], left: str, right: str) -> dict[str, Any]:
+    by_key = {(row["task_id"], row["arm"]): row for row in rows}
+    pairs = [(by_key[(task_id, left)], by_key[(task_id, right)]) for task_id, _, _ in specs()]
+    def accuracy(selection: list[tuple[dict[str, Any], dict[str, Any]]], side: int) -> int:
+        return sum(pair[side]["semantic_correct"] for pair in selection)
+    presence_pairs = [pair for pair in pairs if pair[0]["expected"] == "observe_presence"]
+    inspect_pairs = [pair for pair in pairs if pair[0]["expected"] == "inspect"]
+    return {
+        "left": left,
+        "right": right,
+        "canonical_output_changed_count": sum(pair[0].get("canonical_operation") != pair[1].get("canonical_operation") for pair in pairs),
+        "presence_task_changed_count": sum(pair[0].get("canonical_operation") != pair[1].get("canonical_operation") for pair in presence_pairs),
+        "inspect_task_changed_count": sum(pair[0].get("canonical_operation") != pair[1].get("canonical_operation") for pair in inspect_pairs),
+        "accuracy_delta_overall": accuracy(pairs, 1) - accuracy(pairs, 0),
+        "accuracy_delta_presence": accuracy(presence_pairs, 1) - accuracy(presence_pairs, 0),
+        "accuracy_delta_inspect": accuracy(inspect_pairs, 1) - accuracy(inspect_pairs, 0),
+    }
+
+
+def factorial_interpretation(rows: list[dict[str, Any]], metrics: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    vectors = {arm: tuple(row.get("canonical_operation") for row in rows if row["arm"] == arm) for arm in ("A", "B", "C", "D")}
+    return {
+        "OBSERVE_PRESENCE_LABEL_INTERFERENCE_SUPPORTED": metrics["C"]["semantic_correct"] == metrics["B"]["semantic_correct"] and metrics["D"]["semantic_correct"] == metrics["A"]["semantic_correct"] and vectors["C"] == vectors["B"] and vectors["D"] == vectors["A"],
+        "INSPECT_LABEL_ATTRACTOR_EFFECT_SUPPORTED": metrics["D"]["semantic_correct"] == metrics["B"]["semantic_correct"] and metrics["C"]["semantic_correct"] == metrics["A"]["semantic_correct"] and vectors["D"] == vectors["B"] and vectors["C"] == vectors["A"],
+        "ORIGINAL_LABEL_PAIR_INTERACTION_SUPPORTED": metrics["B"]["semantic_correct"] > metrics["A"]["semantic_correct"] and metrics["C"]["semantic_correct"] == metrics["B"]["semantic_correct"] and metrics["D"]["semantic_correct"] == metrics["B"]["semantic_correct"],
+        "NEUTRAL_PAIR_SYNERGY_OR_COMPLEX_LABEL_INTERACTION_PLAUSIBLE": metrics["B"]["semantic_correct"] > metrics["A"]["semantic_correct"] and metrics["C"]["semantic_correct"] < metrics["B"]["semantic_correct"] and metrics["D"]["semantic_correct"] < metrics["B"]["semantic_correct"],
+        "LABEL_INTERACTION_EFFECT_PLAUSIBLE": len({metrics[arm]["semantic_correct"] for arm in ("A", "B", "C", "D")}) > 1,
+    }
+
+
 def closeout(out: Path) -> None:
-    evaluators = {item["task_id"]: item for item in read_json(EVALUATOR_CASES)["cases"]}; rows = []
-    for task_id, expected, _ in specs():
+    evaluators = read_json(EVALUATOR_CASES)["cases"]
+    runtime_rows = []
+    for task_id, _, _ in specs():
         for arm in ("A", "B", "C", "D"):
-            d = out / "tasks" / task_id / arm; val = read_json(d / "candidate_validation.json"); result = read_json(d / "runtime_result.json"); rows.append({"task_id": task_id, "arm": arm, "expected": expected, "surface_label": val.get("candidate"), "canonical_operation": result.get("canonical_operation"), "semantic_correct": result.get("canonical_operation") == expected, "parse_valid": val.get("parse_valid"), "contract_valid": val.get("contract_valid"), "candidate_valid": val.get("candidate_valid"), "candidate_admissible": val.get("candidate_admissible")})
-    write_json(out / "aggregate.json", {"schema": "zth_semantic_label_factorial_v0_aggregate", "arm_scores": {arm: sum(row["semantic_correct"] for row in rows if row["arm"] == arm) for arm in ("A", "B", "C", "D")}, "rows": rows})
+            d = out / "tasks" / task_id / arm
+            val = read_json(d / "candidate_validation.json")
+            result = read_json(d / "runtime_result.json")
+            runtime_rows.append({"task_id": task_id, "arm": arm, "surface_label": val.get("candidate"), "canonical_operation": result.get("canonical_operation"), "parse_valid": val.get("parse_valid"), "contract_valid": val.get("contract_valid"), "candidate_valid": val.get("candidate_valid"), "candidate_admissible": val.get("candidate_admissible")})
+    rows = score_rows(runtime_rows, evaluators)
+    metrics = arm_metrics(rows)
+    contrasts = {f"{left}_vs_{right}": pairwise_contrast(rows, left, right) for left, right in (("A", "C"), ("A", "D"), ("B", "C"), ("B", "D"))}
+    write_json(out / "aggregate.json", {"schema": "zth_semantic_label_factorial_v0_hardened_aggregate", "evaluator_source": str(EVALUATOR_CASES), "specs_expected_class_used_for_closeout": False, "arm_metrics": metrics, "pairwise_contrasts": contrasts, "interpretation": factorial_interpretation(rows, metrics), "rows": rows})
 
 
 def main() -> None:

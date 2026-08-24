@@ -1,0 +1,183 @@
+{
+  "arm_counts": {
+    "A": 6,
+    "B": 6,
+    "C": 6,
+    "D": 6
+  },
+  "counterbalanced": true,
+  "cross_arm_input": false,
+  "global_position_balance": true,
+  "position_counts": [
+    {
+      "A": 1,
+      "B": 2,
+      "C": 2,
+      "D": 1
+    },
+    {
+      "A": 1,
+      "B": 2,
+      "C": 2,
+      "D": 1
+    },
+    {
+      "A": 2,
+      "B": 1,
+      "C": 1,
+      "D": 2
+    },
+    {
+      "A": 2,
+      "B": 1,
+      "C": 1,
+      "D": 2
+    }
+  ],
+  "schedule": [
+    {
+      "arm": "A",
+      "task_id": "slff-001"
+    },
+    {
+      "arm": "B",
+      "task_id": "slff-001"
+    },
+    {
+      "arm": "C",
+      "task_id": "slff-001"
+    },
+    {
+      "arm": "D",
+      "task_id": "slff-001"
+    },
+    {
+      "arm": "D",
+      "task_id": "slff-002"
+    },
+    {
+      "arm": "C",
+      "task_id": "slff-002"
+    },
+    {
+      "arm": "B",
+      "task_id": "slff-002"
+    },
+    {
+      "arm": "A",
+      "task_id": "slff-002"
+    },
+    {
+      "arm": "B",
+      "task_id": "slff-003"
+    },
+    {
+      "arm": "C",
+      "task_id": "slff-003"
+    },
+    {
+      "arm": "D",
+      "task_id": "slff-003"
+    },
+    {
+      "arm": "A",
+      "task_id": "slff-003"
+    },
+    {
+      "arm": "C",
+      "task_id": "slff-004"
+    },
+    {
+      "arm": "B",
+      "task_id": "slff-004"
+    },
+    {
+      "arm": "A",
+      "task_id": "slff-004"
+    },
+    {
+      "arm": "D",
+      "task_id": "slff-004"
+    },
+    {
+      "arm": "C",
+      "task_id": "slff-005"
+    },
+    {
+      "arm": "D",
+      "task_id": "slff-005"
+    },
+    {
+      "arm": "A",
+      "task_id": "slff-005"
+    },
+    {
+      "arm": "B",
+      "task_id": "slff-005"
+    },
+    {
+      "arm": "B",
+      "task_id": "slff-006"
+    },
+    {
+      "arm": "A",
+      "task_id": "slff-006"
+    },
+    {
+      "arm": "D",
+      "task_id": "slff-006"
+    },
+    {
+      "arm": "C",
+      "task_id": "slff-006"
+    }
+  ],
+  "schedule_defect_repaired_from": "8e846966876625926e20eafa74ec25058155ed85",
+  "strata_positions": {
+    "inspect": {
+      "A": [
+        2,
+        3,
+        4
+      ],
+      "B": [
+        1,
+        2,
+        3
+      ],
+      "C": [
+        1,
+        2,
+        4
+      ],
+      "D": [
+        1,
+        3,
+        4
+      ]
+    },
+    "presence": {
+      "A": [
+        1,
+        3,
+        4
+      ],
+      "B": [
+        1,
+        2,
+        4
+      ],
+      "C": [
+        1,
+        2,
+        3
+      ],
+      "D": [
+        2,
+        3,
+        4
+      ]
+    }
+  },
+  "within_class_position_balance": true
+}

@@ -1,0 +1,10 @@
+Request clause:
+Would you determine if docs/research/R1_COPPER_2026-08-23.md is on hand in this repository?
+
+Classify only the requested operation class.
+class_alpha means determine whether the named target exists, is present, or is available.
+class_beta means examine or look at the named target.
+unresolved means the operation class is ambiguous, unsupported, or cannot be determined safely.
+
+Return only operation_class_candidate in the required structured object. Do not identify the target, choose a tool, decide authorization, or decide task success.
+/no_think

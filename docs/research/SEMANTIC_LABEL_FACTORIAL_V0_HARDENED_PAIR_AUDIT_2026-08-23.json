@@ -1,0 +1,67 @@
+{
+  "authority_identity": true,
+  "definitions_equivalent_after_label_normalization": true,
+  "model_settings_identity": true,
+  "only_model_visible_intervention": "LABEL_TOKENS",
+  "preflight_identity": true,
+  "request_identity": true,
+  "rows": [
+    {
+      "authority_identity": true,
+      "definition_equivalence": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "request_identity": true,
+      "semantic_positions_identical": true,
+      "task_id": "slff-001"
+    },
+    {
+      "authority_identity": true,
+      "definition_equivalence": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "request_identity": true,
+      "semantic_positions_identical": true,
+      "task_id": "slff-002"
+    },
+    {
+      "authority_identity": true,
+      "definition_equivalence": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "request_identity": true,
+      "semantic_positions_identical": true,
+      "task_id": "slff-003"
+    },
+    {
+      "authority_identity": true,
+      "definition_equivalence": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "request_identity": true,
+      "semantic_positions_identical": true,
+      "task_id": "slff-004"
+    },
+    {
+      "authority_identity": true,
+      "definition_equivalence": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "request_identity": true,
+      "semantic_positions_identical": true,
+      "task_id": "slff-005"
+    },
+    {
+      "authority_identity": true,
+      "definition_equivalence": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "request_identity": true,
+      "semantic_positions_identical": true,
+      "task_id": "slff-006"
+    }
+  ],
+  "schema": "zth_semantic_label_factorial_v0_pair_audit",
+  "semantic_enum_positions_identical": true,
+  "surface_label_mapping_frozen": true
+}

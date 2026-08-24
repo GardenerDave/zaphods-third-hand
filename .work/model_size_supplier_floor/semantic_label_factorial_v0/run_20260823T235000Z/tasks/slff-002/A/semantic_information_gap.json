@@ -1,0 +1,8 @@
+{
+  "remaining_candidate_classes": [
+    "observe_presence",
+    "inspect"
+  ],
+  "unknown_decision_critical_fact": "which bounded semantic operation class the request expresses",
+  "why_deterministic_resolution_is_insufficient": "request is outside the frozen deterministic operation grammar"
+}

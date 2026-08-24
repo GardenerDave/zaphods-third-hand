@@ -1,0 +1,15 @@
+{
+  "environment_facts": {
+    "authority_record": {
+      "allowed_observation_operations": [
+        "observe_presence",
+        "inspect"
+      ],
+      "allowed_targets": [
+        "docs/research/R1_COPPER_2026-08-23.md"
+      ]
+    }
+  },
+  "input_request": "Would you determine if docs/research/R1_COPPER_2026-08-23.md is on hand in this repository?",
+  "task_id": "slff-001"
+}
