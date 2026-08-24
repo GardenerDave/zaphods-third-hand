@@ -17,6 +17,12 @@ operate inside the workflow, but authority boundaries are explicit.
 Destructive actions, publication, promotion, disclosure, cleanup, and
 lifecycle movement require authorized approval.
 
+ZTH qualifies bounded supplier capabilities under explicit interfaces and
+preserved evidence; model identity alone is not a sufficient competence claim.
+See the [semantic capability/interface research synthesis](docs/research/SEMANTIC_CAPABILITY_INTERFACE_SYNTHESIS_2026-08-24.md)
+for the completed bounded semantic sequence and its emerging, not-yet-generalized
+“degeneralizing benchmarks” research direction.
+
 ## Why “Third Hand”?
 
 The name borrows from Zaphod carving out hidden space in his own head and

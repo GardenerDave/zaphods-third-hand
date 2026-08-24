@@ -153,6 +153,44 @@ explicit supervised acceptance without promotion or downstream mutation.
 - Capability-mining Runs 1 and 2 are closed: Run 1's repaired holdout reached 8/10 deterministic retries, while Run 2's 20 fresh tasks reached 9/20. Teacher-free generalization replicated at lower strength; weight learning, permanent capability change, arbitrary out-of-distribution generalization, and universal patch applicability remain unproven.
 - v0.4.0 release notes and presentation notes added for the evidence-backed long-duration dogfood loop; the project remains review-only with queue writing, queue insertion, queue running, automatic handoff, and downstream-use authority unimplemented.
 
+## Completed Semantic Supplier/Interface Research
+
+The bounded semantic supplier/interface sequence is completed as research and
+evidence work through
+[`SEMANTIC_INSPECT_LABEL_ROBUSTNESS_V0`](research/SEMANTIC_INSPECT_LABEL_ROBUSTNESS_V0_2026-08-24.md).
+The chronology covers genuine semantic fallback, enum-order and label
+counterfactuals, the four-arm label factorial, and the 48-call inspect-label
+robustness confirmation. It does not qualify a supplier, change production
+routing, or activate a new experiment.
+
+The architectural takeaway is that observable competence is indexed by:
+
+```text
+supplier × capability × interface × evidence
+```
+
+The existing scorecard/capability-card direction should preserve this
+boundedness rather than collapsing evidence into “model X is good at task Y.”
+Authority remains independent, and unresolved delegation remains `review` or
+`ready_for_review`.
+
+## Queued Research Branches
+
+### `SEMANTIC_INTERFACE_CALIBRATION`
+
+Queued behind documentation and synthesis. Future work may study how
+interface-specific evidence should affect bounded supplier development and
+scorecards. No experiment is active from this roadmap update.
+
+### `DEGENERALIZED_BENCHMARK_METHODOLOGY`
+
+Emerging research direction, not a completed general theory and not a
+replacement for standard benchmarks. The proposed direction progressively
+decomposes a broad benchmark claim into capability family, bounded
+responsibility, interface/protocol, authority/context, supplier, and frozen
+evidence. Open questions include evidence transfer across interfaces and the
+point at which a benchmark becomes predictive of delegated responsibility.
+
 ## Integration Roadmap: Improve / Fable / TriDB Harvest
 
 Recent external project review produced 16 integrations for ZTH. These are not separate side projects. They are staged additions to the existing supervised packet, attempt, validation, and provenance workflow.

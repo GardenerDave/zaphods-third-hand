@@ -7,8 +7,15 @@ failed structural and semantic checks, valid attempts, rescues, failures,
 resource calls, and artifact provenance. Transport-invalid attempts are retained
 as exclusions and never become capability failures.
 
-Cards are evidence records, not model claims and not statistical certainty. The
-current labels are deliberately conservative: `insufficient` means no valid
+Cards are evidence records, not model claims and not statistical certainty. A
+card should be read as evidence about a bounded
+`supplier × capability × interface × evidence` unit, not as a universal claim
+about a model or worker. The interface includes the concrete protocol,
+representation, and authority/context boundary used in the attempt. Passing a
+capability through one interface does not qualify it through another without
+new evidence; failing through one interface does not prove the underlying
+capability is absent. The current labels are deliberately conservative:
+`insufficient` means no valid
 comparable opportunity, `observed` means at least one opportunity but too little
 evidence, and `supported` means at least three comparable opportunities. A
 supported card is further labeled `supported_positive` when rescue rate is at

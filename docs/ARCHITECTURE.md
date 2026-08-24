@@ -184,6 +184,33 @@ board-level preflight gates.
 Scores and comparisons are evidence about the tested configuration. They do
 not assign production roles or establish production readiness.
 
+## Bounded Competence and Interface Evidence
+
+ZTH treats a delegated competence claim as evidence about a tested unit, not a
+property inherited by a model name:
+
+```text
+supplier × capability × interface × evidence
+```
+
+The supplier is the mechanism providing the bounded responsibility; the
+capability is the responsibility itself; the interface is the concrete request,
+schema, protocol, and authority/context boundary; and the evidence is the
+frozen evaluator, raw output, validation, telemetry, and review record. A
+supplier passing capability X through interface A does not qualify capability X
+through interface B without evidence for B. Failure through one interface does
+not by itself prove that the underlying capability is absent.
+
+Capability cards and scorecards should therefore remain specific enough to
+record supplier, capability ID, interface/version, authority boundary, evidence
+set, observed metrics, known failure modes, and qualification state. This is a
+documentation requirement, not a new automatic qualification or schema
+migration. See the [semantic capability/interface synthesis](research/SEMANTIC_CAPABILITY_INTERFACE_SYNTHESIS_2026-08-24.md).
+
+The related **degeneralizing benchmarks** direction is an emerging research
+methodology, not a replacement for standard benchmarks: broad scores should be
+decomposed into bounded responsibilities before they are used for delegation.
+
 ## Small-Model Exploratory Harness
 
 ```text

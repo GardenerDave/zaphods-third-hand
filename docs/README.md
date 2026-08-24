@@ -25,6 +25,9 @@ approve their own outputs or move lifecycle state.
 - [`ARCHITECTURE.md`](ARCHITECTURE.md) — current workflow and evidence map.
 - [`ROADMAP.md`](ROADMAP.md) — implemented, planned, and explicitly deferred
   work.
+- [`research/SEMANTIC_CAPABILITY_INTERFACE_SYNTHESIS_2026-08-24.md`](research/SEMANTIC_CAPABILITY_INTERFACE_SYNTHESIS_2026-08-24.md)
+  — completed semantic supplier/interface research synthesis and the emerging
+  degeneralized-benchmark hypothesis.
 
 ## Where to Start
 
