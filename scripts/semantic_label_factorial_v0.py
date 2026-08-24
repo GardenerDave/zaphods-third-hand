@@ -18,8 +18,8 @@ from scripts import zth_qwen3_1_7b_atomic_scope_relation_decomposition as decomp
 from scripts import zth_qwen3_1_7b_clean_scope_logic_probe as runtime
 
 ROOT = runtime.ROOT
-RUN = ROOT / ".work/model_size_supplier_floor/semantic_label_factorial_v0/run_20260823T235000Z"
-PREDECESSOR_RUN = ROOT / ".work/model_size_supplier_floor/semantic_label_factorial_v0/run_20260823T230100Z"
+RUN = ROOT / ".work/model_size_supplier_floor/semantic_label_factorial_v0/run_20260824T003000Z"
+PREDECESSOR_RUN = ROOT / ".work/model_size_supplier_floor/semantic_label_factorial_v0/run_20260823T235000Z"
 RUNTIME_CASES = ROOT / "docs/research/SEMANTIC_LABEL_FACTORIAL_V0_HARDENED_RUNTIME_CASES_2026-08-23.json"
 EVALUATOR_CASES = ROOT / "docs/research/SEMANTIC_LABEL_FACTORIAL_V0_HARDENED_EVALUATOR_CASES_2026-08-23.json"
 PAIR_AUDIT = ROOT / "docs/research/SEMANTIC_LABEL_FACTORIAL_V0_HARDENED_PAIR_AUDIT_2026-08-23.json"
@@ -193,8 +193,10 @@ def predecessor_successor_input_audit(out: Path) -> dict[str, Any]:
             successor = out / "tasks" / task_id / arm
             hashes = {name: (sha_file(predecessor / name), sha_file(successor / name)) for name in names}
             rows.append({"task_id": task_id, "arm": arm, "files_identical": all(left == right for left, right in hashes.values()), "hashes": hashes})
+    predecessor_schedule = read_json(PREDECESSOR_RUN / "execution_order.json")["schedule"]
     assert all(row["files_identical"] for row in rows)
-    return {"predecessor_run": str(PREDECESSOR_RUN), "successor_run": str(out), "model_inputs_identical": True, "rows": rows}
+    assert predecessor_schedule == EXPECTED_SCHEDULE
+    return {"predecessor_run": str(PREDECESSOR_RUN), "successor_run": str(out), "model_inputs_identical": True, "execution_schedule_identical": True, "rows": rows}
 
 
 def historical_requests() -> set[str]:
@@ -241,9 +243,9 @@ def prepare(out: Path) -> None:
     write_json(FIXTURE_REVIEW, {"schema": "zth_semantic_label_factorial_v0_fixture_review", "runtime_input": False, "rows": fixture_rows})
     write_json(PAIR_AUDIT, {"schema": "zth_semantic_label_factorial_v0_pair_audit", "rows": pair_rows, "request_identity": True, "authority_identity": True, "preflight_identity": True, "model_settings_identity": True, "definitions_equivalent_after_label_normalization": True, "semantic_enum_positions_identical": True, "surface_label_mapping_frozen": True, "only_model_visible_intervention": "LABEL_TOKENS"})
     input_audit = predecessor_successor_input_audit(out)
-    write_json(out / "execution_order.json", {"schedule": schedule, "counterbalanced": True, "arm_counts": schedule_audit_result["arm_counts"], "position_counts": schedule_audit_result["position_counts"], "strata_positions": schedule_audit_result["strata_positions"], "within_class_position_balance": True, "global_position_balance": True, "cross_arm_input": False, "schedule_defect_repaired_from": "8e846966876625926e20eafa74ec25058155ed85"})
+    write_json(out / "execution_order.json", {"schedule": schedule, "counterbalanced": True, "arm_counts": schedule_audit_result["arm_counts"], "position_counts": schedule_audit_result["position_counts"], "strata_positions": schedule_audit_result["strata_positions"], "within_class_position_balance": True, "global_position_balance": True, "cross_arm_input": False, "schedule_defect_repaired_from": "8e846966876625926e20eafa74ec25058155ed85", "analysis_defect_repaired_from": "8834ff90162aa296970f38c3ea254afc25c256cd"})
     write_json(out / "predecessor_successor_input_audit.json", input_audit)
-    write_json(out / "router_manifest.json", {"schema": "zth_semantic_label_factorial_v0_hardened_manifest", "status": "prepared_model_free", "predecessor_freeze": "8e846966876625926e20eafa74ec25058155ed85", "task_count": 6, "arm_count": 4, "planned_model_calls": 24, "model_calls_made": 0, "tool_calls_made": 0, "response_files": 0, "true_fallback_eligibility": 6, "historical_request_reuse": 0, "paired_input_identity_audit": True, "predecessor_successor_model_inputs_identical": True, "authority_provenance_audit": True, "definition_equivalence_audit": True, "semantic_enum_positions_identical": True, "surface_label_mapping_frozen": True, "balanced_schedule_audit": True, "within_class_position_balance": True, "frozen_evaluator_is_scoring_authority": True, "specs_expected_class_used_for_closeout": False, "runtime_evaluator_influence": 0, "model_output_granted_authority": 0, "qualification_change": False, "driver_sha256": sha_file(Path(__file__).resolve()), "model_settings": model_settings(), "arms": ARM_LABELS, "enums": ARM_ENUMS})
+    write_json(out / "router_manifest.json", {"schema": "zth_semantic_label_factorial_v0_final_manifest", "status": "prepared_model_free", "predecessor_freeze": "8834ff90162aa296970f38c3ea254afc25c256cd", "task_count": 6, "arm_count": 4, "planned_model_calls": 24, "model_calls_made": 0, "tool_calls_made": 0, "response_files": 0, "true_fallback_eligibility": 6, "historical_request_reuse": 0, "paired_input_identity_audit": True, "predecessor_successor_model_inputs_identical": True, "predecessor_successor_execution_schedule_identical": True, "authority_provenance_audit": True, "definition_equivalence_audit": True, "semantic_enum_positions_identical": True, "surface_label_mapping_frozen": True, "balanced_schedule_audit": True, "within_class_position_balance": True, "frozen_evaluator_is_scoring_authority": True, "factorial_factor_mapping_frozen": True, "factorial_contrast_formulas_tested": True, "specs_expected_class_used_for_closeout": False, "runtime_evaluator_influence": 0, "model_output_granted_authority": 0, "qualification_change": False, "driver_sha256": sha_file(Path(__file__).resolve()), "model_settings": model_settings(), "arms": ARM_LABELS, "enums": ARM_ENUMS})
     write_json(out / "lifecycle.json", {"status": "prepared", "model_calls": 0, "tool_calls": 0, "retries": 0})
     print(json.dumps({"status": "prepared", "fresh_tasks": 6, "arms": 4, "planned_model_calls": 24, "MODEL_CALLS_MADE": 0, "TOOL_CALLS_MADE": 0, "response_files": 0}, indent=2))
 
@@ -318,18 +320,63 @@ def pairwise_contrast(rows: list[dict[str, Any]], left: str, right: str) -> dict
         "accuracy_delta_overall": accuracy(pairs, 1) - accuracy(pairs, 0),
         "accuracy_delta_presence": accuracy(presence_pairs, 1) - accuracy(presence_pairs, 0),
         "accuracy_delta_inspect": accuracy(inspect_pairs, 1) - accuracy(inspect_pairs, 0),
+        "accuracy_delta_overall_rate": (accuracy(pairs, 1) - accuracy(pairs, 0)) / len(pairs),
+        "accuracy_delta_presence_rate": (accuracy(presence_pairs, 1) - accuracy(presence_pairs, 0)) / len(presence_pairs),
+        "accuracy_delta_inspect_rate": (accuracy(inspect_pairs, 1) - accuracy(inspect_pairs, 0)) / len(inspect_pairs),
+    }
+
+
+FACTOR_MAPPING = {
+    "A": {"presence_label": "ORIGINAL", "inspect_label": "ORIGINAL"},
+    "B": {"presence_label": "NEUTRAL", "inspect_label": "NEUTRAL"},
+    "C": {"presence_label": "NEUTRAL", "inspect_label": "ORIGINAL"},
+    "D": {"presence_label": "ORIGINAL", "inspect_label": "NEUTRAL"},
+}
+
+
+def factorial_contrasts_from_rates(rates: dict[str, float]) -> dict[str, float]:
+    return {
+        "presence_label_main_effect": ((rates["C"] + rates["B"]) / 2) - ((rates["A"] + rates["D"]) / 2),
+        "inspect_label_main_effect": ((rates["D"] + rates["B"]) / 2) - ((rates["A"] + rates["C"]) / 2),
+        "label_interaction_contrast": rates["B"] - rates["C"] - rates["D"] + rates["A"],
+    }
+
+
+def factorial_contrasts(metrics: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    outcomes = {
+        "overall": ("semantic_correct", "semantic_total"),
+        "presence": ("presence_correct", "presence_total"),
+        "inspect": ("inspect_correct", "inspect_total"),
+    }
+    result = {}
+    for outcome, (numerator, denominator) in outcomes.items():
+        rates = {arm: metrics[arm][numerator] / metrics[arm][denominator] if metrics[arm][denominator] else 0.0 for arm in ("A", "B", "C", "D")}
+        result[outcome] = {"rates": rates, **factorial_contrasts_from_rates(rates)}
+    return result
+
+
+def factorial_pattern_markers(rates: dict[str, float]) -> dict[str, bool]:
+    interaction = factorial_contrasts_from_rates(rates)["label_interaction_contrast"]
+    return {
+        "PRESENCE_LABEL_MAIN_EFFECT_OBSERVED": factorial_contrasts_from_rates(rates)["presence_label_main_effect"] != 0,
+        "INSPECT_LABEL_MAIN_EFFECT_OBSERVED": factorial_contrasts_from_rates(rates)["inspect_label_main_effect"] != 0,
+        "LABEL_INTERACTION_CONTRAST_NONZERO": interaction != 0,
+        "JOINT_NEUTRAL_LABEL_DEPENDENCE_OBSERVED": rates["B"] > rates["A"] and rates["C"] <= rates["A"] and rates["D"] <= rates["A"],
+        "LABEL_INTERACTION_EFFECT_PLAUSIBLE": rates["B"] > rates["A"] and rates["C"] <= rates["A"] and rates["D"] <= rates["A"] and interaction != 0,
     }
 
 
 def factorial_interpretation(rows: list[dict[str, Any]], metrics: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    contrasts = factorial_contrasts(metrics)
+    overall_rates = contrasts["overall"]["rates"]
     vectors = {arm: tuple(row.get("canonical_operation") for row in rows if row["arm"] == arm) for arm in ("A", "B", "C", "D")}
-    return {
-        "OBSERVE_PRESENCE_LABEL_INTERFERENCE_SUPPORTED": metrics["C"]["semantic_correct"] == metrics["B"]["semantic_correct"] and metrics["D"]["semantic_correct"] == metrics["A"]["semantic_correct"] and vectors["C"] == vectors["B"] and vectors["D"] == vectors["A"],
-        "INSPECT_LABEL_ATTRACTOR_EFFECT_SUPPORTED": metrics["D"]["semantic_correct"] == metrics["B"]["semantic_correct"] and metrics["C"]["semantic_correct"] == metrics["A"]["semantic_correct"] and vectors["D"] == vectors["B"] and vectors["C"] == vectors["A"],
-        "ORIGINAL_LABEL_PAIR_INTERACTION_SUPPORTED": metrics["B"]["semantic_correct"] > metrics["A"]["semantic_correct"] and metrics["C"]["semantic_correct"] == metrics["B"]["semantic_correct"] and metrics["D"]["semantic_correct"] == metrics["B"]["semantic_correct"],
-        "NEUTRAL_PAIR_SYNERGY_OR_COMPLEX_LABEL_INTERACTION_PLAUSIBLE": metrics["B"]["semantic_correct"] > metrics["A"]["semantic_correct"] and metrics["C"]["semantic_correct"] < metrics["B"]["semantic_correct"] and metrics["D"]["semantic_correct"] < metrics["B"]["semantic_correct"],
-        "LABEL_INTERACTION_EFFECT_PLAUSIBLE": len({metrics[arm]["semantic_correct"] for arm in ("A", "B", "C", "D")}) > 1,
-    }
+    markers = factorial_pattern_markers(overall_rates)
+    markers.update({
+        "OBSERVE_PRESENCE_LABEL_INTERFERENCE_SUPPORTED": vectors["C"] == vectors["B"] and vectors["D"] == vectors["A"],
+        "INSPECT_LABEL_ATTRACTOR_EFFECT_SUPPORTED": vectors["D"] == vectors["B"] and vectors["C"] == vectors["A"],
+        "EITHER_SINGLE_LABEL_SUBSTITUTION_RECOVERY_OBSERVED": overall_rates["C"] > overall_rates["A"] and overall_rates["D"] > overall_rates["A"],
+    })
+    return {"factor_mapping": FACTOR_MAPPING, "contrasts": contrasts, "markers": markers}
 
 
 def closeout(out: Path) -> None:
@@ -344,7 +391,7 @@ def closeout(out: Path) -> None:
     rows = score_rows(runtime_rows, evaluators)
     metrics = arm_metrics(rows)
     contrasts = {f"{left}_vs_{right}": pairwise_contrast(rows, left, right) for left, right in (("A", "C"), ("A", "D"), ("B", "C"), ("B", "D"))}
-    write_json(out / "aggregate.json", {"schema": "zth_semantic_label_factorial_v0_hardened_aggregate", "evaluator_source": str(EVALUATOR_CASES), "specs_expected_class_used_for_closeout": False, "arm_metrics": metrics, "pairwise_contrasts": contrasts, "interpretation": factorial_interpretation(rows, metrics), "rows": rows})
+    write_json(out / "aggregate.json", {"schema": "zth_semantic_label_factorial_v0_final_aggregate", "evaluator_source": str(EVALUATOR_CASES), "specs_expected_class_used_for_closeout": False, "factor_mapping": FACTOR_MAPPING, "arm_metrics": metrics, "factorial_contrasts": factorial_contrasts(metrics), "pairwise_contrasts": contrasts, "interpretation": factorial_interpretation(rows, metrics), "rows": rows})
 
 
 def main() -> None:

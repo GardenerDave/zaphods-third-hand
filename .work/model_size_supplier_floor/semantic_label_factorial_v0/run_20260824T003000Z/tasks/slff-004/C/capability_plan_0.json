@@ -1,0 +1,39 @@
+{
+  "capabilities": [
+    {
+      "candidate_suppliers": [
+        {
+          "interface_id": "bounded_operation_class_candidate_v0",
+          "supplier_id": "qwen3_1_7b_bounded_operation_class_candidate_supplier",
+          "supplier_type": "MODEL"
+        }
+      ],
+      "capability_id": "semantic.bounded_operation_classification",
+      "coverage_status": "COVERED",
+      "qualified_candidates": [
+        {
+          "interface_id": "bounded_operation_class_candidate_v0",
+          "supplier_id": "qwen3_1_7b_bounded_operation_class_candidate_supplier",
+          "supplier_type": "MODEL"
+        }
+      ],
+      "selected_supplier": {
+        "interface_id": "bounded_operation_class_candidate_v0",
+        "supplier_id": "qwen3_1_7b_bounded_operation_class_candidate_supplier",
+        "supplier_type": "MODEL"
+      },
+      "selection_reason": "qualified bounded supplier"
+    }
+  ],
+  "derived_required_capabilities": [
+    "semantic.bounded_operation_classification"
+  ],
+  "execution_path_complete": true,
+  "overall_coverage": "COMPLETE",
+  "planned_deterministic_steps": 0,
+  "planned_model_calls": 1,
+  "planned_tool_calls": 0,
+  "routing_success": false,
+  "schema": "zth_true_semantic_fallback_v2_capability_plan_v0",
+  "task_id": "slff-004"
+}

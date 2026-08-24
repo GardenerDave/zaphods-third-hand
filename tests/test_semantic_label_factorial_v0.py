@@ -93,3 +93,32 @@ def test_factorial_metrics_keep_presence_and_inspect_denominators_visible():
         ])
     metrics = probe.arm_metrics(rows)
     assert all(metrics[arm]["presence_total"] == 1 and metrics[arm]["inspect_total"] == 1 for arm in ("A", "B", "C", "D"))
+
+
+def test_factorial_contrasts_distinguish_presence_main_effect_from_interaction():
+    contrasts = probe.factorial_contrasts_from_rates({"A": 0.5, "B": 1.0, "C": 1.0, "D": 0.5})
+    assert contrasts["presence_label_main_effect"] == 0.5
+    assert contrasts["inspect_label_main_effect"] == 0.0
+    assert contrasts["label_interaction_contrast"] == 0.0
+    assert probe.factorial_pattern_markers({"A": 0.5, "B": 1.0, "C": 1.0, "D": 0.5})["LABEL_INTERACTION_EFFECT_PLAUSIBLE"] is False
+
+
+def test_factorial_contrasts_distinguish_inspect_main_effect():
+    contrasts = probe.factorial_contrasts_from_rates({"A": 0.5, "B": 1.0, "C": 0.5, "D": 1.0})
+    assert contrasts["presence_label_main_effect"] == 0.0
+    assert contrasts["inspect_label_main_effect"] == 0.5
+    assert contrasts["label_interaction_contrast"] == 0.0
+
+
+def test_factorial_contrasts_identify_joint_only_recovery():
+    contrasts = probe.factorial_contrasts_from_rates({"A": 0.5, "B": 1.0, "C": 0.5, "D": 0.5})
+    markers = probe.factorial_pattern_markers({"A": 0.5, "B": 1.0, "C": 0.5, "D": 0.5})
+    assert contrasts["label_interaction_contrast"] == 0.5
+    assert markers["JOINT_NEUTRAL_LABEL_DEPENDENCE_OBSERVED"] is True
+    assert markers["LABEL_INTERACTION_EFFECT_PLAUSIBLE"] is True
+
+
+def test_two_single_label_recoveries_are_not_pair_interaction():
+    markers = probe.factorial_pattern_markers({"A": 0.5, "B": 1.0, "C": 1.0, "D": 1.0})
+    assert markers["JOINT_NEUTRAL_LABEL_DEPENDENCE_OBSERVED"] is False
+    assert "ORIGINAL_LABEL_PAIR_INTERACTION_SUPPORTED" not in markers

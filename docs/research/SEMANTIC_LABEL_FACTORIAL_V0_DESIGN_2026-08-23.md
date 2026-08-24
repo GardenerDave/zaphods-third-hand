@@ -76,3 +76,34 @@ The authoritative prepared successor run is
 It contains 24 planned calls, zero model calls, zero tool calls, and zero
 responses. The successor remains an unexecuted freeze; no factorial result is
 claimed here.
+
+## Final analysis-only correction
+
+The hardened predecessor `8834ff90162aa296970f38c3ea254afc25c256cd` remains
+preserved as an unexecuted superseded pre-inference freeze. Its schedule and
+model-visible inputs were valid, but its analysis helper conflated any arm
+accuracy difference with an interaction and overclaimed original-label-pair
+interaction. This was an analysis defect only; no scientific model evidence
+was contaminated.
+
+The final successor changes no request, authority, prompt, schema, model
+setting, candidate mapping, or execution order. It adds explicit factors
+`P = {ORIGINAL, NEUTRAL}` for the presence label and `I = {ORIGINAL, NEUTRAL}`
+for the inspect label. For overall, presence-task, and inspect-task rates it
+computes the descriptive contrasts:
+
+```text
+P main effect = ((C + B) / 2) - ((A + D) / 2)
+I main effect = ((D + B) / 2) - ((A + C) / 2)
+interaction   = B - C - D + A
+```
+
+The closeout retains all preregistered paired contrasts and reports raw rates
+and denominators. Synthetic model-free tests distinguish main effects,
+joint-only recovery, and two-single-label recovery. No statistical
+significance or general interaction claim is attached to this six-task slice.
+
+The authoritative final prepared run is
+`.work/model_size_supplier_floor/semantic_label_factorial_v0/run_20260824T003000Z`.
+It has 24 planned calls, zero model calls, zero tool calls, and zero response
+files.

@@ -1,0 +1,848 @@
+{
+  "execution_schedule_identical": true,
+  "model_inputs_identical": true,
+  "predecessor_run": "/home/navigator/agent-workspace/zaphods-third-hand/.work/model_size_supplier_floor/semantic_label_factorial_v0/run_20260823T235000Z",
+  "rows": [
+    {
+      "arm": "A",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "e6d58b5aa73d5b8108eeb9b81f30152de8c5471b093628ebdbc3583621b6ebb5",
+          "e6d58b5aa73d5b8108eeb9b81f30152de8c5471b093628ebdbc3583621b6ebb5"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "e4237fc2c9a83ec9d3eb86eb7cd0bb0fc1cf282fd1b2867a9e75006538c9f5bb",
+          "e4237fc2c9a83ec9d3eb86eb7cd0bb0fc1cf282fd1b2867a9e75006538c9f5bb"
+        ],
+        "prompt.txt": [
+          "d2fca790a13d1cd18841accac2be739ede452050708185d77727b29a3e40ef0e",
+          "d2fca790a13d1cd18841accac2be739ede452050708185d77727b29a3e40ef0e"
+        ],
+        "runtime_task.json": [
+          "85a9d5baedc3dc3479c6395b1a9ddf729d15f72c118928a87980c53a5b6653f6",
+          "85a9d5baedc3dc3479c6395b1a9ddf729d15f72c118928a87980c53a5b6653f6"
+        ],
+        "schema.json": [
+          "f6e771e71f36159693884a019716d4f758912f770ac6fdc4e8107e54f66a003e",
+          "f6e771e71f36159693884a019716d4f758912f770ac6fdc4e8107e54f66a003e"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-001"
+    },
+    {
+      "arm": "B",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "e6d58b5aa73d5b8108eeb9b81f30152de8c5471b093628ebdbc3583621b6ebb5",
+          "e6d58b5aa73d5b8108eeb9b81f30152de8c5471b093628ebdbc3583621b6ebb5"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "e4237fc2c9a83ec9d3eb86eb7cd0bb0fc1cf282fd1b2867a9e75006538c9f5bb",
+          "e4237fc2c9a83ec9d3eb86eb7cd0bb0fc1cf282fd1b2867a9e75006538c9f5bb"
+        ],
+        "prompt.txt": [
+          "98a0d60fcd091aa135dea79e4236cb2e77484e762204f6f7cda02158f485c9c9",
+          "98a0d60fcd091aa135dea79e4236cb2e77484e762204f6f7cda02158f485c9c9"
+        ],
+        "runtime_task.json": [
+          "85a9d5baedc3dc3479c6395b1a9ddf729d15f72c118928a87980c53a5b6653f6",
+          "85a9d5baedc3dc3479c6395b1a9ddf729d15f72c118928a87980c53a5b6653f6"
+        ],
+        "schema.json": [
+          "f3f1e9475a55766ff4fdc4bf4a9da9f68f16e01c78479bbd1421b6d6186a4fe5",
+          "f3f1e9475a55766ff4fdc4bf4a9da9f68f16e01c78479bbd1421b6d6186a4fe5"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-001"
+    },
+    {
+      "arm": "C",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "e6d58b5aa73d5b8108eeb9b81f30152de8c5471b093628ebdbc3583621b6ebb5",
+          "e6d58b5aa73d5b8108eeb9b81f30152de8c5471b093628ebdbc3583621b6ebb5"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "e4237fc2c9a83ec9d3eb86eb7cd0bb0fc1cf282fd1b2867a9e75006538c9f5bb",
+          "e4237fc2c9a83ec9d3eb86eb7cd0bb0fc1cf282fd1b2867a9e75006538c9f5bb"
+        ],
+        "prompt.txt": [
+          "94c24c397f792315bf9f554d5ac737e94f4d5e67b34fd7803e4b13a3233323c7",
+          "94c24c397f792315bf9f554d5ac737e94f4d5e67b34fd7803e4b13a3233323c7"
+        ],
+        "runtime_task.json": [
+          "85a9d5baedc3dc3479c6395b1a9ddf729d15f72c118928a87980c53a5b6653f6",
+          "85a9d5baedc3dc3479c6395b1a9ddf729d15f72c118928a87980c53a5b6653f6"
+        ],
+        "schema.json": [
+          "c30d5c99024f83ea6a55e0b4e156d8fd1fad903aef66ef1ba253abcb7d317174",
+          "c30d5c99024f83ea6a55e0b4e156d8fd1fad903aef66ef1ba253abcb7d317174"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-001"
+    },
+    {
+      "arm": "D",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "e6d58b5aa73d5b8108eeb9b81f30152de8c5471b093628ebdbc3583621b6ebb5",
+          "e6d58b5aa73d5b8108eeb9b81f30152de8c5471b093628ebdbc3583621b6ebb5"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "e4237fc2c9a83ec9d3eb86eb7cd0bb0fc1cf282fd1b2867a9e75006538c9f5bb",
+          "e4237fc2c9a83ec9d3eb86eb7cd0bb0fc1cf282fd1b2867a9e75006538c9f5bb"
+        ],
+        "prompt.txt": [
+          "6a980074ce2d95290e5959afde0f86b1a77c57b9c0a49d275aeac9cd04b8b700",
+          "6a980074ce2d95290e5959afde0f86b1a77c57b9c0a49d275aeac9cd04b8b700"
+        ],
+        "runtime_task.json": [
+          "85a9d5baedc3dc3479c6395b1a9ddf729d15f72c118928a87980c53a5b6653f6",
+          "85a9d5baedc3dc3479c6395b1a9ddf729d15f72c118928a87980c53a5b6653f6"
+        ],
+        "schema.json": [
+          "0baf93aa5520743d7382446b758fce24f7b960df7ba4b5878d9928acb04b3d4f",
+          "0baf93aa5520743d7382446b758fce24f7b960df7ba4b5878d9928acb04b3d4f"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-001"
+    },
+    {
+      "arm": "A",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "c2046a79ac61204d38d104879b8f834ec894bb4e245c8d0e147d0d8712957387",
+          "c2046a79ac61204d38d104879b8f834ec894bb4e245c8d0e147d0d8712957387"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "da6d8d279773954c87c58d18bc25ac71fe562c727112fba24b0e247d660337bc",
+          "da6d8d279773954c87c58d18bc25ac71fe562c727112fba24b0e247d660337bc"
+        ],
+        "prompt.txt": [
+          "f37e288a75a252a1e1370ee053dcf0617c88e1322da3ae9b3b35e5d5e3035559",
+          "f37e288a75a252a1e1370ee053dcf0617c88e1322da3ae9b3b35e5d5e3035559"
+        ],
+        "runtime_task.json": [
+          "d4388a32a42346147447ca217062cf517c5bf8a3cf2b5369bb12df3c24d7711d",
+          "d4388a32a42346147447ca217062cf517c5bf8a3cf2b5369bb12df3c24d7711d"
+        ],
+        "schema.json": [
+          "f6e771e71f36159693884a019716d4f758912f770ac6fdc4e8107e54f66a003e",
+          "f6e771e71f36159693884a019716d4f758912f770ac6fdc4e8107e54f66a003e"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-002"
+    },
+    {
+      "arm": "B",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "c2046a79ac61204d38d104879b8f834ec894bb4e245c8d0e147d0d8712957387",
+          "c2046a79ac61204d38d104879b8f834ec894bb4e245c8d0e147d0d8712957387"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "da6d8d279773954c87c58d18bc25ac71fe562c727112fba24b0e247d660337bc",
+          "da6d8d279773954c87c58d18bc25ac71fe562c727112fba24b0e247d660337bc"
+        ],
+        "prompt.txt": [
+          "aab95f69e15a4abaf40a53f083d415133e4239de9347aa4d68b337e856768c96",
+          "aab95f69e15a4abaf40a53f083d415133e4239de9347aa4d68b337e856768c96"
+        ],
+        "runtime_task.json": [
+          "d4388a32a42346147447ca217062cf517c5bf8a3cf2b5369bb12df3c24d7711d",
+          "d4388a32a42346147447ca217062cf517c5bf8a3cf2b5369bb12df3c24d7711d"
+        ],
+        "schema.json": [
+          "f3f1e9475a55766ff4fdc4bf4a9da9f68f16e01c78479bbd1421b6d6186a4fe5",
+          "f3f1e9475a55766ff4fdc4bf4a9da9f68f16e01c78479bbd1421b6d6186a4fe5"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-002"
+    },
+    {
+      "arm": "C",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "c2046a79ac61204d38d104879b8f834ec894bb4e245c8d0e147d0d8712957387",
+          "c2046a79ac61204d38d104879b8f834ec894bb4e245c8d0e147d0d8712957387"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "da6d8d279773954c87c58d18bc25ac71fe562c727112fba24b0e247d660337bc",
+          "da6d8d279773954c87c58d18bc25ac71fe562c727112fba24b0e247d660337bc"
+        ],
+        "prompt.txt": [
+          "3932e4b08b3a990ca062d32c776987e01e02de5e5c499156c443c4d259517514",
+          "3932e4b08b3a990ca062d32c776987e01e02de5e5c499156c443c4d259517514"
+        ],
+        "runtime_task.json": [
+          "d4388a32a42346147447ca217062cf517c5bf8a3cf2b5369bb12df3c24d7711d",
+          "d4388a32a42346147447ca217062cf517c5bf8a3cf2b5369bb12df3c24d7711d"
+        ],
+        "schema.json": [
+          "c30d5c99024f83ea6a55e0b4e156d8fd1fad903aef66ef1ba253abcb7d317174",
+          "c30d5c99024f83ea6a55e0b4e156d8fd1fad903aef66ef1ba253abcb7d317174"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-002"
+    },
+    {
+      "arm": "D",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "c2046a79ac61204d38d104879b8f834ec894bb4e245c8d0e147d0d8712957387",
+          "c2046a79ac61204d38d104879b8f834ec894bb4e245c8d0e147d0d8712957387"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "da6d8d279773954c87c58d18bc25ac71fe562c727112fba24b0e247d660337bc",
+          "da6d8d279773954c87c58d18bc25ac71fe562c727112fba24b0e247d660337bc"
+        ],
+        "prompt.txt": [
+          "ef420413e3de0d831a83dcff41e9ab53691b01cd5406ba2cd03cbf9e6a8a9069",
+          "ef420413e3de0d831a83dcff41e9ab53691b01cd5406ba2cd03cbf9e6a8a9069"
+        ],
+        "runtime_task.json": [
+          "d4388a32a42346147447ca217062cf517c5bf8a3cf2b5369bb12df3c24d7711d",
+          "d4388a32a42346147447ca217062cf517c5bf8a3cf2b5369bb12df3c24d7711d"
+        ],
+        "schema.json": [
+          "0baf93aa5520743d7382446b758fce24f7b960df7ba4b5878d9928acb04b3d4f",
+          "0baf93aa5520743d7382446b758fce24f7b960df7ba4b5878d9928acb04b3d4f"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-002"
+    },
+    {
+      "arm": "A",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "6319e6d3efb3b93da08f8420a8549e5082248c063a0e46f1e098c775d3847f02",
+          "6319e6d3efb3b93da08f8420a8549e5082248c063a0e46f1e098c775d3847f02"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "7b4f23209b27772426ef7df52facc75c6d35ec76bc8782ecc75c91423e44b1e6",
+          "7b4f23209b27772426ef7df52facc75c6d35ec76bc8782ecc75c91423e44b1e6"
+        ],
+        "prompt.txt": [
+          "adb3c6a433e37e2cf3774059ae068e92a27cd3d551af236b42c7416810e4e359",
+          "adb3c6a433e37e2cf3774059ae068e92a27cd3d551af236b42c7416810e4e359"
+        ],
+        "runtime_task.json": [
+          "563e4b8f2303972cba4364d8c3804cfd105a9fe23d91c61ec3569e57dfd71ed7",
+          "563e4b8f2303972cba4364d8c3804cfd105a9fe23d91c61ec3569e57dfd71ed7"
+        ],
+        "schema.json": [
+          "f6e771e71f36159693884a019716d4f758912f770ac6fdc4e8107e54f66a003e",
+          "f6e771e71f36159693884a019716d4f758912f770ac6fdc4e8107e54f66a003e"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-003"
+    },
+    {
+      "arm": "B",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "6319e6d3efb3b93da08f8420a8549e5082248c063a0e46f1e098c775d3847f02",
+          "6319e6d3efb3b93da08f8420a8549e5082248c063a0e46f1e098c775d3847f02"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "7b4f23209b27772426ef7df52facc75c6d35ec76bc8782ecc75c91423e44b1e6",
+          "7b4f23209b27772426ef7df52facc75c6d35ec76bc8782ecc75c91423e44b1e6"
+        ],
+        "prompt.txt": [
+          "c75bffe32a250fce0a744c814842ad52948a12c17c8dfa45fef1d45828a497db",
+          "c75bffe32a250fce0a744c814842ad52948a12c17c8dfa45fef1d45828a497db"
+        ],
+        "runtime_task.json": [
+          "563e4b8f2303972cba4364d8c3804cfd105a9fe23d91c61ec3569e57dfd71ed7",
+          "563e4b8f2303972cba4364d8c3804cfd105a9fe23d91c61ec3569e57dfd71ed7"
+        ],
+        "schema.json": [
+          "f3f1e9475a55766ff4fdc4bf4a9da9f68f16e01c78479bbd1421b6d6186a4fe5",
+          "f3f1e9475a55766ff4fdc4bf4a9da9f68f16e01c78479bbd1421b6d6186a4fe5"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-003"
+    },
+    {
+      "arm": "C",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "6319e6d3efb3b93da08f8420a8549e5082248c063a0e46f1e098c775d3847f02",
+          "6319e6d3efb3b93da08f8420a8549e5082248c063a0e46f1e098c775d3847f02"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "7b4f23209b27772426ef7df52facc75c6d35ec76bc8782ecc75c91423e44b1e6",
+          "7b4f23209b27772426ef7df52facc75c6d35ec76bc8782ecc75c91423e44b1e6"
+        ],
+        "prompt.txt": [
+          "d8b230b5926615e7b73a1ac78efd960ad416effeda308ae23406b7370f32c64d",
+          "d8b230b5926615e7b73a1ac78efd960ad416effeda308ae23406b7370f32c64d"
+        ],
+        "runtime_task.json": [
+          "563e4b8f2303972cba4364d8c3804cfd105a9fe23d91c61ec3569e57dfd71ed7",
+          "563e4b8f2303972cba4364d8c3804cfd105a9fe23d91c61ec3569e57dfd71ed7"
+        ],
+        "schema.json": [
+          "c30d5c99024f83ea6a55e0b4e156d8fd1fad903aef66ef1ba253abcb7d317174",
+          "c30d5c99024f83ea6a55e0b4e156d8fd1fad903aef66ef1ba253abcb7d317174"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-003"
+    },
+    {
+      "arm": "D",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "6319e6d3efb3b93da08f8420a8549e5082248c063a0e46f1e098c775d3847f02",
+          "6319e6d3efb3b93da08f8420a8549e5082248c063a0e46f1e098c775d3847f02"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "7b4f23209b27772426ef7df52facc75c6d35ec76bc8782ecc75c91423e44b1e6",
+          "7b4f23209b27772426ef7df52facc75c6d35ec76bc8782ecc75c91423e44b1e6"
+        ],
+        "prompt.txt": [
+          "8e2934a3faea2b425e705d61b9662b59f095a05ff62d95f2d613448c3cac1647",
+          "8e2934a3faea2b425e705d61b9662b59f095a05ff62d95f2d613448c3cac1647"
+        ],
+        "runtime_task.json": [
+          "563e4b8f2303972cba4364d8c3804cfd105a9fe23d91c61ec3569e57dfd71ed7",
+          "563e4b8f2303972cba4364d8c3804cfd105a9fe23d91c61ec3569e57dfd71ed7"
+        ],
+        "schema.json": [
+          "0baf93aa5520743d7382446b758fce24f7b960df7ba4b5878d9928acb04b3d4f",
+          "0baf93aa5520743d7382446b758fce24f7b960df7ba4b5878d9928acb04b3d4f"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-003"
+    },
+    {
+      "arm": "A",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "f1415131dab421f8c565f721f8884f92e408a6302639e8f23a0771cbbc103efa",
+          "f1415131dab421f8c565f721f8884f92e408a6302639e8f23a0771cbbc103efa"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "d3ce800a62dd3cea1d3f056a7dd1e87fa1149511bc342577625059652b293b2c",
+          "d3ce800a62dd3cea1d3f056a7dd1e87fa1149511bc342577625059652b293b2c"
+        ],
+        "prompt.txt": [
+          "93e55f90270a6cda0b6bf625a81aa4cd37bcbfbc342d8e57701ac12a5db52051",
+          "93e55f90270a6cda0b6bf625a81aa4cd37bcbfbc342d8e57701ac12a5db52051"
+        ],
+        "runtime_task.json": [
+          "467e7a229fc55bbd3073236be83b140abf724ccb7186a061d22f2652bf7fac50",
+          "467e7a229fc55bbd3073236be83b140abf724ccb7186a061d22f2652bf7fac50"
+        ],
+        "schema.json": [
+          "f6e771e71f36159693884a019716d4f758912f770ac6fdc4e8107e54f66a003e",
+          "f6e771e71f36159693884a019716d4f758912f770ac6fdc4e8107e54f66a003e"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-004"
+    },
+    {
+      "arm": "B",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "f1415131dab421f8c565f721f8884f92e408a6302639e8f23a0771cbbc103efa",
+          "f1415131dab421f8c565f721f8884f92e408a6302639e8f23a0771cbbc103efa"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "d3ce800a62dd3cea1d3f056a7dd1e87fa1149511bc342577625059652b293b2c",
+          "d3ce800a62dd3cea1d3f056a7dd1e87fa1149511bc342577625059652b293b2c"
+        ],
+        "prompt.txt": [
+          "849a9f8672db93fa91665515058bf537215a12a7c4eaa701b737d503a9dd91c5",
+          "849a9f8672db93fa91665515058bf537215a12a7c4eaa701b737d503a9dd91c5"
+        ],
+        "runtime_task.json": [
+          "467e7a229fc55bbd3073236be83b140abf724ccb7186a061d22f2652bf7fac50",
+          "467e7a229fc55bbd3073236be83b140abf724ccb7186a061d22f2652bf7fac50"
+        ],
+        "schema.json": [
+          "f3f1e9475a55766ff4fdc4bf4a9da9f68f16e01c78479bbd1421b6d6186a4fe5",
+          "f3f1e9475a55766ff4fdc4bf4a9da9f68f16e01c78479bbd1421b6d6186a4fe5"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-004"
+    },
+    {
+      "arm": "C",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "f1415131dab421f8c565f721f8884f92e408a6302639e8f23a0771cbbc103efa",
+          "f1415131dab421f8c565f721f8884f92e408a6302639e8f23a0771cbbc103efa"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "d3ce800a62dd3cea1d3f056a7dd1e87fa1149511bc342577625059652b293b2c",
+          "d3ce800a62dd3cea1d3f056a7dd1e87fa1149511bc342577625059652b293b2c"
+        ],
+        "prompt.txt": [
+          "833c0ac825b28b00126fa60616861944bd3abf1b800db441af241deae4c544fa",
+          "833c0ac825b28b00126fa60616861944bd3abf1b800db441af241deae4c544fa"
+        ],
+        "runtime_task.json": [
+          "467e7a229fc55bbd3073236be83b140abf724ccb7186a061d22f2652bf7fac50",
+          "467e7a229fc55bbd3073236be83b140abf724ccb7186a061d22f2652bf7fac50"
+        ],
+        "schema.json": [
+          "c30d5c99024f83ea6a55e0b4e156d8fd1fad903aef66ef1ba253abcb7d317174",
+          "c30d5c99024f83ea6a55e0b4e156d8fd1fad903aef66ef1ba253abcb7d317174"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-004"
+    },
+    {
+      "arm": "D",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "f1415131dab421f8c565f721f8884f92e408a6302639e8f23a0771cbbc103efa",
+          "f1415131dab421f8c565f721f8884f92e408a6302639e8f23a0771cbbc103efa"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "d3ce800a62dd3cea1d3f056a7dd1e87fa1149511bc342577625059652b293b2c",
+          "d3ce800a62dd3cea1d3f056a7dd1e87fa1149511bc342577625059652b293b2c"
+        ],
+        "prompt.txt": [
+          "9356b1f3f7c1209061cc2a9e08d7c430e73f38afd2e3c26435339bcbf7c3023b",
+          "9356b1f3f7c1209061cc2a9e08d7c430e73f38afd2e3c26435339bcbf7c3023b"
+        ],
+        "runtime_task.json": [
+          "467e7a229fc55bbd3073236be83b140abf724ccb7186a061d22f2652bf7fac50",
+          "467e7a229fc55bbd3073236be83b140abf724ccb7186a061d22f2652bf7fac50"
+        ],
+        "schema.json": [
+          "0baf93aa5520743d7382446b758fce24f7b960df7ba4b5878d9928acb04b3d4f",
+          "0baf93aa5520743d7382446b758fce24f7b960df7ba4b5878d9928acb04b3d4f"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-004"
+    },
+    {
+      "arm": "A",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "a62fd0daac22387881149cc74ebba52142dfd4fb1b85128709e845f5dbb81a73",
+          "a62fd0daac22387881149cc74ebba52142dfd4fb1b85128709e845f5dbb81a73"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "52e92871c9e66cd78788e8c1e06b1824a385c428bdc9c26afb99f6443ecc6b1a",
+          "52e92871c9e66cd78788e8c1e06b1824a385c428bdc9c26afb99f6443ecc6b1a"
+        ],
+        "prompt.txt": [
+          "2ca53fbf5d1d74aa25e71731f1f88be82a799e1ee13a8868d860b819f9d58940",
+          "2ca53fbf5d1d74aa25e71731f1f88be82a799e1ee13a8868d860b819f9d58940"
+        ],
+        "runtime_task.json": [
+          "95b5da75070f1fc56d056d79ff5cf8067ae4ded1bc8ddb951d2233db26068c32",
+          "95b5da75070f1fc56d056d79ff5cf8067ae4ded1bc8ddb951d2233db26068c32"
+        ],
+        "schema.json": [
+          "f6e771e71f36159693884a019716d4f758912f770ac6fdc4e8107e54f66a003e",
+          "f6e771e71f36159693884a019716d4f758912f770ac6fdc4e8107e54f66a003e"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-005"
+    },
+    {
+      "arm": "B",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "a62fd0daac22387881149cc74ebba52142dfd4fb1b85128709e845f5dbb81a73",
+          "a62fd0daac22387881149cc74ebba52142dfd4fb1b85128709e845f5dbb81a73"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "52e92871c9e66cd78788e8c1e06b1824a385c428bdc9c26afb99f6443ecc6b1a",
+          "52e92871c9e66cd78788e8c1e06b1824a385c428bdc9c26afb99f6443ecc6b1a"
+        ],
+        "prompt.txt": [
+          "dbb57b2c91ef0e2a55f00b88ebaa672dabc459929342cd2e3559682397d1f5bb",
+          "dbb57b2c91ef0e2a55f00b88ebaa672dabc459929342cd2e3559682397d1f5bb"
+        ],
+        "runtime_task.json": [
+          "95b5da75070f1fc56d056d79ff5cf8067ae4ded1bc8ddb951d2233db26068c32",
+          "95b5da75070f1fc56d056d79ff5cf8067ae4ded1bc8ddb951d2233db26068c32"
+        ],
+        "schema.json": [
+          "f3f1e9475a55766ff4fdc4bf4a9da9f68f16e01c78479bbd1421b6d6186a4fe5",
+          "f3f1e9475a55766ff4fdc4bf4a9da9f68f16e01c78479bbd1421b6d6186a4fe5"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-005"
+    },
+    {
+      "arm": "C",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "a62fd0daac22387881149cc74ebba52142dfd4fb1b85128709e845f5dbb81a73",
+          "a62fd0daac22387881149cc74ebba52142dfd4fb1b85128709e845f5dbb81a73"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "52e92871c9e66cd78788e8c1e06b1824a385c428bdc9c26afb99f6443ecc6b1a",
+          "52e92871c9e66cd78788e8c1e06b1824a385c428bdc9c26afb99f6443ecc6b1a"
+        ],
+        "prompt.txt": [
+          "27f3b3735206f166b86c52cb3cec17bf8f36787ff7602bcb1ad2d92c87d67e04",
+          "27f3b3735206f166b86c52cb3cec17bf8f36787ff7602bcb1ad2d92c87d67e04"
+        ],
+        "runtime_task.json": [
+          "95b5da75070f1fc56d056d79ff5cf8067ae4ded1bc8ddb951d2233db26068c32",
+          "95b5da75070f1fc56d056d79ff5cf8067ae4ded1bc8ddb951d2233db26068c32"
+        ],
+        "schema.json": [
+          "c30d5c99024f83ea6a55e0b4e156d8fd1fad903aef66ef1ba253abcb7d317174",
+          "c30d5c99024f83ea6a55e0b4e156d8fd1fad903aef66ef1ba253abcb7d317174"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-005"
+    },
+    {
+      "arm": "D",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "a62fd0daac22387881149cc74ebba52142dfd4fb1b85128709e845f5dbb81a73",
+          "a62fd0daac22387881149cc74ebba52142dfd4fb1b85128709e845f5dbb81a73"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "52e92871c9e66cd78788e8c1e06b1824a385c428bdc9c26afb99f6443ecc6b1a",
+          "52e92871c9e66cd78788e8c1e06b1824a385c428bdc9c26afb99f6443ecc6b1a"
+        ],
+        "prompt.txt": [
+          "3aae1f562baba6e18c0aa605ce6dc64553e9dc009fe34ae8d4c5c087de038fcd",
+          "3aae1f562baba6e18c0aa605ce6dc64553e9dc009fe34ae8d4c5c087de038fcd"
+        ],
+        "runtime_task.json": [
+          "95b5da75070f1fc56d056d79ff5cf8067ae4ded1bc8ddb951d2233db26068c32",
+          "95b5da75070f1fc56d056d79ff5cf8067ae4ded1bc8ddb951d2233db26068c32"
+        ],
+        "schema.json": [
+          "0baf93aa5520743d7382446b758fce24f7b960df7ba4b5878d9928acb04b3d4f",
+          "0baf93aa5520743d7382446b758fce24f7b960df7ba4b5878d9928acb04b3d4f"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-005"
+    },
+    {
+      "arm": "A",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "a2499355be0a23ae1d5edba445db781fcf7403483a9dd2456e05f9194754d46f",
+          "a2499355be0a23ae1d5edba445db781fcf7403483a9dd2456e05f9194754d46f"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "a0e5aed9a384acbae09d5373fb2d36f41b68e2e78f720d49e3e25b60196837be",
+          "a0e5aed9a384acbae09d5373fb2d36f41b68e2e78f720d49e3e25b60196837be"
+        ],
+        "prompt.txt": [
+          "5183c07ea51f367a3ede2e505a279a0b0ff045397199bb462c141b637881500e",
+          "5183c07ea51f367a3ede2e505a279a0b0ff045397199bb462c141b637881500e"
+        ],
+        "runtime_task.json": [
+          "6477975b1a9ce5ac4b5a5a181a375716e6373b6de0140391314b7ee7980d8ed5",
+          "6477975b1a9ce5ac4b5a5a181a375716e6373b6de0140391314b7ee7980d8ed5"
+        ],
+        "schema.json": [
+          "f6e771e71f36159693884a019716d4f758912f770ac6fdc4e8107e54f66a003e",
+          "f6e771e71f36159693884a019716d4f758912f770ac6fdc4e8107e54f66a003e"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-006"
+    },
+    {
+      "arm": "B",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "a2499355be0a23ae1d5edba445db781fcf7403483a9dd2456e05f9194754d46f",
+          "a2499355be0a23ae1d5edba445db781fcf7403483a9dd2456e05f9194754d46f"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "a0e5aed9a384acbae09d5373fb2d36f41b68e2e78f720d49e3e25b60196837be",
+          "a0e5aed9a384acbae09d5373fb2d36f41b68e2e78f720d49e3e25b60196837be"
+        ],
+        "prompt.txt": [
+          "c796db9ed9c54349db1ddd77aee3dbbda12e97d3ef7da25f8ea9a0766281869d",
+          "c796db9ed9c54349db1ddd77aee3dbbda12e97d3ef7da25f8ea9a0766281869d"
+        ],
+        "runtime_task.json": [
+          "6477975b1a9ce5ac4b5a5a181a375716e6373b6de0140391314b7ee7980d8ed5",
+          "6477975b1a9ce5ac4b5a5a181a375716e6373b6de0140391314b7ee7980d8ed5"
+        ],
+        "schema.json": [
+          "f3f1e9475a55766ff4fdc4bf4a9da9f68f16e01c78479bbd1421b6d6186a4fe5",
+          "f3f1e9475a55766ff4fdc4bf4a9da9f68f16e01c78479bbd1421b6d6186a4fe5"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-006"
+    },
+    {
+      "arm": "C",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "a2499355be0a23ae1d5edba445db781fcf7403483a9dd2456e05f9194754d46f",
+          "a2499355be0a23ae1d5edba445db781fcf7403483a9dd2456e05f9194754d46f"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "a0e5aed9a384acbae09d5373fb2d36f41b68e2e78f720d49e3e25b60196837be",
+          "a0e5aed9a384acbae09d5373fb2d36f41b68e2e78f720d49e3e25b60196837be"
+        ],
+        "prompt.txt": [
+          "82a51ad8c81d73984e8b1971f0b1464828a5b759a2883808a97bd7a07873d473",
+          "82a51ad8c81d73984e8b1971f0b1464828a5b759a2883808a97bd7a07873d473"
+        ],
+        "runtime_task.json": [
+          "6477975b1a9ce5ac4b5a5a181a375716e6373b6de0140391314b7ee7980d8ed5",
+          "6477975b1a9ce5ac4b5a5a181a375716e6373b6de0140391314b7ee7980d8ed5"
+        ],
+        "schema.json": [
+          "c30d5c99024f83ea6a55e0b4e156d8fd1fad903aef66ef1ba253abcb7d317174",
+          "c30d5c99024f83ea6a55e0b4e156d8fd1fad903aef66ef1ba253abcb7d317174"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-006"
+    },
+    {
+      "arm": "D",
+      "files_identical": true,
+      "hashes": {
+        "capability_plan_0.json": [
+          "a2499355be0a23ae1d5edba445db781fcf7403483a9dd2456e05f9194754d46f",
+          "a2499355be0a23ae1d5edba445db781fcf7403483a9dd2456e05f9194754d46f"
+        ],
+        "model_settings.json": [
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33",
+          "11329875c4086e646c48160dcf26a037475c18641522bcbb2f09a2ee51c8ef33"
+        ],
+        "preflight.json": [
+          "a0e5aed9a384acbae09d5373fb2d36f41b68e2e78f720d49e3e25b60196837be",
+          "a0e5aed9a384acbae09d5373fb2d36f41b68e2e78f720d49e3e25b60196837be"
+        ],
+        "prompt.txt": [
+          "6d540ae6b058bdf706b9f1f54b0b5eedfffa131755f5299e2c263e12337a3848",
+          "6d540ae6b058bdf706b9f1f54b0b5eedfffa131755f5299e2c263e12337a3848"
+        ],
+        "runtime_task.json": [
+          "6477975b1a9ce5ac4b5a5a181a375716e6373b6de0140391314b7ee7980d8ed5",
+          "6477975b1a9ce5ac4b5a5a181a375716e6373b6de0140391314b7ee7980d8ed5"
+        ],
+        "schema.json": [
+          "0baf93aa5520743d7382446b758fce24f7b960df7ba4b5878d9928acb04b3d4f",
+          "0baf93aa5520743d7382446b758fce24f7b960df7ba4b5878d9928acb04b3d4f"
+        ],
+        "semantic_information_gap.json": [
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff",
+          "4262dad2f184bfba7d555243189227f150e48222001b69621a43ec43017360ff"
+        ]
+      },
+      "task_id": "slff-006"
+    }
+  ],
+  "successor_run": ".work/model_size_supplier_floor/semantic_label_factorial_v0/run_20260824T003000Z"
+}
