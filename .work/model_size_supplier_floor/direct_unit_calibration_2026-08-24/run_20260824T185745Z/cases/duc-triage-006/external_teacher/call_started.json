@@ -1,0 +1,12 @@
+{
+  "case_id": "duc-triage-006",
+  "evaluator_access": false,
+  "experiment_payload_sha256": "7dd1d183c080ec9749e255d6150cee2d2b9e75f7333512b16091edf59b9a60fa",
+  "ordinal": 11,
+  "repository_access": false,
+  "schema": "zth_direct_unit_calibration_call_started_v1",
+  "started_at": "2026-08-24T19:02:37.473344+00:00",
+  "supplier_id": "external_teacher",
+  "supplier_identity": "codex-cli-0.146.0",
+  "tool_calls": "observed_after_call"
+}

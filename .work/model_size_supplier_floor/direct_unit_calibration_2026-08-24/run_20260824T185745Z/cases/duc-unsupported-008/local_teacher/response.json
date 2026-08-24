@@ -1,0 +1,68 @@
+{
+  "captured_at": "2026-08-24T19:08:42.719582+00:00",
+  "case_id": "duc-unsupported-008",
+  "content": "{\n  \"known_facts\": [\n    \"One backup restore was completed successfully\",\n    \"Other disaster scenarios were not exercised\"\n  ],\n  \"uncertainty\": \"Limited testing of disaster recovery procedures means potential vulnerabilities in other scenarios are unknown\",\n  \"review_status\": \"Incomplete - disaster recovery testing is not comprehensive\",\n  \"next_step\": \"Review and test all disaster scenarios before declaring disaster recovery complete\"\n}",
+  "experiment_payload_sha256": "9dd601870a1d6e4fc568d4212b3e8b3e710910bba165d49fc009bc9f3b0649aa",
+  "metadata": {
+    "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "endpoint_alias": "JARVIS_LOCAL",
+    "error": null,
+    "evaluator_access": false,
+    "finish_reason": "stop",
+    "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "model_resolution_attempted": false,
+    "model_resolution_error": null,
+    "repository_access": false,
+    "request_elapsed_ms": 2994.604,
+    "request_provenance": {
+      "api": "openai-chat",
+      "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "endpoint_alias": "JARVIS_LOCAL",
+      "max_tokens": 1000,
+      "message_structure": [
+        "system",
+        "user"
+      ],
+      "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "prompt_length": 351,
+      "prompt_sha256": "01dede9ea0f823d497e1629954f8d3a4b755adc65471a56248356d236b160d1f",
+      "request_start_monotonic": 17172.508328589,
+      "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "response_capture_monotonic": 17175.50291808,
+      "seed": null,
+      "stop": null,
+      "system_message_sha256": "e8c1a9955d1a830189fecdfd11c537896d95cddd0419d5a63d957dd6f0fcb6c7",
+      "temperature": 0.2,
+      "top_p": null
+    },
+    "request_url": "http://192.168.1.16:8080/v1/chat/completions",
+    "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "status": "ok",
+    "supplier_native_envelope_control": "BEST_AVAILABLE_OBSERVATION",
+    "timings": {
+      "cache_n": 59,
+      "predicted_ms": 2536.666,
+      "predicted_n": 84,
+      "predicted_per_second": 33.11433196171667,
+      "predicted_per_token_ms": 30.198404761904765,
+      "prompt_ms": 325.505,
+      "prompt_n": 31,
+      "prompt_per_second": 95.23663230979555,
+      "prompt_per_token_ms": 10.50016129032258
+    },
+    "tool_calls": 0,
+    "transport_classification": "model_response",
+    "usage": {
+      "completion_tokens": 84,
+      "prompt_tokens": 90,
+      "prompt_tokens_details": {
+        "cached_tokens": 59
+      },
+      "total_tokens": 174
+    }
+  },
+  "ordinal": 32,
+  "raw_response_sha256": "d3b1e760b55169666598c3761bd6eceac0dcd9ced3be9fba2cf3a504a29c0c7e",
+  "status": "ok",
+  "supplier_id": "local_teacher"
+}

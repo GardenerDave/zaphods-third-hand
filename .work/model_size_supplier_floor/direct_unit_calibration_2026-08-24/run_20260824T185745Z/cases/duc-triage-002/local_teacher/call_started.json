@@ -1,0 +1,12 @@
+{
+  "case_id": "duc-triage-002",
+  "evaluator_access": false,
+  "experiment_payload_sha256": "05ca94c7cf1539e0a6a816b22246342ce9a9e36aa77b5fc8967b75e679b537d7",
+  "ordinal": 4,
+  "repository_access": false,
+  "schema": "zth_direct_unit_calibration_call_started_v1",
+  "started_at": "2026-08-24T19:01:15.426278+00:00",
+  "supplier_id": "local_teacher",
+  "supplier_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "tool_calls": 0
+}

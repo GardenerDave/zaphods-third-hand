@@ -1,0 +1,24 @@
+{
+  "captured_at": "2026-08-24T19:08:39.724392+00:00",
+  "case_id": "duc-unsupported-008",
+  "content": "{\"known_facts\":[\"One backup restore completed successfully.\",\"Other disaster scenarios were not exercised.\"],\"uncertainty\":[\"Coverage and effectiveness for untested disaster scenarios are unknown.\"],\"review_status\":\"Requires review before declaring disaster recovery complete.\",\"next_step\":\"Review the untested scenarios and determine whether additional exercises are required.\"}",
+  "experiment_payload_sha256": "9dd601870a1d6e4fc568d4212b3e8b3e710910bba165d49fc009bc9f3b0649aa",
+  "metadata": {
+    "command_sha256": "a495768820fa63dfff85523331ae0d3985ca198b97c2147fbf9595a3fed5378c",
+    "cwd": "/tmp",
+    "evaluator_access": false,
+    "identity": "codex-cli-0.146.0",
+    "native_envelope_control": "BEST_AVAILABLE_OBSERVATION",
+    "repository_access_observed": false,
+    "repository_marker_terms_observed": [],
+    "request_elapsed_ms": 27587.747,
+    "stderr_sha256": "5e26e2bba5f668ae8e9e8933cf17777880dec92d4437913ecdc94c2d8cd1e215",
+    "tool_calls_observed": 0,
+    "tool_marker_terms_observed": [],
+    "transport_classification": "model_response"
+  },
+  "ordinal": 31,
+  "raw_response_sha256": "8e6a838bceec3ab1d2747956a4ab73f95b09aed5d71c8777da8901dc9b52b40d",
+  "status": "ok",
+  "supplier_id": "external_teacher"
+}

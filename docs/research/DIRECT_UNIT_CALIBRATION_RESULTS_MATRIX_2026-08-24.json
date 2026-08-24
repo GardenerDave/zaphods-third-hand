@@ -1,0 +1,128 @@
+{
+  "evaluator_sha256": "711edbe0836dcb6bcb7afdbd3f538c7f541437b1fe96c84d62585ab90e3edbf6",
+  "experiment_id": "DIRECT_UNIT_CALIBRATION_2026-08-24",
+  "external_protocol_observation": {
+    "repository_access_observed": false,
+    "telemetry_structured": false,
+    "tool_calls_observed": 0
+  },
+  "failure_taxonomy": {
+    "SEMANTIC_FAILURE": 32
+  },
+  "freeze_sha256": "0ddce647ab95e66d6d49e6404bf2a0fb51d195aaa915bf34b41553353a300324",
+  "future_broad_policy_aggregation_rule_not_selected": true,
+  "integrity": {
+    "actual_new_external_calls": 16,
+    "actual_new_local_calls": 16,
+    "actual_new_supplier_calls": 32,
+    "evaluator_loaded_during_acquisition": false,
+    "frozen_case_order_unchanged": true,
+    "new_call_finished_files": 32,
+    "new_call_started_files": 32,
+    "new_failure_files": 0,
+    "new_response_files": 32,
+    "planned_new_supplier_calls": 32,
+    "raw_sealed_before_evaluation": true,
+    "replays": 0,
+    "retries": 0,
+    "scope_v0_interface_sha256": "c6726c65a40df77c6e681226c90f48c16e00348b5727ab15a14c6b7e61cb3f93",
+    "scope_v0_manifest_sha256": "54d06b4c9a221eb8a98bcb5f6d2db5cf2246c57c14058ba4ae9f655696e04173",
+    "v2_evaluator_sha256": "711edbe0836dcb6bcb7afdbd3f538c7f541437b1fe96c84d62585ab90e3edbf6",
+    "v2_freeze_sha256": "0ddce647ab95e66d6d49e6404bf2a0fb51d195aaa915bf34b41553353a300324",
+    "v2_interface_sha256": "d7eff33f17c7d5e833c8fed9bd5804d6dc5d813e92b009f261fc2071d6067bbd",
+    "v2_payload_manifest_sha256": "fc87ede6b0df1afd083c7c9b2f30fa5aba2869293953b97e750a06f1a6e45b76",
+    "v2_runtime_sha256": "caaaa3913b5158b7d68b6719348953e21e47f59f8855607378464d782e06d49c"
+  },
+  "interface_sha256": "d7eff33f17c7d5e833c8fed9bd5804d6dc5d813e92b009f261fc2071d6067bbd",
+  "micro_and_family_macro_summaries_computed": true,
+  "payload_manifest_sha256": "fc87ede6b0df1afd083c7c9b2f30fa5aba2869293953b97e750a06f1a6e45b76",
+  "primary_characterization": "DIRECT_UNIT_CALIBRATION_STAGE_A_COMPLETED_MODEL_FREE_CLOSEOUT",
+  "production_routing_change": false,
+  "qualification_change": false,
+  "run_directory": ".work/model_size_supplier_floor/direct_unit_calibration_2026-08-24/run_20260824T185745Z",
+  "runtime_manifest_sha256": "caaaa3913b5158b7d68b6719348953e21e47f59f8855607378464d782e06d49c",
+  "schema": "zth_direct_unit_calibration_results_matrix_v1",
+  "scope_v0_raw_manifest_sha256": "54d06b4c9a221eb8a98bcb5f6d2db5cf2246c57c14058ba4ae9f655696e04173",
+  "stage_a_success": true,
+  "stage_b_started": false,
+  "supplier_family_summaries": {
+    "external_teacher": {
+      "families": {
+        "scope-authority-boundary": {
+          "failure_classes": {
+            "VALID_DIRECT_RESPONSE": 16
+          },
+          "failures": 0,
+          "opportunities": 16,
+          "rate": 1.0,
+          "successes": 16
+        },
+        "triage-routing": {
+          "failure_classes": {
+            "SEMANTIC_FAILURE": 8
+          },
+          "failures": 8,
+          "opportunities": 8,
+          "rate": 0.0,
+          "successes": 0
+        },
+        "unsupported-certainty": {
+          "failure_classes": {
+            "SEMANTIC_FAILURE": 8
+          },
+          "failures": 8,
+          "opportunities": 8,
+          "rate": 0.0,
+          "successes": 0
+        }
+      },
+      "family_macro_aggregate_direct": 0.3333333333333333,
+      "micro_aggregate_direct": {
+        "failures": 16,
+        "opportunities": 32,
+        "rate": 0.5,
+        "successes": 16
+      }
+    },
+    "local_teacher": {
+      "families": {
+        "scope-authority-boundary": {
+          "failure_classes": {
+            "CONTRACT_FAILURE": 10,
+            "SEMANTIC_FAILURE": 1,
+            "VALID_DIRECT_RESPONSE": 5
+          },
+          "failures": 11,
+          "opportunities": 16,
+          "rate": 0.3125,
+          "successes": 5
+        },
+        "triage-routing": {
+          "failure_classes": {
+            "SEMANTIC_FAILURE": 8
+          },
+          "failures": 8,
+          "opportunities": 8,
+          "rate": 0.0,
+          "successes": 0
+        },
+        "unsupported-certainty": {
+          "failure_classes": {
+            "SEMANTIC_FAILURE": 8
+          },
+          "failures": 8,
+          "opportunities": 8,
+          "rate": 0.0,
+          "successes": 0
+        }
+      },
+      "family_macro_aggregate_direct": 0.10416666666666667,
+      "micro_aggregate_direct": {
+        "failures": 27,
+        "opportunities": 32,
+        "rate": 0.15625,
+        "successes": 5
+      }
+    }
+  }
+}

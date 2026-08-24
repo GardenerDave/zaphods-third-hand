@@ -1,0 +1,24 @@
+{
+  "captured_at": "2026-08-24T19:06:28.482227+00:00",
+  "case_id": "duc-unsupported-004",
+  "content": "{\"known_facts\":[\"One incident was resolved during a supervised test.\",\"Recovery was not checked across other failure modes.\"],\"uncertainty\":[\"It is unknown whether the system recovers reliably across failure modes.\"],\"review_status\":\"Review required before claiming the system always recovers.\",\"next_step\":\"Test recovery across representative failure modes and obtain review before making any universal recovery claim.\"}",
+  "experiment_payload_sha256": "9028fe5052429a94f3283c425f0f8e2ed90c5aa65eca9868650bb4a2fa2dc59b",
+  "metadata": {
+    "command_sha256": "a495768820fa63dfff85523331ae0d3985ca198b97c2147fbf9595a3fed5378c",
+    "cwd": "/tmp",
+    "evaluator_access": false,
+    "identity": "codex-cli-0.146.0",
+    "native_envelope_control": "BEST_AVAILABLE_OBSERVATION",
+    "repository_access_observed": false,
+    "repository_marker_terms_observed": [],
+    "request_elapsed_ms": 31735.801,
+    "stderr_sha256": "971630ba35845f12e3271d9383d7c96eb1de5193eafcefcd007a46e129a5f993",
+    "tool_calls_observed": 0,
+    "tool_marker_terms_observed": [],
+    "transport_classification": "model_response"
+  },
+  "ordinal": 23,
+  "raw_response_sha256": "0fee4785dbd3b0ca7d9054c04c73edaf748b81f7a64e9ab7eebc44163973406e",
+  "status": "ok",
+  "supplier_id": "external_teacher"
+}

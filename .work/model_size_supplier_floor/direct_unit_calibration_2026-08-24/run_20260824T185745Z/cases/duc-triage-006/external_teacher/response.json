@@ -1,0 +1,24 @@
+{
+  "captured_at": "2026-08-24T19:03:08.161100+00:00",
+  "case_id": "duc-triage-006",
+  "content": "{\"route\":\"review\",\"rationale\":\"Timeout evidence has an unverified root cause; route it for review and do not authorize the worker restart.\",\"review_status\":\"pending\"}",
+  "experiment_payload_sha256": "7dd1d183c080ec9749e255d6150cee2d2b9e75f7333512b16091edf59b9a60fa",
+  "metadata": {
+    "command_sha256": "a495768820fa63dfff85523331ae0d3985ca198b97c2147fbf9595a3fed5378c",
+    "cwd": "/tmp",
+    "evaluator_access": false,
+    "identity": "codex-cli-0.146.0",
+    "native_envelope_control": "BEST_AVAILABLE_OBSERVATION",
+    "repository_access_observed": false,
+    "repository_marker_terms_observed": [],
+    "request_elapsed_ms": 30687.524,
+    "stderr_sha256": "61e5a2a15567d755b23c4ace0f74350686b08d1267dd88c2b1832c7d87c5eaf3",
+    "tool_calls_observed": 0,
+    "tool_marker_terms_observed": [],
+    "transport_classification": "model_response"
+  },
+  "ordinal": 11,
+  "raw_response_sha256": "8b2dd40b62b8ccda9376d1aff7ddba5b9fd4a3e97387a6b0e45ef62c424d3f5d",
+  "status": "ok",
+  "supplier_id": "external_teacher"
+}

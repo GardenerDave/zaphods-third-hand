@@ -1,0 +1,14 @@
+{
+  "external_calls": 16,
+  "external_inference_calls": 16,
+  "local_calls": 16,
+  "model_calls": 32,
+  "model_output_granted_authority": 0,
+  "replays": 0,
+  "retries": 0,
+  "runtime_evaluator_influence": 0,
+  "status": "terminal_runtime",
+  "supplier_calls": 32,
+  "teacher_calls": 0,
+  "tool_calls": 0
+}

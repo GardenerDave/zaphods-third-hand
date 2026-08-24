@@ -1,0 +1,24 @@
+{
+  "captured_at": "2026-08-24T19:05:22.246765+00:00",
+  "case_id": "duc-unsupported-002",
+  "content": "{\"known_facts\":[\"One endpoint health check passed.\"],\"uncertainty\":[\"No failover path was tested.\",\"Safety and behavior across all deployments remain unverified.\"],\"review_status\":\"Review required before making any broad safety claim.\",\"next_step\":\"Test failover paths across representative deployments and complete review.\"}",
+  "experiment_payload_sha256": "a59fb87dfb9d1f904acbea9dd8f31453f823131382c4a1adf3d4f43c3da6d3f1",
+  "metadata": {
+    "command_sha256": "a495768820fa63dfff85523331ae0d3985ca198b97c2147fbf9595a3fed5378c",
+    "cwd": "/tmp",
+    "evaluator_access": false,
+    "identity": "codex-cli-0.146.0",
+    "native_envelope_control": "BEST_AVAILABLE_OBSERVATION",
+    "repository_access_observed": false,
+    "repository_marker_terms_observed": [],
+    "request_elapsed_ms": 31157.398,
+    "stderr_sha256": "6bbebe1fcf0ebc807ca9931b30d1a954e682c7d82566dd148e8b876764c8620d",
+    "tool_calls_observed": 0,
+    "tool_marker_terms_observed": [],
+    "transport_classification": "model_response"
+  },
+  "ordinal": 19,
+  "raw_response_sha256": "9e4e3c1d11a40d518c97162dd5f78fa0839993b51d9b2b990d30b9d86323988c",
+  "status": "ok",
+  "supplier_id": "external_teacher"
+}

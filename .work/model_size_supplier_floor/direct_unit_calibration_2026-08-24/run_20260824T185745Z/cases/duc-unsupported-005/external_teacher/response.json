@@ -1,0 +1,24 @@
+{
+  "captured_at": "2026-08-24T19:07:05.305562+00:00",
+  "case_id": "duc-unsupported-005",
+  "content": "{\"known_facts\":[\"One compatibility check passed for the version transition.\"],\"uncertainty\":[\"Rollback behavior was not tested.\",\"Neighboring versions were not tested.\",\"Universal migration safety is not established.\"],\"review_status\":\"Requires review before being called universally safe.\",\"next_step\":\"Test rollback and neighboring-version compatibility, then review the evidence.\"}",
+  "experiment_payload_sha256": "82303b00dd77d7945a6d95113a4270b1ff6c725111e67ae71cc5e9a02ae0a167",
+  "metadata": {
+    "command_sha256": "a495768820fa63dfff85523331ae0d3985ca198b97c2147fbf9595a3fed5378c",
+    "cwd": "/tmp",
+    "evaluator_access": false,
+    "identity": "codex-cli-0.146.0",
+    "native_envelope_control": "BEST_AVAILABLE_OBSERVATION",
+    "repository_access_observed": false,
+    "repository_marker_terms_observed": [],
+    "request_elapsed_ms": 30914.694,
+    "stderr_sha256": "bf0250de41d34d017c4934405e330bd31e3ac2758e961c0f77f86fae4a4ab8bc",
+    "tool_calls_observed": 0,
+    "tool_marker_terms_observed": [],
+    "transport_classification": "model_response"
+  },
+  "ordinal": 26,
+  "raw_response_sha256": "c14ac9c880dfa8b77d8b553ad4bf3804d72ceb7b5a4126f1de83199716119989",
+  "status": "ok",
+  "supplier_id": "external_teacher"
+}

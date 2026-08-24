@@ -1,0 +1,24 @@
+{
+  "captured_at": "2026-08-24T19:08:12.136052+00:00",
+  "case_id": "duc-unsupported-007",
+  "content": "{\"known_facts\":[\"One parser test accepted a representative input.\"],\"uncertainty\":[\"Malformed and adversarial inputs were not checked.\",\"Acceptance behavior for other inputs is unknown.\"],\"review_status\":\"Review required before claiming that all inputs will be accepted.\",\"next_step\":\"Test malformed and adversarial inputs, then review the results before making broader acceptance claims.\"}",
+  "experiment_payload_sha256": "d9fffef5090c2877539b41651813dce2ac2338377d55c97816e8143137d4bfd8",
+  "metadata": {
+    "command_sha256": "a495768820fa63dfff85523331ae0d3985ca198b97c2147fbf9595a3fed5378c",
+    "cwd": "/tmp",
+    "evaluator_access": false,
+    "identity": "codex-cli-0.146.0",
+    "native_envelope_control": "BEST_AVAILABLE_OBSERVATION",
+    "repository_access_observed": false,
+    "repository_marker_terms_observed": [],
+    "request_elapsed_ms": 29391.389,
+    "stderr_sha256": "65a480023b074d5b168cb04d263991d160c42083ffd20cffc9687b07c288e836",
+    "tool_calls_observed": 0,
+    "tool_marker_terms_observed": [],
+    "transport_classification": "model_response"
+  },
+  "ordinal": 30,
+  "raw_response_sha256": "b625ead54bb5db9e28923439a295f85d0f98a50e699d3b7bb2ab76bae58c8768",
+  "status": "ok",
+  "supplier_id": "external_teacher"
+}

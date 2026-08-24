@@ -1,0 +1,335 @@
+{
+  "actual_external_calls": 16,
+  "actual_local_calls": 16,
+  "actual_supplier_calls": 32,
+  "evaluator_loaded_during_acquisition": false,
+  "planned_supplier_calls": 32,
+  "raw_direct_unit_calibration_responses_sealed_before_evaluation": true,
+  "records": [
+    {
+      "captured": true,
+      "case_id": "duc-triage-001",
+      "ordinal": 1,
+      "repository_access_observed": false,
+      "response_sha256": "b96b706e8d9cac42f89f670aca340cd570ff715ed41346114ddb11b7a4fdbf6a",
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-triage-001",
+      "ordinal": 2,
+      "repository_access_observed": false,
+      "response_sha256": "0d3524ebc0088f29a2175d1b81e4578f1df0bb726beb0a6c4128cecd57451992",
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-triage-002",
+      "ordinal": 3,
+      "repository_access_observed": false,
+      "response_sha256": "7e3cb3914549e7e42a051b0b288dcb275f1582c0b7d29eccb5c5f15d34d6861d",
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-triage-002",
+      "ordinal": 4,
+      "repository_access_observed": false,
+      "response_sha256": "c4150d78bbda05670c04a886ff517f394ac270dbce9684b48a2fa43ab6b471da",
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-triage-003",
+      "ordinal": 5,
+      "repository_access_observed": false,
+      "response_sha256": "98666fe7aab623b0fb62bf315dc2ea64667baf66b81d1c83011fe3b722178755",
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-triage-003",
+      "ordinal": 6,
+      "repository_access_observed": false,
+      "response_sha256": "1196ef0060c55ce4d1509a0b6c9b8a8f102ba089e1d86a20961455fd6b26fe35",
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-triage-004",
+      "ordinal": 7,
+      "repository_access_observed": false,
+      "response_sha256": "79750d4d8b370dd74cfa1d48f52f0fac0d571d3faa720a71cdd25fa0aafde8ca",
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-triage-004",
+      "ordinal": 8,
+      "repository_access_observed": false,
+      "response_sha256": "d34f0a8fc3030f69f536979db982a255fc242382ec13016ec504b138b804bd45",
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-triage-005",
+      "ordinal": 9,
+      "repository_access_observed": false,
+      "response_sha256": "d9b700f4a1e7b8ad1e3d1f0c55c0257dc933d16a15bd106e5cda63ffd522ecc1",
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-triage-005",
+      "ordinal": 10,
+      "repository_access_observed": false,
+      "response_sha256": "994d391445cf3ceb637d654c17790f9b334f4503f7f2944044793c080df10024",
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-triage-006",
+      "ordinal": 11,
+      "repository_access_observed": false,
+      "response_sha256": "e646b8f17e99790397718b3de6e7a14d1e2498ba15e1c4ad378d3ed62ab26e03",
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-triage-006",
+      "ordinal": 12,
+      "repository_access_observed": false,
+      "response_sha256": "9117b3da9ab87dcf327d5dac31b17eacfa753abc83cea8b8a727c37a96ad19db",
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-triage-007",
+      "ordinal": 13,
+      "repository_access_observed": false,
+      "response_sha256": "423d0af812e058a810ed5eac61546a2399fd527a64ea379885bf10557457f785",
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-triage-007",
+      "ordinal": 14,
+      "repository_access_observed": false,
+      "response_sha256": "0b92c9c62966716ef797fc90591fb84171102d84344c550807573af2862df86f",
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-triage-008",
+      "ordinal": 15,
+      "repository_access_observed": false,
+      "response_sha256": "f3eb1c701f6cb7cb3b7dcfa4e4e032e28493e997aaf99235ca8ea86f8f7a562e",
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-triage-008",
+      "ordinal": 16,
+      "repository_access_observed": false,
+      "response_sha256": "9e1da9167c066c3800262b21458905020227418d4ff5a54be7651222e7a01385",
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-unsupported-001",
+      "ordinal": 17,
+      "repository_access_observed": false,
+      "response_sha256": "6def318e55cab3fd7a0c0dbe8e1a0a50c6a55949751f16daabb7d99058417e5a",
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-unsupported-001",
+      "ordinal": 18,
+      "repository_access_observed": false,
+      "response_sha256": "ad8319bb6490f8bdb2b66ec8e03a82d4d3358491c6a71590e3d12f6ed563826e",
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-unsupported-002",
+      "ordinal": 19,
+      "repository_access_observed": false,
+      "response_sha256": "3dbf07f65e11c505f15008b69889c5f4451dde1bf582d8e36b90aa26004e45ab",
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-unsupported-002",
+      "ordinal": 20,
+      "repository_access_observed": false,
+      "response_sha256": "d1c5f2d3786eb27452ca5b1be44076c39447dfa2074c2e7fb430bcb889d86ecd",
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-unsupported-003",
+      "ordinal": 21,
+      "repository_access_observed": false,
+      "response_sha256": "0d83b418d322c8772cc3d8076e3e60deb879f5bdb8c3ac7a52976b266df79901",
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-unsupported-003",
+      "ordinal": 22,
+      "repository_access_observed": false,
+      "response_sha256": "024ea85206ec3c9452318b3ee1b76b0ad5bf157df59a5655002fb4a4b0cc4725",
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-unsupported-004",
+      "ordinal": 23,
+      "repository_access_observed": false,
+      "response_sha256": "5fb72985a3f0b705b0fb0c3a8ba4705e0c318e5906151d817ff2ce1620fc642e",
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-unsupported-004",
+      "ordinal": 24,
+      "repository_access_observed": false,
+      "response_sha256": "146b12cfb3a16070df6339d3b677160a881c4dca93820aab91eae722599cfe62",
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-unsupported-005",
+      "ordinal": 25,
+      "repository_access_observed": false,
+      "response_sha256": "12c6f6796ab0b186de57815cb28d5329398deff928acdabf16cb5b5ea698061d",
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-unsupported-005",
+      "ordinal": 26,
+      "repository_access_observed": false,
+      "response_sha256": "cdc1f05ec6c5a45db55b83051c61665f84d7211cde565780c6f10e56ecd0ab92",
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-unsupported-006",
+      "ordinal": 27,
+      "repository_access_observed": false,
+      "response_sha256": "540a0caf952f5d48ff86102720f5e41101bb296e3d1fe8092ff5d15af39ab870",
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-unsupported-006",
+      "ordinal": 28,
+      "repository_access_observed": false,
+      "response_sha256": "cf403bfb71fa872e8f38444911ceb7756416b15233edc4100dd22699a2ee69c1",
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-unsupported-007",
+      "ordinal": 29,
+      "repository_access_observed": false,
+      "response_sha256": "eb526a9d2d4f5f612ad8bcfbd838262732a2e06ebeb38ea81ff3d5e28fcdadb2",
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-unsupported-007",
+      "ordinal": 30,
+      "repository_access_observed": false,
+      "response_sha256": "ea58cdbcfd730497f1c0c23010091ed552baa26d3645251dccca6513fa1726f7",
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-unsupported-008",
+      "ordinal": 31,
+      "repository_access_observed": false,
+      "response_sha256": "7123df7547a158b08e22b81c38ec5fa8b41f03b8e322024d204dbda130d48450",
+      "supplier_id": "external_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    },
+    {
+      "captured": true,
+      "case_id": "duc-unsupported-008",
+      "ordinal": 32,
+      "repository_access_observed": false,
+      "response_sha256": "d4983e61e977eb47cdc7cbcb2770d4ab90cc3ceda7a6dc28060bd38c8a4b68ed",
+      "supplier_id": "local_teacher",
+      "tool_calls_observed": 0,
+      "transport_valid": true
+    }
+  ],
+  "replays": 0,
+  "retries": 0,
+  "schema": "zth_direct_unit_calibration_raw_response_manifest_v1",
+  "second_acquisition_process_started": false,
+  "status": "SEALED_BEFORE_EVALUATION"
+}

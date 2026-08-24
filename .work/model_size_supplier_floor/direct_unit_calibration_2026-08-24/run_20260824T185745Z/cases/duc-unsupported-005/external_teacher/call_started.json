@@ -1,0 +1,12 @@
+{
+  "case_id": "duc-unsupported-005",
+  "evaluator_access": false,
+  "experiment_payload_sha256": "82303b00dd77d7945a6d95113a4270b1ff6c725111e67ae71cc5e9a02ae0a167",
+  "ordinal": 26,
+  "repository_access": false,
+  "schema": "zth_direct_unit_calibration_call_started_v1",
+  "started_at": "2026-08-24T19:06:34.390579+00:00",
+  "supplier_id": "external_teacher",
+  "supplier_identity": "codex-cli-0.146.0",
+  "tool_calls": "observed_after_call"
+}

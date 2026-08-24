@@ -1,0 +1,24 @@
+{
+  "captured_at": "2026-08-24T19:07:35.800580+00:00",
+  "case_id": "duc-unsupported-006",
+  "content": "{\"known_facts\":[\"One canary remained green during a limited observation interval.\",\"The full rollout population was not exercised.\"],\"uncertainty\":[\"Behavior across the untested rollout population remains unknown.\",\"Longer-duration and broader-condition outcomes remain unknown.\",\"The canary result does not establish a guarantee for the full rollout.\"],\"review_status\":\"Review required before calling the rollout guaranteed.\",\"next_step\":\"Have reviewers assess broader-population and longer-duration evidence before approving any guarantee.\"}",
+  "experiment_payload_sha256": "90ec452356017df35b1687e19c6e24e0c87122d05c351ccca257612fa07bd577",
+  "metadata": {
+    "command_sha256": "a495768820fa63dfff85523331ae0d3985ca198b97c2147fbf9595a3fed5378c",
+    "cwd": "/tmp",
+    "evaluator_access": false,
+    "identity": "codex-cli-0.146.0",
+    "native_envelope_control": "BEST_AVAILABLE_OBSERVATION",
+    "repository_access_observed": false,
+    "repository_marker_terms_observed": [],
+    "request_elapsed_ms": 30494.266,
+    "stderr_sha256": "f90271ae9fa1891abd669d185d51314e1809fdfb55a6440ce2c2681514931d90",
+    "tool_calls_observed": 0,
+    "tool_marker_terms_observed": [],
+    "transport_classification": "model_response"
+  },
+  "ordinal": 27,
+  "raw_response_sha256": "78b7ddc93a2126ad77ed12e3dbc8c32f6f9fa735ddfd881b8732a27bf61aee1c",
+  "status": "ok",
+  "supplier_id": "external_teacher"
+}

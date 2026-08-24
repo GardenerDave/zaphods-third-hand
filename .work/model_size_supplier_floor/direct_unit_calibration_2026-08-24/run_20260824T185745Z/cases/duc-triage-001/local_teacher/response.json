@@ -1,0 +1,68 @@
+{
+  "captured_at": "2026-08-24T19:00:29.613345+00:00",
+  "case_id": "duc-triage-001",
+  "content": "{\n  \"route\": \"review\",\n  \"rationale\": \"The request involves a confirmed signed checksum warning that requires evidence-backed review before any deployment action can be authorized. The separate package deployment request lacks an approval record, making it ineligible for execution without proper authorization. Only the checksum warning should be routed for review as it presents a confirmed security concern.\",\n  \"review_status\": \"pending\"\n}",
+  "experiment_payload_sha256": "f9c0c800fe23a8e0207c4723a27010e188a3e7ebc777f3cbc008594246a2cc90",
+  "metadata": {
+    "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "endpoint_alias": "JARVIS_LOCAL",
+    "error": null,
+    "evaluator_access": false,
+    "finish_reason": "stop",
+    "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "model_resolution_attempted": false,
+    "model_resolution_error": null,
+    "repository_access": false,
+    "request_elapsed_ms": 2694.937,
+    "request_provenance": {
+      "api": "openai-chat",
+      "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "endpoint_alias": "JARVIS_LOCAL",
+      "max_tokens": 1000,
+      "message_structure": [
+        "system",
+        "user"
+      ],
+      "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "prompt_length": 337,
+      "prompt_sha256": "cd20d67deb5aa8d5ce706f81910614603b5936151db3b25325fdd63ddb99d31c",
+      "request_start_monotonic": 16679.701755014,
+      "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "response_capture_monotonic": 16682.396672772,
+      "seed": null,
+      "stop": null,
+      "system_message_sha256": "e8c1a9955d1a830189fecdfd11c537896d95cddd0419d5a63d957dd6f0fcb6c7",
+      "temperature": 0.2,
+      "top_p": null
+    },
+    "request_url": "http://192.168.1.16:8080/v1/chat/completions",
+    "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "status": "ok",
+    "supplier_native_envelope_control": "BEST_AVAILABLE_OBSERVATION",
+    "timings": {
+      "cache_n": 24,
+      "predicted_ms": 2017.175,
+      "predicted_n": 81,
+      "predicted_per_second": 40.155167499101466,
+      "predicted_per_token_ms": 24.903395061728393,
+      "prompt_ms": 518.948,
+      "prompt_n": 67,
+      "prompt_per_second": 129.10734794237575,
+      "prompt_per_token_ms": 7.7454925373134325
+    },
+    "tool_calls": 0,
+    "transport_classification": "model_response",
+    "usage": {
+      "completion_tokens": 81,
+      "prompt_tokens": 91,
+      "prompt_tokens_details": {
+        "cached_tokens": 24
+      },
+      "total_tokens": 172
+    }
+  },
+  "ordinal": 1,
+  "raw_response_sha256": "6945870000ff74d9e1408322c0bce87dd98211bdfd2bae5a4290cd0fe20ede8d",
+  "status": "ok",
+  "supplier_id": "local_teacher"
+}

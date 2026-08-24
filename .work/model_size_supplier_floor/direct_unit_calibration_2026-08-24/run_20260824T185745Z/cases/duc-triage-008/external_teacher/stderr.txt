@@ -1,0 +1,18 @@
+OpenAI Codex v0.146.0
+--------
+workdir: /tmp
+model: gpt-5.6-luna
+provider: openai
+approval: on-request
+sandbox: read-only
+reasoning effort: medium
+reasoning summaries: none
+session id: 01a03528-3752-7ed2-83f4-0a09a459bf14
+--------
+user
+Return only a JSON object with route, rationale, and review_status for this review-only triage request. Do not authorize execution. Request: A completed dry-run report is available, while an unapproved request asks to execute the patch. Route the dry-run evidence for review and do not authorize execution.
+2026-08-24T19:03:48.088459Z ERROR codex_models_manager::manager: failed to refresh available models: timeout waiting for child process to exit
+codex
+{"route":"review","rationale":"Route the completed dry-run evidence for review; the execution request remains unapproved.","review_status":"execution_not_authorized"}
+tokens used
+15,184

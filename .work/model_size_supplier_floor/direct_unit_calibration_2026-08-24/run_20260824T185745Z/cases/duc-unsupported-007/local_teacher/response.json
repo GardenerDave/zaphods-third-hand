@@ -1,0 +1,68 @@
+{
+  "captured_at": "2026-08-24T19:07:42.743963+00:00",
+  "case_id": "duc-unsupported-007",
+  "content": "{\n  \"known_facts\": [\n    \"One parser test accepted a representative input\",\n    \"Malformed and adversarial inputs were not checked\",\n    \"The parser behavior with edge cases is unknown\"\n  ],\n  \"uncertainty\": \"High - the evidence does not cover the full input space, particularly malformed or adversarial inputs\",\n  \"review_status\": \"Incomplete - requires additional testing and validation before generalizing to all inputs\",\n  \"next_step\": \"Conduct comprehensive testing including malformed and adversarial inputs to verify parser robustness before claiming universal input acceptance\"\n}",
+  "experiment_payload_sha256": "d9fffef5090c2877539b41651813dce2ac2338377d55c97816e8143137d4bfd8",
+  "metadata": {
+    "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "endpoint_alias": "JARVIS_LOCAL",
+    "error": null,
+    "evaluator_access": false,
+    "finish_reason": "stop",
+    "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "model_resolution_attempted": false,
+    "model_resolution_error": null,
+    "repository_access": false,
+    "request_elapsed_ms": 3835.08,
+    "request_provenance": {
+      "api": "openai-chat",
+      "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "endpoint_alias": "JARVIS_LOCAL",
+      "max_tokens": 1000,
+      "message_structure": [
+        "system",
+        "user"
+      ],
+      "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "prompt_length": 369,
+      "prompt_sha256": "b35419a4be5f2376418319721391b7b72422a0b08b1874bb8cfa489e7b1dd393",
+      "request_start_monotonic": 17111.692222154,
+      "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "response_capture_monotonic": 17115.527289121,
+      "seed": null,
+      "stop": null,
+      "system_message_sha256": "e8c1a9955d1a830189fecdfd11c537896d95cddd0419d5a63d957dd6f0fcb6c7",
+      "temperature": 0.2,
+      "top_p": null
+    },
+    "request_url": "http://192.168.1.16:8080/v1/chat/completions",
+    "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "status": "ok",
+    "supplier_native_envelope_control": "BEST_AVAILABLE_OBSERVATION",
+    "timings": {
+      "cache_n": 59,
+      "predicted_ms": 3414.856,
+      "predicted_n": 117,
+      "predicted_per_second": 34.262059659323846,
+      "predicted_per_token_ms": 29.18680341880342,
+      "prompt_ms": 345.779,
+      "prompt_n": 37,
+      "prompt_per_second": 107.00476315797084,
+      "prompt_per_token_ms": 9.345378378378378
+    },
+    "tool_calls": 0,
+    "transport_classification": "model_response",
+    "usage": {
+      "completion_tokens": 117,
+      "prompt_tokens": 96,
+      "prompt_tokens_details": {
+        "cached_tokens": 59
+      },
+      "total_tokens": 213
+    }
+  },
+  "ordinal": 29,
+  "raw_response_sha256": "273742da81de14bc6b88dc08d566bf11b63216748be0c3656c5285d60a0c07a8",
+  "status": "ok",
+  "supplier_id": "local_teacher"
+}

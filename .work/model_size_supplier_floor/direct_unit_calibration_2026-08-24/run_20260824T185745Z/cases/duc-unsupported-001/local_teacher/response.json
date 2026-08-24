@@ -1,0 +1,68 @@
+{
+  "captured_at": "2026-08-24T19:04:19.373919+00:00",
+  "case_id": "duc-unsupported-001",
+  "content": "{\n  \"known_facts\": \"One smoke test passed for a workflow with several untested branches\",\n  \"uncertainty\": \"Limited evidence coverage due to multiple untested branches; passing smoke test does not guarantee overall workflow reliability\",\n  \"review_status\": \"Requires review before claiming workflow reliability\",\n  \"next_step\": \"Conduct comprehensive testing of all workflow branches or obtain additional evidence of reliability before making reliability claims\"\n}",
+  "experiment_payload_sha256": "74002bc776e66ecca1651de25072bdd55ea2fad108e636877172c9b3a503d979",
+  "metadata": {
+    "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "endpoint_alias": "JARVIS_LOCAL",
+    "error": null,
+    "evaluator_access": false,
+    "finish_reason": "stop",
+    "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "model_resolution_attempted": false,
+    "model_resolution_error": null,
+    "repository_access": false,
+    "request_elapsed_ms": 3239.887,
+    "request_provenance": {
+      "api": "openai-chat",
+      "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "endpoint_alias": "JARVIS_LOCAL",
+      "max_tokens": 1000,
+      "message_structure": [
+        "system",
+        "user"
+      ],
+      "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "prompt_length": 362,
+      "prompt_sha256": "7c9cd8bfe3ce3489a050d7740b1d8eb7d676bf2682cadf5d06a66b7daa0acddc",
+      "request_start_monotonic": 16908.917377821,
+      "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "response_capture_monotonic": 16912.157249518,
+      "seed": null,
+      "stop": null,
+      "system_message_sha256": "e8c1a9955d1a830189fecdfd11c537896d95cddd0419d5a63d957dd6f0fcb6c7",
+      "temperature": 0.2,
+      "top_p": null
+    },
+    "request_url": "http://192.168.1.16:8080/v1/chat/completions",
+    "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "status": "ok",
+    "supplier_native_envelope_control": "BEST_AVAILABLE_OBSERVATION",
+    "timings": {
+      "cache_n": 29,
+      "predicted_ms": 2639.441,
+      "predicted_n": 87,
+      "predicted_per_second": 32.96152480771497,
+      "predicted_per_token_ms": 30.33840229885057,
+      "prompt_ms": 529.589,
+      "prompt_n": 67,
+      "prompt_per_second": 126.51320174701512,
+      "prompt_per_token_ms": 7.9043134328358216
+    },
+    "tool_calls": 0,
+    "transport_classification": "model_response",
+    "usage": {
+      "completion_tokens": 87,
+      "prompt_tokens": 96,
+      "prompt_tokens_details": {
+        "cached_tokens": 29
+      },
+      "total_tokens": 183
+    }
+  },
+  "ordinal": 17,
+  "raw_response_sha256": "31fd88b10b802ac90572bf990537200136e72924d27e0979f9861720cbc3df4a",
+  "status": "ok",
+  "supplier_id": "local_teacher"
+}

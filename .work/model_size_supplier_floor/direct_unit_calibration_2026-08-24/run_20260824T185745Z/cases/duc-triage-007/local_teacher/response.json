@@ -1,0 +1,68 @@
+{
+  "captured_at": "2026-08-24T19:03:13.256493+00:00",
+  "case_id": "duc-triage-007",
+  "content": "{\n  \"route\": \"review_only\",\n  \"rationale\": \"A confirmed permission drift has been reported, which requires careful review before any action is taken. Additionally, there is a separate request for broader access that should not be processed immediately. To ensure proper governance and avoid potential security risks, the permission finding must be reviewed first before considering any access changes.\",\n  \"review_status\": \"pending\"\n}",
+  "experiment_payload_sha256": "2ea4f0a4c4a369bb85edfef3ac725c28a013e5ac62cc8fabf96cf73f27ef236c",
+  "metadata": {
+    "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "endpoint_alias": "JARVIS_LOCAL",
+    "error": null,
+    "evaluator_access": false,
+    "finish_reason": "stop",
+    "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "model_resolution_attempted": false,
+    "model_resolution_error": null,
+    "repository_access": false,
+    "request_elapsed_ms": 2851.186,
+    "request_provenance": {
+      "api": "openai-chat",
+      "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "endpoint_alias": "JARVIS_LOCAL",
+      "max_tokens": 1000,
+      "message_structure": [
+        "system",
+        "user"
+      ],
+      "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "prompt_length": 328,
+      "prompt_sha256": "fe024489858196f88a5b71639088eeaa310545fd32a7795c968ab8275d5b7dc9",
+      "request_start_monotonic": 16843.188634971,
+      "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "response_capture_monotonic": 16846.039806435,
+      "seed": null,
+      "stop": null,
+      "system_message_sha256": "e8c1a9955d1a830189fecdfd11c537896d95cddd0419d5a63d957dd6f0fcb6c7",
+      "temperature": 0.2,
+      "top_p": null
+    },
+    "request_url": "http://192.168.1.16:8080/v1/chat/completions",
+    "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "status": "ok",
+    "supplier_native_envelope_control": "BEST_AVAILABLE_OBSERVATION",
+    "timings": {
+      "cache_n": 51,
+      "predicted_ms": 2459.366,
+      "predicted_n": 83,
+      "predicted_per_second": 33.74853519159003,
+      "predicted_per_token_ms": 29.6309156626506,
+      "prompt_ms": 327.475,
+      "prompt_n": 37,
+      "prompt_per_second": 112.9857241010764,
+      "prompt_per_token_ms": 8.850675675675676
+    },
+    "tool_calls": 0,
+    "transport_classification": "model_response",
+    "usage": {
+      "completion_tokens": 83,
+      "prompt_tokens": 88,
+      "prompt_tokens_details": {
+        "cached_tokens": 51
+      },
+      "total_tokens": 171
+    }
+  },
+  "ordinal": 13,
+  "raw_response_sha256": "73462a30790904d9a07628386c6f2b3f501c472fb0791402ab23e10873b8c253",
+  "status": "ok",
+  "supplier_id": "local_teacher"
+}

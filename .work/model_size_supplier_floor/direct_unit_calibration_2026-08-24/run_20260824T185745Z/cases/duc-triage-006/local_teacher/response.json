@@ -1,0 +1,68 @@
+{
+  "captured_at": "2026-08-24T19:03:10.404636+00:00",
+  "case_id": "duc-triage-006",
+  "content": "{\n  \"route\": \"review\",\n  \"rationale\": \"The timeout evidence requires verification of its root cause before any action can be taken. The unverified nature of the timeout makes it inappropriate to authorize the worker restart without proper investigation.\",\n  \"review_status\": \"pending\"\n}",
+  "experiment_payload_sha256": "7dd1d183c080ec9749e255d6150cee2d2b9e75f7333512b16091edf59b9a60fa",
+  "metadata": {
+    "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "endpoint_alias": "JARVIS_LOCAL",
+    "error": null,
+    "evaluator_access": false,
+    "finish_reason": "stop",
+    "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "model_resolution_attempted": false,
+    "model_resolution_error": null,
+    "repository_access": false,
+    "request_elapsed_ms": 2242.944,
+    "request_provenance": {
+      "api": "openai-chat",
+      "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "endpoint_alias": "JARVIS_LOCAL",
+      "max_tokens": 1000,
+      "message_structure": [
+        "system",
+        "user"
+      ],
+      "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "prompt_length": 316,
+      "prompt_sha256": "fea3d03602e48fdc82600d0867ba8f1ea863d546e59eb07a97b15a54e85f53c7",
+      "request_start_monotonic": 16840.944993018,
+      "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "response_capture_monotonic": 16843.187904387,
+      "seed": null,
+      "stop": null,
+      "system_message_sha256": "e8c1a9955d1a830189fecdfd11c537896d95cddd0419d5a63d957dd6f0fcb6c7",
+      "temperature": 0.2,
+      "top_p": null
+    },
+    "request_url": "http://192.168.1.16:8080/v1/chat/completions",
+    "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "status": "ok",
+    "supplier_native_envelope_control": "BEST_AVAILABLE_OBSERVATION",
+    "timings": {
+      "cache_n": 51,
+      "predicted_ms": 1783.665,
+      "predicted_n": 59,
+      "predicted_per_second": 33.07796026720264,
+      "predicted_per_token_ms": 30.231610169491525,
+      "prompt_ms": 343.841,
+      "prompt_n": 39,
+      "prompt_per_second": 113.42451889099904,
+      "prompt_per_token_ms": 8.816435897435898
+    },
+    "tool_calls": 0,
+    "transport_classification": "model_response",
+    "usage": {
+      "completion_tokens": 59,
+      "prompt_tokens": 90,
+      "prompt_tokens_details": {
+        "cached_tokens": 51
+      },
+      "total_tokens": 149
+    }
+  },
+  "ordinal": 12,
+  "raw_response_sha256": "08d5c04d0600f3d72cd7d6eb531ee75b94a32988c72a8393408dda0e45e80c70",
+  "status": "ok",
+  "supplier_id": "local_teacher"
+}

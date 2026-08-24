@@ -1,0 +1,12 @@
+{
+  "case_id": "duc-unsupported-005",
+  "evaluator_access": false,
+  "experiment_payload_sha256": "82303b00dd77d7945a6d95113a4270b1ff6c725111e67ae71cc5e9a02ae0a167",
+  "ordinal": 25,
+  "repository_access": false,
+  "schema": "zth_direct_unit_calibration_call_started_v1",
+  "started_at": "2026-08-24T19:06:31.425104+00:00",
+  "supplier_id": "local_teacher",
+  "supplier_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "tool_calls": 0
+}

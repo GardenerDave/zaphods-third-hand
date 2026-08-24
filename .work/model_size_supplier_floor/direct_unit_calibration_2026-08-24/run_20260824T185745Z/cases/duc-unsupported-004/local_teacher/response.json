@@ -1,0 +1,68 @@
+{
+  "captured_at": "2026-08-24T19:06:31.423492+00:00",
+  "case_id": "duc-unsupported-004",
+  "content": "{\n  \"known_facts\": \"One incident was resolved during a supervised test, but recovery was not checked across other failure modes\",\n  \"uncertainty\": \"Insufficient evidence to confirm system always recovers across all failure modes\",\n  \"review_status\": \"Incomplete - requires additional testing across failure modes\",\n  \"next_step\": \"Conduct comprehensive recovery testing across all identified failure modes before concluding system recovery capabilities\"\n}",
+  "experiment_payload_sha256": "9028fe5052429a94f3283c425f0f8e2ed90c5aa65eca9868650bb4a2fa2dc59b",
+  "metadata": {
+    "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "endpoint_alias": "JARVIS_LOCAL",
+    "error": null,
+    "evaluator_access": false,
+    "finish_reason": "stop",
+    "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "model_resolution_attempted": false,
+    "model_resolution_error": null,
+    "repository_access": false,
+    "request_elapsed_ms": 2940.824,
+    "request_provenance": {
+      "api": "openai-chat",
+      "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "endpoint_alias": "JARVIS_LOCAL",
+      "max_tokens": 1000,
+      "message_structure": [
+        "system",
+        "user"
+      ],
+      "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "prompt_length": 359,
+      "prompt_sha256": "8827ff05204f16c11241450cd20549911d139bfff96016c438063035f76dc020",
+      "request_start_monotonic": 17041.266019021,
+      "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "response_capture_monotonic": 17044.206828547,
+      "seed": null,
+      "stop": null,
+      "system_message_sha256": "e8c1a9955d1a830189fecdfd11c537896d95cddd0419d5a63d957dd6f0fcb6c7",
+      "temperature": 0.2,
+      "top_p": null
+    },
+    "request_url": "http://192.168.1.16:8080/v1/chat/completions",
+    "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "status": "ok",
+    "supplier_native_envelope_control": "BEST_AVAILABLE_OBSERVATION",
+    "timings": {
+      "cache_n": 59,
+      "predicted_ms": 2495.296,
+      "predicted_n": 86,
+      "predicted_per_second": 34.46484905999128,
+      "predicted_per_token_ms": 29.015069767441858,
+      "prompt_ms": 359.275,
+      "prompt_n": 37,
+      "prompt_per_second": 102.98517848444786,
+      "prompt_per_token_ms": 9.710135135135134
+    },
+    "tool_calls": 0,
+    "transport_classification": "model_response",
+    "usage": {
+      "completion_tokens": 86,
+      "prompt_tokens": 96,
+      "prompt_tokens_details": {
+        "cached_tokens": 59
+      },
+      "total_tokens": 182
+    }
+  },
+  "ordinal": 24,
+  "raw_response_sha256": "a66c22844929962300d0e2bf0a996eeb5ebdc655a0dbc72408a42942eb44354e",
+  "status": "ok",
+  "supplier_id": "local_teacher"
+}
