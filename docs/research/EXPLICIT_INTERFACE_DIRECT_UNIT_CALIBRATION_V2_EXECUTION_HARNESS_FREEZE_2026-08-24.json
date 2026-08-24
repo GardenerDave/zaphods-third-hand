@@ -23,12 +23,17 @@
     "configured_command": "/home/navigator/bin/zth-codex-teacher",
     "cwd": "/tmp",
     "cwd_outside_repository": true,
+    "expected_codex_cli_version": "codex-cli 0.146.0",
+    "expected_wrapper_sha256": "2c5fcaf0727bdf466e21d660c927e63d23ecb67857949b2ef21e7e599297ceab",
     "identity_check": "configuration_only_no_inference",
+    "observed_codex_executable_path": "/home/navigator/.nvm/versions/node/v20.20.2/lib/node_modules/@openai/codex/bin/codex.js",
+    "observed_codex_version": "codex-cli 0.146.0\nWARNING: proceeding, even though we could not create PATH aliases: Read-only file system (os error 30)",
     "read_only_sandbox_enforced_by_wrapper": true,
     "repository_access_observed": "BEST_AVAILABLE_OBSERVATION",
     "service_identity": "codex-cli-0.146.0 via preserved service mechanism",
     "skip_git_repo_check_enforced_by_wrapper": true,
     "tool_calls_observed": "BEST_AVAILABLE_OBSERVATION",
+    "tools_not_mechanically_disabled": true,
     "wrapper_path": "/home/navigator/bin/zth-codex-teacher",
     "wrapper_sha256": "2c5fcaf0727bdf466e21d660c927e63d23ecb67857949b2ef21e7e599297ceab"
   },
@@ -45,7 +50,7 @@
     "evaluator_implementation_imported_after_raw_seal": true,
     "evaluator_sha256_must_match": true
   },
-  "harness_sha256": "fa3b5b8f4a5029b91dca2231dbcd31f7718aa68abc3e0b7b092b0694d770338f",
+  "harness_sha256": "bbf2d6e5e96af73c5e111240f2193e51576a3ee24512d0c65341e5929d3b7502",
   "local_identity_enforcement": {
     "configuration_only_no_inference": true,
     "required_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
@@ -66,10 +71,11 @@
   "replays": 0,
   "resolved_local_identity_preflight": {
     "endpoint_alias": "JARVIS_LOCAL",
+    "frozen_base_url": "http://192.168.1.13:8083/v1",
     "frozen_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf via JARVIS_LOCAL",
     "identity_check": "configuration_only_no_inference",
     "resolved_api": "openai-chat",
-    "resolved_base_url": "http://<LAN_HOST>:8083/v1",
+    "resolved_base_url": "http://192.168.1.13:8083/v1",
     "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
     "worker_name": "handoff"
   },

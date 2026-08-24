@@ -64,6 +64,20 @@ def test_identity_and_projection_hash() -> None:
             os.environ.pop("ZTH_CAPABILITY_TEACHER_MODEL", None)
         else:
             os.environ["ZTH_CAPABILITY_TEACHER_MODEL"] = old_model
+    old_endpoint = os.environ.get("ZTH_CAPABILITY_TEACHER_BASE_URL")
+    os.environ["ZTH_CAPABILITY_TEACHER_BASE_URL"] = "http://alternate.invalid:9999/v1"
+    try:
+        try:
+            MODULE.validate_local_identity()
+        except RuntimeError:
+            pass
+        else:
+            raise AssertionError("arbitrary alternate local endpoint was accepted")
+    finally:
+        if old_endpoint is None:
+            os.environ.pop("ZTH_CAPABILITY_TEACHER_BASE_URL", None)
+        else:
+            os.environ["ZTH_CAPABILITY_TEACHER_BASE_URL"] = old_endpoint
     original_projection = MODULE.V2_PROJECTION_IMPL
     with tempfile.TemporaryDirectory() as directory:
         bad = Path(directory) / "projection.py"
@@ -83,6 +97,23 @@ def test_identity_and_projection_hash() -> None:
 def test_external_mechanism_and_complete_failure_evidence() -> None:
     mechanism = MODULE.validate_external_mechanism()
     assert mechanism["read_only_sandbox_enforced_by_wrapper"] is True
+    assert mechanism["observed_codex_version"].find(MODULE.EXPECTED_CODEX_CLI_VERSION) >= 0
+    frozen = json.loads((DOCS / MODULE.HARNESS_FREEZE_NAME).read_text(encoding="utf-8"))
+    original_wrapper = MODULE.EXTERNAL_WRAPPER
+    with tempfile.TemporaryDirectory(prefix="explicit-v2-wrapper-") as directory:
+        modified = Path(directory) / "zth-codex-teacher"
+        modified.write_bytes(original_wrapper.read_bytes() + b"\n# mutation\n")
+        modified.chmod(0o755)
+        MODULE.EXTERNAL_WRAPPER = modified
+        try:
+            try:
+                MODULE.validate_external_mechanism(frozen["external_mechanism_enforcement"]["configured_command"], frozen["external_mechanism_enforcement"]["wrapper_sha256"])
+            except RuntimeError as exc:
+                assert "SHA256" in str(exc)
+            else:
+                raise AssertionError("modified preserved wrapper was accepted")
+        finally:
+            MODULE.EXTERNAL_WRAPPER = original_wrapper
     try:
         MODULE.validate_external_mechanism("python3 -c pass")
     except RuntimeError:
@@ -123,12 +154,33 @@ def test_terminal_failure_and_guard_without_supplier_calls() -> None:
         assert manifest["actual_supplier_calls"] == 1
         assert len(list((output / "cases").glob("*/*/call_finished.json"))) == 1
         assert guard.exists()
+        second_output = root / "second-run"
         try:
-            MODULE.claim_one_shot_guard(guard, MODULE.sha_file(HARNESS), MODULE.EXPECTED_V2_FREEZE_COMMIT)
+            MODULE.execute(second_output, DOCS, guard_state=guard, capture_overrides={"local_teacher": stub, "external_teacher": stub}, inject_exception_after=1)
         except RuntimeError:
             pass
         else:
-            raise AssertionError("second acquisition guard claim was accepted")
+            raise AssertionError("second execute attempt was accepted")
+        assert not second_output.exists()
+
+
+def test_complete_terminal_raw_seal_hash_coverage() -> None:
+    with tempfile.TemporaryDirectory(prefix="explicit-v2-seal-") as directory:
+        root = Path(directory)
+        output = root / "run"
+        guard = root / "guard.json"
+
+        def stub(_message: bytes) -> dict[str, object]:
+            return {"content_bytes": b"complete-test-only-capture", "metadata": {"test_only": True}}
+
+        assert MODULE.execute(output, DOCS, guard_state=guard, capture_overrides={"local_teacher": stub, "external_teacher": stub}) == 0
+        raw = json.loads((output / "raw_response_manifest.json").read_text(encoding="utf-8"))
+        assert raw["status"] == "SEALED_BEFORE_EVALUATION"
+        assert raw["terminal_arm_artifact_count"] == 32
+        for arm in raw["terminal_arm_artifact_hashes"]:
+            names = {Path(name).name for name in arm["artifact_hashes"]}
+            assert {"supplier_message.txt", "call_started.json", "call_finished.json", "response.json"}.issubset(names)
+            assert all(len(digest) == 64 for digest in arm["artifact_hashes"].values())
 
 
 def test_prepare_only_firewall_and_zero_calls() -> None:
@@ -160,6 +212,7 @@ def main() -> None:
     test_identity_and_projection_hash()
     test_external_mechanism_and_complete_failure_evidence()
     test_terminal_failure_and_guard_without_supplier_calls()
+    test_complete_terminal_raw_seal_hash_coverage()
     test_prepare_only_firewall_and_zero_calls()
     print("PASS V2 hardened acquisition boundary tests; supplier/model calls=0")
 

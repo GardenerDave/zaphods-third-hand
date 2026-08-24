@@ -14,6 +14,7 @@ import hashlib
 import json
 import os
 import shlex
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -44,7 +45,9 @@ EXTERNAL_COMMAND_DEFAULT = str(EXTERNAL_WRAPPER)
 LOCAL_MODEL = "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"
 LOCAL_SERVICE_ALIAS = "JARVIS_LOCAL"
 LOCAL_WORKER_DEFAULT = "handoff"
+FROZEN_LOCAL_BASE_URL = "http://192.168.1.13:8083/v1"
 EXTERNAL_SERVICE_IDENTITY = "codex-cli-0.146.0 via preserved service mechanism"
+EXPECTED_CODEX_CLI_VERSION = "codex-cli 0.146.0"
 LOCAL_SERVICE_IDENTITY = f"{LOCAL_MODEL} via {LOCAL_SERVICE_ALIAS}"
 DEFAULT_GUARD_STATE = ROOT / ".work" / "explicit_interface_direct_unit_calibration_v2" / "ACQUISITION_GUARD.json"
 
@@ -115,6 +118,9 @@ def verify_v2_acquisition_artifacts(artifact_dir: Path) -> tuple[dict[str, Any],
         raise RuntimeError("execution harness implementation hash mismatch")
     if harness_freeze["acquisition_input_projection_sha256"] != sha_file(V2_PROJECTION_IMPL):
         raise RuntimeError("harness freeze projection hash mismatch")
+    expected_wrapper_sha = harness_freeze.get("external_mechanism_enforcement", {}).get("wrapper_sha256")
+    if not expected_wrapper_sha or sha_file(EXTERNAL_WRAPPER) != expected_wrapper_sha:
+        raise RuntimeError("preserved external wrapper hash mismatch")
     if harness_freeze["schedule_sha256"] != sha_bytes(_canonical(harness_freeze["schedule"])):
         raise RuntimeError("expanded schedule hash mismatch")
     if runtime["case_order"] != harness_freeze["case_order"]:
@@ -218,42 +224,66 @@ def validate_local_identity() -> dict[str, Any]:
     api_override = os.environ.get("ICM_HANDOFF_API")
     if api_override is not None and api_override != "openai-chat":
         raise RuntimeError(f"local API override mismatch: {api_override}")
-    spec = resolve_worker_spec(worker_name, base_url=os.environ.get("ZTH_CAPABILITY_TEACHER_BASE_URL"), model=LOCAL_MODEL)
+    explicit_base_url = os.environ.get("ZTH_CAPABILITY_TEACHER_BASE_URL")
+    inherited_base_url = os.environ.get("ICM_HANDOFF_BASE_URL")
+    for value, label in ((explicit_base_url, "ZTH_CAPABILITY_TEACHER_BASE_URL"), (inherited_base_url, "ICM_HANDOFF_BASE_URL")):
+        if value is not None and value.rstrip("/") != FROZEN_LOCAL_BASE_URL:
+            raise RuntimeError(f"local endpoint override mismatch in {label}: {value}")
+    resolved_base_url = (explicit_base_url or inherited_base_url or FROZEN_LOCAL_BASE_URL).rstrip("/")
+    spec = resolve_worker_spec(worker_name, base_url=resolved_base_url, model=LOCAL_MODEL)
     if spec.model != LOCAL_MODEL:
         raise RuntimeError(f"resolved local model mismatch: {spec.model}")
+    if spec.base_url != FROZEN_LOCAL_BASE_URL:
+        raise RuntimeError(f"resolved local endpoint mismatch: {spec.base_url}")
     return {
         "frozen_identity": LOCAL_SERVICE_IDENTITY,
         "worker_name": worker_name,
         "resolved_model": spec.model,
         "resolved_api": spec.api,
         "resolved_base_url": spec.base_url,
+        "frozen_base_url": FROZEN_LOCAL_BASE_URL,
         "endpoint_alias": alias,
         "identity_check": "configuration_only_no_inference",
     }
 
 
-def validate_external_mechanism(command: str | None = None) -> dict[str, Any]:
-    """Validate the preserved no-tool wrapper without invoking it."""
+def validate_external_mechanism(command: str | None = None, expected_wrapper_sha256: str | None = None) -> dict[str, Any]:
+    """Validate the exact preserved wrapper and CLI version without invoking a model."""
     configured = command if command is not None else os.environ.get("ZTH_EXTERNAL_TEACHER_COMMAND", EXTERNAL_COMMAND_DEFAULT)
     argv = shlex.split(configured)
     if argv != [EXTERNAL_COMMAND_DEFAULT]:
         raise RuntimeError("external command is not the preserved zth-codex-teacher wrapper")
     if not EXTERNAL_WRAPPER.is_file() or not os.access(EXTERNAL_WRAPPER, os.X_OK):
         raise RuntimeError("preserved external wrapper is missing or not executable")
+    wrapper_sha256 = sha_file(EXTERNAL_WRAPPER)
+    if expected_wrapper_sha256 is not None and wrapper_sha256 != expected_wrapper_sha256:
+        raise RuntimeError("preserved external wrapper SHA256 differs from frozen value")
     wrapper_text = EXTERNAL_WRAPPER.read_text(encoding="utf-8")
     required = ("codex exec", "--ephemeral", "--sandbox read-only", "--skip-git-repo-check", "--output-last-message")
     missing = [term for term in required if term not in wrapper_text]
     if missing:
         raise RuntimeError(f"preserved external wrapper lacks controls: {missing}")
+    codex_path = shutil.which("codex")
+    if codex_path is None:
+        raise RuntimeError("codex executable is not available on PATH")
+    version_probe = subprocess.run([codex_path, "--version"], capture_output=True, text=True, timeout=10, check=False)
+    observed_version = (version_probe.stdout + version_probe.stderr).strip()
+    if version_probe.returncode != 0 or EXPECTED_CODEX_CLI_VERSION not in observed_version:
+        raise RuntimeError(f"Codex CLI version mismatch: {observed_version}")
     return {
         "configured_command": configured,
         "wrapper_path": str(EXTERNAL_WRAPPER),
-        "wrapper_sha256": sha_file(EXTERNAL_WRAPPER),
+        "wrapper_sha256": wrapper_sha256,
+        "expected_wrapper_sha256": expected_wrapper_sha256 or wrapper_sha256,
+        "observed_codex_executable_path": str(Path(codex_path).resolve()),
+        "observed_codex_version": observed_version,
+        "expected_codex_cli_version": EXPECTED_CODEX_CLI_VERSION,
         "service_identity": EXTERNAL_SERVICE_IDENTITY,
         "cwd": str(EXTERNAL_CWD),
         "cwd_outside_repository": True,
         "read_only_sandbox_enforced_by_wrapper": True,
         "skip_git_repo_check_enforced_by_wrapper": True,
+        "tools_not_mechanically_disabled": True,
         "tool_calls_observed": "BEST_AVAILABLE_OBSERVATION",
         "repository_access_observed": "BEST_AVAILABLE_OBSERVATION",
         "identity_check": "configuration_only_no_inference",
@@ -433,6 +463,19 @@ def _write_raw_and_lifecycle(output_dir: Path, manifest: dict[str, Any], records
     manifest["actual_external_calls"] = sum(item["supplier_id"] == "external_teacher" for item in records)
     manifest["raw_explicit_v2_responses_sealed_before_evaluation"] = True
     atomic_write_json(output_dir / "execution_manifest.json", manifest)
+    terminal_artifacts = []
+    for record in records:
+        arm_dir = output_dir / "cases" / record["case_id"] / record["supplier_id"]
+        files = {}
+        for path in sorted(arm_dir.rglob("*")):
+            if path.is_file():
+                files[str(path.relative_to(output_dir))] = sha_file(path)
+        required = {"supplier_message.txt", "call_started.json", "call_finished.json"}
+        if not required.issubset({Path(name).name for name in files}):
+            raise RuntimeError(f"terminal arm artifact coverage incomplete: {record['case_id']} {record['supplier_id']}")
+        if not any(name.endswith("response.json") or name.endswith("infrastructure_failure.json") for name in files):
+            raise RuntimeError(f"terminal arm lacks response/failure evidence: {record['case_id']} {record['supplier_id']}")
+        terminal_artifacts.append({"ordinal": record["ordinal"], "case_id": record["case_id"], "supplier_id": record["supplier_id"], "artifact_hashes": files})
     raw_manifest = {
         "schema": "zth.explicit_interface_v2.raw_acquisition_manifest",
         "status": "SEALED_BEFORE_EVALUATION",
@@ -447,6 +490,8 @@ def _write_raw_and_lifecycle(output_dir: Path, manifest: dict[str, Any], records
         "actual_external_calls": manifest["actual_external_calls"],
         "retries": 0,
         "replays": 0,
+        "terminal_arm_artifact_hashes": terminal_artifacts,
+        "terminal_arm_artifact_count": len(terminal_artifacts),
         "records": records,
     }
     atomic_write_json(output_dir / "raw_response_manifest.json", raw_manifest)
@@ -467,15 +512,24 @@ def _write_raw_and_lifecycle(output_dir: Path, manifest: dict[str, Any], records
 
 def execute(output_dir: Path, artifact_dir: Path, guard_state: Path | None = None, capture_overrides: dict[str, Callable[[bytes], Any]] | None = None, inject_exception_after: int | None = None) -> int:
     """Execute exactly one schedule, with outer fail-closed terminalization."""
-    validate_local_identity()
-    validate_external_mechanism()
+    local_identity = validate_local_identity()
+    _, runtime, _, harness_freeze, _, _ = prepare_inputs(artifact_dir)
+    validate_schedule(harness_freeze["schedule"], runtime)
+    external_identity = validate_external_mechanism(harness_freeze["external_mechanism_enforcement"]["configured_command"], harness_freeze["external_mechanism_enforcement"]["wrapper_sha256"])
+    if output_dir.exists():
+        raise RuntimeError("run directory already exists; refusing resume/replay")
+    guard = guard_state or DEFAULT_GUARD_STATE
+    claim_one_shot_guard(guard, sha_file(Path(__file__)), EXPECTED_V2_FREEZE_COMMIT)
+    # The guard is claimed before PREPARED/RUNNING transition, so a second
+    # execute attempt with another output directory cannot create lifecycle
+    # evidence or claim a second acquisition process.
     manifest = prepare_run(output_dir, artifact_dir)
+    manifest["resolved_local_identity"] = local_identity
+    manifest["resolved_external_identity"] = external_identity
     manifest["status"] = "RUNNING"
     manifest["processes_started"] = 1
     atomic_write_json(output_dir / "execution_manifest.json", manifest)
-    guard = guard_state or DEFAULT_GUARD_STATE
     try:
-        claim_one_shot_guard(guard, sha_file(Path(__file__)), EXPECTED_V2_FREEZE_COMMIT)
         _, runtime, _, harness_freeze, inputs, input_by_key = prepare_inputs(artifact_dir)
         validate_schedule(harness_freeze["schedule"], runtime)
         call_records: list[dict[str, Any]] = []
@@ -598,8 +652,11 @@ def preflight(artifact_dir: Path) -> None:
     if sha_file(V2_PROJECTION_IMPL) != expected["acquisition_input_projection"]:
         raise RuntimeError("projection implementation hash mismatch in preflight")
     validate_local_identity()
-    validate_external_mechanism()
     _, runtime, _, harness_freeze, inputs, _ = prepare_inputs(artifact_dir)
+    validate_external_mechanism(
+        harness_freeze["external_mechanism_enforcement"]["configured_command"],
+        harness_freeze["external_mechanism_enforcement"]["wrapper_sha256"],
+    )
     validate_schedule(harness_freeze["schedule"], runtime)
     if freeze["V2_TARGET_OUTCOMES"] != 0 or freeze["V2_SUPPLIER_CALLS"] != 0:
         raise RuntimeError("V2 is not unexecuted")
