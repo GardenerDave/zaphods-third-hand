@@ -1,0 +1,63 @@
+{
+  "schema": "zth_direct_unit_calibration_atomic_observation_v1",
+  "status": "frozen_model_free",
+  "supplier_role": "DIRECT_RESPONDER",
+  "required_fields": [
+    "supplier_id",
+    "model_runtime_identity",
+    "capability_family",
+    "bounded_responsibility",
+    "interface_id",
+    "interface_hash",
+    "supplier_role",
+    "downstream_dependencies",
+    "validated_artifact",
+    "authority_context",
+    "evaluator_id",
+    "evidence_timestamp",
+    "case_id",
+    "experiment_payload_hash",
+    "raw_response_hash",
+    "transport_valid",
+    "parse_valid",
+    "contract_valid",
+    "semantic_valid",
+    "capability_valid",
+    "failure_class",
+    "freshness_lineage"
+  ],
+  "direct_unit_invariants": {
+    "supplier_role": "DIRECT_RESPONDER",
+    "downstream_dependencies": [],
+    "validated_artifact": "direct_supplier_response",
+    "deterministic_parser_is_supplier_dependency": false,
+    "teacher_intervention_allowed": false,
+    "downstream_model_repair_allowed": false,
+    "tool_calls": 0,
+    "repository_access": false,
+    "evaluator_access": false
+  },
+  "validation_fields": [
+    "transport_valid",
+    "parse_valid",
+    "contract_valid",
+    "semantic_valid",
+    "capability_valid",
+    "failure_class"
+  ],
+  "evidence_states": [
+    "SUPPORTED_POSITIVE",
+    "SUPPORTED_NEGATIVE",
+    "OBSERVED_INSUFFICIENT",
+    "UNOBSERVED",
+    "OUT_OF_PROFILE",
+    "INTERFACE_TRANSFER_REQUIRED",
+    "SUPPLIER_OR_INTERFACE_CHANGED"
+  ],
+  "aggregation_levels": [
+    "supplier",
+    "supplier×capability_family",
+    "supplier×capability_family×interface",
+    "supplier×capability_family×interface×responsibility"
+  ]
+}

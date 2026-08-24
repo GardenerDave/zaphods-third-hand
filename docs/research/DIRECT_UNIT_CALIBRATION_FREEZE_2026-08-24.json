@@ -1,0 +1,139 @@
+{
+  "schema": "zth_direct_unit_calibration_freeze_v1",
+  "experiment_id": "DIRECT_UNIT_CALIBRATION_2026-08-24",
+  "freeze_characterization": "DIRECT_UNIT_CALIBRATION_EXPERIMENT_FROZEN_UNEXECUTED",
+  "base_design_commit": "f55f677c46a0746ef4ba4dda4072c4e2f452b544",
+  "freeze_type": "model_free_stage_a_freeze",
+  "selected_families": ["scope-authority-boundary", "triage-routing", "unsupported-certainty"],
+  "contradiction_reserve_included": false,
+  "sample_size": {
+    "scope_v0_historical_tasks": 16,
+    "new_triage_cases": 8,
+    "new_unsupported_certainty_cases": 8,
+    "new_cases": 16,
+    "planned_new_local_calls": 16,
+    "planned_new_external_calls": 16,
+    "planned_new_supplier_calls": 32,
+    "existing_scope_v0_direct_observations": 32,
+    "planned_new_direct_observations": 32,
+    "total_direct_observations_after_stage_a": 64,
+    "stage_a_sample_size_frozen_before_new_outcomes": true,
+    "outcome_conditional_sample_extension_permitted": false
+  },
+  "scope_v0_historical_input": {
+    "run_directory": ".work/model_size_supplier_floor/delegation_prediction_test_scope_v0/run_20260824T170000Z",
+    "raw_response_manifest_sha256": "54d06b4c9a221eb8a98bcb5f6d2db5cf2246c57c14058ba4ae9f655696e04173",
+    "lifecycle_sha256": "cd4e9daca5090a4f6dd3896bf8f6d2d4a25add605bc340f179d5da313e64f4f1",
+    "raw_records_verified_against_manifest": 32,
+    "local": {"overall": "5/16", "supported_nonexpanding": "3/8", "expansion_required": "2/8"},
+    "external": {"overall": "16/16", "supported_nonexpanding": "8/8", "expansion_required": "8/8"},
+    "eligible_as_future_historical_evidence": true,
+    "must_not_be_reused_as_future_targets": true,
+    "replay_calls_in_this_freeze": 0
+  },
+  "suppliers": [
+    {"supplier_id": "local_teacher", "identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf", "endpoint_alias": "JARVIS_LOCAL", "role": "DIRECT_RESPONDER"},
+    {"supplier_id": "external_teacher", "identity": "codex-cli-0.146.0", "service_class": "preserved Codex service class", "role": "DIRECT_RESPONDER"}
+  ],
+  "competence_unit": {
+    "expression": "supplier × capability × interface × direct responsibility × validated direct artifact",
+    "supplier_role": "DIRECT_RESPONDER",
+    "downstream_dependencies": [],
+    "validated_artifact": "direct supplier response",
+    "deterministic_parser_evaluator_is_infrastructure": true,
+    "teacher_intervention": false,
+    "downstream_model_repair": false
+  },
+  "interfaces": {
+    "triage-routing": {
+      "interface_id": "duc_triage_direct_json_v1",
+      "interface_hash": "5c7a5c48522e3266299e33de48a7de76e913b26870c80c55b140935c59cc06ea",
+      "prompt_template": "Return only a JSON object with route, rationale, and review_status for this review-only triage request. Do not authorize execution. Request: {{request}}",
+      "output_contract": {"format":"json","required_fields":["route","rationale","review_status"],"additional_properties":false},
+      "authority_context": {"mode":"review-only","mutation_authority":false,"execution_authority":false},
+      "tools": false,
+      "repository_access": false,
+      "evaluator_access": false,
+      "downstream_dependencies": []
+    },
+    "unsupported-certainty": {
+      "interface_id": "duc_unsupported_certainty_direct_json_v1",
+      "interface_hash": "70bcb2e3442b521bbca4daf222c92695bef163fe1fd4428518d5751c32a0c4fc",
+      "prompt_template": "Return only a JSON object with known_facts, uncertainty, review_status, and next_step for this review-only evidence question. Do not make a broad reliability claim. Request: {{request}}",
+      "output_contract": {"format":"json","required_fields":["known_facts","uncertainty","review_status","next_step"],"additional_properties":false},
+      "authority_context": {"mode":"review-only","mutation_authority":false,"execution_authority":false},
+      "tools": false,
+      "repository_access": false,
+      "evaluator_access": false,
+      "downstream_dependencies": []
+    }
+  },
+  "case_order": ["duc-triage-001","duc-triage-002","duc-triage-003","duc-triage-004","duc-triage-005","duc-triage-006","duc-triage-007","duc-triage-008","duc-unsupported-001","duc-unsupported-002","duc-unsupported-003","duc-unsupported-004","duc-unsupported-005","duc-unsupported-006","duc-unsupported-007","duc-unsupported-008"],
+  "case_freshness": {
+    "generated_after_design_commit": "f55f677c46a0746ef4ba4dda4072c4e2f452b544",
+    "new_triage_cases": 8,
+    "new_unsupported_certainty_cases": 8,
+    "scope_v0_ids_or_text_reused": false,
+    "previous_exact_supplier_execution_found": false,
+    "model_outputs_consulted": false,
+    "freshness_process": "new stable IDs and new request text; model-free novelty review against preserved fixture/evidence corpus"
+  },
+  "artifact_hashes": {
+    "atomic_schema": {"path":"docs/research/DIRECT_UNIT_CALIBRATION_ATOMIC_SCHEMA_2026-08-24.json","sha256":"5db777c62bd20bdc31827344b531ddac1b8848a5ab25bdaff2fedf735f8178c1"},
+    "runtime_manifest": {"path":"docs/research/DIRECT_UNIT_CALIBRATION_RUNTIME_MANIFEST_2026-08-24.json","sha256":"6dc320ca526ae48787a6c436b4ad3838c0c3287b796bbe47cafb18b06a013299"},
+    "evaluator_cases": {"path":"docs/research/DIRECT_UNIT_CALIBRATION_EVALUATOR_CASES_2026-08-24.json","sha256":"aaf8d0416e86ba4f250129b61da078fa43e63cee7dd5cc16ebd78b771f8273a1"}
+  },
+  "aggregation": {
+    "micro_and_family_macro_summaries_required": true,
+    "future_broad_policy_aggregation_rule_not_selected": true,
+    "micro_aggregate": "pool all atomic direct observations descriptively",
+    "family_macro_aggregate": "equal descriptive weight for selected family direct-valid rates"
+  },
+  "evidence_states": ["SUPPORTED_POSITIVE","SUPPORTED_NEGATIVE","OBSERVED_INSUFFICIENT","UNOBSERVED","OUT_OF_PROFILE","INTERFACE_TRANSFER_REQUIRED","SUPPLIER_OR_INTERFACE_CHANGED"],
+  "stage_firewall": {
+    "stage_a": "calibration evidence acquisition",
+    "stage_b": "future clean granularity replication",
+    "future_policy_disagreement_must_emerge_from_pre_target_evidence": true,
+    "stage_b_targets_must_be_fresh_relative_to_stage_a": true,
+    "stage_b_policy_freeze_precedes_stage_b_target_outcomes": true,
+    "go_gate_deferred_until_stage_a_closeout": true
+  },
+  "execution_controls": {
+    "retries": 0,
+    "replays": 0,
+    "response_repair": false,
+    "teacher_intervention": false,
+    "downstream_model_repair": false,
+    "model_substitution": false,
+    "tool_calls": 0,
+    "repository_access": false,
+    "evaluator_access": false,
+    "authority_changes": false,
+    "threshold_tuning": false,
+    "qualification_or_promotion": false,
+    "production_routing_change": false
+  },
+  "pre_execution_contamination_audit": {
+    "new_calibration_responses_exist": false,
+    "new_calibration_results_exist": false,
+    "supplier_inference_occurred": false,
+    "all_16_fresh_cases_exist_once": true,
+    "evaluator_expectation_in_runtime_manifest": false,
+    "scope_v0_raw_artifacts_changed": false,
+    "historical_evidence_changed": false,
+    "contradiction_reserve_present": false,
+    "adaptive_sample_extension": false
+  },
+  "characterization": {
+    "direct_unit_calibration_experiment_frozen": true,
+    "direct_responsibility_matched_across_arms": true,
+    "stage_a_sample_size_frozen_before_new_outcomes": true,
+    "outcome_conditional_sample_extension_permitted": false,
+    "micro_and_family_macro_summaries_required": true,
+    "future_broad_policy_aggregation_rule_not_selected": true,
+    "scope_v0_direct_results_eligible_as_future_historical_evidence": true,
+    "competence_unit_alignment_precedes_policy_uncertainty_tuning": true,
+    "primary": "DIRECT_UNIT_CALIBRATION_EXPERIMENT_FROZEN_UNEXECUTED"
+  },
+  "controls": {"model_calls":0,"teacher_calls":0,"tool_calls":0,"external_inference_calls":0,"new_runtime_calls":0,"raw_response_mutations":0,"historical_evidence_mutations":0,"policy_changes":0,"qualification_changes":0,"production_routing_changes":0,"push_performed":false}
+}
