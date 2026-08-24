@@ -1,0 +1,122 @@
+{
+  "schema": "zth_delegation_prediction_prospective_freeze_v2",
+  "experiment_id": "DELEGATION_PREDICTION_TEST_SCOPE_V0",
+  "freeze_status": "FROZEN_UNEXECUTED_CORRECTED",
+  "freeze_characterization": "PROSPECTIVE_DELEGATION_PREDICTION_EXPERIMENT_CORRECTED_FREEZE_UNEXECUTED",
+  "freeze_timestamp_utc": "2026-08-24T15:30:00Z",
+  "base_design_commit": "39f2a07b15324b01c62f14e447fc94169675ddf2",
+  "original_freeze_commit": "99babf1232ea0e80a2ec89aff579d2eafa790af1",
+  "original_freeze_sha256": "4fe343eead59c13b9e42146491e15a0fccfaeda048c89556a2aaa44b66b27dbf",
+  "supersession_reason": "The original freeze contract serialized additionalProperties:false, an exact-key-set rejection rule not fixed by the hardened design or historical Run 4A validator. It was superseded before execution.",
+  "semantic_adjudication": {
+    "historical_extra_field_policy": "ALLOWED",
+    "historical_basis": "Run 4A declared required_fields and the preserved validator checks required presence/types, duplicate keys, target separation, and review semantics without unexpected-key rejection.",
+    "hardened_design_extra_field_policy": "UNSPECIFIED",
+    "original_freeze_added_experimental_semantics": true,
+    "corrected_interface_adds_new_experiment_semantics": false,
+    "corrected_interface_rule": "No exact-key-set rejection is asserted; the four required fields, types, review-only authority, and no-expansion semantics are retained."
+  },
+  "corrected_artifacts": {
+    "interface_contract": "docs/research/DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_V2_2026-08-24.json",
+    "interface_contract_sha256": "c6726c65a40df77c6e681226c90f48c16e00348b5727ab15a14c6b7e61cb3f93",
+    "runtime_manifest": "docs/research/DELEGATION_PREDICTION_PROSPECTIVE_RUNTIME_MANIFEST_2026-08-24.json",
+    "runtime_manifest_sha256": "f10ff1ef98ecc0e452d59e842398a0b37a2760e4d7adf63a2be762d1d23f077c"
+  },
+  "source_provenance": [
+    {"path":"docs/research/DELEGATION_PREDICTION_PROSPECTIVE_MATCHED_DESIGN_2026-08-24.md","sha256":"b01d0f5d4a0df0552b6a88ae4656dcb9c03ff50003bd65a2f5972fa38c3116f9","role":"hardened design"},
+    {"path":"docs/research/DELEGATION_PREDICTION_PROSPECTIVE_PREDICTORS_2026-08-24.json","sha256":"1fcdf91d9cae4be6bb8182aa982896528745e664883e74695972ce15506b7a9c","role":"frozen predictor policies"},
+    {"path":"docs/research/DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json","sha256":"929edfc8a299998bc32faef4144b94f2f007cd511bca6ded4a6d7828cd5481e8","role":"separate scoring-only cases"},
+    {"path":"docs/research/DELEGATION_PREDICTION_PROSPECTIVE_EXECUTION_PLAN_2026-08-24.md","sha256":"49e3e94421223015f266573702f3ea8588aa4ade18daf1048d6add5119df182d","role":"execution controls and stop conditions"},
+    {"path":"docs/research/DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_2026-08-24.json","sha256":"cb6388fa675cf1b3031b224afd1258454102d2bef935b851bfa1ce92de6fce5c","role":"preserved original freeze contract"},
+    {"path":".work/run4a_intervention_market_calibration/run_20260819T184835Z/aggregate.json","sha256":"bee66dac025f40c964b207442e6dd232a9f39a4d18448e568b2b6430b34f3016","role":"historical broad and scope outcomes"},
+    {"path":"docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_4A_2026-08-19.md","sha256":"361faf4580c94455d61826ee5b293d8dcdb7cf3fa256c877b97965c014e7b512","role":"historical supplier evidence report"},
+    {"path":"docs/research/RUN_4A_PREREGISTRATION_2026-08-19.json","sha256":"a9418fe1e45a05e46b4fd183a6345333893192305fbf767461f3b280b26d748b","role":"historical supplier identity and support semantics"},
+    {"path":"docs/research/RUN_4B_SCOPE_INTERVENTION_REPLICATION_PREREGISTRATION_2026-08-19.json","sha256":"59f02a1e23c9cbe7e91bfb9c464675ccbb7bbb54b779091ea11cef8846ce5771","role":"historical scope contract and authority boundary"},
+    {"path":"docs/research/RUN_4_RESOURCE_WEIGHTS_FREEZE_2026-08-19.json","sha256":"8f7820a6a3e5734e071452f643374d8c6c769d4d149bcec3f2f82b88ee6530c2","role":"historical resource prior"},
+    {"path":"docs/research/ATOMIC_SUPPLIER_SCORECARD_SCHEMA_V1.json","sha256":"d484d012e8fe7bb6a5266864b3c8542a96a4e6391ca75145007b0a04eeefeea9","role":"bounded evidence/status schema"},
+    {"path":"local_harness/supervised_attempt_output_validator.py","sha256":"3ca42dfc6f683399752bfe4f5757b9edf4e7eafb09ac30166fe60e9f3beb0d27","role":"historical model-free output validator; required fields/types without exact-key rejection"},
+    {"path":".work/run4a_intervention_market_calibration/run_20260819T184835Z/tasks/run4a-candidate-scope-001/arms/local_teacher/worker-retry.prompt.txt","sha256":"d1fb84e3079c4aa5020bb41e292b0661c476983a3bbfc62360b575bdaef043e4","role":"historical Run 4A output contract; required_fields only"}
+  ],
+  "cohort": {
+    "case_count": 16,
+    "case_ids_in_order": ["dpt-scope-001","dpt-scope-002","dpt-scope-003","dpt-scope-004","dpt-scope-005","dpt-scope-006","dpt-scope-007","dpt-scope-008","dpt-scope-009","dpt-scope-010","dpt-scope-011","dpt-scope-012","dpt-scope-013","dpt-scope-014","dpt-scope-015","dpt-scope-016"],
+    "supplier_selection_disagreement_count": 8,
+    "delegate_vs_abstain_disagreement_count": 8,
+    "binary_expected_success_disagreement_count": 8,
+    "sampling_characterization": "DISAGREEMENT_ENRICHED_NOT_INCIDENCE_REPRESENTATIVE",
+    "cohort_source": "preserved original freeze cohort; no case regenerated, replaced, dropped, or reordered"
+  },
+  "policies": {
+    "predictor_spec_sha256": "1fcdf91d9cae4be6bb8182aa982896528745e664883e74695972ce15506b7a9c",
+    "generalized_policy": "RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1; higher existing broad score delegates, tie/missing abstains; no broad-aggregate threshold",
+    "degeneralized_policy": "SCOPE_INTERFACE_PROFILE_RUN4A_V1; supported compatible profile selects lower expected cost supplier, unsupported/mismatch/tie abstains",
+    "threshold_policy_unchanged": true,
+    "supplier_selections_unchanged": true
+  },
+  "scoring": {
+    "evaluator_cases_sha256": "929edfc8a299998bc32faef4144b94f2f007cd511bca6ded4a6d7828cd5481e8",
+    "runtime_evaluator_influence": 0,
+    "lexicographic_order": ["false_positive_avoidance","successful_delegation","abstention_quality","cost_only_if_capability_equivalent"],
+    "scoring_unchanged": true
+  },
+  "supplier_and_interface_lineage": {
+    "historical_local": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf via JARVIS_LOCAL",
+    "historical_external": "codex-cli-0.146.0 via codex-cli service class",
+    "prospective_local": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf via JARVIS_LOCAL",
+    "prospective_external": "codex-cli-0.146.0 via codex-cli service class",
+    "supplier_identity_status": "EXACT",
+    "historical_interface": "run4a_scope_json_contract_v1",
+    "prospective_interface": "DELEGATION_PREDICTION_SCOPE_JSON_COMPATIBLE_SUCCESSOR_V1",
+    "interface_lineage": "COMPATIBLE_INTERFACE_SUCCESSOR",
+    "experiment_authored_interface_frozen": true,
+    "supplier_identity_frozen": true,
+    "supplier_native_envelope_frozen": false,
+    "supplier_native_envelope_control": "BEST_AVAILABLE_OBSERVATION",
+    "unfreezable_provider_native_state": true,
+    "native_envelope_observability": "supplier-specific native envelope hashes are not available without supplier/runtime observation and cannot be invented in this model-free correction",
+    "tool_calls": 0
+  },
+  "execution_controls": {
+    "retries": 0,
+    "teacher_intervention": false,
+    "prompt_repair": false,
+    "model_substitution": false,
+    "threshold_tuning": false,
+    "post_hoc_case_replacement": false,
+    "tool_calls": 0,
+    "evaluator_access": false,
+    "qualification_or_promotion": false,
+    "runtime_authority_changes": false,
+    "replay": false,
+    "response_repair": false,
+    "production_routing_change": false
+  },
+  "contamination_audit": {
+    "original_freeze_executed": false,
+    "original_freeze_outcome_contamination": false,
+    "original_freeze_superseded_before_execution": true,
+    "target_runtime_directory_exists": false,
+    "prospective_response_artifacts_exist": false,
+    "prospective_result_matrix_exists": false,
+    "prospective_supplier_inference_made": false,
+    "outcome_dependent_artifact_created": false,
+    "evaluator_fields_in_runtime_predictor_inputs": false,
+    "prospective_cases_dropped_or_altered": false,
+    "model_calls": 0,
+    "teacher_calls": 0,
+    "tool_calls": 0,
+    "external_inference_calls": 0,
+    "historical_artifacts_mutated": false,
+    "audit_result": "PASS"
+  },
+  "markers": {
+    "PROSPECTIVE_DELEGATION_PREDICTION_COHORT_UNCHANGED": true,
+    "PROSPECTIVE_PREDICTOR_POLICIES_UNCHANGED": true,
+    "PROSPECTIVE_SCORING_UNCHANGED": true,
+    "CORRECTED_INTERFACE_ADDS_NEW_EXPERIMENT_SEMANTICS": false,
+    "EVALUATOR_EXPECTATIONS_SEPARATED_FROM_RUNTIME_INPUT": true,
+    "RUNTIME_MANIFEST_EVALUATOR_ISOLATION_DEMONSTRATED": true,
+    "RUNTIME_EVALUATOR_INFLUENCE": 0,
+    "PRIMARY_CHARACTERIZATION": "PROSPECTIVE_DELEGATION_PREDICTION_EXPERIMENT_CORRECTED_FREEZE_UNEXECUTED"
+  }
+}

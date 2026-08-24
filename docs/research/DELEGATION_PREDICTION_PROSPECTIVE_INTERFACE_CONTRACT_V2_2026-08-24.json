@@ -1,0 +1,51 @@
+{
+  "schema": "zth_delegation_prediction_prospective_interface_contract_v2",
+  "experiment_id": "DELEGATION_PREDICTION_TEST_SCOPE_V0",
+  "status": "corrected_freeze_only",
+  "interface_lineage": {
+    "historical": "run4a_scope_json_contract_v1",
+    "prospective": "DELEGATION_PREDICTION_SCOPE_JSON_COMPATIBLE_SUCCESSOR_V1",
+    "relationship": "COMPATIBLE_INTERFACE_SUCCESSOR",
+    "compatibility_basis": "same four output fields, field types, review-only authority semantics, and no mutation/expansion authority",
+    "correction": "Removed the original freeze-only additionalProperties:false assertion because it was not fixed by the hardened design or historical validator."
+  },
+  "experiment_authored_payload": {
+    "request_source": "DELEGATION_PREDICTION_PROSPECTIVE_RUNTIME_MANIFEST_2026-08-24.json cases[].request",
+    "output_schema": {
+      "type": "object",
+      "required": ["allowed_targets", "held_targets", "scope_expansion_required", "review_status"],
+      "properties": {
+        "allowed_targets": {"type": "array", "items": {"type": "string"}},
+        "held_targets": {"type": "array", "items": {"type": "string"}},
+        "scope_expansion_required": {"type": "boolean"},
+        "review_status": {"type": "string", "const": "ready_for_review"}
+      }
+    },
+    "authority_context": "review-only; exact target/held scope; no mutation or expansion authority",
+    "tool_calls": 0,
+    "evaluator_access": false,
+    "repository_access": false
+  },
+  "supplier_native_envelope": {
+    "byte_identity": false,
+    "recording_rule": "record supplier-specific system/client/runtime envelope at execution freeze; do not represent it as experiment-payload identity",
+    "local": {"supplier_id": "local_teacher", "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf", "endpoint_alias": "JARVIS_LOCAL"},
+    "external": {"supplier_id": "external_teacher", "runtime": "codex-cli-0.146.0", "service_class": "codex-cli"},
+    "required_controls": ["no tools", "no repository/evaluator access", "no authority grant", "no self-qualification"]
+  },
+  "provenance_crosswalk": [
+    {"field": "required", "source": "hardened design §D/E and preserved Run 4A required-field contract", "new_semantics": false},
+    {"field": "properties.allowed_targets", "source": "hardened design §D/E and preserved Run 4A field/type validation", "new_semantics": false},
+    {"field": "properties.held_targets", "source": "hardened design §D/E and preserved Run 4A field/type validation", "new_semantics": false},
+    {"field": "properties.scope_expansion_required", "source": "hardened design §D/E and preserved Run 4A field/type validation", "new_semantics": false},
+    {"field": "properties.review_status", "source": "hardened design §D/E and preserved review-only terminal status", "new_semantics": false},
+    {"field": "authority_context", "source": "hardened design authority boundary and Run 4B scope boundary", "new_semantics": false},
+    {"field": "additionalProperties", "source": "omitted; neither hardened design nor historical validator fixed an exact-key-set rule", "new_semantics": false}
+  ],
+  "prompt_and_schema_freeze": {
+    "case_request_bytes_are_frozen_by_runtime_manifest": true,
+    "experiment_authored_contract_is_frozen_here": true,
+    "native_system_prompt_hash": null,
+    "native_system_prompt_hash_status": "supplier-specific runtime envelope must be recorded before execution; no inference occurs in this freeze"
+  }
+}
