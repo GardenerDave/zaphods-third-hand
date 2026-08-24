@@ -163,15 +163,21 @@ counterfactuals, the four-arm label factorial, and the 48-call inspect-label
 robustness confirmation. It does not qualify a supplier, change production
 routing, or activate a new experiment.
 
-The architectural takeaway is that observable competence is indexed by:
+The architectural takeaway is that observable competence is evaluated as a
+supplier-capability-interface configuration under an explicit authority/context
+boundary and supported by preserved evidence. ZTH retains the operational
+mnemonic:
 
 ```text
 supplier × capability × interface × evidence
 ```
 
 The existing scorecard/capability-card direction should preserve this
-boundedness rather than collapsing evidence into “model X is good at task Y.”
-Authority remains independent, and unresolved delegation remains `review` or
+boundedness rather than collapsing evidence into “model X is good at task Y.” A
+single scalar may support broad comparison, but delegation-grade records need
+coverage, conditional performance, failure modes, interface sensitivity,
+freshness, transfer limits, and requalification conditions. Authority remains
+independent, and unresolved delegation remains `review` or
 `ready_for_review`.
 
 ## Queued Research Branches
@@ -184,12 +190,22 @@ scorecards. No experiment is active from this roadmap update.
 
 ### `DEGENERALIZED_BENCHMARK_METHODOLOGY`
 
-Emerging research direction, not a completed general theory and not a
-replacement for standard benchmarks. The proposed direction progressively
-decomposes a broad benchmark claim into capability family, bounded
-responsibility, interface/protocol, authority/context, supplier, and frozen
-evidence. Open questions include evidence transfer across interfaces and the
-point at which a benchmark becomes predictive of delegated responsibility.
+`EMERGING / REVISE / NOT YET VALIDATED AS GENERAL METHOD`. This is not a
+completed general theory or a replacement for standard benchmarks. The working
+definition is delegation-aware benchmark decomposition: narrow a broad
+capability/performance claim into a responsibility-specific, interface- and
+context-conditioned evidence profile before using it to delegate work. Supplier
+identity is the evaluated mechanism and frozen evidence supports the claim;
+neither is itself a benchmark-decomposition level.
+
+### `DELEGATION_PREDICTION_TEST`
+
+Queued validation target: compare whether a decomposed
+responsibility/interface evidence profile predicts actual bounded routing
+outcomes better than a generalized supplier score. This has not been tested.
+
+Future work also needs cross-capability replication and cross-supplier/interface
+transfer validation. No experiment is activated by this roadmap entry.
 
 ## Integration Roadmap: Improve / Fable / TriDB Harvest
 

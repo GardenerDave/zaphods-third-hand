@@ -18,7 +18,8 @@ Destructive actions, publication, promotion, disclosure, cleanup, and
 lifecycle movement require authorized approval.
 
 ZTH qualifies bounded supplier capabilities under explicit interfaces and
-preserved evidence; model identity alone is not a sufficient competence claim.
+authority/context boundaries, supported by preserved evidence; model identity
+alone is not a sufficient competence claim.
 See the [semantic capability/interface research synthesis](docs/research/SEMANTIC_CAPABILITY_INTERFACE_SYNTHESIS_2026-08-24.md)
 for the completed bounded semantic sequence and its emerging, not-yet-generalized
 “degeneralizing benchmarks” research direction.

@@ -194,18 +194,23 @@ supplier × capability × interface × evidence
 ```
 
 The supplier is the mechanism providing the bounded responsibility; the
-capability is the responsibility itself; the interface is the concrete request,
-schema, protocol, and authority/context boundary; and the evidence is the
-frozen evaluator, raw output, validation, telemetry, and review record. A
-supplier passing capability X through interface A does not qualify capability X
-through interface B without evidence for B. Failure through one interface does
-not by itself prove that the underlying capability is absent.
+capability is the responsibility itself; and the interface is the concrete
+request, schema, labels, definitions, and protocol. Authority/context is a
+separate conditioning boundary that can change the competence claim. Evidence
+is the frozen evaluator, raw output, validation, telemetry, and review record
+that supports the claim. The full expression remains useful operationally
+because delegation cannot rely on an unsupported claim. A supplier passing
+capability X through interface A does not qualify capability X through
+interface B without evidence for B. Failure through one interface does not by
+itself prove that the underlying capability is absent.
 
 Capability cards and scorecards should therefore remain specific enough to
-record supplier, capability ID, interface/version, authority boundary, evidence
-set, observed metrics, known failure modes, and qualification state. This is a
-documentation requirement, not a new automatic qualification or schema
-migration. See the [semantic capability/interface synthesis](research/SEMANTIC_CAPABILITY_INTERFACE_SYNTHESIS_2026-08-24.md).
+record a qualified interface evidence profile: supplier/version,
+capability/responsibility, interface/version, authority/context, task boundary,
+coverage, conditional performance, failure modes, evidence freshness, transfer
+limits, qualification state, requalification triggers, and supporting evidence.
+This is a documentation requirement, not a new automatic qualification or
+schema migration. See the [semantic capability/interface synthesis](research/SEMANTIC_CAPABILITY_INTERFACE_SYNTHESIS_2026-08-24.md).
 
 The related **degeneralizing benchmarks** direction is an emerging research
 methodology, not a replacement for standard benchmarks: broad scores should be

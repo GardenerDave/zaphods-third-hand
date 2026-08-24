@@ -25,24 +25,33 @@ routing. It is evidence that competence claims must stay indexed to the
 responsibility and interface through which the supplier is actually delegated
 work.
 
+The mnemonic combines terms with different conceptual roles. The evaluated
+configuration is `supplier × capability × interface`; authority/context is an
+explicit conditioning boundary; and frozen evidence is the epistemic support
+for the resulting claim. ZTH retains the full
+`supplier × capability × interface × evidence` expression operationally
+because no competence claim is usable for delegation without preserved
+evidence.
+
 The sequence also motivates an emerging research direction,
 **DEGENERALIZING BENCHMARKS**: progressively decompose broad benchmark claims
 until the measured unit matches a bounded responsibility under a specific
-supplier/interface/evidence configuration. This is a methodology hypothesis,
-not a completed general theory.
+supplier/interface configuration, explicit authority/context boundary, and
+frozen evidence profile. This is a methodology hypothesis, not a completed
+general theory.
 
 ## Evidence anchors
 
 The synthesis was checked against these preserved freeze and closeout anchors:
 
-| Slice | Freeze / design anchor | Closeout anchor |
-|---|---|---|
-| True semantic fallback V1 partial | `25b6051b910acece9dcc192533e86f0bf8db4cdb` | `3da279086a1864244f26bc09c9e527eb4f92fbce` |
-| True semantic fallback V2 | `39adc0477d68b8c3fa6fae10ee34d8543ffc34d9` | `TRUE_SEMANTIC_FALLBACK_V2_2026-08-23.md` |
-| Enum-order counterfactual | `f14023e7484584b975cbac93989daa0f01767e7b` | `SEMANTIC_ENUM_ORDER_COUNTERFACTUAL_V0_2026-08-23.md` |
-| Semantic label counterfactual | `0a8018567b992ed5bd79a90a97497c2d4c773ea1` | `SEMANTIC_LABEL_COUNTERFACTUAL_V0_2026-08-23.md` |
-| Semantic label factorial | `29a3eb0cde307266a575cd1b16ca4b682e2c089c` | `5ddf5b425ad1209aab6bbea196db82494a8b0046` |
-| Inspect-label robustness | `e69c2d3c0470cf7add591471b881fc52d12cc268` | `1881319a1cd977903457d36cc82681b38d58a7d4` |
+| Slice | Freeze/design commit | Execution/closeout commit | Canonical closeout document |
+|---|---|---|---|
+| True semantic fallback V1 partial | `25b6051b910acece9dcc192533e86f0bf8db4cdb` | `3da279086a1864244f26bc09c9e527eb4f92fbce` | `TRUE_SEMANTIC_FALLBACK_V1_PARTIAL_EXECUTION_2026-08-23.md` |
+| True semantic fallback V2 | `39adc0477d68b8c3fa6fae10ee34d8543ffc34d9` | `7d1bef48f9bc27855d1c58da02ea6b62aab2eebc` | `TRUE_SEMANTIC_FALLBACK_V2_2026-08-23.md` |
+| Enum-order counterfactual | `f14023e7484584b975cbac93989daa0f01767e7b` | `88eabce46f13331653b10d596bb1c68716ce55f3` | `SEMANTIC_ENUM_ORDER_COUNTERFACTUAL_V0_2026-08-23.md` |
+| Semantic label counterfactual | `0a8018567b992ed5bd79a90a97497c2d4c773ea1` | `1389ed80140d297472dce98ae3a0b0c7bf60d8e6` | `SEMANTIC_LABEL_COUNTERFACTUAL_V0_2026-08-23.md` |
+| Semantic label factorial | `29a3eb0cde307266a575cd1b16ca4b682e2c089c` | `5ddf5b425ad1209aab6bbea196db82494a8b0046` | `SEMANTIC_LABEL_FACTORIAL_V0_2026-08-24.md` |
+| Inspect-label robustness | `e69c2d3c0470cf7add591471b881fc52d12cc268` | `1881319a1cd977903457d36cc82681b38d58a7d4` | `SEMANTIC_INSPECT_LABEL_ROBUSTNESS_V0_2026-08-24.md` |
 
 The current documentation synthesis and benchmark hypothesis note are at
 `59e96b3f2f8554d295b0d2b2c388a37021fbf4ef`.
@@ -111,8 +120,9 @@ It is not broad natural-language competence or end-to-end task completion.
 
 Across the clean V2 baseline and the enum-order counterfactual, inspect cases
 were correctly classified while presence cases often became inspect. Strict
-JSON, enum, and admissibility compliance ruled out a general structured-output
-or instruction-following failure.
+JSON, enum, and admissibility compliance show that this task slice did not
+exhibit a total structured-output or interface-compliance failure. General
+instruction-following competence was not tested.
 
 ### Enum order did not explain the collapse
 
@@ -146,17 +156,31 @@ measurably reshapes the supplier’s observable decision boundary.
 
 ## The competence unit: supplier × capability × interface × evidence
 
-The sequence motivates indexing competence claims by four elements:
+The sequence motivates indexing competence claims with a useful operational
+mnemonic, while distinguishing the roles of its terms:
+
+```text
+evaluated configuration: supplier × capability × interface
+conditioning boundary:    authority/context
+epistemic support:        frozen evidence
+```
+
+The competence claim concerns a supplier-capability-interface configuration
+under an explicit authority/context boundary and is supported by frozen
+evidence. ZTH retains the full `supplier × capability × interface × evidence`
+expression because evidence is required before the claim can guide
+delegation.
 
 | Element | Meaning in ZTH |
 |---|---|
 | Supplier | The mechanism providing the responsibility: deterministic code, model, tool, review, or an explicitly bounded escalation supplier |
 | Capability | The bounded responsibility being evaluated, such as operation-class classification, target extraction, observation, or post-observation policy |
-| Interface | The concrete request, schema, labels, definitions, protocol, context, and authority boundary through which the responsibility is assigned |
+| Interface | The concrete request, schema, labels, definitions, and protocol through which the responsibility is assigned |
 | Evidence | Frozen requests, evaluator, runtime manifests, raw outputs, validations, telemetry, hashes, and closeout interpretation supporting the claim |
 
-Authority/context is an important conditioning boundary and should be recorded
-alongside the core expression where it affects delegation.
+Authority/context is an independent conditioning boundary, not merely a hidden
+part of the interface. It should be recorded alongside the core expression
+where it affects delegation.
 
 The implication is operational: a supplier must not inherit competence across
 interfaces without evidence. Passing capability X through interface A does not
@@ -171,21 +195,29 @@ scorecards and capability cards should be able to represent a bounded record at
 least conceptually as:
 
 ```text
-supplier
-capability_id
-interface_id/version
-authority boundary/context
-evidence set
-observed metrics
-known failure modes
+supplier identity/version
+capability/responsibility
+task/distribution boundary
+interface/version
+authority/context
+coverage
+conditional/class-specific performance
+failure modes
+interface sensitivity
+evidence freshness
+transfer limits
 qualification state
+requalification triggers
+supporting frozen evidence
 ```
 
 This is a documentation requirement, not a schema migration in this pass. A
-score such as “model X is good at task Y” is too coarse for responsibility
-delegation when interface changes can alter observed behavior. Existing
-scorecards remain historical evidence and do not gain retroactive interface
-qualification from this synthesis.
+single scalar score such as “model X is good at task Y” may remain useful for
+broad comparison, but is insufficient as delegation-grade evidence when
+interface changes can alter observed behavior. A qualified interface evidence
+profile is a more faithful conceptual description than a scalar “qualified
+interface score.” Existing scorecards remain historical evidence and do not gain
+retroactive interface qualification from this synthesis.
 
 ## Degeneralizing benchmarks
 
@@ -197,44 +229,113 @@ NOT_YET_GENERALIZED
 NOT_A_REPLACEMENT_FOR_STANDARD_BENCHMARKS
 ```
 
-**Degeneralizing benchmarks** means starting from a broad benchmark or
-capability claim and progressively decomposing it until the measured unit
-corresponds to a bounded responsibility under a specific supplier/interface/
-evidence configuration.
+**Degeneralizing benchmarks** is a working term for delegation-aware benchmark
+decomposition: narrowing a broad capability or benchmark claim into a
+responsibility-specific, interface- and context-conditioned evidence profile
+before using it to delegate work. What is being degeneralized is primarily the
+capability/performance claim used for delegation, not merely the benchmark
+artifact itself.
 
 ```text
-general benchmark
+general benchmark or capability claim
+    → task/distribution boundary
     → capability family
     → bounded responsibility
     → interface/protocol
     → authority/context boundary
-    → supplier
-    → frozen evidence
+    → supplier evaluation
+    → frozen evidence profile
 ```
 
+The process may decompose the task distribution, capability claim,
+responsibility boundary, interface, and context. Supplier identity is the
+evaluated mechanism at the resulting unit, and frozen evidence supports the
+claim; neither is itself a benchmark-decomposition level.
+
 The objective is not to discard generalized benchmarks. It is to identify where
-a generalized score stops being predictive of the responsibility actually
-being delegated. The semantic sequence motivates this because the same
-supplier and underlying bounded distinction produced materially different
-measurements under controlled interface changes.
+a generalized score stops being predictive of the responsibility actually being
+delegated. The semantic sequence motivates this because the same supplier and
+underlying bounded distinction produced materially different measurements under
+controlled interface changes.
+
+Ordinary benchmark decomposition may stop once errors are understood more
+precisely, performance is stratified, or task families are separated. The
+proposed ZTH stopping criterion is delegation-aware: continue narrowing until
+the evidence corresponds to a responsibility that can actually be delegated
+under a bounded authority/context boundary, then retain qualification only at
+that justified unit. This is a proposed distinction, not a novelty claim about
+external literature.
+
+### Strongest unvalidated proposition
+
+```text
+A generalized benchmark score may stop predicting operational delegation
+before it stops being useful for broad comparison.
+```
+
+This proposition is **NOT YET DEMONSTRATED**. Broad benchmarks may remain useful
+for orientation, discovery, rough comparison, and candidate supplier
+selection, while delegation requires evidence that the score predicts the
+specific bounded responsibility being assigned. The completed experiments did
+not compare a generalized benchmark score against prospective real routing
+outcomes.
 
 ### Tentative de-generalization loop
 
-1. Observe a generalized benchmark or capability claim.
-2. Identify the bounded responsibility actually needed.
-3. Construct an independent evaluator.
-4. Separate authority from model output.
-5. Remove deterministic cases first.
-6. Establish genuine supplier necessity.
-7. Test the bounded supplier/interface pair.
-8. Diagnose systematic failures.
-9. Perturb one interface factor at a time.
-10. Re-test on fresh holdouts.
-11. Record competence and failure at the narrowest justified unit.
-12. Escalate or generalize only when the evidence supports it.
+1. Define the task distribution and coverage boundary for the generalized claim. `[general experimental hygiene; essential]`
+2. Identify and define the bounded responsibility actually needed. `[delegation-specific; essential]`
+3. Construct an independent evaluator. `[general experimental hygiene; essential]`
+4. Separate authority/context from model output. `[delegation-specific; essential]`
+5. Remove deterministic cases first. `[ZTH-specific; essential]`
+6. Establish genuine supplier necessity. `[ZTH-specific; essential]`
+7. Version and test the bounded supplier/interface pair. `[delegation-specific; essential]`
+8. Diagnose failures with an explicit failure taxonomy. `[general hygiene; essential]`
+9. Perturb one interface factor at a time. `[experimental hygiene; optional but valuable]`
+10. Re-test on a fresh holdout. `[general experimental hygiene; essential]`
+11. Record coverage, conditional performance, failure modes, evidence freshness, and transfer limits at the narrowest justified unit. `[delegation-specific; essential]`
+12. Define requalification conditions when the interface, supplier, context, or evidence ages out. `[delegation-specific; essential]`
+13. Escalate or generalize only when the evidence supports it. `[delegation-specific; essential]`
 
-This loop is a research proposal derived from one semantic task family. It has
-not been validated as a general benchmark methodology.
+The loop combines general experimental hygiene with delegation-specific
+controls and ZTH-specific deterministic supplier allocation. It is a research
+proposal derived from one semantic task family and has not been validated as a
+general benchmark methodology.
+
+## Limitations
+
+- The sequence tested one local supplier/model family.
+- It covered one bounded semantic operation-class family.
+- Holdouts were small and support no statistical generalization claim.
+- No standard/generalized benchmark was prospectively decomposed.
+- No evidence yet shows that decomposed profiles predict routing outcomes
+  better than aggregate benchmark scores.
+- There is no cross-supplier transfer validation.
+- There is no cross-capability generalization validation.
+- No interface was production-qualified.
+
+## Current contribution hierarchy
+
+### Demonstrated / strongest
+
+1. Interface representation materially affects observed bounded semantic
+   behavior.
+2. Deterministic decomposition eliminated syntactically induced model calls in
+   the audited slice.
+3. Genuine bounded semantic fallback can provide a decision-critical fact.
+
+### Supported architectural implication
+
+4. Supplier competence used for delegation should be indexed by bounded
+   responsibility and interface/context rather than model identity alone.
+
+### Emerging methodology
+
+5. General benchmark claims may need delegation-aware decomposition.
+
+### Not yet established
+
+6. Degeneralizing benchmarks improves real routing/delegation prediction across
+   capabilities and suppliers.
 
 ## Implications for ZTH
 
@@ -299,15 +400,19 @@ Queued branches:
 
 - **SEMANTIC_INTERFACE_CALIBRATION** — investigate how interface-specific
   evidence should inform bounded supplier development and scorecards.
-- **DEGENERALIZED_BENCHMARK_METHODOLOGY** — document and, in a later reviewed
-  phase, test whether the decomposition loop transfers to other bounded
-  responsibilities.
+- **DEGENERALIZED_BENCHMARK_METHODOLOGY** — `EMERGING / REVISE / NOT YET
+  VALIDATED AS GENERAL METHOD`; document and, in a later reviewed phase, test
+  whether the decomposition loop transfers to other bounded responsibilities.
+- **DELEGATION_PREDICTION_TEST** — compare whether a decomposed
+  responsibility/interface evidence profile predicts actual bounded routing
+  outcomes better than a generalized supplier score.
 
 Future questions include whether the method reproduces for other semantic
 classes, how interface calibration can avoid evaluator leakage, how evidence
 transfer across interfaces should be justified, how narrow a benchmark must be
-before its score predicts delegated work, and whether deterministic decomposition
-can reduce benchmark scope before model testing.
+before its score predicts delegated work, whether deterministic decomposition
+can reduce benchmark scope before model testing, and whether the profile
+transfers across suppliers or capabilities.
 
 These are queued research questions, not implementation tasks or production
 routing changes. Preserve `review` and `ready_for_review` as the authority
