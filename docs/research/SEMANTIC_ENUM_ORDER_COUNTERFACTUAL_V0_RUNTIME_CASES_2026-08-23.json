@@ -1,0 +1,95 @@
+{
+  "cases": [
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "observe_presence",
+            "inspect"
+          ],
+          "allowed_targets": [
+            "docs/research/E1_NICKEL_2026-08-23.md"
+          ]
+        }
+      },
+      "input_request": "Could you tell me if docs/research/E1_NICKEL_2026-08-23.md is somewhere in this repository?",
+      "task_id": "seof-001"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "observe_presence",
+            "inspect"
+          ],
+          "allowed_targets": [
+            "docs/research/E2_OPAL_2026-08-23.json"
+          ]
+        }
+      },
+      "input_request": "Give docs/research/E2_OPAL_2026-08-23.json a careful examination.",
+      "task_id": "seof-002"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "observe_presence",
+            "inspect"
+          ],
+          "allowed_targets": [
+            "docs/research/E3_QUARTZ_2026-08-23.txt"
+          ]
+        }
+      },
+      "input_request": "Would you say whether docs/research/E3_QUARTZ_2026-08-23.txt is stored in this tree?",
+      "task_id": "seof-003"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "observe_presence",
+            "inspect"
+          ],
+          "allowed_targets": [
+            "docs/research/E4_RIVER_2026-08-23.md"
+          ]
+        }
+      },
+      "input_request": "Review docs/research/E4_RIVER_2026-08-23.md for me.",
+      "task_id": "seof-004"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "observe_presence",
+            "inspect"
+          ],
+          "allowed_targets": [
+            "docs/research/E5_SABLE_2026-08-23.json"
+          ]
+        }
+      },
+      "input_request": "Is docs/research/E5_SABLE_2026-08-23.json contained here at present?",
+      "task_id": "seof-005"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "observe_presence",
+            "inspect"
+          ],
+          "allowed_targets": [
+            "docs/research/E6_TIN_2026-08-23.txt"
+          ]
+        }
+      },
+      "input_request": "Examine docs/research/E6_TIN_2026-08-23.txt when convenient.",
+      "task_id": "seof-006"
+    }
+  ],
+  "schema": "zth_semantic_enum_order_counterfactual_v0_runtime_cases"
+}

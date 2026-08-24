@@ -1,0 +1,15 @@
+{
+  "environment_facts": {
+    "authority_record": {
+      "allowed_observation_operations": [
+        "observe_presence",
+        "inspect"
+      ],
+      "allowed_targets": [
+        "docs/research/E6_TIN_2026-08-23.txt"
+      ]
+    }
+  },
+  "input_request": "Examine docs/research/E6_TIN_2026-08-23.txt when convenient.",
+  "task_id": "seof-006"
+}

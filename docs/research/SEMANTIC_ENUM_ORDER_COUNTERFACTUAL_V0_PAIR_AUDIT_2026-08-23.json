@@ -1,0 +1,131 @@
+{
+  "only_model_visible_intervention": "ENUM_ORDER",
+  "paired_authority_identity": true,
+  "paired_model_settings_identity": true,
+  "paired_preflight_identity": true,
+  "paired_prompt_identity": true,
+  "paired_request_identity": true,
+  "rows": [
+    {
+      "authority_hash_equal": true,
+      "gap_hash_equal": true,
+      "model_settings_hash_equal": true,
+      "only_intended_schema_difference": true,
+      "preflight_hash_equal": true,
+      "prompt_hash_equal": true,
+      "request_hash_equal": true,
+      "schema_a_enum": [
+        "inspect",
+        "observe_presence",
+        "unresolved"
+      ],
+      "schema_b_enum": [
+        "observe_presence",
+        "inspect",
+        "unresolved"
+      ],
+      "task_id": "seof-001"
+    },
+    {
+      "authority_hash_equal": true,
+      "gap_hash_equal": true,
+      "model_settings_hash_equal": true,
+      "only_intended_schema_difference": true,
+      "preflight_hash_equal": true,
+      "prompt_hash_equal": true,
+      "request_hash_equal": true,
+      "schema_a_enum": [
+        "inspect",
+        "observe_presence",
+        "unresolved"
+      ],
+      "schema_b_enum": [
+        "observe_presence",
+        "inspect",
+        "unresolved"
+      ],
+      "task_id": "seof-002"
+    },
+    {
+      "authority_hash_equal": true,
+      "gap_hash_equal": true,
+      "model_settings_hash_equal": true,
+      "only_intended_schema_difference": true,
+      "preflight_hash_equal": true,
+      "prompt_hash_equal": true,
+      "request_hash_equal": true,
+      "schema_a_enum": [
+        "inspect",
+        "observe_presence",
+        "unresolved"
+      ],
+      "schema_b_enum": [
+        "observe_presence",
+        "inspect",
+        "unresolved"
+      ],
+      "task_id": "seof-003"
+    },
+    {
+      "authority_hash_equal": true,
+      "gap_hash_equal": true,
+      "model_settings_hash_equal": true,
+      "only_intended_schema_difference": true,
+      "preflight_hash_equal": true,
+      "prompt_hash_equal": true,
+      "request_hash_equal": true,
+      "schema_a_enum": [
+        "inspect",
+        "observe_presence",
+        "unresolved"
+      ],
+      "schema_b_enum": [
+        "observe_presence",
+        "inspect",
+        "unresolved"
+      ],
+      "task_id": "seof-004"
+    },
+    {
+      "authority_hash_equal": true,
+      "gap_hash_equal": true,
+      "model_settings_hash_equal": true,
+      "only_intended_schema_difference": true,
+      "preflight_hash_equal": true,
+      "prompt_hash_equal": true,
+      "request_hash_equal": true,
+      "schema_a_enum": [
+        "inspect",
+        "observe_presence",
+        "unresolved"
+      ],
+      "schema_b_enum": [
+        "observe_presence",
+        "inspect",
+        "unresolved"
+      ],
+      "task_id": "seof-005"
+    },
+    {
+      "authority_hash_equal": true,
+      "gap_hash_equal": true,
+      "model_settings_hash_equal": true,
+      "only_intended_schema_difference": true,
+      "preflight_hash_equal": true,
+      "prompt_hash_equal": true,
+      "request_hash_equal": true,
+      "schema_a_enum": [
+        "inspect",
+        "observe_presence",
+        "unresolved"
+      ],
+      "schema_b_enum": [
+        "observe_presence",
+        "inspect",
+        "unresolved"
+      ],
+      "task_id": "seof-006"
+    }
+  ],
+  "schema": "zth_semantic_enum_order_counterfactual_v0_pair_audit"
+}

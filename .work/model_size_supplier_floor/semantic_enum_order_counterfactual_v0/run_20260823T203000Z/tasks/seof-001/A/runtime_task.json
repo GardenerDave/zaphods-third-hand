@@ -1,0 +1,15 @@
+{
+  "environment_facts": {
+    "authority_record": {
+      "allowed_observation_operations": [
+        "observe_presence",
+        "inspect"
+      ],
+      "allowed_targets": [
+        "docs/research/E1_NICKEL_2026-08-23.md"
+      ]
+    }
+  },
+  "input_request": "Could you tell me if docs/research/E1_NICKEL_2026-08-23.md is somewhere in this repository?",
+  "task_id": "seof-001"
+}

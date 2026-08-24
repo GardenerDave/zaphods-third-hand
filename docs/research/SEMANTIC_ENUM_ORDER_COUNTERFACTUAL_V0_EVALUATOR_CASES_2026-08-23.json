@@ -1,0 +1,41 @@
+{
+  "cases": [
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "observe_presence",
+      "expected_task_count": 2,
+      "task_id": "seof-001"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "inspect",
+      "expected_task_count": 2,
+      "task_id": "seof-002"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "observe_presence",
+      "expected_task_count": 2,
+      "task_id": "seof-003"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "inspect",
+      "expected_task_count": 2,
+      "task_id": "seof-004"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "observe_presence",
+      "expected_task_count": 2,
+      "task_id": "seof-005"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "inspect",
+      "expected_task_count": 2,
+      "task_id": "seof-006"
+    }
+  ],
+  "schema": "zth_semantic_enum_order_counterfactual_v0_evaluator_cases"
+}

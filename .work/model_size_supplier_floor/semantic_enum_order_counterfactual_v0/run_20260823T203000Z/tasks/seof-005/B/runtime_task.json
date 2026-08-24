@@ -1,0 +1,15 @@
+{
+  "environment_facts": {
+    "authority_record": {
+      "allowed_observation_operations": [
+        "observe_presence",
+        "inspect"
+      ],
+      "allowed_targets": [
+        "docs/research/E5_SABLE_2026-08-23.json"
+      ]
+    }
+  },
+  "input_request": "Is docs/research/E5_SABLE_2026-08-23.json contained here at present?",
+  "task_id": "seof-005"
+}
