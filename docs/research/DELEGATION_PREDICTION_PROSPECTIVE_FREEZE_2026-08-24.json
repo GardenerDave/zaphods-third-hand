@@ -1,0 +1,120 @@
+{
+  "schema": "zth_delegation_prediction_prospective_freeze_v1",
+  "experiment_id": "DELEGATION_PREDICTION_TEST_SCOPE_V0",
+  "freeze_timestamp_utc": "2026-08-24T14:45:17Z",
+  "freeze_commit": "resolved_by_containing_commit_and_report",
+  "base_design_commit": "39f2a07b15324b01c62f14e447fc94169675ddf2",
+  "freeze_status": "FROZEN_UNEXECUTED",
+  "freeze_characterization": "PROSPECTIVE_DELEGATION_PREDICTION_EXPERIMENT_FROZEN_UNEXECUTED",
+  "source_provenance": [
+    {"path": "docs/research/DELEGATION_PREDICTION_PROSPECTIVE_MATCHED_DESIGN_2026-08-24.md", "sha256": "b01d0f5d4a0df0552b6a88ae4656dcb9c03ff50003bd65a2f5972fa38c3116f9", "role": "hardened design"},
+    {"path": "docs/research/DELEGATION_PREDICTION_PROSPECTIVE_PREDICTORS_2026-08-24.json", "sha256": "1fcdf91d9cae4be6bb8182aa982896528745e664883e74695972ce15506b7a9c", "role": "frozen predictor policies"},
+    {"path": "docs/research/DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json", "sha256": "929edfc8a299998bc32faef4144b94f2f007cd511bca6ded4a6d7828cd5481e8", "role": "separate scoring-only cases"},
+    {"path": "docs/research/DELEGATION_PREDICTION_PROSPECTIVE_EXECUTION_PLAN_2026-08-24.md", "sha256": "49e3e94421223015f266573702f3ea8588aa4ade18daf1048d6add5119df182d", "role": "execution controls and stop conditions"},
+    {"path": "docs/research/DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_2026-08-24.json", "sha256": "cb6388fa675cf1b3031b224afd1258454102d2bef935b851bfa1ce92de6fce5c", "role": "experiment-authored compatible-successor contract"},
+    {"path": ".work/run4a_intervention_market_calibration/run_20260819T184835Z/aggregate.json", "sha256": "bee66dac025f40c964b207442e6dd232a9f39a4d18448e568b2b6430b34f3016", "role": "historical broad and scope outcomes"},
+    {"path": "docs/reports/model_auditions/SUPERVISED_CAPABILITY_MINING_RUN_4A_2026-08-19.md", "sha256": "361faf4580c94455d61826ee5b293d8dcdb7cf3fa256c877b97965c014e7b512", "role": "historical supplier evidence report"},
+    {"path": "docs/research/RUN_4A_PREREGISTRATION_2026-08-19.json", "sha256": "a9418fe1e45a05e46b4fd183a6345333893192305fbf767461f3b280b26d748b", "role": "historical supplier identity and support semantics"},
+    {"path": "docs/research/RUN_4B_SCOPE_INTERVENTION_REPLICATION_PREREGISTRATION_2026-08-19.json", "sha256": "59f02a1e23c9cbe7e91bfb9c464675ccbb7bbb54b779091ea11cef8846ce5771", "role": "historical scope contract and authority boundary"},
+    {"path": "docs/research/RUN_4_RESOURCE_WEIGHTS_FREEZE_2026-08-19.json", "sha256": "8f7820a6a3e5734e071452f643374d8c6c769d4d149bcec3f2f82b88ee6530c2", "role": "historical resource prior"},
+    {"path": "docs/research/ATOMIC_SUPPLIER_SCORECARD_SCHEMA_V1.json", "sha256": "d484d012e8fe7bb6a5266864b3c8542a96a4e6391ca75145007b0a04eeefeea9", "role": "bounded evidence/status schema"}
+  ],
+  "cohort": {
+    "case_count": 16,
+    "case_order": "dpt-scope-001 through dpt-scope-016 in evaluator-manifest order",
+    "supplier_selection_disagreement_count": 8,
+    "delegate_vs_abstain_disagreement_count": 8,
+    "binary_expected_success_disagreement_count": 8,
+    "sampling_characterization": "DISAGREEMENT_ENRICHED_NOT_INCIDENCE_REPRESENTATIVE",
+    "cases": [
+      {"case_id":"dpt-scope-001","category":"SUPPLIER_SELECTION","stratum":"profile_supported_nonexpanding","capability":"scope-authority-boundary","context":"review-only exact target/held scope","candidate_suppliers":["local_teacher","external_teacher"],"predictor_visible_evidence":["RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1","SCOPE_INTERFACE_PROFILE_RUN4A_V1"],"evaluator_reference":"DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json#dpt-scope-001","interface_reference":"DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_2026-08-24.json","execution_order":1},
+      {"case_id":"dpt-scope-002","category":"SUPPLIER_SELECTION","stratum":"profile_supported_nonexpanding","capability":"scope-authority-boundary","context":"review-only exact target/held scope","candidate_suppliers":["local_teacher","external_teacher"],"predictor_visible_evidence":["RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1","SCOPE_INTERFACE_PROFILE_RUN4A_V1"],"evaluator_reference":"DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json#dpt-scope-002","interface_reference":"DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_2026-08-24.json","execution_order":2},
+      {"case_id":"dpt-scope-003","category":"SUPPLIER_SELECTION","stratum":"profile_supported_nonexpanding","capability":"scope-authority-boundary","context":"review-only exact target/held scope","candidate_suppliers":["local_teacher","external_teacher"],"predictor_visible_evidence":["RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1","SCOPE_INTERFACE_PROFILE_RUN4A_V1"],"evaluator_reference":"DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json#dpt-scope-003","interface_reference":"DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_2026-08-24.json","execution_order":3},
+      {"case_id":"dpt-scope-004","category":"SUPPLIER_SELECTION","stratum":"profile_supported_nonexpanding","capability":"scope-authority-boundary","context":"review-only exact target/held scope","candidate_suppliers":["local_teacher","external_teacher"],"predictor_visible_evidence":["RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1","SCOPE_INTERFACE_PROFILE_RUN4A_V1"],"evaluator_reference":"DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json#dpt-scope-004","interface_reference":"DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_2026-08-24.json","execution_order":4},
+      {"case_id":"dpt-scope-005","category":"SUPPLIER_SELECTION","stratum":"profile_supported_nonexpanding","capability":"scope-authority-boundary","context":"review-only exact target/held scope","candidate_suppliers":["local_teacher","external_teacher"],"predictor_visible_evidence":["RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1","SCOPE_INTERFACE_PROFILE_RUN4A_V1"],"evaluator_reference":"DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json#dpt-scope-005","interface_reference":"DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_2026-08-24.json","execution_order":5},
+      {"case_id":"dpt-scope-006","category":"SUPPLIER_SELECTION","stratum":"profile_supported_nonexpanding","capability":"scope-authority-boundary","context":"review-only exact target/held scope","candidate_suppliers":["local_teacher","external_teacher"],"predictor_visible_evidence":["RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1","SCOPE_INTERFACE_PROFILE_RUN4A_V1"],"evaluator_reference":"DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json#dpt-scope-006","interface_reference":"DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_2026-08-24.json","execution_order":6},
+      {"case_id":"dpt-scope-007","category":"SUPPLIER_SELECTION","stratum":"profile_supported_nonexpanding","capability":"scope-authority-boundary","context":"review-only exact target/held scope","candidate_suppliers":["local_teacher","external_teacher"],"predictor_visible_evidence":["RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1","SCOPE_INTERFACE_PROFILE_RUN4A_V1"],"evaluator_reference":"DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json#dpt-scope-007","interface_reference":"DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_2026-08-24.json","execution_order":7},
+      {"case_id":"dpt-scope-008","category":"SUPPLIER_SELECTION","stratum":"profile_supported_nonexpanding","capability":"scope-authority-boundary","context":"review-only exact target/held scope","candidate_suppliers":["local_teacher","external_teacher"],"predictor_visible_evidence":["RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1","SCOPE_INTERFACE_PROFILE_RUN4A_V1"],"evaluator_reference":"DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json#dpt-scope-008","interface_reference":"DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_2026-08-24.json","execution_order":8},
+      {"case_id":"dpt-scope-009","category":"DELEGATE_VS_ABSTAIN","stratum":"profile_out_of_coverage_expansion_required","capability":"scope-authority-boundary","context":"review-only scope with expansion required","candidate_suppliers":["local_teacher","external_teacher"],"predictor_visible_evidence":["RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1","SCOPE_INTERFACE_PROFILE_RUN4A_V1"],"evaluator_reference":"DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json#dpt-scope-009","interface_reference":"DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_2026-08-24.json","execution_order":9},
+      {"case_id":"dpt-scope-010","category":"DELEGATE_VS_ABSTAIN","stratum":"profile_out_of_coverage_expansion_required","capability":"scope-authority-boundary","context":"review-only scope with expansion required","candidate_suppliers":["local_teacher","external_teacher"],"predictor_visible_evidence":["RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1","SCOPE_INTERFACE_PROFILE_RUN4A_V1"],"evaluator_reference":"DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json#dpt-scope-010","interface_reference":"DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_2026-08-24.json","execution_order":10},
+      {"case_id":"dpt-scope-011","category":"DELEGATE_VS_ABSTAIN","stratum":"profile_out_of_coverage_expansion_required","capability":"scope-authority-boundary","context":"review-only scope with expansion required","candidate_suppliers":["local_teacher","external_teacher"],"predictor_visible_evidence":["RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1","SCOPE_INTERFACE_PROFILE_RUN4A_V1"],"evaluator_reference":"DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json#dpt-scope-011","interface_reference":"DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_2026-08-24.json","execution_order":11},
+      {"case_id":"dpt-scope-012","category":"DELEGATE_VS_ABSTAIN","stratum":"profile_out_of_coverage_expansion_required","capability":"scope-authority-boundary","context":"review-only scope with expansion required","candidate_suppliers":["local_teacher","external_teacher"],"predictor_visible_evidence":["RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1","SCOPE_INTERFACE_PROFILE_RUN4A_V1"],"evaluator_reference":"DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json#dpt-scope-012","interface_reference":"DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_2026-08-24.json","execution_order":12},
+      {"case_id":"dpt-scope-013","category":"DELEGATE_VS_ABSTAIN","stratum":"profile_out_of_coverage_expansion_required","capability":"scope-authority-boundary","context":"review-only scope with expansion required","candidate_suppliers":["local_teacher","external_teacher"],"predictor_visible_evidence":["RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1","SCOPE_INTERFACE_PROFILE_RUN4A_V1"],"evaluator_reference":"DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json#dpt-scope-013","interface_reference":"DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_2026-08-24.json","execution_order":13},
+      {"case_id":"dpt-scope-014","category":"DELEGATE_VS_ABSTAIN","stratum":"profile_out_of_coverage_expansion_required","capability":"scope-authority-boundary","context":"review-only scope with expansion required","candidate_suppliers":["local_teacher","external_teacher"],"predictor_visible_evidence":["RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1","SCOPE_INTERFACE_PROFILE_RUN4A_V1"],"evaluator_reference":"DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json#dpt-scope-014","interface_reference":"DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_2026-08-24.json","execution_order":14},
+      {"case_id":"dpt-scope-015","category":"DELEGATE_VS_ABSTAIN","stratum":"profile_out_of_coverage_expansion_required","capability":"scope-authority-boundary","context":"review-only scope with expansion required","candidate_suppliers":["local_teacher","external_teacher"],"predictor_visible_evidence":["RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1","SCOPE_INTERFACE_PROFILE_RUN4A_V1"],"evaluator_reference":"DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json#dpt-scope-015","interface_reference":"DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_2026-08-24.json","execution_order":15},
+      {"case_id":"dpt-scope-016","category":"DELEGATE_VS_ABSTAIN","stratum":"profile_out_of_coverage_expansion_required","capability":"scope-authority-boundary","context":"review-only scope with expansion required","candidate_suppliers":["local_teacher","external_teacher"],"predictor_visible_evidence":["RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1","SCOPE_INTERFACE_PROFILE_RUN4A_V1"],"evaluator_reference":"DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json#dpt-scope-016","interface_reference":"DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_2026-08-24.json","execution_order":16}
+    ]
+  },
+  "predictor_policies": {
+    "generalized": {"id":"RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1","decision":"higher_existing_broad_score -> delegate; tie/missing -> abstain","threshold":"none applied to broad aggregate","deterministic":true},
+    "degeneralized": {"id":"SCOPE_INTERFACE_PROFILE_RUN4A_V1","decision":"supported_positive compatible profile -> lower expected cost supplier; unsupported/mismatch/tie -> abstain","historical_support_threshold_scope":"Run4A block evidence only","deterministic":true}
+  },
+  "scoring": {
+    "evaluator_manifest": "docs/research/DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json",
+    "runtime_evaluator_influence": 0,
+    "evaluator_runtime_access": false,
+    "decision_outcomes": ["SUCCESSFUL_DELEGATION","FALSE_POSITIVE_DELEGATION","JUSTIFIED_ABSTENTION","UNNECESSARY_ABSTENTION"],
+    "lexicographic_order": ["false_positive_avoidance","successful_delegation","abstention_quality","cost_only_if_capability_equivalent"]
+  },
+  "suppliers_and_interfaces": {
+    "historical_local": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf via JARVIS_LOCAL",
+    "historical_external": "codex-cli-0.146.0 via codex-cli service class",
+    "prospective_local": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf via JARVIS_LOCAL",
+    "prospective_external": "codex-cli-0.146.0 via codex-cli service class",
+    "supplier_identity_status": "EXACT",
+    "historical_interface": "run4a_scope_json_contract_v1",
+    "prospective_interface": "DELEGATION_PREDICTION_SCOPE_JSON_COMPATIBLE_SUCCESSOR_V1",
+    "interface_lineage": "COMPATIBLE_INTERFACE_SUCCESSOR",
+    "experiment_payload_matching": true,
+    "supplier_native_envelopes_byte_identical": false,
+    "tool_calls": 0,
+    "native_envelope_hashes": "operator must record supplier-specific native envelopes before execution; none are generated in this freeze"
+  },
+  "execution_controls": {
+    "retries": 0,
+    "teacher_intervention": false,
+    "prompt_repair": false,
+    "model_substitution": false,
+    "threshold_tuning": false,
+    "post_hoc_case_replacement": false,
+    "tool_calls": 0,
+    "evaluator_access": false,
+    "qualification_or_promotion": false,
+    "runtime_authority_changes": false,
+    "replay": false,
+    "response_repair": false,
+    "production_routing_change": false
+  },
+  "contamination_audit": {
+    "target_runtime_directory_exists": false,
+    "prospective_response_artifacts_exist": false,
+    "prospective_result_matrix_exists": false,
+    "prospective_supplier_inference_made": false,
+    "outcome_dependent_artifact_created": false,
+    "evaluator_fields_in_runtime_predictor_inputs": false,
+    "prospective_cases_dropped_or_altered": false,
+    "model_calls": 0,
+    "teacher_calls": 0,
+    "tool_calls": 0,
+    "external_inference_calls": 0,
+    "historical_artifacts_mutated": false,
+    "audit_result": "PASS"
+  },
+  "repository_state": {
+    "clean_before_freeze_work": true,
+    "base_design_commit_present": true,
+    "prospective_runtime_artifacts_created": false,
+    "freeze_work_changes_only_freeze_artifacts": true
+  },
+  "markers": {
+    "PROSPECTIVE_DELEGATION_PREDICTION_COHORT_FROZEN": true,
+    "DELEGATION_DECISION_ESTIMAND_FROZEN": true,
+    "DISAGREEMENT_ENRICHED_SAMPLING_FROZEN": true,
+    "EVALUATOR_RUNTIME_SEPARATION_FROZEN": true,
+    "SUPPLIER_IDENTITY_AND_INTERFACE_LINEAGE_FROZEN": true,
+    "PROSPECTIVE_EXECUTION_POLICY_FROZEN": true,
+    "PRE_FREEZE_PROSPECTIVE_INFERENCE_DETECTED": false,
+    "PROSPECTIVE_RUNTIME_ARTIFACTS_CREATED": false,
+    "PRIMARY_CHARACTERIZATION": "PROSPECTIVE_DELEGATION_PREDICTION_EXPERIMENT_FROZEN_UNEXECUTED"
+  }
+}
