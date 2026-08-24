@@ -1,0 +1,155 @@
+{
+  "arm_a_semantic_correct": 3,
+  "arm_b_semantic_correct": 6,
+  "paired_canonical_transitions": {
+    "inspect->inspect": 3,
+    "inspect->observe_presence": 3
+  },
+  "rows": [
+    {
+      "arm": "A",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "contract_valid": true,
+      "expected": "observe_presence",
+      "observed_canonical": "inspect",
+      "parse_valid": true,
+      "semantic_correct": false,
+      "surface_label": "inspect",
+      "task_id": "slcf-001"
+    },
+    {
+      "arm": "B",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "contract_valid": true,
+      "expected": "observe_presence",
+      "observed_canonical": "observe_presence",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "class_alpha",
+      "task_id": "slcf-001"
+    },
+    {
+      "arm": "A",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "contract_valid": true,
+      "expected": "inspect",
+      "observed_canonical": "inspect",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "inspect",
+      "task_id": "slcf-002"
+    },
+    {
+      "arm": "B",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "contract_valid": true,
+      "expected": "inspect",
+      "observed_canonical": "inspect",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "class_beta",
+      "task_id": "slcf-002"
+    },
+    {
+      "arm": "A",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "contract_valid": true,
+      "expected": "observe_presence",
+      "observed_canonical": "inspect",
+      "parse_valid": true,
+      "semantic_correct": false,
+      "surface_label": "inspect",
+      "task_id": "slcf-003"
+    },
+    {
+      "arm": "B",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "contract_valid": true,
+      "expected": "observe_presence",
+      "observed_canonical": "observe_presence",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "class_alpha",
+      "task_id": "slcf-003"
+    },
+    {
+      "arm": "A",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "contract_valid": true,
+      "expected": "inspect",
+      "observed_canonical": "inspect",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "inspect",
+      "task_id": "slcf-004"
+    },
+    {
+      "arm": "B",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "contract_valid": true,
+      "expected": "inspect",
+      "observed_canonical": "inspect",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "class_beta",
+      "task_id": "slcf-004"
+    },
+    {
+      "arm": "A",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "contract_valid": true,
+      "expected": "observe_presence",
+      "observed_canonical": "inspect",
+      "parse_valid": true,
+      "semantic_correct": false,
+      "surface_label": "inspect",
+      "task_id": "slcf-005"
+    },
+    {
+      "arm": "B",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "contract_valid": true,
+      "expected": "observe_presence",
+      "observed_canonical": "observe_presence",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "class_alpha",
+      "task_id": "slcf-005"
+    },
+    {
+      "arm": "A",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "contract_valid": true,
+      "expected": "inspect",
+      "observed_canonical": "inspect",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "inspect",
+      "task_id": "slcf-006"
+    },
+    {
+      "arm": "B",
+      "candidate_admissible": true,
+      "candidate_valid": true,
+      "contract_valid": true,
+      "expected": "inspect",
+      "observed_canonical": "inspect",
+      "parse_valid": true,
+      "semantic_correct": true,
+      "surface_label": "class_beta",
+      "task_id": "slcf-006"
+    }
+  ],
+  "schema": "zth_semantic_label_counterfactual_v0_aggregate"
+}
