@@ -1,6 +1,18 @@
 {
   "actual_supplier_calls": 32,
   "claim_boundary": "descriptive result limited to this prospective disagreement-enriched bounded scope cohort; no population, production, qualification, or cross-capability claim",
+  "cost_metrics": {
+    "both_suppliers_valid": 3,
+    "capability_equivalent_cost_comparison_cases": 3,
+    "degeneralized_cost_total_ms": 48661.872,
+    "degeneralized_lower_cost_valid_selections": 3,
+    "external_only_valid": 5,
+    "generalized_cost_total_ms": 86112.036,
+    "generalized_lower_cost_valid_selections": 0,
+    "local_only_valid": 0,
+    "neither_valid": 0,
+    "resource_weight_source": "docs/research/RUN_4_RESOURCE_WEIGHTS_FREEZE_2026-08-19.json"
+  },
   "evaluator_sha256": "929edfc8a299998bc32faef4144b94f2f007cd511bca6ded4a6d7828cd5481e8",
   "execution_harness_commit": "5a0c3c0dea14fb9431803142e5bae1f82f1de068",
   "execution_harness_sha256": "954171b53b9e992a6681db7592fd3ef277081e85fee560f6ad4c8d6009500af5",
@@ -28,7 +40,10 @@
     "GENERALIZED_SELECTS_LOWER_COST_VALID_SUPPLIER": false,
     "NO_MEANINGFUL_DECISION_DIFFERENCE": false
   },
-  "lexicographic_result": "DELEGATION_DECISION_QUALITY_FAVORS_GENERALIZED",
+  "lexicographic_result": {
+    "winner": "DELEGATION_DECISION_QUALITY_FAVORS_GENERALIZED",
+    "winning_tier": "false_positive_avoidance"
+  },
   "lifecycle": {
     "external_calls": 16,
     "external_inference_calls": 16,

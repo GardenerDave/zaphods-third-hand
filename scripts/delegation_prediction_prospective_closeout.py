@@ -17,6 +17,7 @@ RESEARCH = ROOT / "docs/research"
 RUNTIME_MANIFEST = RESEARCH / "DELEGATION_PREDICTION_PROSPECTIVE_RUNTIME_MANIFEST_2026-08-24.json"
 INTERFACE_CONTRACT = RESEARCH / "DELEGATION_PREDICTION_PROSPECTIVE_INTERFACE_CONTRACT_V2_2026-08-24.json"
 EVALUATOR = RESEARCH / "DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json"
+RESOURCE_WEIGHTS = RESEARCH / "RUN_4_RESOURCE_WEIGHTS_FREEZE_2026-08-19.json"
 EXPECTED_RUNTIME_SHA256 = "f10ff1ef98ecc0e452d59e842398a0b37a2760e4d7adf63a2be762d1d23f077c"
 EXPECTED_INTERFACE_SHA256 = "c6726c65a40df77c6e681226c90f48c16e00348b5727ab15a14c6b7e61cb3f93"
 FREEZE_COMMIT = "fc6902926a89d3572b457bea1d5cca5e4ba53f4d"
@@ -42,6 +43,34 @@ def p95(values: list[float]) -> float | None:
     ordered = sorted(values)
     index = max(0, min(len(ordered) - 1, int((len(ordered) - 1) * 0.95)))
     return round(ordered[index], 3)
+
+
+def compare_lexicographic(generalized: dict[str, Any], degeneralized: dict[str, Any], cost: dict[str, Any]) -> dict[str, Any]:
+    tiers = (
+        ("false_positive_avoidance", generalized["false_positive_delegations"], degeneralized["false_positive_delegations"], "lower"),
+        ("successful_delegations", generalized["successful_delegations"], degeneralized["successful_delegations"], "higher"),
+        ("abstention_quality", generalized["unnecessary_abstentions"], degeneralized["unnecessary_abstentions"], "lower"),
+        ("capability_equivalent_cost", cost["generalized_cost_total_ms"], cost["degeneralized_cost_total_ms"], "lower"),
+    )
+    for tier, generalized_value, degeneralized_value, direction in tiers:
+        if generalized_value == degeneralized_value:
+            continue
+        if (direction == "lower" and generalized_value < degeneralized_value) or (direction == "higher" and generalized_value > degeneralized_value):
+            return {"winner": "DELEGATION_DECISION_QUALITY_FAVORS_GENERALIZED", "winning_tier": tier}
+        return {"winner": "DELEGATION_DECISION_QUALITY_FAVORS_DEGENERALIZED", "winning_tier": tier}
+    return {"winner": "NO_MEANINGFUL_DECISION_DIFFERENCE", "winning_tier": None}
+
+
+def run_lexicographic_tests() -> None:
+    base = {"false_positive_delegations": 1, "successful_delegations": 1, "unnecessary_abstentions": 1}
+    equal_cost = {"generalized_cost_total_ms": 100.0, "degeneralized_cost_total_ms": 100.0}
+    assert compare_lexicographic(base, {**base, "false_positive_delegations": 0}, equal_cost)["winner"] == "DELEGATION_DECISION_QUALITY_FAVORS_DEGENERALIZED"
+    assert compare_lexicographic({**base, "false_positive_delegations": 0}, base, equal_cost)["winner"] == "DELEGATION_DECISION_QUALITY_FAVORS_GENERALIZED"
+    assert compare_lexicographic(base, {**base, "successful_delegations": 2}, equal_cost)["winning_tier"] == "successful_delegations"
+    assert compare_lexicographic(base, {**base, "unnecessary_abstentions": 0}, equal_cost)["winning_tier"] == "abstention_quality"
+    assert compare_lexicographic(base, base, {"generalized_cost_total_ms": 200.0, "degeneralized_cost_total_ms": 100.0})["winning_tier"] == "capability_equivalent_cost"
+    assert compare_lexicographic(base, base, equal_cost)["winner"] == "NO_MEANINGFUL_DECISION_DIFFERENCE"
+    assert compare_lexicographic({**base, "false_positive_delegations": 0}, {**base, "false_positive_delegations": 1}, {"generalized_cost_total_ms": 1000.0, "degeneralized_cost_total_ms": 1.0})["winner"] == "DELEGATION_DECISION_QUALITY_FAVORS_GENERALIZED"
 
 
 def contract_valid(content: Any, contract: dict[str, Any]) -> tuple[bool, bool, str | None]:
@@ -72,6 +101,8 @@ def main() -> int:
     manifest = read(RUNTIME_MANIFEST)
     contract = read(INTERFACE_CONTRACT)
     evaluator = read(EVALUATOR)
+    resource_weights = read(RESOURCE_WEIGHTS)
+    run_lexicographic_tests()
     lifecycle = read(run_dir / "lifecycle.json")
     raw_manifest = read(run_dir / "raw_response_manifest.json")
     assert sha256(RUNTIME_MANIFEST) == EXPECTED_RUNTIME_SHA256
@@ -176,12 +207,39 @@ def main() -> int:
 
     g = policy_metrics["generalized"]
     d = policy_metrics["degeneralized"]
-    if d["false_positive_delegations"] < g["false_positive_delegations"] or (d["false_positive_delegations"] == g["false_positive_delegations"] and (d["successful_delegations"] > g["successful_delegations"] or (d["successful_delegations"] == g["successful_delegations"] and d["unnecessary_abstentions"] < g["unnecessary_abstentions"]))):
-        winner = "DELEGATION_DECISION_QUALITY_FAVORS_DEGENERALIZED"
-    elif g["false_positive_delegations"] < d["false_positive_delegations"] or (g["false_positive_delegations"] == d["false_positive_delegations"] and (g["successful_delegations"] > d["successful_delegations"] or (g["successful_delegations"] == d["successful_delegations"] and g["unnecessary_abstentions"] < d["unnecessary_abstentions"]))):
-        winner = "DELEGATION_DECISION_QUALITY_FAVORS_GENERALIZED"
-    else:
-        winner = "NO_MEANINGFUL_DECISION_DIFFERENCE"
+    cost = {"both_suppliers_valid": 0, "local_only_valid": 0, "external_only_valid": 0, "neither_valid": 0, "capability_equivalent_cost_comparison_cases": 0, "generalized_lower_cost_valid_selections": 0, "degeneralized_lower_cost_valid_selections": 0, "generalized_cost_total_ms": 0.0, "degeneralized_cost_total_ms": 0.0}
+    local_cost = float(resource_weights["weights"]["local_teacher_time_ms"])
+    external_cost = float(resource_weights["weights"]["external_teacher_time_ms"])
+    for case in cases[:8]:
+        local_valid = observed[(case["case_id"], "local_teacher")]["bounded_capability_valid"]
+        external_valid = observed[(case["case_id"], "external_teacher")]["bounded_capability_valid"]
+        if local_valid and external_valid:
+            cost["both_suppliers_valid"] += 1
+            cost["capability_equivalent_cost_comparison_cases"] += 1
+            selected_cost = {
+                "local_teacher": local_cost,
+                "external_teacher": external_cost,
+            }
+            selected_generalized = case["generalized_policy"]["selected_supplier"]
+            selected_degeneralized = case["degeneralized_policy"]["selected_supplier"]
+            if selected_generalized in selected_cost:
+                cost["generalized_cost_total_ms"] += selected_cost[selected_generalized]
+            if selected_degeneralized in selected_cost:
+                cost["degeneralized_cost_total_ms"] += selected_cost[selected_degeneralized]
+            lower_cost_supplier = min(selected_cost, key=selected_cost.get)
+            if selected_generalized == lower_cost_supplier:
+                cost["generalized_lower_cost_valid_selections"] += 1
+            if selected_degeneralized == lower_cost_supplier:
+                cost["degeneralized_lower_cost_valid_selections"] += 1
+        elif local_valid:
+            cost["local_only_valid"] += 1
+        elif external_valid:
+            cost["external_only_valid"] += 1
+        else:
+            cost["neither_valid"] += 1
+    cost["resource_weight_source"] = str(RESOURCE_WEIGHTS.relative_to(ROOT))
+    comparison = compare_lexicographic(policy_metrics["generalized"], policy_metrics["degeneralized"], cost)
+    winner = comparison["winner"]
 
     telemetry: dict[str, Any] = {}
     for role, arm_rows in arms.items():
@@ -214,7 +272,8 @@ def main() -> int:
             for role, arm_rows in arms.items()
         },
         "policy_metrics": policy_metrics,
-        "lexicographic_result": winner,
+        "lexicographic_result": comparison,
+        "cost_metrics": cost,
         "interpretation_markers": {
             "DEGENERALIZED_MORE_SUCCESSFUL_DELEGATIONS": d["successful_delegations"] > g["successful_delegations"],
             "GENERALIZED_MORE_SUCCESSFUL_DELEGATIONS": g["successful_delegations"] > d["successful_delegations"],
@@ -222,8 +281,8 @@ def main() -> int:
             "GENERALIZED_FEWER_FALSE_POSITIVE_DELEGATIONS": g["false_positive_delegations"] < d["false_positive_delegations"],
             "DEGENERALIZED_FEWER_UNNECESSARY_ABSTENTIONS": d["unnecessary_abstentions"] < g["unnecessary_abstentions"],
             "GENERALIZED_FEWER_UNNECESSARY_ABSTENTIONS": g["unnecessary_abstentions"] < d["unnecessary_abstentions"],
-            "DEGENERALIZED_SELECTS_LOWER_COST_VALID_SUPPLIER": True,
-            "GENERALIZED_SELECTS_LOWER_COST_VALID_SUPPLIER": False,
+            "DEGENERALIZED_SELECTS_LOWER_COST_VALID_SUPPLIER": cost["degeneralized_lower_cost_valid_selections"] > cost["generalized_lower_cost_valid_selections"],
+            "GENERALIZED_SELECTS_LOWER_COST_VALID_SUPPLIER": cost["generalized_lower_cost_valid_selections"] > cost["degeneralized_lower_cost_valid_selections"],
             "DELEGATION_DECISION_QUALITY_FAVORS_DEGENERALIZED": winner == "DELEGATION_DECISION_QUALITY_FAVORS_DEGENERALIZED",
             "DELEGATION_DECISION_QUALITY_FAVORS_GENERALIZED": winner == "DELEGATION_DECISION_QUALITY_FAVORS_GENERALIZED",
             "NO_MEANINGFUL_DECISION_DIFFERENCE": winner == "NO_MEANINGFUL_DECISION_DIFFERENCE",
@@ -251,7 +310,9 @@ def main() -> int:
         f"- generalized: `{json.dumps(g, sort_keys=True)}`\n"
         f"- degeneralized: `{json.dumps(d, sort_keys=True)}`\n"
         f"- lexicographic result: `{winner}`\n\n"
-        "Markers: `GENERALIZED_MORE_SUCCESSFUL_DELEGATIONS=true`, `GENERALIZED_FEWER_FALSE_POSITIVE_DELEGATIONS=true`, `GENERALIZED_FEWER_UNNECESSARY_ABSTENTIONS=true`, `DEGENERALIZED_SELECTS_LOWER_COST_VALID_SUPPLIER=true`; corresponding generalized/degeneralized advantage markers are false as applicable.\n\n"
+        f"- winning tier: `{comparison['winning_tier']}`\n"
+        f"- capability-equivalent cost cases: {cost['capability_equivalent_cost_comparison_cases']}; generalized lower-cost selections: {cost['generalized_lower_cost_valid_selections']}; degeneralized lower-cost selections: {cost['degeneralized_lower_cost_valid_selections']}\n\n"
+        "Markers: `GENERALIZED_MORE_SUCCESSFUL_DELEGATIONS=true`, `GENERALIZED_FEWER_FALSE_POSITIVE_DELEGATIONS=true`, `GENERALIZED_FEWER_UNNECESSARY_ABSTENTIONS=true`; cost markers are derived from the frozen resource-weight artifact.\n\n"
         "The lexicographic ordering was applied exactly as preregistered: false-positive avoidance, successful delegation, abstention quality, then cost only for capability-equivalent choices. The generalized policy therefore wins this cohort because it has zero false-positive delegations versus five for the degeneralized policy. This disagreement-enriched cohort is not incidence-representative and does not qualify suppliers or alter production routing.\n\n"
         "## Telemetry\n\n"
         "Latency is descriptive. Gross GPU-device energy was unavailable for all 32 calls; energy fields are therefore null. Measurement boundary: level 2, GPU-device-only.\n\n"

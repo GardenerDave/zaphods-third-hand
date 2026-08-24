@@ -17,7 +17,10 @@ The frozen 32-opportunity acquisition completed before evaluator access: 32 loca
 - degeneralized: `{"delegated": 8, "delegated_coverage": 0.5, "false_positive_delegations": 5, "justified_abstentions": 0, "selected_supplier_validation_rate": 0.375, "selected_valid": 3, "successful_delegations": 3, "unnecessary_abstentions": 8}`
 - lexicographic result: `DELEGATION_DECISION_QUALITY_FAVORS_GENERALIZED`
 
-Markers: `GENERALIZED_MORE_SUCCESSFUL_DELEGATIONS=true`, `GENERALIZED_FEWER_FALSE_POSITIVE_DELEGATIONS=true`, `GENERALIZED_FEWER_UNNECESSARY_ABSTENTIONS=true`, `DEGENERALIZED_SELECTS_LOWER_COST_VALID_SUPPLIER=true`; corresponding generalized/degeneralized advantage markers are false as applicable.
+- winning tier: `false_positive_avoidance`
+- capability-equivalent cost cases: 3; generalized lower-cost selections: 0; degeneralized lower-cost selections: 3
+
+Markers: `GENERALIZED_MORE_SUCCESSFUL_DELEGATIONS=true`, `GENERALIZED_FEWER_FALSE_POSITIVE_DELEGATIONS=true`, `GENERALIZED_FEWER_UNNECESSARY_ABSTENTIONS=true`; cost markers are derived from the frozen resource-weight artifact.
 
 The lexicographic ordering was applied exactly as preregistered: false-positive avoidance, successful delegation, abstention quality, then cost only for capability-equivalent choices. The generalized policy therefore wins this cohort because it has zero false-positive delegations versus five for the degeneralized policy. This disagreement-enriched cohort is not incidence-representative and does not qualify suppliers or alter production routing.
 
