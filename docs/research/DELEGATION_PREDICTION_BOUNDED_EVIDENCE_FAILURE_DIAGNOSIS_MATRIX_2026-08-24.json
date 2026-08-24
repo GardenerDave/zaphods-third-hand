@@ -1,0 +1,187 @@
+{
+  "schema": "zth_delegation_prediction_bounded_evidence_failure_diagnosis_matrix_v1",
+  "experiment_id": "DELEGATION_PREDICTION_TEST_SCOPE_V0",
+  "diagnosis_scope": "retrospective_model_free_only",
+  "authoritative_closeout_hardening_commit": "4401840247a225ce1b89d7bf0c3b9fd766e1f67f",
+  "freeze_commit": "fc6902926a89d3572b457bea1d5cca5e4ba53f4d",
+  "execution_harness_commit": "5a0c3c0dea14fb9431803142e5bae1f82f1de068",
+  "original_results_commit": "554b1f2be897d49a5deee9824cf224e75f1f5d06",
+  "run_directory": ".work/model_size_supplier_floor/delegation_prediction_test_scope_v0/run_20260824T170000Z",
+  "source_hashes": {
+    "runtime_manifest": "f10ff1ef98ecc0e452d59e842398a0b37a2760e4d7adf63a2be762d1d23f077c",
+    "interface_contract_v2": "c6726c65a40df77c6e681226c90f48c16e00348b5727ab15a14c6b7e61cb3f93",
+    "evaluator": "929edfc8a299998bc32faef4144b94f2f007cd511bca6ded4a6d7828cd5481e8",
+    "freeze_v2": "469106ebf049a02950608ad807cfe7c4b63a325b2453adae9dec70c67a6d0197",
+    "raw_response_manifest": "54d06b4c9a221eb8a98bcb5f6d2db5cf2246c57c14058ba4ae9f655696e04173",
+    "lifecycle": "cd4e9daca5090a4f6dd3896bf8f6d2d4a25add605bc340f179d5da313e64f4f1",
+    "results_matrix": "beb0fdbed62dbea89f99474c8d3e1490729807a8929a1daddc88f6ce6e5172a7",
+    "run4a_aggregate": "bee66dac025f40c964b207442e6dd232a9f39a4d18448e568b2b6430b34f3016",
+    "run4a_preregistration": "a9418fe1e45a05e46b4fd183a6345333893192305fbf767461f3b280b26d748b",
+    "run4b_preregistration": "59f02a1e23c9cbe7e91bfb9c464675ccbb7bbb54b779091ea11cef8846ce5771",
+    "resource_weights": "8f7820a6a3e5734e071452f643374d8c6c769d4d149bcec3f2f82b88ee6530c2",
+    "atomic_scorecard_schema": "d484d012e8fe7bb6a5266864b3c8542a96a4e6391ca75145007b0a04eeefeea9"
+  },
+  "starting_state": {
+    "head": "4401840247a225ce1b89d7bf0c3b9fd766e1f67f",
+    "working_tree_clean_before_diagnosis": true,
+    "raw_responses": 32,
+    "raw_response_hashes_unchanged": true,
+    "closeout_winner": "DELEGATION_DECISION_QUALITY_FAVORS_GENERALIZED",
+    "local_capability_valid": "5/16",
+    "external_capability_valid": "16/16",
+    "model_calls_during_diagnosis": 0,
+    "teacher_calls_during_diagnosis": 0,
+    "tool_calls_during_diagnosis": 0,
+    "external_inference_calls_during_diagnosis": 0,
+    "policy_changes": 0,
+    "qualification_changes": 0,
+    "production_routing_changes": 0
+  },
+  "policy_knowledge_before_target": {
+    "generalized": {
+      "predictor_id": "RUN4A_INTERVENTION_AGGREGATE_ALL_FAMILIES_V1",
+      "source": ".work/run4a_intervention_market_calibration/run_20260819T184835Z/aggregate.json",
+      "evidence_cutoff": "2026-08-19T19:04:23.253595+00:00 / commit 15dd84cfa82d9c2cef47778111e811e11ecf7274",
+      "local_score": "8/16 = 0.5",
+      "external_score": "11/16 = 0.6875",
+      "selection_rule": "choose higher existing broad score and delegate; tie or missing score abstains",
+      "historical_threshold": "0.50 existed only as Run 4A block-level support semantics and was explicitly not applied to the broad aggregate",
+      "supplier_identity": "local Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf; external codex-cli-0.146.0",
+      "contains_target_outcome": false,
+      "available_before_target": true
+    },
+    "degeneralized": {
+      "predictor_id": "SCOPE_INTERFACE_PROFILE_RUN4A_V1",
+      "source": "Run 4A scope evidence plus Run 4B scope contract, resource weights, and atomic scorecard schema",
+      "evidence_cutoff": "2026-08-20T19:59:07-04:00 / commit 13321742e87aedd090728e4cad741f80166f02d3",
+      "historical_scope_evidence": "local 4/4 and external 4/4 validated rescues, supported_positive, n=4 each",
+      "selection_rule": "for compatible supported_positive scope profile select lowest expected cost supplier; unsupported/out-of-coverage abstains",
+      "coverage_rule": "profile_supported_nonexpanding delegates local; profile_out_of_coverage_expansion_required abstains",
+      "historical_interface": "run4a_scope_json_contract_v1",
+      "prospective_interface": "DELEGATION_PREDICTION_SCOPE_JSON_COMPATIBLE_SUCCESSOR_V1",
+      "supplier_identity": "local Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf; external codex-cli-0.146.0",
+      "contains_target_outcome": false,
+      "available_before_target": true
+    }
+  },
+  "historical_unit_mismatch": {
+    "run4a_local_scope_evidence_unit": "local_teacher intervention followed by a 1.7B worker retry whose final output was validated",
+    "run4a_external_scope_evidence_unit": "external_teacher intervention followed by a 1.7B worker retry whose final output was validated",
+    "prospective_scored_unit": "direct local_teacher or external_teacher response to the four-field scope contract",
+    "supplier_identity_match": true,
+    "supplier_action_or_scored_responsibility_match": false,
+    "diagnosis": "The model identity is exact, but the historical positive evidence is compound teacher-plus-worker rescue evidence, not direct evidence that the teacher alone will satisfy the prospective contract."
+  },
+  "strata": {
+    "A_supplier_selection_dpt_scope_001_to_008": {
+      "policy_disagreement": "generalized external versus degeneralized local",
+      "local_valid": "3/8",
+      "external_valid": "8/8",
+      "both_valid": 3,
+      "local_only_valid": 0,
+      "external_only_valid": 5,
+      "neither_valid": 0,
+      "local_valid_cases": ["dpt-scope-001", "dpt-scope-003", "dpt-scope-006"],
+      "external_only_cases": ["dpt-scope-002", "dpt-scope-004", "dpt-scope-005", "dpt-scope-007", "dpt-scope-008"],
+      "historical_comparison": "Run 4A scope evidence was local 4/4 and external 4/4, but at the compound intervention-plus-worker-retry unit.",
+      "primary_failure": "local direct-output transfer failed on 5/8 fresh cases; external direct output passed 8/8."
+    },
+    "B_delegate_vs_abstain_dpt_scope_009_to_016": {
+      "policy_disagreement": "generalized external delegate versus degeneralized abstain",
+      "local_valid": "2/8",
+      "external_valid": "8/8",
+      "degeneralized_unnecessary_abstentions": "8/8",
+      "local_valid_cases": ["dpt-scope-011", "dpt-scope-014"],
+      "local_invalid_cases": ["dpt-scope-009", "dpt-scope-010", "dpt-scope-012", "dpt-scope-013", "dpt-scope-015", "dpt-scope-016"],
+      "primary_failure": "The bounded policy treated the fresh expansion-required region as out of coverage and abstained; external subsequently validated 8/8. This does not prove the policy should have delegated in advance, but it establishes the abstention opportunity cost in this cohort."
+    }
+  },
+  "local_failure_taxonomy": {
+    "transport_failures": 0,
+    "parse_failures": 0,
+    "contract_or_output_shape_failures": 10,
+    "target_binding_or_allowed_held_separation_failures": 1,
+    "scope_expansion_value_failures": 0,
+    "review_status_failures": 0,
+    "extra_field_failures": 0,
+    "semantic_authority_boundary_failures_separate_from_binding": 0,
+    "recoverable_nested_schema_like_outputs": 10,
+    "failures": [
+      {"case_id":"dpt-scope-002","stratum":"A","raw_response_sha256":"b80f13d4f26516cd310b8cd3ca552352b55cdb96b98c0722fa26833e3b1f8691","parse_valid":true,"contract_valid":false,"bounded_capability_valid":false,"primary_failure_class":"OUTPUT_SHAPE_REQUIRED_FIELDS_NESTED_UNDER_PROPERTIES","secondary_failure_class":"SEMANTIC_CONTENT_RECOVERABLE_BUT_WRONG_ENVELOPE","field_mismatches":["top-level allowed_targets missing","top-level held_targets missing","top-level scope_expansion_required missing","top-level review_status missing"],"historical_same_failure_mode":"NOT_DIRECTLY_COMPARABLE_COMPOUND_RESCUE_UNIT"},
+      {"case_id":"dpt-scope-004","stratum":"A","raw_response_sha256":"205a4fbd7849a33a6bd004255409045beee081acafde82442af630a1722c65ee","parse_valid":true,"contract_valid":false,"bounded_capability_valid":false,"primary_failure_class":"OUTPUT_SHAPE_REQUIRED_FIELDS_NESTED_UNDER_PROPERTIES","secondary_failure_class":"SEMANTIC_CONTENT_RECOVERABLE_BUT_WRONG_ENVELOPE","field_mismatches":["top-level allowed_targets missing","top-level held_targets missing","top-level scope_expansion_required missing","top-level review_status missing"],"historical_same_failure_mode":"NOT_DIRECTLY_COMPARABLE_COMPOUND_RESCUE_UNIT"},
+      {"case_id":"dpt-scope-005","stratum":"A","raw_response_sha256":"047503dcad9b068ef405772022c6d0d4d92c8ad2d5f9a52422b440712e06ecc0","parse_valid":true,"contract_valid":false,"bounded_capability_valid":false,"primary_failure_class":"OUTPUT_SHAPE_REQUIRED_FIELDS_NESTED_UNDER_PROPERTIES","secondary_failure_class":"SEMANTIC_CONTENT_RECOVERABLE_BUT_WRONG_ENVELOPE","field_mismatches":["top-level allowed_targets missing","top-level held_targets missing","top-level scope_expansion_required missing","top-level review_status missing"],"historical_same_failure_mode":"NOT_DIRECTLY_COMPARABLE_COMPOUND_RESCUE_UNIT"},
+      {"case_id":"dpt-scope-007","stratum":"A","raw_response_sha256":"4a8cba8e3cd1b7719be4654f3b5b9852db1506578bd13191b85099cda5e91fd3","parse_valid":true,"contract_valid":false,"bounded_capability_valid":false,"primary_failure_class":"OUTPUT_SHAPE_REQUIRED_FIELDS_NESTED_UNDER_PROPERTIES","secondary_failure_class":"SEMANTIC_CONTENT_RECOVERABLE_BUT_WRONG_ENVELOPE","field_mismatches":["top-level allowed_targets missing","top-level held_targets missing","top-level scope_expansion_required missing","top-level review_status missing"],"historical_same_failure_mode":"NOT_DIRECTLY_COMPARABLE_COMPOUND_RESCUE_UNIT"},
+      {"case_id":"dpt-scope-008","stratum":"A","raw_response_sha256":"9a2d2f901fed7bf0409bd3584f5e76698ec9c8fca2cae32c29974ef56c1ef2d1","parse_valid":true,"contract_valid":false,"bounded_capability_valid":false,"primary_failure_class":"OUTPUT_SHAPE_REQUIRED_FIELDS_NESTED_UNDER_PROPERTIES","secondary_failure_class":"SEMANTIC_CONTENT_RECOVERABLE_BUT_WRONG_ENVELOPE","field_mismatches":["top-level allowed_targets missing","top-level held_targets missing","top-level scope_expansion_required missing","top-level review_status missing"],"historical_same_failure_mode":"NOT_DIRECTLY_COMPARABLE_COMPOUND_RESCUE_UNIT"},
+      {"case_id":"dpt-scope-009","stratum":"B","raw_response_sha256":"02a4757d0cadaa0b8b07a8c76e41ff82af90d3105237f9b11dea228d4abcadff","parse_valid":true,"contract_valid":false,"bounded_capability_valid":false,"primary_failure_class":"OUTPUT_SHAPE_REQUIRED_FIELDS_NESTED_UNDER_PROPERTIES","secondary_failure_class":"SEMANTIC_CONTENT_RECOVERABLE_BUT_WRONG_ENVELOPE","field_mismatches":["top-level required fields missing; nested values semantically match expected expansion case"],"historical_same_failure_mode":"NOT_DIRECTLY_COMPARABLE_COMPOUND_RESCUE_UNIT"},
+      {"case_id":"dpt-scope-010","stratum":"B","raw_response_sha256":"cc0008af2b4779077b438ceb4ec043aab09264d9babe331690b7ec7778d0edb8","parse_valid":true,"contract_valid":true,"bounded_capability_valid":false,"primary_failure_class":"TARGET_BINDING_ALLOWED_HELD_SEPARATION","secondary_failure_class":"AUTHORITY_BOUNDARY_VIOLATION","field_mismatches":["held_targets contains DPT_SABLE_010.md, which is also in allowed_targets"],"historical_same_failure_mode":"VALIDATOR_SEMANTICS_EXIST_HISTORICALLY_BUT_SUCCESSFUL_RUN4A_UNIT_NOT_SAME_DIRECT_SUPPLIER_OUTPUT"},
+      {"case_id":"dpt-scope-012","stratum":"B","raw_response_sha256":"68a9ff08ac226988c5e94a7d42c9d71f09e81c8dff652a673dea203212955389","parse_valid":true,"contract_valid":false,"bounded_capability_valid":false,"primary_failure_class":"OUTPUT_SHAPE_REQUIRED_FIELDS_NESTED_UNDER_PROPERTIES","secondary_failure_class":"SEMANTIC_CONTENT_RECOVERABLE_BUT_WRONG_ENVELOPE","field_mismatches":["top-level required fields missing; nested values semantically match expected expansion case"],"historical_same_failure_mode":"NOT_DIRECTLY_COMPARABLE_COMPOUND_RESCUE_UNIT"},
+      {"case_id":"dpt-scope-013","stratum":"B","raw_response_sha256":"aa8e8468db931e1750ab44f13c2f84a76a66684c6a26751e2531ad5f4d552fc4","parse_valid":true,"contract_valid":false,"bounded_capability_valid":false,"primary_failure_class":"OUTPUT_SHAPE_REQUIRED_FIELDS_NESTED_UNDER_PROPERTIES","secondary_failure_class":"SEMANTIC_CONTENT_RECOVERABLE_BUT_WRONG_ENVELOPE","field_mismatches":["top-level required fields missing; nested values semantically match expected expansion case"],"historical_same_failure_mode":"NOT_DIRECTLY_COMPARABLE_COMPOUND_RESCUE_UNIT"},
+      {"case_id":"dpt-scope-015","stratum":"B","raw_response_sha256":"0bf0100dc16102835abe3ea2e81af362c4952337aa62cdefe64c814bc80d55a3","parse_valid":true,"contract_valid":false,"bounded_capability_valid":false,"primary_failure_class":"OUTPUT_SHAPE_REQUIRED_FIELDS_NESTED_UNDER_PROPERTIES","secondary_failure_class":"SEMANTIC_CONTENT_RECOVERABLE_BUT_WRONG_ENVELOPE","field_mismatches":["top-level required fields missing; nested values semantically match expected expansion case"],"historical_same_failure_mode":"NOT_DIRECTLY_COMPARABLE_COMPOUND_RESCUE_UNIT"},
+      {"case_id":"dpt-scope-016","stratum":"B","raw_response_sha256":"e1f6ad8a58e379840e7d880c583cb60661f391adcbd8257ec4299c8a93deb3c8","parse_valid":true,"contract_valid":false,"bounded_capability_valid":false,"primary_failure_class":"OUTPUT_SHAPE_REQUIRED_FIELDS_NESTED_UNDER_PROPERTIES","secondary_failure_class":"SEMANTIC_CONTENT_RECOVERABLE_BUT_WRONG_ENVELOPE","field_mismatches":["top-level required fields missing; nested values semantically match expected expansion case"],"historical_same_failure_mode":"NOT_DIRECTLY_COMPARABLE_COMPOUND_RESCUE_UNIT"}
+    ]
+  },
+  "hypothesis_diagnosis": {
+    "SPARSE_SUPPORT_OVERCONFIDENCE": {"status":"SUPPORTED_AS_REPRESENTATION_RISK_NOT_CAUSALLY_IDENTIFIED","basis":"The profile used n=4, 4/4, and supported_positive without an uncertainty or transfer margin. The prospective failure is compatible with overconfidence, but n=4 alone does not establish causation."},
+    "COMPATIBLE_INTERFACE_TRANSFER": {"status":"SUPPORTED_AS_RISK_PLAUSIBLE_AS_CONTRIBUTOR","basis":"Historical and prospective contracts share the four-field semantics but differ in prompt/target bindings and execution role. The ten nested-envelope failures align with the changed direct interface; no exact-interface control isolates causation."},
+    "TASK_DISTRIBUTION_TRANSFER": {"status":"SUPPORTED_AS_TRANSFER_LIMIT_NOT_PRIMARY_CAUSE","basis":"Historical tasks were four fresh nonexpanding cases; prospective tasks vary target syntax, file types, wording, and include an expansion-required stratum. However, the dominant failure is output shape and occurs in both strata."},
+    "SUPPLIER_IDENTITY_OR_RUNTIME_DRIFT": {"status":"NOT_SUPPORTED_FOR_IDENTITY_DRIFT","basis":"Visible historical and prospective identities match exactly for Qwen3-Coder-30B and codex-cli-0.146.0. Some historical native metadata is unavailable, and the scored responsibility changed from compound rescue to direct output, which is a unit mismatch rather than identity drift."},
+    "BOUNDED_EVIDENCE_AGING": {"status":"UNRESOLVED_NOT_SUPPORTED_AS_PRIMARY_CAUSE","basis":"The evidence is approximately five days old and the profile does not encode freshness/version aging, but supplier identity remained exact and no temporal drift evidence was observed."}
+  },
+  "coverage_and_abstention": {
+    "dpt_scope_009_to_016_policy_state": "profile_out_of_coverage_expansion_required",
+    "state_semantics": "unsupported/out-of-profile evidence, not supported_negative or incapable",
+    "external_subsequent_validity": "8/8",
+    "degeneralized_unnecessary_abstentions": "8/8",
+    "COVERAGE_ABSENCE_WAS_TREATED_AS_NEGATIVE_EVIDENCE": false,
+    "COVERAGE_ABSENCE_TRIGGERED_ABSTENTION_WITHOUT_NEGATIVE_CAPABILITY_EVIDENCE": true,
+    "interpretation": "The policy failed closed on absence of bounded coverage. It did not assert that either supplier was incapable; it simply withheld delegation because the profile did not cover the expansion-required stratum."
+  },
+  "evidence_state_semantics": {
+    "explicit_states": ["supported_positive", "supported_negative", "observed", "insufficient", "supported"],
+    "derivable_states": ["profile_supported_nonexpanding", "profile_out_of_coverage_expansion_required", "advisory_abstain"],
+    "not_explicitly_represented": ["unobserved", "out_of_profile as an evidence state", "stale_or_changed_supplier", "interface_transfer", "supplier_incapable as distinct from supported_negative"],
+    "delegation_not_authorized": "represented in authority/policy semantics, not as a capability evidence polarity",
+    "EVIDENCE_STATE_SEMANTIC_COLLAPSE_SUPPORTED": true,
+    "finding": "The routing freeze distinguishes positive/negative/observed/insufficient at evidence resolution, but does not natively preserve the separate epistemic distinction between no evidence, out-of-profile evidence, negative evidence, interface transfer, and stale supplier evidence. The prospective bounded policy adds a local coverage regime and maps out-of-coverage to abstention, but the scorecard state model does not carry that distinction as a first-class evidence state."
+  },
+  "broad_score": {
+    "BROAD_SCORE_RESCUE_SIGNAL_OBSERVED": true,
+    "definition": "The broad Run 4A aggregate selected external, and external validated 16/16 in the prospective cohort, including 8/8 in the stratum where the bounded policy abstained.",
+    "not_established": ["statistical calibration", "universal broad-score generalization", "broad evidence should override bounded evidence"]
+  },
+  "stale_execution_manifest": {
+    "execution_manifest_status": "running",
+    "authoritative_lifecycle_status": "terminal_runtime",
+    "authoritative_raw_manifest_status": "SEALED_BEFORE_EVALUATION",
+    "STALE_EXECUTION_MANIFEST_CONTRIBUTED_TO_OBSERVER_MISCLASSIFICATION": true,
+    "historical_manifest_mutated": false,
+    "recommended_control_only": "future harnesses should atomically seal terminal status or have observers prefer the sealed raw manifest/lifecycle over the mutable execution manifest"
+  },
+  "markers": {
+    "BOUNDED_EVIDENCE_TRANSFER_FAILURE_SUPPORTED": true,
+    "SPARSE_SUPPORT_OVERCONFIDENCE_SUPPORTED": true,
+    "COMPATIBLE_INTERFACE_TRANSFER_RISK_SUPPORTED": true,
+    "TASK_DISTRIBUTION_TRANSFER_RISK_SUPPORTED": true,
+    "SUPPLIER_IDENTITY_DRIFT_SUPPORTED": false,
+    "COVERAGE_ABSENCE_WAS_TREATED_AS_NEGATIVE_EVIDENCE": false,
+    "COVERAGE_ABSENCE_TRIGGERED_ABSTENTION_WITHOUT_NEGATIVE_CAPABILITY_EVIDENCE": true,
+    "BROAD_SCORE_RESCUE_SIGNAL_OBSERVED": true,
+    "EVIDENCE_STATE_SEMANTIC_COLLAPSE_SUPPORTED": true,
+    "RETROSPECTIVE_POLICY_TUNING_PERFORMED": false,
+    "NEW_PROSPECTIVE_EXPERIMENT_REQUIRED": true
+  },
+  "next_experimental_question": {
+    "primary_hypothesis": "An uncertainty-aware bounded evidence representation that separates supported positive, supported negative, and unobserved/out-of-profile states can make better delegation decisions than both broad aggregate-only selection and the current hard-boundary abstention policy.",
+    "competing_explanations": ["direct-teacher versus compound-rescue unit mismatch", "compatible-interface transfer risk", "task-distribution transfer", "sparse support overconfidence", "genuine supplier difference on the fresh direct contract"],
+    "minimum_necessary_strata": ["historically supported positive bounded scope", "historically unobserved/out-of-profile scope", "bounded negative evidence if available", "direct supplier output under the same interface and independent validation"],
+    "must_freeze_before_outcomes": ["evidence-state representation", "predictor policies", "supplier/interface identities", "fresh matched cases", "independent evaluator", "scoring and abstention rules", "transfer and freshness metadata"],
+    "falsifiers": ["uncertainty-aware representation does not reduce false-positive or unnecessary-abstention errors on a fresh matched cohort", "direct supplier evaluation shows the historical compound-rescue evidence transfers without an observed unit mismatch", "coverage-state separation has no decision effect when supplier/interface and task strata are matched"]
+  },
+  "primary_characterization": "PROSPECTIVE_BOUNDED_EVIDENCE_POLICY_FAILED_PRIMARILY_AT_EVIDENCE_UNIT_TRANSFER_AND_COVERAGE_SEMANTICS_NOT_AT_TRANSPORT_OR_SUPPLIER_IDENTITY",
+  "RETROSPECTIVE_POLICY_TUNING_PERFORMED": false,
+  "qualification_change": false,
+  "production_routing_change": false,
+  "model_calls_during_diagnosis": 0,
+  "external_inference_calls_during_diagnosis": 0,
+  "raw_response_mutations": 0
+}
