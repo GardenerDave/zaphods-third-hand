@@ -155,13 +155,13 @@ def test_terminal_failure_and_guard_without_supplier_calls() -> None:
         assert len(list((output / "cases").glob("*/*/call_finished.json"))) == 1
         assert guard.exists()
         second_output = root / "second-run"
-        try:
-            MODULE.execute(second_output, DOCS, guard_state=guard, capture_overrides={"local_teacher": stub, "external_teacher": stub}, inject_exception_after=1)
-        except RuntimeError:
-            pass
-        else:
-            raise AssertionError("second execute attempt was accepted")
-        assert not second_output.exists()
+        assert MODULE.execute(second_output, DOCS, guard_state=guard, capture_overrides={"local_teacher": stub, "external_teacher": stub}, inject_exception_after=1) == 1
+        second_manifest = json.loads((second_output / "execution_manifest.json").read_text(encoding="utf-8"))
+        assert second_manifest["status"] == "REJECTED_BEFORE_ACQUISITION"
+        assert second_manifest["processes_started"] == 0
+        assert second_manifest["raw_explicit_v2_responses_sealed_before_evaluation"] is False
+        assert not (second_output / "lifecycle.json").exists()
+        assert not (second_output / "cases").exists()
 
 
 def test_complete_terminal_raw_seal_hash_coverage() -> None:
@@ -175,12 +175,37 @@ def test_complete_terminal_raw_seal_hash_coverage() -> None:
 
         assert MODULE.execute(output, DOCS, guard_state=guard, capture_overrides={"local_teacher": stub, "external_teacher": stub}) == 0
         raw = json.loads((output / "raw_response_manifest.json").read_text(encoding="utf-8"))
+        manifest = json.loads((output / "execution_manifest.json").read_text(encoding="utf-8"))
         assert raw["status"] == "SEALED_BEFORE_EVALUATION"
+        assert manifest["raw_explicit_v2_responses_sealed_before_evaluation"] is True
         assert raw["terminal_arm_artifact_count"] == 32
         for arm in raw["terminal_arm_artifact_hashes"]:
             names = {Path(name).name for name in arm["artifact_hashes"]}
             assert {"supplier_message.txt", "call_started.json", "call_finished.json", "response.json"}.issubset(names)
             assert all(len(digest) == 64 for digest in arm["artifact_hashes"].values())
+
+
+def test_failed_seal_does_not_set_marker() -> None:
+    with tempfile.TemporaryDirectory(prefix="explicit-v2-failed-seal-") as directory:
+        output = Path(directory) / "run"
+        arm = output / "cases" / "case-001" / "local_teacher"
+        arm.mkdir(parents=True)
+        (arm / "supplier_message.txt").write_bytes(b"test")
+        MODULE.atomic_write_json(arm / "call_started.json", {"case_id": "case-001"})
+        MODULE.atomic_write_json(arm / "call_finished.json", {"case_id": "case-001", "supplier_id": "local_teacher", "ordinal": 1})
+        manifest = {"status": "RUNNING", "raw_explicit_v2_responses_sealed_before_evaluation": False}
+        MODULE.atomic_write_json(output / "execution_manifest.json", manifest)
+        record = {"case_id": "case-001", "supplier_id": "local_teacher", "ordinal": 1}
+        try:
+            MODULE._write_raw_and_lifecycle(output, manifest, [record], "TERMINAL_COMPLETE")
+        except RuntimeError as exc:
+            assert "lacks response/failure evidence" in str(exc)
+        else:
+            raise AssertionError("incomplete terminal artifacts were sealed")
+        after = json.loads((output / "execution_manifest.json").read_text(encoding="utf-8"))
+        assert after["raw_explicit_v2_responses_sealed_before_evaluation"] is False
+        assert not (output / "raw_response_manifest.json").exists()
+        assert not (output / "lifecycle.json").exists()
 
 
 def test_prepare_only_firewall_and_zero_calls() -> None:
@@ -213,6 +238,7 @@ def main() -> None:
     test_external_mechanism_and_complete_failure_evidence()
     test_terminal_failure_and_guard_without_supplier_calls()
     test_complete_terminal_raw_seal_hash_coverage()
+    test_failed_seal_does_not_set_marker()
     test_prepare_only_firewall_and_zero_calls()
     print("PASS V2 hardened acquisition boundary tests; supplier/model calls=0")
 

@@ -457,12 +457,6 @@ def claim_one_shot_guard(path: Path, harness_sha256: str, freeze_commit: str) ->
 
 
 def _write_raw_and_lifecycle(output_dir: Path, manifest: dict[str, Any], records: list[dict[str, Any]], status: str) -> None:
-    manifest["status"] = status
-    manifest["actual_supplier_calls"] = len(records)
-    manifest["actual_local_calls"] = sum(item["supplier_id"] == "local_teacher" for item in records)
-    manifest["actual_external_calls"] = sum(item["supplier_id"] == "external_teacher" for item in records)
-    manifest["raw_explicit_v2_responses_sealed_before_evaluation"] = True
-    atomic_write_json(output_dir / "execution_manifest.json", manifest)
     terminal_artifacts = []
     for record in records:
         arm_dir = output_dir / "cases" / record["case_id"] / record["supplier_id"]
@@ -476,6 +470,8 @@ def _write_raw_and_lifecycle(output_dir: Path, manifest: dict[str, Any], records
         if not any(name.endswith("response.json") or name.endswith("infrastructure_failure.json") for name in files):
             raise RuntimeError(f"terminal arm lacks response/failure evidence: {record['case_id']} {record['supplier_id']}")
         terminal_artifacts.append({"ordinal": record["ordinal"], "case_id": record["case_id"], "supplier_id": record["supplier_id"], "artifact_hashes": files})
+    actual_local_calls = sum(item["supplier_id"] == "local_teacher" for item in records)
+    actual_external_calls = sum(item["supplier_id"] == "external_teacher" for item in records)
     raw_manifest = {
         "schema": "zth.explicit_interface_v2.raw_acquisition_manifest",
         "status": "SEALED_BEFORE_EVALUATION",
@@ -486,8 +482,8 @@ def _write_raw_and_lifecycle(output_dir: Path, manifest: dict[str, Any], records
         "evaluator_supplier_visibility": False,
         "planned_supplier_calls": 32,
         "actual_supplier_calls": len(records),
-        "actual_local_calls": manifest["actual_local_calls"],
-        "actual_external_calls": manifest["actual_external_calls"],
+        "actual_local_calls": actual_local_calls,
+        "actual_external_calls": actual_external_calls,
         "retries": 0,
         "replays": 0,
         "terminal_arm_artifact_hashes": terminal_artifacts,
@@ -501,13 +497,21 @@ def _write_raw_and_lifecycle(output_dir: Path, manifest: dict[str, Any], records
         "second_acquisition_process_started": False,
         "supplier_calls": len(records),
         "model_calls": len(records),
-        "external_inference_calls": manifest["actual_external_calls"],
+        "external_inference_calls": actual_external_calls,
         "retries": 0,
         "replays": 0,
         "evaluator_file_access_during_acquisition": False,
         "evaluator_semantics_loaded_during_acquisition": False,
         "evaluator_runtime_influence": 0,
     })
+    # This is the final seal bit.  It is written only after all per-arm hashes,
+    # the raw manifest, and lifecycle metadata have been written successfully.
+    manifest["status"] = status
+    manifest["actual_supplier_calls"] = len(records)
+    manifest["actual_local_calls"] = actual_local_calls
+    manifest["actual_external_calls"] = actual_external_calls
+    manifest["raw_explicit_v2_responses_sealed_before_evaluation"] = True
+    atomic_write_json(output_dir / "execution_manifest.json", manifest)
 
 
 def execute(output_dir: Path, artifact_dir: Path, guard_state: Path | None = None, capture_overrides: dict[str, Callable[[bytes], Any]] | None = None, inject_exception_after: int | None = None) -> int:
@@ -518,12 +522,21 @@ def execute(output_dir: Path, artifact_dir: Path, guard_state: Path | None = Non
     external_identity = validate_external_mechanism(harness_freeze["external_mechanism_enforcement"]["configured_command"], harness_freeze["external_mechanism_enforcement"]["wrapper_sha256"])
     if output_dir.exists():
         raise RuntimeError("run directory already exists; refusing resume/replay")
-    guard = guard_state or DEFAULT_GUARD_STATE
-    claim_one_shot_guard(guard, sha_file(Path(__file__)), EXPECTED_V2_FREEZE_COMMIT)
-    # The guard is claimed before PREPARED/RUNNING transition, so a second
-    # execute attempt with another output directory cannot create lifecycle
-    # evidence or claim a second acquisition process.
     manifest = prepare_run(output_dir, artifact_dir)
+    guard = guard_state or DEFAULT_GUARD_STATE
+    try:
+        claim_one_shot_guard(guard, sha_file(Path(__file__)), EXPECTED_V2_FREEZE_COMMIT)
+    except RuntimeError as exc:
+        manifest["status"] = "REJECTED_BEFORE_ACQUISITION"
+        manifest["rejection"] = str(exc)
+        manifest["processes_started"] = 0
+        manifest["second_acquisition_process_started"] = False
+        manifest["raw_explicit_v2_responses_sealed_before_evaluation"] = False
+        atomic_write_json(output_dir / "execution_manifest.json", manifest)
+        return 1
+    # The guard is claimed after PREPARED and before RUNNING, so a second
+    # execute attempt cannot claim a second acquisition process or create
+    # supplier-opportunity evidence.
     manifest["resolved_local_identity"] = local_identity
     manifest["resolved_external_identity"] = external_identity
     manifest["status"] = "RUNNING"
@@ -600,7 +613,18 @@ def execute(output_dir: Path, artifact_dir: Path, guard_state: Path | None = Non
         records = []
         for path in sorted(output_dir.glob("cases/*/*/call_finished.json")):
             records.append(read_json(path))
-        _write_raw_and_lifecycle(output_dir, manifest, records, "TERMINAL_INCOMPLETE")
+        try:
+            _write_raw_and_lifecycle(output_dir, manifest, records, "TERMINAL_INCOMPLETE")
+        except BaseException as seal_exc:
+            # A failed seal must never be represented as a successful raw
+            # seal.  Preserve the failure and leave the marker false.
+            manifest["status"] = "TERMINAL_INCOMPLETE"
+            manifest["actual_supplier_calls"] = len(records)
+            manifest["actual_local_calls"] = sum(item["supplier_id"] == "local_teacher" for item in records)
+            manifest["actual_external_calls"] = sum(item["supplier_id"] == "external_teacher" for item in records)
+            manifest["raw_explicit_v2_responses_sealed_before_evaluation"] = False
+            manifest["raw_seal_failure"] = str(seal_exc)
+            atomic_write_json(output_dir / "execution_manifest.json", manifest)
         return 1
 
 
@@ -627,8 +651,8 @@ def write_harness_freeze(artifact_dir: Path) -> None:
         "external_mechanism_enforcement": external,
         "supplier_native_envelope_control": "BEST_AVAILABLE_OBSERVATION",
         "supplier_message_runtime_reconstruction": False, "matched_runtime_message_hash_across_arms": True, "matched_runtime_message_bytes_across_arms": True,
-        "one_shot_acquisition": {"processes_started": 1, "second_acquisition_process_started": False, "guard_claimed_immediately_before_first_opportunity": True, "prepare_only_does_not_claim": True},
-        "retries": 0, "replays": 0, "terminal_states": ["PREPARED", "RUNNING", "TERMINAL_COMPLETE", "TERMINAL_INCOMPLETE"], "fail_closed_terminalization": True, "raw_seal_before_evaluation": True,
+        "one_shot_acquisition": {"processes_started": 1, "second_acquisition_process_started": False, "guard_claimed_after_prepared_before_running": True, "guard_claimed_immediately_before_first_opportunity": True, "prepare_only_does_not_claim": True, "second_execute_rejection_status": "REJECTED_BEFORE_ACQUISITION"},
+        "retries": 0, "replays": 0, "terminal_states": ["PREPARED", "REJECTED_BEFORE_ACQUISITION", "RUNNING", "TERMINAL_COMPLETE", "TERMINAL_INCOMPLETE"], "fail_closed_terminalization": True, "raw_seal_before_evaluation": True,
         "firewall": {"evaluator_file_access_during_acquisition": False, "evaluator_semantics_loaded_during_acquisition": False, "evaluator_runtime_influence": 0, "evaluator_supplier_visibility": False, "evaluator_hash_checked_only_in_preflight": True},
         "future_closeout": {"evaluator_implementation_imported_after_raw_seal": True, "evaluator_cases_loaded_after_raw_seal": True, "evaluator_sha256_must_match": True},
         "resolved_local_identity_preflight": local,

@@ -50,7 +50,7 @@
     "evaluator_implementation_imported_after_raw_seal": true,
     "evaluator_sha256_must_match": true
   },
-  "harness_sha256": "bbf2d6e5e96af73c5e111240f2193e51576a3ee24512d0c65341e5929d3b7502",
+  "harness_sha256": "ed1283af61c533a28aa4e17ab7f4e717a0315b4b3862a21eea40cdbfa72dcd6b",
   "local_identity_enforcement": {
     "configuration_only_no_inference": true,
     "required_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
@@ -59,10 +59,12 @@
   "matched_runtime_message_bytes_across_arms": true,
   "matched_runtime_message_hash_across_arms": true,
   "one_shot_acquisition": {
+    "guard_claimed_after_prepared_before_running": true,
     "guard_claimed_immediately_before_first_opportunity": true,
     "prepare_only_does_not_claim": true,
     "processes_started": 1,
-    "second_acquisition_process_started": false
+    "second_acquisition_process_started": false,
+    "second_execute_rejection_status": "REJECTED_BEFORE_ACQUISITION"
   },
   "planned_external_calls": 16,
   "planned_local_calls": 16,
@@ -381,6 +383,7 @@
   "supplier_native_envelope_control": "BEST_AVAILABLE_OBSERVATION",
   "terminal_states": [
     "PREPARED",
+    "REJECTED_BEFORE_ACQUISITION",
     "RUNNING",
     "TERMINAL_COMPLETE",
     "TERMINAL_INCOMPLETE"
