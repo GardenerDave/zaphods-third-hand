@@ -1,0 +1,136 @@
+{
+  "schema": "zth_direct_unit_calibration_design_matrix_v1",
+  "date": "2026-08-24",
+  "status": "design_only_unexecuted",
+  "authoritative_validity_audit_commit": "7340caa2f34e83e4cac205f38c6bdf363c473fa6",
+  "scope_v0": {
+    "experiment_id": "DELEGATION_PREDICTION_TEST_SCOPE_V0",
+    "run_directory": ".work/model_size_supplier_floor/delegation_prediction_test_scope_v0/run_20260824T170000Z",
+    "future_evidence_eligibility": true,
+    "must_not_reuse_as_future_targets": true,
+    "case_count": 16,
+    "direct_results": {
+      "local": {"all": "5/16", "supported_nonexpanding": "3/8", "expansion_required": "2/8"},
+      "external": {"all": "16/16", "supported_nonexpanding": "8/8", "expansion_required": "8/8"}
+    },
+    "model_free_verification": "preserved response.json artifacts compared with scoring-only evaluator"
+  },
+  "suppliers": [
+    {"supplier_id": "local_teacher", "identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf", "role": "DIRECT_RESPONDER"},
+    {"supplier_id": "external_teacher", "identity": "codex-cli-0.146.0", "role": "DIRECT_RESPONDER"}
+  ],
+  "selected_units": [
+    {
+      "capability_family": "scope-authority-boundary",
+      "bounded_responsibility": "direct four-field scope-authority response under review-only authority",
+      "existing_direct_evidence": "Scope V0 16 matched tasks",
+      "fresh_stage_a_cases_minimum": 0,
+      "fresh_stage_a_cases_stronger": 0,
+      "evaluator_available": true,
+      "fresh_generation_available": true,
+      "interface_freezable": true,
+      "tool_free": true,
+      "authority_bounded": true,
+      "selection_basis": "sealed direct evidence and deterministic validation, not expected supplier performance"
+    },
+    {
+      "capability_family": "triage-routing",
+      "bounded_responsibility": "direct bounded triage route/rationale/review decision",
+      "existing_direct_evidence": "fixture-pack and deterministic-validator lineage; prior teacher evidence not adopted as direct calibration evidence",
+      "fresh_stage_a_cases_minimum": 4,
+      "fresh_stage_a_cases_stronger": 8,
+      "evaluator_available": true,
+      "fresh_generation_available": true,
+      "interface_freezable": true,
+      "tool_free": true,
+      "authority_bounded": true,
+      "selection_basis": "distinct bounded responsibility and deterministic evaluation"
+    },
+    {
+      "capability_family": "unsupported-certainty",
+      "bounded_responsibility": "directly separate supported evidence from unsupported certainty",
+      "existing_direct_evidence": "Run 4A fixture/reference-fact and deterministic-validator lineage; prior teacher evidence compound-only",
+      "fresh_stage_a_cases_minimum": 4,
+      "fresh_stage_a_cases_stronger": 8,
+      "evaluator_available": true,
+      "fresh_generation_available": true,
+      "interface_freezable": true,
+      "tool_free": true,
+      "authority_bounded": true,
+      "selection_basis": "distinct evidence/claim-boundary responsibility and deterministic evaluation"
+    }
+  ],
+  "reserve_unit": {
+    "capability_family": "contradiction-handling",
+    "direct_unit_suitability": "MEDIUM",
+    "reason_not_minimum": "existing fixture contracts vary and need normalization",
+    "promotion_condition": "model-free contract normalization and fresh evaluator pack"
+  },
+  "candidate_audit": [
+    {"family": "scope-authority-boundary", "direct_unit_suitability": "HIGH", "evaluator_available": true, "fresh_case_generation_available": true, "interface_freezable": true, "tool_free": true, "authority_bounded": true, "overlap_with_scope_v0": "HIGH", "expected_cost": "existing evidence"},
+    {"family": "triage-routing", "direct_unit_suitability": "HIGH", "evaluator_available": true, "fresh_case_generation_available": true, "interface_freezable": true, "tool_free": true, "authority_bounded": true, "overlap_with_scope_v0": "MEDIUM", "expected_cost": "MODERATE"},
+    {"family": "unsupported-certainty", "direct_unit_suitability": "MEDIUM_HIGH", "evaluator_available": true, "fresh_case_generation_available": true, "interface_freezable": true, "tool_free": true, "authority_bounded": true, "overlap_with_scope_v0": "MEDIUM", "expected_cost": "MODERATE"},
+    {"family": "contradiction-handling", "direct_unit_suitability": "MEDIUM", "evaluator_available": true, "fresh_case_generation_available": true, "interface_freezable": false, "tool_free": true, "authority_bounded": true, "overlap_with_scope_v0": "MEDIUM", "expected_cost": "MODERATE"}
+  ],
+  "atomic_unit_schema": {
+    "required_fields": ["supplier_id", "model_runtime_identity", "capability_family", "bounded_responsibility", "interface_id", "interface_hash", "supplier_role", "downstream_dependencies", "validated_artifact", "authority_context", "evaluator_id", "evidence_timestamp", "case_id", "raw_response_hash", "transport_valid", "parse_valid", "contract_valid", "semantic_valid"],
+    "supplier_role": "DIRECT_RESPONDER",
+    "downstream_dependencies_for_direct_score": [],
+    "preserve_raw_bernoulli_observation": true,
+    "aggregate_levels": ["supplier", "supplier×capability_family", "supplier×capability_family×interface", "supplier×capability_family×interface×responsibility"],
+    "evidence_states_to_preserve": ["SUPPORTED_POSITIVE", "SUPPORTED_NEGATIVE", "OBSERVED_INSUFFICIENT", "UNOBSERVED", "OUT_OF_PROFILE", "INTERFACE_TRANSFER_REQUIRED", "SUPPLIER_OR_INTERFACE_CHANGED"]
+  },
+  "stage_boundary": {
+    "stage_a": "direct-unit calibration; sealed outcomes become future historical evidence; no policy comparison claim",
+    "stage_b": "clean granularity replication after Stage A seal; fresh targets and independent evaluator",
+    "stage_b_targets_in_stage_a": false,
+    "stage_a_outcomes_before_stage_b_policy_freeze": true,
+    "future_policy_disagreement_must_emerge_from_pre_target_evidence": true,
+    "competence_unit_alignment_precedes_policy_uncertainty_tuning": true
+  },
+  "budgets": {
+    "minimum": {"scope_v0_reused_tasks": 16, "new_triage_tasks": 4, "new_unsupported_certainty_tasks": 4, "new_cases": 8, "new_local_calls": 8, "new_external_calls": 8, "new_supplier_calls": 16, "total_atomic_observations_including_scope_v0": 48},
+    "stronger_without_reserve": {"scope_v0_reused_tasks": 16, "new_triage_tasks": 8, "new_unsupported_certainty_tasks": 8, "new_cases": 16, "new_local_calls": 16, "new_external_calls": 16, "new_supplier_calls": 32, "total_atomic_observations_including_scope_v0": 80},
+    "stronger_with_contradiction_reserve": {"scope_v0_reused_tasks": 16, "new_triage_tasks": 8, "new_unsupported_certainty_tasks": 8, "new_contradiction_tasks": 8, "new_cases": 24, "new_local_calls": 24, "new_external_calls": 24, "new_supplier_calls": 48, "total_atomic_observations_including_scope_v0": 112}
+  },
+  "future_gate": {
+    "ready_marker": "CLEAN_GRANULARITY_REPLICATION_READY",
+    "requires": ["aligned atomic units", "broad and bounded summaries reconstructable", "at least one naturally occurring disagreement without target outcomes", "fresh holdouts available", "supplier/interface identities usable"],
+    "otherwise": "CALIBRATION_COMPLETE_NO_INFORMATIVE_GRANULARITY_DISAGREEMENT",
+    "not_decided_by_this_design": true
+  },
+  "source_provenance": [
+    {"path": "docs/research/DELEGATION_PREDICTION_PROSPECTIVE_RESULTS_2026-08-24.md", "sha256": "e67792560ffda0dde87086eddcc3d681b78bd7d132bdb6f2a33c4ac24d7a2f72", "role": "sealed direct Scope V0 result summary"},
+    {"path": "docs/research/DELEGATION_PREDICTION_PROSPECTIVE_EVALUATOR_CASES_2026-08-24.json", "sha256": "929edfc8a299998bc32faef4144b94f2f007cd511bca6ded4a6d7828cd5481e8", "role": "Scope V0 scoring-only evaluator"},
+    {"path": ".work/model_size_supplier_floor/delegation_prediction_test_scope_v0/run_20260824T170000Z/lifecycle.json", "sha256": "cd4e9daca5090a4f6dd3896bf8f6d2d4a25add605bc340f179d5da313e64f4f1", "role": "sealed run lifecycle"},
+    {"path": ".work/model_size_supplier_floor/delegation_prediction_test_scope_v0/run_20260824T170000Z/raw_response_manifest.json", "sha256": "54d06b4c9a221eb8a98bcb5f6d2db5cf2246c57c14058ba4ae9f655696e04173", "role": "sealed raw response provenance"},
+    {"path": "docs/research/ATOMIC_SUPPLIER_SCORECARD_SCHEMA_V1.json", "sha256": "d484d012e8fe7bb6a5266864b3c8542a96a4e6391ca75145007b0a04eeefeea9", "role": "atomic evidence fields"},
+    {"path": "local_harness/run4a_fixture_pack.py", "sha256": "49126b21bc22785f69e41a394888c1932592ef6cf5d8f74c454439b623395dbb", "role": "freshness and satisfiability lineage"},
+    {"path": "local_harness/run5_mixed_fixture_pack.py", "sha256": "d6bb481c1cc379dfc2a813dc6be01ff6c66cbe2db319d9a8b4a21e3b032565cd", "role": "triage/scope freshness lineage"},
+    {"path": "local_harness/supervised_capability_loop.py", "sha256": "23b26115201d8cba17b9da659af72793654897803988e35e28210eba02af81be", "role": "deterministic validation path"},
+    {"path": "local_harness/supervised_reference_fact_validator.py", "sha256": "d86793dfde5a499988be92447f7df79da889a6074b8dc21b1c3b16bd7c60008a", "role": "reference-fact validation semantics"},
+    {"path": "docs/research/RUN_4A_PREREGISTRATION_2026-08-19.json", "sha256": "a9418fe1e45a05e46b4fd183a6345333893192305fbf767461f3b280b26d748b", "role": "historical family and supplier provenance"},
+    {"path": "docs/research/RUN_5_MIXED_ECONOMIC_ROUTING_PREREGISTRATION_2026-08-20.json", "sha256": "cbb6b6250db3489189b43afad36b17ac8ae42dfb928c62ab184766fd269102cd", "role": "triage/scope fixture research lineage"},
+    {"path": "docs/research/RUN_5_MIXED_ECONOMIC_ROUTING_POLICY_FREEZE_2026-08-20.json", "sha256": "c0402861a93599372d5b20f3659b81eb99333983922454849876733a7527c877", "role": "historical bounded policy context"}
+  ],
+  "findings": {
+    "out_of_profile_state_distinguished_from_negative": true,
+    "evidence_state_actionability_gap_supported": true,
+    "future_policy_disagreement_must_emerge_from_pre_target_evidence": true,
+    "scope_v0_direct_results_eligible_as_future_historical_evidence": true,
+    "scope_v0_results_must_not_be_reused_as_targets": true
+  },
+  "controls": {
+    "model_calls": 0,
+    "teacher_calls": 0,
+    "tool_calls": 0,
+    "external_inference_calls": 0,
+    "new_runtime_calls": 0,
+    "raw_response_mutations": 0,
+    "historical_evidence_mutations": 0,
+    "policy_changes": 0,
+    "qualification_changes": 0,
+    "production_routing_changes": 0,
+    "push_performed": false
+  }
+}
