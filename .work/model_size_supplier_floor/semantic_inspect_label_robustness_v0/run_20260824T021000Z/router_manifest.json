@@ -1,0 +1,73 @@
+{
+  "arm_count": 4,
+  "arms": {
+    "A": {
+      "inspect": "inspect",
+      "presence": "observe_presence"
+    },
+    "B": {
+      "inspect": "class_beta",
+      "presence": "observe_presence"
+    },
+    "C": {
+      "inspect": "operation_two",
+      "presence": "observe_presence"
+    },
+    "D": {
+      "inspect": "examine_target",
+      "presence": "observe_presence"
+    }
+  },
+  "authority_identity": true,
+  "class_stratified_execution_balance": true,
+  "definition_equivalence": true,
+  "driver_sha256": "c6f5c16e8e418ffc1bbac346b1c5051b00417093e8d6f078603011c5243ae308",
+  "enums": {
+    "A": [
+      "inspect",
+      "observe_presence",
+      "unresolved"
+    ],
+    "B": [
+      "class_beta",
+      "observe_presence",
+      "unresolved"
+    ],
+    "C": [
+      "operation_two",
+      "observe_presence",
+      "unresolved"
+    ],
+    "D": [
+      "examine_target",
+      "observe_presence",
+      "unresolved"
+    ]
+  },
+  "evaluator_corruption_scoring_test": true,
+  "evaluator_runtime_influence": 0,
+  "frozen_evaluator_scoring_authority": true,
+  "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+  "historical_request_reuse": 0,
+  "inspect_tasks": 6,
+  "model_calls_made": 0,
+  "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+  "model_output_granted_authority": 0,
+  "model_settings_identity": true,
+  "model_sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb",
+  "motivating_closeout": "5ddf5b425ad1209aab6bbea196db82494a8b0046",
+  "operative_parameters": 2031739904,
+  "planned_model_calls": 48,
+  "preflight_identity": true,
+  "presence_tasks": 6,
+  "qualification_change": false,
+  "request_identity_across_arms": true,
+  "response_files": 0,
+  "schema": "zth_semantic_inspect_label_robustness_v0_manifest",
+  "semantic_enum_positions_identical": true,
+  "status": "prepared_model_free",
+  "surface_label_mappings_frozen": true,
+  "task_count": 12,
+  "tool_calls_made": 0,
+  "true_fallback_eligibility": 12
+}

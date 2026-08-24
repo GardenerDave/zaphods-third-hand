@@ -1,0 +1,30 @@
+{
+  "arms": {
+    "A": {
+      "inspect": "inspect",
+      "presence": "observe_presence"
+    },
+    "B": {
+      "inspect": "class_beta",
+      "presence": "observe_presence"
+    },
+    "C": {
+      "inspect": "operation_two",
+      "presence": "observe_presence"
+    },
+    "D": {
+      "inspect": "examine_target",
+      "presence": "observe_presence"
+    }
+  },
+  "automatic_promotion": false,
+  "entries": [
+    {
+      "capability_id": "semantic.bounded_operation_classification",
+      "qualification_decision": "no promotion",
+      "status": "EXPERIMENTAL_CANDIDATE",
+      "supplier_type": "MODEL"
+    }
+  ],
+  "schema": "zth_semantic_inspect_label_robustness_v0_registry"
+}

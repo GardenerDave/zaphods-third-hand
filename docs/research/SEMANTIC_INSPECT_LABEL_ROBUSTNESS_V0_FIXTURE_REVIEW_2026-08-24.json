@@ -1,0 +1,306 @@
+{
+  "rows": [
+    {
+      "definition_supporting_class": "observe_presence means determine whether the named target exists, is present, or is available.",
+      "expected_semantic_class": "observe_presence",
+      "preflight": {
+        "ambiguity_status": "UNAMBIGUOUS",
+        "deterministic_canonical_operation_available_pre_model": false,
+        "model_required": true,
+        "normalization_context": "UNSUPPORTED_OR_UNKNOWN_CONTEXT",
+        "operation_derivation_status": "UNRESOLVED",
+        "reason": "operation class remains unresolved with two safe candidates",
+        "remaining_candidate_operation_classes": [
+          "observe_presence",
+          "inspect"
+        ],
+        "risk_status": "SAFE_BOUNDED",
+        "semantic_fallback_eligible": true,
+        "target": "docs/research/RB_AMBER_2026-08-24.md",
+        "target_count": 1,
+        "target_status": "EXACTLY_ONE_SAFE_TARGET"
+      },
+      "request": "Could you establish if docs/research/RB_AMBER_2026-08-24.md is kept in this repository?",
+      "semantic_fallback_eligible": true,
+      "target": "docs/research/RB_AMBER_2026-08-24.md",
+      "task_id": "silr-001"
+    },
+    {
+      "definition_supporting_class": "inspect means examine or look at the named target.",
+      "expected_semantic_class": "inspect",
+      "preflight": {
+        "ambiguity_status": "UNAMBIGUOUS",
+        "deterministic_canonical_operation_available_pre_model": false,
+        "model_required": true,
+        "normalization_context": "UNSUPPORTED_OR_UNKNOWN_CONTEXT",
+        "operation_derivation_status": "UNRESOLVED",
+        "reason": "operation class remains unresolved with two safe candidates",
+        "remaining_candidate_operation_classes": [
+          "observe_presence",
+          "inspect"
+        ],
+        "risk_status": "SAFE_BOUNDED",
+        "semantic_fallback_eligible": true,
+        "target": "docs/research/RB_GOLD_2026-08-24.md",
+        "target_count": 1,
+        "target_status": "EXACTLY_ONE_SAFE_TARGET"
+      },
+      "request": "Give docs/research/RB_GOLD_2026-08-24.md a close examination.",
+      "semantic_fallback_eligible": true,
+      "target": "docs/research/RB_GOLD_2026-08-24.md",
+      "task_id": "silr-002"
+    },
+    {
+      "definition_supporting_class": "observe_presence means determine whether the named target exists, is present, or is available.",
+      "expected_semantic_class": "observe_presence",
+      "preflight": {
+        "ambiguity_status": "UNAMBIGUOUS",
+        "deterministic_canonical_operation_available_pre_model": false,
+        "model_required": true,
+        "normalization_context": "PRESENCE_OBSERVATION_CONTEXT",
+        "operation_derivation_status": "UNRESOLVED",
+        "reason": "operation class remains unresolved with two safe candidates",
+        "remaining_candidate_operation_classes": [
+          "observe_presence",
+          "inspect"
+        ],
+        "risk_status": "SAFE_BOUNDED",
+        "semantic_fallback_eligible": true,
+        "target": "docs/research/RB_BRONZE_2026-08-24.json",
+        "target_count": 1,
+        "target_status": "EXACTLY_ONE_SAFE_TARGET"
+      },
+      "request": "Would you say whether docs/research/RB_BRONZE_2026-08-24.json is located here?",
+      "semantic_fallback_eligible": true,
+      "target": "docs/research/RB_BRONZE_2026-08-24.json",
+      "task_id": "silr-003"
+    },
+    {
+      "definition_supporting_class": "inspect means examine or look at the named target.",
+      "expected_semantic_class": "inspect",
+      "preflight": {
+        "ambiguity_status": "UNAMBIGUOUS",
+        "deterministic_canonical_operation_available_pre_model": false,
+        "model_required": true,
+        "normalization_context": "UNSUPPORTED_OR_UNKNOWN_CONTEXT",
+        "operation_derivation_status": "UNRESOLVED",
+        "reason": "operation class remains unresolved with two safe candidates",
+        "remaining_candidate_operation_classes": [
+          "observe_presence",
+          "inspect"
+        ],
+        "risk_status": "SAFE_BOUNDED",
+        "semantic_fallback_eligible": true,
+        "target": "docs/research/RB_HAZE_2026-08-24.json",
+        "target_count": 1,
+        "target_status": "EXACTLY_ONE_SAFE_TARGET"
+      },
+      "request": "Spend a moment with docs/research/RB_HAZE_2026-08-24.json.",
+      "semantic_fallback_eligible": true,
+      "target": "docs/research/RB_HAZE_2026-08-24.json",
+      "task_id": "silr-004"
+    },
+    {
+      "definition_supporting_class": "observe_presence means determine whether the named target exists, is present, or is available.",
+      "expected_semantic_class": "observe_presence",
+      "preflight": {
+        "ambiguity_status": "UNAMBIGUOUS",
+        "deterministic_canonical_operation_available_pre_model": false,
+        "model_required": true,
+        "normalization_context": "UNSUPPORTED_OR_UNKNOWN_CONTEXT",
+        "operation_derivation_status": "UNRESOLVED",
+        "reason": "operation class remains unresolved with two safe candidates",
+        "remaining_candidate_operation_classes": [
+          "observe_presence",
+          "inspect"
+        ],
+        "risk_status": "SAFE_BOUNDED",
+        "semantic_fallback_eligible": true,
+        "target": "docs/research/RB_COPPER_2026-08-24.txt",
+        "target_count": 1,
+        "target_status": "EXACTLY_ONE_SAFE_TARGET"
+      },
+      "request": "Can you tell me if docs/research/RB_COPPER_2026-08-24.txt belongs to this tree?",
+      "semantic_fallback_eligible": true,
+      "target": "docs/research/RB_COPPER_2026-08-24.txt",
+      "task_id": "silr-005"
+    },
+    {
+      "definition_supporting_class": "inspect means examine or look at the named target.",
+      "expected_semantic_class": "inspect",
+      "preflight": {
+        "ambiguity_status": "UNAMBIGUOUS",
+        "deterministic_canonical_operation_available_pre_model": false,
+        "model_required": true,
+        "normalization_context": "UNSUPPORTED_OR_UNKNOWN_CONTEXT",
+        "operation_derivation_status": "UNRESOLVED",
+        "reason": "operation class remains unresolved with two safe candidates",
+        "remaining_candidate_operation_classes": [
+          "observe_presence",
+          "inspect"
+        ],
+        "risk_status": "SAFE_BOUNDED",
+        "semantic_fallback_eligible": true,
+        "target": "docs/research/RB_INDIGO_2026-08-24.txt",
+        "target_count": 1,
+        "target_status": "EXACTLY_ONE_SAFE_TARGET"
+      },
+      "request": "Provide a careful reading of docs/research/RB_INDIGO_2026-08-24.txt.",
+      "semantic_fallback_eligible": true,
+      "target": "docs/research/RB_INDIGO_2026-08-24.txt",
+      "task_id": "silr-006"
+    },
+    {
+      "definition_supporting_class": "observe_presence means determine whether the named target exists, is present, or is available.",
+      "expected_semantic_class": "observe_presence",
+      "preflight": {
+        "ambiguity_status": "UNAMBIGUOUS",
+        "deterministic_canonical_operation_available_pre_model": false,
+        "model_required": true,
+        "normalization_context": "PRESENCE_OBSERVATION_CONTEXT",
+        "operation_derivation_status": "UNRESOLVED",
+        "reason": "operation class remains unresolved with two safe candidates",
+        "remaining_candidate_operation_classes": [
+          "observe_presence",
+          "inspect"
+        ],
+        "risk_status": "SAFE_BOUNDED",
+        "semantic_fallback_eligible": true,
+        "target": "docs/research/RB_DAWN_2026-08-24.md",
+        "target_count": 1,
+        "target_status": "EXACTLY_ONE_SAFE_TARGET"
+      },
+      "request": "Please determine whether docs/research/RB_DAWN_2026-08-24.md is part of this project.",
+      "semantic_fallback_eligible": true,
+      "target": "docs/research/RB_DAWN_2026-08-24.md",
+      "task_id": "silr-007"
+    },
+    {
+      "definition_supporting_class": "inspect means examine or look at the named target.",
+      "expected_semantic_class": "inspect",
+      "preflight": {
+        "ambiguity_status": "UNAMBIGUOUS",
+        "deterministic_canonical_operation_available_pre_model": false,
+        "model_required": true,
+        "normalization_context": "UNSUPPORTED_OR_UNKNOWN_CONTEXT",
+        "operation_derivation_status": "UNRESOLVED",
+        "reason": "operation class remains unresolved with two safe candidates",
+        "remaining_candidate_operation_classes": [
+          "observe_presence",
+          "inspect"
+        ],
+        "risk_status": "SAFE_BOUNDED",
+        "semantic_fallback_eligible": true,
+        "target": "docs/research/RB_JADE_2026-08-24.md",
+        "target_count": 1,
+        "target_status": "EXACTLY_ONE_SAFE_TARGET"
+      },
+      "request": "Consider docs/research/RB_JADE_2026-08-24.md in detail.",
+      "semantic_fallback_eligible": true,
+      "target": "docs/research/RB_JADE_2026-08-24.md",
+      "task_id": "silr-008"
+    },
+    {
+      "definition_supporting_class": "observe_presence means determine whether the named target exists, is present, or is available.",
+      "expected_semantic_class": "observe_presence",
+      "preflight": {
+        "ambiguity_status": "UNAMBIGUOUS",
+        "deterministic_canonical_operation_available_pre_model": false,
+        "model_required": true,
+        "normalization_context": "UNSUPPORTED_OR_UNKNOWN_CONTEXT",
+        "operation_derivation_status": "UNRESOLVED",
+        "reason": "operation class remains unresolved with two safe candidates",
+        "remaining_candidate_operation_classes": [
+          "observe_presence",
+          "inspect"
+        ],
+        "risk_status": "SAFE_BOUNDED",
+        "semantic_fallback_eligible": true,
+        "target": "docs/research/RB_EMBER_2026-08-24.json",
+        "target_count": 1,
+        "target_status": "EXACTLY_ONE_SAFE_TARGET"
+      },
+      "request": "Is docs/research/RB_EMBER_2026-08-24.json somewhere in the repository?",
+      "semantic_fallback_eligible": true,
+      "target": "docs/research/RB_EMBER_2026-08-24.json",
+      "task_id": "silr-009"
+    },
+    {
+      "definition_supporting_class": "inspect means examine or look at the named target.",
+      "expected_semantic_class": "inspect",
+      "preflight": {
+        "ambiguity_status": "UNAMBIGUOUS",
+        "deterministic_canonical_operation_available_pre_model": false,
+        "model_required": true,
+        "normalization_context": "UNSUPPORTED_OR_UNKNOWN_CONTEXT",
+        "operation_derivation_status": "UNRESOLVED",
+        "reason": "operation class remains unresolved with two safe candidates",
+        "remaining_candidate_operation_classes": [
+          "observe_presence",
+          "inspect"
+        ],
+        "risk_status": "SAFE_BOUNDED",
+        "semantic_fallback_eligible": true,
+        "target": "docs/research/RB_KELP_2026-08-24.json",
+        "target_count": 1,
+        "target_status": "EXACTLY_ONE_SAFE_TARGET"
+      },
+      "request": "Offer a close study of docs/research/RB_KELP_2026-08-24.json.",
+      "semantic_fallback_eligible": true,
+      "target": "docs/research/RB_KELP_2026-08-24.json",
+      "task_id": "silr-010"
+    },
+    {
+      "definition_supporting_class": "observe_presence means determine whether the named target exists, is present, or is available.",
+      "expected_semantic_class": "observe_presence",
+      "preflight": {
+        "ambiguity_status": "UNAMBIGUOUS",
+        "deterministic_canonical_operation_available_pre_model": false,
+        "model_required": true,
+        "normalization_context": "UNSUPPORTED_OR_UNKNOWN_CONTEXT",
+        "operation_derivation_status": "UNRESOLVED",
+        "reason": "operation class remains unresolved with two safe candidates",
+        "remaining_candidate_operation_classes": [
+          "observe_presence",
+          "inspect"
+        ],
+        "risk_status": "SAFE_BOUNDED",
+        "semantic_fallback_eligible": true,
+        "target": "docs/research/RB_FROST_2026-08-24.txt",
+        "target_count": 1,
+        "target_status": "EXACTLY_ONE_SAFE_TARGET"
+      },
+      "request": "Let me know if docs/research/RB_FROST_2026-08-24.txt is around in the project.",
+      "semantic_fallback_eligible": true,
+      "target": "docs/research/RB_FROST_2026-08-24.txt",
+      "task_id": "silr-011"
+    },
+    {
+      "definition_supporting_class": "inspect means examine or look at the named target.",
+      "expected_semantic_class": "inspect",
+      "preflight": {
+        "ambiguity_status": "UNAMBIGUOUS",
+        "deterministic_canonical_operation_available_pre_model": false,
+        "model_required": true,
+        "normalization_context": "UNSUPPORTED_OR_UNKNOWN_CONTEXT",
+        "operation_derivation_status": "UNRESOLVED",
+        "reason": "operation class remains unresolved with two safe candidates",
+        "remaining_candidate_operation_classes": [
+          "observe_presence",
+          "inspect"
+        ],
+        "risk_status": "SAFE_BOUNDED",
+        "semantic_fallback_eligible": true,
+        "target": "docs/research/RB_LICHEN_2026-08-24.txt",
+        "target_count": 1,
+        "target_status": "EXACTLY_ONE_SAFE_TARGET"
+      },
+      "request": "Take in docs/research/RB_LICHEN_2026-08-24.txt carefully.",
+      "semantic_fallback_eligible": true,
+      "target": "docs/research/RB_LICHEN_2026-08-24.txt",
+      "task_id": "silr-012"
+    }
+  ],
+  "runtime_input": false,
+  "schema": "zth_semantic_inspect_label_robustness_v0_fixture_review"
+}

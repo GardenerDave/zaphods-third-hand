@@ -1,0 +1,10 @@
+Request clause:
+Give docs/research/RB_GOLD_2026-08-24.md a close examination.
+
+Classify only the requested operation class.
+observe_presence means determine whether the named target exists, is present, or is available.
+examine_target means examine or look at the named target.
+unresolved means the operation class is ambiguous, unsupported, or cannot be determined safely.
+
+Return only operation_class_candidate in the required structured object. Do not identify the target, choose a tool, decide authorization, or decide task success.
+/no_think

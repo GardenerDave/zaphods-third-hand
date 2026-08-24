@@ -1,0 +1,65 @@
+{
+  "cases": [
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "observe_presence",
+      "task_id": "silr-001"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "inspect",
+      "task_id": "silr-002"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "observe_presence",
+      "task_id": "silr-003"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "inspect",
+      "task_id": "silr-004"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "observe_presence",
+      "task_id": "silr-005"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "inspect",
+      "task_id": "silr-006"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "observe_presence",
+      "task_id": "silr-007"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "inspect",
+      "task_id": "silr-008"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "observe_presence",
+      "task_id": "silr-009"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "inspect",
+      "task_id": "silr-010"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "observe_presence",
+      "task_id": "silr-011"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "inspect",
+      "task_id": "silr-012"
+    }
+  ],
+  "schema": "zth_semantic_inspect_label_robustness_v0_evaluator_cases"
+}

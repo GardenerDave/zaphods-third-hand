@@ -1,0 +1,14 @@
+{
+  "known_facts_before_model": [
+    "exactly_one_safe_target",
+    "safe_bounded_request",
+    "unambiguous_request",
+    "shared_runtime_authority_allows_both_classes"
+  ],
+  "remaining_candidate_classes": [
+    "observe_presence",
+    "inspect"
+  ],
+  "unknown_decision_critical_fact": "which bounded semantic operation class the request expresses",
+  "why_deterministic_resolution_is_insufficient": "request is outside the frozen deterministic operation grammar"
+}

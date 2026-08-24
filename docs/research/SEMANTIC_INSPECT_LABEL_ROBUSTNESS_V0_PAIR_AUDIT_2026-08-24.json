@@ -1,0 +1,122 @@
+{
+  "authority_identity": true,
+  "definition_equivalence": true,
+  "model_settings_identity": true,
+  "only_intervention": "INSPECT_LABEL_TOKEN",
+  "preflight_identity": true,
+  "presence_label_held_constant": true,
+  "request_identity": true,
+  "rows": [
+    {
+      "authority_identity": true,
+      "definition_equivalence": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "request_identity": true,
+      "semantic_positions_identical": true,
+      "task_id": "silr-001"
+    },
+    {
+      "authority_identity": true,
+      "definition_equivalence": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "request_identity": true,
+      "semantic_positions_identical": true,
+      "task_id": "silr-002"
+    },
+    {
+      "authority_identity": true,
+      "definition_equivalence": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "request_identity": true,
+      "semantic_positions_identical": true,
+      "task_id": "silr-003"
+    },
+    {
+      "authority_identity": true,
+      "definition_equivalence": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "request_identity": true,
+      "semantic_positions_identical": true,
+      "task_id": "silr-004"
+    },
+    {
+      "authority_identity": true,
+      "definition_equivalence": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "request_identity": true,
+      "semantic_positions_identical": true,
+      "task_id": "silr-005"
+    },
+    {
+      "authority_identity": true,
+      "definition_equivalence": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "request_identity": true,
+      "semantic_positions_identical": true,
+      "task_id": "silr-006"
+    },
+    {
+      "authority_identity": true,
+      "definition_equivalence": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "request_identity": true,
+      "semantic_positions_identical": true,
+      "task_id": "silr-007"
+    },
+    {
+      "authority_identity": true,
+      "definition_equivalence": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "request_identity": true,
+      "semantic_positions_identical": true,
+      "task_id": "silr-008"
+    },
+    {
+      "authority_identity": true,
+      "definition_equivalence": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "request_identity": true,
+      "semantic_positions_identical": true,
+      "task_id": "silr-009"
+    },
+    {
+      "authority_identity": true,
+      "definition_equivalence": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "request_identity": true,
+      "semantic_positions_identical": true,
+      "task_id": "silr-010"
+    },
+    {
+      "authority_identity": true,
+      "definition_equivalence": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "request_identity": true,
+      "semantic_positions_identical": true,
+      "task_id": "silr-011"
+    },
+    {
+      "authority_identity": true,
+      "definition_equivalence": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "request_identity": true,
+      "semantic_positions_identical": true,
+      "task_id": "silr-012"
+    }
+  ],
+  "schema": "zth_semantic_inspect_label_robustness_v0_pair_audit",
+  "semantic_enum_positions_identical": true,
+  "surface_label_mappings_frozen": true
+}

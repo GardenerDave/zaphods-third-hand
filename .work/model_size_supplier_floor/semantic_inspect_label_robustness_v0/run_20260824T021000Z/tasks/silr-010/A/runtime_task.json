@@ -1,0 +1,15 @@
+{
+  "environment_facts": {
+    "authority_record": {
+      "allowed_observation_operations": [
+        "observe_presence",
+        "inspect"
+      ],
+      "allowed_targets": [
+        "docs/research/RB_KELP_2026-08-24.json"
+      ]
+    }
+  },
+  "input_request": "Offer a close study of docs/research/RB_KELP_2026-08-24.json.",
+  "task_id": "silr-010"
+}

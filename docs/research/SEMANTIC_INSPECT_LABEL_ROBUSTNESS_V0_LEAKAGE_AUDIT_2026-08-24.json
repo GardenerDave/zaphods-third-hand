@@ -1,0 +1,102 @@
+{
+  "pass": true,
+  "rows": [
+    {
+      "evaluator_fields_present": false,
+      "runtime_authority_class_leak": false,
+      "target": "docs/research/RB_AMBER_2026-08-24.md",
+      "target_semantic_label_leak": false,
+      "task_id": "silr-001",
+      "task_id_class_leak": false
+    },
+    {
+      "evaluator_fields_present": false,
+      "runtime_authority_class_leak": false,
+      "target": "docs/research/RB_GOLD_2026-08-24.md",
+      "target_semantic_label_leak": false,
+      "task_id": "silr-002",
+      "task_id_class_leak": false
+    },
+    {
+      "evaluator_fields_present": false,
+      "runtime_authority_class_leak": false,
+      "target": "docs/research/RB_BRONZE_2026-08-24.json",
+      "target_semantic_label_leak": false,
+      "task_id": "silr-003",
+      "task_id_class_leak": false
+    },
+    {
+      "evaluator_fields_present": false,
+      "runtime_authority_class_leak": false,
+      "target": "docs/research/RB_HAZE_2026-08-24.json",
+      "target_semantic_label_leak": false,
+      "task_id": "silr-004",
+      "task_id_class_leak": false
+    },
+    {
+      "evaluator_fields_present": false,
+      "runtime_authority_class_leak": false,
+      "target": "docs/research/RB_COPPER_2026-08-24.txt",
+      "target_semantic_label_leak": false,
+      "task_id": "silr-005",
+      "task_id_class_leak": false
+    },
+    {
+      "evaluator_fields_present": false,
+      "runtime_authority_class_leak": false,
+      "target": "docs/research/RB_INDIGO_2026-08-24.txt",
+      "target_semantic_label_leak": false,
+      "task_id": "silr-006",
+      "task_id_class_leak": false
+    },
+    {
+      "evaluator_fields_present": false,
+      "runtime_authority_class_leak": false,
+      "target": "docs/research/RB_DAWN_2026-08-24.md",
+      "target_semantic_label_leak": false,
+      "task_id": "silr-007",
+      "task_id_class_leak": false
+    },
+    {
+      "evaluator_fields_present": false,
+      "runtime_authority_class_leak": false,
+      "target": "docs/research/RB_JADE_2026-08-24.md",
+      "target_semantic_label_leak": false,
+      "task_id": "silr-008",
+      "task_id_class_leak": false
+    },
+    {
+      "evaluator_fields_present": false,
+      "runtime_authority_class_leak": false,
+      "target": "docs/research/RB_EMBER_2026-08-24.json",
+      "target_semantic_label_leak": false,
+      "task_id": "silr-009",
+      "task_id_class_leak": false
+    },
+    {
+      "evaluator_fields_present": false,
+      "runtime_authority_class_leak": false,
+      "target": "docs/research/RB_KELP_2026-08-24.json",
+      "target_semantic_label_leak": false,
+      "task_id": "silr-010",
+      "task_id_class_leak": false
+    },
+    {
+      "evaluator_fields_present": false,
+      "runtime_authority_class_leak": false,
+      "target": "docs/research/RB_FROST_2026-08-24.txt",
+      "target_semantic_label_leak": false,
+      "task_id": "silr-011",
+      "task_id_class_leak": false
+    },
+    {
+      "evaluator_fields_present": false,
+      "runtime_authority_class_leak": false,
+      "target": "docs/research/RB_LICHEN_2026-08-24.txt",
+      "target_semantic_label_leak": false,
+      "task_id": "silr-012",
+      "task_id_class_leak": false
+    }
+  ],
+  "schema": "zth_semantic_inspect_label_robustness_v0_leakage_audit"
+}

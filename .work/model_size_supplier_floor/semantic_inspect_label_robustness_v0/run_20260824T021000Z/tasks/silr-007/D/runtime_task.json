@@ -1,0 +1,15 @@
+{
+  "environment_facts": {
+    "authority_record": {
+      "allowed_observation_operations": [
+        "observe_presence",
+        "inspect"
+      ],
+      "allowed_targets": [
+        "docs/research/RB_DAWN_2026-08-24.md"
+      ]
+    }
+  },
+  "input_request": "Please determine whether docs/research/RB_DAWN_2026-08-24.md is part of this project.",
+  "task_id": "silr-007"
+}

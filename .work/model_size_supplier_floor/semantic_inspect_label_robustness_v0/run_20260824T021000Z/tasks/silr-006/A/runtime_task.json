@@ -1,0 +1,15 @@
+{
+  "environment_facts": {
+    "authority_record": {
+      "allowed_observation_operations": [
+        "observe_presence",
+        "inspect"
+      ],
+      "allowed_targets": [
+        "docs/research/RB_INDIGO_2026-08-24.txt"
+      ]
+    }
+  },
+  "input_request": "Provide a careful reading of docs/research/RB_INDIGO_2026-08-24.txt.",
+  "task_id": "silr-006"
+}
