@@ -1,0 +1,43 @@
+{
+  "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+  "measurement_boundary": "gpu_device_only",
+  "measurement_level": 2,
+  "samples": [
+    {
+      "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+      "power_watts": 30.34,
+      "sequence": 9441,
+      "timestamp_utc": "2026-08-24T12:38:41.917413+00:00"
+    },
+    {
+      "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+      "power_watts": 26.44,
+      "sequence": 9442,
+      "timestamp_utc": "2026-08-24T12:38:42.226434+00:00"
+    },
+    {
+      "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+      "power_watts": 26.5,
+      "sequence": 9443,
+      "timestamp_utc": "2026-08-24T12:38:42.418738+00:00"
+    },
+    {
+      "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+      "power_watts": 32.1,
+      "sequence": 9444,
+      "timestamp_utc": "2026-08-24T12:38:42.677548+00:00"
+    },
+    {
+      "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+      "power_watts": 30.28,
+      "sequence": 9445,
+      "timestamp_utc": "2026-08-24T12:38:42.910062+00:00"
+    },
+    {
+      "gpu_uuid": "GPU-c2823a81-56f1-b16e-f9cc-34f4dc58eb85",
+      "power_watts": 30.28,
+      "sequence": 9446,
+      "timestamp_utc": "2026-08-24T12:38:43.164524+00:00"
+    }
+  ]
+}

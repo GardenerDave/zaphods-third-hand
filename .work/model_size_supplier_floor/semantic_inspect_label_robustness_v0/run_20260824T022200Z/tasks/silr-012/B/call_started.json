@@ -1,0 +1,8 @@
+{
+  "arm": "B",
+  "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+  "prompt_sha256": "ddaab27457a041a48f59d2fbb283796ac461188a24c7136499d8c81acd345a5a",
+  "schema_sha256": "0baf93aa5520743d7382446b758fce24f7b960df7ba4b5878d9928acb04b3d4f",
+  "started_at": 1787575149.5468278,
+  "task_id": "silr-012"
+}

@@ -1,0 +1,7 @@
+{
+  "canonical_operation": "inspect",
+  "derivation_type": "PRIOR_MODEL_STEP_LABEL_MAPPING",
+  "model_output_granted_authority": false,
+  "status": "RESOLVED",
+  "surface_label": "inspect"
+}

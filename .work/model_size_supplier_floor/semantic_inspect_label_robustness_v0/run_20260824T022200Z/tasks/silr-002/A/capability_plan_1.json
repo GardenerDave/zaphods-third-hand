@@ -1,0 +1,73 @@
+{
+  "capabilities": [
+    {
+      "candidate_suppliers": [
+        {
+          "interface_id": "deterministic.operation_resolution",
+          "supplier_id": "python_deterministic_v0",
+          "supplier_type": "DETERMINISTIC_CODE"
+        }
+      ],
+      "capability_id": "deterministic.operation_resolution",
+      "coverage_status": "COVERED",
+      "qualified_candidates": [
+        {
+          "interface_id": "deterministic.operation_resolution",
+          "supplier_id": "python_deterministic_v0",
+          "supplier_type": "DETERMINISTIC_CODE"
+        }
+      ],
+      "selected_supplier": {
+        "interface_id": "deterministic.operation_resolution",
+        "supplier_id": "python_deterministic_v0",
+        "supplier_type": "DETERMINISTIC_CODE"
+      },
+      "selection_reason": "qualified bounded supplier"
+    },
+    {
+      "candidate_suppliers": [
+        {
+          "interface_id": "deterministic.authority_validation",
+          "supplier_id": "python_deterministic_v0",
+          "supplier_type": "DETERMINISTIC_CODE"
+        }
+      ],
+      "capability_id": "deterministic.authority_validation",
+      "coverage_status": "COVERED",
+      "qualified_candidates": [
+        {
+          "interface_id": "deterministic.authority_validation",
+          "supplier_id": "python_deterministic_v0",
+          "supplier_type": "DETERMINISTIC_CODE"
+        }
+      ],
+      "selected_supplier": {
+        "interface_id": "deterministic.authority_validation",
+        "supplier_id": "python_deterministic_v0",
+        "supplier_type": "DETERMINISTIC_CODE"
+      },
+      "selection_reason": "qualified bounded supplier"
+    },
+    {
+      "candidate_suppliers": [],
+      "capability_id": "actuator.inspect",
+      "coverage_status": "UNCOVERED",
+      "qualified_candidates": [],
+      "selected_supplier": null,
+      "selection_reason": "NO_QUALIFIED_EXECUTION_SUPPLIER"
+    }
+  ],
+  "derived_required_capabilities": [
+    "deterministic.operation_resolution",
+    "deterministic.authority_validation",
+    "actuator.inspect"
+  ],
+  "execution_path_complete": false,
+  "overall_coverage": "INCOMPLETE",
+  "planned_deterministic_steps": 2,
+  "planned_model_calls": 0,
+  "planned_tool_calls": 0,
+  "routing_success": true,
+  "schema": "zth_true_semantic_fallback_v2_capability_plan_v0",
+  "task_id": "silr-002"
+}

@@ -1,0 +1,89 @@
+{
+  "capabilities": [
+    {
+      "candidate_suppliers": [
+        {
+          "interface_id": "deterministic.operation_resolution",
+          "supplier_id": "python_deterministic_v0",
+          "supplier_type": "DETERMINISTIC_CODE"
+        }
+      ],
+      "capability_id": "deterministic.operation_resolution",
+      "coverage_status": "COVERED",
+      "qualified_candidates": [
+        {
+          "interface_id": "deterministic.operation_resolution",
+          "supplier_id": "python_deterministic_v0",
+          "supplier_type": "DETERMINISTIC_CODE"
+        }
+      ],
+      "selected_supplier": {
+        "interface_id": "deterministic.operation_resolution",
+        "supplier_id": "python_deterministic_v0",
+        "supplier_type": "DETERMINISTIC_CODE"
+      },
+      "selection_reason": "qualified bounded supplier"
+    },
+    {
+      "candidate_suppliers": [
+        {
+          "interface_id": "deterministic.authority_validation",
+          "supplier_id": "python_deterministic_v0",
+          "supplier_type": "DETERMINISTIC_CODE"
+        }
+      ],
+      "capability_id": "deterministic.authority_validation",
+      "coverage_status": "COVERED",
+      "qualified_candidates": [
+        {
+          "interface_id": "deterministic.authority_validation",
+          "supplier_id": "python_deterministic_v0",
+          "supplier_type": "DETERMINISTIC_CODE"
+        }
+      ],
+      "selected_supplier": {
+        "interface_id": "deterministic.authority_validation",
+        "supplier_id": "python_deterministic_v0",
+        "supplier_type": "DETERMINISTIC_CODE"
+      },
+      "selection_reason": "qualified bounded supplier"
+    },
+    {
+      "candidate_suppliers": [
+        {
+          "interface_id": "repository_relative_metadata_observation_v0",
+          "supplier_id": "python_read_only_repository_observer_v0",
+          "supplier_type": "TOOL"
+        }
+      ],
+      "capability_id": "tool.read_only_repository_observation",
+      "coverage_status": "COVERED",
+      "qualified_candidates": [
+        {
+          "interface_id": "repository_relative_metadata_observation_v0",
+          "supplier_id": "python_read_only_repository_observer_v0",
+          "supplier_type": "TOOL"
+        }
+      ],
+      "selected_supplier": {
+        "interface_id": "repository_relative_metadata_observation_v0",
+        "supplier_id": "python_read_only_repository_observer_v0",
+        "supplier_type": "TOOL"
+      },
+      "selection_reason": "qualified bounded supplier"
+    }
+  ],
+  "derived_required_capabilities": [
+    "deterministic.operation_resolution",
+    "deterministic.authority_validation",
+    "tool.read_only_repository_observation"
+  ],
+  "execution_path_complete": true,
+  "overall_coverage": "COMPLETE",
+  "planned_deterministic_steps": 2,
+  "planned_model_calls": 0,
+  "planned_tool_calls": 1,
+  "routing_success": true,
+  "schema": "zth_true_semantic_fallback_v2_capability_plan_v0",
+  "task_id": "silr-005"
+}

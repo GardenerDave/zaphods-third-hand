@@ -68,15 +68,16 @@ def test_class_stratified_schedule_and_prepared_artifact():
     assert prepared["schedule"] == order
 
 
-def test_prepared_freeze_has_zero_calls_and_no_responses():
+def test_completed_run_preserves_full_call_budget_and_integrity():
     run = Path(probe.RUN)
     manifest = json.loads((run / "router_manifest.json").read_text(encoding="utf-8"))
     lifecycle = json.loads((run / "lifecycle.json").read_text(encoding="utf-8"))
     assert manifest["planned_model_calls"] == 48
     assert manifest["true_fallback_eligibility"] == 12
-    assert lifecycle["model_calls"] == 0
+    assert lifecycle["model_calls"] == 48
     assert lifecycle["tool_calls"] == 0
-    assert len(list(run.rglob("response.json"))) == 0
+    assert lifecycle["retries"] == 0
+    assert len(list(run.rglob("response.json"))) == 48
 
 
 def test_evaluator_mutation_changes_score_but_not_runtime_inputs():

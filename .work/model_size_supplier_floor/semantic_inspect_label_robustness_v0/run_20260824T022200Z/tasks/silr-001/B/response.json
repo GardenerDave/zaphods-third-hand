@@ -1,0 +1,48 @@
+{
+  "content": "{\"operation_class_candidate\": \"observe_presence\"}",
+  "gross_energy_joules": 35.845,
+  "metadata": {
+    "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "error": null,
+    "finish_reason": "stop",
+    "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "model_resolution_attempted": false,
+    "model_resolution_error": null,
+    "request_provenance": {
+      "api": "openai-chat",
+      "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "endpoint_alias": "JARVIS_LOCAL",
+      "max_tokens": 512,
+      "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "prompt_length": 567,
+      "prompt_sha256": "62884bac19836528376dcf41d905e172bade4dbdb9dfd2dbb303f55cee3dbb18",
+      "response_format_sha256": "012ca1caf8bc90e3acb8648283dde57ae0c6dc92fc69a137de258cd9a93c7101",
+      "temperature": 0.2
+    },
+    "request_url": null,
+    "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "status": "ok",
+    "timings": {
+      "cache_n": 80,
+      "predicted_ms": 552.233,
+      "predicted_n": 10,
+      "predicted_per_second": 18.10829848994899,
+      "predicted_per_token_ms": 55.223299999999995,
+      "prompt_ms": 543.066,
+      "prompt_n": 69,
+      "prompt_per_second": 127.05637988752747,
+      "prompt_per_token_ms": 7.870521739130435
+    },
+    "transport_classification": "model_response",
+    "usage": {
+      "completion_tokens": 10,
+      "prompt_tokens": 149,
+      "prompt_tokens_details": {
+        "cached_tokens": 80
+      },
+      "total_tokens": 159
+    }
+  },
+  "status": "ok",
+  "wall_elapsed_ms": 1145.356
+}

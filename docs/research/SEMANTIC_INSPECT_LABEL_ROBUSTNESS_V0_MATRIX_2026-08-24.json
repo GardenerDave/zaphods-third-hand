@@ -1,0 +1,571 @@
+{
+  "arm_metrics": {
+    "A": {
+      "candidate_admissible": 12,
+      "candidate_valid": 12,
+      "contract_valid": 12,
+      "inspect_correct": 6,
+      "inspect_outputs": 12,
+      "inspect_total": 6,
+      "observe_presence_outputs": 0,
+      "parse_valid": 12,
+      "presence_correct": 0,
+      "presence_total": 6,
+      "semantic_correct": 6,
+      "semantic_total": 12,
+      "unresolved_or_rejected_outputs": 0
+    },
+    "B": {
+      "candidate_admissible": 12,
+      "candidate_valid": 12,
+      "contract_valid": 12,
+      "inspect_correct": 6,
+      "inspect_outputs": 8,
+      "inspect_total": 6,
+      "observe_presence_outputs": 4,
+      "parse_valid": 12,
+      "presence_correct": 4,
+      "presence_total": 6,
+      "semantic_correct": 10,
+      "semantic_total": 12,
+      "unresolved_or_rejected_outputs": 0
+    },
+    "C": {
+      "candidate_admissible": 12,
+      "candidate_valid": 12,
+      "contract_valid": 12,
+      "inspect_correct": 3,
+      "inspect_outputs": 3,
+      "inspect_total": 6,
+      "observe_presence_outputs": 9,
+      "parse_valid": 12,
+      "presence_correct": 6,
+      "presence_total": 6,
+      "semantic_correct": 9,
+      "semantic_total": 12,
+      "unresolved_or_rejected_outputs": 0
+    },
+    "D": {
+      "candidate_admissible": 12,
+      "candidate_valid": 12,
+      "contract_valid": 12,
+      "inspect_correct": 5,
+      "inspect_outputs": 5,
+      "inspect_total": 6,
+      "observe_presence_outputs": 7,
+      "parse_valid": 12,
+      "presence_correct": 6,
+      "presence_total": 6,
+      "semantic_correct": 11,
+      "semantic_total": 12,
+      "unresolved_or_rejected_outputs": 0
+    }
+  },
+  "comparisons": {
+    "A_vs_B": {
+      "canonical_output_changed_count": 4,
+      "inspect_accuracy_delta": 0,
+      "inspect_accuracy_delta_rate": 0.0,
+      "inspect_changed_count": 0,
+      "left": "A",
+      "overall_accuracy_delta": 4,
+      "overall_accuracy_delta_rate": 0.3333333333333333,
+      "presence_accuracy_delta": 4,
+      "presence_accuracy_delta_rate": 0.6666666666666666,
+      "presence_changed_count": 4,
+      "right": "B"
+    },
+    "A_vs_C": {
+      "canonical_output_changed_count": 9,
+      "inspect_accuracy_delta": -3,
+      "inspect_accuracy_delta_rate": -0.5,
+      "inspect_changed_count": 3,
+      "left": "A",
+      "overall_accuracy_delta": 3,
+      "overall_accuracy_delta_rate": 0.25,
+      "presence_accuracy_delta": 6,
+      "presence_accuracy_delta_rate": 1.0,
+      "presence_changed_count": 6,
+      "right": "C"
+    },
+    "A_vs_D": {
+      "canonical_output_changed_count": 7,
+      "inspect_accuracy_delta": -1,
+      "inspect_accuracy_delta_rate": -0.16666666666666666,
+      "inspect_changed_count": 1,
+      "left": "A",
+      "overall_accuracy_delta": 5,
+      "overall_accuracy_delta_rate": 0.4166666666666667,
+      "presence_accuracy_delta": 6,
+      "presence_accuracy_delta_rate": 1.0,
+      "presence_changed_count": 6,
+      "right": "D"
+    },
+    "B_vs_C": {
+      "canonical_output_changed_count": 5,
+      "inspect_accuracy_delta": -3,
+      "inspect_accuracy_delta_rate": -0.5,
+      "inspect_changed_count": 3,
+      "left": "B",
+      "overall_accuracy_delta": -1,
+      "overall_accuracy_delta_rate": -0.08333333333333333,
+      "presence_accuracy_delta": 2,
+      "presence_accuracy_delta_rate": 0.3333333333333333,
+      "presence_changed_count": 2,
+      "right": "C"
+    },
+    "B_vs_D": {
+      "canonical_output_changed_count": 3,
+      "inspect_accuracy_delta": -1,
+      "inspect_accuracy_delta_rate": -0.16666666666666666,
+      "inspect_changed_count": 1,
+      "left": "B",
+      "overall_accuracy_delta": 1,
+      "overall_accuracy_delta_rate": 0.08333333333333333,
+      "presence_accuracy_delta": 2,
+      "presence_accuracy_delta_rate": 0.3333333333333333,
+      "presence_changed_count": 2,
+      "right": "D"
+    },
+    "C_vs_D": {
+      "canonical_output_changed_count": 4,
+      "inspect_accuracy_delta": 2,
+      "inspect_accuracy_delta_rate": 0.3333333333333333,
+      "inspect_changed_count": 4,
+      "left": "C",
+      "overall_accuracy_delta": 2,
+      "overall_accuracy_delta_rate": 0.16666666666666666,
+      "presence_accuracy_delta": 0,
+      "presence_accuracy_delta_rate": 0.0,
+      "presence_changed_count": 0,
+      "right": "D"
+    }
+  },
+  "driver_sha256": "2deff9cacf71c6d402b51c4347a5d2bb45c93b0cb9f98344c42be334c2d73bfd",
+  "freeze_commit": "e69c2d3c0470cf7add591471b881fc52d12cc268",
+  "integrity_counts": {
+    "call_started.json": 48,
+    "candidate_validation.json": 48,
+    "power_samples.json": 48,
+    "response.json": 48,
+    "runtime_result.json": 48
+  },
+  "interpretation_markers": {
+    "ALL_ARMS_INSPECT_STABLE": false,
+    "CLASS_BETA_PRESENCE_IMPROVEMENT": true,
+    "CLASS_BETA_SPECIFIC_EFFECT_PLAUSIBLE": false,
+    "EXAMINE_TARGET_PRESENCE_IMPROVEMENT": true,
+    "HUMAN_READABLE_INSPECT_REPLACEMENT_SUPPORTED": false,
+    "INSPECT_LABEL_REPLACEMENT_ROBUSTNESS_DEMONSTRATED": false,
+    "LITERAL_INSPECT_LABEL_INTERFERENCE_REPLICATED": false,
+    "MULTIPLE_INSPECT_LABEL_REPLACEMENTS_RECOVER_PRESENCE": false,
+    "NEUTRAL_LABEL_REPLACEMENT_EFFECT_SUPPORTED": false,
+    "OPERATION_TWO_PRESENCE_IMPROVEMENT": true,
+    "ORIGINAL_CONTROL_PERFECT_ON_HOLDOUT": false,
+    "ORIGINAL_CONTROL_PRESENCE_ERRORS_OBSERVED": true
+  },
+  "lifecycle": {
+    "model_calls": 48,
+    "model_output_granted_authority": 0,
+    "retries": 0,
+    "runtime_evaluator_influence": 0,
+    "status": "terminal_runtime",
+    "tool_calls": 0
+  },
+  "qualification_change": false,
+  "raw_artifact_hashes": {
+    "silr-001/A": {
+      "call_started.json": "9a4ff3f4ac8ec6168aee159ab8bca1526296bd520bca9fc24a97428449da530a",
+      "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+      "power_samples.json": "0eaab39e4241f9c2b0f08ae72346ce6a5995621c3e5760881a2180f400a52438",
+      "response.json": "33a7cdcf577784f826a170a720899b553057449ffba776d7db661484096c6afb",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-001/B": {
+      "call_started.json": "efea98a50728a540f83c306332b2c4640809014c68c1d8653de3d010e695c135",
+      "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+      "power_samples.json": "f214aaef3fc391c0356d5e9400440c42ad7b5218c4d0d6ce4575c295cdbfba70",
+      "response.json": "34048de0d106968d9f1adbf405f7f012ac90a5576dd9f94fe4366b89abab3df9",
+      "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+    },
+    "silr-001/C": {
+      "call_started.json": "96dd06b07f19219619aab4fee2cfe39f36f3bfcff419c9d0399ad0f868ea1476",
+      "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+      "power_samples.json": "06ee593c1d76b329c38375ab4834e00fdb8bd594a4d0933a56d6f7035872fc71",
+      "response.json": "93466602ee4d188fc0a6177f42ec12b9a4376fc8478b16ed773209b80f7dd9de",
+      "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+    },
+    "silr-001/D": {
+      "call_started.json": "d9e5bd029df0f3871ce08a95caf43b9a0363b6f5d619be319cf573cf12e8ee87",
+      "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+      "power_samples.json": "7b8ff10268053beb634c16d83fd93fe17488f0052274ca781fd11ee7e5ca2225",
+      "response.json": "da1fd9f12c812f7b4064408e82ef4602d296cfd3554463afcda7dbe9975ef5bb",
+      "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+    },
+    "silr-002/A": {
+      "call_started.json": "637d65db7687a57742868614e9cb6b3c0b8a749ccdeb56c7f2176d22ceb9ddab",
+      "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+      "power_samples.json": "98b1a765128ef8353f2b7da917901541b098f85fe56efcd027154aceaa0e5ed9",
+      "response.json": "5f1672ce8ed3717ce9e7e1faf6a24706348fcf92a2831d8d82fc12418bf8ade2",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-002/B": {
+      "call_started.json": "8d1dc5141f92485f3ac3380bd65db4f6dd6446f17e7e44f92acf42fab80a4bc4",
+      "candidate_validation.json": "05f6e8573fa112a8921c64efa3ff996919b38972059558366e2186907bc20a95",
+      "power_samples.json": "2a1ff570e76f7cc8024c3b7574acf5e201b3635d8b1993fd91a5c729aa75520c",
+      "response.json": "fe16f486c363196aafa814af040f3e163e55962b03e410d25a468123a4e88d88",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-002/C": {
+      "call_started.json": "b433bf30387bcf1580118f5334bdaaf6c57cd0ab51a428e2c1d407e4571eaf57",
+      "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+      "power_samples.json": "9db2f0941cb67534ebaaffcc10103fd9ad7b4dfbaecaad9f8fa3a45bbe9b9655",
+      "response.json": "c1e27bdcc6dee08df65ce71e43424c6f23dcaa2767cb3bf1477078cbcec2f991",
+      "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+    },
+    "silr-002/D": {
+      "call_started.json": "42767e0fa5b24e29cafb41105344f14ce0d681e945fc444407202821db83c194",
+      "candidate_validation.json": "6afd6b2d5f97127c527946d3e1c0c5bd949383104a3db0be6853dd6b81514490",
+      "power_samples.json": "2387f1380b667d7897d6fa09f6334a0b7be4066524cbaae61c216bc8d6354737",
+      "response.json": "42097018bec6348fd09bbafe97fb378c588e2b7c1ca88a5f9455514c26480625",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-003/A": {
+      "call_started.json": "c27588289f5b5beffb195314b29858eafc6264f3094c4dbb53437bd626980e82",
+      "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+      "power_samples.json": "603fc441ec0cdf6dd132c96ecc6ffd450db7ccdc70e0ac53d89b14f0475e8e91",
+      "response.json": "135ef8532897c7ff67b2a52e2c698c0cc5cd6d4067dc2e1e7e88d8e7b555cc70",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-003/B": {
+      "call_started.json": "592bd3ee150cbc3f7657afa7562b134b5842111d035f9090b6fbd292faddd41f",
+      "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+      "power_samples.json": "3644fa6077d78bf7502a04678dd972738e98f23ca1286429516a4845b3919b52",
+      "response.json": "221265b1ede77bae80aebdbe4e431c4191bb939a9fa51be93de51142522ea2ed",
+      "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+    },
+    "silr-003/C": {
+      "call_started.json": "47b2e2c587bd16f4c44b15a80f218c987e899f3ce7b4bf809f23f41a23c3621a",
+      "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+      "power_samples.json": "fa082d1de729c0f3d1c174bd5b6d3f239afc96b3acda3bf1e23248584c33f92e",
+      "response.json": "55ff9f55c71cf76a9812473912a6ad897e5a2a18dc83e7be6b6e9c01f5d6c474",
+      "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+    },
+    "silr-003/D": {
+      "call_started.json": "ccb21a2f49110a6f722deef65c31c73851b26828985eb05d367825726fe7290c",
+      "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+      "power_samples.json": "123f698cd096468e21618099b6710a0bb5ab36ab5e068ba318a62f66434d3831",
+      "response.json": "d8d28ce4aa73a41478e14cf76439609f2e18e0569869a3d6b609c53fc83e86fb",
+      "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+    },
+    "silr-004/A": {
+      "call_started.json": "235a59d9ebf9f8fbf750681d8a4fc1ad9495e5ac45858cdc54589b8e87b52c0a",
+      "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+      "power_samples.json": "582ad282a81f841a3018d84dbef85098a4c19f3c781670b48bfe44809955b953",
+      "response.json": "e9f5916a29461fce6e0b8d1a92997366df48f6234d6692915b8a582a42fb1552",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-004/B": {
+      "call_started.json": "185a09a7d598bc1cf17dda6359080b1e471b310ce2936f8acdc5dd9771c2d3fe",
+      "candidate_validation.json": "05f6e8573fa112a8921c64efa3ff996919b38972059558366e2186907bc20a95",
+      "power_samples.json": "a25f54f693b2bfd41dec5ca0e10e69d4474ae0bed1620a58c81b3fe7963b90bc",
+      "response.json": "cf43e417f134bab9444c76aa2d78d5a9a880a11baa164fbfb7c3210cb739f347",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-004/C": {
+      "call_started.json": "e4bac07c4b7f22846fa5f75dd9af9558e5a7128556cb5035891dcac0a4c636ff",
+      "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+      "power_samples.json": "835c0168bfa435eda3cd741a7583707de851548c3a6d1b6158689669e0ce7009",
+      "response.json": "844e9396d314d599c59d4738ade54cf7532c53d3ccb71e3248d889e4a4219065",
+      "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+    },
+    "silr-004/D": {
+      "call_started.json": "7fdb4c5536a66210587ca313c2e7d10dd4dfa632d8e55e8e213ab948171abd58",
+      "candidate_validation.json": "6afd6b2d5f97127c527946d3e1c0c5bd949383104a3db0be6853dd6b81514490",
+      "power_samples.json": "cb49fd063ea7cc1fab8eb6f71414b52c005e37c02e9db2dffc1fcfcbdb0a8c37",
+      "response.json": "ac7f45379f1a80cebae901dedbb185d5bdac72ed8cdac9a9d727656d0afb879e",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-005/A": {
+      "call_started.json": "8effb9b53bfd1e80c3fcf2e7492fdf04fe788a91340de74c81c2443fc3ff2da6",
+      "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+      "power_samples.json": "a416e0cf87bf248461879c6ad98779c2154653d42fa2fccc7e4f0cb2588cadd9",
+      "response.json": "947fb08f3262b9dfbd9639138b4d5ebd76d40b895b4d84f7ccfb6c2c63e90292",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-005/B": {
+      "call_started.json": "c544e61b11a603a59e99e12be9d8a1289fc21602230c84cb299eae3bc8014920",
+      "candidate_validation.json": "05f6e8573fa112a8921c64efa3ff996919b38972059558366e2186907bc20a95",
+      "power_samples.json": "008e9612e93dd489d7eeeb21ee79e2a1649d80fc6f526e98579203538a526831",
+      "response.json": "1cab4158a5e138b9eb3e71279ce37c2b98483dd60f782fb5b2def4feb7b30036",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-005/C": {
+      "call_started.json": "d75c754ff65616c9e8b42b23029f4ae4042143912c295122bdaa56568d8216cc",
+      "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+      "power_samples.json": "795c152e362fbc93c4b3c2a4d1dc41be5cfd2313a865a300a20b3fc16dbc652f",
+      "response.json": "b6d42fbb6f62ed65afc15a27b300616063f5c7c8a3fec007df6d9eae230d6c40",
+      "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+    },
+    "silr-005/D": {
+      "call_started.json": "10afb53af5a0aae573a720b694a5f78082efda0c16db7e7615f7348907f04ba5",
+      "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+      "power_samples.json": "808ddd28294309ae64736bfb9e41ac385160e97a8c244b0d266317668753ba6e",
+      "response.json": "26648fa3bbc61f55ab06f6fb9061aac914e58e576332c7a800c1b83f7e91617e",
+      "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+    },
+    "silr-006/A": {
+      "call_started.json": "c67661cb41a6d87cdcf42556b2c9f0f6b344996476faaa0aa7cd53e4bf91d145",
+      "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+      "power_samples.json": "9844e16bee7fcee81394df579031d25c447b043cdd30d9e1cbfa62f69b22174d",
+      "response.json": "d0dd7796862063f70ae7585891737e15b474f52e2bc41f1985e30be4bb4b1521",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-006/B": {
+      "call_started.json": "899dba4ee393452c72659c98600d7c97d73f8576aace367fc8ea13e281b9ff99",
+      "candidate_validation.json": "05f6e8573fa112a8921c64efa3ff996919b38972059558366e2186907bc20a95",
+      "power_samples.json": "89f75d48670c5251e66e6a298470e41ea7f0f30cf38b0dcadacccc2a8ab4c5fb",
+      "response.json": "740e3b2783dabe62c41b7e0aa45b46c66b81afcaf8dafa708c42659bdbc8a5f9",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-006/C": {
+      "call_started.json": "9997d4b95c7ae08bd968495d18bb9074e0a3b8f235d65784473d6adf078d4160",
+      "candidate_validation.json": "b1b0736f4fab1be240685e4dc5305bf1d6625274a740c1b5e28039be801f5723",
+      "power_samples.json": "43bdc03368eb99e28c9114e9e75415942d55d207673e0fdcf86ad15917f69f47",
+      "response.json": "b0d1dc95e260df35298a1da17ff2e75fee63fa1aac6ee3f29da95bae3e45978f",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-006/D": {
+      "call_started.json": "390d58a52d066aeb54670c7ff80da7d362b3afeaf16a77a6fbdf55dbb1074292",
+      "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+      "power_samples.json": "cf88a19ade0db9381824355808e4c0e450b80d793fba27da202c4418aec13c08",
+      "response.json": "9311a0be8e6eedb3c78522e8bb74f1a0e7977d17bb19f8be123c9e638b702baa",
+      "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+    },
+    "silr-007/A": {
+      "call_started.json": "1964e5e3b85ee3d5c2e3e6434df0d03756fae982f6b2be9a1a9ba6bf48c64564",
+      "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+      "power_samples.json": "e2ef097f1dbba69d8daaf3f37f053b922b02838c800e70eeaea16dc717237c43",
+      "response.json": "87136369862b6a32f4bb07ed45e94586097b3a71fe35920c66ce88e997630151",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-007/B": {
+      "call_started.json": "4bec3de72c85cf85d564b7b460f4fb849bcf26654a991afd6fefe8d5a19071ec",
+      "candidate_validation.json": "05f6e8573fa112a8921c64efa3ff996919b38972059558366e2186907bc20a95",
+      "power_samples.json": "96809116362e883781ff0c779167d75d6b29f124f162b18178876650cc3d28fb",
+      "response.json": "8b52c710d156f129d2b18cf567f41410904a938f554dcc3633a4039987ce0231",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-007/C": {
+      "call_started.json": "8fa1b38776b67da19484fe6765ba10b62d0e0ca7ee09ab8216abd97eab391242",
+      "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+      "power_samples.json": "73c165a00690d15310cb072027fc91d1bfac5cf294feb7f07ca23c1d7d1fa08d",
+      "response.json": "5c0b8d33b8e8fc9da756c36739fae3759a0e294b71722c10a3bf0ec4ea846881",
+      "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+    },
+    "silr-007/D": {
+      "call_started.json": "edfe82b2ae8e7d5b7249eb3c20668f98c346b789196252616860fa318c01be22",
+      "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+      "power_samples.json": "5bbcd7a1d0c3fbf346fe553614304f1f844be9f7c2b3a3f9fd10009d52822050",
+      "response.json": "de4ff008c98be452b96de0c13622f71fab4c0881e0f82174731cf4d7cbf83348",
+      "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+    },
+    "silr-008/A": {
+      "call_started.json": "5b2471a830d707392fc3ded2ef68f562b8f1499c64ea49924173539bec2f4eff",
+      "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+      "power_samples.json": "464c9822582b6a2e2a259a68cd986e1839382449fbae16ad88982c10fdfdef61",
+      "response.json": "e78e1f7a6d724fad11a40604d647a02347ec181096bd356297a243cdf5304060",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-008/B": {
+      "call_started.json": "650a4baf561b02ed0b590133d816d801bbcc7462cb258c6c3d660a3cc5ce9aaa",
+      "candidate_validation.json": "05f6e8573fa112a8921c64efa3ff996919b38972059558366e2186907bc20a95",
+      "power_samples.json": "e03150c3a0b0803408b192df6d00e1cfe88d8664e50b6db12bd718bfa1ea7515",
+      "response.json": "4df363cc55394d7f4c247c8bb2f321d9502a3e1bc2dbf9ce52066e5d88e5dfad",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-008/C": {
+      "call_started.json": "e4225d2635051f1a9ac9e678dc3f225d95a5f9eab25fcf7188e22fb45de7140b",
+      "candidate_validation.json": "b1b0736f4fab1be240685e4dc5305bf1d6625274a740c1b5e28039be801f5723",
+      "power_samples.json": "96f52419989a19fa938322cb22440c6746d3ec2ba3d5aad0400cdec7f6ca2a10",
+      "response.json": "272e0bce08124c4c367bee7794cac75d87c64f1bea69ee116082cb4542928361",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-008/D": {
+      "call_started.json": "3da792712fd4478ac0f714eb7f5d261ca944261daf1cea9a3cabc3404dd1e958",
+      "candidate_validation.json": "6afd6b2d5f97127c527946d3e1c0c5bd949383104a3db0be6853dd6b81514490",
+      "power_samples.json": "ff23a439ebc2a98c28f1c73bcfbafb45f34ab8618d924327141e4e1f174fdadf",
+      "response.json": "b61555d3a30f8c46c9a177fd83edd88dedfdd3227625c31bfd850f666daa1da3",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-009/A": {
+      "call_started.json": "47c44ab7771169ff7eedcc5db546c0e096476e95e33bdac4ab5c6b122ab4f448",
+      "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+      "power_samples.json": "9b4bf920c81f69729dc3ef2dcfb4aafead0842c4f86be9f0a00f9baa5ba4ae10",
+      "response.json": "bddddb37d796f2c5f65e92801c3f71170c20198f4ab09b1d18a46d4af002e2c2",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-009/B": {
+      "call_started.json": "3939f5dbc81052f4fba06b1063b12ee28c4a56befa2eefa6f2c200ca3e030519",
+      "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+      "power_samples.json": "519cdd752152473c81a8bba7c36216b56be688eb2da2691bf4ace128ad1e3cd7",
+      "response.json": "53710838c2fe5123c5b490e32f6bded13b1a860e457ca52112f4dfd3b34a3dc8",
+      "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+    },
+    "silr-009/C": {
+      "call_started.json": "d79f6143bd8d608b5b2d64fa589ec7a0d78826cd57b317e869014a599fa3464c",
+      "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+      "power_samples.json": "06e17f1f73261e97ce8e53cda0a6c77a03c2c12de90c84faf4f274f01f43b6dd",
+      "response.json": "5ca42b1952f4947a9424564e8f96f96bfc10c1f8ff2bc1dd5afde0f8b90ea515",
+      "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+    },
+    "silr-009/D": {
+      "call_started.json": "5caebef92710fd3ab3f9eb31789022067c446f1d138e1079ff70b5052e0d7c07",
+      "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+      "power_samples.json": "1ee76273a0da1224925046a841a4487096edc924ba3dd3acd4863ffde910f11a",
+      "response.json": "dafe36f189176a46f481c9ef9bc24d16cfb1b84b465a20d23b76ca28d084ca03",
+      "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+    },
+    "silr-010/A": {
+      "call_started.json": "4fc93dc6bc1d71d38fb37ff450db8315f2a1c094f096dfb910313b6ad885f8ca",
+      "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+      "power_samples.json": "a594f7542ef6b0617eb656295ce60e1b839db671e89818d634e43b5c07706eee",
+      "response.json": "c46456ab2ba5ddbac5588c65229dfa996cf4eac57b0089c57fcf13df77964fb5",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-010/B": {
+      "call_started.json": "705aa7f7f20ba552401a14a3c77406a9e5e49cf42e17ea7bca950a1daea30143",
+      "candidate_validation.json": "05f6e8573fa112a8921c64efa3ff996919b38972059558366e2186907bc20a95",
+      "power_samples.json": "f2a3f6f822209bf38bbad76a3315efffd459a98e8717648615c43c6df75e149b",
+      "response.json": "884c2081a06784c6e77baa6582d2d3b72421918285dfc1e36d3f392e9103afc7",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-010/C": {
+      "call_started.json": "52cb7b477b88727be07cf12e770fb82c3ec0583c78d3a59e5241f7f89686ea29",
+      "candidate_validation.json": "b1b0736f4fab1be240685e4dc5305bf1d6625274a740c1b5e28039be801f5723",
+      "power_samples.json": "86e828fbb9c3d580f6f83a761c49aedbaba47b304266766c449d5451b8a9aa2f",
+      "response.json": "f3f622b5e43018c6e0685b7abef540784b89b8cd517dfe29d7d13574000e301c",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-010/D": {
+      "call_started.json": "7cf79f70e0fc7d7d6112bf02f3c0ab2d52ea6080dfed185ed7a902d35efb3e53",
+      "candidate_validation.json": "6afd6b2d5f97127c527946d3e1c0c5bd949383104a3db0be6853dd6b81514490",
+      "power_samples.json": "57dff8f947a69685723a425fe34045120f162b521f09003c5dc58fef7ec417ea",
+      "response.json": "07c4f008bdb9cc2e48e02583de0aab586b34365c5547f7627d8cc8bfffac80fe",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-011/A": {
+      "call_started.json": "4d69be39800dca9ee01804b48e5d172141d493f2e60a4e4e57130e47a058a804",
+      "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+      "power_samples.json": "ef134a02d8de0fc0252ca5aa61c01514d2265d8df938ebf92a7dc4b53c61f9e8",
+      "response.json": "f507d9757a1d789b858580aafd1a22fe8b499ca1f41d1d8ca5e7ea5b4184e2aa",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-011/B": {
+      "call_started.json": "6f4f4d095932f05e65d5009ccbf97ab626988be8d7e4e6f96cad61b8f9ce2d86",
+      "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+      "power_samples.json": "a8f0557912376c4a2d60db38df00a027dc2b111bbf70fde062ea5cfa58eaeb8b",
+      "response.json": "3bc6174fe0c030cee1ef406ca7b912736922693ffb7a717fe4c2cf95b4c273d5",
+      "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+    },
+    "silr-011/C": {
+      "call_started.json": "55be47b737c1d605f41672f5dcc656c784addb563eaea647e65b60a9b69beac0",
+      "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+      "power_samples.json": "f030f1c1de8a41557af0cf8ca04b67521963f3e76ad0ee16295374594bed8f74",
+      "response.json": "169567ac6adb4bed70c32d27e9909c068840c742b1a82224644738a05067fb3d",
+      "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+    },
+    "silr-011/D": {
+      "call_started.json": "2e734957fbe0629462c4551fca31f403dad6434bd4d446eabfee18ffb917959d",
+      "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+      "power_samples.json": "bbd9c3cbd3192f6f55226f5575b711d9ffdd8e0f6a0e3e987b9064fb1a9661fd",
+      "response.json": "abf4eae1a1ae4a8efb4ec9e6f80e0dc0187f59e4345b0199e6fdf2b9fee71ec8",
+      "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+    },
+    "silr-012/A": {
+      "call_started.json": "a91ad38cc450a1096dd50ce275809b117c1177672da91480f1d03e57e7801ddf",
+      "candidate_validation.json": "f6e0d8d0f4a1f333a703681307adf7acf876edc6b76aeb543af740e12f7e7e9f",
+      "power_samples.json": "a1175f4cd629a0a4724b72f68a523dec50df40f0a253439dd2c94a81167677bc",
+      "response.json": "8396ca1f8e4e473fae68abc1fe7adcbab7af564f6be747d044b3c0465bedcaf5",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-012/B": {
+      "call_started.json": "119de1f270d732de81bfcd80e912d5b9fabfc9b9909de14f18722e9112f47b8c",
+      "candidate_validation.json": "05f6e8573fa112a8921c64efa3ff996919b38972059558366e2186907bc20a95",
+      "power_samples.json": "c08013f3ae89d22238874b6767b291b687df2b982c21e0f8a2ace19bead2dac5",
+      "response.json": "19bb975adf8416cdd69434998d8a22d02aa3effe4b6c60c8bed9b5b5de8dcace",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    },
+    "silr-012/C": {
+      "call_started.json": "91fa6790edf1272dddedc2003723c631e1ff2b771560b28442593c9dc7bab20e",
+      "candidate_validation.json": "9e8563fcbbc033c07b404350e157c61479e92490144b192600ee69166398a93a",
+      "power_samples.json": "f4c30e1738553ec9335c2e791febd06059926954813d70ee328fb766c5c731d5",
+      "response.json": "4d71269a83ea5467c52705c0e2a452e151f49fdbb367dd4695f32f65cbd84a90",
+      "runtime_result.json": "117c3b6d88df45a978e6691bc82a83fc86c3472d40fe31199606b78eccee5cd7"
+    },
+    "silr-012/D": {
+      "call_started.json": "e7eca7f13fd79a315f2b2fc1ecba550d2f25223c9a9c8936580e83441de6e30d",
+      "candidate_validation.json": "6afd6b2d5f97127c527946d3e1c0c5bd949383104a3db0be6853dd6b81514490",
+      "power_samples.json": "fd5befef53c63dc0f2b59fcc23b116949a062cc3fe88615504d96655e52fdc43",
+      "response.json": "2347c0fc63f9b7a5d094b67af18b421cbf4ff7b447e2706d454895b2ad24cd1e",
+      "runtime_result.json": "a427ee942e6412594238e069f6c34988370417f92e665cb9baa880bbdc18079e"
+    }
+  },
+  "replacement_vector_markers": {
+    "ALL_REPLACEMENT_CANONICAL_VECTORS_IDENTICAL": false,
+    "B_C_CANONICAL_VECTOR_IDENTICAL": false,
+    "B_D_CANONICAL_VECTOR_IDENTICAL": false,
+    "C_D_CANONICAL_VECTOR_IDENTICAL": false
+  },
+  "run_directory": ".work/model_size_supplier_floor/semantic_inspect_label_robustness_v0/run_20260824T022200Z",
+  "schema": "zth_semantic_inspect_label_robustness_v0_closeout_matrix",
+  "telemetry": {
+    "A": {
+      "count": 12,
+      "gross_energy_joules_mean": 34.258125,
+      "gross_energy_joules_median": 34.54125,
+      "gross_energy_joules_total": 411.09749999999997,
+      "latency_ms_mean": 1115.99925,
+      "latency_ms_median": 1113.0500000000002,
+      "latency_ms_p95_nearest_rank": 1190.145
+    },
+    "B": {
+      "count": 12,
+      "gross_energy_joules_mean": 37.153124999999996,
+      "gross_energy_joules_median": 35.9475,
+      "gross_energy_joules_total": 445.8375,
+      "latency_ms_mean": 1178.6873333333333,
+      "latency_ms_median": 1157.1895,
+      "latency_ms_p95_nearest_rank": 1255.44
+    },
+    "C": {
+      "count": 12,
+      "gross_energy_joules_mean": 36.45,
+      "gross_energy_joules_median": 35.39875,
+      "gross_energy_joules_total": 437.4,
+      "latency_ms_mean": 1164.2113333333334,
+      "latency_ms_median": 1166.091,
+      "latency_ms_p95_nearest_rank": 1253.592
+    },
+    "D": {
+      "count": 12,
+      "gross_energy_joules_mean": 36.38291666666667,
+      "gross_energy_joules_median": 35.3875,
+      "gross_energy_joules_total": 436.595,
+      "latency_ms_mean": 1175.8248333333333,
+      "latency_ms_median": 1152.898,
+      "latency_ms_p95_nearest_rank": 1251.877
+    },
+    "overall": {
+      "count": 48,
+      "gross_energy_joules_mean": 36.06104166666667,
+      "gross_energy_joules_median": 35.06375,
+      "gross_energy_joules_total": 1730.93,
+      "latency_ms_mean": 1158.6806875,
+      "latency_ms_median": 1148.7525,
+      "latency_ms_p95_nearest_rank": 1271.796,
+      "measurement_boundary": "gpu_device_only",
+      "measurement_level": 2
+    }
+  }
+}

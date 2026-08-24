@@ -1,6 +1,8 @@
 {
-  "model_calls": 0,
+  "model_calls": 48,
+  "model_output_granted_authority": 0,
   "retries": 0,
-  "status": "prepared",
+  "runtime_evaluator_influence": 0,
+  "status": "terminal_runtime",
   "tool_calls": 0
 }
