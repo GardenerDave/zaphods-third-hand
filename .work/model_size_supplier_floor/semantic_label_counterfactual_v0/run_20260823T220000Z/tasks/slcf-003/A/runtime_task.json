@@ -1,0 +1,15 @@
+{
+  "environment_facts": {
+    "authority_record": {
+      "allowed_observation_operations": [
+        "observe_presence",
+        "inspect"
+      ],
+      "allowed_targets": [
+        "docs/research/Q3_YONDER_2026-08-23.txt"
+      ]
+    }
+  },
+  "input_request": "Please say if docs/research/Q3_YONDER_2026-08-23.txt can be found in the repository.",
+  "task_id": "slcf-003"
+}

@@ -1,0 +1,95 @@
+{
+  "cases": [
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "observe_presence",
+            "inspect"
+          ],
+          "allowed_targets": [
+            "docs/research/Q1_VELVET_2026-08-23.md"
+          ]
+        }
+      },
+      "input_request": "Would you be able to establish if docs/research/Q1_VELVET_2026-08-23.md is available within this workspace?",
+      "task_id": "slcf-001"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "observe_presence",
+            "inspect"
+          ],
+          "allowed_targets": [
+            "docs/research/Q2_WILLOW_2026-08-23.json"
+          ]
+        }
+      },
+      "input_request": "Can you tell me whether docs/research/Q2_WILLOW_2026-08-23.json is currently stored here?",
+      "task_id": "slcf-002"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "observe_presence",
+            "inspect"
+          ],
+          "allowed_targets": [
+            "docs/research/Q3_YONDER_2026-08-23.txt"
+          ]
+        }
+      },
+      "input_request": "Please say if docs/research/Q3_YONDER_2026-08-23.txt can be found in the repository.",
+      "task_id": "slcf-003"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "observe_presence",
+            "inspect"
+          ],
+          "allowed_targets": [
+            "docs/research/Q4_ZEPHYR_2026-08-23.md"
+          ]
+        }
+      },
+      "input_request": "Please assess docs/research/Q4_ZEPHYR_2026-08-23.md.",
+      "task_id": "slcf-004"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "observe_presence",
+            "inspect"
+          ],
+          "allowed_targets": [
+            "docs/research/Q5_ALMOND_2026-08-23.json"
+          ]
+        }
+      },
+      "input_request": "Study docs/research/Q5_ALMOND_2026-08-23.json for a moment.",
+      "task_id": "slcf-005"
+    },
+    {
+      "environment_facts": {
+        "authority_record": {
+          "allowed_observation_operations": [
+            "observe_presence",
+            "inspect"
+          ],
+          "allowed_targets": [
+            "docs/research/Q6_BRIGHT_2026-08-23.txt"
+          ]
+        }
+      },
+      "input_request": "Give docs/research/Q6_BRIGHT_2026-08-23.txt a close examination.",
+      "task_id": "slcf-006"
+    }
+  ],
+  "schema": "zth_semantic_label_counterfactual_v0_runtime_cases"
+}

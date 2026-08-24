@@ -1,0 +1,15 @@
+{
+  "environment_facts": {
+    "authority_record": {
+      "allowed_observation_operations": [
+        "observe_presence",
+        "inspect"
+      ],
+      "allowed_targets": [
+        "docs/research/Q2_WILLOW_2026-08-23.json"
+      ]
+    }
+  },
+  "input_request": "Can you tell me whether docs/research/Q2_WILLOW_2026-08-23.json is currently stored here?",
+  "task_id": "slcf-002"
+}

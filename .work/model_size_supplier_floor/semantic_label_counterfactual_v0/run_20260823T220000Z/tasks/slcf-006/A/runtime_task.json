@@ -1,0 +1,15 @@
+{
+  "environment_facts": {
+    "authority_record": {
+      "allowed_observation_operations": [
+        "observe_presence",
+        "inspect"
+      ],
+      "allowed_targets": [
+        "docs/research/Q6_BRIGHT_2026-08-23.txt"
+      ]
+    }
+  },
+  "input_request": "Give docs/research/Q6_BRIGHT_2026-08-23.txt a close examination.",
+  "task_id": "slcf-006"
+}

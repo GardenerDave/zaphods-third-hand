@@ -1,0 +1,126 @@
+{
+  "definitions_equivalent_except_label_tokens": true,
+  "only_model_visible_intervention": "LABEL_TOKENS",
+  "paired_authority_identity": true,
+  "paired_model_settings_identity": true,
+  "paired_preflight_identity": true,
+  "paired_request_identity": true,
+  "rows": [
+    {
+      "authority_identity": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "prompt_definition_equivalence": true,
+      "request_identity": true,
+      "schema_a_enum": [
+        "inspect",
+        "observe_presence",
+        "unresolved"
+      ],
+      "schema_b_enum": [
+        "class_beta",
+        "class_alpha",
+        "unresolved"
+      ],
+      "semantic_positions_identical": true,
+      "task_id": "slcf-001"
+    },
+    {
+      "authority_identity": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "prompt_definition_equivalence": true,
+      "request_identity": true,
+      "schema_a_enum": [
+        "inspect",
+        "observe_presence",
+        "unresolved"
+      ],
+      "schema_b_enum": [
+        "class_beta",
+        "class_alpha",
+        "unresolved"
+      ],
+      "semantic_positions_identical": true,
+      "task_id": "slcf-002"
+    },
+    {
+      "authority_identity": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "prompt_definition_equivalence": true,
+      "request_identity": true,
+      "schema_a_enum": [
+        "inspect",
+        "observe_presence",
+        "unresolved"
+      ],
+      "schema_b_enum": [
+        "class_beta",
+        "class_alpha",
+        "unresolved"
+      ],
+      "semantic_positions_identical": true,
+      "task_id": "slcf-003"
+    },
+    {
+      "authority_identity": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "prompt_definition_equivalence": true,
+      "request_identity": true,
+      "schema_a_enum": [
+        "inspect",
+        "observe_presence",
+        "unresolved"
+      ],
+      "schema_b_enum": [
+        "class_beta",
+        "class_alpha",
+        "unresolved"
+      ],
+      "semantic_positions_identical": true,
+      "task_id": "slcf-004"
+    },
+    {
+      "authority_identity": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "prompt_definition_equivalence": true,
+      "request_identity": true,
+      "schema_a_enum": [
+        "inspect",
+        "observe_presence",
+        "unresolved"
+      ],
+      "schema_b_enum": [
+        "class_beta",
+        "class_alpha",
+        "unresolved"
+      ],
+      "semantic_positions_identical": true,
+      "task_id": "slcf-005"
+    },
+    {
+      "authority_identity": true,
+      "model_settings_identity": true,
+      "preflight_identity": true,
+      "prompt_definition_equivalence": true,
+      "request_identity": true,
+      "schema_a_enum": [
+        "inspect",
+        "observe_presence",
+        "unresolved"
+      ],
+      "schema_b_enum": [
+        "class_beta",
+        "class_alpha",
+        "unresolved"
+      ],
+      "semantic_positions_identical": true,
+      "task_id": "slcf-006"
+    }
+  ],
+  "schema": "zth_semantic_label_counterfactual_v0_pair_audit",
+  "semantic_enum_positions_identical": true
+}

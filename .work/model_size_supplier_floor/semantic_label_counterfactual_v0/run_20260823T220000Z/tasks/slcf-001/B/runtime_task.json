@@ -1,0 +1,15 @@
+{
+  "environment_facts": {
+    "authority_record": {
+      "allowed_observation_operations": [
+        "observe_presence",
+        "inspect"
+      ],
+      "allowed_targets": [
+        "docs/research/Q1_VELVET_2026-08-23.md"
+      ]
+    }
+  },
+  "input_request": "Would you be able to establish if docs/research/Q1_VELVET_2026-08-23.md is available within this workspace?",
+  "task_id": "slcf-001"
+}

@@ -1,0 +1,17 @@
+{
+  "ambiguity_status": "UNAMBIGUOUS",
+  "deterministic_canonical_operation_available_pre_model": false,
+  "model_required": true,
+  "normalization_context": "UNSUPPORTED_OR_UNKNOWN_CONTEXT",
+  "operation_derivation_status": "UNRESOLVED",
+  "reason": "operation class remains unresolved with two safe candidates",
+  "remaining_candidate_operation_classes": [
+    "observe_presence",
+    "inspect"
+  ],
+  "risk_status": "SAFE_BOUNDED",
+  "semantic_fallback_eligible": true,
+  "target": "docs/research/Q5_ALMOND_2026-08-23.json",
+  "target_count": 1,
+  "target_status": "EXACTLY_ONE_SAFE_TARGET"
+}

@@ -1,0 +1,23 @@
+{
+  "automatic_promotion": false,
+  "entries": [
+    {
+      "capability_id": "semantic.bounded_operation_classification",
+      "qualification_decision": "no promotion",
+      "status": "EXPERIMENTAL_CANDIDATE",
+      "supplier_id": "qwen3_1_7b_bounded_operation_class_candidate_supplier",
+      "supplier_type": "MODEL"
+    }
+  ],
+  "schema": "zth_semantic_label_counterfactual_v0_registry",
+  "semantic_mapping": {
+    "A": {
+      "inspect": "inspect",
+      "observe_presence": "observe_presence"
+    },
+    "B": {
+      "class_alpha": "observe_presence",
+      "class_beta": "inspect"
+    }
+  }
+}

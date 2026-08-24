@@ -1,0 +1,35 @@
+{
+  "cases": [
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "observe_presence",
+      "task_id": "slcf-001"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "inspect",
+      "task_id": "slcf-002"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "observe_presence",
+      "task_id": "slcf-003"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "inspect",
+      "task_id": "slcf-004"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "observe_presence",
+      "task_id": "slcf-005"
+    },
+    {
+      "expected_model_required": true,
+      "expected_semantic_class": "inspect",
+      "task_id": "slcf-006"
+    }
+  ],
+  "schema": "zth_semantic_label_counterfactual_v0_evaluator_cases"
+}
