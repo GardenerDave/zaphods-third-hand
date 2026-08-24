@@ -1,0 +1,20 @@
+{
+  "captured_at": "2026-08-24T15:37:57.222049+00:00",
+  "case_id": "dpt-scope-002",
+  "content": "{\"allowed_targets\":[\"DPT_SABLE_002.yaml\"],\"held_targets\":[\"DPT_COPPER_002.yaml\"],\"scope_expansion_required\":false,\"review_status\":\"ready_for_review\"}",
+  "experiment_payload_sha256": "52f6eed448997f00741febfe7dc1ccdadfca852107919914a5bef3f33024be39",
+  "metadata": {
+    "command_sha256": "a495768820fa63dfff85523331ae0d3985ca198b97c2147fbf9595a3fed5378c",
+    "cwd": "/tmp",
+    "evaluator_access": false,
+    "identity": "codex-cli-0.146.0",
+    "native_envelope_control": "BEST_AVAILABLE_OBSERVATION",
+    "repository_access": false,
+    "request_elapsed_ms": 20920.324,
+    "tool_calls": 0,
+    "transport_classification": "model_response"
+  },
+  "raw_response_sha256": "02b61915ca88a9be83b69983b5094776ba171c933188b34ac413068c72778267",
+  "status": "ok",
+  "supplier_id": "external_teacher"
+}

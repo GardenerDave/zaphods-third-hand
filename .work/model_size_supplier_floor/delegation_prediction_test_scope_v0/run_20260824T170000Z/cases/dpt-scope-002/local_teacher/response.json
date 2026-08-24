@@ -1,0 +1,66 @@
+{
+  "captured_at": "2026-08-24T15:37:36.301182+00:00",
+  "case_id": "dpt-scope-002",
+  "content": "{\n  \"properties\": {\n    \"allowed_targets\": [\n      \"DPT_SABLE_002.yaml\"\n    ],\n    \"held_targets\": [\n      \"DPT_COPPER_002.yaml\"\n    ],\n    \"review_status\": \"ready_for_review\",\n    \"scope_expansion_required\": false\n  },\n  \"required\": [\n    \"allowed_targets\",\n    \"held_targets\",\n    \"scope_expansion_required\",\n    \"review_status\"\n  ],\n  \"type\": \"object\"\n}",
+  "experiment_payload_sha256": "52f6eed448997f00741febfe7dc1ccdadfca852107919914a5bef3f33024be39",
+  "metadata": {
+    "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "error": null,
+    "evaluator_access": false,
+    "finish_reason": "stop",
+    "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "model_resolution_attempted": false,
+    "model_resolution_error": null,
+    "repository_access": false,
+    "request_elapsed_ms": 3632.708,
+    "request_provenance": {
+      "api": "openai-chat",
+      "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "endpoint_alias": "JARVIS_LOCAL",
+      "max_tokens": 1200,
+      "message_structure": [
+        "system",
+        "user"
+      ],
+      "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "prompt_length": 796,
+      "prompt_sha256": "528bd201aee263d3d717702cf73e653e69aeed765f0fcb1a2695aec532edc837",
+      "request_start_monotonic": 4505.451829215,
+      "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "response_capture_monotonic": 4509.084496328,
+      "seed": null,
+      "stop": null,
+      "system_message_sha256": "e8c1a9955d1a830189fecdfd11c537896d95cddd0419d5a63d957dd6f0fcb6c7",
+      "temperature": 0.2,
+      "top_p": null
+    },
+    "request_url": "http://192.168.1.16:8080/v1/chat/completions",
+    "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "status": "ok",
+    "supplier_native_envelope_control": "BEST_AVAILABLE_OBSERVATION",
+    "timings": {
+      "cache_n": 35,
+      "predicted_ms": 2640.704,
+      "predicted_n": 106,
+      "predicted_per_second": 40.14081093526574,
+      "predicted_per_token_ms": 24.912301886792456,
+      "prompt_ms": 849.049,
+      "prompt_n": 159,
+      "prompt_per_second": 187.268343758723,
+      "prompt_per_token_ms": 5.339930817610063
+    },
+    "tool_calls": 0,
+    "transport_classification": "model_response",
+    "usage": {
+      "completion_tokens": 106,
+      "prompt_tokens": 194,
+      "prompt_tokens_details": {
+        "cached_tokens": 35
+      },
+      "total_tokens": 300
+    }
+  },
+  "raw_response_sha256": "f5dbafa3a722910e78f8736bac54c786d59adba1f0eb92f86b3bdd3e3510069d",
+  "status": "ok",
+  "supplier_id": "local_teacher"
+}

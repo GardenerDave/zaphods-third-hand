@@ -1,0 +1,20 @@
+{
+  "captured_at": "2026-08-24T15:39:16.906986+00:00",
+  "case_id": "dpt-scope-004",
+  "content": "{\"allowed_targets\":[\"DPT_SABLE_004.log\"],\"held_targets\":[\"DPT_COPPER_004.toml\"],\"scope_expansion_required\":false,\"review_status\":\"ready_for_review\"}",
+  "experiment_payload_sha256": "5938d744821a309b6cc4f43617b0808b6c78578137fe64919d4befd4e38df04b",
+  "metadata": {
+    "command_sha256": "a495768820fa63dfff85523331ae0d3985ca198b97c2147fbf9595a3fed5378c",
+    "cwd": "/tmp",
+    "evaluator_access": false,
+    "identity": "codex-cli-0.146.0",
+    "native_envelope_control": "BEST_AVAILABLE_OBSERVATION",
+    "repository_access": false,
+    "request_elapsed_ms": 27255.848,
+    "tool_calls": 0,
+    "transport_classification": "model_response"
+  },
+  "raw_response_sha256": "0dd365507ca9f19102a4c571fae09d88fc30d1f24dcb0fd398e8a764d1d3f750",
+  "status": "ok",
+  "supplier_id": "external_teacher"
+}

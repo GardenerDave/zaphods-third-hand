@@ -1,0 +1,162 @@
+{
+  "evaluator_loaded_during_acquisition": false,
+  "execution_order": [
+    {
+      "case_id": "dpt-scope-001",
+      "supplier": "local_teacher"
+    },
+    {
+      "case_id": "dpt-scope-001",
+      "supplier": "external_teacher"
+    },
+    {
+      "case_id": "dpt-scope-002",
+      "supplier": "local_teacher"
+    },
+    {
+      "case_id": "dpt-scope-002",
+      "supplier": "external_teacher"
+    },
+    {
+      "case_id": "dpt-scope-003",
+      "supplier": "local_teacher"
+    },
+    {
+      "case_id": "dpt-scope-003",
+      "supplier": "external_teacher"
+    },
+    {
+      "case_id": "dpt-scope-004",
+      "supplier": "local_teacher"
+    },
+    {
+      "case_id": "dpt-scope-004",
+      "supplier": "external_teacher"
+    },
+    {
+      "case_id": "dpt-scope-005",
+      "supplier": "local_teacher"
+    },
+    {
+      "case_id": "dpt-scope-005",
+      "supplier": "external_teacher"
+    },
+    {
+      "case_id": "dpt-scope-006",
+      "supplier": "local_teacher"
+    },
+    {
+      "case_id": "dpt-scope-006",
+      "supplier": "external_teacher"
+    },
+    {
+      "case_id": "dpt-scope-007",
+      "supplier": "local_teacher"
+    },
+    {
+      "case_id": "dpt-scope-007",
+      "supplier": "external_teacher"
+    },
+    {
+      "case_id": "dpt-scope-008",
+      "supplier": "local_teacher"
+    },
+    {
+      "case_id": "dpt-scope-008",
+      "supplier": "external_teacher"
+    },
+    {
+      "case_id": "dpt-scope-009",
+      "supplier": "local_teacher"
+    },
+    {
+      "case_id": "dpt-scope-009",
+      "supplier": "external_teacher"
+    },
+    {
+      "case_id": "dpt-scope-010",
+      "supplier": "local_teacher"
+    },
+    {
+      "case_id": "dpt-scope-010",
+      "supplier": "external_teacher"
+    },
+    {
+      "case_id": "dpt-scope-011",
+      "supplier": "local_teacher"
+    },
+    {
+      "case_id": "dpt-scope-011",
+      "supplier": "external_teacher"
+    },
+    {
+      "case_id": "dpt-scope-012",
+      "supplier": "local_teacher"
+    },
+    {
+      "case_id": "dpt-scope-012",
+      "supplier": "external_teacher"
+    },
+    {
+      "case_id": "dpt-scope-013",
+      "supplier": "local_teacher"
+    },
+    {
+      "case_id": "dpt-scope-013",
+      "supplier": "external_teacher"
+    },
+    {
+      "case_id": "dpt-scope-014",
+      "supplier": "local_teacher"
+    },
+    {
+      "case_id": "dpt-scope-014",
+      "supplier": "external_teacher"
+    },
+    {
+      "case_id": "dpt-scope-015",
+      "supplier": "local_teacher"
+    },
+    {
+      "case_id": "dpt-scope-015",
+      "supplier": "external_teacher"
+    },
+    {
+      "case_id": "dpt-scope-016",
+      "supplier": "local_teacher"
+    },
+    {
+      "case_id": "dpt-scope-016",
+      "supplier": "external_teacher"
+    }
+  ],
+  "experiment_payload_hashes": {
+    "dpt-scope-001": "b2f3f726d56c5189d10a42441101be1b4124ba4617ef3bcc5f2d2f1c58a6c3d4",
+    "dpt-scope-002": "52f6eed448997f00741febfe7dc1ccdadfca852107919914a5bef3f33024be39",
+    "dpt-scope-003": "a92151b0606b8b83812e5cec7056da90afd3f1d39e7b5792bfa022d0362bf326",
+    "dpt-scope-004": "5938d744821a309b6cc4f43617b0808b6c78578137fe64919d4befd4e38df04b",
+    "dpt-scope-005": "fb01e1963f47091baaa92528c53ab701b14f3821b241a17a02c5ada6760b00c3",
+    "dpt-scope-006": "00e4f3eb227b190d6fa18bfdb3f781b22cba4446059650bc0bb8f45bdefcb4a0",
+    "dpt-scope-007": "4cb3c90a4b4aacbfa4c55f7ad383e54b59f90640ac9a0b8ee08a4bb3450dd1a4",
+    "dpt-scope-008": "9edcc504fa485f79d22cbf4c5a23801f1fea86fe2d008df25fed49584ee3f97b",
+    "dpt-scope-009": "4206cf0bf0c2639700a94c7a5637aab0ff483c2a3d0601c7dcee770c8bb495b2",
+    "dpt-scope-010": "061188eab01f8bfc4f4108c4e4a755c6f9674cd75eefcc3df2ed83a1f978048a",
+    "dpt-scope-011": "5641c2b7b348ace37e44f27edf9ab8a2cba963acee54ac8c3bc35352dbad31e0",
+    "dpt-scope-012": "f631edf36ed7300f257664e148519f9afa46b0538b7b2c53f945869e6dabd6f4",
+    "dpt-scope-013": "a9e7442fa16574069b80642fcac5c7c16dc9d3725ab56ec36fbd48d4bbb51d1c",
+    "dpt-scope-014": "25f4020d7885b64bf6f7c0ff07d99808713b16dd36b0001df910d3af087441ae",
+    "dpt-scope-015": "56327474c78bd6052698b581fc76f0c0ed972bc45b4301567a3ac22af3997dab",
+    "dpt-scope-016": "0b2943252d63f5b505efb765503f600e9717f93ece60434164101dc427dd36c0"
+  },
+  "freeze_commit": "fc6902926a89d3572b457bea1d5cca5e4ba53f4d",
+  "interface_contract_sha256": "c6726c65a40df77c6e681226c90f48c16e00348b5727ab15a14c6b7e61cb3f93",
+  "planned_external_calls": 16,
+  "planned_local_calls": 16,
+  "planned_supplier_calls": 32,
+  "replays": 0,
+  "retries": 0,
+  "runtime_manifest_sha256": "f10ff1ef98ecc0e452d59e842398a0b37a2760e4d7adf63a2be762d1d23f077c",
+  "schema": "zth_delegation_prediction_prospective_execution_manifest_v1",
+  "status": "running",
+  "tool_calls": 0
+}
