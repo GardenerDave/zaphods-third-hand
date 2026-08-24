@@ -1,0 +1,263 @@
+{
+  "schema": "zth_direct_unit_calibration_freeze_v2",
+  "experiment_id": "DIRECT_UNIT_CALIBRATION_2026-08-24",
+  "freeze_characterization": "DIRECT_UNIT_CALIBRATION_EXPERIMENT_CORRECTED_FREEZE_UNEXECUTED",
+  "base_design_commit": "f55f677c46a0746ef4ba4dda4072c4e2f452b544",
+  "supersedes_before_execution": {
+    "original_freeze_commit": "850913c2c6690694c20a28a2048421b2e2d221ed",
+    "original_freeze_sha256": "99d7b84792e15d0d588b9e167544d199f1e99cc301d682cb92d420280efb3877",
+    "original_freeze_executed": false,
+    "original_freeze_outcome_contamination": false,
+    "original_freeze_superseded_before_execution": true,
+    "reason": "V1 added unentailed strict extra-property rejection, field-scoped/literal semantic predicates, and exact route-label/type requirements."
+  },
+  "preserved_protocol": {
+    "selected_families": [
+      "scope-authority-boundary",
+      "triage-routing",
+      "unsupported-certainty"
+    ],
+    "case_order": [
+      "duc-triage-001",
+      "duc-triage-002",
+      "duc-triage-003",
+      "duc-triage-004",
+      "duc-triage-005",
+      "duc-triage-006",
+      "duc-triage-007",
+      "duc-triage-008",
+      "duc-unsupported-001",
+      "duc-unsupported-002",
+      "duc-unsupported-003",
+      "duc-unsupported-004",
+      "duc-unsupported-005",
+      "duc-unsupported-006",
+      "duc-unsupported-007",
+      "duc-unsupported-008"
+    ],
+    "case_requests_unchanged_from_v1": true,
+    "new_cases": 16,
+    "planned_new_supplier_calls": 32,
+    "sample_size_frozen_before_new_outcomes": true,
+    "outcome_conditional_sample_extension_permitted": false,
+    "contradiction_reserve_included": false,
+    "micro_and_family_macro_summaries_required": true,
+    "future_broad_policy_aggregation_rule_not_selected": true,
+    "stage_a_stage_b_firewall_preserved": true
+  },
+  "corrected_semantics": {
+    "interface_contract_adds_new_experiment_semantics": false,
+    "additional_properties": "not rejected, matching preserved validator behavior",
+    "family_field_types": "no new family-specific type constraints",
+    "phrase_scope": "serialized_declared_output, matching historical reference facts",
+    "exact_route_label": false,
+    "next_step_literal_more_evidence": false,
+    "review_status": "ready_for_review"
+  },
+  "artifact_hashes": {
+    "atomic_schema_v1": {
+      "path": "docs/research/DIRECT_UNIT_CALIBRATION_ATOMIC_SCHEMA_2026-08-24.json",
+      "sha256": "5db777c62bd20bdc31827344b531ddac1b8848a5ab25bdaff2fedf735f8178c1"
+    },
+    "v2_interface_contract": {
+      "path": "docs/research/DIRECT_UNIT_CALIBRATION_INTERFACE_CONTRACT_V2_2026-08-24.json",
+      "sha256": "d7eff33f17c7d5e833c8fed9bd5804d6dc5d813e92b009f261fc2071d6067bbd"
+    },
+    "v2_runtime_manifest": {
+      "path": "docs/research/DIRECT_UNIT_CALIBRATION_RUNTIME_MANIFEST_V2_2026-08-24.json",
+      "sha256": "caaaa3913b5158b7d68b6719348953e21e47f59f8855607378464d782e06d49c"
+    },
+    "v2_evaluator_cases": {
+      "path": "docs/research/DIRECT_UNIT_CALIBRATION_EVALUATOR_CASES_V2_2026-08-24.json",
+      "sha256": "711edbe0836dcb6bcb7afdbd3f538c7f541437b1fe96c84d62585ab90e3edbf6"
+    },
+    "v2_payload_manifest": {
+      "path": "docs/research/DIRECT_UNIT_CALIBRATION_PAYLOAD_MANIFEST_V2_2026-08-24.json",
+      "sha256": "fc87ede6b0df1afd083c7c9b2f30fa5aba2869293953b97e750a06f1a6e45b76"
+    }
+  },
+  "source_provenance": [
+    {
+      "path": "docs/research/DIRECT_UNIT_CALIBRATION_DESIGN_2026-08-24.md",
+      "sha256": "53b2828ef6441f1c3c9c8dfa9c73b3e6195084fcd335ee8a911ae4b79b8e53d0",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "docs/research/DIRECT_UNIT_CALIBRATION_MATRIX_2026-08-24.json",
+      "sha256": "f7da6ce462926fbc38299d81feddfc63bf0b872856d4831979f2ecbcb1fa0002",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "docs/research/RUN_4A_PREREGISTRATION_2026-08-19.json",
+      "sha256": "a9418fe1e45a05e46b4fd183a6345333893192305fbf767461f3b280b26d748b",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "docs/research/RUN_5_MIXED_ECONOMIC_ROUTING_PREREGISTRATION_2026-08-20.json",
+      "sha256": "cbb6b6250db3489189b43afad36b17ac8ae42dfb928c62ab184766fd269102cd",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/supervised_attempt_output_validator.py",
+      "sha256": "3ca42dfc6f683399752bfe4f5757b9edf4e7eafb09ac30166fe60e9f3beb0d27",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/supervised_reference_fact_validator.py",
+      "sha256": "d86793dfde5a499988be92447f7df79da889a6074b8dc21b1c3b16bd7c60008a",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/supervised_capability_loop.py",
+      "sha256": "23b26115201d8cba17b9da659af72793654897803988e35e28210eba02af81be",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-001.json",
+      "sha256": "0bf8a00d962b38a775d64af44e8f585904747185bce101e359d40b5c7a030c9a",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/uncertainty-001.json",
+      "sha256": "7d521329bdd3c6bab8dee3044ceae4489cf6ada7083827a6aadaccbbb1b3ff68",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/manifest.json",
+      "sha256": "e44f7868c316f17f2cddd00736899e3f7e622af0cae4f3c449a5875eb11c906c",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/novelty_audit.json",
+      "sha256": "e7bde86b1a4bd01682b18415e9969cbd81a23aaf2f85f770d2b8e3e498988558",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-002.json",
+      "sha256": "2a386dbefbfc6a29f51fe966cc6dd684218b772d5ebf4a2cd7cf579119c467cd",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-003.json",
+      "sha256": "cb992f9f1f9f155c4b06e213cce202d4d93aa553ce0299e47fa9541770907a0b",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-004.json",
+      "sha256": "23eb4e72791163620cbc8931701012df3561df2b8914db4bfbf9fa78cb2a4605",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-005.json",
+      "sha256": "2bcd2018a0f07c9c7914a79b0d5b6e42a4d50c6c94182449487791850f3a21e3",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-006.json",
+      "sha256": "c1df7aba88c3912f54fe169a2440f4aaa1e7594aba1e8bdfb6d1a35a11e29ad7",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-007.json",
+      "sha256": "231a09bfb1a3b0af433b53018a4c28c829830c4a9b0c46209f79a08a99d514c0",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-008.json",
+      "sha256": "13a4a654ce652a619dd5eebc82975d95a4cd174ab68fb5d6362d16b1888c6fc6",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-009.json",
+      "sha256": "39281d771ab5039b013120f12ba57d11933a64d393851bce0eccffd82fc01e76",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-010.json",
+      "sha256": "67175e21756b7109903f290971da9a3a4fcab33d72ebdd42469aa4e8c4df1b1c",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-011.json",
+      "sha256": "e362796ec224dc297b6bb52d928d1da349bc09bb9f12e67f11b7cf040a95a42c",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-012.json",
+      "sha256": "bab4f29119aad6c87303ae7431b9dc2e6dde97875d4c5afcb8c8d66d57627362",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-013.json",
+      "sha256": "da9f67a21e53430f022b1003fa0c056c07233c1852222075b379168dfe92ccf0",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-014.json",
+      "sha256": "59600007aa485d1e0139dc15ac2b54a07e5a54c3ac441f32b9ccd2786d19805d",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_run5_triage/triage-015.json",
+      "sha256": "7131c1b0f00fee92f113c108f8b0f5c898e5a962681d60eb8dd93da2a5d78403",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/uncertainty-002.json",
+      "sha256": "57467ef372f90e1f43cd5b381f98b903644a480abc737a37995c34fb54c67fa8",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/uncertainty-003.json",
+      "sha256": "d6a7b86d7f3aa1bb9713f235c204d5fa472f18ca4860bd92e0f69ec793bd6218",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/uncertainty-004.json",
+      "sha256": "eded1a06f32bca2dc24c77b1c8c23636b850b5f3e9dbc1d0abaf4676d31bdeb9",
+      "role": "design_or_historical_validator_lineage"
+    },
+    {
+      "path": "local_harness/fixtures/capability_loop/reviewed_v4a/uncertainty-005.json",
+      "sha256": "c7e969eb08bedb8b86b764ad1939f6cff4a6fc2b309a6c3c7aa517ce1edb6685",
+      "role": "design_or_historical_validator_lineage"
+    }
+  ],
+  "supplier_controls": {
+    "retries": 0,
+    "replays": 0,
+    "response_repair": false,
+    "teacher_intervention": false,
+    "downstream_model_repair": false,
+    "model_substitution": false,
+    "tool_calls": 0,
+    "repository_access": false,
+    "evaluator_access": false,
+    "authority_changes": false,
+    "threshold_tuning": false,
+    "qualification_or_promotion": false,
+    "production_routing_change": false
+  },
+  "contamination_audit": {
+    "current_freeze_executed": false,
+    "new_supplier_responses_exist": false,
+    "new_calibration_outcomes_exist": false,
+    "scope_v0_mutated": false,
+    "case_requests_changed": false,
+    "sample_size_changed": false,
+    "policy_changed": false,
+    "payload_manifest_derived_model_free": true
+  },
+  "characterization": {
+    "direct_unit_calibration_experiment_frozen": true,
+    "corrected_authoritative_freeze": true,
+    "direct_responsibility_matched_across_arms": true,
+    "exact_experiment_authored_payload_frozen": true,
+    "matched_case_payload_hash_across_arms": true,
+    "model_calls": 0,
+    "teacher_calls": 0,
+    "tool_calls": 0,
+    "external_inference_calls": 0,
+    "primary": "DIRECT_UNIT_CALIBRATION_EXPERIMENT_CORRECTED_FREEZE_UNEXECUTED"
+  }
+}

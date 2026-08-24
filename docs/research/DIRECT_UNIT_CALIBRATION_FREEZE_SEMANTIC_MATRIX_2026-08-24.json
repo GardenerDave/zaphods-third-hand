@@ -1,0 +1,116 @@
+{
+  "schema": "zth_direct_unit_calibration_freeze_semantic_audit_v1",
+  "design_commit": "f55f677c46a0746ef4ba4dda4072c4e2f452b544",
+  "v1_freeze_commit": "850913c2c6690694c20a28a2048421b2e2d221ed",
+  "v1_preserved": true,
+  "contamination": {
+    "current_freeze_executed": false,
+    "new_supplier_responses": 0,
+    "new_calibration_outcomes": 0,
+    "scope_v0_mutations": 0,
+    "case_request_changes": 0
+  },
+  "historical_validator_findings": {
+    "required_fields": "required fields are checked for presence",
+    "additional_properties": "not rejected",
+    "family_field_types": "route/rationale/review_status and known_facts/uncertainty/next_step are not family-type checked",
+    "phrase_scoring": "must_include/must_not_include uses serialized declared output",
+    "review_status": "direct exact field check"
+  },
+  "design_semantics": {
+    "triage_family_contract_details": "UNSPECIFIED_BY_DESIGN",
+    "unsupported_certainty_contract_details": "UNSPECIFIED_BY_DESIGN",
+    "interface_exact_prompt": "UNSPECIFIED_BY_DESIGN",
+    "review_only_authority": "EXPLICITLY_FIXED_BY_DESIGN",
+    "deterministic_evaluator": "EXPLICITLY_FIXED_BY_DESIGN",
+    "direct_responder_and_no_downstream_dependency": "EXPLICITLY_FIXED_BY_DESIGN"
+  },
+  "crosswalk": [
+    {
+      "family": "triage-routing",
+      "freeze_rule": "required_fields route/rationale/review_status",
+      "historical_source": "reviewed_run5_triage output_contract.required_fields",
+      "classification": "FAITHFUL_SERIALIZATION"
+    },
+    {
+      "family": "triage-routing",
+      "freeze_rule": "additional_properties=false",
+      "historical_source": "not present; validator has no extra-key rejection",
+      "classification": "NEW_EXPERIMENT_SEMANTIC"
+    },
+    {
+      "family": "triage-routing",
+      "freeze_rule": "exact route labels",
+      "historical_source": "no route equality in preserved validator",
+      "classification": "NEW_EXPERIMENT_SEMANTIC"
+    },
+    {
+      "family": "triage-routing",
+      "freeze_rule": "field-scoped rationale predicates",
+      "historical_source": "historical predicates scope to serialized declared output",
+      "classification": "NEW_EXPERIMENT_SEMANTIC"
+    },
+    {
+      "family": "triage-routing",
+      "freeze_rule": "review_status=ready_for_review",
+      "historical_source": "Run 5 direct review_status reference fact",
+      "classification": "FAITHFUL_SERIALIZATION"
+    },
+    {
+      "family": "unsupported-certainty",
+      "freeze_rule": "required_fields known_facts/uncertainty/review_status/next_step",
+      "historical_source": "reviewed_v4a uncertainty output_contract.required_fields",
+      "classification": "FAITHFUL_SERIALIZATION"
+    },
+    {
+      "family": "unsupported-certainty",
+      "freeze_rule": "additional_properties=false",
+      "historical_source": "not present; validator has no extra-key rejection",
+      "classification": "NEW_EXPERIMENT_SEMANTIC"
+    },
+    {
+      "family": "unsupported-certainty",
+      "freeze_rule": "field-scoped known_facts/uncertainty predicates",
+      "historical_source": "historical predicates scope to serialized declared output",
+      "classification": "NEW_EXPERIMENT_SEMANTIC"
+    },
+    {
+      "family": "unsupported-certainty",
+      "freeze_rule": "next_step contains literal more evidence",
+      "historical_source": "not present in preserved uncertainty contracts",
+      "classification": "NEW_EXPERIMENT_SEMANTIC"
+    },
+    {
+      "family": "unsupported-certainty",
+      "freeze_rule": "review_status=ready_for_review",
+      "historical_source": "Run 4A direct review_status reference fact",
+      "classification": "FAITHFUL_SERIALIZATION"
+    },
+    {
+      "family": "both",
+      "freeze_rule": "exact prompt wording",
+      "historical_source": "no exact prompt fixed by design; authority/responsibility are fixed",
+      "classification": "COMPATIBLE_EXPLICIT_SUCCESSOR"
+    }
+  ],
+  "decision": {
+    "triage_freeze_adds_new_experiment_semantics": true,
+    "unsupported_certainty_freeze_adds_new_experiment_semantics": true,
+    "freeze_adds_new_experiment_semantics": true,
+    "historical_extra_field_policy": "ALLOWED_OR_UNRESTRICTED",
+    "hardened_design_extra_field_policy": "UNSPECIFIED",
+    "corrected_interface_adds_new_experiment_semantics": false
+  },
+  "payload_audit": {
+    "exact_experiment_authored_payload_frozen": true,
+    "matched_case_payload_hash_across_arms": true,
+    "evaluator_expectations_in_payload": false,
+    "supplier_native_envelopes": "separately controlled and not frozen by this artifact"
+  },
+  "controls": {
+    "model_calls": 0,
+    "teacher_calls": 0,
+    "tool_calls": 0,
+    "external_inference_calls": 0
+  }
+}
