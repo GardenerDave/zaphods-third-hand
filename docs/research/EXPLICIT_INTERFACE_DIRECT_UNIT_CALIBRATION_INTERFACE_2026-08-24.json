@@ -1,0 +1,102 @@
+{
+  "schema": "zth.explicit_interface_direct_unit_calibration.interface.v1",
+  "experiment_id": "explicit_interface_direct_unit_calibration_2026-08-24",
+  "status": "frozen_unexecuted",
+  "new_competence_unit": true,
+  "old_bounded_evidence_transfer_permitted": false,
+  "supplier_role": "DIRECT_RESPONDER",
+  "downstream_dependencies": [],
+  "tools": false,
+  "repository_access": false,
+  "evaluator_access": false,
+  "interfaces": {
+    "triage-routing": {
+      "interface_id": "duc_explicit_triage_direct_json_v1",
+      "bounded_responsibility": "directly classify one evidence-backed review item without authorizing execution",
+      "prompt_template": "Return only a JSON object. Required fields are route, rationale, and review_status. The route value must be exactly \"review\". The review_status value must be exactly \"ready_for_review\". In rationale, explicitly state every case-specific required fact listed below and do not state any prohibited fact. The authority context is review-only: you may describe and route evidence, but you may not authorize mutation, deployment, publication, deletion, delivery, or closure. Case request: {{request}} Required rationale facts: {{rationale_required_facts}}. Prohibited rationale facts: {{rationale_forbidden_facts}}.",
+      "output_contract": {
+        "format": "json_object",
+        "additional_properties": "allowed",
+        "fields": {
+          "route": {
+            "type": "string",
+            "required": true,
+            "exact_value": "review"
+          },
+          "rationale": {
+            "type": "string",
+            "required": true
+          },
+          "review_status": {
+            "type": "string",
+            "required": true,
+            "exact_value": "ready_for_review"
+          }
+        }
+      },
+      "visible_semantic_checks": [
+        "rationale contains every visible rationale_required_facts item",
+        "rationale contains no visible rationale_forbidden_facts item",
+        "route equals visible route_exact value"
+      ],
+      "interface_hash": "74043998edb2e64c65ad6e5908d406d68bc1f9fc5999b95615586fbdfdcaf269"
+    },
+    "unsupported-certainty": {
+      "interface_id": "duc_explicit_unsupported_certainty_direct_json_v1",
+      "bounded_responsibility": "directly separate observed facts from untested uncertainty without making a broad reliability claim",
+      "prompt_template": "Return only a JSON object. Required fields are known_facts, uncertainty, review_status, and next_step. The review_status value must be exactly \"ready_for_review\". List the visible known fact, state the visible untested uncertainty, and identify the visible next evidence needed. Do not make the visible prohibited broad claim. The authority context is review-only: report evidence and limits; do not authorize an operational action. Case request: {{request}} Known fact to preserve: {{known_facts_required}}. Uncertainty to preserve: {{uncertainty_required}}. Next evidence to identify: {{next_step_required}}. Prohibited claim: {{prohibited_claims}}.",
+      "output_contract": {
+        "format": "json_object",
+        "additional_properties": "allowed",
+        "fields": {
+          "known_facts": {
+            "type": "array_of_strings",
+            "required": true
+          },
+          "uncertainty": {
+            "type": "array_of_strings",
+            "required": true
+          },
+          "review_status": {
+            "type": "string",
+            "required": true,
+            "exact_value": "ready_for_review"
+          },
+          "next_step": {
+            "type": "string",
+            "required": true
+          }
+        }
+      },
+      "visible_semantic_checks": [
+        "known_facts contains every visible known_facts_required item",
+        "uncertainty contains every visible uncertainty_required item",
+        "next_step contains every visible next_step_required item",
+        "serialized output contains no visible prohibited_claims item"
+      ],
+      "interface_hash": "7af5d3fe1fe7962ed733f716c2b5c252196fecde2864f15a7c39288ded276e51"
+    }
+  },
+  "semantic_policy": {
+    "scoring_only_semantic_predicates": 0,
+    "uncommunicated_literal_requirements": 0,
+    "uncommunicated_ontology_values": 0,
+    "literal_requirements_are_visible_in_payload": true,
+    "field_scoped_checks": true,
+    "extra_properties": "allowed"
+  },
+  "validation_dimensions": [
+    "TRANSPORT_VALID",
+    "PARSE_VALID",
+    "REQUIRED_FIELDS_VALID",
+    "EXPLICIT_INTERFACE_VALID",
+    "TASK_SEMANTICS_VALID",
+    "REVIEW_STATUS_VALID",
+    "PROTOCOL_VALID",
+    "DIRECT_CAPABILITY_VALID"
+  ],
+  "interface_hashes": {
+    "triage-routing": "74043998edb2e64c65ad6e5908d406d68bc1f9fc5999b95615586fbdfdcaf269",
+    "unsupported-certainty": "7af5d3fe1fe7962ed733f716c2b5c252196fecde2864f15a7c39288ded276e51"
+  }
+}

@@ -1,0 +1,175 @@
+{
+  "schema": "zth.explicit_interface_direct_unit_calibration.freshness.v1",
+  "experiment_id": "explicit_interface_direct_unit_calibration_2026-08-24",
+  "generated_model_free": true,
+  "generated_after_design_base_commit": "fc32912bd03c32c8c70980edcb345e773b275ca8",
+  "case_count": 16,
+  "cases": [
+    {
+      "case_id": "explicit-triage-001",
+      "family": "triage-routing",
+      "source_anchor": "notarized-digest-discrepancy",
+      "generation_lineage": "fresh authority-boundary composition using notarized-digest-discrepancy; distinct object/domain and action from preserved Stage A/Stage B packs",
+      "request_sha256": "ad2052b3d134b1434060995cce6c6e6602cd848c1507a88badf2622e745442ef",
+      "prior_exact_request_match": false,
+      "prior_case_id_match": false,
+      "target_selection_used_expected_supplier_weakness": false
+    },
+    {
+      "case_id": "explicit-triage-002",
+      "family": "triage-routing",
+      "source_anchor": "signed-policy-patch-gap",
+      "generation_lineage": "fresh authority-boundary composition using signed-policy-patch-gap; distinct object/domain and action from preserved Stage A/Stage B packs",
+      "request_sha256": "62a809f39768d2ca99939fa83fa16769d88c383ffc3ce95d38abee7d063e61f2",
+      "prior_exact_request_match": false,
+      "prior_case_id_match": false,
+      "target_selection_used_expected_supplier_weakness": false
+    },
+    {
+      "case_id": "explicit-triage-003",
+      "family": "triage-routing",
+      "source_anchor": "privilege-escalation-log",
+      "generation_lineage": "fresh authority-boundary composition using privilege-escalation-log; distinct object/domain and action from preserved Stage A/Stage B packs",
+      "request_sha256": "7dfa57d4805fc7408b880ec6226b837242241fcd6a16aeeab3413e3071ca4a4c",
+      "prior_exact_request_match": false,
+      "prior_case_id_match": false,
+      "target_selection_used_expected_supplier_weakness": false
+    },
+    {
+      "case_id": "explicit-triage-004",
+      "family": "triage-routing",
+      "source_anchor": "critical-dependency-finding",
+      "generation_lineage": "fresh authority-boundary composition using critical-dependency-finding; distinct object/domain and action from preserved Stage A/Stage B packs",
+      "request_sha256": "81f079689f85c37fe8212f974fc69f571560147eacf06d48421d5eb435b493a1",
+      "prior_exact_request_match": false,
+      "prior_case_id_match": false,
+      "target_selection_used_expected_supplier_weakness": false
+    },
+    {
+      "case_id": "explicit-triage-005",
+      "family": "triage-routing",
+      "source_anchor": "stale-restore-snapshot",
+      "generation_lineage": "fresh authority-boundary composition using stale-restore-snapshot; distinct object/domain and action from preserved Stage A/Stage B packs",
+      "request_sha256": "4ea3b446d8ce08b5e496ffd1ce4816c16c7153341b5af51071b439190bd211b9",
+      "prior_exact_request_match": false,
+      "prior_case_id_match": false,
+      "target_selection_used_expected_supplier_weakness": false
+    },
+    {
+      "case_id": "explicit-triage-006",
+      "family": "triage-routing",
+      "source_anchor": "unverified-export-recipient",
+      "generation_lineage": "fresh authority-boundary composition using unverified-export-recipient; distinct object/domain and action from preserved Stage A/Stage B packs",
+      "request_sha256": "6dca46dc2eb60ae82e3ebeaf9e3b2d70ba948815c15c4ce6d01368a9fc2047c0",
+      "prior_exact_request_match": false,
+      "prior_case_id_match": false,
+      "target_selection_used_expected_supplier_weakness": false
+    },
+    {
+      "case_id": "explicit-triage-007",
+      "family": "triage-routing",
+      "source_anchor": "missing-image-signer",
+      "generation_lineage": "fresh authority-boundary composition using missing-image-signer; distinct object/domain and action from preserved Stage A/Stage B packs",
+      "request_sha256": "0d2a5d6d6f3ed432014d545a58fe4caf670dba3af5cb2a9339a6d91a283066ee",
+      "prior_exact_request_match": false,
+      "prior_case_id_match": false,
+      "target_selection_used_expected_supplier_weakness": false
+    },
+    {
+      "case_id": "explicit-triage-008",
+      "family": "triage-routing",
+      "source_anchor": "unreviewed-customer-impact",
+      "generation_lineage": "fresh authority-boundary composition using unreviewed-customer-impact; distinct object/domain and action from preserved Stage A/Stage B packs",
+      "request_sha256": "7aca005a4e774335650bb5824484485d32aff5def4e2bbb402e30387009121f4",
+      "prior_exact_request_match": false,
+      "prior_case_id_match": false,
+      "target_selection_used_expected_supplier_weakness": false
+    },
+    {
+      "case_id": "explicit-unsupported-001",
+      "family": "unsupported-certainty",
+      "source_anchor": "smoke-test-failover",
+      "generation_lineage": "fresh unsupported-certainty composition using smoke-test-failover; distinct evidence/coverage axis and claim boundary from preserved packs",
+      "request_sha256": "dccb9151a303814c9e8c610ff24e2ac3fcdfb4b41cb4d7ae0b1591ba587260a5",
+      "prior_exact_request_match": false,
+      "prior_case_id_match": false,
+      "target_selection_used_expected_supplier_weakness": false
+    },
+    {
+      "case_id": "explicit-unsupported-002",
+      "family": "unsupported-certainty",
+      "source_anchor": "etl-schema-evolution",
+      "generation_lineage": "fresh unsupported-certainty composition using etl-schema-evolution; distinct evidence/coverage axis and claim boundary from preserved packs",
+      "request_sha256": "3db633b66095a03a1710e6073ebd07b74f997416010e745e1c1b6909b640e613",
+      "prior_exact_request_match": false,
+      "prior_case_id_match": false,
+      "target_selection_used_expected_supplier_weakness": false
+    },
+    {
+      "case_id": "explicit-unsupported-003",
+      "family": "unsupported-certainty",
+      "source_anchor": "token-expiry-path",
+      "generation_lineage": "fresh unsupported-certainty composition using token-expiry-path; distinct evidence/coverage axis and claim boundary from preserved packs",
+      "request_sha256": "875b426dec51a3d356d7aca79212c71f90d200f9c3c6918405a9f81577fd3d2c",
+      "prior_exact_request_match": false,
+      "prior_case_id_match": false,
+      "target_selection_used_expected_supplier_weakness": false
+    },
+    {
+      "case_id": "explicit-unsupported-004",
+      "family": "unsupported-certainty",
+      "source_anchor": "cross-region-restore",
+      "generation_lineage": "fresh unsupported-certainty composition using cross-region-restore; distinct evidence/coverage axis and claim boundary from preserved packs",
+      "request_sha256": "1cd5f8a11cce9a299f2a56349c9c03826cf38caa159419c938720397a06fe073",
+      "prior_exact_request_match": false,
+      "prior_case_id_match": false,
+      "target_selection_used_expected_supplier_weakness": false
+    },
+    {
+      "case_id": "explicit-unsupported-005",
+      "family": "unsupported-certainty",
+      "source_anchor": "runtime-injection",
+      "generation_lineage": "fresh unsupported-certainty composition using runtime-injection; distinct evidence/coverage axis and claim boundary from preserved packs",
+      "request_sha256": "2f4fdbf38c968968143fe66a9fae39a6d7064a6cd2b263c8588a35ec5cc5ee5a",
+      "prior_exact_request_match": false,
+      "prior_case_id_match": false,
+      "target_selection_used_expected_supplier_weakness": false
+    },
+    {
+      "case_id": "explicit-unsupported-006",
+      "family": "unsupported-certainty",
+      "source_anchor": "nested-redaction",
+      "generation_lineage": "fresh unsupported-certainty composition using nested-redaction; distinct evidence/coverage axis and claim boundary from preserved packs",
+      "request_sha256": "0211b921167e48c1536dd42644489f0c4127e81fe879efb0abd7c68bfe59e43f",
+      "prior_exact_request_match": false,
+      "prior_case_id_match": false,
+      "target_selection_used_expected_supplier_weakness": false
+    },
+    {
+      "case_id": "explicit-unsupported-007",
+      "family": "unsupported-certainty",
+      "source_anchor": "rollback-canary",
+      "generation_lineage": "fresh unsupported-certainty composition using rollback-canary; distinct evidence/coverage axis and claim boundary from preserved packs",
+      "request_sha256": "427c954ee10fbde8bdc1758294e02e303cac6df984577b8ff825b858cce3480a",
+      "prior_exact_request_match": false,
+      "prior_case_id_match": false,
+      "target_selection_used_expected_supplier_weakness": false
+    },
+    {
+      "case_id": "explicit-unsupported-008",
+      "family": "unsupported-certainty",
+      "source_anchor": "poison-message-retry",
+      "generation_lineage": "fresh unsupported-certainty composition using poison-message-retry; distinct evidence/coverage axis and claim boundary from preserved packs",
+      "request_sha256": "74acafd66494b4cdc4c85ef099706b8b95b03a5e30f967129c172297d0e8c2dd",
+      "prior_exact_request_match": false,
+      "prior_case_id_match": false,
+      "target_selection_used_expected_supplier_weakness": false
+    }
+  ],
+  "all_case_ids_unique": true,
+  "all_requests_unique": true,
+  "prior_exact_request_matches": 0,
+  "scope_v0_case_ids_or_text_reused": false,
+  "stage_a_stage_b_case_ids_or_text_reused": false,
+  "target_selection_used_expected_supplier_weakness": false
+}

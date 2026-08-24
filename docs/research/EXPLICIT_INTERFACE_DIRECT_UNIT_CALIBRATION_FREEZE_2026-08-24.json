@@ -1,0 +1,110 @@
+{
+  "schema": "zth.explicit_interface_direct_unit_calibration.freeze.v1",
+  "experiment_id": "explicit_interface_direct_unit_calibration_2026-08-24",
+  "design_id": "explicit_interface_direct_unit_calibration_design_v1",
+  "status": "frozen_unexecuted",
+  "freeze_base_commit": "fc32912bd03c32c8c70980edcb345e773b275ca8",
+  "prior_stage_b_result_commit": "8f828328a0aeb4062de83e17a16a2aef0b6f4631",
+  "prior_stage_b_validity_diagnosis_commit": "fc32912bd03c32c8c70980edcb345e773b275ca8",
+  "preserved_prior_evidence": {
+    "docs/research/CLEAN_GRANULARITY_REPLICATION_STAGE_B_FREEZE_2026-08-24.json": "80555c53bb69cfd745bcb5ef97e55856ffa273d4785291a555633f63ccf83b36",
+    "docs/research/CLEAN_GRANULARITY_REPLICATION_STAGE_B_RESULTS_2026-08-24.md": "060ab70db49664dc6c12288d2b329d0f1f70d6e44b0b2ecb572bb64721d74309",
+    "docs/research/CLEAN_GRANULARITY_REPLICATION_STAGE_B_RESULTS_MATRIX_2026-08-24.json": "5e0ec44f7675b84e8ccf34995141c02f57fb979795d0752bfac76bec61464cd0",
+    "docs/research/CLEAN_GRANULARITY_REPLICATION_STAGE_B_VALIDITY_DIAGNOSIS_2026-08-24.md": "29b7f66db559737f8453508ae424bbb66e5042ed7ca2aa15cfd162083f3375d8",
+    "docs/research/CLEAN_GRANULARITY_REPLICATION_STAGE_B_VALIDITY_DIAGNOSIS_MATRIX_2026-08-24.json": "099633e587700b96273108237a396cf4d09f132c141175894e33997a98630ca4"
+  },
+  "new_interface_id": true,
+  "old_bounded_evidence_transfer_permitted": false,
+  "selected_families": [
+    "triage-routing",
+    "unsupported-certainty"
+  ],
+  "case_count": 16,
+  "cases_per_family": {
+    "triage-routing": 8,
+    "unsupported-certainty": 8
+  },
+  "case_order": [
+    "explicit-triage-001",
+    "explicit-triage-002",
+    "explicit-triage-003",
+    "explicit-triage-004",
+    "explicit-triage-005",
+    "explicit-triage-006",
+    "explicit-triage-007",
+    "explicit-triage-008",
+    "explicit-unsupported-001",
+    "explicit-unsupported-002",
+    "explicit-unsupported-003",
+    "explicit-unsupported-004",
+    "explicit-unsupported-005",
+    "explicit-unsupported-006",
+    "explicit-unsupported-007",
+    "explicit-unsupported-008"
+  ],
+  "supplier_arms": [
+    "local_teacher",
+    "external_teacher"
+  ],
+  "planned_local_calls": 16,
+  "planned_external_calls": 16,
+  "planned_supplier_calls": 32,
+  "sample_size_frozen_before_outcomes": true,
+  "outcome_conditional_sample_extension_permitted": false,
+  "contradiction_reserve_present": false,
+  "direct_competence_unit": {
+    "supplier_role": "DIRECT_RESPONDER",
+    "downstream_dependencies": [],
+    "validated_artifact": "direct supplier JSON response",
+    "old_hidden_interface_evidence_pooled": false
+  },
+  "semantic_controls": {
+    "scoring_only_semantic_predicates": 0,
+    "uncommunicated_literal_requirements": 0,
+    "uncommunicated_ontology_values": 0,
+    "explicit_interface_is_new_competence_unit": true,
+    "validation_dimensions_separate": [
+      "TRANSPORT_VALID",
+      "PARSE_VALID",
+      "REQUIRED_FIELDS_VALID",
+      "EXPLICIT_INTERFACE_VALID",
+      "TASK_SEMANTICS_VALID",
+      "REVIEW_STATUS_VALID",
+      "PROTOCOL_VALID",
+      "DIRECT_CAPABILITY_VALID"
+    ]
+  },
+  "future_policy_gate": {
+    "future_replication_conditional_on_natural_disagreement": true,
+    "manufactured_policy_disagreement_permitted": false,
+    "future_broad_policy_aggregation_rule_selected": false,
+    "future_bounded_policy_selected": false
+  },
+  "firewall": {
+    "preflight_may_verify_scoring_hashes": true,
+    "acquisition_may_open_evaluator": false,
+    "acquisition_may_load_evaluator_semantics": false,
+    "evaluator_runtime_influence": 0,
+    "evaluator_supplier_visibility": false,
+    "missing_evaluator_acquisition_regression": "pass"
+  },
+  "artifact_hashes": {
+    "interface": "7ca9d62424f421d58cc8710c06e585419dd14f67e2bad531c04ae99737d6fef3",
+    "runtime_manifest": "d375eb7639582d942a437a3d743280c4fd2a3c7ab7477321e20bf6e712fab19c",
+    "evaluator_cases": "31f91f9768e37c8e9cf4718497fe2f74633c5453b77f853cf160525e088f2427",
+    "payload_manifest": "117dba94861d1d454c46e787bcaa0ec57783f448b3fe430aa2400c09e158cd08",
+    "freshness_audit": "d0d1aa93ef21ff758a7d47078662471076f3b6779801d115dc5d0f89916d7955"
+  },
+  "contamination_audit": {
+    "target_outcomes": 0,
+    "supplier_calls": 0,
+    "model_calls": 0,
+    "new_response_artifacts": 0,
+    "new_result_artifacts": 0,
+    "historical_stage_a_stage_b_artifacts_mutated": false,
+    "targets_fresh": true,
+    "runtime_evaluator_influence": 0
+  },
+  "characterization": "EXPLICIT_INTERFACE_DIRECT_UNIT_CALIBRATION_FROZEN_UNEXECUTED",
+  "next_decision": "EXECUTE_EXPLICIT_INTERFACE_DIRECT_UNIT_CALIBRATION"
+}
