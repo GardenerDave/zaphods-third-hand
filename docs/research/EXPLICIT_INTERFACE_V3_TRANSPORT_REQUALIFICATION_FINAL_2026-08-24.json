@@ -1,0 +1,45 @@
+{
+  "schema": "zth.explicit_interface_v3.transport_requalification_final",
+  "current_base_commit": "b3367222175d39031210a5c9cc5a188864987b48",
+  "previous_failed_qualification_preserved": true,
+  "v2_mutated": false,
+  "local_transport_qualified": true,
+  "external_transport_qualified": true,
+  "local": {
+    "base_url": "http://192.168.1.16:8080/v1",
+    "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "models_response_sha256": "56a4a28d039d1e378d561319b17ae0da276c2806231105c6bbadd21979fb20a7",
+    "request_url": "http://192.168.1.16:8080/v1/chat/completions",
+    "response": "TRANSPORT_OK",
+    "response_sha256": "52c39f2b1f4fa8585552879bc993f277904438f439a300241bf0d895a634139a",
+    "completion_calls": 1,
+    "status": "ok"
+  },
+  "external": {
+    "run_dir": ".work/model_size_supplier_floor/explicit_interface_v3_transport_requalification_2026-08-24/external_run_20260824T212000Z",
+    "codex_home": "/tmp/zth_v3_codex_home",
+    "auth_precheck": "authenticated_chatgpt",
+    "authentication_mechanism_type": "file-backed ChatGPT tokens",
+    "wrapper_sha256": "2c5fcaf0727bdf466e21d660c927e63d23ecb67857949b2ef21e7e599297ceab",
+    "codex_cli_version": "codex-cli 0.146.0",
+    "cwd": "/tmp",
+    "returncode": 0,
+    "stdout": "TRANSPORT_OK",
+    "stdout_sha256": "52c39f2b1f4fa8585552879bc993f277904438f439a300241bf0d895a634139a",
+    "stderr_sha256": "3aec8674d33f25fbfe0486a4009e60f3e6ff8a6a025262ab13b2d641fe78a9b1",
+    "model_produced_response": true,
+    "repository_mutation": false,
+    "tools_mechanically_disabled": false,
+    "tool_calls_observed": "BEST_AVAILABLE_OBSERVATION",
+    "repository_access_observed": "BEST_AVAILABLE_OBSERVATION"
+  },
+  "calls": {
+    "new_local_qualification_calls": 1,
+    "new_external_qualification_calls": 1,
+    "v2_experiment_calls": 0,
+    "v3_experiment_calls": 0,
+    "retries": 0,
+    "replays": 0
+  },
+  "next_decision": "FREEZE_EXPLICIT_INTERFACE_DIRECT_UNIT_CALIBRATION_V3"
+}

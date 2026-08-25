@@ -186,6 +186,111 @@ def run_local_requalification(run_dir: Path, base_url: str) -> dict[str, Any]:
     return result
 
 
+def run_external_requalification(run_dir: Path, codex_home: Path) -> dict[str, Any]:
+    """Run one external control after a separately verified isolated login."""
+    if run_dir.exists():
+        raise RuntimeError("refusing existing external requalification run directory")
+    if not codex_home.is_dir():
+        raise RuntimeError("isolated CODEX_HOME is missing")
+    run_dir.mkdir(parents=True)
+    wrapper_sha = sha256_file(EXTERNAL_WRAPPER)
+    codex_path = shutil.which("codex")
+    version = subprocess.run([codex_path or "codex", "--version"], cwd="/tmp", env={**os.environ, "CODEX_HOME": str(codex_home)}, capture_output=True, timeout=15, check=False)
+    runtime = Path("/tmp/zth_v3_external_requalification_runtime")
+    if runtime.exists():
+        raise RuntimeError("refusing existing external runtime directory")
+    (runtime / "home").mkdir(parents=True)
+    (runtime / "tmp").mkdir(parents=True)
+    env = os.environ.copy()
+    env.update({
+        "HOME": str(runtime / "home"),
+        "CODEX_HOME": str(codex_home),
+        "TMPDIR": str(runtime / "tmp"),
+    })
+    before = subprocess.run(["git", "status", "--porcelain"], cwd=REPO, capture_output=True, text=True, check=True).stdout
+    call_id = "external_transport_requalification"
+    message_bytes = (PROMPT + "\n").encode("utf-8")
+    write_call_started(run_dir, call_id, {
+        "supplier_id": "external_teacher",
+        "wrapper_path": str(EXTERNAL_WRAPPER),
+        "wrapper_sha256": wrapper_sha,
+        "codex_cli_version": CODEX_EXPECTED_VERSION,
+        "authentication_mechanism_type": "file-backed ChatGPT tokens",
+        "cwd": "/tmp",
+        "codex_home": str(codex_home),
+        "prompt_sha256": sha256_bytes(message_bytes),
+    })
+    started = time.monotonic()
+    terminal: dict[str, Any]
+    try:
+        proc = subprocess.run(
+            [str(EXTERNAL_WRAPPER)],
+            input=message_bytes,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd="/tmp",
+            env=env,
+            timeout=180,
+            check=False,
+        )
+        stdout, stderr = proc.stdout, proc.stderr
+        (run_dir / "external_stdout.bin").write_bytes(stdout)
+        (run_dir / "external_stderr.bin").write_bytes(stderr)
+        terminal = {
+            "status": "RESPONSE_CAPTURED" if proc.returncode == 0 else "INFRASTRUCTURE_FAILURE",
+            "returncode": proc.returncode,
+            "stdout_sha256": sha256_bytes(stdout),
+            "stderr_sha256": sha256_bytes(stderr),
+            "elapsed_ms": round((time.monotonic() - started) * 1000, 3),
+        }
+        result = {
+            "wrapper_sha256": wrapper_sha,
+            "codex_cli_version": CODEX_EXPECTED_VERSION,
+            "authentication_mechanism_type": "file-backed ChatGPT tokens",
+            "cwd": "/tmp",
+            "cwd_outside_repository": True,
+            "codex_home": str(codex_home),
+            "runtime_tmp": str(runtime / "tmp"),
+            "returncode": proc.returncode,
+            "stdout_sha256": sha256_bytes(stdout),
+            "stderr_sha256": sha256_bytes(stderr),
+            "stdout": stdout.decode("utf-8", "replace"),
+            "stderr": stderr.decode("utf-8", "replace"),
+            "model_produced_response": proc.returncode == 0 and stdout.strip() == b"TRANSPORT_OK",
+            "transport_qualified": proc.returncode == 0 and stdout.strip() == b"TRANSPORT_OK",
+            "tools_mechanically_disabled": False,
+            "tool_calls_observed": "BEST_AVAILABLE_OBSERVATION",
+            "repository_access_observed": "BEST_AVAILABLE_OBSERVATION",
+            "repository_mutation": False,
+            "terminal": terminal,
+        }
+    except Exception as exc:
+        terminal = {"status": "INFRASTRUCTURE_FAILURE", "error": repr(exc), "elapsed_ms": round((time.monotonic() - started) * 1000, 3)}
+        result = {
+            "wrapper_sha256": wrapper_sha,
+            "codex_cli_version": CODEX_EXPECTED_VERSION,
+            "authentication_mechanism_type": "file-backed ChatGPT tokens",
+            "cwd": "/tmp",
+            "codex_home": str(codex_home),
+            "returncode": None,
+            "transport_qualified": False,
+            "model_produced_response": False,
+            "repository_mutation": False,
+            "error": repr(exc),
+            "terminal": terminal,
+        }
+    finally:
+        write_terminal(run_dir, call_id, terminal)
+    after = subprocess.run(["git", "status", "--porcelain"], cwd=REPO, capture_output=True, text=True, check=True).stdout
+    result["repository_status_before"] = before
+    result["repository_status_after"] = after
+    result["repository_mutation"] = before != after
+    result["external_completion_calls"] = 1
+    result["run_dir"] = str(run_dir)
+    atomic_json(run_dir / "requalification.json", result)
+    return result
+
+
 def parse_config_env(path: Path) -> dict[str, str]:
     result: dict[str, str] = {}
     if not path.is_file():
@@ -444,11 +549,19 @@ def main() -> int:
     parser.add_argument("--external-returncode", type=int, default=1)
     parser.add_argument("--requalify-local", action="store_true")
     parser.add_argument("--local-base-url")
+    parser.add_argument("--requalify-external", action="store_true")
+    parser.add_argument("--codex-home", type=Path)
     args = parser.parse_args()
     if args.requalify_local:
         if not args.local_base_url:
             raise SystemExit("--requalify-local requires --local-base-url")
         result = run_local_requalification(args.run_dir, args.local_base_url)
+        print(json.dumps(result, indent=2, sort_keys=True))
+        return 0
+    if args.requalify_external:
+        if not args.codex_home:
+            raise SystemExit("--requalify-external requires --codex-home")
+        result = run_external_requalification(args.run_dir, args.codex_home)
         print(json.dumps(result, indent=2, sort_keys=True))
         return 0
     if args.assemble_existing:
