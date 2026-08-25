@@ -55,6 +55,137 @@ def atomic_json(path: Path, value: Any) -> None:
     tmp.replace(path)
 
 
+def write_call_started(run_dir: Path, call_id: str, metadata: dict[str, Any]) -> None:
+    atomic_json(run_dir / f"{call_id}.call_started.json", {
+        "call_id": call_id,
+        "status": "CALL_STARTED",
+        "model_calls": 1,
+        **metadata,
+    })
+
+
+def write_terminal(run_dir: Path, call_id: str, terminal: dict[str, Any]) -> None:
+    """Write terminal evidence independently of result assembly."""
+    payload = {"call_id": call_id, "terminal": True, **terminal}
+    try:
+        atomic_json(run_dir / f"{call_id}.terminal.json", payload)
+    except Exception as exc:  # fail closed if normal JSON recording fails
+        fallback = run_dir / f"{call_id}.terminal_recording_failure.txt"
+        fallback.write_text(
+            json.dumps({"call_id": call_id, "recording_error": repr(exc), "terminal": payload}, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        raise
+
+
+def fetch_models_raw(base_url: str, timeout: int = 10) -> tuple[bytes, Any]:
+    url = base_url.rstrip("/") + "/models"
+    request = urllib.request.Request(
+        url,
+        headers={"Accept": "application/json", "Authorization": "Bearer dummy"},
+        method="GET",
+    )
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        raw = response.read()
+    return raw, json.loads(raw.decode("utf-8"))
+
+
+def local_requalification(run_dir: Path, base_url: str) -> dict[str, Any]:
+    """Run one gated local completion; no external path is touched."""
+    run_dir.mkdir(parents=True, exist_ok=True)
+    spec = resolve_worker_spec("handoff", base_url=base_url, model=LOCAL_MODEL, api="openai-chat")
+    models_url_value = models_url(spec)
+    if "<LAN_HOST>" in models_url_value:
+        raise RuntimeError("unresolved local endpoint placeholder")
+    models_raw, models_payload = fetch_models_raw(spec.base_url or base_url)
+    (run_dir / "models_response.bin").write_bytes(models_raw)
+    model_ids = [
+        str(item["id"])
+        for item in (models_payload.get("data", []) if isinstance(models_payload, dict) else [])
+        if isinstance(item, dict) and item.get("id")
+    ]
+    if model_ids != [LOCAL_MODEL]:
+        raise RuntimeError(f"authoritative model inventory mismatch: {model_ids!r}")
+    call_id = "local_transport_requalification"
+    message_bytes = (PROMPT + "\n").encode("utf-8")
+    write_call_started(run_dir, call_id, {
+        "supplier_id": "local_teacher",
+        "base_url": spec.base_url,
+        "request_url": completion_url(spec),
+        "model": LOCAL_MODEL,
+        "prompt_sha256": sha256_bytes(message_bytes),
+    })
+    started = time.monotonic()
+    response: Any = None
+    error: str | None = None
+    try:
+        response = call_worker(spec, PROMPT, max_tokens=32, timeout=120)
+        raw = response.content.encode("utf-8")
+        (run_dir / "local_response.bin").write_bytes(raw)
+        terminal = {
+            "status": "RESPONSE_CAPTURED",
+            "response_status": response.status,
+            "response_sha256": sha256_bytes(raw),
+            "response_nonempty": bool(raw.strip()),
+            "request_url": response.request_url,
+            "elapsed_ms": round((time.monotonic() - started) * 1000, 3),
+        }
+        return {
+            "transport_qualified": response.status == "ok" and bool(raw.strip()),
+            "base_url": spec.base_url,
+            "request_url": response.request_url,
+            "model": LOCAL_MODEL,
+            "models_response_sha256": sha256_bytes(models_raw),
+            "model_ids": model_ids,
+            "response_status": response.status,
+            "response_sha256": sha256_bytes(raw),
+            "response_text": response.content,
+            "response_metadata": response.metadata(),
+            "completion_calls": 1,
+            "models_get_calls": 1,
+            "elapsed_ms": terminal["elapsed_ms"],
+            "terminal": terminal,
+        }
+    except Exception as exc:
+        error = repr(exc)
+        terminal = {
+            "status": "INFRASTRUCTURE_FAILURE",
+            "error": error,
+            "elapsed_ms": round((time.monotonic() - started) * 1000, 3),
+        }
+        return {
+            "transport_qualified": False,
+            "base_url": spec.base_url,
+            "request_url": completion_url(spec),
+            "model": LOCAL_MODEL,
+            "models_response_sha256": sha256_bytes(models_raw),
+            "model_ids": model_ids,
+            "completion_calls": 1,
+            "models_get_calls": 1,
+            "error": error,
+            "terminal": terminal,
+        }
+    finally:
+        if call_id not in {p.name.removesuffix(".terminal.json") for p in run_dir.glob("*.terminal.json")}:
+            write_terminal(run_dir, call_id, terminal)
+
+
+def run_local_requalification(run_dir: Path, base_url: str) -> dict[str, Any]:
+    if run_dir.exists():
+        raise RuntimeError("refusing existing requalification run directory")
+    run_dir.mkdir(parents=True)
+    result = {
+        "schema": "zth.explicit_interface_v3.transport_requalification",
+        "previous_qualification_commit": "8e9d567e2898fe11231dcd563a0b66845228213d",
+        "v2_preserved": True,
+        "v2_or_v3_experiment_calls": 0,
+        "external_completion_calls": 0,
+        "local": local_requalification(run_dir, base_url),
+    }
+    atomic_json(run_dir / "requalification.json", result)
+    return result
+
+
 def parse_config_env(path: Path) -> dict[str, str]:
     result: dict[str, str] = {}
     if not path.is_file():
@@ -183,23 +314,40 @@ def external_transport(run_dir: Path) -> dict[str, Any]:
         "CODEX_HOME": str(runtime / "codex_home"),
         "TMPDIR": str(runtime),
     })
+    call_id = "external_transport_qualification"
+    message_bytes = (PROMPT + "\n").encode("utf-8")
+    write_call_started(run_dir, call_id, {
+        "supplier_id": "external_teacher",
+        "wrapper_path": str(EXTERNAL_WRAPPER),
+        "cwd": "/tmp",
+        "prompt_sha256": sha256_bytes(message_bytes),
+    })
     started = time.monotonic()
-    proc = subprocess.run(
-        [str(EXTERNAL_WRAPPER)],
-        input=(PROMPT + "\n").encode("utf-8"),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        cwd="/tmp",
-        env=env,
-        timeout=180,
-        check=False,
-    )
-    elapsed = round((time.monotonic() - started) * 1000, 3)
-    stdout = proc.stdout
-    stderr = proc.stderr
-    (run_dir / "external_stdout.bin").write_bytes(stdout)
-    (run_dir / "external_stderr.bin").write_bytes(stderr)
-    return {
+    terminal: dict[str, Any]
+    try:
+        proc = subprocess.run(
+            [str(EXTERNAL_WRAPPER)],
+            input=message_bytes,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd="/tmp",
+            env=env,
+            timeout=180,
+            check=False,
+        )
+        elapsed = round((time.monotonic() - started) * 1000, 3)
+        stdout = proc.stdout
+        stderr = proc.stderr
+        (run_dir / "external_stdout.bin").write_bytes(stdout)
+        (run_dir / "external_stderr.bin").write_bytes(stderr)
+        terminal = {
+            "status": "RESPONSE_CAPTURED" if proc.returncode == 0 else "INFRASTRUCTURE_FAILURE",
+            "returncode": proc.returncode,
+            "stdout_sha256": sha256_bytes(stdout),
+            "stderr_sha256": sha256_bytes(stderr),
+            "elapsed_ms": elapsed,
+        }
+        result = {
         "wrapper_path": str(EXTERNAL_WRAPPER),
         "wrapper_sha256": wrapper_sha,
         "codex_path": codex_path,
@@ -223,7 +371,25 @@ def external_transport(run_dir: Path) -> dict[str, Any]:
         "elapsed_ms": elapsed,
         "transport_qualified": proc.returncode == 0 and stdout.strip() == b"TRANSPORT_OK",
         "model_completion_calls": 1,
-    }
+        }
+    except Exception as exc:
+        terminal = {
+            "status": "INFRASTRUCTURE_FAILURE",
+            "error": repr(exc),
+            "elapsed_ms": round((time.monotonic() - started) * 1000, 3),
+        }
+        result = {
+            "wrapper_path": str(EXTERNAL_WRAPPER),
+            "wrapper_sha256": wrapper_sha,
+            "cwd": "/tmp",
+            "returncode": None,
+            "transport_qualified": False,
+            "model_completion_calls": 1,
+            "error": repr(exc),
+        }
+    finally:
+        write_terminal(run_dir, call_id, terminal)
+    return result
 
 
 def assemble_existing(run_dir: Path, external_returncode: int) -> dict[str, Any]:
@@ -276,7 +442,15 @@ def main() -> int:
     parser.add_argument("--run-dir", required=True, type=Path)
     parser.add_argument("--assemble-existing", action="store_true")
     parser.add_argument("--external-returncode", type=int, default=1)
+    parser.add_argument("--requalify-local", action="store_true")
+    parser.add_argument("--local-base-url")
     args = parser.parse_args()
+    if args.requalify_local:
+        if not args.local_base_url:
+            raise SystemExit("--requalify-local requires --local-base-url")
+        result = run_local_requalification(args.run_dir, args.local_base_url)
+        print(json.dumps(result, indent=2, sort_keys=True))
+        return 0
     if args.assemble_existing:
         if not args.run_dir.is_dir() or not (args.run_dir / "external_stdout.bin").is_file() or not (args.run_dir / "external_stderr.bin").is_file():
             raise SystemExit("existing raw qualification evidence is incomplete")
