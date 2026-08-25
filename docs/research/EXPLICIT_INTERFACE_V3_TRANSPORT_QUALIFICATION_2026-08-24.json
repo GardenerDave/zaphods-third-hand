@@ -1,0 +1,55 @@
+{
+  "schema": "zth.explicit_interface_v3.transport_qualification",
+  "v2_closeout_commit": "9145c17da7ce694bd55ba2c612a58029e75aa768",
+  "v2_characterization": "LOCAL_AND_EXTERNAL_CAPABILITY_NOT_MEASURED_DUE_TO_TRANSPORT_FAILURES",
+  "v2_mutated": false,
+  "qualification_run": ".work/model_size_supplier_floor/explicit_interface_v3_transport_qualification_2026-08-24/run_20260824T000000Z",
+  "local": {
+    "transport_qualified": false,
+    "authoritative_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf via JARVIS_LOCAL",
+    "configured_handoff_endpoint": "http://192.168.1.13:8083/v1",
+    "configured_handoff_model": "Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M",
+    "models_get_attempted": false,
+    "completion_attempted": false,
+    "completion_calls": 0,
+    "actual_v2_request_url": "http://<LAN_HOST>:8083/v1/chat/completions",
+    "request_construction_regression": {
+      "validated_base_url": "http://192.168.1.13:8083/v1",
+      "constructed_completion_url": "http://192.168.1.13:8083/v1/chat/completions",
+      "placeholder_absent": true,
+      "call_worker_consumes_validated_base_url": true
+    },
+    "root_cause": "capture path allowed resolve_worker_spec to fall back to the icm_spec placeholder when the optional override was absent",
+    "qualification_block": "no reachable configured endpoint exposing the authoritative 30B identity"
+  },
+  "external": {
+    "transport_qualified": false,
+    "wrapper_path": "/home/navigator/bin/zth-codex-teacher",
+    "wrapper_sha256": "2c5fcaf0727bdf466e21d660c927e63d23ecb67857949b2ef21e7e599297ceab",
+    "codex_version": "codex-cli 0.146.0",
+    "observed_native_model": "gpt-5.6-sol",
+    "cwd": "/tmp",
+    "isolated_writable_runtime_state": true,
+    "returncode": 1,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "082fd9aa9fb027337dc870862e89a6df4119e105be956f7d8f1c965998123383",
+    "model_produced_response": false,
+    "root_cause_v2": "Codex local state initialization was blocked by the read-only runtime",
+    "qualification_failure": "Codex service authentication returned 401 Unauthorized with missing bearer/basic authentication",
+    "tools_mechanically_disabled": false,
+    "tool_calls_observed": "BEST_AVAILABLE_OBSERVATION",
+    "repository_access_observed": "BEST_AVAILABLE_OBSERVATION"
+  },
+  "qualification_calls": {
+    "local_completion": 0,
+    "external_invocation": 1,
+    "external_model_produced_response": 0,
+    "v2_or_v3_experiment_calls": 0
+  },
+  "repository_mutation": false,
+  "v3_evaluator_note": {
+    "protocol_valid_transport_rule": "make PROTOCOL_VALID require TRANSPORT_VALID, or rename it PROHIBITED_ACTIONS_NOT_OBSERVED",
+    "local_request_error_terminal_disposition": "use explicit transport-failure disposition rather than RESPONSE_CAPTURED"
+  },
+  "next_decision": "FIX_FAILED_TRANSPORT_BEFORE_V3"
+}
