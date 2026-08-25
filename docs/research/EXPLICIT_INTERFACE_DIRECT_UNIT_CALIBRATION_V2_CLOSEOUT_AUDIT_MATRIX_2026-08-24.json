@@ -1,0 +1,40 @@
+{
+  "schema": "zth.explicit_interface_direct_unit_calibration_v2.closeout_audit.v1",
+  "run": ".work/model_size_supplier_floor/explicit_interface_direct_unit_calibration_v2/run_20260824T000000Z",
+  "schedule_sha256": "6cd43015d5cdb40034c073bc6185ea70b24d77e75ad5623954ebbd8fe981e121",
+  "evaluator_sha256": "db067b700711c91c8a22877a7b8170c517640b9f5e1723f8041d5b4a44f5d9fb",
+  "planned_terminal_arms": "32/32",
+  "local_arms": "16/16",
+  "external_arms": "16/16",
+  "raw_seal": true,
+  "terminal_arm_artifact_hash_coverage": "32/32",
+  "retries": 0,
+  "replays": 0,
+  "evaluator_file_access_during_acquisition": false,
+  "evaluator_semantics_loaded_during_acquisition": false,
+  "evaluator_runtime_influence": 0,
+  "local_direct_capability": "0/16",
+  "external_direct_capability": "0/16",
+  "local_transport_valid": "0/16",
+  "external_transport_valid": "0/16",
+  "local_valid_supplier_response_observed": false,
+  "external_valid_supplier_response_observed": false,
+  "external_failure_return_codes": {"1": 16},
+  "external_failure_signature": {
+    "count": 16,
+    "classification": "codex_cli_state_initialization_read_only_filesystem",
+    "stdout_nonempty": 0,
+    "model_response_observed": false
+  },
+  "local_failure_signature": {
+    "count": 16,
+    "classification": "local_http_endpoint_or_dns_configuration",
+    "request_url": "http://<LAN_HOST>:8083/v1/chat/completions",
+    "error": "<urlopen error [Errno -2] Name or service not known>"
+  },
+  "characterization": "LOCAL_AND_EXTERNAL_CAPABILITY_NOT_MEASURED_DUE_TO_TRANSPORT_FAILURES",
+  "closeout_supplier_calls": 0,
+  "closeout_model_calls": 0,
+  "closeout_external_inference_calls": 0,
+  "next_decision": "DESIGN_EXPLICIT_INTERFACE_V3_TRANSPORT_CORRECTION"
+}

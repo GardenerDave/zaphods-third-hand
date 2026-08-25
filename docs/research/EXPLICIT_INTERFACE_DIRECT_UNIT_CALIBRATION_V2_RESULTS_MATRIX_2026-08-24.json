@@ -1,0 +1,1705 @@
+{
+  "acquisition_integrity": {
+    "evaluator_access_during_acquisition": false,
+    "evaluator_runtime_influence": 0,
+    "evaluator_semantics_loaded_during_acquisition": false,
+    "external": 16,
+    "local": 16,
+    "planned": 32,
+    "processes_started": 1,
+    "replays": 0,
+    "retries": 0,
+    "second_process_started": false,
+    "terminal": 32
+  },
+  "closeout_calls": {
+    "external_inference_calls": 0,
+    "model_calls": 0,
+    "replays": 0,
+    "retries": 0,
+    "supplier_calls": 0
+  },
+  "external_transport_diagnosis": {
+    "failure_count": 16,
+    "failure_layer": "Codex CLI/wrapper initialization and read-only filesystem state; no model-produced response observed",
+    "heterogeneity": "identical",
+    "response_generation_observed": false,
+    "signatures": {
+      "codex_cli_state_initialization_read_only_filesystem": {
+        "count": 16,
+        "normalized_stderr": "warning: proceeding, even though we could not create path aliases: read-only file system (os error 30) error: failed to initialize in-process app-server client: read-only file system (os error 30)"
+      }
+    },
+    "stdout_nonempty_count": 0,
+    "unique_return_codes": {
+      "1": 16
+    }
+  },
+  "family_macro_aggregate_direct_explicit_v2": {
+    "external_teacher": {
+      "families_equal_weighted": true,
+      "valid_rate": 0.0
+    },
+    "local_teacher": {
+      "families_equal_weighted": true,
+      "valid_rate": 0.0
+    }
+  },
+  "family_supplier": {
+    "triage-routing|external_teacher": {
+      "DIRECT_CAPABILITY_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "EXPLICIT_INTERFACE_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "PARSE_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "PROTOCOL_VALID": {
+        "total": 8,
+        "valid": 8
+      },
+      "REQUIRED_FIELDS_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "REQUIRED_FIELD_TYPES_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "REVIEW_STATUS_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "TASK_SEMANTICS_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "TRANSPORT_VALID": {
+        "total": 8,
+        "valid": 0
+      }
+    },
+    "triage-routing|local_teacher": {
+      "DIRECT_CAPABILITY_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "EXPLICIT_INTERFACE_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "PARSE_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "PROTOCOL_VALID": {
+        "total": 8,
+        "valid": 8
+      },
+      "REQUIRED_FIELDS_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "REQUIRED_FIELD_TYPES_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "REVIEW_STATUS_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "TASK_SEMANTICS_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "TRANSPORT_VALID": {
+        "total": 8,
+        "valid": 0
+      }
+    },
+    "unsupported-certainty|external_teacher": {
+      "DIRECT_CAPABILITY_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "EXPLICIT_INTERFACE_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "PARSE_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "PROTOCOL_VALID": {
+        "total": 8,
+        "valid": 8
+      },
+      "REQUIRED_FIELDS_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "REQUIRED_FIELD_TYPES_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "REVIEW_STATUS_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "TASK_SEMANTICS_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "TRANSPORT_VALID": {
+        "total": 8,
+        "valid": 0
+      }
+    },
+    "unsupported-certainty|local_teacher": {
+      "DIRECT_CAPABILITY_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "EXPLICIT_INTERFACE_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "PARSE_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "PROTOCOL_VALID": {
+        "total": 8,
+        "valid": 8
+      },
+      "REQUIRED_FIELDS_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "REQUIRED_FIELD_TYPES_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "REVIEW_STATUS_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "TASK_SEMANTICS_VALID": {
+        "total": 8,
+        "valid": 0
+      },
+      "TRANSPORT_VALID": {
+        "total": 8,
+        "valid": 0
+      }
+    }
+  },
+  "interpretation": {
+    "characterization": "LOCAL_AND_EXTERNAL_CAPABILITY_NOT_MEASURED_DUE_TO_TRANSPORT_FAILURES",
+    "experimental_mechanism": "both_supplier_transport_failures_prevented_meaningful_matched_capability_comparison",
+    "external_direct_capability_evaluator_rate": {
+      "total": 16,
+      "valid": 0
+    },
+    "external_semantic_capability_observed": false,
+    "local_direct_capability_evaluator_rate": {
+      "total": 16,
+      "valid": 0
+    },
+    "local_semantic_capability_observed": false
+  },
+  "local_transport_diagnosis": {
+    "failure_layer": "local HTTP endpoint/DNS or configuration; all captured statuses were request_error",
+    "request_urls": {
+      "http://<LAN_HOST>:8083/v1/chat/completions": 16
+    },
+    "response_generation_observed": false,
+    "unique_errors": {
+      "<urlopen error [Errno -2] Name or service not known>": 16
+    }
+  },
+  "micro_aggregate_direct_explicit_v2": {
+    "external_teacher": {
+      "DIRECT_CAPABILITY_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "EXPLICIT_INTERFACE_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "PARSE_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "PROTOCOL_VALID": {
+        "total": 16,
+        "valid": 16
+      },
+      "REQUIRED_FIELDS_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "REQUIRED_FIELD_TYPES_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "REVIEW_STATUS_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "TASK_SEMANTICS_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "TRANSPORT_VALID": {
+        "total": 16,
+        "valid": 0
+      }
+    },
+    "local_teacher": {
+      "DIRECT_CAPABILITY_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "EXPLICIT_INTERFACE_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "PARSE_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "PROTOCOL_VALID": {
+        "total": 16,
+        "valid": 16
+      },
+      "REQUIRED_FIELDS_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "REQUIRED_FIELD_TYPES_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "REVIEW_STATUS_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "TASK_SEMANTICS_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "TRANSPORT_VALID": {
+        "total": 16,
+        "valid": 0
+      }
+    }
+  },
+  "provenance": {
+    "evaluator_cases_sha256": "d3db606f9fe642146d55ecc7f64daf95c785db8c4cc5505fcd6ba81cb703bcfb",
+    "evaluator_sha256": "db067b700711c91c8a22877a7b8170c517640b9f5e1723f8041d5b4a44f5d9fb",
+    "execution_manifest_status": "TERMINAL_COMPLETE",
+    "raw_seal": true,
+    "run": ".work/model_size_supplier_floor/explicit_interface_direct_unit_calibration_v2/run_20260824T000000Z",
+    "schedule_sha256": "6cd43015d5cdb40034c073bc6185ea70b24d77e75ad5623954ebbd8fe981e121",
+    "terminal_arm_artifact_hash_count": 32
+  },
+  "rows": [
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-triage-001",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 1,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 68,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": true,
+      "return_code": null,
+      "source_kind": "response_artifact",
+      "supplier_id": "local_teacher",
+      "terminal_disposition": "RESPONSE_CAPTURED",
+      "transport_classification": "model_response",
+      "transport_status": "request_error"
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-triage-001",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "no_response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 2,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 0,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": false,
+      "return_code": 1,
+      "source_kind": "no_response_artifact",
+      "supplier_id": "external_teacher",
+      "terminal_disposition": "EXTERNAL_NONZERO_EXIT",
+      "transport_classification": "transport_or_empty_failure",
+      "transport_status": null
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-triage-002",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "no_response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 3,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 0,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": false,
+      "return_code": 1,
+      "source_kind": "no_response_artifact",
+      "supplier_id": "external_teacher",
+      "terminal_disposition": "EXTERNAL_NONZERO_EXIT",
+      "transport_classification": "transport_or_empty_failure",
+      "transport_status": null
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-triage-002",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 4,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 68,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": true,
+      "return_code": null,
+      "source_kind": "response_artifact",
+      "supplier_id": "local_teacher",
+      "terminal_disposition": "RESPONSE_CAPTURED",
+      "transport_classification": "model_response",
+      "transport_status": "request_error"
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-triage-003",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 5,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 68,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": true,
+      "return_code": null,
+      "source_kind": "response_artifact",
+      "supplier_id": "local_teacher",
+      "terminal_disposition": "RESPONSE_CAPTURED",
+      "transport_classification": "model_response",
+      "transport_status": "request_error"
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-triage-003",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "no_response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 6,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 0,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": false,
+      "return_code": 1,
+      "source_kind": "no_response_artifact",
+      "supplier_id": "external_teacher",
+      "terminal_disposition": "EXTERNAL_NONZERO_EXIT",
+      "transport_classification": "transport_or_empty_failure",
+      "transport_status": null
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-triage-004",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "no_response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 7,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 0,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": false,
+      "return_code": 1,
+      "source_kind": "no_response_artifact",
+      "supplier_id": "external_teacher",
+      "terminal_disposition": "EXTERNAL_NONZERO_EXIT",
+      "transport_classification": "transport_or_empty_failure",
+      "transport_status": null
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-triage-004",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 8,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 68,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": true,
+      "return_code": null,
+      "source_kind": "response_artifact",
+      "supplier_id": "local_teacher",
+      "terminal_disposition": "RESPONSE_CAPTURED",
+      "transport_classification": "model_response",
+      "transport_status": "request_error"
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-triage-005",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 9,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 68,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": true,
+      "return_code": null,
+      "source_kind": "response_artifact",
+      "supplier_id": "local_teacher",
+      "terminal_disposition": "RESPONSE_CAPTURED",
+      "transport_classification": "model_response",
+      "transport_status": "request_error"
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-triage-005",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "no_response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 10,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 0,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": false,
+      "return_code": 1,
+      "source_kind": "no_response_artifact",
+      "supplier_id": "external_teacher",
+      "terminal_disposition": "EXTERNAL_NONZERO_EXIT",
+      "transport_classification": "transport_or_empty_failure",
+      "transport_status": null
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-triage-006",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "no_response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 11,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 0,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": false,
+      "return_code": 1,
+      "source_kind": "no_response_artifact",
+      "supplier_id": "external_teacher",
+      "terminal_disposition": "EXTERNAL_NONZERO_EXIT",
+      "transport_classification": "transport_or_empty_failure",
+      "transport_status": null
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-triage-006",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 12,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 68,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": true,
+      "return_code": null,
+      "source_kind": "response_artifact",
+      "supplier_id": "local_teacher",
+      "terminal_disposition": "RESPONSE_CAPTURED",
+      "transport_classification": "model_response",
+      "transport_status": "request_error"
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-triage-007",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 13,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 68,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": true,
+      "return_code": null,
+      "source_kind": "response_artifact",
+      "supplier_id": "local_teacher",
+      "terminal_disposition": "RESPONSE_CAPTURED",
+      "transport_classification": "model_response",
+      "transport_status": "request_error"
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-triage-007",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "no_response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 14,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 0,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": false,
+      "return_code": 1,
+      "source_kind": "no_response_artifact",
+      "supplier_id": "external_teacher",
+      "terminal_disposition": "EXTERNAL_NONZERO_EXIT",
+      "transport_classification": "transport_or_empty_failure",
+      "transport_status": null
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-triage-008",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "no_response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 15,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 0,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": false,
+      "return_code": 1,
+      "source_kind": "no_response_artifact",
+      "supplier_id": "external_teacher",
+      "terminal_disposition": "EXTERNAL_NONZERO_EXIT",
+      "transport_classification": "transport_or_empty_failure",
+      "transport_status": null
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-triage-008",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 16,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 68,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": true,
+      "return_code": null,
+      "source_kind": "response_artifact",
+      "supplier_id": "local_teacher",
+      "terminal_disposition": "RESPONSE_CAPTURED",
+      "transport_classification": "model_response",
+      "transport_status": "request_error"
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-unsupported-001",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "unsupported-certainty",
+      "ordinal": 17,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 68,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": true,
+      "return_code": null,
+      "source_kind": "response_artifact",
+      "supplier_id": "local_teacher",
+      "terminal_disposition": "RESPONSE_CAPTURED",
+      "transport_classification": "model_response",
+      "transport_status": "request_error"
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-unsupported-001",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "no_response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "unsupported-certainty",
+      "ordinal": 18,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 0,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": false,
+      "return_code": 1,
+      "source_kind": "no_response_artifact",
+      "supplier_id": "external_teacher",
+      "terminal_disposition": "EXTERNAL_NONZERO_EXIT",
+      "transport_classification": "transport_or_empty_failure",
+      "transport_status": null
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-unsupported-002",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "no_response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "unsupported-certainty",
+      "ordinal": 19,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 0,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": false,
+      "return_code": 1,
+      "source_kind": "no_response_artifact",
+      "supplier_id": "external_teacher",
+      "terminal_disposition": "EXTERNAL_NONZERO_EXIT",
+      "transport_classification": "transport_or_empty_failure",
+      "transport_status": null
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-unsupported-002",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "unsupported-certainty",
+      "ordinal": 20,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 68,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": true,
+      "return_code": null,
+      "source_kind": "response_artifact",
+      "supplier_id": "local_teacher",
+      "terminal_disposition": "RESPONSE_CAPTURED",
+      "transport_classification": "model_response",
+      "transport_status": "request_error"
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-unsupported-003",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "unsupported-certainty",
+      "ordinal": 21,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 68,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": true,
+      "return_code": null,
+      "source_kind": "response_artifact",
+      "supplier_id": "local_teacher",
+      "terminal_disposition": "RESPONSE_CAPTURED",
+      "transport_classification": "model_response",
+      "transport_status": "request_error"
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-unsupported-003",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "no_response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "unsupported-certainty",
+      "ordinal": 22,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 0,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": false,
+      "return_code": 1,
+      "source_kind": "no_response_artifact",
+      "supplier_id": "external_teacher",
+      "terminal_disposition": "EXTERNAL_NONZERO_EXIT",
+      "transport_classification": "transport_or_empty_failure",
+      "transport_status": null
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-unsupported-004",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "no_response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "unsupported-certainty",
+      "ordinal": 23,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 0,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": false,
+      "return_code": 1,
+      "source_kind": "no_response_artifact",
+      "supplier_id": "external_teacher",
+      "terminal_disposition": "EXTERNAL_NONZERO_EXIT",
+      "transport_classification": "transport_or_empty_failure",
+      "transport_status": null
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-unsupported-004",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "unsupported-certainty",
+      "ordinal": 24,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 68,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": true,
+      "return_code": null,
+      "source_kind": "response_artifact",
+      "supplier_id": "local_teacher",
+      "terminal_disposition": "RESPONSE_CAPTURED",
+      "transport_classification": "model_response",
+      "transport_status": "request_error"
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-unsupported-005",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "unsupported-certainty",
+      "ordinal": 25,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 68,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": true,
+      "return_code": null,
+      "source_kind": "response_artifact",
+      "supplier_id": "local_teacher",
+      "terminal_disposition": "RESPONSE_CAPTURED",
+      "transport_classification": "model_response",
+      "transport_status": "request_error"
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-unsupported-005",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "no_response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "unsupported-certainty",
+      "ordinal": 26,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 0,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": false,
+      "return_code": 1,
+      "source_kind": "no_response_artifact",
+      "supplier_id": "external_teacher",
+      "terminal_disposition": "EXTERNAL_NONZERO_EXIT",
+      "transport_classification": "transport_or_empty_failure",
+      "transport_status": null
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-unsupported-006",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "no_response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "unsupported-certainty",
+      "ordinal": 27,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 0,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": false,
+      "return_code": 1,
+      "source_kind": "no_response_artifact",
+      "supplier_id": "external_teacher",
+      "terminal_disposition": "EXTERNAL_NONZERO_EXIT",
+      "transport_classification": "transport_or_empty_failure",
+      "transport_status": null
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-unsupported-006",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "unsupported-certainty",
+      "ordinal": 28,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 68,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": true,
+      "return_code": null,
+      "source_kind": "response_artifact",
+      "supplier_id": "local_teacher",
+      "terminal_disposition": "RESPONSE_CAPTURED",
+      "transport_classification": "model_response",
+      "transport_status": "request_error"
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-unsupported-007",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "unsupported-certainty",
+      "ordinal": 29,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 68,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": true,
+      "return_code": null,
+      "source_kind": "response_artifact",
+      "supplier_id": "local_teacher",
+      "terminal_disposition": "RESPONSE_CAPTURED",
+      "transport_classification": "model_response",
+      "transport_status": "request_error"
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-unsupported-007",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "no_response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "unsupported-certainty",
+      "ordinal": 30,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 0,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": false,
+      "return_code": 1,
+      "source_kind": "no_response_artifact",
+      "supplier_id": "external_teacher",
+      "terminal_disposition": "EXTERNAL_NONZERO_EXIT",
+      "transport_classification": "transport_or_empty_failure",
+      "transport_status": null
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-unsupported-008",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "no_response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "unsupported-certainty",
+      "ordinal": 31,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 0,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": false,
+      "return_code": 1,
+      "source_kind": "no_response_artifact",
+      "supplier_id": "external_teacher",
+      "terminal_disposition": "EXTERNAL_NONZERO_EXIT",
+      "transport_classification": "transport_or_empty_failure",
+      "transport_status": null
+    },
+    {
+      "DIRECT_CAPABILITY_VALID": false,
+      "case_id": "explicit-v2-unsupported-008",
+      "dimensions": {
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": false,
+        "PARSE_VALID": false,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": false,
+        "REQUIRED_FIELD_TYPES_VALID": false,
+        "REVIEW_STATUS_VALID": false,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": false
+      },
+      "evaluator_input_source": "response_artifact",
+      "failure_dimensions": [
+        "TRANSPORT_VALID",
+        "PARSE_VALID",
+        "REQUIRED_FIELDS_VALID",
+        "REQUIRED_FIELD_TYPES_VALID",
+        "EXPLICIT_INTERFACE_VALID",
+        "TASK_SEMANTICS_VALID",
+        "REVIEW_STATUS_VALID"
+      ],
+      "family": "unsupported-certainty",
+      "ordinal": 32,
+      "protocol_observations": {
+        "evaluator_access_observed": false,
+        "repository_access_observed": false,
+        "tool_calls_observed": false
+      },
+      "raw_content_length": 68,
+      "raw_supplier_content_observed": false,
+      "response_artifact_present": true,
+      "return_code": null,
+      "source_kind": "response_artifact",
+      "supplier_id": "local_teacher",
+      "terminal_disposition": "RESPONSE_CAPTURED",
+      "transport_classification": "model_response",
+      "transport_status": "request_error"
+    }
+  ],
+  "supplier_summary": {
+    "external_teacher": {
+      "DIRECT_CAPABILITY_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "EXPLICIT_INTERFACE_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "PARSE_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "PROTOCOL_VALID": {
+        "total": 16,
+        "valid": 16
+      },
+      "REQUIRED_FIELDS_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "REQUIRED_FIELD_TYPES_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "REVIEW_STATUS_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "TASK_SEMANTICS_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "TRANSPORT_VALID": {
+        "total": 16,
+        "valid": 0
+      }
+    },
+    "local_teacher": {
+      "DIRECT_CAPABILITY_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "EXPLICIT_INTERFACE_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "PARSE_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "PROTOCOL_VALID": {
+        "total": 16,
+        "valid": 16
+      },
+      "REQUIRED_FIELDS_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "REQUIRED_FIELD_TYPES_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "REVIEW_STATUS_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "TASK_SEMANTICS_VALID": {
+        "total": 16,
+        "valid": 0
+      },
+      "TRANSPORT_VALID": {
+        "total": 16,
+        "valid": 0
+      }
+    }
+  }
+}
