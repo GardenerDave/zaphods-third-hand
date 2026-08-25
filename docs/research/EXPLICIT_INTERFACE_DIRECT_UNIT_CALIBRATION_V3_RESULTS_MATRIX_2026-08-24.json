@@ -1,0 +1,1128 @@
+{
+  "dimensions": [
+    "TRANSPORT_VALID",
+    "PARSE_VALID",
+    "REQUIRED_FIELDS_VALID",
+    "REQUIRED_FIELD_TYPES_VALID",
+    "EXPLICIT_INTERFACE_VALID",
+    "TASK_SEMANTICS_VALID",
+    "REVIEW_STATUS_VALID",
+    "PROHIBITED_ACTIONS_NOT_OBSERVED",
+    "PROTOCOL_VALID",
+    "DIRECT_CAPABILITY_VALID"
+  ],
+  "evaluation_external_inference_calls": 0,
+  "evaluation_model_calls": 0,
+  "evaluation_supplier_calls": 0,
+  "failure_dimensions": {
+    "by_family": {
+      "triage-routing": {
+        "TASK_SEMANTICS_VALID": 5
+      }
+    },
+    "by_supplier": {
+      "local_teacher": {
+        "TASK_SEMANTICS_VALID": 5
+      }
+    },
+    "by_supplier_family": {
+      "local_teacher|triage-routing": {
+        "TASK_SEMANTICS_VALID": 5
+      }
+    },
+    "overall": {
+      "TASK_SEMANTICS_VALID": 5
+    }
+  },
+  "family_macro_aggregate_direct_explicit_v3": {
+    "external_teacher": {
+      "equal_weight_rate": 1.0,
+      "family_rates": {
+        "triage-routing": 1.0,
+        "unsupported-certainty": 1.0
+      }
+    },
+    "local_teacher": {
+      "equal_weight_rate": 0.6875,
+      "family_rates": {
+        "triage-routing": 0.375,
+        "unsupported-certainty": 1.0
+      }
+    }
+  },
+  "group_summaries": {
+    "triage-routing|external_teacher": {
+      "DIRECT_CAPABILITY_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "EXPLICIT_INTERFACE_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "PARSE_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "PROHIBITED_ACTIONS_NOT_OBSERVED": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "PROTOCOL_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "REQUIRED_FIELDS_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "REQUIRED_FIELD_TYPES_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "REVIEW_STATUS_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "TASK_SEMANTICS_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "TRANSPORT_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "n": 8
+    },
+    "triage-routing|local_teacher": {
+      "DIRECT_CAPABILITY_VALID": {
+        "rate": 0.375,
+        "total": 8,
+        "valid": 3
+      },
+      "EXPLICIT_INTERFACE_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "PARSE_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "PROHIBITED_ACTIONS_NOT_OBSERVED": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "PROTOCOL_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "REQUIRED_FIELDS_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "REQUIRED_FIELD_TYPES_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "REVIEW_STATUS_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "TASK_SEMANTICS_VALID": {
+        "rate": 0.375,
+        "total": 8,
+        "valid": 3
+      },
+      "TRANSPORT_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "n": 8
+    },
+    "unsupported-certainty|external_teacher": {
+      "DIRECT_CAPABILITY_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "EXPLICIT_INTERFACE_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "PARSE_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "PROHIBITED_ACTIONS_NOT_OBSERVED": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "PROTOCOL_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "REQUIRED_FIELDS_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "REQUIRED_FIELD_TYPES_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "REVIEW_STATUS_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "TASK_SEMANTICS_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "TRANSPORT_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "n": 8
+    },
+    "unsupported-certainty|local_teacher": {
+      "DIRECT_CAPABILITY_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "EXPLICIT_INTERFACE_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "PARSE_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "PROHIBITED_ACTIONS_NOT_OBSERVED": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "PROTOCOL_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "REQUIRED_FIELDS_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "REQUIRED_FIELD_TYPES_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "REVIEW_STATUS_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "TASK_SEMANTICS_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "TRANSPORT_VALID": {
+        "rate": 1.0,
+        "total": 8,
+        "valid": 8
+      },
+      "n": 8
+    }
+  },
+  "interpretation_boundary": "V3 calibration cohort only; semantic capability was observable because all 32 transports produced captured responses; no population, general capability, routing superiority, or supplier qualification claim.",
+  "matched_pair_counts": {
+    "both_pass": 11,
+    "external_only": 5
+  },
+  "matched_pair_counts_by_family": {
+    "triage-routing|both_pass": 3,
+    "triage-routing|external_only": 5,
+    "unsupported-certainty|both_pass": 8
+  },
+  "micro_aggregate_direct_explicit_v3": {
+    "external_teacher": {
+      "rate": 1.0,
+      "total": 16,
+      "valid": 16
+    },
+    "local_teacher": {
+      "rate": 0.6875,
+      "total": 16,
+      "valid": 11
+    }
+  },
+  "provenance": {
+    "evaluator_cases_sha256": "91454cc877dcb27805fdc6288d1b7753bd079273babc7663cb334a79fe114698",
+    "evaluator_sha256": "3922879d7c740531d65c0af06b1d9fb0a667357867736783d0ccd6ccd20d5eda",
+    "execution_boundary_commit": "442ff0a875bc09135aeaf57193fa97f753c68115",
+    "execution_harness_sha256": "b51bb6458f2a1708928a3f9e657213ed622ed2e8332a652a5db54ea74e36299d",
+    "raw_seal": true,
+    "replays": 0,
+    "response_count": 32,
+    "retries": 0,
+    "run": ".work/model_size_supplier_floor/explicit_interface_direct_unit_calibration_v3/run_20260824T225000Z",
+    "schedule_sha256": "25d5107fdf23948a7419336e50386233be824a8d47574254c428699b5d2bbe61",
+    "transport_failures": 0
+  },
+  "rows": [
+    {
+      "case_id": "explicit-v3-triage-001",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "triage-routing",
+      "ordinal": 1,
+      "raw_supplier_content_sha256": "3c723366f3aeffe12e132d5c10fc4c88c59f780cbb40e7a403a930a539b41ebf",
+      "supplier_id": "local_teacher"
+    },
+    {
+      "case_id": "explicit-v3-triage-001",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "triage-routing",
+      "ordinal": 2,
+      "raw_supplier_content_sha256": "601ec23e5b3b190a33863bcec1563c15c88a6cb7cc286817d9eb8ac6053e65c5",
+      "supplier_id": "external_teacher"
+    },
+    {
+      "case_id": "explicit-v3-triage-002",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "triage-routing",
+      "ordinal": 3,
+      "raw_supplier_content_sha256": "8cca7fd1270f70f9dcbb7660437db5e14db63eb4316ac51e4fa055c7cec5eaff",
+      "supplier_id": "external_teacher"
+    },
+    {
+      "case_id": "explicit-v3-triage-002",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": false,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": false,
+      "failure_dimensions": [
+        "TASK_SEMANTICS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 4,
+      "raw_supplier_content_sha256": "aa7f4f24ab1c9de81884a90e7b7aa3e8d9410993289dc43c12fb6944805454bf",
+      "supplier_id": "local_teacher"
+    },
+    {
+      "case_id": "explicit-v3-triage-003",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": false,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": false,
+      "failure_dimensions": [
+        "TASK_SEMANTICS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 5,
+      "raw_supplier_content_sha256": "b46523bcf41f68e8662c9953296f515866f5feeb71f47a0a2a5d0a9b093db658",
+      "supplier_id": "local_teacher"
+    },
+    {
+      "case_id": "explicit-v3-triage-003",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "triage-routing",
+      "ordinal": 6,
+      "raw_supplier_content_sha256": "5b869a25dfe2d34a3e4be5aec0598df408f51597082f4f1b9eb76950c6a202ea",
+      "supplier_id": "external_teacher"
+    },
+    {
+      "case_id": "explicit-v3-triage-004",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "triage-routing",
+      "ordinal": 7,
+      "raw_supplier_content_sha256": "1d50074f22ac262c100be233229e84d94cd0aaacaa7741e42e073e697e997152",
+      "supplier_id": "external_teacher"
+    },
+    {
+      "case_id": "explicit-v3-triage-004",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": false,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": false,
+      "failure_dimensions": [
+        "TASK_SEMANTICS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 8,
+      "raw_supplier_content_sha256": "bd431e36d7822d692d23310c2406da85a0fc2f7476b47f3770218038131fadda",
+      "supplier_id": "local_teacher"
+    },
+    {
+      "case_id": "explicit-v3-triage-005",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "triage-routing",
+      "ordinal": 9,
+      "raw_supplier_content_sha256": "2a9508936d935774d2e6bcd014cdd2f7840569cfe20a53a3f5cff1e9d378b04c",
+      "supplier_id": "local_teacher"
+    },
+    {
+      "case_id": "explicit-v3-triage-005",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "triage-routing",
+      "ordinal": 10,
+      "raw_supplier_content_sha256": "8d461759d2e4c3b71e6d0d7289376cb1f5e101d3cb81319ca287a2aa2f35b4e8",
+      "supplier_id": "external_teacher"
+    },
+    {
+      "case_id": "explicit-v3-triage-006",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "triage-routing",
+      "ordinal": 11,
+      "raw_supplier_content_sha256": "4568e445a94f73b0e55fb2e85f408eed283fb10cac5065dc23293a6b421ba93d",
+      "supplier_id": "external_teacher"
+    },
+    {
+      "case_id": "explicit-v3-triage-006",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": false,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": false,
+      "failure_dimensions": [
+        "TASK_SEMANTICS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 12,
+      "raw_supplier_content_sha256": "af791847363a135d782b70f0240032d017dc11bc7e26c3741d613f7c8796fd38",
+      "supplier_id": "local_teacher"
+    },
+    {
+      "case_id": "explicit-v3-triage-007",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": false,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": false,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": false,
+      "failure_dimensions": [
+        "TASK_SEMANTICS_VALID"
+      ],
+      "family": "triage-routing",
+      "ordinal": 13,
+      "raw_supplier_content_sha256": "adfa8e30ead06c8038db6d7b9c03c8efb1058c3c6466ed3917db1c3b4aaa123e",
+      "supplier_id": "local_teacher"
+    },
+    {
+      "case_id": "explicit-v3-triage-007",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "triage-routing",
+      "ordinal": 14,
+      "raw_supplier_content_sha256": "16ab0ce02906428624ccb4ca69a6331449cdd7d11825f1cabbdbadf89047d2c4",
+      "supplier_id": "external_teacher"
+    },
+    {
+      "case_id": "explicit-v3-triage-008",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "triage-routing",
+      "ordinal": 15,
+      "raw_supplier_content_sha256": "5e5250d818b94024efdbe637996b36d28a2409d975995c528aa32e75ef8de5ad",
+      "supplier_id": "external_teacher"
+    },
+    {
+      "case_id": "explicit-v3-triage-008",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "triage-routing",
+      "ordinal": 16,
+      "raw_supplier_content_sha256": "e7eaacc92611880e7988059b64bb9511a1445ec80edb17e5c06cdbf9a625d608",
+      "supplier_id": "local_teacher"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-001",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "unsupported-certainty",
+      "ordinal": 17,
+      "raw_supplier_content_sha256": "9f135eab3f71294fe49cdf5df008ed5d18e5e2568b02891d3a3bbe47ddc05497",
+      "supplier_id": "local_teacher"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-001",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "unsupported-certainty",
+      "ordinal": 18,
+      "raw_supplier_content_sha256": "7da0ad4bf5d7ef71ba354352b1c1bdbd247aa1b628826da6b2621d8fe85cc5be",
+      "supplier_id": "external_teacher"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-002",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "unsupported-certainty",
+      "ordinal": 19,
+      "raw_supplier_content_sha256": "ebf5edaffc6d186e4d9f15306b8a5e48b2dc6d8ae58920695f49ddbc57b99cf1",
+      "supplier_id": "external_teacher"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-002",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "unsupported-certainty",
+      "ordinal": 20,
+      "raw_supplier_content_sha256": "852b5dd013c4bac57a1f0d3e6e1d25409f85cd9d2d397026818a52607620b8b9",
+      "supplier_id": "local_teacher"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-003",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "unsupported-certainty",
+      "ordinal": 21,
+      "raw_supplier_content_sha256": "a868033f622e77635894ed0ca5333cf97ed14a43f09298731f441e07f089b3b6",
+      "supplier_id": "local_teacher"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-003",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "unsupported-certainty",
+      "ordinal": 22,
+      "raw_supplier_content_sha256": "eb7120d1441a72b67a491fa9e7ba25e8aa8499d3099becc2552dce8b21192e23",
+      "supplier_id": "external_teacher"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-004",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "unsupported-certainty",
+      "ordinal": 23,
+      "raw_supplier_content_sha256": "e27fbd319a5c6ad0944cbde721e665581a9f58fd622bc61fe8e5e561ab741d27",
+      "supplier_id": "external_teacher"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-004",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "unsupported-certainty",
+      "ordinal": 24,
+      "raw_supplier_content_sha256": "361456ff21f924ab13be88699d1845b12f8b7390d076c4517b5d0751a03170e4",
+      "supplier_id": "local_teacher"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-005",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "unsupported-certainty",
+      "ordinal": 25,
+      "raw_supplier_content_sha256": "fb57954eacfbf610f9c15f146391f1ebf776c52bc3b9792034b640a43b5c588d",
+      "supplier_id": "local_teacher"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-005",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "unsupported-certainty",
+      "ordinal": 26,
+      "raw_supplier_content_sha256": "5d7aa4e93ae556e299bea00de00589527001aeabef16c5399fb8b42e3dc0343f",
+      "supplier_id": "external_teacher"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-006",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "unsupported-certainty",
+      "ordinal": 27,
+      "raw_supplier_content_sha256": "3b7b2817be8f9f2b88cc0d474e6e3bff0609bd035f0d14ae09366a2706ffea11",
+      "supplier_id": "external_teacher"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-006",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "unsupported-certainty",
+      "ordinal": 28,
+      "raw_supplier_content_sha256": "0812f78e3a98e28a80f57f54c7d34e1569e64f3f9b90431dbbaa2e5d027f04da",
+      "supplier_id": "local_teacher"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-007",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "unsupported-certainty",
+      "ordinal": 29,
+      "raw_supplier_content_sha256": "bc3aa4f8b9ad40c5b45b247845ae3f7fb0c0a95f99f91ae217cbc76cbfc46f7e",
+      "supplier_id": "local_teacher"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-007",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "unsupported-certainty",
+      "ordinal": 30,
+      "raw_supplier_content_sha256": "751fe020bbd0fc7ccbf7b0daa0f87d5a369c79602dd4a9e7a7fa7a64babb5103",
+      "supplier_id": "external_teacher"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-008",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "unsupported-certainty",
+      "ordinal": 31,
+      "raw_supplier_content_sha256": "8d571f7fb5b4e072b0053803bd3c0ca2113843de43804e3929c8e4c3e69710e4",
+      "supplier_id": "external_teacher"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-008",
+      "dimensions": {
+        "DIRECT_CAPABILITY_VALID": true,
+        "DUPLICATE_KEYS_VALID": true,
+        "EXPLICIT_INTERFACE_VALID": true,
+        "PARSE_VALID": true,
+        "PROHIBITED_ACTIONS_NOT_OBSERVED": true,
+        "PROTOCOL_VALID": true,
+        "REQUIRED_FIELDS_VALID": true,
+        "REQUIRED_FIELD_TYPES_VALID": true,
+        "REVIEW_STATUS_VALID": true,
+        "TASK_SEMANTICS_VALID": true,
+        "TRANSPORT_VALID": true
+      },
+      "direct_capability_valid": true,
+      "failure_dimensions": [],
+      "family": "unsupported-certainty",
+      "ordinal": 32,
+      "raw_supplier_content_sha256": "f3f0bc18775b146f2b485ec2a60ac62d6570e9ba3da12fec31fa0b6d22af473a",
+      "supplier_id": "local_teacher"
+    }
+  ],
+  "schema": "zth.explicit_interface_direct_unit_calibration.v3.results.matrix",
+  "status": "closed_model_free",
+  "supplier_summaries": {
+    "external_teacher": {
+      "DIRECT_CAPABILITY_VALID": {
+        "rate": 1.0,
+        "total": 16,
+        "valid": 16
+      },
+      "EXPLICIT_INTERFACE_VALID": {
+        "rate": 1.0,
+        "total": 16,
+        "valid": 16
+      },
+      "PARSE_VALID": {
+        "rate": 1.0,
+        "total": 16,
+        "valid": 16
+      },
+      "PROHIBITED_ACTIONS_NOT_OBSERVED": {
+        "rate": 1.0,
+        "total": 16,
+        "valid": 16
+      },
+      "PROTOCOL_VALID": {
+        "rate": 1.0,
+        "total": 16,
+        "valid": 16
+      },
+      "REQUIRED_FIELDS_VALID": {
+        "rate": 1.0,
+        "total": 16,
+        "valid": 16
+      },
+      "REQUIRED_FIELD_TYPES_VALID": {
+        "rate": 1.0,
+        "total": 16,
+        "valid": 16
+      },
+      "REVIEW_STATUS_VALID": {
+        "rate": 1.0,
+        "total": 16,
+        "valid": 16
+      },
+      "TASK_SEMANTICS_VALID": {
+        "rate": 1.0,
+        "total": 16,
+        "valid": 16
+      },
+      "TRANSPORT_VALID": {
+        "rate": 1.0,
+        "total": 16,
+        "valid": 16
+      },
+      "n": 16
+    },
+    "local_teacher": {
+      "DIRECT_CAPABILITY_VALID": {
+        "rate": 0.6875,
+        "total": 16,
+        "valid": 11
+      },
+      "EXPLICIT_INTERFACE_VALID": {
+        "rate": 1.0,
+        "total": 16,
+        "valid": 16
+      },
+      "PARSE_VALID": {
+        "rate": 1.0,
+        "total": 16,
+        "valid": 16
+      },
+      "PROHIBITED_ACTIONS_NOT_OBSERVED": {
+        "rate": 1.0,
+        "total": 16,
+        "valid": 16
+      },
+      "PROTOCOL_VALID": {
+        "rate": 1.0,
+        "total": 16,
+        "valid": 16
+      },
+      "REQUIRED_FIELDS_VALID": {
+        "rate": 1.0,
+        "total": 16,
+        "valid": 16
+      },
+      "REQUIRED_FIELD_TYPES_VALID": {
+        "rate": 1.0,
+        "total": 16,
+        "valid": 16
+      },
+      "REVIEW_STATUS_VALID": {
+        "rate": 1.0,
+        "total": 16,
+        "valid": 16
+      },
+      "TASK_SEMANTICS_VALID": {
+        "rate": 0.6875,
+        "total": 16,
+        "valid": 11
+      },
+      "TRANSPORT_VALID": {
+        "rate": 1.0,
+        "total": 16,
+        "valid": 16
+      },
+      "n": 16
+    }
+  }
+}
