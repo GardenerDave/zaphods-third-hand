@@ -1,0 +1,121 @@
+{
+  "case_count": 16,
+  "cases": [
+    {
+      "case_id": "explicit-v3-triage-001",
+      "exact_request_reuse": true,
+      "reason": "same preregistered semantic case; new V3 execution/interface artifact lineage; no V2 response evidence reused",
+      "semantic_case_preserved": true,
+      "source_v2_case_id": "explicit-v2-triage-001"
+    },
+    {
+      "case_id": "explicit-v3-triage-002",
+      "exact_request_reuse": true,
+      "reason": "same preregistered semantic case; new V3 execution/interface artifact lineage; no V2 response evidence reused",
+      "semantic_case_preserved": true,
+      "source_v2_case_id": "explicit-v2-triage-002"
+    },
+    {
+      "case_id": "explicit-v3-triage-003",
+      "exact_request_reuse": true,
+      "reason": "same preregistered semantic case; new V3 execution/interface artifact lineage; no V2 response evidence reused",
+      "semantic_case_preserved": true,
+      "source_v2_case_id": "explicit-v2-triage-003"
+    },
+    {
+      "case_id": "explicit-v3-triage-004",
+      "exact_request_reuse": true,
+      "reason": "same preregistered semantic case; new V3 execution/interface artifact lineage; no V2 response evidence reused",
+      "semantic_case_preserved": true,
+      "source_v2_case_id": "explicit-v2-triage-004"
+    },
+    {
+      "case_id": "explicit-v3-triage-005",
+      "exact_request_reuse": true,
+      "reason": "same preregistered semantic case; new V3 execution/interface artifact lineage; no V2 response evidence reused",
+      "semantic_case_preserved": true,
+      "source_v2_case_id": "explicit-v2-triage-005"
+    },
+    {
+      "case_id": "explicit-v3-triage-006",
+      "exact_request_reuse": true,
+      "reason": "same preregistered semantic case; new V3 execution/interface artifact lineage; no V2 response evidence reused",
+      "semantic_case_preserved": true,
+      "source_v2_case_id": "explicit-v2-triage-006"
+    },
+    {
+      "case_id": "explicit-v3-triage-007",
+      "exact_request_reuse": true,
+      "reason": "same preregistered semantic case; new V3 execution/interface artifact lineage; no V2 response evidence reused",
+      "semantic_case_preserved": true,
+      "source_v2_case_id": "explicit-v2-triage-007"
+    },
+    {
+      "case_id": "explicit-v3-triage-008",
+      "exact_request_reuse": true,
+      "reason": "same preregistered semantic case; new V3 execution/interface artifact lineage; no V2 response evidence reused",
+      "semantic_case_preserved": true,
+      "source_v2_case_id": "explicit-v2-triage-008"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-001",
+      "exact_request_reuse": true,
+      "reason": "same preregistered semantic case; new V3 execution/interface artifact lineage; no V2 response evidence reused",
+      "semantic_case_preserved": true,
+      "source_v2_case_id": "explicit-v2-unsupported-001"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-002",
+      "exact_request_reuse": true,
+      "reason": "same preregistered semantic case; new V3 execution/interface artifact lineage; no V2 response evidence reused",
+      "semantic_case_preserved": true,
+      "source_v2_case_id": "explicit-v2-unsupported-002"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-003",
+      "exact_request_reuse": true,
+      "reason": "same preregistered semantic case; new V3 execution/interface artifact lineage; no V2 response evidence reused",
+      "semantic_case_preserved": true,
+      "source_v2_case_id": "explicit-v2-unsupported-003"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-004",
+      "exact_request_reuse": true,
+      "reason": "same preregistered semantic case; new V3 execution/interface artifact lineage; no V2 response evidence reused",
+      "semantic_case_preserved": true,
+      "source_v2_case_id": "explicit-v2-unsupported-004"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-005",
+      "exact_request_reuse": true,
+      "reason": "same preregistered semantic case; new V3 execution/interface artifact lineage; no V2 response evidence reused",
+      "semantic_case_preserved": true,
+      "source_v2_case_id": "explicit-v2-unsupported-005"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-006",
+      "exact_request_reuse": true,
+      "reason": "same preregistered semantic case; new V3 execution/interface artifact lineage; no V2 response evidence reused",
+      "semantic_case_preserved": true,
+      "source_v2_case_id": "explicit-v2-unsupported-006"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-007",
+      "exact_request_reuse": true,
+      "reason": "same preregistered semantic case; new V3 execution/interface artifact lineage; no V2 response evidence reused",
+      "semantic_case_preserved": true,
+      "source_v2_case_id": "explicit-v2-unsupported-007"
+    },
+    {
+      "case_id": "explicit-v3-unsupported-008",
+      "exact_request_reuse": true,
+      "reason": "same preregistered semantic case; new V3 execution/interface artifact lineage; no V2 response evidence reused",
+      "semantic_case_preserved": true,
+      "source_v2_case_id": "explicit-v2-unsupported-008"
+    }
+  ],
+  "experiment_id": "explicit_interface_direct_unit_calibration_v3_2026-08-24",
+  "schema": "zth.explicit_interface_direct_unit_calibration.freshness.v3",
+  "source_v2_case_set": "explicit_interface_direct_unit_calibration_v2_2026-08-24",
+  "supplier_outcomes_used": false
+}

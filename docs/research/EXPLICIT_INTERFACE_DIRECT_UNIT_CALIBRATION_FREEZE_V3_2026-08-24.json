@@ -1,0 +1,437 @@
+{
+  "artifact_hashes": {
+    "evaluator_cases": "91454cc877dcb27805fdc6288d1b7753bd079273babc7663cb334a79fe114698",
+    "evaluator_implementation": "3922879d7c740531d65c0af06b1d9fb0a667357867736783d0ccd6ccd20d5eda",
+    "execution_harness": "8d0f536222c5359214f2d97246989048744d37affd84b948527a24de40a410af",
+    "freshness": "3d082d2e583d108be5dc08198dbdaf3cd4cd416bb8209a0ddaaec6ba44d30dde",
+    "interface": "83e0e261fbd854e975680371b605b9607d13a25c7a3bafef9cc870bfdbc76047",
+    "payload": "a126a36ce4b37bb73772943c428977a46dc9057dcc385be856419a7b1826a423",
+    "projection": "6eacf474264296055dd417b1757933a4ff9968a6e8e2cbd056c8e9df9d8f31ee",
+    "projection_implementation": "7020c72840a976d6200f9a353f7f66329d9bd9b2ec1826ac1f0a5e7021a10e16",
+    "runtime": "ced64e1dac7aa5db7e8ef1fc0dfe5de92ec455d50c9ea7eb4e7fc3ae9e34fafb"
+  },
+  "case_count": 16,
+  "case_hashes": {
+    "explicit-v3-triage-001": "44c74eabcc8d70e10cb153f9f6248a9b490551348310defcbffdb0fc347bf0c7",
+    "explicit-v3-triage-002": "2402f4238e13de9f2f5c633bdc4c26ffd935e7cd73003b1d1dda0bae925c1f71",
+    "explicit-v3-triage-003": "c8a1acc815912001a67601ac1c678ce86ed0dfa524ff1d0b1998d7f9ea0fe8bc",
+    "explicit-v3-triage-004": "f9a4045e3da9b5dc37b3df9d1eef8ea5f26e224235e3c53d4a8edf0fe3f5d365",
+    "explicit-v3-triage-005": "1f80efa86deff61992e29dd778c9aae6e132c703f048e03752e410b402310736",
+    "explicit-v3-triage-006": "dd11920e4ad674f20be784632e90d54a1fb2775949eb01603f44f4e5624c05b5",
+    "explicit-v3-triage-007": "474f0a25fa63f75f62b20fa37dea0c0be45ce2e1b74bc6fc7fbc2087bf262b2e",
+    "explicit-v3-triage-008": "8acb79b15813f8a64c1e864b933eb07f883903b1d0f0a4a76e0c1bbf5ecdf981",
+    "explicit-v3-unsupported-001": "4c9d791f27db5d8115c4d9456043604abc54401ce6195255920c6afee30d5ebe",
+    "explicit-v3-unsupported-002": "f6a52eeda823b217ea824052f9c569cec343e95f6f1ab3fdf4b531f4ca342751",
+    "explicit-v3-unsupported-003": "33c49750ea4fccbaf9363c961b58b881661f293ebe8b5e2673d2f62650d9de9e",
+    "explicit-v3-unsupported-004": "216203a39bdd3622fbea4bfaf0bfb479519a3a2fe767769e0c1cc19a7fe0890b",
+    "explicit-v3-unsupported-005": "b1b43092d75055ce18cdd42f963a9645b910fed4f42f6c59f1a1281fa22cec1d",
+    "explicit-v3-unsupported-006": "37fe472cdedd967d41aed41e40f589f1389cb6b3231a849e996c7788f33109c5",
+    "explicit-v3-unsupported-007": "5a167db2271799696248b4918290b6072b934aa81f22b388abe738f1a95b17b6",
+    "explicit-v3-unsupported-008": "5fe2ea9ff520d054f12d3c1ecfdcf0abbbb75b94d54d7a975a8540126cd11017"
+  },
+  "case_order": [
+    "explicit-v3-triage-001",
+    "explicit-v3-triage-002",
+    "explicit-v3-triage-003",
+    "explicit-v3-triage-004",
+    "explicit-v3-triage-005",
+    "explicit-v3-triage-006",
+    "explicit-v3-triage-007",
+    "explicit-v3-triage-008",
+    "explicit-v3-unsupported-001",
+    "explicit-v3-unsupported-002",
+    "explicit-v3-unsupported-003",
+    "explicit-v3-unsupported-004",
+    "explicit-v3-unsupported-005",
+    "explicit-v3-unsupported-006",
+    "explicit-v3-unsupported-007",
+    "explicit-v3-unsupported-008"
+  ],
+  "cases_per_family": {
+    "triage-routing": 8,
+    "unsupported-certainty": 8
+  },
+  "characterization": "EXPLICIT_INTERFACE_DIRECT_UNIT_CALIBRATION_V3_FROZEN_UNEXECUTED",
+  "claim_boundary": "direct-unit calibration only; no routing-policy winner, qualification, or production-routing claim",
+  "contamination": {
+    "external_inference_calls": 0,
+    "model_calls": 0,
+    "v2_mutated": false,
+    "v2_outcomes_reused": false,
+    "v3_supplier_calls": 0,
+    "v3_target_outcomes": 0
+  },
+  "contradiction_reserve_present": false,
+  "experiment_id": "explicit_interface_direct_unit_calibration_v3_2026-08-24",
+  "external_supplier": {
+    "authenticated_codex_home": "/tmp/zth_v3_codex_home",
+    "codex_cli": "codex-cli 0.146.0",
+    "cwd": "/tmp",
+    "repository_access_observed": "BEST_AVAILABLE_OBSERVATION",
+    "supplier_id": "external_teacher",
+    "tool_calls_observed": "BEST_AVAILABLE_OBSERVATION",
+    "tools_mechanically_disabled": false,
+    "transport_qualified": true,
+    "wrapper": "/home/navigator/bin/zth-codex-teacher",
+    "wrapper_sha256": "2c5fcaf0727bdf466e21d660c927e63d23ecb67857949b2ef21e7e599297ceab"
+  },
+  "firewall": {
+    "evaluator_cases_loaded_during_acquisition": false,
+    "evaluator_imported_during_acquisition": false,
+    "evaluator_runtime_influence": 0,
+    "raw_sealed_before_evaluation": true
+  },
+  "local_supplier": {
+    "base_url": "http://192.168.1.16:8080/v1",
+    "endpoint_alias": "JARVIS_LOCAL",
+    "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "supplier_id": "local_teacher",
+    "transport_qualified": true
+  },
+  "matched_supplier_messages": {
+    "bytes": true,
+    "hashes": true,
+    "runtime_reconstruction": false
+  },
+  "next_decision": "EXECUTE_EXPLICIT_INTERFACE_DIRECT_UNIT_CALIBRATION_V3",
+  "one_shot": {
+    "guard_before_running": true,
+    "prepare_before_guard": true,
+    "replays": 0,
+    "resume": false,
+    "retries": 0,
+    "second_execute_rejected_before_acquisition": true
+  },
+  "outcome_conditional_sample_extension_permitted": false,
+  "planned_external_calls": 16,
+  "planned_local_calls": 16,
+  "planned_supplier_calls": 32,
+  "protocol_correction": {
+    "independent_dimension": "PROHIBITED_ACTIONS_NOT_OBSERVED",
+    "protocol_valid_definition": "TRANSPORT_VALID AND PROHIBITED_ACTIONS_NOT_OBSERVED"
+  },
+  "question": "Compare the local 30B supplier and external Codex supplier on identical frozen explicit-interface tasks under matched supplier-message bytes; calibration only.",
+  "sample_size_frozen_before_outcomes": true,
+  "schedule": [
+    {
+      "capability_family": "triage-routing",
+      "case_id": "explicit-v3-triage-001",
+      "first_arm_supplier_id": "local_teacher",
+      "interface_id": "duc_explicit_triage_direct_json_v3",
+      "ordinal": 1,
+      "supplier_id": "local_teacher",
+      "supplier_message_sha256": "03b09b4884716c54c30bfa32ab53a2b05cd4ef4a3e7d72ddd7713264c9b02b93"
+    },
+    {
+      "capability_family": "triage-routing",
+      "case_id": "explicit-v3-triage-001",
+      "first_arm_supplier_id": "local_teacher",
+      "interface_id": "duc_explicit_triage_direct_json_v3",
+      "ordinal": 2,
+      "supplier_id": "external_teacher",
+      "supplier_message_sha256": "03b09b4884716c54c30bfa32ab53a2b05cd4ef4a3e7d72ddd7713264c9b02b93"
+    },
+    {
+      "capability_family": "triage-routing",
+      "case_id": "explicit-v3-triage-002",
+      "first_arm_supplier_id": "external_teacher",
+      "interface_id": "duc_explicit_triage_direct_json_v3",
+      "ordinal": 3,
+      "supplier_id": "external_teacher",
+      "supplier_message_sha256": "b5de0673afe14031f62e66aae19f071e32816a8f9f397a3608e3491f2eb235c0"
+    },
+    {
+      "capability_family": "triage-routing",
+      "case_id": "explicit-v3-triage-002",
+      "first_arm_supplier_id": "external_teacher",
+      "interface_id": "duc_explicit_triage_direct_json_v3",
+      "ordinal": 4,
+      "supplier_id": "local_teacher",
+      "supplier_message_sha256": "b5de0673afe14031f62e66aae19f071e32816a8f9f397a3608e3491f2eb235c0"
+    },
+    {
+      "capability_family": "triage-routing",
+      "case_id": "explicit-v3-triage-003",
+      "first_arm_supplier_id": "local_teacher",
+      "interface_id": "duc_explicit_triage_direct_json_v3",
+      "ordinal": 5,
+      "supplier_id": "local_teacher",
+      "supplier_message_sha256": "afad2779c7c9923da03b702fe6edf8496b9644566fac7078bf18ea9ec7a9c0e7"
+    },
+    {
+      "capability_family": "triage-routing",
+      "case_id": "explicit-v3-triage-003",
+      "first_arm_supplier_id": "local_teacher",
+      "interface_id": "duc_explicit_triage_direct_json_v3",
+      "ordinal": 6,
+      "supplier_id": "external_teacher",
+      "supplier_message_sha256": "afad2779c7c9923da03b702fe6edf8496b9644566fac7078bf18ea9ec7a9c0e7"
+    },
+    {
+      "capability_family": "triage-routing",
+      "case_id": "explicit-v3-triage-004",
+      "first_arm_supplier_id": "external_teacher",
+      "interface_id": "duc_explicit_triage_direct_json_v3",
+      "ordinal": 7,
+      "supplier_id": "external_teacher",
+      "supplier_message_sha256": "21fb2701f057a0956c0c572c1f79f76422a8701e1b9c49a4dd69f8647501e92d"
+    },
+    {
+      "capability_family": "triage-routing",
+      "case_id": "explicit-v3-triage-004",
+      "first_arm_supplier_id": "external_teacher",
+      "interface_id": "duc_explicit_triage_direct_json_v3",
+      "ordinal": 8,
+      "supplier_id": "local_teacher",
+      "supplier_message_sha256": "21fb2701f057a0956c0c572c1f79f76422a8701e1b9c49a4dd69f8647501e92d"
+    },
+    {
+      "capability_family": "triage-routing",
+      "case_id": "explicit-v3-triage-005",
+      "first_arm_supplier_id": "local_teacher",
+      "interface_id": "duc_explicit_triage_direct_json_v3",
+      "ordinal": 9,
+      "supplier_id": "local_teacher",
+      "supplier_message_sha256": "3770bfae37dc3c035aa9a32d9d67f2bacbd09769315739286da1642d2a0c18ea"
+    },
+    {
+      "capability_family": "triage-routing",
+      "case_id": "explicit-v3-triage-005",
+      "first_arm_supplier_id": "local_teacher",
+      "interface_id": "duc_explicit_triage_direct_json_v3",
+      "ordinal": 10,
+      "supplier_id": "external_teacher",
+      "supplier_message_sha256": "3770bfae37dc3c035aa9a32d9d67f2bacbd09769315739286da1642d2a0c18ea"
+    },
+    {
+      "capability_family": "triage-routing",
+      "case_id": "explicit-v3-triage-006",
+      "first_arm_supplier_id": "external_teacher",
+      "interface_id": "duc_explicit_triage_direct_json_v3",
+      "ordinal": 11,
+      "supplier_id": "external_teacher",
+      "supplier_message_sha256": "f350146ed8f91d9f47656fa67c8b8321f1ca3c62e7e7178467b965733d0dbe1a"
+    },
+    {
+      "capability_family": "triage-routing",
+      "case_id": "explicit-v3-triage-006",
+      "first_arm_supplier_id": "external_teacher",
+      "interface_id": "duc_explicit_triage_direct_json_v3",
+      "ordinal": 12,
+      "supplier_id": "local_teacher",
+      "supplier_message_sha256": "f350146ed8f91d9f47656fa67c8b8321f1ca3c62e7e7178467b965733d0dbe1a"
+    },
+    {
+      "capability_family": "triage-routing",
+      "case_id": "explicit-v3-triage-007",
+      "first_arm_supplier_id": "local_teacher",
+      "interface_id": "duc_explicit_triage_direct_json_v3",
+      "ordinal": 13,
+      "supplier_id": "local_teacher",
+      "supplier_message_sha256": "1a1746f5e778c692ec83b653aa042fd18c2f5c05a163be7e7cabb69f72b0f559"
+    },
+    {
+      "capability_family": "triage-routing",
+      "case_id": "explicit-v3-triage-007",
+      "first_arm_supplier_id": "local_teacher",
+      "interface_id": "duc_explicit_triage_direct_json_v3",
+      "ordinal": 14,
+      "supplier_id": "external_teacher",
+      "supplier_message_sha256": "1a1746f5e778c692ec83b653aa042fd18c2f5c05a163be7e7cabb69f72b0f559"
+    },
+    {
+      "capability_family": "triage-routing",
+      "case_id": "explicit-v3-triage-008",
+      "first_arm_supplier_id": "external_teacher",
+      "interface_id": "duc_explicit_triage_direct_json_v3",
+      "ordinal": 15,
+      "supplier_id": "external_teacher",
+      "supplier_message_sha256": "b7424d0a06d7f1b734edb737614866325768c1f87136217af0160e7d46f1026d"
+    },
+    {
+      "capability_family": "triage-routing",
+      "case_id": "explicit-v3-triage-008",
+      "first_arm_supplier_id": "external_teacher",
+      "interface_id": "duc_explicit_triage_direct_json_v3",
+      "ordinal": 16,
+      "supplier_id": "local_teacher",
+      "supplier_message_sha256": "b7424d0a06d7f1b734edb737614866325768c1f87136217af0160e7d46f1026d"
+    },
+    {
+      "capability_family": "unsupported-certainty",
+      "case_id": "explicit-v3-unsupported-001",
+      "first_arm_supplier_id": "local_teacher",
+      "interface_id": "duc_explicit_unsupported_certainty_direct_json_v3",
+      "ordinal": 17,
+      "supplier_id": "local_teacher",
+      "supplier_message_sha256": "05b6b8baded83f7694adb8dd26555451c2651fbbe517a92481a5cd7715ef65a4"
+    },
+    {
+      "capability_family": "unsupported-certainty",
+      "case_id": "explicit-v3-unsupported-001",
+      "first_arm_supplier_id": "local_teacher",
+      "interface_id": "duc_explicit_unsupported_certainty_direct_json_v3",
+      "ordinal": 18,
+      "supplier_id": "external_teacher",
+      "supplier_message_sha256": "05b6b8baded83f7694adb8dd26555451c2651fbbe517a92481a5cd7715ef65a4"
+    },
+    {
+      "capability_family": "unsupported-certainty",
+      "case_id": "explicit-v3-unsupported-002",
+      "first_arm_supplier_id": "external_teacher",
+      "interface_id": "duc_explicit_unsupported_certainty_direct_json_v3",
+      "ordinal": 19,
+      "supplier_id": "external_teacher",
+      "supplier_message_sha256": "d4ecacc9820caaae71424343e155a4af96e073ebb0c81ac2f05ce742dced2ecc"
+    },
+    {
+      "capability_family": "unsupported-certainty",
+      "case_id": "explicit-v3-unsupported-002",
+      "first_arm_supplier_id": "external_teacher",
+      "interface_id": "duc_explicit_unsupported_certainty_direct_json_v3",
+      "ordinal": 20,
+      "supplier_id": "local_teacher",
+      "supplier_message_sha256": "d4ecacc9820caaae71424343e155a4af96e073ebb0c81ac2f05ce742dced2ecc"
+    },
+    {
+      "capability_family": "unsupported-certainty",
+      "case_id": "explicit-v3-unsupported-003",
+      "first_arm_supplier_id": "local_teacher",
+      "interface_id": "duc_explicit_unsupported_certainty_direct_json_v3",
+      "ordinal": 21,
+      "supplier_id": "local_teacher",
+      "supplier_message_sha256": "174a706246b6405239c82c7e6c936e272304ece57dec36793c592693bb0c2273"
+    },
+    {
+      "capability_family": "unsupported-certainty",
+      "case_id": "explicit-v3-unsupported-003",
+      "first_arm_supplier_id": "local_teacher",
+      "interface_id": "duc_explicit_unsupported_certainty_direct_json_v3",
+      "ordinal": 22,
+      "supplier_id": "external_teacher",
+      "supplier_message_sha256": "174a706246b6405239c82c7e6c936e272304ece57dec36793c592693bb0c2273"
+    },
+    {
+      "capability_family": "unsupported-certainty",
+      "case_id": "explicit-v3-unsupported-004",
+      "first_arm_supplier_id": "external_teacher",
+      "interface_id": "duc_explicit_unsupported_certainty_direct_json_v3",
+      "ordinal": 23,
+      "supplier_id": "external_teacher",
+      "supplier_message_sha256": "5fcc41a10772a3a0d73f0f3c726082225f374e65f2b7ab0b6fe0296adb7e6d1d"
+    },
+    {
+      "capability_family": "unsupported-certainty",
+      "case_id": "explicit-v3-unsupported-004",
+      "first_arm_supplier_id": "external_teacher",
+      "interface_id": "duc_explicit_unsupported_certainty_direct_json_v3",
+      "ordinal": 24,
+      "supplier_id": "local_teacher",
+      "supplier_message_sha256": "5fcc41a10772a3a0d73f0f3c726082225f374e65f2b7ab0b6fe0296adb7e6d1d"
+    },
+    {
+      "capability_family": "unsupported-certainty",
+      "case_id": "explicit-v3-unsupported-005",
+      "first_arm_supplier_id": "local_teacher",
+      "interface_id": "duc_explicit_unsupported_certainty_direct_json_v3",
+      "ordinal": 25,
+      "supplier_id": "local_teacher",
+      "supplier_message_sha256": "67dcae1dfa1ce6e050c8e818af4aec3b0c58d1f9551506aa9ac19784868308b1"
+    },
+    {
+      "capability_family": "unsupported-certainty",
+      "case_id": "explicit-v3-unsupported-005",
+      "first_arm_supplier_id": "local_teacher",
+      "interface_id": "duc_explicit_unsupported_certainty_direct_json_v3",
+      "ordinal": 26,
+      "supplier_id": "external_teacher",
+      "supplier_message_sha256": "67dcae1dfa1ce6e050c8e818af4aec3b0c58d1f9551506aa9ac19784868308b1"
+    },
+    {
+      "capability_family": "unsupported-certainty",
+      "case_id": "explicit-v3-unsupported-006",
+      "first_arm_supplier_id": "external_teacher",
+      "interface_id": "duc_explicit_unsupported_certainty_direct_json_v3",
+      "ordinal": 27,
+      "supplier_id": "external_teacher",
+      "supplier_message_sha256": "fe0fff55a641194e1fab4da1c1268a567bc396a9ac478e04fdd659e49794e993"
+    },
+    {
+      "capability_family": "unsupported-certainty",
+      "case_id": "explicit-v3-unsupported-006",
+      "first_arm_supplier_id": "external_teacher",
+      "interface_id": "duc_explicit_unsupported_certainty_direct_json_v3",
+      "ordinal": 28,
+      "supplier_id": "local_teacher",
+      "supplier_message_sha256": "fe0fff55a641194e1fab4da1c1268a567bc396a9ac478e04fdd659e49794e993"
+    },
+    {
+      "capability_family": "unsupported-certainty",
+      "case_id": "explicit-v3-unsupported-007",
+      "first_arm_supplier_id": "local_teacher",
+      "interface_id": "duc_explicit_unsupported_certainty_direct_json_v3",
+      "ordinal": 29,
+      "supplier_id": "local_teacher",
+      "supplier_message_sha256": "e35048b6d907456863c8c4dff08540dc73ad1282783a41781f2750059424871d"
+    },
+    {
+      "capability_family": "unsupported-certainty",
+      "case_id": "explicit-v3-unsupported-007",
+      "first_arm_supplier_id": "local_teacher",
+      "interface_id": "duc_explicit_unsupported_certainty_direct_json_v3",
+      "ordinal": 30,
+      "supplier_id": "external_teacher",
+      "supplier_message_sha256": "e35048b6d907456863c8c4dff08540dc73ad1282783a41781f2750059424871d"
+    },
+    {
+      "capability_family": "unsupported-certainty",
+      "case_id": "explicit-v3-unsupported-008",
+      "first_arm_supplier_id": "external_teacher",
+      "interface_id": "duc_explicit_unsupported_certainty_direct_json_v3",
+      "ordinal": 31,
+      "supplier_id": "external_teacher",
+      "supplier_message_sha256": "1a248ee7b201aa51cb5ddeb08ca2b69c0585ae5112e9235a260cd9e99590ca3d"
+    },
+    {
+      "capability_family": "unsupported-certainty",
+      "case_id": "explicit-v3-unsupported-008",
+      "first_arm_supplier_id": "external_teacher",
+      "interface_id": "duc_explicit_unsupported_certainty_direct_json_v3",
+      "ordinal": 32,
+      "supplier_id": "local_teacher",
+      "supplier_message_sha256": "1a248ee7b201aa51cb5ddeb08ca2b69c0585ae5112e9235a260cd9e99590ca3d"
+    }
+  ],
+  "schedule_sha256": "25d5107fdf23948a7419336e50386233be824a8d47574254c428699b5d2bbe61",
+  "schema": "zth.explicit_interface_direct_unit_calibration.freeze.v3",
+  "source_v2_freeze_commit": "a00d8a72e3c547ea401b8ab0075a4260c85eb82a",
+  "status": "frozen_unexecuted",
+  "transport_failure_dispositions": [
+    "LOCAL_TRANSPORT_FAILURE",
+    "EXTERNAL_TRANSPORT_FAILURE",
+    "EXTERNAL_NONZERO_EXIT"
+  ],
+  "transport_qualification": {
+    "commit": "46638a5ce8b461cd57676a1317a4a57d129c7d02",
+    "external": {
+      "codex_cli": "codex-cli 0.146.0",
+      "codex_home": "/tmp/zth_v3_codex_home",
+      "cwd": "/tmp",
+      "qualified": true,
+      "return_code": 0,
+      "stdout": "TRANSPORT_OK",
+      "stdout_sha256": "52c39f2b1f4fa8585552879bc993f277904438f439a300241bf0d895a634139a",
+      "wrapper": "/home/navigator/bin/zth-codex-teacher",
+      "wrapper_sha256": "2c5fcaf0727bdf466e21d660c927e63d23ecb67857949b2ef21e7e599297ceab"
+    },
+    "local": {
+      "base_url": "http://192.168.1.16:8080/v1",
+      "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "models_response_sha256": "56a4a28d039d1e378d561319b17ae0da276c2806231105c6bbadd21979fb20a7",
+      "qualification": "TRANSPORT_OK",
+      "qualified": true
+    }
+  },
+  "transport_qualification_commit": "46638a5ce8b461cd57676a1317a4a57d129c7d02",
+  "v2_characterization": "LOCAL_AND_EXTERNAL_CAPABILITY_NOT_MEASURED_DUE_TO_TRANSPORT_FAILURES"
+}

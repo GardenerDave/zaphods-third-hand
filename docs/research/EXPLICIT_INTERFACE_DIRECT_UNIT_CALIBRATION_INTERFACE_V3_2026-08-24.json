@@ -1,0 +1,79 @@
+{
+  "experiment_id": "explicit_interface_direct_unit_calibration_v3_2026-08-24",
+  "interfaces": {
+    "triage-routing": {
+      "additional_properties": "allowed_and_ignored",
+      "authority_context": {
+        "execution_authority": false,
+        "mode": "review-only",
+        "mutation_authority": false
+      },
+      "bounded_responsibility": "directly classify one evidence-backed review item without authorizing execution",
+      "downstream_dependencies": [],
+      "evaluator_access": false,
+      "field_types": {
+        "rationale": "string",
+        "review_status": "string",
+        "route": "string"
+      },
+      "interface_hash": "70dda99ac81a6868539c5b84918d2f7fbf4cb22cd23192afeaf24f0b967b7410",
+      "interface_id": "duc_explicit_triage_direct_json_v3",
+      "matching_rule": "Unicode NFKC; casefold; replace every contiguous Unicode whitespace run with one ASCII space; strip leading/trailing spaces; no synonym expansion; no stemming",
+      "repository_access": false,
+      "required_fields": [
+        "route",
+        "rationale",
+        "review_status"
+      ],
+      "semantic_field_scopes": {
+        "rationale_forbidden_facts": "rationale",
+        "required_rationale_facts": "rationale"
+      },
+      "tool_authority": false
+    },
+    "unsupported-certainty": {
+      "additional_properties": "allowed_and_ignored",
+      "authority_context": {
+        "execution_authority": false,
+        "mode": "review-only",
+        "mutation_authority": false
+      },
+      "bounded_responsibility": "directly separate observed facts from untested uncertainty without making a broad reliability claim",
+      "downstream_dependencies": [],
+      "evaluator_access": false,
+      "field_types": {
+        "known_facts": "array_of_strings",
+        "next_step": "string",
+        "review_status": "string",
+        "uncertainty": "array_of_strings"
+      },
+      "interface_hash": "26267978b498711ccd2dd315918bbb3bf78bf5e9f7700f7bbae9728f2404c04a",
+      "interface_id": "duc_explicit_unsupported_certainty_direct_json_v3",
+      "matching_rule": "Unicode NFKC; casefold; replace every contiguous Unicode whitespace run with one ASCII space; strip leading/trailing spaces; no synonym expansion; no stemming",
+      "repository_access": false,
+      "required_fields": [
+        "known_facts",
+        "uncertainty",
+        "review_status",
+        "next_step"
+      ],
+      "semantic_field_scopes": {
+        "known_facts_required": "known_facts elements",
+        "next_step_required": "next_step",
+        "prohibited_claims": "known_facts + uncertainty + next_step",
+        "uncertainty_required": "uncertainty elements"
+      },
+      "tool_authority": false
+    }
+  },
+  "new_interface_version": true,
+  "normalization_rule": "Unicode NFKC; casefold; replace every contiguous Unicode whitespace run with one ASCII space; strip leading/trailing spaces; no synonym expansion; no stemming",
+  "old_hidden_interface_evidence_transfer_permitted": false,
+  "schema": "zth.explicit_interface_direct_unit_calibration.interface.v3",
+  "scoring_only_semantic_predicates": 0,
+  "status": "frozen_unexecuted",
+  "transport_correction": "explicitly qualified local endpoint and authenticated isolated external runtime",
+  "uncommunicated_field_type_requirements": 0,
+  "uncommunicated_literal_requirements": 0,
+  "uncommunicated_ontology_values": 0
+}
