@@ -36,6 +36,11 @@ EXTERNAL_WRAPPER_SHA256 = "2c5fcaf0727bdf466e21d660c927e63d23ecb67857949b2ef21e7
 CODEX_VERSION = "codex-cli 0.146.0"
 CODEX_HOME = "/tmp/zth_v3_codex_home"
 EXTERNAL_CWD = "/tmp"
+EXTERNAL_RUNTIME_ROOT = "/tmp/zth_explicit_interface_v3_external_runtime"
+EXTERNAL_HOME = EXTERNAL_RUNTIME_ROOT + "/home"
+EXTERNAL_TMPDIR = EXTERNAL_RUNTIME_ROOT + "/tmp"
+TRANSPORT_QUALIFICATION_COMMIT = "46638a5ce8b461cd57676a1317a4a57d129c7d02"
+INITIAL_V3_FREEZE_COMMIT = "c4bd2c6c386b4df9493ce8e166dc34c4b2f58bab"
 
 
 def read(path: Path) -> Any:
@@ -100,7 +105,7 @@ def main() -> int:
         case["interface_contract"]["interface_id"] = interface_ids[family]
 
     runtime = copy.deepcopy(source["runtime"])
-    runtime.update({"schema": "zth.explicit_interface_direct_unit_calibration.runtime.v3", "experiment_id": "explicit_interface_direct_unit_calibration_v3_2026-08-24", "status": "frozen_unexecuted", "local_base_url": LOCAL_BASE_URL, "local_model": LOCAL_MODEL, "external_wrapper": EXTERNAL_WRAPPER, "external_wrapper_sha256": EXTERNAL_WRAPPER_SHA256, "external_codex_version": CODEX_VERSION, "external_codex_home": CODEX_HOME, "external_cwd": EXTERNAL_CWD})
+    runtime.update({"schema": "zth.explicit_interface_direct_unit_calibration.runtime.v3", "experiment_id": "explicit_interface_direct_unit_calibration_v3_2026-08-24", "status": "frozen_unexecuted", "local_base_url": LOCAL_BASE_URL, "local_model": LOCAL_MODEL, "external_wrapper": EXTERNAL_WRAPPER, "external_wrapper_sha256": EXTERNAL_WRAPPER_SHA256, "external_codex_version": CODEX_VERSION, "external_codex_home": CODEX_HOME, "external_cwd": EXTERNAL_CWD, "external_home": EXTERNAL_HOME, "external_tmpdir": EXTERNAL_TMPDIR, "transport_qualification_commit": TRANSPORT_QUALIFICATION_COMMIT, "initial_v3_freeze_commit": INITIAL_V3_FREEZE_COMMIT})
     runtime["case_order"] = [v3_case_id(case_id) for case_id in runtime["case_order"]]
     for case in runtime["cases"]:
         family = case["capability_family"]
@@ -147,7 +152,8 @@ def main() -> int:
         "experiment_id": runtime["experiment_id"],
         "status": "frozen_unexecuted",
         "source_v2_freeze_commit": "a00d8a72e3c547ea401b8ab0075a4260c85eb82a",
-        "transport_qualification_commit": "46638a5ce8b461cd57676a1317a4a57d129c7d02",
+        "transport_qualification_commit": TRANSPORT_QUALIFICATION_COMMIT,
+        "initial_v3_freeze_commit": INITIAL_V3_FREEZE_COMMIT,
         "v2_characterization": "LOCAL_AND_EXTERNAL_CAPABILITY_NOT_MEASURED_DUE_TO_TRANSPORT_FAILURES",
         "question": "Compare the local 30B supplier and external Codex supplier on identical frozen explicit-interface tasks under matched supplier-message bytes; calibration only.",
         "case_count": 16,
@@ -162,7 +168,7 @@ def main() -> int:
         "contradiction_reserve_present": False,
         "transport_qualification": {"commit": "46638a5ce8b461cd57676a1317a4a57d129c7d02", "local": {"qualified": True, "base_url": LOCAL_BASE_URL, "model": LOCAL_MODEL, "qualification": "TRANSPORT_OK", "models_response_sha256": "56a4a28d039d1e378d561319b17ae0da276c2806231105c6bbadd21979fb20a7"}, "external": {"qualified": True, "wrapper": EXTERNAL_WRAPPER, "wrapper_sha256": EXTERNAL_WRAPPER_SHA256, "codex_cli": CODEX_VERSION, "codex_home": CODEX_HOME, "cwd": EXTERNAL_CWD, "return_code": 0, "stdout": "TRANSPORT_OK", "stdout_sha256": "52c39f2b1f4fa8585552879bc993f277904438f439a300241bf0d895a634139a"}},
         "local_supplier": {"supplier_id": "local_teacher", "base_url": LOCAL_BASE_URL, "model": LOCAL_MODEL, "endpoint_alias": "JARVIS_LOCAL", "transport_qualified": True},
-        "external_supplier": {"supplier_id": "external_teacher", "wrapper": EXTERNAL_WRAPPER, "wrapper_sha256": EXTERNAL_WRAPPER_SHA256, "codex_cli": CODEX_VERSION, "authenticated_codex_home": CODEX_HOME, "cwd": EXTERNAL_CWD, "transport_qualified": True, "tools_mechanically_disabled": False, "tool_calls_observed": "BEST_AVAILABLE_OBSERVATION", "repository_access_observed": "BEST_AVAILABLE_OBSERVATION"},
+        "external_supplier": {"supplier_id": "external_teacher", "wrapper": EXTERNAL_WRAPPER, "wrapper_sha256": EXTERNAL_WRAPPER_SHA256, "codex_cli": CODEX_VERSION, "authenticated_codex_home": CODEX_HOME, "cwd": EXTERNAL_CWD, "external_home": EXTERNAL_HOME, "external_tmpdir": EXTERNAL_TMPDIR, "transport_qualified": True, "tools_mechanically_disabled": False, "tool_calls_observed": "BEST_AVAILABLE_OBSERVATION", "repository_access_observed": "BEST_AVAILABLE_OBSERVATION"},
         "matched_supplier_messages": {"bytes": True, "hashes": True, "runtime_reconstruction": False},
         "schedule": schedule,
         "schedule_sha256": schedule_hash,
@@ -170,6 +176,7 @@ def main() -> int:
         "transport_failure_dispositions": ["LOCAL_TRANSPORT_FAILURE", "EXTERNAL_TRANSPORT_FAILURE", "EXTERNAL_NONZERO_EXIT"],
         "firewall": {"evaluator_imported_during_acquisition": False, "evaluator_cases_loaded_during_acquisition": False, "evaluator_runtime_influence": 0, "raw_sealed_before_evaluation": True},
         "one_shot": {"prepare_before_guard": True, "guard_before_running": True, "second_execute_rejected_before_acquisition": True, "retries": 0, "replays": 0, "resume": False},
+        "terminal_evidence": {"call_started_requires_terminal_evidence": True, "recording_failure_fallback": "terminal_recording_failure.json", "recording_failure_is_incomplete": True},
         "artifact_hashes": {
             "interface": sha_file(OUT["interface"]), "runtime": sha_file(OUT["runtime"]), "payload": sha_file(OUT["payload"]), "evaluator_cases": sha_file(OUT["evaluator"]), "projection": sha_file(OUT["projection"]), "freshness": sha_file(OUT["freshness"]), "evaluator_implementation": sha_file(ROOT / "scripts/evaluate_explicit_interface_direct_unit_calibration_v3.py"), "projection_implementation": sha_file(ROOT / "scripts/project_explicit_interface_direct_unit_calibration_v2_inputs.py"), "execution_harness": sha_file(ROOT / "scripts/execute_explicit_interface_direct_unit_calibration_v3.py"),
         },
@@ -180,7 +187,7 @@ def main() -> int:
     }
     write(OUT["freeze"], freeze)
 
-    harness_freeze = {"schema": "zth.explicit_interface_direct_unit_calibration.execution_harness_freeze.v3", "status": "frozen_unexecuted", "freeze_artifact": str(OUT["freeze"].relative_to(ROOT)), "freeze_sha256": sha_file(OUT["freeze"]), "execution_harness_path": "scripts/execute_explicit_interface_direct_unit_calibration_v3.py", "execution_harness_sha256": sha_file(ROOT / "scripts/execute_explicit_interface_direct_unit_calibration_v3.py"), "evaluator_implementation_sha256": freeze["artifact_hashes"]["evaluator_implementation"], "projection_sha256": freeze["artifact_hashes"]["projection"], "schedule": schedule, "schedule_sha256": schedule_hash, "planned_local_calls": 16, "planned_external_calls": 16, "planned_supplier_calls": 32, "matched_runtime_message_bytes_across_arms": True, "matched_runtime_message_hash_across_arms": True, "supplier_message_runtime_reconstruction": False, "local_endpoint_binding": LOCAL_BASE_URL, "external_cwd": EXTERNAL_CWD, "external_codex_home": CODEX_HOME, "raw_seal_marker_ordering": "artifact coverage; raw manifest; lifecycle; marker true last", "one_shot_guard_ordering": "PREPARED; guard; RUNNING", "evaluator_file_access_during_acquisition": False, "evaluator_semantics_loaded_during_acquisition": False, "evaluator_runtime_influence": 0, "retries": 0, "replays": 0, "v3_supplier_calls": 0, "v3_target_outcomes": 0}
+    harness_freeze = {"schema": "zth.explicit_interface_direct_unit_calibration.execution_harness_freeze.v3", "status": "frozen_unexecuted", "freeze_artifact": str(OUT["freeze"].relative_to(ROOT)), "freeze_sha256": sha_file(OUT["freeze"]), "initial_v3_freeze_commit": INITIAL_V3_FREEZE_COMMIT, "transport_qualification_commit": TRANSPORT_QUALIFICATION_COMMIT, "execution_harness_path": "scripts/execute_explicit_interface_direct_unit_calibration_v3.py", "execution_harness_sha256": sha_file(ROOT / "scripts/execute_explicit_interface_direct_unit_calibration_v3.py"), "evaluator_implementation_sha256": freeze["artifact_hashes"]["evaluator_implementation"], "projection_sha256": freeze["artifact_hashes"]["projection"], "schedule": schedule, "schedule_sha256": schedule_hash, "planned_local_calls": 16, "planned_external_calls": 16, "planned_supplier_calls": 32, "matched_runtime_message_bytes_across_arms": True, "matched_runtime_message_hash_across_arms": True, "supplier_message_runtime_reconstruction": False, "local_endpoint_binding": LOCAL_BASE_URL, "external_cwd": EXTERNAL_CWD, "external_codex_home": CODEX_HOME, "external_home": EXTERNAL_HOME, "external_tmpdir": EXTERNAL_TMPDIR, "external_runtime_root": EXTERNAL_RUNTIME_ROOT, "raw_seal_marker_ordering": "artifact coverage; raw manifest; lifecycle; marker true last; false for incomplete", "one_shot_guard_ordering": "PREPARED; guard; RUNNING", "terminal_recording_failure_fallback": "terminal_recording_failure.json", "evaluator_file_access_during_acquisition": False, "evaluator_semantics_loaded_during_acquisition": False, "evaluator_runtime_influence": 0, "retries": 0, "replays": 0, "v3_supplier_calls": 0, "v3_target_outcomes": 0}
     write(OUT["harness_freeze"], harness_freeze)
     return 0
 

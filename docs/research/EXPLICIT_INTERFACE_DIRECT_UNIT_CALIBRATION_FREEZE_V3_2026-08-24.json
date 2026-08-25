@@ -2,13 +2,13 @@
   "artifact_hashes": {
     "evaluator_cases": "91454cc877dcb27805fdc6288d1b7753bd079273babc7663cb334a79fe114698",
     "evaluator_implementation": "3922879d7c740531d65c0af06b1d9fb0a667357867736783d0ccd6ccd20d5eda",
-    "execution_harness": "8d0f536222c5359214f2d97246989048744d37affd84b948527a24de40a410af",
+    "execution_harness": "b51bb6458f2a1708928a3f9e657213ed622ed2e8332a652a5db54ea74e36299d",
     "freshness": "3d082d2e583d108be5dc08198dbdaf3cd4cd416bb8209a0ddaaec6ba44d30dde",
     "interface": "83e0e261fbd854e975680371b605b9607d13a25c7a3bafef9cc870bfdbc76047",
     "payload": "a126a36ce4b37bb73772943c428977a46dc9057dcc385be856419a7b1826a423",
     "projection": "6eacf474264296055dd417b1757933a4ff9968a6e8e2cbd056c8e9df9d8f31ee",
     "projection_implementation": "7020c72840a976d6200f9a353f7f66329d9bd9b2ec1826ac1f0a5e7021a10e16",
-    "runtime": "ced64e1dac7aa5db7e8ef1fc0dfe5de92ec455d50c9ea7eb4e7fc3ae9e34fafb"
+    "runtime": "1c2f6d1a30334d30e39c939e4dc5faf22dc931ab7dc21dcf262c81c504ff734c"
   },
   "case_count": 16,
   "case_hashes": {
@@ -67,6 +67,8 @@
     "authenticated_codex_home": "/tmp/zth_v3_codex_home",
     "codex_cli": "codex-cli 0.146.0",
     "cwd": "/tmp",
+    "external_home": "/tmp/zth_explicit_interface_v3_external_runtime/home",
+    "external_tmpdir": "/tmp/zth_explicit_interface_v3_external_runtime/tmp",
     "repository_access_observed": "BEST_AVAILABLE_OBSERVATION",
     "supplier_id": "external_teacher",
     "tool_calls_observed": "BEST_AVAILABLE_OBSERVATION",
@@ -81,6 +83,7 @@
     "evaluator_runtime_influence": 0,
     "raw_sealed_before_evaluation": true
   },
+  "initial_v3_freeze_commit": "c4bd2c6c386b4df9493ce8e166dc34c4b2f58bab",
   "local_supplier": {
     "base_url": "http://192.168.1.16:8080/v1",
     "endpoint_alias": "JARVIS_LOCAL",
@@ -406,6 +409,11 @@
   "schema": "zth.explicit_interface_direct_unit_calibration.freeze.v3",
   "source_v2_freeze_commit": "a00d8a72e3c547ea401b8ab0075a4260c85eb82a",
   "status": "frozen_unexecuted",
+  "terminal_evidence": {
+    "call_started_requires_terminal_evidence": true,
+    "recording_failure_fallback": "terminal_recording_failure.json",
+    "recording_failure_is_incomplete": true
+  },
   "transport_failure_dispositions": [
     "LOCAL_TRANSPORT_FAILURE",
     "EXTERNAL_TRANSPORT_FAILURE",

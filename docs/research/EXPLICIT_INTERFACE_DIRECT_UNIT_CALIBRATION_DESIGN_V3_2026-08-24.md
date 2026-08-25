@@ -33,6 +33,13 @@ The fixed budget is 16 local and 16 external opportunities, 32 total. There
 are no conditional extensions, retries, replays, resume operations, or
 replacement calls.
 
+The external arm uses the qualified isolated runtime arrangement on every
+opportunity: `CODEX_HOME=/tmp/zth_v3_codex_home`,
+`HOME=/tmp/zth_explicit_interface_v3_external_runtime/home`,
+`TMPDIR=/tmp/zth_explicit_interface_v3_external_runtime/tmp`, and cwd `/tmp`.
+The HOME and TMPDIR paths are outside the repository and contain no experiment
+inputs or scoring artifacts.
+
 ## Qualified transport bindings
 
 Local transport was qualified at
@@ -68,7 +75,10 @@ is written last.
 Execution is one-shot: PREPARED, atomically claim the experiment guard,
 RUNNING, then calls. A second execution is rejected before RUNNING and before
 supplier-opportunity artifacts. Every started opportunity has CALL_STARTED and
-a terminal artifact, including transport failure evidence.
+a terminal artifact, including transport failure evidence. If normal
+post-call recording fails, a `terminal_recording_failure.json` fallback records
+the started opportunity and preserves any captured raw bytes; the run becomes
+`TERMINAL_INCOMPLETE` and the raw-seal marker remains false.
 
 ## Future closeout
 

@@ -41,6 +41,23 @@ class V3BoundaryTests(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 harness.validate_local_configuration()
 
+    def test_external_invocation_receives_exact_frozen_runtime_environment(self) -> None:
+        completed = mock.Mock(returncode=0, stdout=b"transport-test", stderr=b"")
+        with mock.patch.object(harness.subprocess, "run", return_value=completed) as run:
+            result = harness.capture_external(b"test")
+        kwargs = run.call_args.kwargs
+        self.assertEqual(kwargs["cwd"], harness.EXTERNAL_CWD)
+        self.assertEqual(kwargs["env"]["HOME"], str(harness.EXTERNAL_HOME))
+        self.assertEqual(kwargs["env"]["TMPDIR"], str(harness.EXTERNAL_TMPDIR))
+        self.assertEqual(kwargs["env"]["CODEX_HOME"], str(harness.CODEX_HOME))
+        self.assertEqual(result["terminal_disposition"], "RESPONSE_CAPTURED")
+
+    def test_external_runtime_paths_are_frozen_outside_repository(self) -> None:
+        runtime = harness.validate_external_runtime_paths(create=True)
+        self.assertEqual(runtime["home"], "/tmp/zth_explicit_interface_v3_external_runtime/home")
+        self.assertEqual(runtime["tmpdir"], "/tmp/zth_explicit_interface_v3_external_runtime/tmp")
+        self.assertTrue(runtime["outside_repository"])
+
     def test_prepare_only_does_not_open_evaluator_or_claim_guard(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "run"
@@ -111,6 +128,28 @@ class V3BoundaryTests(unittest.TestCase):
             self.assertEqual(terminal["terminal_disposition"], "LOCAL_TRANSPORT_FAILURE")
             self.assertTrue((arm / "infrastructure_failure.json").exists())
             self.assertFalse((arm / "response.json").exists())
+
+    def test_post_call_recording_failure_has_fallback_terminal_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            output = base / "run"
+            guard = base / "guard.json"
+            result = {"content_bytes": b"synthetic raw supplier output", "terminal_disposition": "RESPONSE_CAPTURED", "metadata": {"transport_valid": True, "prohibited_actions_not_observed": True}}
+            with mock.patch.object(harness, "_write_terminal_arm", side_effect=RuntimeError("injected recorder failure")):
+                exit_code = harness.execute(output, guard_state=guard, capture_overrides={"local_teacher": lambda _message: result})
+            self.assertEqual(exit_code, 1)
+            call_started = list(output.glob("cases/*/*/call_started.json"))
+            fallback = list(output.glob("cases/*/*/terminal_recording_failure.json"))
+            self.assertEqual(len(call_started), 1)
+            self.assertEqual(len(fallback), 1)
+            raw = json.loads((output / "raw_response_manifest.json").read_text(encoding="utf-8"))
+            execution = json.loads((output / "execution_manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(execution["status"], "TERMINAL_INCOMPLETE")
+            self.assertEqual(execution["supplier_calls"], 1)
+            self.assertFalse(execution["raw_explicit_v3_responses_sealed_before_evaluation"])
+            self.assertFalse(raw["raw_explicit_v3_responses_sealed_before_evaluation"])
+            self.assertEqual(len(raw["records"]), 1)
+            self.assertEqual(raw["records"][0]["terminal_disposition"], "TERMINAL_RECORDING_FAILURE")
 
     def test_acquisition_module_has_no_scoring_import(self) -> None:
         source = Path(harness.__file__).read_text(encoding="utf-8")

@@ -37,7 +37,8 @@ EVALUATOR_NAME = "EXPLICIT_INTERFACE_DIRECT_UNIT_CALIBRATION_EVALUATOR_CASES_V3_
 HARNESS_FREEZE_NAME = "EXPLICIT_INTERFACE_DIRECT_UNIT_CALIBRATION_V3_EXECUTION_HARNESS_FREEZE_2026-08-24.json"
 EVALUATOR_IMPL = ROOT / "scripts" / "evaluate_explicit_interface_direct_unit_calibration_v3.py"
 PROJECTION_IMPL = ROOT / "scripts" / "project_explicit_interface_direct_unit_calibration_v2_inputs.py"
-EXPECTED_FREEZE_COMMIT = "46638a5ce8b461cd57676a1317a4a57d129c7d02"
+TRANSPORT_QUALIFICATION_COMMIT = "46638a5ce8b461cd57676a1317a4a57d129c7d02"
+INITIAL_V3_FREEZE_COMMIT = "c4bd2c6c386b4df9493ce8e166dc34c4b2f58bab"
 LOCAL_BASE_URL = "http://192.168.1.16:8080/v1"
 LOCAL_MODEL = "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"
 EXTERNAL_WRAPPER = Path("/home/navigator/bin/zth-codex-teacher")
@@ -45,6 +46,9 @@ EXTERNAL_WRAPPER_SHA256 = "2c5fcaf0727bdf466e21d660c927e63d23ecb67857949b2ef21e7
 EXPECTED_CODEX_VERSION = "codex-cli 0.146.0"
 CODEX_HOME = Path("/tmp/zth_v3_codex_home")
 EXTERNAL_CWD = Path("/tmp")
+EXTERNAL_RUNTIME_ROOT = Path("/tmp/zth_explicit_interface_v3_external_runtime")
+EXTERNAL_HOME = EXTERNAL_RUNTIME_ROOT / "home"
+EXTERNAL_TMPDIR = EXTERNAL_RUNTIME_ROOT / "tmp"
 DEFAULT_RUN_ROOT = ROOT / ".work" / "model_size_supplier_floor" / "explicit_interface_direct_unit_calibration_v3"
 DEFAULT_GUARD = DEFAULT_RUN_ROOT / "ACQUISITION_GUARD.json"
 
@@ -169,19 +173,46 @@ def validate_external_identity() -> dict[str, Any]:
     codex = shutil.which("codex")
     if not codex:
         raise RuntimeError("codex executable unavailable")
-    version = subprocess.run([codex, "--version"], cwd=EXTERNAL_CWD, capture_output=True, text=True, timeout=10, check=False)
+    runtime_paths = validate_external_runtime_paths(create=True)
+    runtime_env = external_runtime_environment()
+    version = subprocess.run([codex, "--version"], cwd=EXTERNAL_CWD, env=runtime_env, capture_output=True, text=True, timeout=10, check=False)
     observed_version = (version.stdout + version.stderr).strip()
     if version.returncode != 0 or EXPECTED_CODEX_VERSION not in observed_version:
         raise RuntimeError(f"Codex version mismatch: {observed_version}")
     if not CODEX_HOME.is_dir() or not os.access(CODEX_HOME, os.R_OK | os.X_OK):
         raise RuntimeError("isolated CODEX_HOME is unavailable")
-    status = subprocess.run([codex, "login", "status"], cwd=EXTERNAL_CWD, env={**os.environ, "CODEX_HOME": str(CODEX_HOME)}, capture_output=True, text=True, timeout=20, check=False)
+    status = subprocess.run([codex, "login", "status"], cwd=EXTERNAL_CWD, env=runtime_env, capture_output=True, text=True, timeout=20, check=False)
     status_text = (status.stdout + status.stderr).casefold()
     if status.returncode != 0 or "logged in" not in status_text:
         raise RuntimeError("isolated Codex login status is not authenticated")
     if ROOT == EXTERNAL_CWD or ROOT in EXTERNAL_CWD.parents:
         raise RuntimeError("external cwd is inside the repository")
-    return {"wrapper": str(EXTERNAL_WRAPPER), "wrapper_sha256": wrapper_hash, "codex_path": str(Path(codex).resolve()), "codex_version": observed_version, "codex_home": str(CODEX_HOME), "cwd": str(EXTERNAL_CWD), "authenticated": True, "tools_mechanically_disabled": False, "tool_calls_observed": "BEST_AVAILABLE_OBSERVATION", "repository_access_observed": "BEST_AVAILABLE_OBSERVATION"}
+    return {"wrapper": str(EXTERNAL_WRAPPER), "wrapper_sha256": wrapper_hash, "codex_path": str(Path(codex).resolve()), "codex_version": observed_version, "codex_home": str(CODEX_HOME), "cwd": str(EXTERNAL_CWD), "authenticated": True, "runtime_paths": runtime_paths, "tools_mechanically_disabled": False, "tool_calls_observed": "BEST_AVAILABLE_OBSERVATION", "repository_access_observed": "BEST_AVAILABLE_OBSERVATION"}
+
+
+def validate_external_runtime_paths(*, create: bool = False) -> dict[str, Any]:
+    """Validate/create isolated writable runtime state, never repository state."""
+    paths = {"home": EXTERNAL_HOME, "tmpdir": EXTERNAL_TMPDIR}
+    for path in paths.values():
+        if ROOT == path or ROOT in path.parents:
+            raise RuntimeError(f"external runtime path is inside repository: {path}")
+        if create:
+            path.mkdir(parents=True, exist_ok=True)
+        elif not path.exists():
+            if not path.parent.exists() or not os.access(path.parent, os.W_OK | os.X_OK):
+                raise RuntimeError(f"external runtime path cannot be created: {path}")
+        if path.exists() and not os.access(path, os.W_OK | os.X_OK):
+            raise RuntimeError(f"external runtime path is not writable: {path}")
+    if EXTERNAL_CWD != Path("/tmp") or ROOT == EXTERNAL_CWD or ROOT in EXTERNAL_CWD.parents:
+        raise RuntimeError("external cwd binding is invalid")
+    return {"home": str(EXTERNAL_HOME), "tmpdir": str(EXTERNAL_TMPDIR), "codex_home": str(CODEX_HOME), "cwd": str(EXTERNAL_CWD), "outside_repository": True, "writable": True}
+
+
+def external_runtime_environment(base: dict[str, str] | None = None) -> dict[str, str]:
+    """Return the complete frozen external runtime environment."""
+    env = dict(os.environ if base is None else base)
+    env.update({"HOME": str(EXTERNAL_HOME), "TMPDIR": str(EXTERNAL_TMPDIR), "CODEX_HOME": str(CODEX_HOME)})
+    return env
 
 
 def preflight(artifact_dir: Path = DOCS) -> dict[str, Any]:
@@ -206,6 +237,7 @@ def preflight(artifact_dir: Path = DOCS) -> dict[str, Any]:
         raise RuntimeError("V3 acquisition guard or run directory already exists")
     local = check_local_models()
     external = validate_external_identity()
+    external["runtime_paths"] = validate_external_runtime_paths(create=False)
     return {"status": "preflight_pass", "local": local, "external": external, "schedule_sha256": harness_freeze["schedule_sha256"], "supplier_calls": 0, "model_calls": 0, "external_inference_calls": 0}
 
 
@@ -216,14 +248,14 @@ def prepare_run(output_dir: Path, artifact_dir: Path = DOCS) -> dict[str, Any]:
     validate_schedule(projection["schedule"], projection["cases"])
     validate_matched_messages(projection)
     output_dir.mkdir(parents=True, exist_ok=False)
-    manifest = {"schema": "zth.explicit_interface_direct_unit_calibration_v3.execution_manifest", "status": "PREPARED", "freeze_commit": EXPECTED_FREEZE_COMMIT, "schedule": projection["schedule"], "schedule_sha256": sha_bytes(canonical(projection["schedule"])), "planned_supplier_calls": 32, "planned_local_calls": 16, "planned_external_calls": 16, "processes_started": 0, "second_acquisition_process_started": False, "retries": 0, "replays": 0, "evaluator_file_access_during_acquisition": False, "evaluator_semantics_loaded_during_acquisition": False, "evaluator_runtime_influence": 0, "evaluator_supplier_visibility": False, "raw_explicit_v3_responses_sealed_before_evaluation": False, "supplier_calls": 0}
+    manifest = {"schema": "zth.explicit_interface_direct_unit_calibration_v3.execution_manifest", "status": "PREPARED", "initial_v3_freeze_commit": INITIAL_V3_FREEZE_COMMIT, "transport_qualification_commit": TRANSPORT_QUALIFICATION_COMMIT, "schedule": projection["schedule"], "schedule_sha256": sha_bytes(canonical(projection["schedule"])), "planned_supplier_calls": 32, "planned_local_calls": 16, "planned_external_calls": 16, "processes_started": 0, "second_acquisition_process_started": False, "retries": 0, "replays": 0, "evaluator_file_access_during_acquisition": False, "evaluator_semantics_loaded_during_acquisition": False, "evaluator_runtime_influence": 0, "evaluator_supplier_visibility": False, "raw_explicit_v3_responses_sealed_before_evaluation": False, "supplier_calls": 0}
     atomic_write_json(output_dir / "execution_manifest.json", manifest)
     return manifest
 
 
 def claim_guard(path: Path) -> dict[str, Any]:
     path.parent.mkdir(parents=True, exist_ok=True)
-    value = {"schema": "zth.explicit_interface_direct_unit_calibration_v3.one_shot_guard", "status": "ACQUISITION_CLAIMED", "claimed_at": utc_now(), "freeze_commit": EXPECTED_FREEZE_COMMIT, "harness_sha256": sha_file(Path(__file__)), "processes_started": 1, "second_acquisition_process_started": False}
+    value = {"schema": "zth.explicit_interface_direct_unit_calibration_v3.one_shot_guard", "status": "ACQUISITION_CLAIMED", "claimed_at": utc_now(), "initial_v3_freeze_commit": INITIAL_V3_FREEZE_COMMIT, "transport_qualification_commit": TRANSPORT_QUALIFICATION_COMMIT, "harness_sha256": sha_file(Path(__file__)), "processes_started": 1, "second_acquisition_process_started": False}
     try:
         fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
     except FileExistsError as exc:
@@ -260,7 +292,8 @@ def capture_external(message: bytes) -> dict[str, Any]:
         raise RuntimeError("external command is not the frozen wrapper")
     started = time.monotonic()
     try:
-        result = subprocess.run(shlex.split(command), input=message, capture_output=True, cwd=EXTERNAL_CWD, env={**os.environ, "CODEX_HOME": str(CODEX_HOME)}, timeout=900, check=False)
+        validate_external_runtime_paths(create=True)
+        result = subprocess.run(shlex.split(command), input=message, capture_output=True, cwd=EXTERNAL_CWD, env=external_runtime_environment(), timeout=900, check=False)
         stdout, stderr, return_code = result.stdout, result.stderr, result.returncode
         timed_out = False
     except subprocess.TimeoutExpired as exc:
@@ -288,22 +321,36 @@ def _write_terminal_arm(arm_dir: Path, item: dict[str, Any], result: dict[str, A
     return terminal
 
 
+def _write_recording_failure(arm_dir: Path, item: dict[str, Any], result: dict[str, Any], started: str, error: BaseException) -> dict[str, Any]:
+    """Persist an unambiguous terminal record when normal recording fails."""
+    content = result.get("content_bytes", b"")
+    if content:
+        (arm_dir / "captured_supplier_content.bin").write_bytes(content)
+    if result.get("stdout_bytes") is not None:
+        (arm_dir / "captured_stdout.bin").write_bytes(result.get("stdout_bytes", b""))
+    if result.get("stderr_bytes") is not None:
+        (arm_dir / "captured_stderr.bin").write_bytes(result.get("stderr_bytes", b""))
+    failure = {"schema": "zth.explicit_interface_direct_unit_calibration_v3.terminal_recording_failure", "terminal_disposition": "TERMINAL_RECORDING_FAILURE", "ordinal": item["ordinal"], "case_id": item["case_id"], "supplier_id": item["supplier_id"], "supplier_opportunity_started": True, "started_at": started, "recording_error_type": type(error).__name__, "recording_error": str(error), "captured_content_sha256": sha_bytes(content), "captured_stdout_sha256": sha_bytes(result.get("stdout_bytes", b"")), "captured_stderr_sha256": sha_bytes(result.get("stderr_bytes", b"")), "retries": 0, "replays": 0, "captured_at": utc_now()}
+    failure_hash = atomic_write_json(arm_dir / "terminal_recording_failure.json", failure)
+    return {"schema": "zth.explicit_interface_direct_unit_calibration_v3.call_finished_fallback", "ordinal": item["ordinal"], "case_id": item["case_id"], "capability_family": item["capability_family"], "interface_id": item["interface_id"], "supplier_id": item["supplier_id"], "supplier_message_sha256": item["supplier_message_sha256"], "started_at": started, "finished_at": utc_now(), "elapsed_ms": 0, "terminal_disposition": "TERMINAL_RECORDING_FAILURE", "terminal_recording_failure_artifact_sha256": failure_hash, "retries": 0, "replays": 0}
+
+
 def seal_raw(run_dir: Path, manifest: dict[str, Any], records: list[dict[str, Any]], status: str) -> bool:
     arm_hashes = []
     for record in records:
         arm_dir = run_dir / "cases" / record["case_id"] / record["supplier_id"]
         names = {path.name for path in arm_dir.glob("*") if path.is_file()}
-        if not {"supplier_message.txt", "call_started.json", "call_finished.json"}.issubset(names):
+        if not {"supplier_message.txt", "call_started.json"}.issubset(names):
             raise RuntimeError("terminal artifact coverage incomplete")
-        if not ("response.json" in names or "infrastructure_failure.json" in names):
+        if not (("call_finished.json" in names and ("response.json" in names or "infrastructure_failure.json" in names)) or "terminal_recording_failure.json" in names):
             raise RuntimeError("terminal evidence missing")
         arm_hashes.append({"ordinal": record["ordinal"], "case_id": record["case_id"], "supplier_id": record["supplier_id"], "artifact_hashes": {str(path.relative_to(run_dir)): sha_file(path) for path in sorted(arm_dir.glob("*")) if path.is_file()}})
     raw = {"schema": "zth.explicit_interface_direct_unit_calibration_v3.raw_acquisition_manifest", "status": "SEALED_BEFORE_EVALUATION" if status == "TERMINAL_COMPLETE" else "SEALED_INCOMPLETE", "raw_explicit_v3_responses_sealed_before_evaluation": False, "evaluator_file_access_during_acquisition": False, "evaluator_semantics_loaded_during_acquisition": False, "evaluator_runtime_influence": 0, "terminal_arm_artifacts": arm_hashes, "terminal_arm_artifact_count": len(arm_hashes), "records": records, "retries": 0, "replays": 0}
     atomic_write_json(run_dir / "raw_response_manifest.json", raw)
     atomic_write_json(run_dir / "lifecycle.json", {"status": status, "processes_started": 1, "supplier_calls": len(records), "terminal_arm_artifact_count": len(arm_hashes), "raw_seal_written": True})
-    manifest.update({"status": status, "supplier_calls": len(records), "raw_explicit_v3_responses_sealed_before_evaluation": True})
+    manifest.update({"status": status, "supplier_calls": len(records), "raw_explicit_v3_responses_sealed_before_evaluation": status == "TERMINAL_COMPLETE"})
     atomic_write_json(run_dir / "execution_manifest.json", manifest)
-    raw["raw_explicit_v3_responses_sealed_before_evaluation"] = True
+    raw["raw_explicit_v3_responses_sealed_before_evaluation"] = status == "TERMINAL_COMPLETE"
     atomic_write_json(run_dir / "raw_response_manifest.json", raw)
     return True
 
@@ -312,6 +359,7 @@ def execute(output_dir: Path, artifact_dir: Path = DOCS, guard_state: Path | Non
     projection = load_projection(artifact_dir)
     validate_schedule(projection["schedule"], projection["cases"])
     validate_matched_messages(projection)
+    validate_external_runtime_paths(create=True)
     manifest = prepare_run(output_dir, artifact_dir)
     guard = guard_state or DEFAULT_GUARD
     try:
@@ -345,7 +393,11 @@ def execute(output_dir: Path, artifact_dir: Path = DOCS, guard_state: Path | Non
                     result = capture_external(message_bytes)
             except Exception as exc:
                 result = {"content_bytes": b"", "terminal_disposition": "LOCAL_TRANSPORT_FAILURE" if item["supplier_id"] == "local_teacher" else "EXTERNAL_TRANSPORT_FAILURE", "metadata": {"error": str(exc), "transport_valid": False, "prohibited_actions_not_observed": False}}
-            records.append(_write_terminal_arm(arm_dir, item, result, started, round((time.monotonic() - mono) * 1000, 3)))
+            try:
+                records.append(_write_terminal_arm(arm_dir, item, result, started, round((time.monotonic() - mono) * 1000, 3)))
+            except Exception as recording_error:
+                records.append(_write_recording_failure(arm_dir, item, result, started, recording_error))
+                raise RuntimeError("terminal recording failed after supplier opportunity; acquisition is incomplete") from recording_error
         seal_raw(output_dir, manifest, records, "TERMINAL_COMPLETE")
         return 0
     except BaseException as exc:

@@ -344,8 +344,11 @@
   "external_codex_home": "/tmp/zth_v3_codex_home",
   "external_codex_version": "codex-cli 0.146.0",
   "external_cwd": "/tmp",
+  "external_home": "/tmp/zth_explicit_interface_v3_external_runtime/home",
+  "external_tmpdir": "/tmp/zth_explicit_interface_v3_external_runtime/tmp",
   "external_wrapper": "/home/navigator/bin/zth-codex-teacher",
   "external_wrapper_sha256": "2c5fcaf0727bdf466e21d660c927e63d23ecb67857949b2ef21e7e599297ceab",
+  "initial_v3_freeze_commit": "c4bd2c6c386b4df9493ce8e166dc34c4b2f58bab",
   "interface_contract_path": "docs/research/EXPLICIT_INTERFACE_DIRECT_UNIT_CALIBRATION_INTERFACE_V3_2026-08-24.json",
   "interface_contract_sha256": "83e0e261fbd854e975680371b605b9607d13a25c7a3bafef9cc870bfdbc76047",
   "local_base_url": "http://192.168.1.16:8080/v1",
@@ -357,5 +360,6 @@
   "supplier_arms": [
     "local_teacher",
     "external_teacher"
-  ]
+  ],
+  "transport_qualification_commit": "46638a5ce8b461cd57676a1317a4a57d129c7d02"
 }
