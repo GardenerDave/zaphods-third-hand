@@ -1,0 +1,61 @@
+{
+  "schema": "historian_focused_30b_shared_memory_v1_queries",
+  "historian_commit": "1403d4bb95e7b07046c88733e75950f337a65c8f",
+  "worker_contract_version": "shared_memory_worker_v2",
+  "tasks": [
+    {
+      "id": "Q01",
+      "task_class": "historical_fact_recovery",
+      "question": "Which Historian record says V2 capability stayed unmeasured after the transport failure instead of becoming a capability verdict?",
+      "expected_record_ids": ["CLM-v2-unmeasured", "EVT-v2-acquisition"],
+      "required_citation_ids": ["CLM-v2-unmeasured"],
+      "answer_mode": "grounded_fact",
+      "forbidden_misconception": "transport failure alone proved capability"
+    },
+    {
+      "id": "Q02",
+      "task_class": "historical_fact_recovery",
+      "question": "Which Historian record marks the prerequisite that transport qualification had to come before later capability evidence?",
+      "expected_record_ids": ["INT-qualification-gate", "EVT-v3-acquisition"],
+      "required_citation_ids": ["INT-qualification-gate"],
+      "answer_mode": "grounded_fact",
+      "forbidden_misconception": "capability evidence can precede transport qualification"
+    },
+    {
+      "id": "Q03",
+      "task_class": "historical_synthesis",
+      "question": "Trace the sequence from the V2 transport failure through requalification to the V3 acquisition.",
+      "expected_record_ids": ["INT-qualification-gate", "CLM-v2-unmeasured", "EVT-v3-acquisition", "EVT-external-requalified", "EVT-local-requalified"],
+      "required_citation_ids": ["CLM-v2-unmeasured", "EVT-v3-acquisition"],
+      "answer_mode": "synthesis",
+      "forbidden_misconception": "the sequence was a direct capability proof"
+    },
+    {
+      "id": "Q04",
+      "task_class": "historical_synthesis",
+      "question": "How do the transport failure, the requalification steps, and the V3 acquisition fit together chronologically?",
+      "expected_record_ids": ["CLM-qualified-evidence-boundary", "EVT-local-requalified", "EVT-external-requalified", "CLM-v3-evaluation-scorecard"],
+      "required_citation_ids": ["CLM-qualified-evidence-boundary", "CLM-v3-evaluation-scorecard"],
+      "answer_mode": "synthesis",
+      "forbidden_misconception": "chronology alone establishes capability"
+    },
+    {
+      "id": "Q05",
+      "task_class": "evidence_boundary_reasoning",
+      "question": "Does transport qualification by itself establish model capability according to Historian?",
+      "expected_record_ids": ["CLM-qualified-evidence-boundary", "CLM-v2-unmeasured"],
+      "required_citation_ids": ["CLM-qualified-evidence-boundary"],
+      "answer_mode": "boundary_reasoning",
+      "forbidden_misconception": "transport qualification proves capability"
+    },
+    {
+      "id": "Q06",
+      "task_class": "evidence_boundary_reasoning",
+      "question": "What can the Historian evidence say about the boundary between transport qualification and capability evidence?",
+      "expected_record_ids": ["CLM-v2-unmeasured", "CLM-qualified-evidence-boundary", "CLM-v3-evaluation-scorecard"],
+      "required_citation_ids": ["CLM-v2-unmeasured"],
+      "answer_mode": "boundary_reasoning",
+      "forbidden_misconception": "the boundary is only rhetorical"
+    }
+  ]
+}
