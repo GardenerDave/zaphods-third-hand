@@ -179,7 +179,7 @@ def test_tick_once_creates_run_dir_and_summary(tmp_path):
     run_dir = _latest_run_dir(snapshot)
     summary = _read_json(run_dir / "tick_summary.json")
     assert summary["summary_schema"] == "long_duration_dogfood_tick_v1"
-    assert summary["branch"] == "dogfood/overnight-20260718"
+    assert summary["branch"] == "main"
     assert len(summary["head_commit"]) == 40
     assert summary["next_task_category"] in {"tests_or_fixtures", "code_or_validator", "blocked_needs_review"}
     assert isinstance(summary["implementation_prompt"], str) and summary["implementation_prompt"].strip()
