@@ -55,6 +55,61 @@ def _valid_raw_output_json() -> str:
     )
 
 
+def _captured_model_call_metadata(
+    *,
+    prompt_text: str,
+    raw_output_text: str,
+    model: str = "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    endpoint: str = "http://192.168.1.16:8081/v1",
+) -> dict[str, object]:
+    return {
+        "source": "local_openai_compatible_endpoint",
+        "endpoint": endpoint,
+        "model": model,
+        "temperature": 0,
+        "max_tokens": 1024,
+        "prompt_path": "prompt_to_paste.md",
+        "prompt_sha256": manual_attempt._sha256_text(prompt_text),
+        "prompt_length": len(prompt_text),
+        "raw_output_path": "raw_model_output.txt",
+        "raw_output_sha256": manual_attempt._sha256_text(raw_output_text),
+        "raw_output_length": len(raw_output_text),
+        "call_status": "completed",
+        "review_required": True,
+        "request_provenance": {
+            "api": "openai-chat",
+            "endpoint": endpoint,
+            "request_url": f"{endpoint.rstrip('/')}/chat/completions",
+            "model": model,
+            "configured_model": model,
+            "resolved_model": model,
+            "prompt_path": "prompt_to_paste.md",
+            "prompt_sha256": manual_attempt._sha256_text(prompt_text),
+            "prompt_length": len(prompt_text),
+            "max_tokens": 1024,
+            "temperature": 0,
+        },
+        "response_provenance": {
+            "raw_output_path": "raw_model_output.txt",
+            "raw_output_sha256": manual_attempt._sha256_text(raw_output_text),
+            "raw_output_length": len(raw_output_text),
+            "model": model,
+        },
+        "authority_boundaries": [
+            "Local model call is not command execution authority.",
+            "Local model call is not file modification authority.",
+            "No automatic patch promotion authority is granted.",
+            "No automatic training authority is granted.",
+            "No default failure-to-curriculum capture authority is granted.",
+            "Ingest and explicit review are required before downstream use.",
+        ],
+    }
+
+
+def _write_captured_model_call_metadata(path: Path, payload: dict[str, object]) -> None:
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
 def _prepare_run(tmp_path: Path, *, timestamp: str = "20260707T010101Z") -> Path:
     out_dir = tmp_path / "runs"
     result = run_script(
@@ -67,7 +122,12 @@ def _prepare_run(tmp_path: Path, *, timestamp: str = "20260707T010101Z") -> Path
         timestamp,
     )
     assert result.returncode == 0
-    return out_dir / timestamp
+    run_dir = out_dir / timestamp
+    (run_dir / "prompt_to_paste.md").write_text(
+        (run_dir / "model_prompt_packet.md").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    return run_dir
 
 
 def _session_run(
@@ -1476,6 +1536,241 @@ def test_ingest_marks_manual_operator_provenance_and_no_endpoint_usage_fields(tm
     assert attempt["model_metadata"]["provider"] == "manual_operator"
     assert "endpoint_url" not in attempt
     assert "raw_model_output" in attempt
+
+
+def test_ingest_with_model_call_metadata_records_captured_model_provenance(tmp_path: Path):
+    run_dir = _prepare_run(tmp_path, timestamp="20260707T151616Z")
+    prompt_text = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
+    source_raw = tmp_path / "raw_model_output.txt"
+    raw_text = _valid_raw_output_json()
+    source_raw.write_text(raw_text, encoding="utf-8")
+    metadata = tmp_path / "local_model_call.json"
+    metadata_payload = _captured_model_call_metadata(prompt_text=prompt_text, raw_output_text=raw_text)
+    _write_captured_model_call_metadata(metadata, metadata_payload)
+
+    result = run_script(
+        "ingest",
+        "--run-dir",
+        run_dir,
+        "--raw-output-file",
+        source_raw,
+        "--model-call-metadata-file",
+        metadata,
+        "--decision",
+        "accepted",
+        "--decision-reason",
+        "Output satisfies the required contract and remains within scope.",
+        "--operator",
+        "manual",
+        "--next-worker",
+        "qwen3-30b",
+        "--next-worker-objective",
+        "Produce a bounded downstream comparison report.",
+    )
+    assert result.returncode == 0
+
+    attempt = json.loads((run_dir / "supervised_model_attempt.json").read_text(encoding="utf-8"))
+    assert attempt["model_metadata"]["model_id"] == "Qwen_Qwen3-1.7B-Q4_K_M.gguf"
+    assert attempt["model_metadata"]["provider"] == "local_model_call"
+    assert attempt["provenance"]["source"] == "captured_model_output"
+    assert attempt["provenance"]["model_call_metadata_path"].endswith("local_model_call.json")
+    assert attempt["provenance"]["model_call_metadata_sha256"] == manual_attempt._sha256_file(metadata)
+    assert attempt["provenance"]["raw_output_sha256"] == manual_attempt._sha256_text(raw_text)
+    assert attempt["provenance"]["raw_output_length"] == len(raw_text)
+    assert attempt["provenance"]["acquisition_request_provenance"]["resolved_model"] == "Qwen_Qwen3-1.7B-Q4_K_M.gguf"
+    assert "manual_operator_provided_model_output" not in json.dumps(attempt)
+    assert attempt["provenance"]["acquisition_request_provenance"]["prompt_sha256"] == metadata_payload["prompt_sha256"]
+    assert attempt["provenance"]["acquisition_request_provenance"]["prompt_length"] == metadata_payload["prompt_length"]
+    assert attempt["provenance"]["acquisition_request_provenance"]["prompt_path"] == "prompt_to_paste.md"
+    assert attempt["provenance"]["acquisition_request_provenance"]["request_url"] == metadata_payload["request_provenance"][
+        "request_url"
+    ]
+
+    manifest = json.loads((run_dir / "transaction_manifest.json").read_text(encoding="utf-8"))
+    assert manifest["records"]["attempt_id"] == attempt["attempt_id"]
+    assert manifest["first_worker_identity"] == "Qwen_Qwen3-1.7B-Q4_K_M.gguf"
+
+
+def test_ingest_with_tampered_model_call_metadata_fails_closed(tmp_path: Path):
+    run_dir = _prepare_run(tmp_path, timestamp="20260707T161718Z")
+    prompt_text = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
+    raw_text = _valid_raw_output_json()
+    source_raw = tmp_path / "raw_model_output.txt"
+    source_raw.write_text(raw_text, encoding="utf-8")
+    metadata = _captured_model_call_metadata(prompt_text=prompt_text, raw_output_text=raw_text)
+    metadata["raw_output_sha256"] = "0" * 64
+    metadata_path = tmp_path / "tampered_model_call.json"
+    metadata_path.write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    result = run_script(
+        "ingest",
+        "--run-dir",
+        run_dir,
+        "--raw-output-file",
+        source_raw,
+        "--model-call-metadata-file",
+        metadata_path,
+    )
+    assert result.returncode != 0
+    assert "does not match model call metadata raw_output_sha256" in result.stderr
+
+
+def test_ingest_with_prompt_sha_mismatch_fails_closed(tmp_path: Path):
+    run_dir = _prepare_run(tmp_path, timestamp="20260707T171820Z")
+    raw_text = _valid_raw_output_json()
+    source_raw = tmp_path / "raw_model_output.txt"
+    source_raw.write_text(raw_text, encoding="utf-8")
+    metadata = _captured_model_call_metadata(
+        prompt_text=(run_dir / "prompt_to_paste.md").read_text(encoding="utf-8"),
+        raw_output_text=raw_text,
+    )
+    metadata["prompt_sha256"] = "1" * 64
+    metadata["request_provenance"]["prompt_sha256"] = "1" * 64
+    metadata_path = tmp_path / "prompt_sha_mismatch.json"
+    _write_captured_model_call_metadata(metadata_path, metadata)
+
+    result = run_script(
+        "ingest",
+        "--run-dir",
+        run_dir,
+        "--raw-output-file",
+        source_raw,
+        "--model-call-metadata-file",
+        metadata_path,
+    )
+    assert result.returncode != 0
+    assert "prompt_sha256 does not match run prompt artifact" in result.stderr
+
+
+def test_ingest_with_prompt_length_mismatch_fails_closed(tmp_path: Path):
+    run_dir = _prepare_run(tmp_path, timestamp="20260707T171821Z")
+    raw_text = _valid_raw_output_json()
+    source_raw = tmp_path / "raw_model_output.txt"
+    source_raw.write_text(raw_text, encoding="utf-8")
+    metadata = _captured_model_call_metadata(
+        prompt_text=(run_dir / "prompt_to_paste.md").read_text(encoding="utf-8"),
+        raw_output_text=raw_text,
+    )
+    metadata["prompt_length"] = metadata["prompt_length"] + 1
+    metadata["request_provenance"]["prompt_length"] = metadata["request_provenance"]["prompt_length"] + 1
+    metadata_path = tmp_path / "prompt_length_mismatch.json"
+    _write_captured_model_call_metadata(metadata_path, metadata)
+
+    result = run_script(
+        "ingest",
+        "--run-dir",
+        run_dir,
+        "--raw-output-file",
+        source_raw,
+        "--model-call-metadata-file",
+        metadata_path,
+    )
+    assert result.returncode != 0
+    assert "prompt_length does not match run prompt artifact" in result.stderr
+
+
+def test_ingest_with_response_sha_mismatch_fails_closed(tmp_path: Path):
+    run_dir = _prepare_run(tmp_path, timestamp="20260707T171822Z")
+    raw_text = _valid_raw_output_json()
+    source_raw = tmp_path / "raw_model_output.txt"
+    source_raw.write_text(raw_text, encoding="utf-8")
+    metadata = _captured_model_call_metadata(
+        prompt_text=(run_dir / "prompt_to_paste.md").read_text(encoding="utf-8"),
+        raw_output_text=raw_text,
+    )
+    metadata["response_provenance"]["raw_output_sha256"] = "2" * 64
+    metadata_path = tmp_path / "response_sha_mismatch.json"
+    _write_captured_model_call_metadata(metadata_path, metadata)
+
+    result = run_script(
+        "ingest",
+        "--run-dir",
+        run_dir,
+        "--raw-output-file",
+        source_raw,
+        "--model-call-metadata-file",
+        metadata_path,
+    )
+    assert result.returncode != 0
+    assert "response_provenance.raw_output_sha256 must match raw_output_sha256" in result.stderr
+
+
+def test_ingest_with_response_length_mismatch_fails_closed(tmp_path: Path):
+    run_dir = _prepare_run(tmp_path, timestamp="20260707T171823Z")
+    raw_text = _valid_raw_output_json()
+    source_raw = tmp_path / "raw_model_output.txt"
+    source_raw.write_text(raw_text, encoding="utf-8")
+    metadata = _captured_model_call_metadata(
+        prompt_text=(run_dir / "prompt_to_paste.md").read_text(encoding="utf-8"),
+        raw_output_text=raw_text,
+    )
+    metadata["response_provenance"]["raw_output_length"] = metadata["response_provenance"]["raw_output_length"] + 1
+    metadata_path = tmp_path / "response_length_mismatch.json"
+    _write_captured_model_call_metadata(metadata_path, metadata)
+
+    result = run_script(
+        "ingest",
+        "--run-dir",
+        run_dir,
+        "--raw-output-file",
+        source_raw,
+        "--model-call-metadata-file",
+        metadata_path,
+    )
+    assert result.returncode != 0
+    assert "response_provenance.raw_output_length must match raw_output_length" in result.stderr
+
+
+def test_ingest_with_failed_acquisition_status_fails_closed(tmp_path: Path):
+    run_dir = _prepare_run(tmp_path, timestamp="20260707T171824Z")
+    raw_text = _valid_raw_output_json()
+    source_raw = tmp_path / "raw_model_output.txt"
+    source_raw.write_text(raw_text, encoding="utf-8")
+    metadata = _captured_model_call_metadata(
+        prompt_text=(run_dir / "prompt_to_paste.md").read_text(encoding="utf-8"),
+        raw_output_text=raw_text,
+    )
+    metadata["call_status"] = "failed"
+    metadata_path = tmp_path / "failed_acquisition.json"
+    _write_captured_model_call_metadata(metadata_path, metadata)
+
+    result = run_script(
+        "ingest",
+        "--run-dir",
+        run_dir,
+        "--raw-output-file",
+        source_raw,
+        "--model-call-metadata-file",
+        metadata_path,
+    )
+    assert result.returncode != 0
+    assert "must represent a completed acquisition" in result.stderr
+
+
+def test_ingest_with_model_call_metadata_requires_acquisition_provenance(tmp_path: Path):
+    run_dir = _prepare_run(tmp_path, timestamp="20260707T171819Z")
+    raw_text = _valid_raw_output_json()
+    source_raw = tmp_path / "raw_model_output.txt"
+    source_raw.write_text(raw_text, encoding="utf-8")
+    metadata = _captured_model_call_metadata(
+        prompt_text=(run_dir / "model_prompt_packet.md").read_text(encoding="utf-8"),
+        raw_output_text=raw_text,
+    )
+    del metadata["request_provenance"]
+    metadata_path = tmp_path / "missing_request_provenance.json"
+    metadata_path.write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    result = run_script(
+        "ingest",
+        "--run-dir",
+        run_dir,
+        "--raw-output-file",
+        source_raw,
+        "--model-call-metadata-file",
+        metadata_path,
+    )
+    assert result.returncode != 0
+    assert "must include request_provenance" in result.stderr
 
 
 def test_prepare_prints_run_dir_and_ingest_prints_validation_status(tmp_path: Path):

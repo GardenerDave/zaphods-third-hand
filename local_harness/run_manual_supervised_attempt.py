@@ -84,6 +84,18 @@ def _read_json(path: Path, *, kind: str) -> dict[str, Any]:
     return payload
 
 
+def _sha256_text(text: str) -> str:
+    import hashlib
+
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def _sha256_file(path: Path) -> str:
+    import hashlib
+
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def _parse_field_list_from_text(text: str, prefix: str) -> list[str]:
     if not text.startswith(prefix):
         return []
@@ -156,7 +168,9 @@ def _call_local_metadata_payload(
     temperature: float,
     max_tokens: int,
     prompt_path: Path,
+    prompt_text: str,
     raw_output_path: Path,
+    raw_output_text: str,
 ) -> dict[str, Any]:
     return {
         "source": "local_openai_compatible_endpoint",
@@ -165,9 +179,32 @@ def _call_local_metadata_payload(
         "temperature": temperature,
         "max_tokens": max_tokens,
         "prompt_path": prompt_path.name,
+        "prompt_sha256": _sha256_text(prompt_text),
+        "prompt_length": len(prompt_text),
         "raw_output_path": raw_output_path.name,
+        "raw_output_sha256": _sha256_text(raw_output_text),
+        "raw_output_length": len(raw_output_text),
         "call_status": "completed",
         "review_required": True,
+        "request_provenance": {
+            "api": "openai-chat",
+            "endpoint": endpoint,
+            "request_url": _call_local_url(endpoint),
+            "model": model,
+            "configured_model": model,
+            "resolved_model": model,
+            "prompt_path": prompt_path.name,
+            "prompt_sha256": _sha256_text(prompt_text),
+            "prompt_length": len(prompt_text),
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+        },
+        "response_provenance": {
+            "raw_output_path": raw_output_path.name,
+            "raw_output_sha256": _sha256_text(raw_output_text),
+            "raw_output_length": len(raw_output_text),
+            "model": model,
+        },
         "authority_boundaries": [
             "Local model call is not command execution authority.",
             "Local model call is not file modification authority.",
@@ -774,7 +811,9 @@ def run_call_local(
         temperature=temperature,
         max_tokens=max_tokens,
         prompt_path=prompt_path,
+        prompt_text=prompt_text,
         raw_output_path=raw_output_path,
+        raw_output_text=assistant_content,
     )
     _write_json(metadata_path, metadata_payload)
 
@@ -956,6 +995,7 @@ def run_ingest(
     *,
     run_dir: Path,
     raw_output_file: Path,
+    model_call_metadata_file: Path | None = None,
     decision: str | None = None,
     decision_reason: str | None = None,
     operator: str | None = None,
@@ -976,33 +1016,128 @@ def run_ingest(
         raise ValueError(f"--raw-output-file does not exist: {raw_output_file}")
     raw_output_text = raw_output_file.read_text(encoding="utf-8")
 
+    model_call_metadata: dict[str, Any] | None = None
+    if model_call_metadata_file is not None:
+        if not model_call_metadata_file.is_file():
+            raise ValueError(f"--model-call-metadata-file does not exist: {model_call_metadata_file}")
+        model_call_metadata = _read_json(model_call_metadata_file, kind="model call metadata")
+        if model_call_metadata.get("call_status") != "completed":
+            raise ValueError("--model-call-metadata-file must represent a completed acquisition")
+        request_provenance = model_call_metadata.get("request_provenance")
+        if not isinstance(request_provenance, dict):
+            raise ValueError("--model-call-metadata-file must include request_provenance")
+        model_identity = model_call_metadata.get("model")
+        if not isinstance(model_identity, str) or not model_identity.strip():
+            raise ValueError("--model-call-metadata-file must include model")
+        metadata_prompt_sha = model_call_metadata.get("prompt_sha256")
+        metadata_prompt_length = model_call_metadata.get("prompt_length")
+        if metadata_prompt_sha is None:
+            raise ValueError("--model-call-metadata-file must include prompt_sha256")
+        if metadata_prompt_length is None:
+            raise ValueError("--model-call-metadata-file must include prompt_length")
+        prompt_path_value = model_call_metadata.get("prompt_path")
+        if not isinstance(prompt_path_value, str) or not prompt_path_value.strip():
+            raise ValueError("--model-call-metadata-file must include prompt_path")
+        expected_prompt_path = run_dir / prompt_path_value
+        if not expected_prompt_path.is_file():
+            raise ValueError(f"--model-call-metadata-file prompt_path does not resolve in run: {expected_prompt_path}")
+        if _sha256_file(expected_prompt_path) != metadata_prompt_sha:
+            raise ValueError("--model-call-metadata-file prompt_sha256 does not match run prompt artifact")
+        if len(expected_prompt_path.read_text(encoding="utf-8")) != metadata_prompt_length:
+            raise ValueError("--model-call-metadata-file prompt_length does not match run prompt artifact")
+        if request_provenance.get("resolved_model") not in {None, model_identity}:
+            raise ValueError("--model-call-metadata-file resolved_model must match model")
+        if request_provenance.get("model") not in {None, model_identity}:
+            raise ValueError("--model-call-metadata-file request_provenance.model must match model")
+        if request_provenance.get("prompt_path") not in {None, prompt_path_value}:
+            raise ValueError("--model-call-metadata-file request_provenance.prompt_path must match prompt_path")
+        if request_provenance.get("prompt_sha256") != metadata_prompt_sha:
+            raise ValueError("--model-call-metadata-file request_provenance.prompt_sha256 must match prompt_sha256")
+        if request_provenance.get("prompt_length") != metadata_prompt_length:
+            raise ValueError("--model-call-metadata-file request_provenance.prompt_length must match prompt_length")
+        response_provenance = model_call_metadata.get("response_provenance")
+        if not isinstance(response_provenance, dict):
+            raise ValueError("--model-call-metadata-file must include response_provenance")
+        if response_provenance.get("raw_output_sha256") is None:
+            raise ValueError("--model-call-metadata-file must include response_provenance.raw_output_sha256")
+        if response_provenance.get("raw_output_length") is None:
+            raise ValueError("--model-call-metadata-file must include response_provenance.raw_output_length")
+        if response_provenance.get("model") not in {None, model_identity}:
+            raise ValueError("--model-call-metadata-file response_provenance.model must match model")
+        if model_call_metadata.get("raw_output_sha256") is None:
+            raise ValueError("--model-call-metadata-file must include raw_output_sha256")
+        if model_call_metadata.get("raw_output_length") is None:
+            raise ValueError("--model-call-metadata-file must include raw_output_length")
+        if model_call_metadata["raw_output_sha256"] != _sha256_text(raw_output_text):
+            raise ValueError("--raw-output-file does not match model call metadata raw_output_sha256")
+        if model_call_metadata["raw_output_length"] != len(raw_output_text):
+            raise ValueError("--raw-output-file length does not match model call metadata raw_output_length")
+        if response_provenance.get("raw_output_sha256") != model_call_metadata["raw_output_sha256"]:
+            raise ValueError("--model-call-metadata-file response_provenance.raw_output_sha256 must match raw_output_sha256")
+        if response_provenance.get("raw_output_length") != model_call_metadata["raw_output_length"]:
+            raise ValueError("--model-call-metadata-file response_provenance.raw_output_length must match raw_output_length")
+        if response_provenance.get("raw_output_path") not in {None, model_call_metadata.get("raw_output_path")}:
+            raise ValueError("--model-call-metadata-file response_provenance.raw_output_path must match raw_output_path")
+
     run_raw_output_path = run_dir / "raw_model_output.txt"
     run_raw_output_path.write_text(raw_output_text, encoding="utf-8")
 
     ts = _utc_timestamp().lower()
-    attempt_record = build_supervised_model_attempt_record(
-        attempt_id=f"manual_attempt_{ts}",
-        orchestration_id=_require_nonempty(manifest.get("orchestration_id"), field="orchestration_id"),
-        triage_id=_require_nonempty(manifest.get("triage_id"), field="triage_id"),
-        prompt_packet_id=_require_nonempty(manifest.get("prompt_packet_id"), field="prompt_packet_id"),
-        source_prompt_packet_path=str(model_prompt_packet_path),
-        raw_model_output=raw_output_text,
-        model_metadata={
-            "model_id": "manual_operator_provided_model_output",
-            "provider": "manual_operator",
-        },
-        operator_metadata={
-            "operator": operator.strip() if isinstance(operator, str) and operator.strip() else "manual",
-            "review_required": True,
-        },
-        provenance={
-            "source": "manual_operator_pasted_model_output",
-            "input_artifact": "model_prompt_packet",
-            "raw_output_preserved": True,
-            "run_manifest_path": str(manifest_path),
-            "raw_output_source_path": str(raw_output_file),
-        },
-    )
+    if model_call_metadata is None:
+        attempt_record = build_supervised_model_attempt_record(
+            attempt_id=f"manual_attempt_{ts}",
+            orchestration_id=_require_nonempty(manifest.get("orchestration_id"), field="orchestration_id"),
+            triage_id=_require_nonempty(manifest.get("triage_id"), field="triage_id"),
+            prompt_packet_id=_require_nonempty(manifest.get("prompt_packet_id"), field="prompt_packet_id"),
+            source_prompt_packet_path=str(model_prompt_packet_path),
+            raw_model_output=raw_output_text,
+            model_metadata={
+                "model_id": "manual_operator_provided_model_output",
+                "provider": "manual_operator",
+            },
+            operator_metadata={
+                "operator": operator.strip() if isinstance(operator, str) and operator.strip() else "manual",
+                "review_required": True,
+            },
+            provenance={
+                "source": "manual_operator_pasted_model_output",
+                "input_artifact": "model_prompt_packet",
+                "raw_output_preserved": True,
+                "run_manifest_path": str(manifest_path),
+                "raw_output_source_path": str(raw_output_file),
+            },
+        )
+    else:
+        attempt_record = build_supervised_model_attempt_record(
+            attempt_id=f"model_attempt_{ts}",
+            orchestration_id=_require_nonempty(manifest.get("orchestration_id"), field="orchestration_id"),
+            triage_id=_require_nonempty(manifest.get("triage_id"), field="triage_id"),
+            prompt_packet_id=_require_nonempty(manifest.get("prompt_packet_id"), field="prompt_packet_id"),
+            source_prompt_packet_path=str(model_prompt_packet_path),
+            raw_model_output=raw_output_text,
+            model_metadata={
+                "model_id": model_call_metadata["model"],
+                "provider": "local_model_call",
+                "request_url": model_call_metadata.get("request_url"),
+            },
+            operator_metadata={
+                "operator": operator.strip() if isinstance(operator, str) and operator.strip() else "manual",
+                "review_required": True,
+            },
+            provenance={
+                "source": "captured_model_output",
+                "input_artifact": "model_prompt_packet",
+                "raw_output_preserved": True,
+                "run_manifest_path": str(manifest_path),
+                "raw_output_source_path": str(raw_output_file),
+                "raw_output_sha256": model_call_metadata["raw_output_sha256"],
+                "raw_output_length": model_call_metadata["raw_output_length"],
+                "model_call_metadata_path": str(model_call_metadata_file),
+                "model_call_metadata_sha256": _sha256_file(model_call_metadata_file),
+                "model_call_metadata": model_call_metadata,
+                "acquisition_request_provenance": model_call_metadata.get("request_provenance"),
+            },
+        )
 
     validation_record = validate_supervised_attempt_output_against_contract(
         attempt_record=attempt_record,
@@ -1166,6 +1301,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     ingest = subparsers.add_parser("ingest")
     ingest.add_argument("--run-dir", type=Path, required=True)
     ingest.add_argument("--raw-output-file", type=Path, required=True)
+    ingest.add_argument("--model-call-metadata-file", type=Path)
     ingest.add_argument("--decision", choices=sorted(ALLOWED_DECISIONS))
     ingest.add_argument("--decision-reason")
     ingest.add_argument("--operator")
@@ -1283,6 +1419,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         result = run_ingest(
             run_dir=args.run_dir,
             raw_output_file=args.raw_output_file,
+            model_call_metadata_file=args.model_call_metadata_file,
             decision=args.decision,
             decision_reason=args.decision_reason,
             operator=args.operator,

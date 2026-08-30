@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+import local_harness.run_manual_supervised_attempt as manual_attempt
 from local_harness.transaction_handoff import (
     NEXT_WORKER_CONTEXT_SCHEMA,
     TRANSACTION_MANIFEST_SCHEMA,
@@ -84,6 +85,99 @@ def _prepare_and_accept_run(
         run_dir,
         "--raw-output-file",
         raw_output,
+        "--decision",
+        "accepted",
+        "--decision-reason",
+        "Output satisfies the contract and remains within scope.",
+        "--operator",
+        "manual",
+        "--next-worker",
+        "qwen3-30b",
+        *(
+            ["--next-worker-objective", next_worker_objective]
+            if next_worker_objective is not None
+            else []
+        ),
+    )
+    assert ingest.returncode == 0
+    return run_dir
+
+
+def _prepare_and_accept_model_run(
+    tmp_path: Path,
+    *,
+    timestamp: str = "20260707T111213Z",
+    next_worker_objective: str | None = None,
+) -> Path:
+    out_dir = tmp_path / "runs"
+    prep = run_script(
+        "prepare",
+        "--messy-input",
+        "The LoRA and prompt injection work got messy. Build a bounded design packet.",
+        "--out-dir",
+        out_dir,
+        "--timestamp",
+        timestamp,
+    )
+    assert prep.returncode == 0
+    run_dir = out_dir / timestamp
+    prompt_text = (run_dir / "model_prompt_packet.md").read_text(encoding="utf-8")
+    (run_dir / "prompt_to_paste.md").write_text(prompt_text, encoding="utf-8")
+    raw_text = _valid_raw_output_json()
+    raw_output = tmp_path / "raw_model_output.txt"
+    raw_output.write_text(raw_text, encoding="utf-8")
+    metadata = {
+        "source": "local_openai_compatible_endpoint",
+        "endpoint": "http://192.168.1.16:8081/v1",
+        "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+        "temperature": 0,
+        "max_tokens": 1024,
+        "prompt_path": "model_prompt_packet.md",
+        "prompt_sha256": manual_attempt._sha256_text(prompt_text),
+        "prompt_length": len(prompt_text),
+        "raw_output_path": "raw_model_output.txt",
+        "raw_output_sha256": manual_attempt._sha256_text(raw_text),
+        "raw_output_length": len(raw_text),
+        "call_status": "completed",
+        "review_required": True,
+        "request_provenance": {
+            "api": "openai-chat",
+            "endpoint": "http://192.168.1.16:8081/v1",
+            "request_url": "http://192.168.1.16:8081/v1/chat/completions",
+            "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+            "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+            "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+            "prompt_path": "model_prompt_packet.md",
+            "prompt_sha256": manual_attempt._sha256_text(prompt_text),
+            "prompt_length": len(prompt_text),
+            "max_tokens": 1024,
+            "temperature": 0,
+        },
+        "response_provenance": {
+            "raw_output_path": "raw_model_output.txt",
+            "raw_output_sha256": manual_attempt._sha256_text(raw_text),
+            "raw_output_length": len(raw_text),
+            "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+        },
+        "authority_boundaries": [
+            "Local model call is not command execution authority.",
+            "Local model call is not file modification authority.",
+            "No automatic patch promotion authority is granted.",
+            "No automatic training authority is granted.",
+            "No default failure-to-curriculum capture authority is granted.",
+            "Ingest and explicit review are required before downstream use.",
+        ],
+    }
+    metadata_path = tmp_path / "local_model_call.json"
+    metadata_path.write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    ingest = run_script(
+        "ingest",
+        "--run-dir",
+        run_dir,
+        "--raw-output-file",
+        raw_output,
+        "--model-call-metadata-file",
+        metadata_path,
         "--decision",
         "accepted",
         "--decision-reason",
@@ -257,6 +351,28 @@ def test_transaction_handoff_raw_output_reference_points_to_raw_model_output(tmp
 
     assert reference.endswith("raw_model_output.txt")
     assert Path(reference).is_file()
+
+
+def test_transaction_handoff_preserves_actual_worker_identity_from_model_ingest(tmp_path: Path) -> None:
+    run_dir = _prepare_and_accept_model_run(
+        tmp_path,
+        next_worker_objective="Produce a bounded downstream comparison report.",
+    )
+    result = build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
+    context = json.loads(result["next_worker_context_path"].read_text(encoding="utf-8"))
+    attempt = json.loads((run_dir / "supervised_model_attempt.json").read_text(encoding="utf-8"))
+    continuation = build_next_worker_continuation_context(
+        transaction_manifest=json.loads(result["transaction_manifest_path"].read_text(encoding="utf-8")),
+        next_worker_context=context,
+        output_dir=run_dir,
+    )
+
+    assert attempt["model_metadata"]["model_id"] == "Qwen_Qwen3-1.7B-Q4_K_M.gguf"
+    assert context["first_worker_identity"] == "Qwen_Qwen3-1.7B-Q4_K_M.gguf"
+    assert context["previous_attempt"]["result_reference"]["raw_output_sha256"] == manual_attempt._sha256_text(
+        _valid_raw_output_json()
+    )
+    assert "The LoRA and prompt injection work got messy." in continuation["continuation_text"]
 
 
 def test_transaction_handoff_handoff_packet_reference_resolves_correctly(tmp_path: Path) -> None:

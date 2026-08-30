@@ -217,6 +217,14 @@ python3 local_harness/run_manual_supervised_attempt.py ingest \
 
 Without explicit review metadata, ingest stops after validation and reports that review is required before downstream use.
 
+Ingest supports two provenance classes:
+
+- `manual_operator_provided_model_output`, for historical operator-pasted output
+- `captured_model_output`, when `--model-call-metadata-file` points at preserved acquisition metadata for a real model call
+
+Captured-model ingest preserves the actual worker identity, acquisition provenance, and raw-response identity from the recorded model-call metadata. The manual path remains available for historical compatibility, but it is not used to represent a truthful captured worker result in a continuous supervised transaction.
+For captured-model ingest, `model_call_metadata_sha256` records the SHA-256 of the exact metadata file bytes, not a reserialized copy.
+
 The transaction manifest is an index over the existing supervised artifacts.
 It references, but does not replace, the attempt, validation, review,
 downstream-use gate, and handoff packet records. The next-worker context bundle

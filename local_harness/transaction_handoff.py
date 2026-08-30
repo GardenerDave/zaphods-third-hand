@@ -375,6 +375,7 @@ def build_next_worker_context(
             "result_reference": {
                 "raw_output_artifact": deepcopy(raw_output_reference),
                 "raw_output_reference": raw_output_reference.get("path"),
+                "raw_output_sha256": raw_output_reference.get("sha256"),
             },
         },
         "validation": {
