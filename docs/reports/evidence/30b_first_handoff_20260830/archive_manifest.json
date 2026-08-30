@@ -1,0 +1,82 @@
+{
+  "archive_root": "docs/reports/evidence/30b_first_handoff_20260830",
+  "experiment_id": "30b_first_handoff_20260830",
+  "files": [
+    {
+      "path": "acquisition/raw_response.txt",
+      "sha256": "fe2caf58ca3723318c565c7e1d465c4979574fd706d3c92208311dc0b02c31f5",
+      "size": 877
+    },
+    {
+      "path": "acquisition/request_metadata.json",
+      "sha256": "27415c77ddc98b38fb98f9a985957a0383f8af7a3dded9bf8d124526a75ccaec",
+      "size": 1685
+    },
+    {
+      "path": "closeout.json",
+      "sha256": "f168972e733b210a00a07eaca2771f40bdc57d266900ed890c2b18c9b38daa59",
+      "size": 2070
+    },
+    {
+      "path": "preregistration.json",
+      "sha256": "8a6901fbd6076190375163f1609df6334c78b03c8ec56a81144d12b26d7c7f8c",
+      "size": 1844
+    },
+    {
+      "path": "source_run/downstream_use_gate.json",
+      "sha256": "ff85584b88d981c07159cc9881bfb060ac8fce13a3cbdcce5384e0867b76c6c5",
+      "size": 1672
+    },
+    {
+      "path": "source_run/handoff_packet.json",
+      "sha256": "c5cffeb8efbbba96ac9530cf3cac7940021ee60b56ac0187909767c6d3fcc25b",
+      "size": 2176
+    },
+    {
+      "path": "source_run/model_prompt_packet.md",
+      "sha256": "3e4c6d2cb9ab3393502769d3aaa8ce027bd8334ad6b54974c65bd21deae7d007",
+      "size": 2713
+    },
+    {
+      "path": "source_run/next_worker_context.json",
+      "sha256": "097dfe4dd9b6b2127bfa74e00e0d4703a9bf5de3969e93a5384c787632c99d41",
+      "size": 13535
+    },
+    {
+      "path": "source_run/next_worker_context.md",
+      "sha256": "aeed44caa09b98df8b804c5e22455d1b5013e47f4281928bde7f17301d77b994",
+      "size": 10489
+    },
+    {
+      "path": "source_run/output_validation.json",
+      "sha256": "653217f87f2e3f9583b1c6950b7d7faec5d69047ed312fc8cf8eedabc4312bc4",
+      "size": 2236
+    },
+    {
+      "path": "source_run/raw_model_output.txt",
+      "sha256": "adbbf7c43a9436426596e2ebd8911c4ed41d4bf7958c164f4f21469192c7f064",
+      "size": 1344
+    },
+    {
+      "path": "source_run/review_decision.json",
+      "sha256": "aab640710bf974ccb5cf533ff53244c447f54571800b75ed84a4091061cc966d",
+      "size": 1509
+    },
+    {
+      "path": "source_run/run_manifest.json",
+      "sha256": "d4f321c905a43a746d6da918740d5785f8fa99d5c5e42bb3037cdd0c8d3b1c44",
+      "size": 974
+    },
+    {
+      "path": "source_run/transaction_manifest.json",
+      "sha256": "faae2b912e11191c4b21f09e213f4b720d67cf00c16caf1297b797474737918e",
+      "size": 3117
+    },
+    {
+      "path": "source_run/triage_packet.json",
+      "sha256": "858bbe6b9e06e59ea8156cdc897f920004a609cca1741c9b503d5b5774b9b9b4",
+      "size": 1446
+    }
+  ],
+  "source_root": ".work/operator_handoffs/30b_first_handoff_20260830"
+}

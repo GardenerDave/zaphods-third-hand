@@ -1,0 +1,44 @@
+{
+  "acquisition_status": "completed",
+  "answer_summary": {
+    "authority_preserved": true,
+    "continuation_correctness": false,
+    "context_sufficiency": "partial",
+    "manual_reconstruction_required": false,
+    "provenance_chain_intact": true,
+    "retry_fallback_replay": false,
+    "semantic_failure": true,
+    "transport_failure": false
+  },
+  "context_artifact": ".work/operator_handoffs/30b_first_handoff_20260830/source_run/next_worker_context.md",
+  "context_sha256": "aeed44caa09b98df8b804c5e22455d1b5013e47f4281928bde7f17301d77b994",
+  "evaluation": {
+    "did_produce_valid_downstream_result": false,
+    "did_understand_original_task": "partial",
+    "did_understand_prior_work": "partial",
+    "did_identify_correct_next_step": false,
+    "did_preserve_authority_boundaries": true,
+    "did_receive_generated_context": true
+  },
+  "experiment_id": "30b_first_handoff_20260830",
+  "files_created": [
+    ".work/operator_handoffs/30b_first_handoff_20260830/preregistration.json",
+    ".work/operator_handoffs/30b_first_handoff_20260830/closeout.json",
+    ".work/operator_handoffs/30b_first_handoff_20260830/source_run/transaction_manifest.json",
+    ".work/operator_handoffs/30b_first_handoff_20260830/source_run/next_worker_context.json",
+    ".work/operator_handoffs/30b_first_handoff_20260830/source_run/next_worker_context.md",
+    ".work/operator_handoffs/30b_first_handoff_20260830/acquisition/request_metadata.json",
+    ".work/operator_handoffs/30b_first_handoff_20260830/acquisition/raw_response.txt"
+  ],
+  "first_worker_identity": "manual_operator_provided_model_output",
+  "raw_response_preserved": true,
+  "request_sha256": "aeed44caa09b98df8b804c5e22455d1b5013e47f4281928bde7f17301d77b994",
+  "second_worker_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "source_transaction_id": "orch_manual_20260707t112634z",
+  "transport": {
+    "endpoint": "http://192.168.1.16:8080/v1",
+    "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "request_url": "http://192.168.1.16:8080/v1/chat/completions",
+    "status": "ok"
+  }
+}

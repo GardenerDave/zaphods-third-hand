@@ -1,0 +1,24 @@
+{
+  "allowed_targets": [
+    "docs/reports/"
+  ],
+  "held_targets": [
+    "production automation",
+    "automatic curriculum capture",
+    "automatic promotion",
+    "implementation_packet"
+  ],
+  "scope_expansion_required": false,
+  "claims": [
+    "The LoRA and prompt injection work got messy.",
+    "Build a bounded design packet."
+  ],
+  "evidence_basis": [
+    "The task request explicitly states the goal of building a bounded design packet in response to messy LoRA and prompt injection work.",
+    "The allowed_targets and held_targets are explicitly defined in the task request."
+  ],
+  "unverified_claims": [],
+  "format": "json",
+  "required_fields_present": true,
+  "reason": "The output strictly adheres to the allowed and held targets as defined in the task request, and all required fields are present with appropriate values based on the evidence provided."
+}
