@@ -1747,6 +1747,20 @@ def test_ingest_with_failed_acquisition_status_fails_closed(tmp_path: Path):
     assert "must represent a completed acquisition" in result.stderr
 
 
+def test_call_local_materializes_prompt_copy_from_prepared_run(tmp_path: Path):
+    run_dir = _prepare_run(tmp_path, timestamp="20260707T181825Z")
+    result = _run_call_local_in_process(
+        run_dir=run_dir,
+        endpoint="http://127.0.0.1:8081/v1",
+        model="Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+        response_body={"choices": [{"message": {"content": _valid_raw_output_json()}}]},
+    )
+    assert result.returncode == 0, result.stderr
+    assert (run_dir / "prompt_to_paste.md").is_file()
+    assert (run_dir / "raw_model_output.txt").is_file()
+    assert (run_dir / "local_model_call.json").is_file()
+
+
 def test_ingest_with_model_call_metadata_requires_acquisition_provenance(tmp_path: Path):
     run_dir = _prepare_run(tmp_path, timestamp="20260707T171819Z")
     raw_text = _valid_raw_output_json()

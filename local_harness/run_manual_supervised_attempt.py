@@ -650,7 +650,10 @@ def run_call_local(
 ) -> dict[str, Any]:
     prompt_path = run_dir / "prompt_to_paste.md"
     if not prompt_path.is_file():
-        raise ValueError(f"missing prompt_to_paste.md: {prompt_path}")
+        model_prompt_packet_path = run_dir / "model_prompt_packet.md"
+        if not model_prompt_packet_path.is_file():
+            raise ValueError(f"missing prompt_to_paste.md: {prompt_path}")
+        prompt_path.write_text(model_prompt_packet_path.read_text(encoding="utf-8"), encoding="utf-8")
     prompt_text = prompt_path.read_text(encoding="utf-8")
     if not prompt_text.strip():
         raise ValueError("prompt_to_paste.md must contain non-empty text")
