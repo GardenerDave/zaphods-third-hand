@@ -133,6 +133,8 @@ def validate_supervised_handoff_packet(record: Any) -> dict[str, Any]:
     _require_nonempty_str(record, "handoff_scope")
     _require_nonempty_str(record, "next_step_type")
     _require_nonempty_str(record, "next_step_summary")
+    if "next_step_objective" in record and record["next_step_objective"] is not None:
+        _require_nonempty_str(record, "next_step_objective")
     _require_nonempty_str(record, "handoff_reason")
 
     if "prompt_packet_id" in record and record["prompt_packet_id"] is not None:
@@ -222,6 +224,7 @@ def build_supervised_handoff_packet(
     handoff_payload: dict[str, Any],
     operator_metadata: dict[str, Any],
     handoff_reason: str,
+    next_step_objective: str | None = None,
     handoff_status: str | None = None,
     handoff_scope: str = "bounded_supervised_input_only",
     allowed_downstream_use: list[str] | None = None,
@@ -270,6 +273,7 @@ def build_supervised_handoff_packet(
         "handoff_scope": handoff_scope,
         "next_step_type": next_step_type,
         "next_step_summary": next_step_summary,
+        "next_step_objective": next_step_objective,
         "handoff_payload": payload,
         "operator_metadata": deepcopy(operator_metadata),
         "handoff_reason": handoff_reason,

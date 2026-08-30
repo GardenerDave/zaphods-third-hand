@@ -115,6 +115,31 @@ def _artifact_reference(path: Path, *, artifact: str, id_key: str | None = None,
     return reference
 
 
+def _reference_by_artifact(evidence_references: list[dict[str, Any]], artifact: str) -> dict[str, Any]:
+    for reference in evidence_references:
+        if reference.get("artifact") == artifact:
+            return reference
+    raise TransactionHandoffError(f"missing evidence reference for {artifact}")
+
+
+def _read_tracked_artifact(reference: dict[str, Any], *, kind: str, require_sha256: bool = True) -> tuple[Path, str]:
+    path_value = reference.get("path")
+    if not isinstance(path_value, str) or not path_value.strip():
+        raise TransactionHandoffError(f"{kind} reference must include a path")
+    path = Path(path_value)
+    if not path.is_file():
+        raise TransactionHandoffError(f"missing {kind}: {path}")
+    bytes_text = path.read_text(encoding="utf-8")
+    recorded_sha256 = reference.get("sha256")
+    if require_sha256:
+        if not isinstance(recorded_sha256, str) or not recorded_sha256.strip():
+            raise TransactionHandoffError(f"{kind} reference must include sha256")
+        actual_sha256 = _sha256(path)
+        if actual_sha256 != recorded_sha256:
+            raise TransactionHandoffError(f"{kind} bytes do not match recorded sha256")
+    return path, bytes_text
+
+
 def derive_transaction_id(*, run_id: str, orchestration_id: str | None = None, attempt_id: str | None = None) -> str:
     base = run_id.strip()
     for candidate in (orchestration_id, attempt_id):
@@ -323,6 +348,10 @@ def build_next_worker_context(
     task_request = task_state.get("task_request")
     if not isinstance(task_request, str) or not task_request.strip():
         raise TransactionHandoffError("task state must include a non-empty task_request")
+    raw_output_reference = _reference_by_artifact(
+        transaction_manifest["evidence_references"],
+        "raw_model_output",
+    )
 
     next_worker_context = {
         "schema_version": NEXT_WORKER_CONTEXT_SCHEMA,
@@ -344,8 +373,8 @@ def build_next_worker_context(
         "previous_attempt": {
             "attempt_id": attempt_record["attempt_id"],
             "result_reference": {
-                "raw_output_artifact": None,
-                "raw_output_reference": attempt_record.get("provenance", {}).get("raw_output_source_path"),
+                "raw_output_artifact": deepcopy(raw_output_reference),
+                "raw_output_reference": raw_output_reference.get("path"),
             },
         },
         "validation": {
@@ -367,6 +396,8 @@ def build_next_worker_context(
             "handoff_id": handoff_record["handoff_id"],
             "handoff_status": handoff_record["handoff_status"],
             "handoff_reason": handoff_record["handoff_reason"],
+            "next_step_summary": handoff_record["next_step_summary"],
+            "next_step_objective": handoff_record.get("next_step_objective"),
             "handoff_packet_reference": _artifact_reference(
                 handoff_packet_path,
                 artifact="handoff_packet",
@@ -383,11 +414,174 @@ def build_next_worker_context(
         },
         "ready_for_next_worker": True,
     }
-    next_worker_context["previous_attempt"]["result_reference"]["raw_output_artifact"] = _artifact_reference(
-        Path(raw_output_reference),
-        artifact="raw_model_output",
-    )
     return next_worker_context
+
+
+def build_next_worker_continuation_context(
+    *,
+    transaction_manifest: dict[str, Any],
+    next_worker_context: dict[str, Any],
+    output_dir: Path | None = None,
+) -> dict[str, Any]:
+    if transaction_manifest.get("schema_version") != TRANSACTION_MANIFEST_SCHEMA:
+        raise TransactionHandoffError("transaction manifest schema_version is unsupported")
+    if next_worker_context.get("schema_version") != NEXT_WORKER_CONTEXT_SCHEMA:
+        raise TransactionHandoffError("next-worker context schema_version is unsupported")
+    if transaction_manifest.get("transaction_id") != next_worker_context.get("transaction_id"):
+        raise TransactionHandoffError("continuation context requires matching transaction IDs")
+    if transaction_manifest.get("lifecycle_state") == "COMPLETE":
+        raise TransactionHandoffError("continuation context cannot be built after COMPLETE")
+
+    raw_output_reference = _reference_by_artifact(
+        transaction_manifest["evidence_references"],
+        "raw_model_output",
+    )
+    model_prompt_reference = _reference_by_artifact(
+        transaction_manifest["evidence_references"],
+        "model_prompt_packet",
+    )
+
+    raw_output_path, raw_output_text = _read_tracked_artifact(raw_output_reference, kind="raw model output")
+    raw_output_recorded_sha256 = raw_output_reference.get("sha256")
+    handoff_packet_reference = next_worker_context["handoff"]["handoff_packet_reference"]
+    if not isinstance(handoff_packet_reference, dict):
+        raise TransactionHandoffError("handoff packet reference must be a JSON object")
+    handoff_packet_path, _ = _read_tracked_artifact(handoff_packet_reference, kind="handoff packet")
+    handoff_packet_payload = _read_json(handoff_packet_path, kind="handoff packet")
+    handoff_manifest_reference = _reference_by_artifact(
+        transaction_manifest["evidence_references"],
+        "handoff_packet",
+    )
+    if handoff_packet_reference.get("path") != handoff_manifest_reference.get("path"):
+        raise TransactionHandoffError("handoff packet reference path does not match transaction manifest evidence")
+
+    previous_attempt = next_worker_context.get("previous_attempt", {})
+    result_reference = previous_attempt.get("result_reference", {})
+    raw_output_artifact_reference = result_reference.get("raw_output_artifact")
+    if not isinstance(raw_output_artifact_reference, dict):
+        raise TransactionHandoffError("previous result must include raw_output_artifact reference")
+    if raw_output_artifact_reference.get("artifact") != "raw_model_output":
+        raise TransactionHandoffError("previous result must reference raw_model_output")
+    if raw_output_artifact_reference.get("path") != str(raw_output_path):
+        raise TransactionHandoffError("previous result reference path does not match evidence")
+    artifact_sha256 = raw_output_artifact_reference.get("sha256")
+    if raw_output_recorded_sha256 is not None:
+        if artifact_sha256 is not None and artifact_sha256 != raw_output_recorded_sha256:
+            raise TransactionHandoffError("previous result sha256 does not match evidence")
+        if _sha256(raw_output_path) != raw_output_recorded_sha256:
+            raise TransactionHandoffError("previous result bytes do not match recorded sha256")
+
+    task_state = deepcopy(next_worker_context["task_state"])
+    bounded_task_request = task_state.get("bounded_task_request")
+    if not isinstance(bounded_task_request, str) or not bounded_task_request.strip():
+        raise TransactionHandoffError("task_state must include bounded_task_request")
+
+    allowed_targets = list(next_worker_context["constraints"]["allowed_targets"])
+    held_targets = list(next_worker_context["constraints"]["held_targets"])
+    authority_boundaries = next_worker_context["authority_boundaries"]
+    next_step_scope = next_worker_context["constraints"]["next_step_scope"]
+    review = next_worker_context["review"]
+    validation = next_worker_context["validation"]
+    downstream_use_gate = next_worker_context["downstream_use_gate"]
+    handoff = next_worker_context["handoff"]
+    next_step_objective = handoff_packet_payload.get("next_step_objective")
+    if not isinstance(next_step_objective, str) or not next_step_objective.strip():
+        raise TransactionHandoffError("handoff packet must provide a concrete next_step_objective")
+    transition_summary = handoff_packet_payload.get("next_step_summary")
+    if not isinstance(transition_summary, str) or not transition_summary.strip():
+        raise TransactionHandoffError("handoff packet must provide next_step_summary")
+
+    if next_worker_context.get("ready_for_next_worker") is not True:
+        raise TransactionHandoffError("continuation context requires a ready next-worker context")
+
+    continuation_lines = [
+        "Continue from the accepted previous-worker result. Do not redo the original worker task.",
+        "",
+        "# ZTH Executable Continuation Prompt",
+        "",
+        "## Next-Worker Directive",
+        "Continue from the accepted previous-worker result. Do not redo the original worker task.",
+        "",
+        "## Already Completed",
+        f"- transaction_id: {transaction_manifest['transaction_id']}",
+        f"- lifecycle_state: {transaction_manifest['lifecycle_state']}",
+        f"- review_decision: {review['decision']}",
+        f"- validation_status: {validation['validation_status']}",
+        f"- downstream_use_gate: {downstream_use_gate['gate_status']}",
+        f"- handoff_status: {handoff['handoff_status']}",
+        f"- handoff_reason: {handoff['handoff_reason']}",
+        f"- next_step_summary: {transition_summary}",
+        f"- next_step_objective: {next_step_objective}",
+        "",
+        "### Accepted Previous-Worker Result",
+        f"```text\n{raw_output_text.rstrip()}\n```",
+        "",
+        "### Bounded Original Task",
+        f"```text\n{bounded_task_request.rstrip()}\n```",
+        "",
+        "### Perform Now",
+        next_step_objective,
+        "",
+        "### Transition Summary",
+        transition_summary,
+        "",
+        "### Authorized Scope",
+        next_step_scope,
+        "",
+        "### Allowed Targets",
+        f"```json\n{json.dumps(allowed_targets, indent=2, sort_keys=True)}\n```",
+        "",
+        "### Held Targets",
+        f"```json\n{json.dumps(held_targets, indent=2, sort_keys=True)}\n```",
+        "",
+        "### Inherited Authority Boundaries",
+        f"```json\n{json.dumps(authority_boundaries, indent=2, sort_keys=True)}\n```",
+        "",
+        "### Second-Worker Output Contract",
+        "Return the downstream continuation result only.",
+        "State how you used the accepted prior result, confirm scope compliance, and report any unresolved issue preventing continuation.",
+        "Do not redo the first-worker task.",
+        "",
+        "### Provenance",
+        f"- transaction_id: {transaction_manifest['transaction_id']}",
+        f"- run_id: {transaction_manifest['run_id']}",
+        f"- first_worker_identity: {next_worker_context['first_worker_identity']}",
+        f"- selected_next_worker_identity: {next_worker_context.get('selected_next_worker_identity') or '<none>'}",
+        f"- raw_model_output_path: {raw_output_path}",
+        f"- raw_model_output_sha256: {raw_output_recorded_sha256}",
+        f"- handoff_packet_path: {handoff_packet_path}",
+        f"- model_prompt_packet_path: {model_prompt_reference.get('path')}",
+        "",
+        "### Authority Notice",
+        "- This prompt authorizes only the stated downstream task.",
+        "- It does not grant repository modification, promotion, training, autonomous routing, or other held authority unless explicitly present in the source transaction.",
+        "",
+        "### Review Boundary",
+        "- This artifact is a derived executable continuation view, not an authority source.",
+    ]
+    continuation_text = "\n".join(continuation_lines).rstrip() + "\n"
+    result: dict[str, Any] = {
+        "transaction_id": transaction_manifest["transaction_id"],
+        "schema_version": "zth.next_worker_continuation.v0.1",
+        "source_context_schema_version": next_worker_context["schema_version"],
+        "ready_for_continuation": True,
+        "continuation_text": continuation_text,
+        "source_references": {
+            "transaction_manifest": transaction_manifest,
+            "next_worker_context": {
+                "schema_version": next_worker_context["schema_version"],
+                "path": next_worker_context.get("path"),
+            },
+            "raw_model_output": raw_output_artifact_reference,
+            "handoff_packet": handoff_packet_reference,
+        },
+    }
+    if output_dir is not None:
+        output_dir.mkdir(parents=True, exist_ok=True)
+        output_path = output_dir / "next_worker_continuation.md"
+        output_path.write_text(continuation_text, encoding="utf-8")
+        result["continuation_path"] = output_path
+    return result
 
 
 def render_next_worker_context(context: dict[str, Any]) -> str:

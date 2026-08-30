@@ -11,6 +11,7 @@ from local_harness.transaction_handoff import (
     NEXT_WORKER_CONTEXT_SCHEMA,
     TRANSACTION_MANIFEST_SCHEMA,
     TransactionHandoffError,
+    build_next_worker_continuation_context,
     build_transaction_handoff_artifacts,
     derive_lifecycle_state,
 )
@@ -57,7 +58,12 @@ def _valid_raw_output_json() -> str:
     )
 
 
-def _prepare_and_accept_run(tmp_path: Path, *, timestamp: str = "20260707T101010Z") -> Path:
+def _prepare_and_accept_run(
+    tmp_path: Path,
+    *,
+    timestamp: str = "20260707T101010Z",
+    next_worker_objective: str | None = None,
+) -> Path:
     out_dir = tmp_path / "runs"
     prep = run_script(
         "prepare",
@@ -86,6 +92,11 @@ def _prepare_and_accept_run(tmp_path: Path, *, timestamp: str = "20260707T101010
         "manual",
         "--next-worker",
         "qwen3-30b",
+        *(
+            ["--next-worker-objective", next_worker_objective]
+            if next_worker_objective is not None
+            else []
+        ),
     )
     assert ingest.returncode == 0
     return run_dir
@@ -124,7 +135,10 @@ def _prepare_and_blocked_run(tmp_path: Path, *, timestamp: str = "20260707T11111
 
 
 def test_transaction_manifest_references_chain_without_replacing_records(tmp_path: Path) -> None:
-    run_dir = _prepare_and_accept_run(tmp_path)
+    run_dir = _prepare_and_accept_run(
+        tmp_path,
+        next_worker_objective="Produce a bounded downstream comparison report.",
+    )
     result = build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
 
     manifest = json.loads(result["transaction_manifest_path"].read_text(encoding="utf-8"))
@@ -141,7 +155,10 @@ def test_transaction_manifest_references_chain_without_replacing_records(tmp_pat
 
 
 def test_next_worker_context_contains_required_handoff_information(tmp_path: Path) -> None:
-    run_dir = _prepare_and_accept_run(tmp_path)
+    run_dir = _prepare_and_accept_run(
+        tmp_path,
+        next_worker_objective="Produce a bounded downstream comparison report.",
+    )
     result = build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
     context = json.loads(result["next_worker_context_path"].read_text(encoding="utf-8"))
 
@@ -162,7 +179,10 @@ def test_next_worker_context_contains_required_handoff_information(tmp_path: Pat
 
 
 def test_transaction_id_is_stable_across_reconstruction(tmp_path: Path) -> None:
-    run_dir = _prepare_and_accept_run(tmp_path)
+    run_dir = _prepare_and_accept_run(
+        tmp_path,
+        next_worker_objective="Produce a bounded downstream comparison report.",
+    )
     first = build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
     second = build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
 
@@ -194,7 +214,10 @@ def test_transaction_handoff_fails_closed_on_chain_mismatch(tmp_path: Path) -> N
 
 
 def test_transaction_handoff_fails_closed_on_broadened_allowed_targets(tmp_path: Path) -> None:
-    run_dir = _prepare_and_accept_run(tmp_path)
+    run_dir = _prepare_and_accept_run(
+        tmp_path,
+        next_worker_objective="Produce a bounded downstream comparison report.",
+    )
     triage_path = run_dir / "triage_packet.json"
     triage = json.loads(triage_path.read_text(encoding="utf-8"))
     triage["allowed_targets"] = ["docs/reports/", "production automation"]
@@ -295,3 +318,126 @@ def test_transaction_handoff_does_not_mark_complete(tmp_path: Path) -> None:
 
     assert manifest["lifecycle_state"] == "HANDOFF"
     assert manifest["lifecycle_state"] != "COMPLETE"
+
+
+def test_next_worker_continuation_contains_actual_previous_result_body(tmp_path: Path) -> None:
+    run_dir = _prepare_and_accept_run(
+        tmp_path,
+        next_worker_objective="Produce a bounded downstream comparison report.",
+    )
+    handoff_result = build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
+    continuation_result = build_next_worker_continuation_context(
+        transaction_manifest=handoff_result["transaction_manifest"],
+        next_worker_context=handoff_result["next_worker_context"],
+        output_dir=run_dir,
+    )
+    continuation_text = continuation_result["continuation_text"]
+    raw_output_text = (run_dir / "raw_model_output.txt").read_text(encoding="utf-8").strip()
+
+    assert continuation_result["transaction_id"] == handoff_result["transaction_manifest"]["transaction_id"]
+    assert continuation_text.startswith(
+        "Continue from the accepted previous-worker result. Do not redo the original worker task."
+    )
+    assert "## Next-Worker Directive" in continuation_text
+    assert raw_output_text in continuation_text
+    assert "The LoRA and prompt injection work got messy." in continuation_text
+    assert "validation_status" in continuation_text
+    assert "handoff_scope" not in continuation_text
+    assert "manual_operator_provided_model_output" in continuation_text
+
+
+def test_next_worker_continuation_preserves_authority_and_is_not_first_worker_prompt_dominant(tmp_path: Path) -> None:
+    run_dir = _prepare_and_accept_run(
+        tmp_path,
+        next_worker_objective="Produce a bounded downstream comparison report.",
+    )
+    handoff_result = build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
+    continuation_result = build_next_worker_continuation_context(
+        transaction_manifest=handoff_result["transaction_manifest"],
+        next_worker_context=handoff_result["next_worker_context"],
+        output_dir=run_dir,
+    )
+    continuation_text = continuation_result["continuation_text"]
+
+    assert "allowed_targets" in continuation_text
+    assert "held_targets" in continuation_text
+    assert "Inherited Authority Boundaries" in continuation_text
+    assert "This prompt authorizes only the stated downstream task." in continuation_text
+    assert continuation_text.index("## Next-Worker Directive") < continuation_text.index("### Bounded Original Task")
+    assert continuation_text.index("## Next-Worker Directive") < continuation_text.index("### Accepted Previous-Worker Result")
+    assert continuation_text.index("### Second-Worker Output Contract") < continuation_text.index("### Provenance")
+
+
+def test_next_worker_continuation_perform_now_contains_concrete_objective_not_scope(tmp_path: Path) -> None:
+    run_dir = _prepare_and_accept_run(
+        tmp_path,
+        next_worker_objective="Produce a bounded downstream comparison report.",
+    )
+    handoff_result = build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
+    continuation_result = build_next_worker_continuation_context(
+        transaction_manifest=handoff_result["transaction_manifest"],
+        next_worker_context=handoff_result["next_worker_context"],
+        output_dir=run_dir,
+    )
+    continuation_text = continuation_result["continuation_text"]
+
+    assert "Perform Now" in continuation_text
+    assert "Use reviewed output as bounded input for the next supervised step." in continuation_text
+    assert "bounded_supervised_input_only" in continuation_text
+    assert continuation_text.index("### Perform Now") < continuation_text.index("### Authorized Scope")
+    assert "bounded_supervised_input_only" in continuation_text.split("### Perform Now", 1)[1]
+
+
+def test_next_worker_continuation_fails_closed_on_missing_or_tampered_previous_result(tmp_path: Path) -> None:
+    run_dir = _prepare_and_accept_run(
+        tmp_path,
+        next_worker_objective="Produce a bounded downstream comparison report.",
+    )
+    handoff_result = build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
+    raw_output_path = run_dir / "raw_model_output.txt"
+    original_text = raw_output_path.read_text(encoding="utf-8")
+
+    raw_output_path.write_text(original_text + "\nmutated\n", encoding="utf-8")
+    with pytest.raises(TransactionHandoffError, match="bytes do not match recorded sha256|previous result bytes do not match recorded sha256"):
+        build_next_worker_continuation_context(
+            transaction_manifest=handoff_result["transaction_manifest"],
+            next_worker_context=handoff_result["next_worker_context"],
+            output_dir=run_dir,
+        )
+
+    raw_output_path.unlink()
+    with pytest.raises(TransactionHandoffError, match="missing raw model output"):
+        build_next_worker_continuation_context(
+            transaction_manifest=handoff_result["transaction_manifest"],
+            next_worker_context=handoff_result["next_worker_context"],
+            output_dir=run_dir,
+        )
+
+
+def test_next_worker_continuation_round_trips_with_same_transaction_id_and_does_not_complete(tmp_path: Path) -> None:
+    run_dir = _prepare_and_accept_run(
+        tmp_path,
+        next_worker_objective="Produce a bounded downstream comparison report.",
+    )
+    handoff_result = build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
+    continuation_result = build_next_worker_continuation_context(
+        transaction_manifest=handoff_result["transaction_manifest"],
+        next_worker_context=handoff_result["next_worker_context"],
+        output_dir=run_dir,
+    )
+
+    assert continuation_result["transaction_id"] == handoff_result["transaction_manifest"]["transaction_id"]
+    assert continuation_result["ready_for_continuation"] is True
+    assert "COMPLETE" not in continuation_result["continuation_text"]
+
+
+def test_next_worker_continuation_fails_closed_without_explicit_objective(tmp_path: Path) -> None:
+    run_dir = _prepare_and_accept_run(tmp_path)
+    handoff_result = build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
+
+    with pytest.raises(TransactionHandoffError, match="next_step_objective"):
+        build_next_worker_continuation_context(
+            transaction_manifest=handoff_result["transaction_manifest"],
+            next_worker_context=handoff_result["next_worker_context"],
+            output_dir=run_dir,
+        )

@@ -227,6 +227,15 @@ In the next-worker bundle, `task_request` is the full prepared first-worker
 prompt packet, while `bounded_task_request` preserves the original bounded
 task/request text for adapters that need the compact source task directly.
 
+The executable continuation view is derived from the transaction dossier and is
+separate from the evidentiary bundle. It is the model-facing projection used to
+continue from the accepted prior result, and it must carry the actual accepted
+result body rather than only a path or hash reference. The dossier remains the
+auditable authority source; the continuation view is not an authority source.
+`next_step_summary` describes the supervised transition, `handoff_scope`
+describes the authority/scope boundary, and `next_step_objective` is the
+explicit downstream task that `Perform Now` uses.
+
 ## Contract source and provenance
 
 Ingest validates against the exact `output_contract.json` created during prepare.

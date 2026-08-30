@@ -25,7 +25,10 @@ from local_harness.render_model_prompt_packet import (
 from local_harness.render_supervised_attempt_output_validation import (
     render_supervised_attempt_output_validation,
 )
-from local_harness.transaction_handoff import build_transaction_handoff_artifacts
+from local_harness.transaction_handoff import (
+    build_next_worker_continuation_context,
+    build_transaction_handoff_artifacts,
+)
 from local_harness.supervised_attempt_output_validator import (
     validate_supervised_attempt_output_against_contract,
 )
@@ -957,6 +960,7 @@ def run_ingest(
     decision_reason: str | None = None,
     operator: str | None = None,
     next_worker: str | None = None,
+    next_worker_objective: str | None = None,
 ) -> dict[str, Any]:
     manifest, manifest_path = _resolve_manifest(run_dir)
 
@@ -1065,6 +1069,7 @@ def run_ingest(
         gate_record=gate_record,
         next_step_type="next_supervised_step_input",
         next_step_summary="Use reviewed output as bounded input for the next supervised step.",
+        next_step_objective=next_worker_objective,
         handoff_payload={
             "payload_kind": "reviewed_model_output_reference",
             "raw_output_artifact": str(run_raw_output_path),
@@ -1099,6 +1104,18 @@ def run_ingest(
             next_worker_identity=next_worker,
         )
         result.update(transaction_result)
+        if next_worker_objective is not None:
+            continuation_result = build_next_worker_continuation_context(
+                transaction_manifest=transaction_result["transaction_manifest"],
+                next_worker_context=transaction_result["next_worker_context"],
+                output_dir=run_dir,
+            )
+            result.update(
+                {
+                    "next_worker_continuation_path": continuation_result["continuation_path"],
+                    "next_worker_continuation": continuation_result,
+                }
+            )
     return result
 
 
@@ -1153,6 +1170,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     ingest.add_argument("--decision-reason")
     ingest.add_argument("--operator")
     ingest.add_argument("--next-worker")
+    ingest.add_argument("--next-worker-objective")
 
     return parser
 
@@ -1269,6 +1287,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             decision_reason=args.decision_reason,
             operator=args.operator,
             next_worker=args.next_worker,
+            next_worker_objective=args.next_worker_objective,
         )
         print(f"run_dir: {result['run_dir']}")
         print(f"attempt_path: {result['attempt_path']}")
@@ -1287,6 +1306,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         if "transaction_manifest_path" in result:
             print(f"transaction_manifest_path: {result['transaction_manifest_path']}")
             print(f"next_worker_context_path: {result['next_worker_context_path']}")
+        if "next_worker_continuation_path" in result:
+            print(f"next_worker_continuation_path: {result['next_worker_continuation_path']}")
         return 0
     except Exception as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
