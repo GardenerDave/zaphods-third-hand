@@ -1,0 +1,15 @@
+{
+  "endpoint": "http://192.168.1.16:8080/v1",
+  "exact_acquisition_prompt_sha256": "cc6d255b0b56e8c79c01c6e24560635af80ddc1f43a9744f156a4b9161fdfa59",
+  "experiment_id": "30b_substantive_handoff_v3_20260830",
+  "implementation_head": "f8165e959a4c15ab86cffd132a7946fa9986bea6",
+  "known_transform": "rstrip + \\n/no_think via --final-only",
+  "max_tokens": 2048,
+  "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "request_url": "http://192.168.1.16:8080/v1/chat/completions",
+  "retry_policy": "one primary call; no silent retry; no fallback model; no replay",
+  "source_prompt_sha256": "2d2c6630afe2418f9d08958ad3bedd2941390f50a95feb9f8c6cbf2de27e0b03",
+  "source_transaction_id": "orch_manual_20260707t112634z",
+  "temperature": 0.2,
+  "timeout_seconds": 120
+}

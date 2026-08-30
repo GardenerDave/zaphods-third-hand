@@ -1,0 +1,35 @@
+```json
+{
+  "plan": [
+    {
+      "action": "Generate a cleanup summary report",
+      "affects": [
+        "docs/reports/cleanup_summary.md"
+      ],
+      "validation_criterion": "The report includes a section titled 'Cleanup Summary' with a list of identified messy inputs related to LoRA and prompt injection, and a section titled 'Action Items' with a list of steps taken to clean up the inputs."
+    },
+    {
+      "action": "Create a log entry for the cleanup process",
+      "affects": [
+        "docs/reports/cleanup_log.txt"
+      ],
+      "validation_criterion": "The log file contains an entry with timestamp, action type 'cleanup', and a description of the process completed."
+    },
+    {
+      "action": "Document the held targets in a separate file",
+      "affects": [
+        "docs/reports/held_targets.md"
+      ],
+      "validation_criterion": "The file lists the held targets: 'production automation', 'automatic curriculum capture', 'automatic promotion', and 'implementation_packet', with a note that these are not to be activated."
+    }
+  ],
+  "held_work": [
+    "production automation",
+    "automatic curriculum capture",
+    "automatic promotion",
+    "implementation_packet"
+  ],
+  "scope_compliance": "The plan strictly uses the allowed target 'docs/reports/' and avoids all held targets. All actions are bounded and supervised as required.",
+  "unresolved_issues": "No unresolved issues. The plan is fully executable within the given constraints."
+}
+```

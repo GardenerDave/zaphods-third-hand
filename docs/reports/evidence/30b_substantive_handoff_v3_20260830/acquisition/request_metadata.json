@@ -1,0 +1,52 @@
+{
+  "status": "ok",
+  "request_url": "http://192.168.1.16:8080/v1/chat/completions",
+  "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "finish_reason": "stop",
+  "usage": {
+    "completion_tokens": 327,
+    "prompt_tokens": 1569,
+    "total_tokens": 1896,
+    "prompt_tokens_details": {
+      "cached_tokens": 23
+    }
+  },
+  "timings": {
+    "cache_n": 23,
+    "prompt_n": 1546,
+    "prompt_ms": 3528.777,
+    "prompt_per_token_ms": 2.282520698576973,
+    "prompt_per_second": 438.1121277995181,
+    "predicted_n": 327,
+    "predicted_ms": 8439.677,
+    "predicted_per_token_ms": 25.809409785932722,
+    "predicted_per_second": 38.7455586274214
+  },
+  "error": null,
+  "model_resolution_attempted": false,
+  "model_resolution_error": null,
+  "request_provenance": {
+    "prompt_sha256": "cc6d255b0b56e8c79c01c6e24560635af80ddc1f43a9744f156a4b9161fdfa59",
+    "prompt_length": 6813,
+    "api": "openai-chat",
+    "message_structure": [
+      "system",
+      "user"
+    ],
+    "system_message_sha256": "e8c1a9955d1a830189fecdfd11c537896d95cddd0419d5a63d957dd6f0fcb6c7",
+    "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "max_tokens": 2048,
+    "temperature": 0.2,
+    "top_p": null,
+    "seed": null,
+    "stop": null,
+    "endpoint_alias": "JARVIS_LOCAL",
+    "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "request_start_monotonic": 14058.583563639,
+    "response_capture_monotonic": 14070.748347201
+  },
+  "transport_classification": "model_response"
+}
