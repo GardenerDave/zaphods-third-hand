@@ -1,0 +1,78 @@
+{
+  "acceptance_status": "not_reviewed",
+  "attempt_id": "model_attempt_20260830t233805z",
+  "authority_boundaries": [
+    "Validation is evidence, not acceptance.",
+    "No command execution authority is granted.",
+    "No direct file modification authority is granted.",
+    "No automatic patch promotion authority is granted.",
+    "No automatic training authority is granted.",
+    "No default failure-to-curriculum capture authority is granted.",
+    "Human review is required before downstream use."
+  ],
+  "checks": [
+    {
+      "check_id": "parse_json",
+      "message": "Raw model output parsed as JSON.",
+      "status": "passed"
+    },
+    {
+      "check_id": "required_fields",
+      "message": "All required fields are present.",
+      "status": "passed"
+    },
+    {
+      "check_id": "required_field_types",
+      "message": "Invalid required field types or values: claims must be a list; evidence_basis must be a list; unverified_claims must be a list",
+      "status": "failed"
+    },
+    {
+      "check_id": "allowed_held_target_separation",
+      "message": "Allowed and held targets are separated.",
+      "status": "passed"
+    },
+    {
+      "check_id": "target_authority",
+      "message": "Allowed targets stay within structured authorized targets.",
+      "status": "passed"
+    },
+    {
+      "check_id": "requires_reason",
+      "message": "Non-empty reason field is present.",
+      "status": "passed"
+    }
+  ],
+  "diagnostics": [
+    "claims must be a list",
+    "evidence_basis must be a list",
+    "unverified_claims must be a list"
+  ],
+  "orchestration_id": "orch_manual_20260830t000005z",
+  "output_contract": {
+    "format": "json",
+    "required_fields": [
+      "allowed_targets",
+      "held_targets",
+      "scope_expansion_required",
+      "claims",
+      "evidence_basis",
+      "unverified_claims",
+      "format",
+      "required_fields_present",
+      "reason"
+    ],
+    "requires_reason": true
+  },
+  "prompt_packet_id": "prompt_packet_manual_20260830t000005z",
+  "provenance": {
+    "input_attempt_id": "model_attempt_20260830t233805z",
+    "source": "supervised_attempt_output_validation"
+  },
+  "raw_output_preserved": true,
+  "review_required": true,
+  "target_authority_status": "passed",
+  "triage_id": "triage_manual_20260830t000005z",
+  "validated_at": "2026-08-30T23:38:05Z",
+  "validation_id": "manual_validation_20260830t233805z",
+  "validation_status": "failed"
+}

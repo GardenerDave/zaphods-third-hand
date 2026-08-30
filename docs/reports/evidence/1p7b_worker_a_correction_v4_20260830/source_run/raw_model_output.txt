@@ -1,0 +1,19 @@
+{
+  "allowed_targets": ["docs/reports/"],
+  "held_targets": ["production automation", "automatic curriculum capture", "automatic promotion", "implementation_packet"],
+  "scope_expansion_required": false,
+  "claims": {
+    "scope_boundary_v1": "Only include targets explicitly listed in allowed_targets.",
+    "unsupported_certainty_v1": "Only state claims supported by the evidence you were given.",
+    "output_contract_v1": "Return exactly one output in the declared contract format."
+  },
+  "evidence_basis": "The packet includes evidence covering the scope of the allowed targets and the output contract.",
+  "unverified_claims": {
+    "scope_boundary_v1": "Not verified in this packet.",
+    "unsupported_certainty_v1": "Not verified in this packet.",
+    "output_contract_v1": "Not verified in this packet."
+  },
+  "format": "json",
+  "required_fields_present": true,
+  "reason": "The output meets the required format and includes all necessary fields with appropriate values."
+}

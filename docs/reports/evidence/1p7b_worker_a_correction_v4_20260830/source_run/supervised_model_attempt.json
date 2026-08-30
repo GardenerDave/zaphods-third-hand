@@ -1,0 +1,94 @@
+{
+  "acceptance_status": "not_reviewed",
+  "attempt_id": "model_attempt_20260830t233805z",
+  "authority_boundaries": [
+    "No command execution authority is granted.",
+    "No direct file modification authority is granted.",
+    "No automatic patch promotion authority is granted.",
+    "No automatic training authority is granted.",
+    "No default failure-to-curriculum capture authority is granted.",
+    "Human review is required before downstream use."
+  ],
+  "model_metadata": {
+    "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "provider": "local_model_call",
+    "request_url": null
+  },
+  "operator_metadata": {
+    "operator": "manual",
+    "review_required": true
+  },
+  "orchestration_id": "orch_manual_20260830t000005z",
+  "output_format_claim": null,
+  "prompt_packet_id": "prompt_packet_manual_20260830t000005z",
+  "provenance": {
+    "acquisition_request_provenance": {
+      "api": "openai-chat",
+      "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "endpoint": "http://192.168.1.16:8081/v1",
+      "max_tokens": 1024,
+      "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "prompt_length": 4534,
+      "prompt_path": "prompt_to_paste.md",
+      "prompt_sha256": "9aa0978a8b04384045778621e41af1d460f1d93c4a0f1d0ca0cc8a57fb58806d",
+      "request_url": "http://192.168.1.16:8081/v1/chat/completions",
+      "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "temperature": 0
+    },
+    "input_artifact": "model_prompt_packet",
+    "model_call_metadata": {
+      "authority_boundaries": [
+        "Local model call is not command execution authority.",
+        "Local model call is not file modification authority.",
+        "No automatic patch promotion authority is granted.",
+        "No automatic training authority is granted.",
+        "No default failure-to-curriculum capture authority is granted.",
+        "Ingest and explicit review are required before downstream use."
+      ],
+      "call_status": "completed",
+      "endpoint": "http://192.168.1.16:8081/v1",
+      "max_tokens": 1024,
+      "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "prompt_length": 4534,
+      "prompt_path": "prompt_to_paste.md",
+      "prompt_sha256": "9aa0978a8b04384045778621e41af1d460f1d93c4a0f1d0ca0cc8a57fb58806d",
+      "raw_output_length": 985,
+      "raw_output_path": "raw_model_output.txt",
+      "raw_output_sha256": "4eec07aec1b0fd5a29dad568d753539309b43cef0aa8223ed5d8e684348df807",
+      "request_provenance": {
+        "api": "openai-chat",
+        "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+        "endpoint": "http://192.168.1.16:8081/v1",
+        "max_tokens": 1024,
+        "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+        "prompt_length": 4534,
+        "prompt_path": "prompt_to_paste.md",
+        "prompt_sha256": "9aa0978a8b04384045778621e41af1d460f1d93c4a0f1d0ca0cc8a57fb58806d",
+        "request_url": "http://192.168.1.16:8081/v1/chat/completions",
+        "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+        "temperature": 0
+      },
+      "response_provenance": {
+        "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+        "raw_output_length": 985,
+        "raw_output_path": "raw_model_output.txt",
+        "raw_output_sha256": "4eec07aec1b0fd5a29dad568d753539309b43cef0aa8223ed5d8e684348df807"
+      },
+      "review_required": true,
+      "source": "local_openai_compatible_endpoint",
+      "temperature": 0
+    },
+    "model_call_metadata_path": ".work/operator_handoffs/1p7b_worker_a_correction_v4_20260830/20260830T000005Z/local_model_call.json",
+    "model_call_metadata_sha256": "ce2dd169edb489fb246255ca6acb3aa6aadd880a9dbd34f6b32ed14f373362aa",
+    "raw_output_length": 985,
+    "raw_output_preserved": true,
+    "raw_output_sha256": "4eec07aec1b0fd5a29dad568d753539309b43cef0aa8223ed5d8e684348df807",
+    "raw_output_source_path": ".work/operator_handoffs/1p7b_worker_a_correction_v4_20260830/20260830T000005Z/raw_model_output.txt",
+    "run_manifest_path": ".work/operator_handoffs/1p7b_worker_a_correction_v4_20260830/20260830T000005Z/run_manifest.json",
+    "source": "captured_model_output"
+  },
+  "raw_model_output": "{\n  \"allowed_targets\": [\"docs/reports/\"],\n  \"held_targets\": [\"production automation\", \"automatic curriculum capture\", \"automatic promotion\", \"implementation_packet\"],\n  \"scope_expansion_required\": false,\n  \"claims\": {\n    \"scope_boundary_v1\": \"Only include targets explicitly listed in allowed_targets.\",\n    \"unsupported_certainty_v1\": \"Only state claims supported by the evidence you were given.\",\n    \"output_contract_v1\": \"Return exactly one output in the declared contract format.\"\n  },\n  \"evidence_basis\": \"The packet includes evidence covering the scope of the allowed targets and the output contract.\",\n  \"unverified_claims\": {\n    \"scope_boundary_v1\": \"Not verified in this packet.\",\n    \"unsupported_certainty_v1\": \"Not verified in this packet.\",\n    \"output_contract_v1\": \"Not verified in this packet.\"\n  },\n  \"format\": \"json\",\n  \"required_fields_present\": true,\n  \"reason\": \"The output meets the required format and includes all necessary fields with appropriate values.\"\n}",
+  "source_prompt_packet_path": ".work/operator_handoffs/1p7b_worker_a_correction_v4_20260830/20260830T000005Z/model_prompt_packet.md",
+  "triage_id": "triage_manual_20260830t000005z",
+  "validation_status": "not_validated"
+}

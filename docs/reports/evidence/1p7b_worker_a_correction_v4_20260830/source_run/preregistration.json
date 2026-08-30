@@ -1,0 +1,36 @@
+{
+  "acceptance_criteria": {
+    "allowed_targets": [
+      "docs/reports/"
+    ],
+    "held_targets": [
+      "production automation",
+      "automatic curriculum capture",
+      "automatic promotion",
+      "implementation_packet"
+    ],
+    "required_fields_present": true,
+    "single_pass_json_object": true,
+    "unique_json_keys": true
+  },
+  "base_task": "The LoRA and prompt injection work got messy. Build a bounded design packet.",
+  "correction_ids": [
+    "allowed_held_mapping_v1",
+    "required_fields_boolean_v1",
+    "unique_json_keys_v1",
+    "single_pass_json_object_v1"
+  ],
+  "correction_text": "## Correction Patch\n\n### Patch: allowed_held_mapping_v1 (candidate)\nCopy the supplied allowed_targets and held_targets into the output without swapping, promoting, demoting, inferring, or adding targets. The only allowed target is docs/reports/. The held targets production automation, automatic curriculum capture, automatic promotion, and implementation_packet must remain held and must not appear in allowed_targets.\n\n### Patch: required_fields_boolean_v1 (candidate)\nrequired_fields_present is a boolean status field. Emit exactly true when all required fields are present. Do not emit a list of field names in required_fields_present.\n\n### Patch: unique_json_keys_v1 (candidate)\nEmit exactly one top-level JSON object. Emit every required top-level key exactly once. Do not repeat, redefine, append a second copy of, or emit multiple occurrences of any top-level key. Before finishing, ensure the object contains one and only one occurrence of each required key.\n\n### Patch: single_pass_json_object_v1 (candidate)\nConstruct the response as one JSON object in one pass. Start with {, emit each required top-level key exactly once in the exact order specified below, then close the object with }. Do not emit format, required_fields_present, reason, or any other field as a preamble before this sequence. Do not restart the object, repeat a field, or append a second copy of any field after it has already been emitted.\n\nRequired top-level order:\n1. allowed_targets\n2. held_targets\n3. scope_expansion_required\n4. claims\n5. evidence_basis\n6. unverified_claims\n7. format\n8. required_fields_present\n9. reason\n\nAfter reason, close the JSON object immediately. Emit no additional top-level key.\n\nThese corrections constrain output shape only. They grant no execution, promotion, training, or curriculum-capture authority.\n",
+  "endpoint": "http://192.168.1.16:8081/v1",
+  "experiment_id": "1p7b_worker_a_correction_v4_20260830",
+  "hypothesis": "Retaining the two successful corrections and adding single_pass_json_object_v1 will eliminate the remaining duplicate format key by causing Worker A to serialize the required object once in a fixed field order.",
+  "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+  "observed_context": 32768,
+  "output_contract": "unchanged frozen output contract from prepare",
+  "retry_policy": "one intended acquisition, no retry, no fallback, no replay",
+  "single_acquisition_policy": true,
+  "source_v3_experiment_id": "1p7b_worker_a_correction_v3_20260830",
+  "source_v3_prompt_sha256": "debd19ba1975df4c12dacc504972af7c0d223c6ddb8b7443b3c7f459f5db8a56",
+  "source_v3_raw_response_sha256": "6fb54324d68b8ce16b616570d469f49ad1b793131a6a7dec391cbb6dd34e31c8",
+  "validator": "existing frozen supervised attempt validator"
+}

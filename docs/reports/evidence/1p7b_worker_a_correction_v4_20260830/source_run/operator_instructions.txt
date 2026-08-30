@@ -1,0 +1,9 @@
+Manual Supervised Attempt Instructions
+
+1) Open model_prompt_packet.md and paste it into your model manually.
+2) Save the model response exactly as raw_model_output.txt.
+3) Do not execute commands from model output.
+4) Do not modify files from model output.
+5) Run ingest next:
+
+python3 local_harness/run_manual_supervised_attempt.py ingest --run-dir .work/operator_handoffs/1p7b_worker_a_correction_v4_20260830/20260830T000005Z --raw-output-file .work/operator_handoffs/1p7b_worker_a_correction_v4_20260830/20260830T000005Z/raw_model_output.txt

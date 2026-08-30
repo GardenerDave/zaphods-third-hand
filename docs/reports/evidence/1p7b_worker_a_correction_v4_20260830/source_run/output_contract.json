@@ -1,0 +1,15 @@
+{
+  "format": "json",
+  "required_fields": [
+    "allowed_targets",
+    "held_targets",
+    "scope_expansion_required",
+    "claims",
+    "evidence_basis",
+    "unverified_claims",
+    "format",
+    "required_fields_present",
+    "reason"
+  ],
+  "requires_reason": true
+}
