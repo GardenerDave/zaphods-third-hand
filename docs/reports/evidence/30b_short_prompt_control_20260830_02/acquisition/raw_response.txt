@@ -1,0 +1,10 @@
+1. **Recommended next supervised action**:  
+   Route the request to the `docs/reports/` target for further analysis, ensuring no held targets are engaged and no authority boundaries are violated.
+
+2. **Evidence from accepted result**:  
+   - The accepted result confirms that `docs/reports/` is the only allowed target.  
+   - The held targets (`production automation`, `automatic curriculum capture`, `automatic promotion`, `implementation_packet`) are explicitly listed and must remain separate.  
+   - The task summary indicates deterministic routing to a `design_packet` workflow based on matched keywords (`lora`, `prompt injection`), which aligns with the scope boundary.
+
+3. **Unresolved constraint that must remain held**:  
+   - **Human review is required before downstream use** — this constraint must remain enforced to ensure all actions are reviewed by a human prior to any use or further processing.

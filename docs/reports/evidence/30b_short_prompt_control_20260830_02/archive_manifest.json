@@ -1,0 +1,48 @@
+{
+  "entries": [
+    {
+      "archive_path": "docs/reports/evidence/30b_short_prompt_control_20260830_02/preregistration.json",
+      "sha256": "ba28cd700935b5eee3123d1d0f4764098544c56b5c83dac6ec584cb14abed90a",
+      "size": 2266,
+      "source_path": ".work/operator_handoffs/30b_short_prompt_control_20260830_02/preregistration.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_short_prompt_control_20260830_02/canonical_request.json",
+      "sha256": "7c93d8e06c80c4b4441c3c5697cc540e8b2389bd639289a7a93ae5b183cf491b",
+      "size": 3150,
+      "source_path": ".work/operator_handoffs/30b_short_prompt_control_20260830_02/canonical_request.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_short_prompt_control_20260830_02/source_run/control_prompt.md",
+      "sha256": "2845131ebd460cccfd8bde1d2eaf2877f53465f9211ac6e453bb14fafccfb667",
+      "size": 2561,
+      "source_path": ".work/operator_handoffs/30b_short_prompt_control_20260830_02/source_run/control_prompt.md"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_short_prompt_control_20260830_02/source_run/exact_acquisition_prompt.txt",
+      "sha256": "1219c9e0e3798d7d82dd01f65d5fe0480703516ad6885ef060f8aca76f1c4c3b",
+      "size": 2570,
+      "source_path": ".work/operator_handoffs/30b_short_prompt_control_20260830_02/source_run/exact_acquisition_prompt.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_short_prompt_control_20260830_02/acquisition/request_metadata.json",
+      "sha256": "c125c2a394d5ac8892a598c33cd7e19970d42b885f28cce5f47b70d17e265fa1",
+      "size": 1690,
+      "source_path": ".work/operator_handoffs/30b_short_prompt_control_20260830_02/acquisition_metadata.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_short_prompt_control_20260830_02/acquisition/raw_response.txt",
+      "sha256": "b9a7700ba2d9589a5d098524b688fac7f6dd7a4503457eb46f8b5dca7273f69e",
+      "size": 917,
+      "source_path": ".work/operator_handoffs/30b_short_prompt_control_20260830_02/acquisition_stdout.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_short_prompt_control_20260830_02/acquisition/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0,
+      "source_path": ".work/operator_handoffs/30b_short_prompt_control_20260830_02/acquisition_stderr.txt"
+    }
+  ],
+  "generated_at": "2026-08-30T21:45:00Z",
+  "experiment_id": "30b_short_prompt_control_20260830_02"
+}

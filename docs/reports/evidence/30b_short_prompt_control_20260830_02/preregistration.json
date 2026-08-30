@@ -1,0 +1,54 @@
+{
+  "accepted_result_sha256": "dd439cafe48235a29dbd17deea51ddabf453405fca0463f84a5eb0f382bdc7ed",
+  "authority_inputs": {
+    "allowed_targets": [
+      "docs/reports/"
+    ],
+    "authorized_scope": "bounded_supervised_input_only",
+    "held_targets": [
+      "production automation",
+      "automatic curriculum capture",
+      "automatic promotion",
+      "implementation_packet"
+    ]
+  },
+  "comparison_targets": [
+    "V1",
+    "V2"
+  ],
+  "control_prompt_bytes": 2561,
+  "control_prompt_chars": 2561,
+  "control_prompt_sha256": "2845131ebd460cccfd8bde1d2eaf2877f53465f9211ac6e453bb14fafccfb667",
+  "control_purpose": "prompt-architecture control comparing objective-first short prompt against V2 dossier-derived executable layout",
+  "downstream_objective": "Using the accepted design packet above, produce a bounded downstream recommendation identifying the next supervised action, the evidence from the accepted result supporting it, and any unresolved constraint that must remain held.",
+  "endpoint": "http://192.168.1.16:8080/v1",
+  "evaluation_criteria": [
+    "objective adherence",
+    "prior-result use",
+    "continuation behavior",
+    "deliverable",
+    "authority"
+  ],
+  "exact_acquisition_prompt_bytes": 2570,
+  "exact_acquisition_prompt_chars": 2570,
+  "exact_acquisition_prompt_sha256": "1219c9e0e3798d7d82dd01f65d5fe0480703516ad6885ef060f8aca76f1c4c3b",
+  "experiment_id": "30b_short_prompt_control_20260830_02",
+  "implementation_head": "8520b31268a966e4fa747e7a11bee28c83454bca",
+  "message_structure": [
+    "system",
+    "user"
+  ],
+  "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "notes": "This experiment is a manually constructed prompt-architecture control. It does not represent a generated ZTH handoff artifact.",
+  "objective_provenance": "operator_supplied_experiment_objective",
+  "request_parameters": {
+    "final_only": true,
+    "max_tokens": 2048,
+    "retry_policy": "one primary call; no silent retry; no fallback model; no replay",
+    "temperature": 0.2,
+    "timeout_seconds": 120
+  },
+  "request_url": "http://192.168.1.16:8080/v1/chat/completions",
+  "source_transaction_id": "orch_manual_20260707t112634z",
+  "system_message": "You are a concise local AI worker. Follow the user's instructions exactly."
+}

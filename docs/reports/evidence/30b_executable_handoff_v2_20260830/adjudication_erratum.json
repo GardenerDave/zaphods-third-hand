@@ -1,0 +1,10 @@
+{
+  "experiment_id": "30b_executable_handoff_v2_20260830",
+  "adjudication": {
+    "literal_contract_verdict": "PASS",
+    "roadmap_level_verdict": "INCONCLUSIVE",
+    "interpretation": "The preserved raw response satisfied the frozen recommendation contract. The earlier FAIL language treated execution of the recommended action as if it were required by the frozen objective.",
+    "evidence_unchanged": true
+  },
+  "source": "post-experiment adjudication after short-prompt comparison"
+}
