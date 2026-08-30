@@ -1,0 +1,66 @@
+{
+  "allowed_targets": [
+    "docs/reports/"
+  ],
+  "authority_boundaries": [
+    "no_automatic_patch_promotion",
+    "no_automatic_training",
+    "no_default_failure_to_curriculum_capture",
+    "no_direct_file_modification_authority",
+    "no_execution_authority"
+  ],
+  "held_targets": [
+    "production automation",
+    "automatic curriculum capture",
+    "automatic promotion",
+    "implementation_packet"
+  ],
+  "orchestration_id": "orch_manual_20260830t000003z",
+  "output_contract": {
+    "format": "json",
+    "requires_reason": true
+  },
+  "provenance": {
+    "selected_patch_ids": [
+      "scope_boundary_v1",
+      "unsupported_certainty_v1",
+      "output_contract_v1"
+    ],
+    "selected_patch_statuses": {
+      "output_contract_v1": "candidate",
+      "scope_boundary_v1": "candidate",
+      "unsupported_certainty_v1": "candidate"
+    },
+    "source": "orchestration_assembler",
+    "triage_id": "triage_manual_20260830t000003z",
+    "triage_packet_provenance": {
+      "matched_keywords": [
+        "lora",
+        "prompt injection"
+      ],
+      "router_rule_id": "route_design_packet_fallback",
+      "source": "manual_supervised_attempt_prepare"
+    }
+  },
+  "recommended_workflow": "design_packet",
+  "rendered_patch_deltas": "## Applied Prompt Patches\n\n### Patch: scope_boundary_v1 (candidate)\n\nOnly include targets explicitly listed in allowed_targets. Related or plausible files must go in held_targets.\n\nRequired output fields: allowed_targets, held_targets, scope_expansion_required, reason\n\n### Patch: unsupported_certainty_v1 (candidate)\n\nOnly state claims supported by the evidence you were given. Mark any scope-level or repo-wide statement as unverified unless the packet includes evidence covering that scope. Prefer 'not verified in this packet' over confident generalization.\n\nRequired output fields: claims, evidence_basis, unverified_claims, reason\n\n### Patch: output_contract_v1 (candidate)\n\nReturn exactly one output in the declared contract format. Include every required field, even when its value is empty or unknown. Do not add fields that grant authority. Do not wrap the structured output in commentary.\n\nRequired output fields: format, required_fields_present, reason\n\nThese patches constrain output shape only. They grant no execution,\npromotion, training, or curriculum-capture authority.\n",
+  "review_required": true,
+  "risk_flags": [
+    "prompt_injection_surface",
+    "scope_creep",
+    "training_pipeline_ambiguity"
+  ],
+  "selected_prompt_patches": [
+    "scope_boundary_v1",
+    "unsupported_certainty_v1",
+    "output_contract_v1"
+  ],
+  "source_summary": "Deterministic routing of messy input to design_packet (matched keywords: lora, prompt injection).",
+  "task_type": "design_planning",
+  "triage_id": "triage_manual_20260830t000003z",
+  "validation_hooks": [
+    "allowed_held_target_separation",
+    "required_reason",
+    "no_execution_authority"
+  ]
+}

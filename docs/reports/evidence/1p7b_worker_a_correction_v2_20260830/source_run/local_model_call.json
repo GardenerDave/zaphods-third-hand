@@ -1,0 +1,42 @@
+{
+  "authority_boundaries": [
+    "Local model call is not command execution authority.",
+    "Local model call is not file modification authority.",
+    "No automatic patch promotion authority is granted.",
+    "No automatic training authority is granted.",
+    "No default failure-to-curriculum capture authority is granted.",
+    "Ingest and explicit review are required before downstream use."
+  ],
+  "call_status": "completed",
+  "endpoint": "http://192.168.1.16:8081/v1",
+  "max_tokens": 1024,
+  "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+  "prompt_length": 3481,
+  "prompt_path": "prompt_to_paste.md",
+  "prompt_sha256": "34220099c71033e1f488ab855d5ad147e5fc8292161ff278cc19cbc209d5017c",
+  "raw_output_length": 589,
+  "raw_output_path": "raw_model_output.txt",
+  "raw_output_sha256": "4e9ef87456dba6b76b9301d524bfa0b04f18ec98370187c01e2bc70a46942a1a",
+  "request_provenance": {
+    "api": "openai-chat",
+    "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "endpoint": "http://192.168.1.16:8081/v1",
+    "max_tokens": 1024,
+    "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "prompt_length": 3481,
+    "prompt_path": "prompt_to_paste.md",
+    "prompt_sha256": "34220099c71033e1f488ab855d5ad147e5fc8292161ff278cc19cbc209d5017c",
+    "request_url": "http://192.168.1.16:8081/v1/chat/completions",
+    "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "temperature": 0
+  },
+  "response_provenance": {
+    "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "raw_output_length": 589,
+    "raw_output_path": "raw_model_output.txt",
+    "raw_output_sha256": "4e9ef87456dba6b76b9301d524bfa0b04f18ec98370187c01e2bc70a46942a1a"
+  },
+  "review_required": true,
+  "source": "local_openai_compatible_endpoint",
+  "temperature": 0
+}

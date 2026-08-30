@@ -1,0 +1,29 @@
+{
+  "acceptance_criteria": {
+    "allowed_targets": [
+      "docs/reports/"
+    ],
+    "held_targets": [
+      "production automation",
+      "automatic curriculum capture",
+      "automatic promotion",
+      "implementation_packet"
+    ],
+    "required_fields_present": true
+  },
+  "base_task": "The LoRA and prompt injection work got messy. Build a bounded design packet.",
+  "correction_ids": [
+    "allowed_held_mapping_v1",
+    "required_fields_boolean_v1"
+  ],
+  "correction_text": "## Correction Patch\n\n### Patch: allowed_held_mapping_v1 (candidate)\nCopy the supplied allowed_targets and held_targets into the output without swapping, promoting, demoting, inferring, or adding targets. The only allowed target is docs/reports/. The held targets production automation, automatic curriculum capture, automatic promotion, and implementation_packet must remain held and must not appear in allowed_targets.\n\n### Patch: required_fields_boolean_v1 (candidate)\nrequired_fields_present is a boolean status field. Emit exactly true when all required fields are present. Do not emit a list of field names in required_fields_present.\n\nThese corrections constrain output shape only. They grant no execution, promotion, training, or curriculum-capture authority.\n",
+  "endpoint": "http://192.168.1.16:8081/v1",
+  "experiment_id": "1p7b_worker_a_correction_v2_20260830",
+  "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+  "observed_context": 32768,
+  "output_contract": "unchanged frozen output contract from prepare",
+  "retry_policy": "one intended acquisition, no retry, no fallback, no replay",
+  "source_failed_experiment_id": "1p7b_to_30b_production_handoff_v2_20260830",
+  "source_raw_response_sha256": "df7d0072ad1883ee9e7323a2edf37abc598654d326e81db9ea90a11dc5d6b302",
+  "validator": "existing frozen supervised attempt validator"
+}
