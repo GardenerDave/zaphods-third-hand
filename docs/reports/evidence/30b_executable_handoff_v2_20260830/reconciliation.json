@@ -1,0 +1,25 @@
+{
+  "experiment_id": "30b_executable_handoff_v2_20260830",
+  "classification": "HASH_SEMANTICS_ONLY",
+  "generated_artifact": {
+    "path": "source_run/next_worker_continuation.md",
+    "sha256": "686fe89d31af9413fdbcdac85e8ee23693cf565168b3f6e75b030bb09af1ff84"
+  },
+  "acquisition_user_message": {
+    "derivation": "artifact_text.rstrip() + \"\\n/no_think\"",
+    "sha256": "e5bd3a9398eb0b4b0eca41b4386528ae09dd653eefc3fd8106224bdfca18d206",
+    "transform": "final_only_append_no_think"
+  },
+  "interpretation": {
+    "prompt_integrity_status": "resolved",
+    "artifact_rewritten_after_acquisition": false,
+    "semantic_verdict_changed": false,
+    "future_rule": [
+      "Freeze the generated model-facing artifact before acquisition.",
+      "Freeze the exact transformed user-message string before acquisition.",
+      "Record request payload or canonical request representation where practical.",
+      "Record SHA-256 and length for each pre-acquisition artifact.",
+      "Never regenerate the acquisition-prompt artifact in place after transport."
+    ]
+  }
+}

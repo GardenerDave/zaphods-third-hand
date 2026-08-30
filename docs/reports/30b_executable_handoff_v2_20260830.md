@@ -45,3 +45,31 @@ The 30B response stated a proposed report in `docs/reports/` and summarized the 
 V2 fixed the missing visibility and objective framing, but the continuation contract still did not induce a materially correct downstream continuation. The model answered within scope and with provenance intact, yet it still translated the prompt into a report-generation / task-restate response instead of a concrete next-step recommendation grounded in the accepted result.
 
 This is a failure of continuation semantics, not transport or authority.
+
+## Erratum: Prompt Integrity Reconciliation
+
+The V2 acquisition metadata prompt hash does not match the archived `next_worker_continuation.md` bytes directly because acquisition used the documented `--final-only` path, which appends `\n/no_think` before hashing and transport.
+
+- Archived generated continuation artifact SHA-256: `686fe89d31af9413fdbcdac85e8ee23693cf565168b3f6e75b030bb09af1ff84`
+- Exact acquisition user-message SHA-256: `e5bd3a9398eb0b4b0eca41b4386528ae09dd653eefc3fd8106224bdfca18d206`
+- Transform: `artifact_text.rstrip() + "\n/no_think"`
+
+This is a hash-semantics-only discrepancy. It does not change the V2 semantic verdict:
+
+- intended 30B transport succeeded
+- prior-result body was model-visible
+- explicit downstream objective was model-visible
+- authority boundaries were preserved
+- practical downstream continuation still failed
+
+The exact model-visible user prompt remains deterministically recoverable from the archived continuation artifact plus the acquisition-time `/no_think` transform.
+
+Future acquisition-integrity rule:
+
+1. Freeze the generated model-facing artifact.
+2. Freeze the exact transformed user-message content that will be sent.
+3. Freeze the exact request payload or canonical request representation where practical.
+4. Record SHA-256 and byte/character length for each.
+5. Record all acquisition-time transforms before the network call.
+
+The acquisition-prompt artifact must never be regenerated in place after transport.
