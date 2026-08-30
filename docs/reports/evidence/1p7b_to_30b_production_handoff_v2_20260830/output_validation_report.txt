@@ -1,0 +1,69 @@
+# Supervised Attempt Output Validation
+
+## Validation IDs
+- validation_id: manual_validation_20260830t230134z
+- attempt_id: model_attempt_20260830t230134z
+- orchestration_id: orch_manual_20260830t000001z
+- triage_id: triage_manual_20260830t000001z
+- prompt_packet_id: prompt_packet_manual_20260830t000001z
+
+## Validation Status
+- validation_status: failed
+
+## Acceptance Status
+- acceptance_status: not_reviewed
+
+## Output Contract
+```json
+{
+  "format": "json",
+  "required_fields": [
+    "allowed_targets",
+    "held_targets",
+    "scope_expansion_required",
+    "claims",
+    "evidence_basis",
+    "unverified_claims",
+    "format",
+    "required_fields_present",
+    "reason"
+  ],
+  "requires_reason": true
+}
+```
+
+## Checks
+- [passed] parse_json: Raw model output parsed as JSON.
+- [passed] required_fields: All required fields are present.
+- [failed] required_field_types: Invalid required field types or values: required_fields_present must be boolean true
+- [passed] allowed_held_target_separation: Allowed and held targets are separated.
+- [failed] target_authority: Unauthorized allowed target in raw model output: automatic curriculum capture, automatic promotion, implementation_packet, production automation
+- [passed] requires_reason: Non-empty reason field is present.
+
+## Diagnostics
+- required_fields_present must be boolean true
+- Unauthorized allowed target in raw model output: automatic curriculum capture
+- Unauthorized allowed target in raw model output: automatic promotion
+- Unauthorized allowed target in raw model output: implementation_packet
+- Unauthorized allowed target in raw model output: production automation
+
+## Authority Boundaries
+- Validation is evidence, not acceptance.
+- No command execution authority is granted.
+- No direct file modification authority is granted.
+- No automatic patch promotion authority is granted.
+- No automatic training authority is granted.
+- No default failure-to-curriculum capture authority is granted.
+- Human review is required before downstream use.
+
+## Provenance
+```json
+{
+  "input_attempt_id": "model_attempt_20260830t230134z",
+  "source": "supervised_attempt_output_validation"
+}
+```
+
+## Review Requirement
+- Validation is evidence, not acceptance.
+- Human review is required before downstream use.

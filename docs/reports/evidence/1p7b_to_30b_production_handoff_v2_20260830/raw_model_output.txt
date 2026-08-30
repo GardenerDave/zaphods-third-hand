@@ -1,0 +1,35 @@
+{
+  "format": "json",
+  "required_fields_present": [
+    "allowed_targets",
+    "held_targets",
+    "scope_expansion_required",
+    "claims",
+    "evidence_basis",
+    "unverified_claims",
+    "reason"
+  ],
+  "allowed_targets": [
+    "production automation",
+    "automatic curriculum capture",
+    "automatic promotion",
+    "implementation_packet"
+  ],
+  "held_targets": [
+    "docs/reports/"
+  ],
+  "scope_expansion_required": false,
+  "claims": [
+    "The packet is designed to route messy input to design_packet.",
+    "The packet includes matched keywords: lora, prompt injection."
+  ],
+  "evidence_basis": [
+    "The task summary specifies deterministic routing of messy input to design_packet.",
+    "The packet includes matched keywords: lora, prompt injection."
+  ],
+  "unverified_claims": [
+    "The packet is designed to route messy input to design_packet.",
+    "The packet includes matched keywords: lora, prompt injection."
+  ],
+  "reason": "The packet is designed to route messy input to design_packet and includes matched keywords: lora, prompt injection. The claims are supported by the task summary and the presence of the keywords. No scope-level or repo-wide statements are verified in this packet."
+}

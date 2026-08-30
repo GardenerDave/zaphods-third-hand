@@ -1,0 +1,78 @@
+{
+  "experiment_id": "1p7b_to_30b_production_handoff_v2_20260830",
+  "files": [
+    {
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_production_handoff_v2_20260830/run_manifest.json",
+      "sha256": "5bd9f5b16fe0aa8e2e51b645aa21cd4f26c17387959a2637a7794e083379c9d9",
+      "size": 1178,
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_production_handoff_v2_20260830/20260830T000001Z/run_manifest.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_production_handoff_v2_20260830/messy_input.txt",
+      "sha256": "ba546ce0c60f663c6178c243b64e18f69f4764dba4fb310aff706e07b974db86",
+      "size": 77,
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_production_handoff_v2_20260830/20260830T000001Z/messy_input.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_production_handoff_v2_20260830/triage_packet.json",
+      "sha256": "48ea30ea39cb8eb7b50a754f184563ee990d3adb3f4a2f5b5679eba7bd0f2a0a",
+      "size": 1446,
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_production_handoff_v2_20260830/20260830T000001Z/triage_packet.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_production_handoff_v2_20260830/orchestration_packet.json",
+      "sha256": "55dbca1f323f5f8e3cd1ee1eb40f0a9a181aaab5fed635941851e496b7e94840",
+      "size": 2941,
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_production_handoff_v2_20260830/20260830T000001Z/orchestration_packet.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_production_handoff_v2_20260830/output_contract.json",
+      "sha256": "ed6708b775988f35ef5969190338709b6f732199068f75ac62d049d39a7daba5",
+      "size": 272,
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_production_handoff_v2_20260830/20260830T000001Z/output_contract.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_production_handoff_v2_20260830/model_prompt_packet.md",
+      "sha256": "63b0ecd15b1aba9ed7900fc2b49968bed09fd2a1ea046362158bd77139643dc4",
+      "size": 2713,
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_production_handoff_v2_20260830/20260830T000001Z/model_prompt_packet.md"
+    },
+    {
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_production_handoff_v2_20260830/prompt_to_paste.md",
+      "sha256": "63b0ecd15b1aba9ed7900fc2b49968bed09fd2a1ea046362158bd77139643dc4",
+      "size": 2713,
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_production_handoff_v2_20260830/20260830T000001Z/prompt_to_paste.md"
+    },
+    {
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_production_handoff_v2_20260830/local_model_call.json",
+      "sha256": "89882c9793f04b519a3d19115f75741feaf79d2bafda1655bc54dc602300caa0",
+      "size": 1725,
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_production_handoff_v2_20260830/20260830T000001Z/local_model_call.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_production_handoff_v2_20260830/raw_model_output.txt",
+      "sha256": "df7d0072ad1883ee9e7323a2edf37abc598654d326e81db9ea90a11dc5d6b302",
+      "size": 1222,
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_production_handoff_v2_20260830/20260830T000001Z/raw_model_output.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_production_handoff_v2_20260830/supervised_model_attempt.json",
+      "sha256": "a200bc9a8a7440c598503a25f4cc1e826233bbfe243774132470d0f27be7dfb3",
+      "size": 5656,
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_production_handoff_v2_20260830/20260830T000001Z/supervised_model_attempt.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_production_handoff_v2_20260830/output_validation.json",
+      "sha256": "4c21e868fdf301e5f004af300c8cea51cbb04e568480c38118f359a166fb2086",
+      "size": 2731,
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_production_handoff_v2_20260830/20260830T000001Z/output_validation.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_production_handoff_v2_20260830/output_validation_report.txt",
+      "sha256": "98930b125f70cc1368c45e38ebb0700421e005d6120a2b08387ff093b0ebcf50",
+      "size": 2273,
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_production_handoff_v2_20260830/20260830T000001Z/output_validation_report.txt"
+    }
+  ],
+  "source_run_dir": ".work/operator_handoffs/1p7b_to_30b_production_handoff_v2_20260830/20260830T000001Z"
+}

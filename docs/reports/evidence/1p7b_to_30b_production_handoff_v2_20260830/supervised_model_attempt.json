@@ -1,0 +1,94 @@
+{
+  "acceptance_status": "not_reviewed",
+  "attempt_id": "model_attempt_20260830t230134z",
+  "authority_boundaries": [
+    "No command execution authority is granted.",
+    "No direct file modification authority is granted.",
+    "No automatic patch promotion authority is granted.",
+    "No automatic training authority is granted.",
+    "No default failure-to-curriculum capture authority is granted.",
+    "Human review is required before downstream use."
+  ],
+  "model_metadata": {
+    "model_id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "provider": "local_model_call",
+    "request_url": null
+  },
+  "operator_metadata": {
+    "operator": "manual",
+    "review_required": true
+  },
+  "orchestration_id": "orch_manual_20260830t000001z",
+  "output_format_claim": null,
+  "prompt_packet_id": "prompt_packet_manual_20260830t000001z",
+  "provenance": {
+    "acquisition_request_provenance": {
+      "api": "openai-chat",
+      "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "endpoint": "http://192.168.1.16:8081/v1",
+      "max_tokens": 1024,
+      "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "prompt_length": 2713,
+      "prompt_path": "prompt_to_paste.md",
+      "prompt_sha256": "63b0ecd15b1aba9ed7900fc2b49968bed09fd2a1ea046362158bd77139643dc4",
+      "request_url": "http://192.168.1.16:8081/v1/chat/completions",
+      "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "temperature": 0
+    },
+    "input_artifact": "model_prompt_packet",
+    "model_call_metadata": {
+      "authority_boundaries": [
+        "Local model call is not command execution authority.",
+        "Local model call is not file modification authority.",
+        "No automatic patch promotion authority is granted.",
+        "No automatic training authority is granted.",
+        "No default failure-to-curriculum capture authority is granted.",
+        "Ingest and explicit review are required before downstream use."
+      ],
+      "call_status": "completed",
+      "endpoint": "http://192.168.1.16:8081/v1",
+      "max_tokens": 1024,
+      "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "prompt_length": 2713,
+      "prompt_path": "prompt_to_paste.md",
+      "prompt_sha256": "63b0ecd15b1aba9ed7900fc2b49968bed09fd2a1ea046362158bd77139643dc4",
+      "raw_output_length": 1222,
+      "raw_output_path": "raw_model_output.txt",
+      "raw_output_sha256": "df7d0072ad1883ee9e7323a2edf37abc598654d326e81db9ea90a11dc5d6b302",
+      "request_provenance": {
+        "api": "openai-chat",
+        "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+        "endpoint": "http://192.168.1.16:8081/v1",
+        "max_tokens": 1024,
+        "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+        "prompt_length": 2713,
+        "prompt_path": "prompt_to_paste.md",
+        "prompt_sha256": "63b0ecd15b1aba9ed7900fc2b49968bed09fd2a1ea046362158bd77139643dc4",
+        "request_url": "http://192.168.1.16:8081/v1/chat/completions",
+        "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+        "temperature": 0
+      },
+      "response_provenance": {
+        "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+        "raw_output_length": 1222,
+        "raw_output_path": "raw_model_output.txt",
+        "raw_output_sha256": "df7d0072ad1883ee9e7323a2edf37abc598654d326e81db9ea90a11dc5d6b302"
+      },
+      "review_required": true,
+      "source": "local_openai_compatible_endpoint",
+      "temperature": 0
+    },
+    "model_call_metadata_path": ".work/operator_handoffs/1p7b_to_30b_production_handoff_v2_20260830/20260830T000001Z/local_model_call.json",
+    "model_call_metadata_sha256": "89882c9793f04b519a3d19115f75741feaf79d2bafda1655bc54dc602300caa0",
+    "raw_output_length": 1222,
+    "raw_output_preserved": true,
+    "raw_output_sha256": "df7d0072ad1883ee9e7323a2edf37abc598654d326e81db9ea90a11dc5d6b302",
+    "raw_output_source_path": ".work/operator_handoffs/1p7b_to_30b_production_handoff_v2_20260830/20260830T000001Z/raw_model_output.txt",
+    "run_manifest_path": ".work/operator_handoffs/1p7b_to_30b_production_handoff_v2_20260830/20260830T000001Z/run_manifest.json",
+    "source": "captured_model_output"
+  },
+  "raw_model_output": "{\n  \"format\": \"json\",\n  \"required_fields_present\": [\n    \"allowed_targets\",\n    \"held_targets\",\n    \"scope_expansion_required\",\n    \"claims\",\n    \"evidence_basis\",\n    \"unverified_claims\",\n    \"reason\"\n  ],\n  \"allowed_targets\": [\n    \"production automation\",\n    \"automatic curriculum capture\",\n    \"automatic promotion\",\n    \"implementation_packet\"\n  ],\n  \"held_targets\": [\n    \"docs/reports/\"\n  ],\n  \"scope_expansion_required\": false,\n  \"claims\": [\n    \"The packet is designed to route messy input to design_packet.\",\n    \"The packet includes matched keywords: lora, prompt injection.\"\n  ],\n  \"evidence_basis\": [\n    \"The task summary specifies deterministic routing of messy input to design_packet.\",\n    \"The packet includes matched keywords: lora, prompt injection.\"\n  ],\n  \"unverified_claims\": [\n    \"The packet is designed to route messy input to design_packet.\",\n    \"The packet includes matched keywords: lora, prompt injection.\"\n  ],\n  \"reason\": \"The packet is designed to route messy input to design_packet and includes matched keywords: lora, prompt injection. The claims are supported by the task summary and the presence of the keywords. No scope-level or repo-wide statements are verified in this packet.\"\n}",
+  "source_prompt_packet_path": ".work/operator_handoffs/1p7b_to_30b_production_handoff_v2_20260830/20260830T000001Z/model_prompt_packet.md",
+  "triage_id": "triage_manual_20260830t000001z",
+  "validation_status": "not_validated"
+}
