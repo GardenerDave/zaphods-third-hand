@@ -1,0 +1,16 @@
+```json
+{
+  "next_supervised_action": "Generate a detailed report in docs/reports/ summarizing the messy LoRA and prompt injection work, including the reasons for the messiness and proposed cleanup steps.",
+  "evidence_from_accepted_result": [
+    "The accepted design packet confirms that the only allowed target is docs/reports/.",
+    "The held targets (production automation, automatic curriculum capture, automatic promotion, implementation_packet) remain separate and not engaged.",
+    "The task summary indicates deterministic routing to design_packet due to keywords 'lora' and 'prompt injection', which aligns with the need for a structured report.",
+    "The prompt patch instructions include scope_boundary_v1, unsupported_certainty_v1, and output_contract_v1, ensuring bounded scope and clarity."
+  ],
+  "unresolved_constraints": [
+    "The constraint that the report must remain within the scope of docs/reports/ must be strictly enforced.",
+    "The held targets must remain untouched and not activated in any form during this step."
+  ],
+  "scope_compliance": "The proposed action is fully compliant with the allowed targets and held targets as per the accepted design packet. It avoids any unauthorized scope expansion or activation of held targets."
+}
+```

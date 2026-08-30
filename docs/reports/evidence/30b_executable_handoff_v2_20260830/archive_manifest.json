@@ -1,0 +1,143 @@
+{
+  "entries": [
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/preregistration.json",
+      "sha256": "3885946cd517c5112871d984a525c1175a288e2212e151714db2baa3e80056dc",
+      "size": 2829,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/preregistration.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/acquisition/request_metadata.json",
+      "sha256": "a522163919b30bdc6eb2525a4cdffc4a3c2dcff103bff87ffbf2b609b9582022",
+      "size": 1694,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/acquisition_metadata.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/acquisition/raw_response.txt",
+      "sha256": "dd439cafe48235a29dbd17deea51ddabf453405fca0463f84a5eb0f382bdc7ed",
+      "size": 1274,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/acquisition_stdout.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/acquisition/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/acquisition_stderr.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/source_run/run_manifest.json",
+      "sha256": "d4f321c905a43a746d6da918740d5785f8fa99d5c5e42bb3037cdd0c8d3b1c44",
+      "size": 974,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/run_manifest.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/source_run/transaction_manifest.json",
+      "sha256": "e089e5cc59acd8598edc18d97f9a266bd5475279d6f0a258dc1e36c778978e35",
+      "size": 3181,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/transaction_manifest.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/source_run/next_worker_context.json",
+      "sha256": "df6c00f4c87689a872bc3ebc747e765702460338b3ee87ae8df44124acbde299",
+      "size": 13986,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/next_worker_context.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/source_run/next_worker_context.md",
+      "sha256": "9faa6f0e4eb161484e68a598f380d60b6deaf4e51e9beb842dc39bbea584249a",
+      "size": 10936,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/next_worker_context.md"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/source_run/next_worker_continuation.md",
+      "sha256": "686fe89d31af9413fdbcdac85e8ee23693cf565168b3f6e75b030bb09af1ff84",
+      "size": 6296,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/next_worker_continuation.md"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/source_run/model_prompt_packet.md",
+      "sha256": "3e4c6d2cb9ab3393502769d3aaa8ce027bd8334ad6b54974c65bd21deae7d007",
+      "size": 2713,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/model_prompt_packet.md"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/source_run/raw_model_output.txt",
+      "sha256": "adbbf7c43a9436426596e2ebd8911c4ed41d4bf7958c164f4f21469192c7f064",
+      "size": 1344,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/raw_model_output.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/source_run/output_validation.json",
+      "sha256": "e71b4eb12369b6e5f707c47f6a58367316045e0287624dac39696391b5fb0a92",
+      "size": 2236,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/output_validation.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/source_run/output_validation_report.txt",
+      "sha256": "4eb2721c25d03cb7f57c4fa1c76e502e188c2e0d2d07fd222fafc73cd12f5523",
+      "size": 1814,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/output_validation_report.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/source_run/review_decision.json",
+      "sha256": "8665534e2918bad04c2db1d76a1792cf24202c4653e52ab799b89d49859e0ba6",
+      "size": 1509,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/review_decision.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/source_run/downstream_use_gate.json",
+      "sha256": "ec276a172544449987e3e2323b1c41235f3a5e5dc8b9aa9474ca2f4182732e4f",
+      "size": 1672,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/downstream_use_gate.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/source_run/handoff_packet.json",
+      "sha256": "32efd2a2b246ea83b9b42b216ed5820b3e2540a6fa7dff9ce648c1b0e244f0d8",
+      "size": 2442,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/handoff_packet.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/source_run/triage_packet.json",
+      "sha256": "858bbe6b9e06e59ea8156cdc897f920004a609cca1741c9b503d5b5774b9b9b4",
+      "size": 1446,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/triage_packet.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/source_run/messy_input.txt",
+      "sha256": "ba546ce0c60f663c6178c243b64e18f69f4764dba4fb310aff706e07b974db86",
+      "size": 77,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/messy_input.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/source_run/operator_instructions.txt",
+      "sha256": "1ac53421a6fe0e73e5cfc813783601f2c355e4b5c5553365eda0e3e78f8c7aaf",
+      "size": 490,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/operator_instructions.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/source_run/prompt_to_paste.md",
+      "sha256": "3e4c6d2cb9ab3393502769d3aaa8ce027bd8334ad6b54974c65bd21deae7d007",
+      "size": 2713,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/prompt_to_paste.md"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/source_run/correction_prompt_to_paste.md",
+      "sha256": "6691d62b561ccf71377c686d1d060781d55629c76a6cd1ff88997e4dde7da287",
+      "size": 1756,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/correction_prompt_to_paste.md"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/source_run/supervised_model_attempt.json",
+      "sha256": "453c5af50663932e0dc817dec02f8d95310eaa9aeab27200e9dc17e4719b64f7",
+      "size": 2849,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/supervised_model_attempt.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/30b_executable_handoff_v2_20260830/source_run/output_contract.json",
+      "sha256": "ed6708b775988f35ef5969190338709b6f732199068f75ac62d049d39a7daba5",
+      "size": 272,
+      "source_path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/output_contract.json"
+    }
+  ],
+  "generated_at": "2026-08-30T21:23:04.705803Z"
+}

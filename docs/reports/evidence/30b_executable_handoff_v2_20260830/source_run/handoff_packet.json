@@ -1,0 +1,53 @@
+{
+  "allowed_downstream_use": [
+    "may_be_used_as_reviewed_input_for_next_supervised_step"
+  ],
+  "attempt_id": "manual_attempt_20260830t212100z",
+  "authority_boundaries": [
+    "Handoff packet is not command execution authority.",
+    "Handoff packet is not file modification authority.",
+    "Handoff packet is not patch application authority.",
+    "No automatic patch promotion authority is granted.",
+    "No automatic training authority is granted.",
+    "No default failure-to-curriculum capture authority is granted.",
+    "Next step must remain supervised."
+  ],
+  "decision_id": "manual_decision_20260830t212100z",
+  "gate_id": "manual_gate_20260830t212100z",
+  "gate_status": "allowed",
+  "handoff_id": "manual_handoff_20260830t212100z",
+  "handoff_payload": {
+    "payload_kind": "reviewed_model_output_reference",
+    "raw_output_artifact": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/raw_model_output.txt",
+    "source_attempt_id": "manual_attempt_20260830t212100z",
+    "source_decision_id": "manual_decision_20260830t212100z",
+    "source_gate_id": "manual_gate_20260830t212100z",
+    "source_validation_id": "manual_validation_20260830t212100z"
+  },
+  "handoff_reason": "Handoff remains supervised and bounded by downstream-use gate status.",
+  "handoff_scope": "bounded_supervised_input_only",
+  "handoff_status": "prepared",
+  "next_step_objective": "Using the accepted design packet above, produce a bounded downstream recommendation identifying the next supervised action, the evidence from the accepted result supporting it, and any unresolved constraint that must remain held.",
+  "next_step_summary": "Use reviewed output as bounded input for the next supervised step.",
+  "next_step_type": "next_supervised_step_input",
+  "operator_metadata": {
+    "operator": "manual",
+    "review_required": true
+  },
+  "orchestration_id": "orch_manual_20260707t112634z",
+  "prohibited_downstream_use": [
+    "no_command_execution",
+    "no_direct_file_modification",
+    "no_patch_application",
+    "no_automatic_patch_promotion",
+    "no_automatic_training",
+    "no_default_failure_to_curriculum_capture"
+  ],
+  "prompt_packet_id": "prompt_packet_manual_20260707t112634z",
+  "provenance": {
+    "input_gate_id": "manual_gate_20260830t212100z",
+    "source": "supervised_handoff_packet"
+  },
+  "triage_id": "triage_manual_20260707t112634z",
+  "validation_id": "manual_validation_20260830t212100z"
+}

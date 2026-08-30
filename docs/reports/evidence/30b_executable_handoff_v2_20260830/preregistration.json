@@ -1,0 +1,80 @@
+{
+  "copied_source_hashes": {
+    "downstream_use_gate.json": {
+      "sha256": "ff85584b88d981c07159cc9881bfb060ac8fce13a3cbdcce5384e0867b76c6c5",
+      "size": 1672
+    },
+    "handoff_packet.json": {
+      "sha256": "c5cffeb8efbbba96ac9530cf3cac7940021ee60b56ac0187909767c6d3fcc25b",
+      "size": 2176
+    },
+    "model_prompt_packet.md": {
+      "sha256": "3e4c6d2cb9ab3393502769d3aaa8ce027bd8334ad6b54974c65bd21deae7d007",
+      "size": 2713
+    },
+    "next_worker_context.json": {
+      "sha256": "097dfe4dd9b6b2127bfa74e00e0d4703a9bf5de3969e93a5384c787632c99d41",
+      "size": 13535
+    },
+    "next_worker_context.md": {
+      "sha256": "aeed44caa09b98df8b804c5e22455d1b5013e47f4281928bde7f17301d77b994",
+      "size": 10489
+    },
+    "output_validation.json": {
+      "sha256": "653217f87f2e3f9583b1c6950b7d7faec5d69047ed312fc8cf8eedabc4312bc4",
+      "size": 2236
+    },
+    "raw_model_output.txt": {
+      "sha256": "adbbf7c43a9436426596e2ebd8911c4ed41d4bf7958c164f4f21469192c7f064",
+      "size": 1344
+    },
+    "review_decision.json": {
+      "sha256": "aab640710bf974ccb5cf533ff53244c447f54571800b75ed84a4091061cc966d",
+      "size": 1509
+    },
+    "run_manifest.json": {
+      "sha256": "d4f321c905a43a746d6da918740d5785f8fa99d5c5e42bb3037cdd0c8d3b1c44",
+      "size": 974
+    },
+    "transaction_manifest.json": {
+      "sha256": "faae2b912e11191c4b21f09e213f4b720d67cf00c16caf1297b797474737918e",
+      "size": 3117
+    },
+    "triage_packet.json": {
+      "sha256": "858bbe6b9e06e59ea8156cdc897f920004a609cca1741c9b503d5b5774b9b9b4",
+      "size": 1446
+    }
+  },
+  "created_at": "2026-08-30T21:20:45.674786Z",
+  "current_commit": "b9f7836adb9ea164eef622e83284c06edbd7e113",
+  "downstream_objective": "Using the accepted design packet above, produce a bounded downstream recommendation identifying the next supervised action, the evidence from the accepted result supporting it, and any unresolved constraint that must remain held.",
+  "endpoint": "http://192.168.1.16:8080/v1",
+  "evaluation_criteria": [
+    "transport",
+    "prior-result use",
+    "objective adherence",
+    "continuation behavior",
+    "authority preservation",
+    "contract quality",
+    "provenance"
+  ],
+  "experiment_id": "30b_executable_handoff_v2_20260830",
+  "failure_categories": [
+    "transport",
+    "context",
+    "objective",
+    "authority",
+    "provenance",
+    "contract"
+  ],
+  "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "objective_provenance": "operator_supplied_experiment_objective",
+  "request_parameters": {
+    "max_tokens": 2048,
+    "retry_policy": "one primary call; no silent retry; no fallback model; no replay",
+    "temperature": 0,
+    "timeout_seconds": 120
+  },
+  "source_run_id": "manual_supervised_attempt_20260707t112634z",
+  "source_transaction_id": "orch_manual_20260707t112634z"
+}

@@ -1,0 +1,69 @@
+{
+  "created_at": "2026-07-07T11:26:34Z",
+  "evidence_references": [
+    {
+      "artifact": "run_manifest",
+      "path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/run_manifest.json",
+      "sha256": "d4f321c905a43a746d6da918740d5785f8fa99d5c5e42bb3037cdd0c8d3b1c44"
+    },
+    {
+      "artifact": "model_prompt_packet",
+      "path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/model_prompt_packet.md",
+      "sha256": "3e4c6d2cb9ab3393502769d3aaa8ce027bd8334ad6b54974c65bd21deae7d007"
+    },
+    {
+      "artifact": "raw_model_output",
+      "path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/raw_model_output.txt",
+      "sha256": "adbbf7c43a9436426596e2ebd8911c4ed41d4bf7958c164f4f21469192c7f064"
+    },
+    {
+      "artifact": "supervised_model_attempt",
+      "attempt_id": "manual_attempt_20260830t212100z",
+      "path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/supervised_model_attempt.json",
+      "sha256": "453c5af50663932e0dc817dec02f8d95310eaa9aeab27200e9dc17e4719b64f7"
+    },
+    {
+      "artifact": "output_validation",
+      "path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/output_validation.json",
+      "sha256": "e71b4eb12369b6e5f707c47f6a58367316045e0287624dac39696391b5fb0a92",
+      "validation_id": "manual_validation_20260830t212100z"
+    },
+    {
+      "artifact": "review_decision",
+      "decision_id": "manual_decision_20260830t212100z",
+      "path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/review_decision.json",
+      "sha256": "8665534e2918bad04c2db1d76a1792cf24202c4653e52ab799b89d49859e0ba6"
+    },
+    {
+      "artifact": "downstream_use_gate",
+      "gate_id": "manual_gate_20260830t212100z",
+      "path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/downstream_use_gate.json",
+      "sha256": "ec276a172544449987e3e2323b1c41235f3a5e5dc8b9aa9474ca2f4182732e4f"
+    },
+    {
+      "artifact": "handoff_packet",
+      "handoff_id": "manual_handoff_20260830t212100z",
+      "path": ".work/operator_handoffs/30b_executable_handoff_v2_20260830/source_run/handoff_packet.json",
+      "sha256": "32efd2a2b246ea83b9b42b216ed5820b3e2540a6fa7dff9ce648c1b0e244f0d8"
+    }
+  ],
+  "first_worker_identity": "manual_operator_provided_model_output",
+  "intended_next_worker_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "lifecycle_state": "HANDOFF",
+  "records": {
+    "attempt_id": "manual_attempt_20260830t212100z",
+    "decision_id": "manual_decision_20260830t212100z",
+    "gate_id": "manual_gate_20260830t212100z",
+    "handoff_id": "manual_handoff_20260830t212100z",
+    "validation_id": "manual_validation_20260830t212100z"
+  },
+  "run_id": "manual_supervised_attempt_20260707t112634z",
+  "schema_version": "zth.transaction_manifest.v0.1",
+  "task_reference": {
+    "orchestration_id": "orch_manual_20260707t112634z",
+    "prompt_packet_id": "prompt_packet_manual_20260707t112634z",
+    "triage_id": "triage_manual_20260707t112634z"
+  },
+  "transaction_id": "orch_manual_20260707t112634z",
+  "updated_at": "2026-08-30T21:21:00.894188Z"
+}
