@@ -184,6 +184,8 @@ def _call_local_metadata_payload(
     prompt_text: str,
     raw_output_path: Path,
     raw_output_text: str,
+    request_body_sha256: str | None = None,
+    request_body_length: int | None = None,
     response_schema_path: Path | None = None,
     response_schema_source_path: Path | None = None,
     response_format: dict[str, Any] | None = None,
@@ -212,6 +214,8 @@ def _call_local_metadata_payload(
         "raw_output_path": raw_output_path.name,
         "raw_output_sha256": _sha256_text(raw_output_text),
         "raw_output_length": len(raw_output_text),
+        "request_body_sha256": request_body_sha256,
+        "request_body_length": request_body_length,
         "structured_output": structured_output,
         "call_status": "completed",
         "review_required": True,
@@ -227,6 +231,8 @@ def _call_local_metadata_payload(
             "prompt_length": len(prompt_text),
             "max_tokens": max_tokens,
             "temperature": temperature,
+            "request_body_sha256": request_body_sha256,
+            "request_body_length": request_body_length,
             "structured_output_enabled": response_format is not None,
             "structured_output_mechanism": "openai_json_schema" if response_format is not None else None,
             "response_format": response_format,
@@ -728,6 +734,7 @@ def run_call_local(
     if response_format is not None:
         request_payload["response_format"] = response_format
     request_bytes = json.dumps(request_payload).encode("utf-8")
+    request_body_sha256 = _sha256_text(request_bytes.decode("utf-8"))
     request = urllib.request.Request(
         request_url,
         data=request_bytes,
@@ -875,6 +882,8 @@ def run_call_local(
         prompt_text=prompt_text,
         raw_output_path=raw_output_path,
         raw_output_text=assistant_content,
+        request_body_sha256=request_body_sha256,
+        request_body_length=len(request_bytes),
         response_schema_path=response_schema_path,
         response_schema_source_path=response_schema_source_path,
         response_format=response_format,
@@ -1186,6 +1195,10 @@ def run_ingest(
                     )
                 if request_provenance.get("response_format") is None:
                     raise ValueError("--model-call-metadata-file request_provenance.response_format must be present")
+                if structured_output.get("response_format") != request_provenance.get("response_format"):
+                    raise ValueError(
+                        "--model-call-metadata-file structured_output.response_format must match request_provenance.response_format"
+                    )
             elif structured_enabled is not False:
                 raise ValueError("--model-call-metadata-file structured_output.enabled must be boolean when present")
 
