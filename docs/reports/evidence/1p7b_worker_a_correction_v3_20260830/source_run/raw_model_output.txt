@@ -1,0 +1,29 @@
+{
+  "format": "json",
+  "required_fields_present": true,
+  "reason": "All required fields are present and meet the constraints of the ZTH model prompt packet.",
+  "allowed_targets": [
+    "docs/reports/"
+  ],
+  "held_targets": [
+    "production automation",
+    "automatic curriculum capture",
+    "automatic promotion",
+    "implementation_packet"
+  ],
+  "scope_expansion_required": false,
+  "claims": [
+    "The allowed_targets list includes 'docs/reports/' as the only valid target.",
+    "The held_targets list includes 'production automation' and others as specified.",
+    "The scope_expansion_required flag is false, as no additional targets are needed."
+  ],
+  "evidence_basis": [
+    "The allowed_targets are explicitly listed and match the ZTH workflow constraints.",
+    "The held_targets are explicitly listed and must remain in the output.",
+    "The scope_expansion_required flag is false, as no additional targets are required."
+  ],
+  "unverified_claims": [
+    "No scope-level or repo-wide statements are unverified in this packet."
+  ],
+  "format": "json"
+}

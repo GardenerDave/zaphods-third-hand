@@ -1,0 +1,33 @@
+{
+  "acceptance_criteria": {
+    "allowed_targets": [
+      "docs/reports/"
+    ],
+    "held_targets": [
+      "production automation",
+      "automatic curriculum capture",
+      "automatic promotion",
+      "implementation_packet"
+    ],
+    "required_fields_present": true,
+    "unique_json_keys": true
+  },
+  "base_task": "The LoRA and prompt injection work got messy. Build a bounded design packet.",
+  "correction_ids": [
+    "allowed_held_mapping_v1",
+    "required_fields_boolean_v1",
+    "unique_json_keys_v1"
+  ],
+  "correction_text": "## Correction Patch\n\n### Patch: allowed_held_mapping_v1 (candidate)\nCopy the supplied allowed_targets and held_targets into the output without swapping, promoting, demoting, inferring, or adding targets. The only allowed target is docs/reports/. The held targets production automation, automatic curriculum capture, automatic promotion, and implementation_packet must remain held and must not appear in allowed_targets.\n\n### Patch: required_fields_boolean_v1 (candidate)\nrequired_fields_present is a boolean status field. Emit exactly true when all required fields are present. Do not emit a list of field names in required_fields_present.\n\n### Patch: unique_json_keys_v1 (candidate)\nEmit exactly one top-level JSON object. Emit every required top-level key exactly once. Do not repeat, redefine, append a second copy of, or emit multiple occurrences of any top-level key. Before finishing, ensure the object contains one and only one occurrence of each required key.\n\nRequired top-level keys:\nallowed_targets\nheld_targets\nscope_expansion_required\nclaims\nevidence_basis\nunverified_claims\nformat\nrequired_fields_present\nreason\n\nThese corrections constrain output shape only. They grant no execution, promotion, training, or curriculum-capture authority.\n",
+  "endpoint": "http://192.168.1.16:8081/v1",
+  "experiment_id": "1p7b_worker_a_correction_v3_20260830",
+  "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+  "observed_context": 32768,
+  "output_contract": "unchanged frozen output contract from prepare",
+  "retry_policy": "one intended acquisition, no retry, no fallback, no replay",
+  "single_acquisition_policy": true,
+  "source_v2_experiment_id": "1p7b_worker_a_correction_v2_20260830",
+  "source_v2_prompt_sha256": "34220099c71033e1f488ab855d5ad147e5fc8292161ff278cc19cbc209d5017c",
+  "source_v2_raw_response_sha256": "4e9ef87456dba6b76b9301d524bfa0b04f18ec98370187c01e2bc70a46942a1a",
+  "validator": "existing frozen supervised attempt validator"
+}
