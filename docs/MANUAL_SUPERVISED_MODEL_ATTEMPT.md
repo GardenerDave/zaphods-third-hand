@@ -200,6 +200,9 @@ If explicit review metadata is provided, ingest also writes:
 - `review_decision.json`
 - `downstream_use_gate.json`
 - `handoff_packet.json`
+- `transaction_manifest.json`
+- `next_worker_context.json`
+- `next_worker_context.md`
 
 Example:
 
@@ -213,6 +216,16 @@ python3 local_harness/run_manual_supervised_attempt.py ingest \
 ```
 
 Without explicit review metadata, ingest stops after validation and reports that review is required before downstream use.
+
+The transaction manifest is an index over the existing supervised artifacts.
+It references, but does not replace, the attempt, validation, review,
+downstream-use gate, and handoff packet records. The next-worker context bundle
+is a deterministic, machine-readable next-step input artifact that can be
+consumed later by a second worker without the operator manually reconstructing
+the handoff prompt. It does not invoke a downstream worker in this slice.
+In the next-worker bundle, `task_request` is the full prepared first-worker
+prompt packet, while `bounded_task_request` preserves the original bounded
+task/request text for adapters that need the compact source task directly.
 
 ## Contract source and provenance
 

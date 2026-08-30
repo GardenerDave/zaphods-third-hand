@@ -25,6 +25,7 @@ from local_harness.render_model_prompt_packet import (
 from local_harness.render_supervised_attempt_output_validation import (
     render_supervised_attempt_output_validation,
 )
+from local_harness.transaction_handoff import build_transaction_handoff_artifacts
 from local_harness.supervised_attempt_output_validator import (
     validate_supervised_attempt_output_against_contract,
 )
@@ -955,6 +956,7 @@ def run_ingest(
     decision: str | None = None,
     decision_reason: str | None = None,
     operator: str | None = None,
+    next_worker: str | None = None,
 ) -> dict[str, Any]:
     manifest, manifest_path = _resolve_manifest(run_dir)
 
@@ -1091,6 +1093,12 @@ def run_ingest(
             "handoff_path": handoff_path,
         }
     )
+    if decision == "accepted":
+        transaction_result = build_transaction_handoff_artifacts(
+            run_dir=run_dir,
+            next_worker_identity=next_worker,
+        )
+        result.update(transaction_result)
     return result
 
 
@@ -1144,6 +1152,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     ingest.add_argument("--decision", choices=sorted(ALLOWED_DECISIONS))
     ingest.add_argument("--decision-reason")
     ingest.add_argument("--operator")
+    ingest.add_argument("--next-worker")
 
     return parser
 
@@ -1259,6 +1268,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             decision=args.decision,
             decision_reason=args.decision_reason,
             operator=args.operator,
+            next_worker=args.next_worker,
         )
         print(f"run_dir: {result['run_dir']}")
         print(f"attempt_path: {result['attempt_path']}")
@@ -1274,6 +1284,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"decision_path: {result['decision_path']}")
         print(f"gate_path: {result['gate_path']}")
         print(f"handoff_path: {result['handoff_path']}")
+        if "transaction_manifest_path" in result:
+            print(f"transaction_manifest_path: {result['transaction_manifest_path']}")
+            print(f"next_worker_context_path: {result['next_worker_context_path']}")
         return 0
     except Exception as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
