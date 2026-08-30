@@ -47,9 +47,28 @@ The corrected Worker-A response preserved the earlier successful behaviors:
   - `implementation_packet`
 - `required_fields_present` was boolean `true`
 
+## Structural-output objective
+
+The raw response satisfied the V4 structural-output objective:
+
+- one top-level JSON object;
+- every required top-level key emitted exactly once;
+- fixed top-level key order preserved;
+- no duplicate top-level keys.
+
+The three successful semantic corrections from earlier runs remained in force:
+
+- `allowed_targets` was exactly `["docs/reports/"]`
+- `held_targets` was exactly:
+  - `production automation`
+  - `automatic curriculum capture`
+  - `automatic promotion`
+  - `implementation_packet`
+- `required_fields_present` was boolean `true`
+
 ## Remaining failure
 
-The unchanged validator still failed. In this run, the failure shifted from duplicate-key serialization to required-field type mismatch:
+The unchanged validator still failed because the model did not satisfy the full type contract:
 
 - `required_field_types: failed`
 - diagnostic:
@@ -123,12 +142,14 @@ V4 corrected raw SHA-256:
 | required_field_types | FAIL | PASS | PASS | FAIL |
 | target_authority | FAIL | PASS | PASS | PASS |
 | duplicate_json_keys | absent | 3 duplicated keys | 1 duplicated key | absent as top-level duplicate keys |
+| structural-output objective | FAIL | FAIL | PASS | PASS |
 | overall validation | FAIL | FAIL | FAIL | FAIL |
 
 ## Verdicts
 
-- Existing correction retention: `PASS`
-- `single_pass_json_object_v1` uptake: `FAIL`
+- Existing correction retention: `PASS / RETAINED`
+- V4 structural-output objective: `PASS`
+- Individual patch causal attribution: `NOT IDENTIFIABLE`
 - Complete Worker-A contract: `FAIL`
 - Worker B: `NOT REACHED`
 - Bounded correction trajectory: not claimed

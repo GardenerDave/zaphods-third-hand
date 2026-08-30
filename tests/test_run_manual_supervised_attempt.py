@@ -61,7 +61,28 @@ def _captured_model_call_metadata(
     raw_output_text: str,
     model: str = "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
     endpoint: str = "http://192.168.1.16:8081/v1",
+    response_schema_path: Path | None = None,
+    response_schema_source_path: Path | None = None,
 ) -> dict[str, object]:
+    structured_output: dict[str, object] = {
+        "enabled": response_schema_path is not None,
+        "mechanism": "openai_json_schema" if response_schema_path is not None else None,
+    }
+    if response_schema_path is not None:
+        structured_output["schema_path"] = response_schema_path.name
+        structured_output["schema_sha256"] = manual_attempt._sha256_file(response_schema_path)
+        structured_output["schema_length"] = len(response_schema_path.read_text(encoding="utf-8"))
+    if response_schema_source_path is not None:
+        structured_output["schema_source_path"] = str(response_schema_source_path)
+    if response_schema_path is not None:
+        structured_output["response_format"] = {
+            "type": "json_schema",
+            "json_schema": {
+                "name": "zth_structured_output",
+                "strict": True,
+                "schema": json.loads(response_schema_path.read_text(encoding="utf-8")),
+            },
+        }
     return {
         "source": "local_openai_compatible_endpoint",
         "endpoint": endpoint,
@@ -74,6 +95,7 @@ def _captured_model_call_metadata(
         "raw_output_path": "raw_model_output.txt",
         "raw_output_sha256": manual_attempt._sha256_text(raw_output_text),
         "raw_output_length": len(raw_output_text),
+        "structured_output": structured_output,
         "call_status": "completed",
         "review_required": True,
         "request_provenance": {
@@ -88,12 +110,16 @@ def _captured_model_call_metadata(
             "prompt_length": len(prompt_text),
             "max_tokens": 1024,
             "temperature": 0,
+            "structured_output_enabled": response_schema_path is not None,
+            "structured_output_mechanism": "openai_json_schema" if response_schema_path is not None else None,
+            "response_format": structured_output.get("response_format"),
         },
         "response_provenance": {
             "raw_output_path": "raw_model_output.txt",
             "raw_output_sha256": manual_attempt._sha256_text(raw_output_text),
             "raw_output_length": len(raw_output_text),
             "model": model,
+            "structured_output": structured_output,
         },
         "authority_boundaries": [
             "Local model call is not command execution authority.",
@@ -221,6 +247,7 @@ def _run_call_local_in_process(
     overwrite: bool = False,
     response_code: int = 200,
     response_body: dict[str, object] | None = None,
+    response_schema_file: Path | None = None,
     urlopen_side_effect=None,
 ) -> subprocess.CompletedProcess[str]:
     seen_request: dict[str, object] | None = None
@@ -261,6 +288,11 @@ def _run_call_local_in_process(
                         str(max_tokens),
                         "--timeout-seconds",
                         str(timeout_seconds),
+                        *(
+                            ["--response-schema-file", str(response_schema_file)]
+                            if response_schema_file is not None
+                            else []
+                        ),
                         *(["--overwrite"] if overwrite else []),
                     ]
                 )
@@ -706,6 +738,7 @@ def test_call_local_reads_prompt_posts_to_chat_completions_and_writes_raw_output
     assert body["messages"][0]["role"] == "user"
     prompt = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
     assert body["messages"][0]["content"] == prompt
+    assert "response_format" not in body
 
     raw = (run_dir / "raw_model_output.txt").read_text(encoding="utf-8")
     assert raw == "{\"reason\":\"local\"}"
@@ -718,6 +751,8 @@ def test_call_local_reads_prompt_posts_to_chat_completions_and_writes_raw_output
     assert metadata["model"] == "qwen3-1.7b-gpu-40k"
     assert metadata["temperature"] == 0
     assert metadata["max_tokens"] == 1024
+    assert metadata["structured_output"]["enabled"] is False
+    assert metadata["request_provenance"]["structured_output_enabled"] is False
     assert metadata["call_status"] == "completed"
     assert metadata["review_required"] is True
     boundaries = metadata["authority_boundaries"]
@@ -730,9 +765,55 @@ def test_call_local_reads_prompt_posts_to_chat_completions_and_writes_raw_output
 
     assert "next_ingest_command:" in result.stdout
     assert "run_manual_supervised_attempt.py ingest" in result.stdout
+    assert "response_format" not in json.dumps(body)
     assert not (run_dir / "review_decision.json").exists()
     assert not (run_dir / "downstream_use_gate.json").exists()
     assert not (run_dir / "handoff_packet.json").exists()
+
+
+def test_call_local_with_response_schema_encodes_response_format_and_records_provenance(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260707T212122Z")
+    schema = run_dir / "response_schema.json"
+    schema.write_text(
+        json.dumps(
+            {
+                "type": "object",
+                "properties": {
+                    "reason": {"type": "string"},
+                },
+                "required": ["reason"],
+                "additionalProperties": False,
+            }
+        ),
+        encoding="utf-8",
+    )
+    result = _run_call_local_in_process(
+        run_dir=run_dir,
+        endpoint="http://127.0.0.1:65500/v1",
+        model="qwen3-1.7b-gpu-40k",
+        response_schema_file=schema,
+        response_body={"choices": [{"message": {"content": "{\"reason\":\"local\"}"}}]},
+    )
+
+    assert result.returncode == 0
+    body = json.loads(result.stdout.split("request_payload: ", 1)[1]) if "request_payload: " in result.stdout else None
+    assert isinstance(body, dict)
+    assert body["response_format"]["type"] == "json_schema"
+    assert body["response_format"]["json_schema"]["name"] == "zth_structured_output"
+    assert body["response_format"]["json_schema"]["strict"] is True
+    assert body["response_format"]["json_schema"]["schema"]["required"] == ["reason"]
+
+    metadata = json.loads((run_dir / "local_model_call.json").read_text(encoding="utf-8"))
+    assert metadata["structured_output"]["enabled"] is True
+    assert metadata["structured_output"]["mechanism"] == "openai_json_schema"
+    assert metadata["structured_output"]["schema_path"] == "response_schema.json"
+    assert metadata["structured_output"]["schema_sha256"] == manual_attempt._sha256_file(run_dir / "response_schema.json")
+    assert metadata["structured_output"]["schema_length"] == len((run_dir / "response_schema.json").read_bytes())
+    assert metadata["request_provenance"]["structured_output_enabled"] is True
+    assert metadata["request_provenance"]["structured_output_mechanism"] == "openai_json_schema"
+    assert metadata["request_provenance"]["response_format"]["json_schema"]["name"] == "zth_structured_output"
+    assert metadata["response_provenance"]["structured_output"]["enabled"] is True
+    assert (run_dir / "response_schema.json").read_text(encoding="utf-8") == schema.read_text(encoding="utf-8")
 
 
 def test_call_local_honors_optional_temperature_and_max_tokens(tmp_path: Path):
@@ -751,6 +832,23 @@ def test_call_local_honors_optional_temperature_and_max_tokens(tmp_path: Path):
     assert isinstance(body, dict)
     assert body["temperature"] == 0.2
     assert body["max_tokens"] == 256
+
+
+def test_call_local_rejects_missing_response_schema_file(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260707T222223Z")
+    result = run_script(
+        "call-local",
+        "--run-dir",
+        run_dir,
+        "--endpoint",
+        "http://127.0.0.1:65500/v1",
+        "--model",
+        "qwen3-1.7b-gpu-40k",
+        "--response-schema-file",
+        run_dir / "missing_response_schema.json",
+    )
+    assert result.returncode != 0
+    assert "does not exist" in result.stderr
 
 
 def test_call_local_refuses_overwrite_nonempty_raw_output_without_overwrite(tmp_path: Path):
@@ -1589,6 +1687,189 @@ def test_ingest_with_model_call_metadata_records_captured_model_provenance(tmp_p
     manifest = json.loads((run_dir / "transaction_manifest.json").read_text(encoding="utf-8"))
     assert manifest["records"]["attempt_id"] == attempt["attempt_id"]
     assert manifest["first_worker_identity"] == "Qwen_Qwen3-1.7B-Q4_K_M.gguf"
+
+
+def test_ingest_with_structured_model_call_metadata_records_structured_output_provenance(tmp_path: Path):
+    run_dir = _prepare_run(tmp_path, timestamp="20260707T151617Z")
+    prompt_text = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
+    source_raw = tmp_path / "raw_model_output.txt"
+    raw_text = _valid_raw_output_json()
+    source_raw.write_text(raw_text, encoding="utf-8")
+    schema = run_dir / "response_schema.json"
+    schema.write_text(
+        json.dumps(
+            {
+                "type": "object",
+                "properties": {"reason": {"type": "string"}},
+                "required": ["reason"],
+                "additionalProperties": False,
+            }
+        ),
+        encoding="utf-8",
+    )
+    metadata = tmp_path / "local_model_call.json"
+    metadata_payload = _captured_model_call_metadata(
+        prompt_text=prompt_text,
+        raw_output_text=raw_text,
+        response_schema_path=schema,
+        response_schema_source_path=schema,
+    )
+    _write_captured_model_call_metadata(metadata, metadata_payload)
+
+    result = run_script(
+        "ingest",
+        "--run-dir",
+        run_dir,
+        "--raw-output-file",
+        source_raw,
+        "--model-call-metadata-file",
+        metadata,
+        "--decision",
+        "accepted",
+        "--decision-reason",
+        "Output satisfies the required contract and remains within scope.",
+        "--operator",
+        "manual",
+        "--next-worker",
+        "qwen3-30b",
+        "--next-worker-objective",
+        "Produce a bounded downstream comparison report.",
+    )
+    assert result.returncode == 0
+
+    attempt = json.loads((run_dir / "supervised_model_attempt.json").read_text(encoding="utf-8"))
+    assert attempt["model_metadata"]["model_id"] == "Qwen_Qwen3-1.7B-Q4_K_M.gguf"
+    assert attempt["provenance"]["source"] == "captured_model_output"
+    assert attempt["provenance"]["structured_output"]["enabled"] is True
+    assert attempt["provenance"]["structured_output"]["mechanism"] == "openai_json_schema"
+    assert attempt["provenance"]["structured_output"]["schema_path"] == "response_schema.json"
+    assert attempt["provenance"]["structured_output"]["schema_sha256"] == manual_attempt._sha256_file(schema)
+    assert attempt["provenance"]["structured_output"]["schema_length"] == len(schema.read_bytes())
+    assert "manual_operator_provided_model_output" not in json.dumps(attempt)
+
+
+def test_ingest_with_structured_model_call_metadata_rejects_tampered_schema_provenance(tmp_path: Path):
+    run_dir = _prepare_run(tmp_path, timestamp="20260707T151618Z")
+    prompt_text = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
+    source_raw = tmp_path / "raw_model_output.txt"
+    raw_text = _valid_raw_output_json()
+    source_raw.write_text(raw_text, encoding="utf-8")
+    schema = run_dir / "response_schema.json"
+    schema.write_text(
+        json.dumps(
+            {
+                "type": "object",
+                "properties": {"reason": {"type": "string"}},
+                "required": ["reason"],
+                "additionalProperties": False,
+            }
+        ),
+        encoding="utf-8",
+    )
+    metadata = tmp_path / "local_model_call.json"
+    metadata_payload = _captured_model_call_metadata(
+        prompt_text=prompt_text,
+        raw_output_text=raw_text,
+        response_schema_path=schema,
+        response_schema_source_path=schema,
+    )
+    metadata_payload["structured_output"]["schema_sha256"] = "0" * 64
+    metadata_payload["request_provenance"]["response_format"]["json_schema"]["schema"]["required"] = ["reason"]
+    _write_captured_model_call_metadata(metadata, metadata_payload)
+
+    result = run_script(
+        "ingest",
+        "--run-dir",
+        run_dir,
+        "--raw-output-file",
+        source_raw,
+        "--model-call-metadata-file",
+        metadata,
+    )
+    assert result.returncode != 0
+    assert "structured_output.schema_sha256 does not match schema artifact" in result.stderr
+
+
+def test_ingest_with_structured_model_call_metadata_rejects_unsupported_mechanism(tmp_path: Path):
+    run_dir = _prepare_run(tmp_path, timestamp="20260707T151620Z")
+    prompt_text = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
+    source_raw = tmp_path / "raw_model_output.txt"
+    raw_text = _valid_raw_output_json()
+    source_raw.write_text(raw_text, encoding="utf-8")
+    schema = run_dir / "response_schema.json"
+    schema.write_text(
+        json.dumps(
+            {
+                "type": "object",
+                "properties": {"reason": {"type": "string"}},
+                "required": ["reason"],
+                "additionalProperties": False,
+            }
+        ),
+        encoding="utf-8",
+    )
+    metadata = tmp_path / "local_model_call.json"
+    metadata_payload = _captured_model_call_metadata(
+        prompt_text=prompt_text,
+        raw_output_text=raw_text,
+        response_schema_path=schema,
+        response_schema_source_path=schema,
+    )
+    metadata_payload["structured_output"]["mechanism"] = "unsupported_mechanism"
+    _write_captured_model_call_metadata(metadata, metadata_payload)
+
+    result = run_script(
+        "ingest",
+        "--run-dir",
+        run_dir,
+        "--raw-output-file",
+        source_raw,
+        "--model-call-metadata-file",
+        metadata,
+    )
+    assert result.returncode != 0
+    assert "structured_output.mechanism must be openai_json_schema" in result.stderr
+
+
+def test_ingest_with_structured_model_call_metadata_rejects_failed_acquisition(tmp_path: Path):
+    run_dir = _prepare_run(tmp_path, timestamp="20260707T151619Z")
+    prompt_text = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
+    source_raw = tmp_path / "raw_model_output.txt"
+    raw_text = _valid_raw_output_json()
+    source_raw.write_text(raw_text, encoding="utf-8")
+    schema = run_dir / "response_schema.json"
+    schema.write_text(
+        json.dumps(
+            {
+                "type": "object",
+                "properties": {"reason": {"type": "string"}},
+                "required": ["reason"],
+                "additionalProperties": False,
+            }
+        ),
+        encoding="utf-8",
+    )
+    metadata = tmp_path / "local_model_call.json"
+    metadata_payload = _captured_model_call_metadata(
+        prompt_text=prompt_text,
+        raw_output_text=raw_text,
+        response_schema_path=schema,
+        response_schema_source_path=schema,
+    )
+    metadata_payload["call_status"] = "failed"
+    _write_captured_model_call_metadata(metadata, metadata_payload)
+
+    result = run_script(
+        "ingest",
+        "--run-dir",
+        run_dir,
+        "--raw-output-file",
+        source_raw,
+        "--model-call-metadata-file",
+        metadata,
+    )
+    assert result.returncode != 0
+    assert "must represent a completed acquisition" in result.stderr
 
 
 def test_ingest_with_tampered_model_call_metadata_fails_closed(tmp_path: Path):

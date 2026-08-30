@@ -7,6 +7,7 @@ import argparse
 import json
 import sys
 import socket
+import shutil
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
@@ -96,6 +97,18 @@ def _sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _load_json_object_file(path: Path, *, kind: str) -> dict[str, Any]:
+    if not path.is_file():
+        raise ValueError(f"missing {kind}: {path}")
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"invalid JSON in {kind}: {path}") from exc
+    if not isinstance(payload, dict):
+        raise ValueError(f"{kind} must be a JSON object")
+    return payload
+
+
 def _parse_field_list_from_text(text: str, prefix: str) -> list[str]:
     if not text.startswith(prefix):
         return []
@@ -171,7 +184,22 @@ def _call_local_metadata_payload(
     prompt_text: str,
     raw_output_path: Path,
     raw_output_text: str,
+    response_schema_path: Path | None = None,
+    response_schema_source_path: Path | None = None,
+    response_format: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    structured_output: dict[str, Any] = {
+        "enabled": response_format is not None,
+        "mechanism": "openai_json_schema" if response_format is not None else None,
+    }
+    if response_schema_path is not None:
+        structured_output["schema_path"] = response_schema_path.name
+        structured_output["schema_sha256"] = _sha256_file(response_schema_path)
+        structured_output["schema_length"] = len(response_schema_path.read_bytes())
+    if response_schema_source_path is not None:
+        structured_output["schema_source_path"] = str(response_schema_source_path)
+    if response_format is not None:
+        structured_output["response_format"] = response_format
     return {
         "source": "local_openai_compatible_endpoint",
         "endpoint": endpoint,
@@ -184,6 +212,7 @@ def _call_local_metadata_payload(
         "raw_output_path": raw_output_path.name,
         "raw_output_sha256": _sha256_text(raw_output_text),
         "raw_output_length": len(raw_output_text),
+        "structured_output": structured_output,
         "call_status": "completed",
         "review_required": True,
         "request_provenance": {
@@ -198,12 +227,16 @@ def _call_local_metadata_payload(
             "prompt_length": len(prompt_text),
             "max_tokens": max_tokens,
             "temperature": temperature,
+            "structured_output_enabled": response_format is not None,
+            "structured_output_mechanism": "openai_json_schema" if response_format is not None else None,
+            "response_format": response_format,
         },
         "response_provenance": {
             "raw_output_path": raw_output_path.name,
             "raw_output_sha256": _sha256_text(raw_output_text),
             "raw_output_length": len(raw_output_text),
             "model": model,
+            "structured_output": structured_output,
         },
         "authority_boundaries": [
             "Local model call is not command execution authority.",
@@ -647,6 +680,7 @@ def run_call_local(
     max_tokens: int,
     timeout_seconds: float,
     overwrite: bool,
+    response_schema_file: Path | None = None,
 ) -> dict[str, Any]:
     prompt_path = run_dir / "prompt_to_paste.md"
     if not prompt_path.is_file():
@@ -662,6 +696,28 @@ def run_call_local(
     if raw_output_path.exists() and raw_output_path.read_text(encoding="utf-8") and not overwrite:
         raise ValueError("raw_model_output.txt is non-empty; use --overwrite to replace it")
 
+    response_schema_path: Path | None = None
+    response_schema_source_path: Path | None = None
+    response_format: dict[str, Any] | None = None
+    if response_schema_file is not None:
+        if not response_schema_file.is_file():
+            raise ValueError(f"--response-schema-file does not exist: {response_schema_file}")
+        response_schema_source_path = response_schema_file
+        response_schema_payload = _load_json_object_file(response_schema_file, kind="response schema")
+        response_schema_path = run_dir / "response_schema.json"
+        if response_schema_file.resolve() != response_schema_path.resolve():
+            shutil.copyfile(response_schema_file, response_schema_path)
+        elif not response_schema_path.exists():
+            response_schema_path.write_text(response_schema_file.read_text(encoding="utf-8"), encoding="utf-8")
+        response_format = {
+            "type": "json_schema",
+            "json_schema": {
+                "name": "zth_structured_output",
+                "strict": True,
+                "schema": response_schema_payload,
+            },
+        }
+
     request_url = _call_local_url(endpoint)
     request_payload = {
         "model": _require_nonempty(model, field="--model"),
@@ -669,6 +725,8 @@ def run_call_local(
         "temperature": temperature,
         "max_tokens": max_tokens,
     }
+    if response_format is not None:
+        request_payload["response_format"] = response_format
     request_bytes = json.dumps(request_payload).encode("utf-8")
     request = urllib.request.Request(
         request_url,
@@ -817,6 +875,9 @@ def run_call_local(
         prompt_text=prompt_text,
         raw_output_path=raw_output_path,
         raw_output_text=assistant_content,
+        response_schema_path=response_schema_path,
+        response_schema_source_path=response_schema_source_path,
+        response_format=response_format,
     )
     _write_json(metadata_path, metadata_payload)
 
@@ -1081,6 +1142,52 @@ def run_ingest(
             raise ValueError("--model-call-metadata-file response_provenance.raw_output_length must match raw_output_length")
         if response_provenance.get("raw_output_path") not in {None, model_call_metadata.get("raw_output_path")}:
             raise ValueError("--model-call-metadata-file response_provenance.raw_output_path must match raw_output_path")
+        structured_output = model_call_metadata.get("structured_output")
+        if structured_output is not None:
+            if not isinstance(structured_output, dict):
+                raise ValueError("--model-call-metadata-file structured_output must be an object when present")
+            structured_enabled = structured_output.get("enabled")
+            if structured_enabled is True:
+                if structured_output.get("mechanism") != "openai_json_schema":
+                    raise ValueError("--model-call-metadata-file structured_output.mechanism must be openai_json_schema")
+                schema_path_value = structured_output.get("schema_path")
+                schema_sha256 = structured_output.get("schema_sha256")
+                schema_length = structured_output.get("schema_length")
+                if not isinstance(schema_path_value, str) or not schema_path_value.strip():
+                    raise ValueError(
+                        "--model-call-metadata-file structured_output.schema_path must be a non-empty string"
+                    )
+                if not isinstance(schema_sha256, str) or not schema_sha256.strip():
+                    raise ValueError(
+                        "--model-call-metadata-file structured_output.schema_sha256 must be a non-empty string"
+                    )
+                if not isinstance(schema_length, int):
+                    raise ValueError("--model-call-metadata-file structured_output.schema_length must be an integer")
+                schema_path = run_dir / schema_path_value
+                if not schema_path.is_file():
+                    raise ValueError(
+                        f"--model-call-metadata-file structured_output.schema_path does not resolve in run: {schema_path}"
+                    )
+                if _sha256_file(schema_path) != schema_sha256:
+                    raise ValueError(
+                        "--model-call-metadata-file structured_output.schema_sha256 does not match schema artifact"
+                    )
+                if len(schema_path.read_bytes()) != schema_length:
+                    raise ValueError(
+                        "--model-call-metadata-file structured_output.schema_length does not match schema artifact"
+                    )
+                if request_provenance.get("structured_output_enabled") is not True:
+                    raise ValueError(
+                        "--model-call-metadata-file request_provenance.structured_output_enabled must be true"
+                    )
+                if request_provenance.get("structured_output_mechanism") != "openai_json_schema":
+                    raise ValueError(
+                        "--model-call-metadata-file request_provenance.structured_output_mechanism must be openai_json_schema"
+                    )
+                if request_provenance.get("response_format") is None:
+                    raise ValueError("--model-call-metadata-file request_provenance.response_format must be present")
+            elif structured_enabled is not False:
+                raise ValueError("--model-call-metadata-file structured_output.enabled must be boolean when present")
 
     run_raw_output_path = run_dir / "raw_model_output.txt"
     run_raw_output_path.write_text(raw_output_text, encoding="utf-8")
@@ -1139,6 +1246,7 @@ def run_ingest(
                 "model_call_metadata_sha256": _sha256_file(model_call_metadata_file),
                 "model_call_metadata": model_call_metadata,
                 "acquisition_request_provenance": model_call_metadata.get("request_provenance"),
+                "structured_output": model_call_metadata.get("structured_output"),
             },
         )
 
@@ -1284,6 +1392,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     call_local.add_argument("--temperature", type=float, default=0)
     call_local.add_argument("--max-tokens", type=int, default=1024)
     call_local.add_argument("--timeout-seconds", type=float, default=30)
+    call_local.add_argument("--response-schema-file", type=Path)
     call_local.add_argument("--overwrite", action="store_true")
 
     retry_contract = subparsers.add_parser("retry-contract")
@@ -1378,6 +1487,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 max_tokens=args.max_tokens,
                 timeout_seconds=args.timeout_seconds,
                 overwrite=bool(args.overwrite),
+                response_schema_file=args.response_schema_file,
             )
             print(f"run_dir: {result['run_dir']}")
             print(f"endpoint: {result['endpoint']}")

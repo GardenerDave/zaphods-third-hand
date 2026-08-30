@@ -123,12 +123,15 @@ Behavior:
 - writes assistant content exactly to `raw_model_output.txt`
 - writes call metadata to `local_model_call.json`
 - prints the next ingest command
+- optionally accepts `--response-schema-file` to send an OpenAI-compatible `response_format` JSON Schema constraint
+- preserves the exact schema artifact in the run directory as `response_schema.json` when structured output is enabled
 
 Optional flags:
 
 - `--temperature`
 - `--max-tokens`
 - `--timeout-seconds`
+- `--response-schema-file`
 - `--overwrite` to replace a non-empty `raw_model_output.txt`
 
 This mode does not validate acceptance by itself. The operator must still run ingest.
@@ -224,6 +227,7 @@ Ingest supports two provenance classes:
 
 Captured-model ingest preserves the actual worker identity, acquisition provenance, and raw-response identity from the recorded model-call metadata. The manual path remains available for historical compatibility, but it is not used to represent a truthful captured worker result in a continuous supervised transaction.
 For captured-model ingest, `model_call_metadata_sha256` records the SHA-256 of the exact metadata file bytes, not a reserialized copy.
+When structured output is active, the captured metadata also records the exact schema artifact, schema SHA-256, schema length, and request-level structured-output mechanism used for the acquisition.
 
 The transaction manifest is an index over the existing supervised artifacts.
 It references, but does not replace, the attempt, validation, review,
@@ -243,6 +247,11 @@ auditable authority source; the continuation view is not an authority source.
 `next_step_summary` describes the supervised transition, `handoff_scope`
 describes the authority/scope boundary, and `next_step_objective` is the
 explicit downstream task that `Perform Now` uses.
+
+Structured decoding, when available through the acquisition path, is for
+deterministic shape enforcement. It can guarantee representational well-formedness
+such as object shape, required keys, and container types, but it does not replace
+semantic validation or authority checks.
 
 ## Contract source and provenance
 
