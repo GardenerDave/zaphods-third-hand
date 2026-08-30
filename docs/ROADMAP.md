@@ -62,6 +62,195 @@ portable local variant management. Those remain roadmap-level problems that
 require evidence, not authority, and must stay behind explicit review and no
 unattended promotion boundaries.
 
+## Architectural Direction Update
+
+ZTH is moving from capability discovery toward integration and operational
+usefulness. The next roadmap sequence is now organized around supervised
+transaction handling, evidence-bearing handoff, and ZTH-specific authority
+semantics layered over mature external standards.
+
+The project should increasingly own:
+
+- authority and permission boundaries;
+- allowed / held target semantics;
+- qualification and capability profiles;
+- validation and review;
+- failure classification;
+- evidence provenance;
+- immutable experiment evidence;
+- prompt-patch / correction methodology;
+- teacher / worker learning trajectories;
+- Project Historian integration.
+
+The project should increasingly avoid owning generic infrastructure that
+mature open-source tools or standards can provide. When a standard boundary is
+adopted, ZTH should carry its own authority, provenance, validation,
+qualification, and review semantics on top of that boundary instead of
+replacing them.
+
+Priority order for the next phase:
+
+1. Canonical supervised handoff transaction.
+1. Historian read-only context interface.
+1. Common model transport abstraction.
+1. First coding-agent / ACP adapter.
+1. End-to-end 1.7B -> handoff -> 30B/Codex demonstration.
+1. Runtime lifecycle consolidation.
+1. Evaluation-framework adoption for new experiments.
+1. Operational telemetry.
+1. Continue semantic escalation research independently.
+1. Only then revisit durable autonomous scheduling.
+
+First major milestone acceptance target:
+
+- one bounded 1.7B worker attempt is executed under the supervised handoff
+  transaction;
+- the result is captured and validated;
+- a review or explicit handoff decision is made;
+- a second worker, such as 30B or Codex, receives the necessary task state,
+  Historian evidence references, constraints, authority boundaries, previous
+  attempt/result, validation state, and handoff reason automatically;
+- the operator does not manually reconstruct the handoff prompt or copy
+  context between models;
+- the second worker produces a validated result;
+- the Historian evidence is sealed as part of the transaction closeout.
+
+Automatic semantic routing is not required for this acceptance milestone. The
+handoff may be explicit or triggered only by already-qualified deterministic
+rules.
+
+Canonical transaction lifecycle:
+
+```text
+CREATED
+    -> EVIDENCE_BOUND
+    -> DISPATCHED
+    -> CAPTURED
+    -> VALIDATED
+    -> REVIEW_REQUIRED
+    -> ACCEPTED / REJECTED / ESCALATION_REQUESTED
+    -> HANDOFF
+    -> COMPLETE
+```
+
+Existing packet and runner records remain preserved. Over time, compatible
+packet forms may become generated views or events of this canonical
+transaction rather than independent orchestration systems. This is a
+prospective architecture note only; it does not authorize destructive
+migration of historical artifacts.
+
+Standards at system boundaries:
+
+- A2A: agent-to-agent task and artifact exchange.
+- ACP: coding-agent sessions such as Codex, OpenHands, or similar agents.
+- MCP: tools, resources, and read-only Project Historian context.
+
+These standards solve different boundaries. ZTH retains authority, provenance,
+qualification, validation, review, and failure semantics. Each standard still
+requires qualification before adoption.
+
+Model gateway safeguards:
+
+- exact model identity remains explicit for qualified research;
+- no silent fallback unless a frozen protocol explicitly permits it;
+- retries remain governed by the experiment or protocol;
+- endpoint and model provenance remain recorded;
+- native or direct helpers remain available where exact backend behavior is
+  scientifically required, including tokenization and template behavior.
+
+The model gateway is infrastructure, not the ZTH research router.
+
+Evaluation-framework direction for new experiments:
+
+- Inspect AI is the candidate default framework for new research
+  qualification and evaluation;
+- Promptfoo is the candidate framework for cheaper prompt-patch,
+  output-contract, and regression testing.
+
+Historical experiments remain frozen and are not retrofitted merely to use
+these tools. Potential ZTH-specific Inspect components remain candidates
+pending qualification:
+
+- fixture / dataset adapter;
+- output-contract scorer;
+- unsupported-certainty scorer;
+- authority-boundary scorer;
+- Historian evidence adapter;
+- provenance exporter.
+
+Coding-agent boundary:
+
+ZTH should supervise coding agents rather than build another terminal,
+workspace, editing, shell, or context-management runtime. The intended flow
+is:
+
+```text
+ZTH task + authority
+    -> ACP adapter
+    -> Codex / OpenHands / another qualified coding agent
+    -> result / proof
+    -> ZTH validation and review
+```
+
+Codex is the likely first ACP-backed integration because it is already used
+in the project, but that does not make it a permanent architectural
+dependency.
+
+Operational telemetry versus Project Historian:
+
+- Operational telemetry answers, "What is happening right now?"
+- Project Historian answers, "What evidence do we permanently trust about
+  what happened?"
+
+OpenTelemetry plus Langfuse or an equivalent self-hostable system may be
+evaluated for the operational telemetry layer. Historian remains the durable
+evidentiary layer and may reference trace IDs where useful.
+
+Semantic escalation remains a parallel research lane because the recent
+compact semantic-observer experiment completed the operational calls but did
+not achieve adequate semantic or unsupported-certainty sensitivity. The
+semantic observer therefore remains advisory/research-only, has no automatic
+routing authority, and is not a dependency for practical supervised handoff.
+
+Future semantic research should continue separately on stronger signals such
+as structured contradiction checks, claim/evidence validation,
+task-specific validators, combined weak signals, uncertainty calibration, and
+targeted hard-case fixtures.
+
+Scheduler deferral:
+
+OpenAI Symphony, Temporal, and similar durable orchestration systems should be
+evaluated only after the supervised handoff lifecycle is working reliably.
+Useful concepts include isolated workspaces, durable workflow state, crash
+reconciliation, bounded concurrency, and proof-of-work before closure. Any
+scheduler adopted later must preserve ZTH authority boundaries rather than
+silently expanding autonomy.
+
+Work classification:
+
+- Immediate: canonical supervised handoff transaction and Historian read-only
+  context interface groundwork.
+- Near-term: common model transport abstraction, first coding-agent / ACP
+  adapter, the 1.7B -> handoff -> 30B/Codex demonstration, and runtime
+  lifecycle consolidation.
+- Research parallel track: semantic escalation research, evaluation
+  framework qualification for new experiments, and operational telemetry
+  selection.
+- Deferred: durable autonomous scheduling and any scheduler-first expansion.
+
+Existing custom infrastructure that should be treated as legacy when mature
+replacements cover the same role, but preserved for unique ZTH semantics or
+historical evidence:
+
+- packet and runner variants that become generated views of the canonical
+  transaction;
+- bespoke transport plumbing that is superseded by a qualified model gateway;
+- custom agent/session wrappers that are replaced by ACP-backed adapters;
+- custom experiment harness components that are superseded by qualified
+  evaluation frameworks for new work;
+- ad hoc telemetry capture that is superseded by a dedicated operational trace
+  system.
+
 ## LARQL Direct Editing Status
 
 ZTH's mainline steering path remains prompt and scaffold injection: bounded

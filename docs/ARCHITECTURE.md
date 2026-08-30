@@ -26,6 +26,39 @@ Direct weight editing and patched-model comparison remain in the repository as
 parked research evidence, but they are not the architectural center of the
 public workflow.
 
+The next architectural milestone is a canonical supervised handoff
+transaction. ZTH should increasingly centralize authority boundaries,
+allowed/held target semantics, qualification profiles, validation and review,
+failure classification, and evidence provenance inside that transaction
+model. Existing packet and runner forms remain valid historical evidence, but
+they should increasingly become generated views or compatibility surfaces
+where a canonical transaction can represent the same work.
+
+At system boundaries, ZTH should prefer mature standards and keep its own
+semantics layered on top:
+
+- A2A for agent-to-agent task and artifact exchange when it is a fit;
+- ACP for coding-agent sessions and adapters such as Codex or OpenHands;
+- MCP for tools, resources, and read-only Historian context;
+- a qualified model gateway such as LiteLLM or equivalent when it is
+  verified in the environment.
+
+ZTH-specific authority, provenance, validation, qualification, and review
+semantics remain a ZTH layer. The repo should not collapse into a plain
+implementation of those standards.
+
+Some custom infrastructure should be preserved but not expanded when mature
+replacements cover the same role:
+
+- packet and runner variants that will become generated transaction views;
+- bespoke endpoint/provider plumbing that a qualified model gateway can
+  replace;
+- session wrappers that are superseded by ACP-backed adapters;
+- custom evaluation harness pieces that newer qualified frameworks can cover
+  for new experiments;
+- ad hoc telemetry capture that should defer to dedicated operational trace
+  tooling.
+
 ## Runtime Classes
 
 | Runtime class | Meaning | Examples |
