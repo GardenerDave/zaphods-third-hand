@@ -1,24 +1,8 @@
 {
-  "schema": "zth_evidence_side_trust_audit_v1",
-  "date": "2026-08-31",
-  "model_calls": 0,
   "conclusion": "partially_recomposed; specific trust gap remains",
+  "date": "2026-08-31",
   "evidence_inventory": [
     {
-      "case_id": "A1",
-      "evidence_id": "case_a1_evidence",
-      "projected_evidence_path": ".work/semantic_claim_discipline_final_20260831/task_a/baseline/20260831T133000Z/evidence_projection.json",
-      "projected_evidence_sha256": "4b4844e57eff1ef14ed45135f600ee8d942358931847e457264612c5f1724134",
-      "source_type": "model_produced_and_evaluator_produced",
-      "structured_fields_available": [
-        "budget",
-        "evidence_sources",
-        "output_contract",
-        "rendered_patch_deltas",
-        "selected_prompt_patches",
-        "task_summary",
-        "task_title"
-      ],
       "bundle_sources": [
         {
           "path": ".work/semantic_claim_discipline_final_20260831/task_a/baseline/20260831T133000Z/raw_model_output.txt",
@@ -36,26 +20,20 @@
           "source_type": "model_produced_and_evaluator_produced"
         }
       ],
+      "case_id": "A1",
       "derived_properties": [
         {
-          "property": "raw_response_integrity",
           "derivation": "raw_output_sha256_matches_preserved_artifact_and_validation_passed",
+          "derivation_method": "deterministic",
+          "policy_trust": "trusted",
+          "property": "raw_response_integrity",
           "rule_id": "raw_response_integrity_v1",
-          "trust_class": "system_derived"
+          "semantic_source": "machine_observable"
         }
       ],
-      "unknown_properties": [
-        "transport_qualification",
-        "bounded_handoff_success",
-        "semantic_capability",
-        "semantic_acceptance"
-      ]
-    },
-    {
-      "case_id": "A2",
-      "evidence_id": "case_a2_evidence",
-      "projected_evidence_path": ".work/semantic_claim_discipline_final_20260831/task_a/patched/20260831T133000Z/evidence_projection.json",
-      "projected_evidence_sha256": "55c08bd837cd6e2a2ea1a1870ef7d1750dfc3403b6955f3955a36cec3b937625",
+      "evidence_id": "case_a1_evidence",
+      "projected_evidence_path": ".work/semantic_claim_discipline_final_20260831/task_a/baseline/20260831T133000Z/evidence_projection.json",
+      "projected_evidence_sha256": "4b4844e57eff1ef14ed45135f600ee8d942358931847e457264612c5f1724134",
       "source_type": "model_produced_and_evaluator_produced",
       "structured_fields_available": [
         "budget",
@@ -66,6 +44,14 @@
         "task_summary",
         "task_title"
       ],
+      "unknown_properties": [
+        "transport_qualification",
+        "bounded_handoff_success",
+        "semantic_capability",
+        "semantic_acceptance"
+      ]
+    },
+    {
       "bundle_sources": [
         {
           "path": ".work/semantic_claim_discipline_final_20260831/task_a/patched/20260831T133000Z/raw_model_output.txt",
@@ -83,20 +69,11 @@
           "source_type": "model_produced_and_evaluator_produced"
         }
       ],
+      "case_id": "A2",
       "derived_properties": [],
-      "unknown_properties": [
-        "transport_qualification",
-        "bounded_handoff_success",
-        "semantic_capability",
-        "raw_response_integrity",
-        "semantic_acceptance"
-      ]
-    },
-    {
-      "case_id": "A3",
-      "evidence_id": "case_a3_evidence",
-      "projected_evidence_path": ".work/semantic_claim_discipline_final_20260831/task_b/baseline/20260831T133000Z/evidence_projection.json",
-      "projected_evidence_sha256": "bf441830a675db4dc31fb2a0cf4005e43452870e5ae3de6209225db1c367da82",
+      "evidence_id": "case_a2_evidence",
+      "projected_evidence_path": ".work/semantic_claim_discipline_final_20260831/task_a/patched/20260831T133000Z/evidence_projection.json",
+      "projected_evidence_sha256": "55c08bd837cd6e2a2ea1a1870ef7d1750dfc3403b6955f3955a36cec3b937625",
       "source_type": "model_produced_and_evaluator_produced",
       "structured_fields_available": [
         "budget",
@@ -107,6 +84,15 @@
         "task_summary",
         "task_title"
       ],
+      "unknown_properties": [
+        "transport_qualification",
+        "bounded_handoff_success",
+        "semantic_capability",
+        "raw_response_integrity",
+        "semantic_acceptance"
+      ]
+    },
+    {
       "bundle_sources": [
         {
           "path": ".work/semantic_claim_discipline_final_20260831/task_b/baseline/20260831T133000Z/raw_model_output.txt",
@@ -124,13 +110,29 @@
           "source_type": "model_produced_and_evaluator_produced"
         }
       ],
+      "case_id": "A3",
       "derived_properties": [
         {
-          "property": "raw_response_integrity",
           "derivation": "raw_output_sha256_matches_preserved_artifact_and_validation_passed",
+          "derivation_method": "deterministic",
+          "policy_trust": "trusted",
+          "property": "raw_response_integrity",
           "rule_id": "raw_response_integrity_v1",
-          "trust_class": "system_derived"
+          "semantic_source": "machine_observable"
         }
+      ],
+      "evidence_id": "case_a3_evidence",
+      "projected_evidence_path": ".work/semantic_claim_discipline_final_20260831/task_b/baseline/20260831T133000Z/evidence_projection.json",
+      "projected_evidence_sha256": "bf441830a675db4dc31fb2a0cf4005e43452870e5ae3de6209225db1c367da82",
+      "source_type": "model_produced_and_evaluator_produced",
+      "structured_fields_available": [
+        "budget",
+        "evidence_sources",
+        "output_contract",
+        "rendered_patch_deltas",
+        "selected_prompt_patches",
+        "task_summary",
+        "task_title"
       ],
       "unknown_properties": [
         "transport_qualification",
@@ -140,18 +142,6 @@
       ]
     },
     {
-      "case_id": "HANDOFF",
-      "evidence_id": "case_handoff_evidence",
-      "projected_evidence_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/evidence_projection.json",
-      "projected_evidence_sha256": null,
-      "source_type": "operator_produced_and_model_produced",
-      "structured_fields_available": [
-        "downstream_use_gate",
-        "handoff_packet",
-        "review_decision",
-        "supervised_model_attempt",
-        "worker_b_call_intent"
-      ],
       "bundle_sources": [
         {
           "path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/review_decision.json",
@@ -169,67 +159,78 @@
           "source_type": "operator_produced_and_model_produced"
         }
       ],
+      "case_id": "HANDOFF",
       "derived_properties": [
         {
-          "property": "bounded_handoff_success",
           "derivation": "accepted_review_and_allowed_gate_with_prepared_handoff",
-          "rule_id": "bounded_handoff_success_v1",
-          "trust_class": "system_derived"
-        },
-        {
+          "derivation_method": "deterministic",
+          "policy_trust": "advisory",
           "property": "semantic_acceptance",
-          "derivation": "accepted_review_and_allowed_gate_with_prepared_handoff",
           "rule_id": "semantic_acceptance_v1",
-          "trust_class": "system_derived"
+          "semantic_source": "reviewer_model"
         }
+      ],
+      "evidence_id": "case_handoff_evidence",
+      "projected_evidence_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/evidence_projection.json",
+      "projected_evidence_sha256": null,
+      "source_type": "operator_produced_and_model_produced",
+      "structured_fields_available": [
+        "downstream_use_gate",
+        "handoff_packet",
+        "review_decision",
+        "supervised_model_attempt",
+        "worker_b_call_intent"
       ],
       "unknown_properties": [
         "transport_qualification",
+        "bounded_handoff_success",
         "semantic_capability",
         "raw_response_integrity"
       ]
     }
   ],
+  "model_calls": 0,
+  "next_action": "improve source instrumentation rather than asking a model to guess evidence semantics",
   "property_coverage": [
     {
+      "deterministic_rule": "none",
       "property": "transport_qualification",
-      "system_derivable": false,
+      "remaining_semantic_gap": "transport qualification is not represented as a trusted evidence-side property for the natural candidate lineages",
       "structured_source": "none in the preserved A1/A2/A3 natural bundles; no trusted transport qualification artifact present",
-      "deterministic_rule": "none",
-      "trust_class": "unknown",
-      "remaining_semantic_gap": "transport qualification is not represented as a trusted evidence-side property for the natural candidate lineages"
-    },
-    {
-      "property": "bounded_handoff_success",
-      "system_derivable": true,
-      "structured_source": "structured handoff bundle",
-      "deterministic_rule": "bounded_handoff_success_v1",
-      "trust_class": "system_derived",
-      "remaining_semantic_gap": "does not generalize to transport qualification or semantic capability"
-    },
-    {
-      "property": "semantic_capability",
       "system_derivable": false,
-      "structured_source": "none in preserved structured evidence for A1/A2/A3 natural bundles",
+      "trust_class": "unknown"
+    },
+    {
       "deterministic_rule": "none",
-      "trust_class": "unknown",
-      "remaining_semantic_gap": "semantic capability remains untyped on the evidence side"
+      "property": "bounded_handoff_success",
+      "remaining_semantic_gap": "prepared handoff is not downstream success",
+      "structured_source": "none in the preserved handoff bundle",
+      "system_derivable": false,
+      "trust_class": "unknown"
     },
     {
-      "property": "raw_response_integrity",
-      "system_derivable": true,
-      "structured_source": "raw model output plus local call and validation artifacts",
+      "deterministic_rule": "none",
+      "property": "semantic_capability",
+      "remaining_semantic_gap": "semantic capability remains untyped on the evidence side",
+      "structured_source": "none in preserved structured evidence for A1/A2/A3 natural bundles",
+      "system_derivable": false,
+      "trust_class": "unknown"
+    },
+    {
       "deterministic_rule": "raw_response_integrity_v1",
-      "trust_class": "system_derived",
-      "remaining_semantic_gap": "captures preservation integrity only, not semantic correctness"
+      "property": "raw_response_integrity",
+      "remaining_semantic_gap": "captures preservation integrity only, not semantic correctness",
+      "structured_source": "raw model output plus local call and validation artifacts",
+      "system_derivable": true,
+      "trust_class": "system_derived"
     },
     {
-      "property": "semantic_acceptance",
-      "system_derivable": true,
-      "structured_source": "structured handoff bundle",
       "deterministic_rule": "semantic_acceptance_v1",
-      "trust_class": "system_derived",
-      "remaining_semantic_gap": "applies only to the bounded handoff/review lane"
+      "property": "semantic_acceptance",
+      "remaining_semantic_gap": "reviewer disposition is not machine-ground truth",
+      "structured_source": "structured reviewer/gate bundle",
+      "system_derivable": true,
+      "trust_class": "advisory"
     }
   ],
   "replay_status": {
@@ -237,5 +238,17 @@
     "reason": "the deterministic invariant can consume typed candidate assertions and trusted handoff/raw-response evidence, but the natural bundles do not expose a system-derived transport_qualification layer",
     "recomposition_mode": "partially_recomposed"
   },
-  "next_action": "improve source instrumentation rather than asking a model to guess evidence semantics"
+  "schema": "zth_evidence_side_trust_audit_v1",
+  "transport_qualification_search": {
+    "binds_to_natural_a1_a3": false,
+    "found_artifacts": [
+      "docs/research/EXPLICIT_INTERFACE_V3_TRANSPORT_QUALIFICATION_2026-08-24.md",
+      "docs/research/EXPLICIT_INTERFACE_V3_TRANSPORT_REQUALIFICATION_FINAL_2026-08-24.md",
+      "docs/research/EXPLICIT_INTERFACE_V3_TRANSPORT_REQUALIFICATION_FINAL_2026-08-24.json"
+    ],
+    "qualified_control": "TRANSPORT_OK",
+    "qualified_path": "http://192.168.1.16:8080/v1 / Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "reason": "different task family and no direct causal linkage to the preserved natural candidate bundles",
+    "scope": "explicit-interface V3 calibration lane"
+  }
 }

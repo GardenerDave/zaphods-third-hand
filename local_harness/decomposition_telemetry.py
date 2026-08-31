@@ -17,6 +17,7 @@ def _canonical_json(value: Any) -> str:
 
 @dataclass(frozen=True)
 class DecompositionObservation:
+    record_type: str
     observation_id: str
     parent_task: str
     bifurcation_signal: str
@@ -43,7 +44,23 @@ def freeze_decomposition_observation(observation: DecompositionObservation) -> d
     }
 
 
-def write_decomposition_observation(path: Path, observation: DecompositionObservation) -> str:
+def write_prediction_record(path: Path, observation: DecompositionObservation) -> str:
+    if observation.record_type != "prediction":
+        raise ValueError("prediction record_type required")
+    if path.exists():
+        raise FileExistsError(path)
     frozen = freeze_decomposition_observation(observation)
     path.write_text(frozen["serialized"], encoding="utf-8")
     return frozen["observation_sha256"]
+
+
+def write_resolution_record(path: Path, resolution: dict[str, Any]) -> str:
+    if resolution.get("record_type") != "resolution":
+        raise ValueError("resolution record_type required")
+    if not resolution.get("prediction_sha256"):
+        raise ValueError("prediction_sha256 required")
+    if path.exists():
+        raise FileExistsError(path)
+    serialized = _canonical_json(resolution)
+    path.write_text(serialized, encoding="utf-8")
+    return _sha256_bytes(serialized.encode("utf-8"))

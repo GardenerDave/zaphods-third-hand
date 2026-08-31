@@ -6,12 +6,14 @@ from pathlib import Path
 from local_harness.decomposition_telemetry import (
     DecompositionObservation,
     freeze_decomposition_observation,
-    write_decomposition_observation,
+    write_prediction_record,
+    write_resolution_record,
 )
 
 
 def test_freeze_decomposition_observation_is_stable(tmp_path: Path):
     obs = DecompositionObservation(
+        record_type="prediction",
         observation_id="semantic-router-per-property-recovery-20260831",
         parent_task="multi-label proposition extraction",
         bifurcation_signal="natural-case failures despite synthetic success",
@@ -29,6 +31,52 @@ def test_freeze_decomposition_observation_is_stable(tmp_path: Path):
     assert len(frozen["observation_sha256"]) == 64
 
     out = tmp_path / "observation.json"
-    sha = write_decomposition_observation(out, obs)
+    sha = write_prediction_record(out, obs)
     assert sha == frozen["observation_sha256"]
     assert json.loads(out.read_text(encoding="utf-8"))["observation_id"] == obs.observation_id
+
+
+def test_prediction_record_is_write_once(tmp_path: Path):
+    obs = DecompositionObservation(
+        record_type="prediction",
+        observation_id="seed-1",
+        parent_task="task",
+        bifurcation_signal="signal",
+        proposed_decomposition="atomization",
+    )
+    path = tmp_path / "prediction.json"
+    first = write_prediction_record(path, obs)
+    assert len(first) == 64
+    try:
+        write_prediction_record(path, obs)
+        raise AssertionError("expected FileExistsError")
+    except FileExistsError:
+        pass
+
+
+def test_resolution_links_prediction_hash_and_is_write_once(tmp_path: Path):
+    obs = DecompositionObservation(
+        record_type="prediction",
+        observation_id="seed-2",
+        parent_task="task",
+        bifurcation_signal="signal",
+        proposed_decomposition="atomization",
+    )
+    pred_path = tmp_path / "prediction.json"
+    pred_sha = write_prediction_record(pred_path, obs)
+    resolution_path = tmp_path / "resolution.json"
+    res = {
+        "record_type": "resolution",
+        "observation_id": "seed-2",
+        "prediction_sha256": pred_sha,
+        "observed_outcome": "done",
+        "useful": True,
+    }
+    res_sha = write_resolution_record(resolution_path, res)
+    assert len(res_sha) == 64
+    assert json.loads(resolution_path.read_text(encoding="utf-8"))["prediction_sha256"] == pred_sha
+    try:
+        write_resolution_record(resolution_path, res)
+        raise AssertionError("expected FileExistsError")
+    except FileExistsError:
+        pass

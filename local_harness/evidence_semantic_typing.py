@@ -25,6 +25,29 @@ ALLOWED_TRUST_CLASSES = {
     "unknown",
 }
 
+ALLOWED_DERIVATION_METHODS = {
+    "deterministic",
+    "operator_labeled",
+    "model_interpreted",
+    "unknown",
+}
+
+ALLOWED_SEMANTIC_SOURCES = {
+    "machine_observable",
+    "operator",
+    "reviewer_model",
+    "worker_model",
+    "mixed",
+    "unknown",
+}
+
+ALLOWED_POLICY_TRUST = {
+    "trusted",
+    "bounded_trusted",
+    "advisory",
+    "unknown",
+}
+
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -43,7 +66,9 @@ class DerivedProperty:
     derivation: str
     rule_id: str
     source_refs: list[str]
-    trust_class: str
+    derivation_method: str
+    semantic_source: str
+    policy_trust: str
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -51,7 +76,9 @@ class DerivedProperty:
             "derivation": self.derivation,
             "rule_id": self.rule_id,
             "source_refs": list(self.source_refs),
-            "trust_class": self.trust_class,
+            "derivation_method": self.derivation_method,
+            "semantic_source": self.semantic_source,
+            "policy_trust": self.policy_trust,
         }
 
 
@@ -100,7 +127,9 @@ def derive_typed_evidence_from_bundle(*, evidence_id: str, source_paths: list[Pa
                     derivation="raw_output_sha256_matches_preserved_artifact_and_validation_passed",
                     rule_id="raw_response_integrity_v1",
                     source_refs=[_source_ref(raw_output), _source_ref(local_model_call), _source_ref(output_validation)],
-                    trust_class="system_derived",
+                    derivation_method="deterministic",
+                    semantic_source="machine_observable",
+                    policy_trust="trusted",
                 )
             )
             unknown.discard("raw_response_integrity")
@@ -112,20 +141,6 @@ def derive_typed_evidence_from_bundle(*, evidence_id: str, source_paths: list[Pa
         if decision.get("decision") == "accepted" and gate.get("gate_status") == "allowed" and handoff.get("handoff_status") == "prepared":
             derived.append(
                 DerivedProperty(
-                    property="bounded_handoff_success",
-                    derivation="accepted_review_and_allowed_gate_with_prepared_handoff",
-                    rule_id="bounded_handoff_success_v1",
-                    source_refs=[
-                        _source_ref(review_decision),
-                        _source_ref(downstream_use_gate),
-                        _source_ref(handoff_packet),
-                    ],
-                    trust_class="system_derived",
-                )
-            )
-            unknown.discard("bounded_handoff_success")
-            derived.append(
-                DerivedProperty(
                     property="semantic_acceptance",
                     derivation="accepted_review_and_allowed_gate_with_prepared_handoff",
                     rule_id="semantic_acceptance_v1",
@@ -134,17 +149,27 @@ def derive_typed_evidence_from_bundle(*, evidence_id: str, source_paths: list[Pa
                         _source_ref(downstream_use_gate),
                         _source_ref(handoff_packet),
                     ],
-                    trust_class="system_derived",
+                    derivation_method="deterministic",
+                    semantic_source="reviewer_model",
+                    policy_trust="advisory",
                 )
             )
             unknown.discard("semantic_acceptance")
+
+    trust_values = {item.policy_trust for item in derived}
+    if not derived:
+        trust_summary = "unknown"
+    elif len(trust_values) == 1:
+        trust_summary = next(iter(trust_values))
+    else:
+        trust_summary = "mixed"
 
     return EvidenceTypingResult(
         evidence_id=evidence_id,
         source_refs=source_refs,
         derived_properties=derived,
         unknown_properties=sorted(unknown),
-        trust_summary="system_derived" if derived else "unknown",
+        trust_summary=trust_summary,
     )
 
 
