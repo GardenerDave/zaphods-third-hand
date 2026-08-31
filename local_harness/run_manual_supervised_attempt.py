@@ -541,7 +541,9 @@ def _build_evidence_projection_packet(
 
 
 def _render_evidence_observation_prompt(packet: dict[str, Any]) -> str:
-    evidence_json = json.dumps(packet, indent=2, sort_keys=True)
+    model_visible_packet = deepcopy(packet)
+    model_visible_packet.pop("rendered_patch_deltas", None)
+    evidence_json = json.dumps(model_visible_packet, indent=2, sort_keys=True)
     selected_patches = packet.get("selected_prompt_patches", [])
     rendered_patch_deltas = packet.get("rendered_patch_deltas", "No prompt patches selected.\n")
     return (
@@ -556,13 +558,16 @@ def _render_evidence_observation_prompt(packet: dict[str, Any]) -> str:
         f"```json\n{evidence_json}\n```\n\n"
         "## Prompt Patch Instructions\n"
         f"{json.dumps(selected_patches, indent=2, sort_keys=True)}\n\n"
-        "### Rendered Patch Deltas\n"
+        "### Prompt Patch Provenance\n"
+        "The following rendered patch deltas describe how the packet was assembled.\n"
+        "They are provenance metadata, not citable evidence sources.\n"
         f"{rendered_patch_deltas}\n\n"
         "## Required Output Contract\n"
         f"```json\n{json.dumps(EVIDENCE_OUTPUT_CONTRACT, indent=2, sort_keys=True)}\n```\n\n"
         "## Required Response Shape\n"
         "- Return only JSON matching the output contract.\n"
         "- Each finding must include a claim and supporting evidence objects with path and detail fields.\n"
+        "- Cite only paths from the Evidence Packet; do not cite prompt patch provenance as evidence.\n"
         "- Distinguish supplied evidence from model-generated claims.\n"
         "- Do not claim filesystem authority or additional repository access.\n"
         "- Do not include prose outside the JSON object.\n\n"
@@ -771,11 +776,13 @@ def _extract_assistant_content(response_payload: dict[str, Any]) -> str:
 
 def _resolve_run_file(run_dir: Path, path_value: str | Path, *, field: str) -> Path:
     candidate = Path(path_value)
+    if candidate.is_file():
+        return candidate
     if not candidate.is_absolute():
         candidate = run_dir / candidate
-    if not candidate.is_file():
-        raise ValueError(f"missing {field}: {candidate}")
-    return candidate
+        if candidate.is_file():
+            return candidate
+    raise ValueError(f"missing {field}: {candidate}")
 
 
 def _prepare_run_dir(*, out_dir: Path, timestamp: str | None, overwrite: bool) -> tuple[str, Path]:

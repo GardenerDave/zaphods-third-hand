@@ -594,6 +594,9 @@ def test_prepare_with_evidence_files_projects_bounded_observation_packet(tmp_pat
     assert "evidence_output_contract_sha256" in summary
     assert summary["evidence_budget"]["status"] == "passed"
     assert summary["evidence_budget"]["any_source_truncated"] is True
+    assert "Prompt Patch Provenance" in prompt
+    assert "provenance metadata, not citable evidence sources" in prompt
+    assert "Cite only paths from the Evidence Packet" in prompt
 
 
 def test_prepare_with_evidence_files_fails_early_when_total_budget_overflows(tmp_path: Path):
@@ -630,6 +633,61 @@ def test_prepare_with_evidence_files_fails_early_when_total_budget_overflows(tmp
     projection = json.loads((run_path / "evidence_projection.json").read_text(encoding="utf-8"))
     assert projection["budget"]["status"] == "failed"
     assert projection["budget"]["estimated_prompt_tokens"] > projection["budget"]["available_prompt_tokens"]
+
+
+def test_prepare_to_ingest_round_trip_resolves_repo_relative_artifacts(tmp_path: Path):
+    out_dir = Path(".work") / f"test_round_trip_{tmp_path.name}"
+    timestamp = "20260831T180000Z"
+    source = tmp_path / "evidence.txt"
+    source.write_text("alpha\nbeta\n", encoding="utf-8")
+    try:
+        prepare_result = manual_attempt.run_prepare(
+            messy_input="Inspect supplied evidence only.",
+            out_dir=out_dir,
+            timestamp=timestamp,
+            overwrite=True,
+            evidence_files=[source],
+            evidence_task_title="Evidence inspection",
+            evidence_task_summary="Use only the supplied evidence packet.",
+            evidence_max_chars=100,
+        )
+        run_dir = prepare_result["run_dir"]
+        raw_output = run_dir / "raw_model_output.txt"
+        raw_output.write_text(
+            json.dumps(
+                {
+                    "findings": [
+                        {
+                            "claim": "The supplied evidence source is projected correctly and can be grounded without path duplication.",
+                            "evidence": [
+                                {
+                                    "path": str(source),
+                                    "detail": "The evidence file was supplied directly to prepare and should remain the grounding source.",
+                                }
+                            ],
+                        }
+                    ],
+                    "format": "json",
+                    "required_fields_present": True,
+                    "reason": "The output remains bounded and supervised.",
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        ingest_result = manual_attempt.run_ingest(
+            run_dir=run_dir,
+            raw_output_file=raw_output,
+        )
+
+        assert ingest_result["validation_status"] == "passed"
+        evidence_projection = json.loads((run_dir / "evidence_projection.json").read_text(encoding="utf-8"))
+        assert evidence_projection["evidence_sources"][0]["path"] == str(source)
+    finally:
+        if out_dir.exists():
+            import shutil
+
+            shutil.rmtree(out_dir)
 
 
 def test_prepare_refuses_overwrite_by_default(tmp_path: Path):
@@ -689,6 +747,33 @@ def test_prepare_rejects_both_messy_input_variants(tmp_path: Path):
     )
     assert result.returncode != 0
     assert "exactly one of --messy-input or --messy-input-file" in result.stderr
+
+
+def test_prepare_and_ingest_keep_prompt_patch_provenance_out_of_grounding(tmp_path: Path):
+    run_dir = tmp_path / "runs"
+    source = tmp_path / "evidence.txt"
+    source.write_text("line one\nline two\n", encoding="utf-8")
+    result = run_script(
+        "prepare",
+        "--messy-input",
+        "Inspect supplied evidence only.",
+        "--out-dir",
+        run_dir,
+        "--timestamp",
+        "20260707T040410Z",
+        "--evidence-file",
+        source,
+        "--evidence-task-title",
+        "Evidence inspection",
+        "--evidence-task-summary",
+        "Use only the supplied evidence packet.",
+    )
+    assert result.returncode == 0
+    run_path = run_dir / "20260707T040410Z"
+    prompt = (run_path / "prompt_to_paste.md").read_text(encoding="utf-8")
+    assert "Prompt Patch Provenance" in prompt
+    assert "not citable evidence sources" in prompt
+    assert "rendered_patch_deltas" in (run_path / "evidence_projection.json").read_text(encoding="utf-8")
 
 
 def test_session_mode_writes_required_artifacts_and_prompt_copy(tmp_path: Path):
