@@ -1185,6 +1185,32 @@ def run_ingest(
                     raise ValueError(
                         "--model-call-metadata-file structured_output.schema_length does not match schema artifact"
                     )
+                schema_artifact = _load_json_object_file(schema_path, kind="structured output schema artifact")
+                structured_response_format = structured_output.get("response_format")
+                request_response_format = request_provenance.get("response_format")
+                if structured_response_format != request_response_format:
+                    raise ValueError(
+                        "--model-call-metadata-file structured_output.response_format must match request_provenance.response_format"
+                    )
+                if not isinstance(structured_response_format, dict):
+                    raise ValueError("--model-call-metadata-file structured_output.response_format must be an object")
+                if structured_response_format.get("type") != "json_schema":
+                    raise ValueError("--model-call-metadata-file structured_output.response_format.type must be json_schema")
+                structured_json_schema = structured_response_format.get("json_schema")
+                if not isinstance(structured_json_schema, dict):
+                    raise ValueError(
+                        "--model-call-metadata-file structured_output.response_format.json_schema must be an object"
+                    )
+                if structured_json_schema.get("schema") != schema_artifact:
+                    raise ValueError(
+                        "--model-call-metadata-file structured_output.response_format.json_schema.schema must match response_schema.json"
+                    )
+                if request_response_format is None:
+                    raise ValueError("--model-call-metadata-file request_provenance.response_format must be present")
+                if request_response_format != structured_response_format:
+                    raise ValueError(
+                        "--model-call-metadata-file request_provenance.response_format must match structured_output.response_format"
+                    )
                 if request_provenance.get("structured_output_enabled") is not True:
                     raise ValueError(
                         "--model-call-metadata-file request_provenance.structured_output_enabled must be true"
@@ -1193,12 +1219,20 @@ def run_ingest(
                     raise ValueError(
                         "--model-call-metadata-file request_provenance.structured_output_mechanism must be openai_json_schema"
                     )
-                if request_provenance.get("response_format") is None:
-                    raise ValueError("--model-call-metadata-file request_provenance.response_format must be present")
-                if structured_output.get("response_format") != request_provenance.get("response_format"):
-                    raise ValueError(
-                        "--model-call-metadata-file structured_output.response_format must match request_provenance.response_format"
-                    )
+                request_body_sha256 = model_call_metadata.get("request_body_sha256")
+                request_body_length = model_call_metadata.get("request_body_length")
+                request_request_body_sha256 = request_provenance.get("request_body_sha256")
+                request_request_body_length = request_provenance.get("request_body_length")
+                if request_body_sha256 is not None or request_request_body_sha256 is not None:
+                    if request_body_sha256 != request_request_body_sha256:
+                        raise ValueError(
+                            "--model-call-metadata-file request_body_sha256 must match request_provenance.request_body_sha256"
+                        )
+                if request_body_length is not None or request_request_body_length is not None:
+                    if request_body_length != request_request_body_length:
+                        raise ValueError(
+                            "--model-call-metadata-file request_body_length must match request_provenance.request_body_length"
+                        )
             elif structured_enabled is not False:
                 raise ValueError("--model-call-metadata-file structured_output.enabled must be boolean when present")
 

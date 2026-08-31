@@ -1840,7 +1840,12 @@ def test_ingest_with_structured_model_call_metadata_rejects_response_format_mism
         response_schema_path=schema,
         response_schema_source_path=schema,
     )
-    metadata_payload["request_provenance"]["response_format"]["json_schema"]["schema"]["additionalProperties"] = True
+    wrong_schema = json.loads(
+        json.dumps(metadata_payload["request_provenance"]["response_format"]["json_schema"]["schema"])
+    )
+    wrong_schema["additionalProperties"] = True
+    metadata_payload["structured_output"]["response_format"]["json_schema"]["schema"] = wrong_schema
+    metadata_payload["request_provenance"]["response_format"]["json_schema"]["schema"] = wrong_schema
     _write_captured_model_call_metadata(metadata, metadata_payload)
 
     result = run_script(
@@ -1853,7 +1858,89 @@ def test_ingest_with_structured_model_call_metadata_rejects_response_format_mism
         metadata,
     )
     assert result.returncode != 0
-    assert "structured_output.response_format must match request_provenance.response_format" in result.stderr
+    assert "structured_output.response_format.json_schema.schema must match response_schema.json" in result.stderr
+
+
+def test_ingest_with_structured_model_call_metadata_rejects_request_body_mismatch(tmp_path: Path):
+    run_dir = _prepare_run(tmp_path, timestamp="20260707T151618AZ")
+    prompt_text = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
+    source_raw = tmp_path / "raw_model_output.txt"
+    raw_text = _valid_raw_output_json()
+    source_raw.write_text(raw_text, encoding="utf-8")
+    schema = run_dir / "response_schema.json"
+    schema.write_text(
+        json.dumps(
+            {
+                "type": "object",
+                "properties": {"reason": {"type": "string"}},
+                "required": ["reason"],
+                "additionalProperties": False,
+            }
+        ),
+        encoding="utf-8",
+    )
+    metadata = tmp_path / "local_model_call.json"
+    metadata_payload = _captured_model_call_metadata(
+        prompt_text=prompt_text,
+        raw_output_text=raw_text,
+        response_schema_path=schema,
+        response_schema_source_path=schema,
+    )
+    metadata_payload["request_body_sha256"] = "0" * 64
+    _write_captured_model_call_metadata(metadata, metadata_payload)
+
+    result = run_script(
+        "ingest",
+        "--run-dir",
+        run_dir,
+        "--raw-output-file",
+        source_raw,
+        "--model-call-metadata-file",
+        metadata,
+    )
+    assert result.returncode != 0
+    assert "request_body_sha256 must match request_provenance.request_body_sha256" in result.stderr
+
+
+def test_ingest_with_structured_model_call_metadata_rejects_request_body_length_mismatch(tmp_path: Path):
+    run_dir = _prepare_run(tmp_path, timestamp="20260707T151618BZ")
+    prompt_text = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
+    source_raw = tmp_path / "raw_model_output.txt"
+    raw_text = _valid_raw_output_json()
+    source_raw.write_text(raw_text, encoding="utf-8")
+    schema = run_dir / "response_schema.json"
+    schema.write_text(
+        json.dumps(
+            {
+                "type": "object",
+                "properties": {"reason": {"type": "string"}},
+                "required": ["reason"],
+                "additionalProperties": False,
+            }
+        ),
+        encoding="utf-8",
+    )
+    metadata = tmp_path / "local_model_call.json"
+    metadata_payload = _captured_model_call_metadata(
+        prompt_text=prompt_text,
+        raw_output_text=raw_text,
+        response_schema_path=schema,
+        response_schema_source_path=schema,
+    )
+    metadata_payload["request_body_length"] = metadata_payload["request_body_length"] + 1
+    _write_captured_model_call_metadata(metadata, metadata_payload)
+
+    result = run_script(
+        "ingest",
+        "--run-dir",
+        run_dir,
+        "--raw-output-file",
+        source_raw,
+        "--model-call-metadata-file",
+        metadata,
+    )
+    assert result.returncode != 0
+    assert "request_body_length must match request_provenance.request_body_length" in result.stderr
 
 
 def test_ingest_with_structured_model_call_metadata_rejects_unsupported_mechanism(tmp_path: Path):
