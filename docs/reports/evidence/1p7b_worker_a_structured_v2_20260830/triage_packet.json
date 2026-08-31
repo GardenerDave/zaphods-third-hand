@@ -1,0 +1,49 @@
+{
+  "allowed_targets": [
+    "docs/reports/"
+  ],
+  "bounded_outputs": [
+    "design_packet"
+  ],
+  "confidence": "low",
+  "held_targets": [
+    "production automation",
+    "automatic curriculum capture",
+    "automatic promotion",
+    "implementation_packet"
+  ],
+  "messy_input": "The LoRA and prompt injection work got messy. Build a bounded design packet.",
+  "normalized_intent": "Deterministic routing of messy input to design_packet (matched keywords: lora, prompt injection).",
+  "output_contract": {
+    "format": "json",
+    "requires_reason": true
+  },
+  "provenance": {
+    "matched_keywords": [
+      "lora",
+      "prompt injection"
+    ],
+    "router_rule_id": "route_design_packet_fallback",
+    "source": "manual_supervised_attempt_prepare"
+  },
+  "reason": "Deterministic keyword routing produced a bounded recommendation for supervised review. No execution, promotion, training, or curriculum authority is granted.",
+  "recommended_prompt_patches": [
+    "scope_boundary_v1",
+    "unsupported_certainty_v1",
+    "output_contract_v1"
+  ],
+  "recommended_workflow": "design_packet",
+  "requires_clarification": true,
+  "risk_flags": [
+    "prompt_injection_surface",
+    "scope_creep",
+    "training_pipeline_ambiguity"
+  ],
+  "task_type": "design_planning",
+  "triage_id": "triage_manual_20260830t000006z",
+  "validation_hooks": [
+    "allowed_held_target_separation",
+    "required_reason",
+    "no_execution_authority"
+  ]
+}

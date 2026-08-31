@@ -1,0 +1,23 @@
+{
+  "canonical_output_contract_path": "canonical_output_contract.json",
+  "canonical_output_contract_sha256": "ed6708b775988f35ef5969190338709b6f732199068f75ac62d049d39a7daba5",
+  "canonical_selected_prompt_patches": [
+    "scope_boundary_v1",
+    "unsupported_certainty_v1",
+    "output_contract_v1"
+  ],
+  "explicitly_excluded_prompt_patches": [],
+  "explicitly_included_prompt_patches": [
+    "allowed_held_mapping_v1",
+    "required_fields_boolean_v1"
+  ],
+  "final_selected_prompt_patches": [
+    "scope_boundary_v1",
+    "unsupported_certainty_v1",
+    "output_contract_v1",
+    "allowed_held_mapping_v1",
+    "required_fields_boolean_v1"
+  ],
+  "projected_output_contract_path": "output_contract.json",
+  "projected_output_contract_sha256": "ed6708b775988f35ef5969190338709b6f732199068f75ac62d049d39a7daba5"
+}

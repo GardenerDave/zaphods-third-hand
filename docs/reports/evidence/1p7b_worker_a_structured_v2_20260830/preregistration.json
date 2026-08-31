@@ -1,0 +1,26 @@
+{
+  "acceptance_criteria": "unchanged validator must pass completely after truthful captured-model ingest",
+  "acquisition_policy": "one authorized acquisition, no retry, no fallback, no replay",
+  "base_task": "The LoRA and prompt injection work got messy. Build a bounded design packet.",
+  "experiment_id": "1p7b_worker_a_structured_v2_20260830",
+  "head": "4608687cd409b7ac37134b1f738da03ab439d42b",
+  "prompt_length": 3536,
+  "prompt_sha256": "989abea0efc8dde3024b428a05e3635d1151caf58f0f6edd0c2c6134f850f14e",
+  "request_body_length": 4641,
+  "request_body_sha256": "51681ec203fc2c6b35a3b319d0f18f23386772bfa08698924e2dd816793e8e7a",
+  "response_schema_length": 1028,
+  "response_schema_sha256": "8a0eefccc8738cb56dbd83b9a908ed459f865149cd6482c5db767e81c3e65b59",
+  "semantic_corrections": [
+    "allowed_held_mapping_v1",
+    "required_fields_boolean_v1"
+  ],
+  "syntax_patches_superseded": [
+    "unique_json_keys_v1",
+    "single_pass_json_object_v1"
+  ],
+  "worker": {
+    "context": 32768,
+    "endpoint": "http://192.168.1.16:8081/v1",
+    "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf"
+  }
+}

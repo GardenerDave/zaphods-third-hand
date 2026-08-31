@@ -1,0 +1,40 @@
+{
+  "allowed_downstream_use": [
+    "may_be_used_as_reviewed_input_for_next_supervised_step"
+  ],
+  "attempt_id": "model_attempt_20260831t005655z",
+  "authority_boundaries": [
+    "Review decision is not command execution authority.",
+    "No direct file modification authority is granted.",
+    "No automatic patch promotion authority is granted.",
+    "No automatic training authority is granted.",
+    "No default failure-to-curriculum capture authority is granted.",
+    "Downstream use must remain supervised."
+  ],
+  "decided_at": "2026-08-31T00:56:55Z",
+  "decision": "accepted",
+  "decision_id": "manual_decision_20260831t005655z",
+  "decision_reason": "Output satisfies the contract and remains within scope.",
+  "decision_scope": "output_contract_only",
+  "orchestration_id": "orch_manual_20260830t000006z",
+  "prohibited_downstream_use": [
+    "no_command_execution",
+    "no_direct_file_modification",
+    "no_automatic_patch_promotion",
+    "no_automatic_training",
+    "no_default_failure_to_curriculum_capture"
+  ],
+  "prompt_packet_id": "prompt_packet_manual_20260830t000006z",
+  "provenance": {
+    "input_attempt_id": "model_attempt_20260831t005655z",
+    "input_validation_id": "manual_validation_20260831t005655z",
+    "source": "supervised_review_decision"
+  },
+  "reviewer_metadata": {
+    "review_required": true,
+    "reviewer": "manual"
+  },
+  "triage_id": "triage_manual_20260830t000006z",
+  "validation_id": "manual_validation_20260831t005655z",
+  "validation_status": "passed"
+}

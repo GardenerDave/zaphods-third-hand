@@ -1,0 +1,12 @@
+{
+  "structured_v1": {
+    "classification": "prompt_projection_design_deviation",
+    "supervised_ingest_provenance": "invalid manual operator provenance",
+    "worker_a_result": "did not cleanly test the intended canonical projection"
+  },
+  "structured_v2": {
+    "classification": "canonical_projection_and_truthful_captured_model_ingest",
+    "supervised_ingest_provenance": "captured_model_output",
+    "worker_a_result": "passed the frozen contract"
+  }
+}

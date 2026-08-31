@@ -1,0 +1,59 @@
+{
+  "type": "object",
+  "properties": {
+    "allowed_targets": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "held_targets": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "scope_expansion_required": {
+      "type": "boolean"
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence_basis": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "unverified_claims": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "format": {
+      "type": "string"
+    },
+    "required_fields_present": {
+      "type": "boolean"
+    },
+    "reason": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "allowed_targets",
+    "held_targets",
+    "scope_expansion_required",
+    "claims",
+    "evidence_basis",
+    "unverified_claims",
+    "format",
+    "required_fields_present",
+    "reason"
+  ],
+  "additionalProperties": false
+}
