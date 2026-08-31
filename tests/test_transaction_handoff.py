@@ -12,6 +12,7 @@ from local_harness.transaction_handoff import (
     NEXT_WORKER_CONTEXT_SCHEMA,
     TRANSACTION_MANIFEST_SCHEMA,
     TransactionHandoffError,
+    build_worker_b_preflight,
     build_next_worker_continuation_context,
     build_transaction_handoff_artifacts,
     derive_lifecycle_state,
@@ -557,3 +558,45 @@ def test_next_worker_continuation_fails_closed_without_explicit_objective(tmp_pa
             next_worker_context=handoff_result["next_worker_context"],
             output_dir=run_dir,
         )
+
+
+def test_worker_b_preflight_passes_and_writes_artifact(tmp_path: Path) -> None:
+    run_dir = _prepare_and_accept_run(
+        tmp_path,
+        next_worker_objective=(
+            "Using the accepted previous-worker result as completed work, produce the actual "
+            "review-ready downstream cleanup implementation plan now. The plan must contain: "
+            "(1) an ordered sequence of concrete cleanup actions, (2) the specific files/"
+            "components or artifact classes each action affects, (3) a validation criterion "
+            "for each action, and (4) unresolved or held work that must not be activated. "
+            "Do not recommend that another worker create this plan. Produce the plan itself "
+            "in this response."
+        ),
+    )
+    build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
+    build_next_worker_continuation_context(
+        transaction_manifest=json.loads((run_dir / "transaction_manifest.json").read_text(encoding="utf-8")),
+        next_worker_context=json.loads((run_dir / "next_worker_context.json").read_text(encoding="utf-8")),
+        output_dir=run_dir,
+    )
+
+    result = build_worker_b_preflight(run_dir=run_dir, expected_next_worker_identity="qwen3-30b", output_dir=run_dir)
+
+    assert result["status"] == "passed"
+    assert (run_dir / "worker_b_preflight.json").is_file()
+    assert any(check["check_id"] == "objective_propagation" for check in result["checks"])
+    assert any(check["check_id"] == "authority" for check in result["checks"])
+
+
+def test_worker_b_preflight_fails_on_objective_mismatch(tmp_path: Path) -> None:
+    run_dir = _prepare_and_accept_run(tmp_path, next_worker_objective="Produce a bounded downstream comparison report.")
+    build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
+    context_path = run_dir / "next_worker_context.json"
+    context = json.loads(context_path.read_text(encoding="utf-8"))
+    context["handoff"]["next_step_objective"] = "Something else"
+    context_path.write_text(json.dumps(context, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    result = build_worker_b_preflight(run_dir=run_dir, expected_next_worker_identity="qwen3-30b")
+
+    assert result["status"] == "failed"
+    assert any(check["check_id"] == "preflight" for check in result["checks"])

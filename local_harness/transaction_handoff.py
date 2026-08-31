@@ -418,6 +418,114 @@ def build_next_worker_context(
     return next_worker_context
 
 
+def _extract_markdown_section(text: str, heading: str) -> str:
+    marker = f"### {heading}"
+    start = text.find(marker)
+    if start == -1:
+        raise TransactionHandoffError(f"missing markdown section: {heading}")
+    section_start = text.find("\n", start)
+    if section_start == -1:
+        raise TransactionHandoffError(f"missing markdown body for section: {heading}")
+    next_heading = text.find("\n### ", section_start + 1)
+    end = len(text) if next_heading == -1 else next_heading
+    return text[section_start + 1 : end].strip()
+
+
+def build_worker_b_preflight(
+    *,
+    run_dir: Path,
+    expected_next_worker_identity: str,
+    output_dir: Path | None = None,
+) -> dict[str, Any]:
+    run_manifest = _read_json(run_dir / "run_manifest.json", kind="run manifest")
+    transaction_manifest = _read_json(run_dir / "transaction_manifest.json", kind="transaction manifest")
+    next_worker_context = _read_json(run_dir / "next_worker_context.json", kind="next-worker context")
+    next_worker_continuation_path = run_dir / "next_worker_continuation.md"
+    if not next_worker_continuation_path.is_file():
+        raise TransactionHandoffError("missing next-worker continuation markdown")
+    continuation_text = next_worker_continuation_path.read_text(encoding="utf-8")
+
+    checks: list[dict[str, Any]] = []
+
+    def record(check_id: str, status: str, message: str) -> None:
+        checks.append({"check_id": check_id, "status": status, "message": message})
+
+    try:
+        if run_manifest.get("report_type") != "manual_supervised_attempt_run_manifest.v1":
+            raise TransactionHandoffError("run manifest report_type must be manual_supervised_attempt_run_manifest.v1")
+        record("run_manifest", "passed", "Run manifest resolved.")
+
+        if transaction_manifest.get("lifecycle_state") != "HANDOFF":
+            raise TransactionHandoffError("transaction lifecycle must be HANDOFF")
+        record("transaction_lifecycle", "passed", "Transaction lifecycle is HANDOFF.")
+
+        if transaction_manifest.get("intended_next_worker_identity") != expected_next_worker_identity:
+            raise TransactionHandoffError("selected next worker identity mismatch")
+        record("next_worker_identity", "passed", "Intended next worker identity matches.")
+
+        previous_attempt = next_worker_context.get("previous_attempt", {})
+        result_reference = previous_attempt.get("result_reference", {})
+        raw_sha = result_reference.get("raw_output_sha256")
+        raw_artifact = result_reference.get("raw_output_artifact", {})
+        raw_ref_path = raw_artifact.get("path")
+        if not isinstance(raw_sha, str) or not raw_sha.strip():
+            raise TransactionHandoffError("missing previous result sha256")
+        if not isinstance(raw_ref_path, str) or not raw_ref_path.strip():
+            raise TransactionHandoffError("missing previous result path")
+        if _sha256(Path(raw_ref_path)) != raw_sha:
+            raise TransactionHandoffError("previous result sha256 does not match evidence")
+        record("previous_result_binding", "passed", "Previous result sha256 matches evidence.")
+
+        objective = next_worker_context.get("handoff", {}).get("next_step_objective")
+        if not isinstance(objective, str) or not objective.strip():
+            raise TransactionHandoffError("missing next_step_objective")
+        if objective not in continuation_text:
+            raise TransactionHandoffError("continuation text does not contain next_step_objective")
+        perform_now = _extract_markdown_section(continuation_text, "Perform Now")
+        if perform_now.strip() != objective.strip():
+            raise TransactionHandoffError("Perform Now does not match next_step_objective")
+        record("objective_propagation", "passed", "Objective appears in handoff and continuation.")
+
+        allowed_targets = next_worker_context.get("constraints", {}).get("allowed_targets")
+        held_targets = next_worker_context.get("constraints", {}).get("held_targets")
+        if not isinstance(allowed_targets, list) or not isinstance(held_targets, list):
+            raise TransactionHandoffError("missing authority targets in next-worker context")
+        if "docs/reports/" not in allowed_targets:
+            raise TransactionHandoffError("allowed targets do not preserve docs/reports/")
+        if held_targets != [
+            "production automation",
+            "automatic curriculum capture",
+            "automatic promotion",
+            "implementation_packet",
+        ]:
+            raise TransactionHandoffError("held targets do not preserve authoritative identity")
+        record("authority", "passed", "Allowed/held authority preserved.")
+
+        evidence_references = transaction_manifest.get("evidence_references", [])
+        for required_artifact in ("run_manifest", "model_prompt_packet", "raw_model_output", "supervised_model_attempt", "output_validation", "review_decision", "downstream_use_gate", "handoff_packet"):
+            if not any(ref.get("artifact") == required_artifact for ref in evidence_references):
+                raise TransactionHandoffError(f"missing evidence reference for {required_artifact}")
+        record("evidence_references", "passed", "Required evidence references present.")
+
+        status = "passed"
+    except TransactionHandoffError as exc:
+        record("preflight", "failed", str(exc))
+        status = "failed"
+
+    result = {
+        "run_dir": str(run_dir),
+        "expected_next_worker_identity": expected_next_worker_identity,
+        "status": status,
+        "checks": checks,
+    }
+    if output_dir is not None:
+        output_dir.mkdir(parents=True, exist_ok=True)
+        path = output_dir / "worker_b_preflight.json"
+        _write_json(path, result)
+        result["preflight_path"] = path
+    return result
+
+
 def build_next_worker_continuation_context(
     *,
     transaction_manifest: dict[str, Any],
