@@ -1,0 +1,19 @@
+{
+  "assertions": [
+    {
+      "evidence_refs": [
+        "case_x4_evidence"
+      ],
+      "epistemic_status": "established",
+      "property": "transport_qualification"
+    },
+    {
+      "evidence_refs": [
+        "case_x4_evidence"
+      ],
+      "epistemic_status": "not_established",
+      "property": "semantic_capability"
+    }
+  ],
+  "typing_source": "frozen_experiment_gold"
+}

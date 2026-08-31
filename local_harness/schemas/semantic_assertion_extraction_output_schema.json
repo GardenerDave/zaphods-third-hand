@@ -1,0 +1,50 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "assertions"
+  ],
+  "properties": {
+    "assertions": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "property",
+          "epistemic_status",
+          "evidence_refs"
+        ],
+        "properties": {
+          "property": {
+            "type": "string",
+            "enum": [
+              "transport_qualification",
+              "bounded_handoff_success",
+              "semantic_capability",
+              "raw_response_integrity",
+              "semantic_acceptance"
+            ]
+          },
+          "epistemic_status": {
+            "type": "string",
+            "enum": [
+              "established",
+              "not_established"
+            ]
+          },
+          "evidence_refs": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

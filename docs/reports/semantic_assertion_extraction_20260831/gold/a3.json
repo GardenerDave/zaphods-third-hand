@@ -1,0 +1,19 @@
+{
+  "assertions": [
+    {
+      "evidence_refs": [
+        "case_a3_evidence"
+      ],
+      "epistemic_status": "established",
+      "property": "raw_response_integrity"
+    },
+    {
+      "evidence_refs": [
+        "case_a3_evidence"
+      ],
+      "epistemic_status": "not_established",
+      "property": "semantic_acceptance"
+    }
+  ],
+  "typing_source": "frozen_experiment_gold"
+}

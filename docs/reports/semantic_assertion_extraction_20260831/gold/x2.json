@@ -1,0 +1,12 @@
+{
+  "assertions": [
+    {
+      "evidence_refs": [
+        "case_x2_evidence"
+      ],
+      "epistemic_status": "not_established",
+      "property": "semantic_capability"
+    }
+  ],
+  "typing_source": "frozen_experiment_gold"
+}

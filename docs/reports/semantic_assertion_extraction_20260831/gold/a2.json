@@ -1,0 +1,12 @@
+{
+  "assertions": [
+    {
+      "evidence_refs": [
+        "case_a2_evidence"
+      ],
+      "epistemic_status": "established",
+      "property": "semantic_capability"
+    }
+  ],
+  "typing_source": "frozen_experiment_gold"
+}

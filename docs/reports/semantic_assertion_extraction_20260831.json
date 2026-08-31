@@ -1,0 +1,334 @@
+{
+  "experiment_id": "semantic_assertion_extraction_20260831",
+  "question": "Candidate-side semantic extraction only.",
+  "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "endpoint": "http://192.168.1.16:8080/v1",
+  "temperature": 0,
+  "max_tokens": 256,
+  "schema": {
+    "path": "local_harness/schemas/semantic_assertion_extraction_output_schema.json",
+    "sha256": "2796bc32b9ea0e2fd61cd7164065ac9e63c9b4a4d07380b6a25effd5070a7040"
+  },
+  "frozen_vocabulary": [
+    "transport_qualification",
+    "bounded_handoff_success",
+    "semantic_capability",
+    "raw_response_integrity",
+    "semantic_acceptance"
+  ],
+  "gold_source": "docs/reports/semantic_assertion_extraction_20260831/gold",
+  "model_calls": 7,
+  "cases": [
+    {
+      "case_id": "a1_bad_current_contract",
+      "kind": "natural",
+      "candidate_path": ".work/semantic_claim_discipline_final_20260831/task_a/baseline/20260831T133000Z/raw_model_output.txt",
+      "candidate_sha256": "5a0912db03697edb38469b6f537940e019f6984c2f9f6b17cf06524797104384",
+      "evidence_path": ".work/semantic_claim_discipline_final_20260831/task_a/baseline/20260831T133000Z/evidence_projection.md",
+      "evidence_sha256": "e599c23ee9a1bd5ddffe993173016b664328c3e66c0a64b1c7d6e260646beb00",
+      "gold_path": "docs/reports/semantic_assertion_extraction_20260831/gold/a1.json",
+      "gold_sha256": "49eaeda1474cdca16030abe7e3c8db938d3e02922a66993380479a85fa5d223b",
+      "prompt_sha256": "b3737bb27c8027ec37f4b0eb789daf084014b6a26e78cef7ca243c221f226e73",
+      "request_sha256": "74e42f499ad9316b81b5559286c7e869d169ab91832d5667939f35e181a64bb0",
+      "response_sha256": "6cf9abbba3855323e1421c93f2e95a53868542a77f346af8e9a86bd015956014",
+      "finish_reason": "stop",
+      "prompt_tokens": 4123,
+      "completion_tokens": 52,
+      "validation_status": "passed",
+      "extracted_assertions": [
+        {
+          "property": "transport_qualification",
+          "epistemic_status": "established",
+          "evidence_refs": [
+            "case_a1_evidence"
+          ]
+        }
+      ],
+      "gold_assertions": [
+        {
+          "property": "semantic_capability",
+          "epistemic_status": "established",
+          "evidence_refs": [
+            "case_a1_evidence"
+          ]
+        }
+      ],
+      "score": {
+        "property_accuracy": false,
+        "polarity_accuracy": true,
+        "completeness": false,
+        "spurious_typing": true
+      }
+    },
+    {
+      "case_id": "a2_bad_epistemic_schema",
+      "kind": "natural",
+      "candidate_path": ".work/epistemic_schema_experiment_20260831_abs_fresh/20260831T040000Z/raw_model_output.txt",
+      "candidate_sha256": "0356824fe565b692850a57b277b56dea1a995b0619cc9ec4e41f0aa76bed8b19",
+      "evidence_path": ".work/epistemic_schema_experiment_20260831_abs_fresh/20260831T040000Z/evidence_projection.md",
+      "evidence_sha256": "c70fa604a658ab11cf0bcf54aa3d954098c6d9433c23435f5f860b86fc664c3b",
+      "gold_path": "docs/reports/semantic_assertion_extraction_20260831/gold/a2.json",
+      "gold_sha256": "925665cf6fc97c9af3005ad44aebf1fb179b2cb8962de75cff028d35241180a5",
+      "prompt_sha256": "ef42a181fbc0dbf84327810e7368f95e5e300d37a8b373181d0595978eaee44e",
+      "request_sha256": "636c77e7cf49b7ba736096e125e8319ad8af8ad8b8bf701a56fb84ae8cf90289",
+      "response_sha256": "ae1a9a9c5592092b3e8c4ff843fb4006ea5d4974ee65784956d46a81f023dc68",
+      "finish_reason": "length",
+      "prompt_tokens": 5513,
+      "completion_tokens": 256,
+      "validation_status": "failed",
+      "validation_diagnostics": [
+        "JSON parse failed: Expecting ',' delimiter at line 44, column 4"
+      ],
+      "extracted_assertions": [],
+      "gold_assertions": [
+        {
+          "property": "semantic_capability",
+          "epistemic_status": "established",
+          "evidence_refs": [
+            "case_a2_evidence"
+          ]
+        }
+      ],
+      "score": {
+        "property_accuracy": false,
+        "polarity_accuracy": false,
+        "completeness": false,
+        "spurious_typing": true
+      }
+    },
+    {
+      "case_id": "a3_good_control",
+      "kind": "natural",
+      "candidate_path": ".work/semantic_claim_discipline_final_20260831/task_b/baseline/20260831T133000Z/raw_model_output.txt",
+      "candidate_sha256": "eb2ca82150fcb6e2fb1aebda882c946eed310c145ddea43d944ddfe008b60470",
+      "evidence_path": ".work/semantic_claim_discipline_final_20260831/task_b/baseline/20260831T133000Z/evidence_projection.md",
+      "evidence_sha256": "89d34b8b44dde0ff224c63273e2d9e1946aea23bf2dd4c7e5c6996c4c00344ae",
+      "gold_path": "docs/reports/semantic_assertion_extraction_20260831/gold/a3.json",
+      "gold_sha256": "87def3b7503c331a73fbe0a8cd124d2ebf4c1b7255bc0bc50ab5f1cfadeaea3f",
+      "prompt_sha256": "646d568704d747e2c956a9c0a30310bc781db46009fc2d763b3745959079415d",
+      "request_sha256": "ab64637ddcb7a9f0bba05237094f71c122ba7f7c4f63af3c753d46b09f8bd786",
+      "response_sha256": "12d6348b00f0b47cca4a2da2f81fbd9258125d01bdcba9293919ccd1322b1e85",
+      "finish_reason": "stop",
+      "prompt_tokens": 3191,
+      "completion_tokens": 54,
+      "validation_status": "passed",
+      "extracted_assertions": [
+        {
+          "property": "raw_response_integrity",
+          "epistemic_status": "established",
+          "evidence_refs": [
+            "case_a3_evidence"
+          ]
+        }
+      ],
+      "gold_assertions": [
+        {
+          "property": "raw_response_integrity",
+          "epistemic_status": "established",
+          "evidence_refs": [
+            "case_a3_evidence"
+          ]
+        },
+        {
+          "property": "semantic_acceptance",
+          "epistemic_status": "not_established",
+          "evidence_refs": [
+            "case_a3_evidence"
+          ]
+        }
+      ],
+      "score": {
+        "property_accuracy": true,
+        "polarity_accuracy": true,
+        "completeness": false,
+        "spurious_typing": false
+      }
+    },
+    {
+      "case_id": "x1_positive_capability",
+      "kind": "synthetic",
+      "candidate_path": "docs/reports/semantic_assertion_extraction_20260831/candidates/x1.txt",
+      "candidate_sha256": "d5cb0008e6716361823b8bcc872811a241d1ce84d9d0dab9ea212e90adc78f03",
+      "evidence_path": "docs/reports/semantic_assertion_extraction_20260831/evidence/x1.txt",
+      "evidence_sha256": "2451d120e9214b74b9af2cbb2bb78f2359fbc5444e2477a03b28bfd7dcca55e5",
+      "gold_path": "docs/reports/semantic_assertion_extraction_20260831/gold/x1.json",
+      "gold_sha256": "45796e15fb07fe9d3225e8a604bdb3b32b0954dbfd56c6f77104ce01c7c72285",
+      "prompt_sha256": "50bbe6f35dd37bf8d2134864b581242187366d8a9d79da0026378175bf83816a",
+      "request_sha256": "d7b06569650c7271da76487a3ed5f7932146ab59a822adea58b4bc30342f5766",
+      "response_sha256": "6ec8fc010865d01aa2cae832708bcf5fdff21b56affb2c0dbc1b0858035ee592",
+      "finish_reason": "stop",
+      "prompt_tokens": 179,
+      "completion_tokens": 47,
+      "validation_status": "passed",
+      "extracted_assertions": [
+        {
+          "property": "semantic_capability",
+          "epistemic_status": "established",
+          "evidence_refs": [
+            "case_x1_evidence"
+          ]
+        }
+      ],
+      "gold_assertions": [
+        {
+          "property": "semantic_capability",
+          "epistemic_status": "established",
+          "evidence_refs": [
+            "case_x1_evidence"
+          ]
+        }
+      ],
+      "score": {
+        "property_accuracy": true,
+        "polarity_accuracy": true,
+        "completeness": true,
+        "spurious_typing": false
+      }
+    },
+    {
+      "case_id": "x2_negative_capability",
+      "kind": "synthetic",
+      "candidate_path": "docs/reports/semantic_assertion_extraction_20260831/candidates/x2.txt",
+      "candidate_sha256": "e41628bb44e28fb805d5e958a8c486ccdcfa7693a2d9c2102bff0c37fbbf1247",
+      "evidence_path": "docs/reports/semantic_assertion_extraction_20260831/evidence/x2.txt",
+      "evidence_sha256": "2451d120e9214b74b9af2cbb2bb78f2359fbc5444e2477a03b28bfd7dcca55e5",
+      "gold_path": "docs/reports/semantic_assertion_extraction_20260831/gold/x2.json",
+      "gold_sha256": "45b293788a60b56d4e657b8c97e51bc50d8b14fcc133dddfb1319cb23ab5b9cd",
+      "prompt_sha256": "abc072e01f30f61fa63e5e76090d98549696870f7799bb860440ff8e5f18e2a8",
+      "request_sha256": "d6c7519d02e3b785ebf1fc73a27ba8665301d6841e5870171dd297423616b7ba",
+      "response_sha256": "edbf8d36a94885c24e2ea3fe7693e3b0df09ea5658bddcd4f8924696429f04d6",
+      "finish_reason": "stop",
+      "prompt_tokens": 181,
+      "completion_tokens": 49,
+      "validation_status": "passed",
+      "extracted_assertions": [
+        {
+          "property": "semantic_capability",
+          "epistemic_status": "not_established",
+          "evidence_refs": [
+            "case_x2_evidence"
+          ]
+        }
+      ],
+      "gold_assertions": [
+        {
+          "property": "semantic_capability",
+          "epistemic_status": "not_established",
+          "evidence_refs": [
+            "case_x2_evidence"
+          ]
+        }
+      ],
+      "score": {
+        "property_accuracy": true,
+        "polarity_accuracy": true,
+        "completeness": true,
+        "spurious_typing": false
+      }
+    },
+    {
+      "case_id": "x3_positive_transport",
+      "kind": "synthetic",
+      "candidate_path": "docs/reports/semantic_assertion_extraction_20260831/candidates/x3.txt",
+      "candidate_sha256": "261d53b34c85437badbe5d39eb5f1344b772f0e0c659c03b44e3f3b67abb67c8",
+      "evidence_path": "docs/reports/semantic_assertion_extraction_20260831/evidence/x3.txt",
+      "evidence_sha256": "2451d120e9214b74b9af2cbb2bb78f2359fbc5444e2477a03b28bfd7dcca55e5",
+      "gold_path": "docs/reports/semantic_assertion_extraction_20260831/gold/x3.json",
+      "gold_sha256": "caf8ac7cad122f9448b1c5bfa503282b2863ec755a0a1de4e119bb23588394db",
+      "prompt_sha256": "37e04c31e4b4e0e1c38503b45ac1d61f5dc4f596d1c965eafba9be99bc7bfe90",
+      "request_sha256": "64c9031156690f31611fe2faf8b8b229ceb4c0c24fa39e2f75c5b523b707494e",
+      "response_sha256": "fdaaea38309bc33f2cf34a82537370ee4a40997ad4805fe82185d5107508cbda",
+      "finish_reason": "stop",
+      "prompt_tokens": 179,
+      "completion_tokens": 48,
+      "validation_status": "passed",
+      "extracted_assertions": [
+        {
+          "property": "transport_qualification",
+          "epistemic_status": "established",
+          "evidence_refs": [
+            "case_x3_evidence"
+          ]
+        }
+      ],
+      "gold_assertions": [
+        {
+          "property": "transport_qualification",
+          "epistemic_status": "established",
+          "evidence_refs": [
+            "case_x3_evidence"
+          ]
+        }
+      ],
+      "score": {
+        "property_accuracy": true,
+        "polarity_accuracy": true,
+        "completeness": true,
+        "spurious_typing": false
+      }
+    },
+    {
+      "case_id": "x4_mixed",
+      "kind": "synthetic",
+      "candidate_path": "docs/reports/semantic_assertion_extraction_20260831/candidates/x4.txt",
+      "candidate_sha256": "cea583cc8b2d7d57c51def080d887abae6708904e8755f390e91745b403e5a0c",
+      "evidence_path": "docs/reports/semantic_assertion_extraction_20260831/evidence/x4.txt",
+      "evidence_sha256": "2451d120e9214b74b9af2cbb2bb78f2359fbc5444e2477a03b28bfd7dcca55e5",
+      "gold_path": "docs/reports/semantic_assertion_extraction_20260831/gold/x4.json",
+      "gold_sha256": "7dbe7153793c331f4a9aef935e9ad7fb5958708855ac3b31208f3eb69b15ebdc",
+      "prompt_sha256": "f6e296a0da71de9c6d292e6cc209d5d1959a7517e36706bf29b2fca60cae5e52",
+      "request_sha256": "29ca0d91107c97d1b8077399eed9ff1326c506e009e3a96adbd9d7ac526bb794",
+      "response_sha256": "9e2c43f2198ef9237e246f830ef8aad2b22b46ee212780f14984ed098001e774",
+      "finish_reason": "stop",
+      "prompt_tokens": 189,
+      "completion_tokens": 86,
+      "validation_status": "passed",
+      "extracted_assertions": [
+        {
+          "property": "transport_qualification",
+          "epistemic_status": "established",
+          "evidence_refs": [
+            "case_x4_evidence"
+          ]
+        },
+        {
+          "property": "semantic_capability",
+          "epistemic_status": "not_established",
+          "evidence_refs": [
+            "case_x4_evidence"
+          ]
+        }
+      ],
+      "gold_assertions": [
+        {
+          "property": "transport_qualification",
+          "epistemic_status": "established",
+          "evidence_refs": [
+            "case_x4_evidence"
+          ]
+        },
+        {
+          "property": "semantic_capability",
+          "epistemic_status": "not_established",
+          "evidence_refs": [
+            "case_x4_evidence"
+          ]
+        }
+      ],
+      "score": {
+        "property_accuracy": true,
+        "polarity_accuracy": true,
+        "completeness": true,
+        "spurious_typing": false
+      }
+    }
+  ],
+  "bifurcation_atomization_note": "The failed trajectory separated evidence, representation, polarity, and scope into distinct layers before deterministic recomposition became possible for the checker. This extraction experiment probes the remaining acquisition/trust layer for candidate-side typing.",
+  "optional_derived_routing_consequence": "not computed in this turn",
+  "what_this_does_not_establish": [
+    "independent trust",
+    "evidence typing",
+    "production integration",
+    "general semantic routing"
+  ]
+}
