@@ -2,6 +2,7 @@
   "patch_id": "single_pass_json_object_v1",
   "title": "Single-pass JSON object emission",
   "status": "candidate",
+  "selection_policy": "explicit_only",
   "failure_signature": [
     "model restarts the object after beginning JSON output",
     "model appends a second top-level object or preamble after the object begins"

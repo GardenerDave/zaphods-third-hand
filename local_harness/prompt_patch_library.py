@@ -18,6 +18,7 @@ from typing import Any
 
 ALLOWED_STATUSES = {"candidate", "active", "deprecated"}
 DEFAULT_SELECTABLE_STATUSES = {"candidate", "active"}
+ALLOWED_SELECTION_POLICIES = {None, "explicit_only"}
 ALLOWED_STAGES = {
     "intake",
     "triage",
@@ -87,6 +88,11 @@ def validate_patch(patch: Any) -> dict[str, Any]:
     _require_str_list(patch, "failure_signature")
     _require_str_list(patch, "required_output_fields")
     _require_str_list(patch, "validator_expectations")
+    selection_policy = patch.get("selection_policy")
+    if selection_policy not in ALLOWED_SELECTION_POLICIES:
+        raise PromptPatchError(
+            "patch selection_policy must be omitted or one of: explicit_only"
+        )
 
     status = _require_nonempty_str(patch, "status")
     if status not in ALLOWED_STATUSES:
@@ -153,8 +159,11 @@ class PromptPatchLibrary:
         return [
             patch
             for _, patch in sorted(self._patches.items())
-            if patch["status"] in statuses
+            if patch["status"] in statuses and patch.get("selection_policy") != "explicit_only"
         ]
+
+    def selectable_patch_ids(self, *, include_deprecated: bool = False) -> list[str]:
+        return [patch["patch_id"] for patch in self._selectable(include_deprecated)]
 
     def filter_by_stage(
         self, stage: str, *, include_deprecated: bool = False

@@ -2,6 +2,7 @@
   "patch_id": "unique_json_keys_v1",
   "title": "Unique top-level JSON keys",
   "status": "candidate",
+  "selection_policy": "explicit_only",
   "failure_signature": [
     "model repeats a required top-level JSON key",
     "model emits a second copy of a top-level JSON field"

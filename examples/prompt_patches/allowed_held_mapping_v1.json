@@ -2,6 +2,7 @@
   "patch_id": "allowed_held_mapping_v1",
   "title": "Allowed and held target mapping",
   "status": "candidate",
+  "selection_policy": "explicit_only",
   "failure_signature": [
     "model swaps allowed and held targets",
     "model promotes held targets into allowed targets",

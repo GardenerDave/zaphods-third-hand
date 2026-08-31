@@ -55,6 +55,13 @@ def _valid_raw_output_json() -> str:
     )
 
 
+def _extract_output_contract(rendered_prompt: str) -> dict:
+    marker = "## Output Contract\n```json\n"
+    start = rendered_prompt.index(marker) + len(marker)
+    end = rendered_prompt.index("\n```", start)
+    return json.loads(rendered_prompt[start:end])
+
+
 def _captured_model_call_metadata(
     *,
     prompt_text: str,
@@ -1847,6 +1854,10 @@ def test_prepare_projects_canonical_prompt_with_explicit_patch_includes(tmp_path
     prompt_packet = (run_dir / "model_prompt_packet.md").read_text(encoding="utf-8")
     prompt_copy = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
     summary = json.loads((run_dir / "prompt_projection_summary.json").read_text(encoding="utf-8"))
+    canonical_output_contract = json.loads((run_dir / "canonical_output_contract.json").read_text(encoding="utf-8"))
+    projected_output_contract = json.loads((run_dir / "output_contract.json").read_text(encoding="utf-8"))
+    canonical_prompt_contract = _extract_output_contract(prompt_packet)
+    prompt_contract = _extract_output_contract(prompt_copy)
     assert prompt_copy != prompt_packet
     assert "Patch: output_contract_v1" in prompt_packet
     assert "Patch: output_contract_v1" in prompt_copy
@@ -1876,6 +1887,16 @@ def test_prepare_projects_canonical_prompt_with_explicit_patch_includes(tmp_path
         "allowed_held_mapping_v1",
         "required_fields_boolean_v1",
     ]
+    assert canonical_prompt_contract == canonical_output_contract
+    assert prompt_contract == projected_output_contract
+    assert summary["canonical_output_contract_sha256"] == manual_attempt._sha256_text(
+        json.dumps(canonical_output_contract, indent=2, sort_keys=True) + "\n"
+    )
+    assert summary["projected_output_contract_sha256"] == manual_attempt._sha256_text(
+        json.dumps(projected_output_contract, indent=2, sort_keys=True) + "\n"
+    )
+    assert summary["canonical_output_contract_path"] == "canonical_output_contract.json"
+    assert summary["projected_output_contract_path"] == "output_contract.json"
 
 
 def test_prepare_projection_include_and_exclude_is_deterministic(tmp_path: Path):

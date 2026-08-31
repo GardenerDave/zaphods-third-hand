@@ -51,6 +51,7 @@ Prepare creates a timestamped run directory with:
 - `model_prompt_packet.md`
 - `operator_instructions.txt`
 - `run_manifest.json`
+- `canonical_output_contract.json`
 - `output_contract.json`
 
 Example:
@@ -81,6 +82,7 @@ Session writes:
 - `raw_model_output.txt`
 - `operator_instructions.txt`
 - `run_manifest.json`
+- `canonical_output_contract.json`
 - `output_contract.json`
 
 Workflow:
@@ -230,6 +232,7 @@ For captured-model ingest, `model_call_metadata_sha256` records the SHA-256 of t
 When structured output is active, the captured metadata also records the exact schema artifact, schema SHA-256, schema length, and request-level structured-output mechanism used for the acquisition.
 The runner can project `prompt_to_paste.md` from the canonical prepared packet while explicitly including or excluding prompt-patch IDs, instead of hand-writing a replacement prompt from scratch.
 Canonical `model_prompt_packet.md` stays unchanged. `prompt_to_paste.md` is a deterministic projection that can add approved prompt patches with `--include-prompt-patch` and omit superseded patches with `--exclude-prompt-patch`.
+Prompt patches marked `selection_policy: explicit_only` are omitted from generic selection and are included only by exact ID.
 
 The transaction manifest is an index over the existing supervised artifacts.
 It references, but does not replace, the attempt, validation, review,
@@ -257,7 +260,7 @@ semantic validation or authority checks.
 
 ## Contract source and provenance
 
-Ingest validates against the exact `output_contract.json` created during prepare.
+Ingest validates against the exact projected acquisition contract written to `output_contract.json` during prepare. The canonical pre-projection contract, when useful for auditability, is preserved separately as `canonical_output_contract.json`.
 Validation checks required field presence and basic required field types, including that `required_fields_present` is boolean `true`.
 Validation also rejects duplicate JSON keys because they create provenance and contract ambiguity.
 Validation also rejects held-target mutations by comparing the emitted `held_targets` exactly against the authoritative held-target set from the run state.

@@ -666,7 +666,7 @@ def run_prepare(
     validate_orchestration_packet(orchestration_packet, patch_library)
 
     model_prompt_packet = render_model_prompt_packet(orchestration_packet, patch_library)
-    output_contract = build_model_prompt_output_contract(orchestration_packet, patch_library)
+    canonical_output_contract = build_model_prompt_output_contract(orchestration_packet, patch_library)
     prompt_projection_packet, prompt_projection_summary = _project_prompt_packet(
         orchestration_packet,
         patch_library,
@@ -674,12 +674,14 @@ def run_prepare(
         exclude_prompt_patches=exclude_prompt_patches,
     )
     prompt_to_paste = render_model_prompt_packet(prompt_projection_packet, patch_library)
+    projected_output_contract = build_model_prompt_output_contract(prompt_projection_packet, patch_library)
 
     messy_input_path = run_dir / "messy_input.txt"
     prompt_path = run_dir / "model_prompt_packet.md"
     prompt_to_paste_path = run_dir / "prompt_to_paste.md"
     instructions_path = run_dir / "operator_instructions.txt"
     output_contract_path = run_dir / "output_contract.json"
+    canonical_output_contract_path = run_dir / "canonical_output_contract.json"
     triage_packet_path = run_dir / "triage_packet.json"
     orchestration_packet_path = run_dir / "orchestration_packet.json"
     manifest_path = run_dir / "run_manifest.json"
@@ -688,9 +690,18 @@ def run_prepare(
     prompt_path.write_text(model_prompt_packet.rstrip() + "\n", encoding="utf-8")
     prompt_to_paste_path.write_text(prompt_to_paste.rstrip() + "\n", encoding="utf-8")
     projection_summary_path = run_dir / "prompt_projection_summary.json"
+    prompt_projection_summary["canonical_output_contract_sha256"] = _sha256_text(
+        json.dumps(canonical_output_contract, indent=2, sort_keys=True) + "\n"
+    )
+    prompt_projection_summary["projected_output_contract_sha256"] = _sha256_text(
+        json.dumps(projected_output_contract, indent=2, sort_keys=True) + "\n"
+    )
+    prompt_projection_summary["canonical_output_contract_path"] = canonical_output_contract_path.name
+    prompt_projection_summary["projected_output_contract_path"] = output_contract_path.name
     _write_json(projection_summary_path, prompt_projection_summary)
     instructions_path.write_text(_operator_instructions_text(run_dir), encoding="utf-8")
-    _write_json(output_contract_path, output_contract)
+    _write_json(canonical_output_contract_path, canonical_output_contract)
+    _write_json(output_contract_path, projected_output_contract)
     _write_json(triage_packet_path, triage_packet)
     _write_json(orchestration_packet_path, orchestration_packet)
 
@@ -708,6 +719,7 @@ def run_prepare(
             "prompt_to_paste": str(prompt_to_paste_path),
             "prompt_projection_summary": str(projection_summary_path),
             "operator_instructions": str(instructions_path),
+            "canonical_output_contract": str(canonical_output_contract_path),
             "output_contract": str(output_contract_path),
             "triage_packet": str(triage_packet_path),
             "orchestration_packet": str(orchestration_packet_path),
@@ -721,6 +733,7 @@ def run_prepare(
         "model_prompt_packet_path": prompt_path,
         "prompt_to_paste_path": prompt_to_paste_path,
         "prompt_projection_summary_path": projection_summary_path,
+        "canonical_output_contract_path": canonical_output_contract_path,
         "output_contract_path": output_contract_path,
     }
 
