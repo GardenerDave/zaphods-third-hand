@@ -513,6 +513,8 @@ def _build_evidence_projection_packet(
 
 def _render_evidence_observation_prompt(packet: dict[str, Any]) -> str:
     evidence_json = json.dumps(packet, indent=2, sort_keys=True)
+    selected_patches = packet.get("selected_prompt_patches", [])
+    rendered_patch_deltas = packet.get("rendered_patch_deltas", "No prompt patches selected.\n")
     return (
         "# ZTH Repository Observation Packet\n\n"
         "## Role\n"
@@ -523,6 +525,10 @@ def _render_evidence_observation_prompt(packet: dict[str, Any]) -> str:
         f"{packet['task_summary']}\n\n"
         "## Evidence Packet\n"
         f"```json\n{evidence_json}\n```\n\n"
+        "## Prompt Patch Instructions\n"
+        f"{json.dumps(selected_patches, indent=2, sort_keys=True)}\n\n"
+        "### Rendered Patch Deltas\n"
+        f"{rendered_patch_deltas}\n\n"
         "## Required Output Contract\n"
         f"```json\n{json.dumps(EVIDENCE_OUTPUT_CONTRACT, indent=2, sort_keys=True)}\n```\n\n"
         "## Required Response Shape\n"
@@ -822,6 +828,8 @@ def run_prepare(
             evidence_sources=evidence_files,
             max_chars_per_source=evidence_max_chars,
         )
+        evidence_projection_packet["selected_prompt_patches"] = list(prompt_projection_packet["selected_prompt_patches"])
+        evidence_projection_packet["rendered_patch_deltas"] = prompt_projection_packet["rendered_patch_deltas"]
         evidence_prompt_to_paste = _render_evidence_observation_prompt(evidence_projection_packet)
         evidence_budget = _prepare_evidence_budget(
             prompt_text=evidence_prompt_to_paste,
