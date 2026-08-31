@@ -1,0 +1,166 @@
+{
+  "entries": [
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/canonical_output_contract.json",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/canonical_output_contract.json",
+      "sha256": "ed6708b775988f35ef5969190338709b6f732199068f75ac62d049d39a7daba5",
+      "size": 272
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/downstream_use_gate.json",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/downstream_use_gate.json",
+      "sha256": "55bb5f75502979157d154ba2f9d01e09e3501a907c586b8c856efe262d796b2c",
+      "size": 1671
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/handoff_packet.json",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/handoff_packet.json",
+      "sha256": "1e427124041f233fb2562e4916868ae1642be86fbf1e6476a298220006161d43",
+      "size": 2733
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/local_model_call.json",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/local_model_call.json",
+      "sha256": "05c1946b43345cbc314db446902c668555a4c01d43f9ba0d0e7c24afdda2823c",
+      "size": 7976
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/messy_input.txt",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/messy_input.txt",
+      "sha256": "ba546ce0c60f663c6178c243b64e18f69f4764dba4fb310aff706e07b974db86",
+      "size": 77
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/model_prompt_packet.md",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/model_prompt_packet.md",
+      "sha256": "09de405d560f9b55f434db0fe9ba38ca96c954e37853185057476104ac80db16",
+      "size": 2713
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/next_worker_context.json",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/next_worker_context.json",
+      "sha256": "16755e59bc1b986b1f907ab6db014e58a0f01f1b2888b3caebf91849fefd0be8",
+      "size": 14872
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/next_worker_context.md",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/next_worker_context.md",
+      "sha256": "6ed34bbb5fb1d08085f208c0368ede94567aff9b33dc4c1dc0dea87c99701663",
+      "size": 11830
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/next_worker_continuation.md",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/next_worker_continuation.md",
+      "sha256": "681a4c72c25fb91e22b536919c9d5fa30c282a7ad85f9e350878e67f59308664",
+      "size": 5965
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/operator_instructions.txt",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/operator_instructions.txt",
+      "sha256": "9fb0fb4b85b350524c367fb8a943dea05b7387275634bdaea0bb14f6b47b4c61",
+      "size": 598
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/orchestration_packet.json",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/orchestration_packet.json",
+      "sha256": "7280e0ffe48eacf9a1bda280e3c40ee4ce77a124f493fc7780d8c6f87f16e53f",
+      "size": 2941
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/output_contract.json",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/output_contract.json",
+      "sha256": "ed6708b775988f35ef5969190338709b6f732199068f75ac62d049d39a7daba5",
+      "size": 272
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/output_validation.json",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/output_validation.json",
+      "sha256": "ab8546fa462925270749a76417d01fc49a0d465708827319c7baa0f9a9e70ad4",
+      "size": 2393
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/output_validation_report.txt",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/output_validation_report.txt",
+      "sha256": "bb90d737790a51d8fefd20a57ba42cd98d9aed183001c5fb927d3443b13c72d1",
+      "size": 1904
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/prompt_projection_summary.json",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/prompt_projection_summary.json",
+      "sha256": "4e16281f72a9bd5c6f41c8abe5450dc838e0f73e557ca9f592c3e2e40396925e",
+      "size": 817
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/prompt_to_paste.md",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/prompt_to_paste.md",
+      "sha256": "078ef3964f5abae4a04446c9c088658312456d3e5fbdbd20f085092a9465f730",
+      "size": 3536
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/raw_model_output.txt",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/raw_model_output.txt",
+      "sha256": "58f62a2f81dfcf90b8cb385b8cf09501e25f4d49fa8f2fec6915accea60f2a5b",
+      "size": 402
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/response_schema.json",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/response_schema.json",
+      "sha256": "8a0eefccc8738cb56dbd83b9a908ed459f865149cd6482c5db767e81c3e65b59",
+      "size": 1028
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/review_decision.json",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/review_decision.json",
+      "sha256": "5054d1fa243d33fb48e40801b6cfccafdd9d828dc55a4987cab98e134ff269cc",
+      "size": 1589
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/run_manifest.json",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/run_manifest.json",
+      "sha256": "fecc98e083e6a243c5ae4c52afc1656858c4679a72f26b3df84d3176218965b9",
+      "size": 1789
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/supervised_model_attempt.json",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/supervised_model_attempt.json",
+      "sha256": "58b4c0cdd27b91e477e04f586b65ba085a2db67a26629e8d1599afb2b7f5c1ec",
+      "size": 16220
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/transaction_manifest.json",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/transaction_manifest.json",
+      "sha256": "753be2d27cd671492f6d6337f8abb28efe60f99fea27617e6169ec5a42fa1467",
+      "size": 3441
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/triage_packet.json",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/triage_packet.json",
+      "sha256": "805098ead5f5bc1347729d69d922c8bc166d8851917895151e95a75d4d22e1aa",
+      "size": 1446
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/worker_b_call_intent.json",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/worker_b_call_intent.json",
+      "sha256": "88e350efa2fe12eecd05b6e0f7250f4d75d24ebf64b35d59eaf73a67f223a3d5",
+      "size": 14155
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/worker_b_call_intent.transport_events.jsonl",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/worker_b_call_intent.transport_events.jsonl",
+      "sha256": "ae0d74b23be5e36e63751e05ba91eb2e6dc141d754192f08dc98eb7dc470b008",
+      "size": 836
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/worker_b_local_model_call.json",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/worker_b_local_model_call.json",
+      "sha256": "207a3036cdf26503f554565ad1e2e87f7591ec02cae1bd79e961b6548099bc84",
+      "size": 1848
+    },
+    {
+      "source_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/worker_b_preflight.json",
+      "archive_path": "docs/reports/evidence/1p7b_to_30b_structured_continuous_v2_20260830/source_run/worker_b_preflight.json",
+      "sha256": "cf64eca8d67676485e3f3bc9fbe5ff775574310139436a35824f8347860c6cf2",
+      "size": 1501
+    }
+  ]
+}

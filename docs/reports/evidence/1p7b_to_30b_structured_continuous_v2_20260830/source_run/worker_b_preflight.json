@@ -1,0 +1,52 @@
+{
+  "checks": [
+    {
+      "check_id": "run_manifest",
+      "message": "Run manifest resolved.",
+      "status": "passed"
+    },
+    {
+      "check_id": "transaction_lifecycle",
+      "message": "Transaction lifecycle is HANDOFF.",
+      "status": "passed"
+    },
+    {
+      "check_id": "next_worker_identity",
+      "message": "Intended next worker identity matches.",
+      "status": "passed"
+    },
+    {
+      "check_id": "worker_identity",
+      "message": "Worker identity agrees across artifacts.",
+      "status": "passed"
+    },
+    {
+      "check_id": "previous_result_binding",
+      "message": "Previous result sha256 matches evidence.",
+      "status": "passed"
+    },
+    {
+      "check_id": "previous_result_identity",
+      "message": "Attempt/result identity agrees across transaction artifacts.",
+      "status": "passed"
+    },
+    {
+      "check_id": "objective_propagation",
+      "message": "Objective appears in handoff and continuation.",
+      "status": "passed"
+    },
+    {
+      "check_id": "authority",
+      "message": "Allowed/held authority preserved across artifacts.",
+      "status": "passed"
+    },
+    {
+      "check_id": "evidence_references",
+      "message": "Required evidence references present.",
+      "status": "passed"
+    }
+  ],
+  "expected_next_worker_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "run_dir": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z",
+  "status": "passed"
+}

@@ -1,0 +1,69 @@
+{
+  "created_at": "2026-08-31T01:59:40Z",
+  "evidence_references": [
+    {
+      "artifact": "run_manifest",
+      "path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/run_manifest.json",
+      "sha256": "fecc98e083e6a243c5ae4c52afc1656858c4679a72f26b3df84d3176218965b9"
+    },
+    {
+      "artifact": "model_prompt_packet",
+      "path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/model_prompt_packet.md",
+      "sha256": "09de405d560f9b55f434db0fe9ba38ca96c954e37853185057476104ac80db16"
+    },
+    {
+      "artifact": "raw_model_output",
+      "path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/raw_model_output.txt",
+      "sha256": "58f62a2f81dfcf90b8cb385b8cf09501e25f4d49fa8f2fec6915accea60f2a5b"
+    },
+    {
+      "artifact": "supervised_model_attempt",
+      "attempt_id": "model_attempt_20260831t020103z",
+      "path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/supervised_model_attempt.json",
+      "sha256": "58b4c0cdd27b91e477e04f586b65ba085a2db67a26629e8d1599afb2b7f5c1ec"
+    },
+    {
+      "artifact": "output_validation",
+      "path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/output_validation.json",
+      "sha256": "ab8546fa462925270749a76417d01fc49a0d465708827319c7baa0f9a9e70ad4",
+      "validation_id": "manual_validation_20260831t020103z"
+    },
+    {
+      "artifact": "review_decision",
+      "decision_id": "manual_decision_20260831t020103z",
+      "path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/review_decision.json",
+      "sha256": "5054d1fa243d33fb48e40801b6cfccafdd9d828dc55a4987cab98e134ff269cc"
+    },
+    {
+      "artifact": "downstream_use_gate",
+      "gate_id": "manual_gate_20260831t020103z",
+      "path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/downstream_use_gate.json",
+      "sha256": "55bb5f75502979157d154ba2f9d01e09e3501a907c586b8c856efe262d796b2c"
+    },
+    {
+      "artifact": "handoff_packet",
+      "handoff_id": "manual_handoff_20260831t020103z",
+      "path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/handoff_packet.json",
+      "sha256": "1e427124041f233fb2562e4916868ae1642be86fbf1e6476a298220006161d43"
+    }
+  ],
+  "first_worker_identity": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+  "intended_next_worker_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "lifecycle_state": "HANDOFF",
+  "records": {
+    "attempt_id": "model_attempt_20260831t020103z",
+    "decision_id": "manual_decision_20260831t020103z",
+    "gate_id": "manual_gate_20260831t020103z",
+    "handoff_id": "manual_handoff_20260831t020103z",
+    "validation_id": "manual_validation_20260831t020103z"
+  },
+  "run_id": "manual_supervised_attempt_20260831t020000z",
+  "schema_version": "zth.transaction_manifest.v0.1",
+  "task_reference": {
+    "orchestration_id": "orch_manual_20260831t020000z",
+    "prompt_packet_id": "prompt_packet_manual_20260831t020000z",
+    "triage_id": "triage_manual_20260831t020000z"
+  },
+  "transaction_id": "orch_manual_20260831t020000z",
+  "updated_at": "2026-08-31T02:01:03.959815Z"
+}
