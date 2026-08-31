@@ -3,7 +3,7 @@
 ## Evidence inventory
 
 The preserved natural A1/A2/A3 bundles expose structured artifacts and provenance, but not a trusted typed layer for transport qualification or semantic capability.
-Transport qualification is now represented by an authoritative artifact-resolution path for the explicit-interface V3 lane, but the natural A1/A2/A3 lineages remain unbound.
+Transport qualification is now represented by a structured transaction-side reference plus an authoritative artifact-resolution path for the explicit-interface V3 lane, but the natural A1/A2/A3 lineages remain unbound.
 
 ### A1
 
@@ -85,6 +85,8 @@ They do **not** bind to the preserved natural A1/A2/A3 evidence lineage:
 - no direct causal linkage to the natural candidate bundles
 
 So they are useful transport history, but not a trusted transport-qualification representation for the natural transport-versus-capability invariant replay.
+
+The current implementation can now resolve a structured transaction-side `transport_qualification_ref` against the authoritative artifact, but it still requires an explicit scope-compatible transaction binding before policy trust is granted.
 
 ## Deterministic replay status
 

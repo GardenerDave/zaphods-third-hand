@@ -1491,12 +1491,28 @@ def _require_nonempty(value: str | None, *, field: str) -> str:
     return value
 
 
+def _parse_transport_qualification_ref(value: str | dict[str, Any] | None) -> dict[str, Any] | None:
+    if value is None:
+        return None
+    if isinstance(value, dict):
+        return value
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError("transport qualification ref must be a non-empty string or JSON object")
+    try:
+        parsed = json.loads(value)
+    except json.JSONDecodeError as exc:
+        raise ValueError("transport qualification ref must be a JSON object") from exc
+    if not isinstance(parsed, dict):
+        raise ValueError("transport qualification ref must be a JSON object")
+    return parsed
+
+
 def run_ingest(
     *,
     run_dir: Path,
     raw_output_file: Path,
     model_call_metadata_file: Path | None = None,
-    transport_qualification_ref: str | None = None,
+    transport_qualification_ref: str | dict[str, Any] | None = None,
     decision: str | None = None,
     decision_reason: str | None = None,
     operator: str | None = None,
@@ -1512,6 +1528,7 @@ def run_ingest(
     )
     output_contract = _read_json(output_contract_path, kind="output contract")
     authorized_targets, authoritative_held_targets = _load_structured_authority_targets(run_dir, manifest)
+    parsed_transport_qualification_ref = _parse_transport_qualification_ref(transport_qualification_ref)
     projected_source_paths: list[str] | None = None
     evidence_projection_artifact = artifacts.get("evidence_projection")
     if isinstance(evidence_projection_artifact, str) and evidence_projection_artifact.strip():
@@ -1695,7 +1712,7 @@ def run_ingest(
                 "operator": operator.strip() if isinstance(operator, str) and operator.strip() else "manual",
                 "review_required": True,
             },
-            transport_qualification_ref=transport_qualification_ref,
+            transport_qualification_ref=parsed_transport_qualification_ref,
             provenance={
                 "source": "manual_operator_pasted_model_output",
                 "input_artifact": "model_prompt_packet",
@@ -1734,7 +1751,7 @@ def run_ingest(
                 "model_call_metadata": model_call_metadata,
                 "acquisition_request_provenance": model_call_metadata.get("request_provenance"),
                 "structured_output": model_call_metadata.get("structured_output"),
-                "transport_qualification_ref": transport_qualification_ref,
+                "transport_qualification_ref": parsed_transport_qualification_ref,
             },
         )
 

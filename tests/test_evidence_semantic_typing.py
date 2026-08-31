@@ -3,11 +3,13 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import local_harness.run_manual_supervised_attempt as manual_attempt
 from local_harness.evidence_semantic_typing import (
     build_source_inventory,
     derive_typed_evidence_from_bundle,
     HandoffCompletionRef,
     TransportQualificationRef,
+    derive_transport_qualification_from_attempt,
     resolve_handoff_completion_reference,
     resolve_transport_qualification_reference,
 )
@@ -174,6 +176,124 @@ def test_transport_qualification_reference_hash_failure_fails_closed():
         pass
     else:
         raise AssertionError("expected transport qualification hash failure")
+
+
+def test_transport_qualification_reference_requires_matching_selector_and_scope(tmp_path: Path):
+    artifact = tmp_path / "qualification.json"
+    artifact.write_text(
+        json.dumps(
+            {
+                "local": {
+                    "status": "failed",
+                    "request_url": "http://example.invalid/v1/chat/completions",
+                    "model": "test-model",
+                    "scope": "bounded-test-lane",
+                },
+                "external": {
+                    "status": "ok",
+                    "request_url": "http://example.invalid/v1/chat/completions",
+                    "model": "test-model",
+                    "scope": "bounded-test-lane",
+                },
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    ref = TransportQualificationRef(
+        artifact_ref=str(artifact),
+        artifact_sha256=manual_attempt._sha256_file(artifact),
+        qualification_selector="local",
+    )
+    verification = resolve_transport_qualification_reference(
+        qualification_ref=ref,
+        transaction_endpoint="http://example.invalid/v1/chat/completions",
+        transaction_model="test-model",
+        transaction_scope="bounded-test-lane",
+    )
+    assert verification.qualification_passed is False
+    assert verification.policy_usable is False
+
+
+def test_transport_qualification_ref_round_trip_and_evidence_join(tmp_path: Path):
+    qualification = tmp_path / "qualification.json"
+    qualification.write_text(
+        json.dumps(
+            {
+                "local": {
+                    "status": "ok",
+                    "request_url": "http://example.invalid/v1/chat/completions",
+                    "model": "test-model",
+                    "scope": "bounded-test-lane",
+                }
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    ref = TransportQualificationRef(
+        artifact_ref=str(qualification),
+        artifact_sha256=manual_attempt._sha256_file(qualification),
+        qualification_selector="local",
+        qualification_id="qual-test-1",
+    )
+    attempt = {
+        "provenance": {
+            "transport_qualification_ref": ref.as_dict(),
+            "transport_qualification_scope": "bounded-test-lane",
+        }
+    }
+    transport_property, verification = derive_transport_qualification_from_attempt(
+        attempt_record=attempt,
+        transaction_endpoint="http://example.invalid/v1/chat/completions",
+        transaction_model="test-model",
+    )
+    assert transport_property is not None
+    assert transport_property.property == "transport_qualification"
+    assert verification is not None
+    assert verification.policy_usable is True
+    assert verification.scope_match is True
+    reloaded = TransportQualificationRef.from_dict(attempt["provenance"]["transport_qualification_ref"])
+    assert reloaded.as_dict() == ref.as_dict()
+
+
+def test_transport_qualification_ref_bad_hash_fails_closed_on_join(tmp_path: Path):
+    qualification = tmp_path / "qualification.json"
+    qualification.write_text(
+        json.dumps(
+            {
+                "local": {
+                    "status": "ok",
+                    "request_url": "http://example.invalid/v1/chat/completions",
+                    "model": "test-model",
+                    "scope": "bounded-test-lane",
+                }
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    ref = TransportQualificationRef(
+        artifact_ref=str(qualification),
+        artifact_sha256="0" * 64,
+        qualification_selector="local",
+    )
+    attempt = {"provenance": {"transport_qualification_ref": ref.as_dict(), "transport_qualification_scope": "bounded-test-lane"}}
+    try:
+        derive_transport_qualification_from_attempt(
+            attempt_record=attempt,
+            transaction_endpoint="http://example.invalid/v1/chat/completions",
+            transaction_model="test-model",
+        )
+        raise AssertionError("expected hash failure")
+    except ValueError:
+        pass
 
 
 def test_handoff_completion_reference_requires_authoritative_artifact():

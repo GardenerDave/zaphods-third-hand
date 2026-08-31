@@ -47,6 +47,40 @@ class SupervisedModelAttemptError(ValueError):
     """Raised when a supervised model attempt record is malformed or unsafe."""
 
 
+def validate_transport_qualification_ref(payload: Any) -> dict[str, Any]:
+    if not isinstance(payload, dict):
+        raise SupervisedModelAttemptError("transport_qualification_ref must be a JSON object")
+    allowed = {"artifact_ref", "artifact_sha256", "qualification_id", "qualification_selector"}
+    unexpected = sorted(set(payload) - allowed)
+    if unexpected:
+        raise SupervisedModelAttemptError(
+            "transport_qualification_ref contains unsupported fields: " + ", ".join(unexpected)
+        )
+    forbidden = [key for key in ("valid", "passed", "trusted", "policy_usable", "completed") if payload.get(key) is not None]
+    if forbidden:
+        raise SupervisedModelAttemptError(
+            "transport_qualification_ref contains truth-bearing fields: " + ", ".join(forbidden)
+        )
+    artifact_ref = payload.get("artifact_ref")
+    artifact_sha256 = payload.get("artifact_sha256")
+    if not isinstance(artifact_ref, str) or not artifact_ref.strip():
+        raise SupervisedModelAttemptError("transport_qualification_ref.artifact_ref must be a non-empty string")
+    if not isinstance(artifact_sha256, str) or len(artifact_sha256) != 64 or any(c not in "0123456789abcdef" for c in artifact_sha256.lower()):
+        raise SupervisedModelAttemptError("transport_qualification_ref.artifact_sha256 must be a 64-character hex string")
+    qualification_id = payload.get("qualification_id")
+    if qualification_id is not None and (not isinstance(qualification_id, str) or not qualification_id.strip()):
+        raise SupervisedModelAttemptError("transport_qualification_ref.qualification_id must be a non-empty string when present")
+    qualification_selector = payload.get("qualification_selector")
+    if qualification_selector is not None and (not isinstance(qualification_selector, str) or not qualification_selector.strip()):
+        raise SupervisedModelAttemptError("transport_qualification_ref.qualification_selector must be a non-empty string when present")
+    return {
+        "artifact_ref": artifact_ref,
+        "artifact_sha256": artifact_sha256,
+        "qualification_id": qualification_id,
+        "qualification_selector": qualification_selector,
+    }
+
+
 def _require_nonempty_str(record: dict[str, Any], key: str) -> str:
     value = record.get(key)
     if not isinstance(value, str) or not value.strip():
@@ -167,12 +201,17 @@ def build_supervised_model_attempt_record(
     operator_metadata: dict[str, Any],
     prompt_packet_id: str | None = None,
     source_prompt_packet_path: str | None = None,
-    transport_qualification_ref: str | None = None,
+    transport_qualification_ref: dict[str, Any] | None = None,
     output_format_claim: str | None = None,
     provenance: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     if not isinstance(raw_model_output, str):
         raise SupervisedModelAttemptError("raw_model_output must be a string")
+    validated_transport_ref = (
+        validate_transport_qualification_ref(transport_qualification_ref)
+        if transport_qualification_ref is not None
+        else None
+    )
 
     record = {
         "attempt_id": attempt_id,
@@ -197,7 +236,7 @@ def build_supervised_model_attempt_record(
             "triage_id": triage_id,
             "prompt_packet_id": prompt_packet_id,
             "source_prompt_packet_path": source_prompt_packet_path,
-            "transport_qualification_ref": transport_qualification_ref,
+            "transport_qualification_ref": validated_transport_ref,
         },
     }
     return validate_supervised_model_attempt_record(record)

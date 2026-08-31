@@ -235,7 +235,7 @@
   ],
   "replay_status": {
     "end_to_end_recomposition": "blocked by missing trusted transport-qualification linkage for the natural A1/A2/A3 evidence lineage",
-    "reason": "the deterministic invariant can consume typed candidate assertions and trusted handoff/raw-response evidence, but the natural bundles do not expose a policy-usable transport_qualification binding to the authoritative V3 qualification artifact",
+    "reason": "the deterministic invariant can consume typed candidate assertions and trusted handoff/raw-response evidence, and the implementation can resolve a structured transport_qualification_ref against the authoritative V3 qualification artifact, but the natural bundles do not expose a policy-usable transport_qualification binding to that artifact",
     "recomposition_mode": "partially_recomposed"
   },
   "schema": "zth_evidence_side_trust_audit_v1",

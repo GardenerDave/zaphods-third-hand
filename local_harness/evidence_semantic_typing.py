@@ -127,6 +127,36 @@ class TransportQualificationRef:
             "qualification_selector": self.qualification_selector,
         }
 
+    @classmethod
+    def from_dict(cls, payload: dict[str, Any]) -> "TransportQualificationRef":
+        if not isinstance(payload, dict):
+            raise ValueError("transport qualification ref must be a JSON object")
+        allowed = {"artifact_ref", "artifact_sha256", "qualification_id", "qualification_selector"}
+        unexpected = sorted(set(payload) - allowed)
+        truthy = [key for key in ("valid", "passed", "trusted", "policy_usable") if payload.get(key) is not None]
+        if unexpected:
+            raise ValueError(f"transport qualification ref contains unsupported fields: {', '.join(unexpected)}")
+        if truthy:
+            raise ValueError(f"transport qualification ref contains truth-bearing fields: {', '.join(truthy)}")
+        artifact_ref = payload.get("artifact_ref")
+        artifact_sha256 = payload.get("artifact_sha256")
+        if not isinstance(artifact_ref, str) or not artifact_ref.strip():
+            raise ValueError("transport qualification ref requires artifact_ref")
+        if not isinstance(artifact_sha256, str) or len(artifact_sha256) != 64 or any(c not in "0123456789abcdef" for c in artifact_sha256.lower()):
+            raise ValueError("transport qualification ref requires valid artifact_sha256")
+        qualification_id = payload.get("qualification_id")
+        if qualification_id is not None and (not isinstance(qualification_id, str) or not qualification_id.strip()):
+            raise ValueError("transport qualification ref qualification_id must be a non-empty string when present")
+        qualification_selector = payload.get("qualification_selector")
+        if qualification_selector is not None and (not isinstance(qualification_selector, str) or not qualification_selector.strip()):
+            raise ValueError("transport qualification ref qualification_selector must be a non-empty string when present")
+        return cls(
+            artifact_ref=artifact_ref,
+            artifact_sha256=artifact_sha256,
+            qualification_id=qualification_id,
+            qualification_selector=qualification_selector,
+        )
+
 
 @dataclass(frozen=True)
 class HandoffCompletionRef:
@@ -240,21 +270,27 @@ def resolve_transport_qualification_reference(
         kind="transport qualification",
     )
     diagnostics: list[str] = []
+    selector = qualification_ref.qualification_selector or "local"
+    if selector not in {"local", "external"}:
+        raise ValueError("qualification_selector must be 'local' or 'external'")
+    branch = payload.get(selector)
+    if not isinstance(branch, dict):
+        raise ValueError(f"transport qualification artifact is missing branch {selector!r}")
     qualification_passed = bool(
-        payload.get("local_transport_qualified") is True
-        or payload.get("external_transport_qualified") is True
-        or payload.get("qualification_passed") is True
-        or payload.get("passed") is True
+        branch.get("status") == "ok"
+        or branch.get("transport_qualified") is True
+        or branch.get("qualification_passed") is True
+        or payload.get(f"{selector}_transport_qualified") is True
     )
     if not qualification_passed:
         diagnostics.append("qualification artifact did not indicate a passed transport qualification")
     endpoint = _first_string(
-        payload,
-        [("local", "request_url"), ("request_url",), ("endpoint",), ("local", "endpoint")],
+        branch,
+        [("request_url",), ("endpoint",), ("base_url",)],
     )
     model = _first_string(
-        payload,
-        [("local", "model"), ("model",), ("external", "model"), ("local", "resolved_model")],
+        branch,
+        [("model",), ("resolved_model",)],
     )
     endpoint_match = endpoint == transaction_endpoint if endpoint is not None else None
     model_match = model == transaction_model if model is not None else None
@@ -262,7 +298,7 @@ def resolve_transport_qualification_reference(
         diagnostics.append("endpoint mismatch")
     if model_match is False:
         diagnostics.append("model mismatch")
-    scope = _first_string(payload, [("scope",), ("lane",), ("qualification_scope",), ("local", "scope")])
+    scope = _first_string(branch, [("scope",), ("lane",), ("qualification_scope",)])
     if transaction_scope is None or scope is None:
         scope_match: bool | None = None
         diagnostics.append("scope match unresolved")
@@ -270,7 +306,7 @@ def resolve_transport_qualification_reference(
         scope_match = scope == transaction_scope
         if scope_match is False:
             diagnostics.append("scope mismatch")
-    freshness = _first_string(payload, [("valid_until",), ("expires_at",), ("qualified_until",)])
+    freshness = _first_string(branch, [("valid_until",), ("expires_at",), ("qualified_until",)])
     freshness_match: bool | None = None if freshness is None else True
     policy_usable = bool(
         qualification_passed
@@ -290,7 +326,7 @@ def resolve_transport_qualification_reference(
         scope_match=scope_match,
         freshness_match=freshness_match,
         policy_usable=policy_usable,
-        diagnostics=diagnostics,
+        diagnostics=[f"qualification_selector={selector}"] + diagnostics,
         source_refs=source_refs,
     )
 
@@ -360,6 +396,44 @@ def resolve_handoff_completion_reference(
     )
 
 
+def derive_transport_qualification_from_attempt(
+    *,
+    attempt_record: dict[str, Any],
+    transaction_endpoint: str,
+    transaction_model: str,
+) -> tuple[DerivedProperty | None, TransportQualificationVerification | None]:
+    provenance = attempt_record.get("provenance")
+    if not isinstance(provenance, dict):
+        return None, None
+    ref_payload = provenance.get("transport_qualification_ref")
+    if ref_payload is None:
+        return None, None
+    qualification_ref = TransportQualificationRef.from_dict(ref_payload if isinstance(ref_payload, dict) else {"artifact_ref": ref_payload})
+    transaction_scope = provenance.get("transport_qualification_scope")
+    if transaction_scope is not None and not (isinstance(transaction_scope, str) and transaction_scope.strip()):
+        raise ValueError("transport_qualification_scope must be a non-empty string when present")
+    verification = resolve_transport_qualification_reference(
+        qualification_ref=qualification_ref,
+        transaction_endpoint=transaction_endpoint,
+        transaction_model=transaction_model,
+        transaction_scope=transaction_scope if isinstance(transaction_scope, str) and transaction_scope.strip() else None,
+    )
+    if not verification.policy_usable:
+        return None, verification
+    return (
+        DerivedProperty(
+            property="transport_qualification",
+            derivation="authoritative_qualification_ref_resolved_against_artifact",
+            rule_id="transport_qualification_v1",
+            source_refs=list(verification.source_refs),
+            derivation_method="deterministic",
+            semantic_source="machine_observable",
+            policy_trust="bounded_trusted",
+        ),
+        verification,
+    )
+
+
 def derive_typed_evidence_from_bundle(*, evidence_id: str, source_paths: list[Path]) -> EvidenceTypingResult:
     source_refs = [_source_ref(path) for path in source_paths]
     derived: list[DerivedProperty] = []
@@ -367,6 +441,7 @@ def derive_typed_evidence_from_bundle(*, evidence_id: str, source_paths: list[Pa
     by_name = {path.name: path for path in source_paths}
 
     local_model_call = by_name.get("local_model_call.json")
+    supervised_attempt = by_name.get("supervised_model_attempt.json")
     review_decision = by_name.get("review_decision.json")
     downstream_use_gate = by_name.get("downstream_use_gate.json")
     handoff_packet = by_name.get("handoff_packet.json")
@@ -387,6 +462,23 @@ def derive_typed_evidence_from_bundle(*, evidence_id: str, source_paths: list[Pa
                 )
             )
             unknown.discard("raw_response_integrity")
+
+    if supervised_attempt and local_model_call:
+        attempt = _load_json(supervised_attempt)
+        call = _load_json(local_model_call)
+        transaction_endpoint = call.get("request_provenance", {}).get("request_url") if isinstance(call.get("request_provenance"), dict) else None
+        transaction_model = call.get("model")
+        if isinstance(transaction_endpoint, str) and transaction_endpoint.strip() and isinstance(transaction_model, str) and transaction_model.strip():
+            transport_property, verification = derive_transport_qualification_from_attempt(
+                attempt_record=attempt,
+                transaction_endpoint=transaction_endpoint,
+                transaction_model=transaction_model,
+            )
+            if transport_property is not None:
+                derived.append(transport_property)
+                unknown.discard("transport_qualification")
+            elif verification is not None and verification.policy_usable is False:
+                unknown.add("transport_qualification")
 
     if review_decision and downstream_use_gate and handoff_packet:
         decision = _load_json(review_decision)
