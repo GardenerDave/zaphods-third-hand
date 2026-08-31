@@ -1,7 +1,7 @@
 {
   "id": "transport_qualification_vs_model_capability_v1",
   "title": "Do not equate transport validity with semantic capability",
-  "status": "active",
+  "status": "held",
   "applies_when": [
     "the task asks whether successful transport, handoff, or acquisition proves model capability",
     "the evidence establishes that a model response was successfully acquired and validated through a supervised path",
