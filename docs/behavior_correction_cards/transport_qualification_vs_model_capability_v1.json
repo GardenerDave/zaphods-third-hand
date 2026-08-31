@@ -1,0 +1,41 @@
+{
+  "id": "transport_qualification_vs_model_capability_v1",
+  "title": "Do not equate transport validity with semantic capability",
+  "status": "active",
+  "applies_when": [
+    "the task asks whether successful transport, handoff, or acquisition proves model capability",
+    "the evidence establishes that a model response was successfully acquired and validated through a supervised path",
+    "the model risks upgrading transport success into a stronger general capability claim",
+    "the model may conflate evidence eligibility with semantic capability"
+  ],
+  "correction_instruction": [
+    "Preserve the distinction between transport validity and semantic capability.",
+    "Treat successful transport as evidence that responses can be acquired through the path and are eligible for later evaluation.",
+    "Do not claim that transport success alone proves general model capability.",
+    "If the evidence only shows a bounded supervised path, keep the conclusion bounded to that path.",
+    "When the stronger claim is not established, say so explicitly."
+  ],
+  "validator_expectations": [
+    "the main conclusion must not state that transport qualification proves model capability unless the evidence explicitly establishes that broader claim",
+    "the response should distinguish transport validity from semantic capability evaluation",
+    "claim and reason should agree on the boundary being asserted",
+    "unsupported escalation should not appear in the main conclusion"
+  ],
+  "known_failure_modes": [
+    "the response upgrades transport qualification into proof of model capability",
+    "the response treats bounded validation as universal capability",
+    "the response says the path is valid but fails to distinguish eligibility from capability",
+    "the response contradicts itself between claim and reason"
+  ],
+  "provenance_notes": [
+    "Derived from the known Task A unsupported-claim failure observed during supervised ZTH dogfooding.",
+    "This is a frozen, evidence-backed correction artifact, not a weight update or automatic policy."
+  ],
+  "non_authorities": [
+    "does not authorize model-weight changes",
+    "does not authorize automatic promotion",
+    "does not authorize training data capture",
+    "does not override supervised review",
+    "does not authorize file edits or execution authority"
+  ]
+}
