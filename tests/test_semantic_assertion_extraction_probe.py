@@ -208,7 +208,7 @@ def test_run_case_rejects_wrong_evidence_ref(tmp_path: Path):
 
     validation = json.loads((out_dir / "validation.json").read_text(encoding="utf-8"))
     assert validation["overall_validation_status"] == "failed"
-    assert validation["semantic_score_status"] == "scored"
+    assert validation["semantic_score_status"] == "not_scored"
     assert any("must equal expected evidence id" in problem for problem in validation["diagnostics"])
     assert result["validation"]["overall_validation_status"] == "failed"
 
@@ -275,3 +275,10 @@ def test_run_case_marks_mechanical_failure_as_not_scored(tmp_path: Path):
     assert validation["semantic_score_status"] == "not_scored"
     assert validation["semantic_score_reason"] == "mechanical_output_failure"
     assert validation["overall_validation_status"] == "failed"
+
+
+def test_semantic_score_is_scored_only_when_overall_validation_passes():
+    assert probe._semantic_score_status("passed") == "scored"
+    assert probe._semantic_score_status("failed") == "not_scored"
+    assert probe._semantic_score_reason("passed") == "semantic_comparison_completed"
+    assert probe._semantic_score_reason("failed") == "mechanical_output_failure"

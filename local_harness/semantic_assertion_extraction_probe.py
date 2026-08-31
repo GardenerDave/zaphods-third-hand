@@ -139,6 +139,14 @@ def _load_gold(path: Path) -> dict[str, Any]:
     return payload
 
 
+def _semantic_score_status(validation_status: str) -> str:
+    return "scored" if validation_status == "passed" else "not_scored"
+
+
+def _semantic_score_reason(validation_status: str) -> str:
+    return "semantic_comparison_completed" if validation_status == "passed" else "mechanical_output_failure"
+
+
 def run_case(
     *,
     case: ExtractionCase,
@@ -223,15 +231,16 @@ def run_case(
         "gold_assertions": expected_assertions,
         "request_body": request_body,
     }
-    semantic_score_status = "not_scored" if parsed_output is None else "scored"
-    semantic_score_reason = "mechanical_output_failure" if parsed_output is None else "semantic_comparison_completed"
+    validation_status = "passed" if not validation_problems else "failed"
+    semantic_score_status = _semantic_score_status(validation_status)
+    semantic_score_reason = _semantic_score_reason(validation_status)
     validation = {
         "case_id": case.case_id,
         "parse_status": "passed" if parsed_output is not None else "failed",
         "schema_status": "passed" if not validation_problems else "failed",
         "grounding_status": "passed" if not any("evidence_refs" in problem or "must equal expected evidence id" in problem for problem in validation_problems) else "failed",
         "diagnostics": validation_problems,
-        "overall_validation_status": "passed" if not validation_problems else "failed",
+        "overall_validation_status": validation_status,
         "semantic_score_status": semantic_score_status,
         "semantic_score_reason": semantic_score_reason,
         "schema_source_path": str(SCHEMA_PATH),

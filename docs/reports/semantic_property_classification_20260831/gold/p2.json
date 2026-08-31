@@ -1,0 +1,6 @@
+{
+  "assertion_status": "not_asserted",
+  "evidence_id": "case_p2_evidence",
+  "property": "transport_qualification",
+  "typing_source": "frozen_experiment_gold"
+}

@@ -1,0 +1,6 @@
+{
+  "assertion_status": "not_established",
+  "evidence_id": "case_p3_evidence",
+  "property": "semantic_capability",
+  "typing_source": "frozen_experiment_gold"
+}

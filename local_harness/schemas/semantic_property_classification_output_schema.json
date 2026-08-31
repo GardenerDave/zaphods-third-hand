@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "property",
+    "assertion_status"
+  ],
+  "properties": {
+    "property": {
+      "type": "string",
+      "enum": [
+        "transport_qualification",
+        "bounded_handoff_success",
+        "semantic_capability",
+        "raw_response_integrity",
+        "semantic_acceptance"
+      ]
+    },
+    "assertion_status": {
+      "type": "string",
+      "enum": [
+        "established",
+        "not_established",
+        "not_asserted"
+      ]
+    }
+  }
+}
