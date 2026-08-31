@@ -267,7 +267,35 @@ def _call_local_metadata_payload(
     response_schema_path: Path | None = None,
     response_schema_source_path: Path | None = None,
     response_format: dict[str, Any] | None = None,
+    response_payload: dict[str, Any] | None = None,
+    response_status: int | None = None,
 ) -> dict[str, Any]:
+    response_envelope: dict[str, Any] = {}
+    if response_payload is not None:
+        choices = response_payload.get("choices")
+        first_choice = choices[0] if isinstance(choices, list) and choices else None
+        if isinstance(first_choice, dict):
+            finish_reason = first_choice.get("finish_reason")
+            if finish_reason is not None:
+                response_envelope["finish_reason"] = finish_reason
+        usage = response_payload.get("usage")
+        if isinstance(usage, dict):
+            usage_payload: dict[str, Any] = {}
+            for field in ("prompt_tokens", "completion_tokens", "total_tokens"):
+                if usage.get(field) is not None:
+                    usage_payload[field] = usage.get(field)
+            if usage_payload:
+                response_envelope["usage"] = usage_payload
+            timings = usage.get("timings")
+            if isinstance(timings, dict) and timings:
+                response_envelope["timings"] = timings
+        for field in ("id", "model", "created", "system_fingerprint"):
+            if response_payload.get(field) is not None:
+                response_envelope[field] = response_payload.get(field)
+        if response_status is not None:
+            response_envelope["response_status"] = response_status
+        if response_envelope:
+            response_envelope["response_body_sha256"] = _sha256_text(json.dumps(response_payload, sort_keys=True))
     structured_output: dict[str, Any] = {
         "enabled": response_format is not None,
         "mechanism": "openai_json_schema" if response_format is not None else None,
@@ -321,6 +349,7 @@ def _call_local_metadata_payload(
             "raw_output_length": len(raw_output_text),
             "model": model,
             "structured_output": structured_output,
+            **({"endpoint_response": response_envelope} if response_envelope else {}),
         },
         "authority_boundaries": [
             "Local model call is not command execution authority.",
@@ -1220,6 +1249,8 @@ def run_call_local(
         response_schema_path=response_schema_path,
         response_schema_source_path=response_schema_source_path,
         response_format=response_format,
+        response_payload=response_payload,
+        response_status=status_code,
     )
     _write_json(metadata_path, metadata_payload)
 

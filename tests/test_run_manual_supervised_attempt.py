@@ -1060,6 +1060,62 @@ def test_call_local_with_response_schema_encodes_response_format_and_records_pro
     assert (run_dir / "response_schema.json").read_text(encoding="utf-8") == schema.read_text(encoding="utf-8")
 
 
+def test_call_local_preserves_endpoint_finish_reason_and_usage_when_present(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260707T212122A")
+    response_body = {
+        "choices": [
+            {
+                "finish_reason": "length",
+                "message": {"content": '{"reason":"local"}'},
+            }
+        ],
+        "usage": {
+            "prompt_tokens": 41,
+            "completion_tokens": 17,
+            "total_tokens": 58,
+        },
+    }
+    result = _run_call_local_in_process(
+        run_dir=run_dir,
+        endpoint="http://127.0.0.1:65500/v1",
+        model="qwen3-1.7b-gpu-40k",
+        response_body=response_body,
+    )
+
+    assert result.returncode == 0
+    metadata = json.loads((run_dir / "local_model_call.json").read_text(encoding="utf-8"))
+    endpoint_response = metadata["response_provenance"]["endpoint_response"]
+    assert endpoint_response["finish_reason"] == "length"
+    assert endpoint_response["usage"] == {
+        "prompt_tokens": 41,
+        "completion_tokens": 17,
+        "total_tokens": 58,
+    }
+    assert endpoint_response["response_status"] == 200
+    assert "response_body_sha256" in endpoint_response
+    assert metadata["raw_output_sha256"] == manual_attempt._sha256_text('{"reason":"local"}')
+    assert not (run_dir / "local_model_call.failed.json").exists()
+
+
+def test_call_local_preserves_absent_usage_fields_without_fabrication(tmp_path: Path):
+    run_dir, _ = _session_run(tmp_path, timestamp="20260707T212122B")
+    result = _run_call_local_in_process(
+        run_dir=run_dir,
+        endpoint="http://127.0.0.1:65500/v1",
+        model="qwen3-1.7b-gpu-40k",
+        response_body={"choices": [{"message": {"content": '{"reason":"local"}'}}]},
+    )
+
+    assert result.returncode == 0
+    metadata = json.loads((run_dir / "local_model_call.json").read_text(encoding="utf-8"))
+    endpoint_response = metadata["response_provenance"]["endpoint_response"]
+    assert "finish_reason" not in endpoint_response
+    assert "usage" not in endpoint_response
+    assert endpoint_response["response_status"] == 200
+    assert "response_body_sha256" in endpoint_response
+    assert metadata["raw_output_sha256"] == manual_attempt._sha256_text('{"reason":"local"}')
+
+
 def test_call_local_honors_optional_temperature_and_max_tokens(tmp_path: Path):
     run_dir, _ = _session_run(tmp_path, timestamp="20260707T222222Z")
     result = _run_call_local_in_process(
