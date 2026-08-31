@@ -1722,6 +1722,51 @@ def test_ingest_with_model_call_metadata_records_captured_model_provenance(tmp_p
     assert manifest["first_worker_identity"] == "Qwen_Qwen3-1.7B-Q4_K_M.gguf"
 
 
+def test_ingest_with_model_call_metadata_rejects_held_target_mutation(tmp_path: Path):
+    run_dir = _prepare_run(tmp_path, timestamp="20260707T151615Z")
+    prompt_text = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
+    source_raw = tmp_path / "raw_model_output.txt"
+    raw_text = json.dumps(
+        {
+            "allowed_targets": ["docs/reports/"],
+            "held_targets": [
+                "docs/reports/production automation",
+                "docs/reports/automatic curriculum capture",
+                "docs/reports/automatic promotion",
+                "docs/reports/implementation_packet",
+            ],
+            "scope_expansion_required": False,
+            "claims": [],
+            "evidence_basis": [],
+            "unverified_claims": [],
+            "format": "json",
+            "required_fields_present": True,
+            "reason": "The output remains bounded and supervised.",
+        }
+    )
+    source_raw.write_text(raw_text, encoding="utf-8")
+    metadata = tmp_path / "local_model_call.json"
+    metadata_payload = _captured_model_call_metadata(prompt_text=prompt_text, raw_output_text=raw_text)
+    _write_captured_model_call_metadata(metadata, metadata_payload)
+
+    result = run_script(
+        "ingest",
+        "--run-dir",
+        run_dir,
+        "--raw-output-file",
+        source_raw,
+        "--model-call-metadata-file",
+        metadata,
+    )
+    assert result.returncode == 0
+    validation = json.loads((run_dir / "output_validation.json").read_text(encoding="utf-8"))
+    assert validation["validation_status"] == "failed"
+    assert any(
+        check["check_id"] == "held_target_preservation" and check["status"] == "failed"
+        for check in validation["checks"]
+    )
+
+
 def test_ingest_with_structured_model_call_metadata_records_structured_output_provenance(tmp_path: Path):
     run_dir = _prepare_run(tmp_path, timestamp="20260707T151617Z")
     prompt_text = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
@@ -1779,6 +1824,28 @@ def test_ingest_with_structured_model_call_metadata_records_structured_output_pr
     assert attempt["provenance"]["structured_output"]["schema_sha256"] == manual_attempt._sha256_file(schema)
     assert attempt["provenance"]["structured_output"]["schema_length"] == len(schema.read_bytes())
     assert "manual_operator_provided_model_output" not in json.dumps(attempt)
+
+
+def test_prepare_can_project_prompt_without_selected_patch(tmp_path: Path):
+    result = run_script(
+        "prepare",
+        "--messy-input",
+        "The LoRA and prompt injection work got messy. Build a bounded design packet.",
+        "--out-dir",
+        tmp_path / "runs",
+        "--timestamp",
+        "20260707T161616Z",
+        "--exclude-prompt-patch",
+        "output_contract_v1",
+    )
+    assert result.returncode == 0
+    run_dir = tmp_path / "runs" / "20260707T161616Z"
+    prompt_packet = (run_dir / "model_prompt_packet.md").read_text(encoding="utf-8")
+    prompt_copy = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
+    assert prompt_copy != prompt_packet
+    assert "Patch: output_contract_v1" in prompt_packet
+    assert "Patch: output_contract_v1" not in prompt_copy
+    assert "required_fields_present" not in prompt_copy
 
 
 def test_ingest_with_structured_model_call_metadata_rejects_tampered_schema_provenance(tmp_path: Path):

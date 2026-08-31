@@ -318,6 +318,7 @@ def validate_supervised_attempt_output_against_contract(
     validation_id: str,
     validated_at: str,
     authorized_targets: list[str] | None = None,
+    authoritative_held_targets: list[str] | None = None,
 ) -> dict[str, Any]:
     try:
         validated_attempt = validate_supervised_model_attempt_record(attempt_record)
@@ -428,6 +429,50 @@ def validate_supervised_attempt_output_against_contract(
             diagnostics.extend(
                 [f"Target cannot be both allowed and held: {target}" for target in overlap_targets]
             )
+        if authoritative_held_targets is None:
+            checks.append(
+                {
+                    "check_id": "held_target_preservation",
+                    "status": "not_applicable",
+                    "message": "Authoritative held targets were not available for this run.",
+                }
+            )
+        else:
+            held_targets_value = parsed_output.get("held_targets")
+            if not isinstance(held_targets_value, list):
+                checks.append(
+                    {
+                        "check_id": "held_target_preservation",
+                        "status": "failed",
+                        "message": "held_targets must be a list to evaluate held-target preservation.",
+                    }
+                )
+                diagnostics.append("held_targets must be a list to evaluate held-target preservation.")
+            elif held_targets_value != authoritative_held_targets:
+                missing = [target for target in authoritative_held_targets if target not in held_targets_value]
+                unexpected = [target for target in held_targets_value if target not in authoritative_held_targets]
+                details: list[str] = []
+                if missing:
+                    details.append("missing authoritative held targets: " + ", ".join(missing))
+                if unexpected:
+                    details.append("unexpected held targets: " + ", ".join(unexpected))
+                checks.append(
+                    {
+                        "check_id": "held_target_preservation",
+                        "status": "failed",
+                        "message": "Held targets must match authoritative held targets exactly."
+                        + (" " + "; ".join(details) if details else ""),
+                    }
+                )
+                diagnostics.extend(details or ["Held targets do not match authoritative held targets exactly."])
+            else:
+                checks.append(
+                    {
+                        "check_id": "held_target_preservation",
+                        "status": "passed",
+                        "message": "Held targets match authoritative held targets exactly.",
+                    }
+                )
     elif contract_format == "json":
         checks.append(
             {

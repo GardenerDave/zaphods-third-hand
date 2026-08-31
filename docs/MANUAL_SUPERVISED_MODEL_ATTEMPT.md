@@ -228,6 +228,7 @@ Ingest supports two provenance classes:
 Captured-model ingest preserves the actual worker identity, acquisition provenance, and raw-response identity from the recorded model-call metadata. The manual path remains available for historical compatibility, but it is not used to represent a truthful captured worker result in a continuous supervised transaction.
 For captured-model ingest, `model_call_metadata_sha256` records the SHA-256 of the exact metadata file bytes, not a reserialized copy.
 When structured output is active, the captured metadata also records the exact schema artifact, schema SHA-256, schema length, and request-level structured-output mechanism used for the acquisition.
+The runner can also project `prompt_to_paste.md` from the canonical prepared packet while excluding specific prompt-patch IDs, instead of hand-writing a replacement prompt from scratch.
 
 The transaction manifest is an index over the existing supervised artifacts.
 It references, but does not replace, the attempt, validation, review,
@@ -258,6 +259,7 @@ semantic validation or authority checks.
 Ingest validates against the exact `output_contract.json` created during prepare.
 Validation checks required field presence and basic required field types, including that `required_fields_present` is boolean `true`.
 Validation also rejects duplicate JSON keys because they create provenance and contract ambiguity.
+Validation also rejects held-target mutations by comparing the emitted `held_targets` exactly against the authoritative held-target set from the run state.
 When structured run artifacts provide authorized targets, validation can also reject `allowed_targets` values that exceed that authority.
 Validation also rejects targets that appear in both `allowed_targets` and `held_targets`, which prevents structurally valid but contradictory target-scope outputs.
 

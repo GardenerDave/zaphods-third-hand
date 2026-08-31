@@ -282,6 +282,34 @@ def test_passes_when_allowed_and_held_targets_do_not_overlap():
     )
 
 
+def test_rejects_held_targets_that_do_not_match_authoritative_targets_exactly():
+    attempt = make_attempt_record(
+        '{"allowed_targets": ["docs/reports/"], "held_targets": ["docs/reports/production automation"], "scope_expansion_required": true, "claims": [], "evidence_basis": [], "unverified_claims": [], "format": "json", "required_fields_present": true, "reason": "bounded"}'
+    )
+    output_contract = {"format": "json", "requires_reason": True, "required_fields": []}
+    record = validate_supervised_attempt_output_against_contract(
+        attempt_record=attempt,
+        output_contract=output_contract,
+        validation_id="validation_held_exact_bad",
+        validated_at="2026-07-06T00:00:00Z",
+        authorized_targets=["docs/reports/"],
+        authoritative_held_targets=[
+            "production automation",
+            "automatic curriculum capture",
+            "automatic promotion",
+            "implementation_packet",
+        ],
+    )
+    assert record["validation_status"] == "failed"
+    assert any(
+        check["check_id"] == "held_target_preservation" and check["status"] == "failed"
+        for check in record["checks"]
+    )
+    diagnostics = "\n".join(record["diagnostics"])
+    assert "missing authoritative held targets: production automation" in diagnostics
+    assert "unexpected held targets: docs/reports/production automation" in diagnostics
+
+
 def test_rejects_allowed_and_held_target_overlap():
     attempt = make_attempt_record(
         '{"allowed_targets": ["docs/reports/"], "held_targets": ["docs/reports/"], "scope_expansion_required": true, "claims": [], "evidence_basis": [], "unverified_claims": [], "format": "json", "required_fields_present": true, "reason": "bounded"}'
