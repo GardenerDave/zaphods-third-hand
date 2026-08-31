@@ -30,13 +30,16 @@ def test_prompt_is_candidate_only_and_single_property():
     assert "The supplied evidence does not establish semantic capability." in prompt
     assert "semantic_capability" in prompt
     assert "not_asserted" in prompt
-    assert "evidence prose" not in prompt.lower()
+    assert "transport_qualification" not in prompt
+    assert "bounded_handoff_success" not in prompt
+    assert "raw_response_integrity" not in prompt
+    assert "semantic_acceptance" not in prompt
     assert "frozen_experiment_gold" not in prompt
     assert "transport_qualification_implies_semantic_capability_not_established_v1" not in prompt
 
 
 def test_compile_not_asserted_emits_no_ir():
-    assert probe.compile_classification_to_typed_assertions(
+    assert probe._compile_to_typed_assertions(
         property_name="semantic_capability",
         assertion_status="not_asserted",
         evidence_id="case_p2_evidence",
@@ -46,11 +49,24 @@ def test_compile_not_asserted_emits_no_ir():
 def test_run_case_validates_and_preserves_schema(tmp_path: Path):
     candidate = tmp_path / "candidate.txt"
     candidate.write_text("The supplied evidence establishes semantic capability.", encoding="utf-8")
+    gold = tmp_path / "gold.json"
+    gold.write_text(
+        json.dumps(
+            {
+                "case_id": "p1",
+                "property": "semantic_capability",
+                "assertion_status": "established",
+                "evidence_id": "case_p1_evidence",
+                "typing_source": "frozen_experiment_gold",
+            }
+        ),
+        encoding="utf-8",
+    )
     case = probe.ClassificationCase(
         case_id="p1",
         candidate_path=candidate,
         property_name="semantic_capability",
-        gold_status="established",
+        gold_path=gold,
         evidence_id="case_p1_evidence",
     )
     out_dir = tmp_path / "out"
@@ -90,30 +106,53 @@ def test_run_case_validates_and_preserves_schema(tmp_path: Path):
         )
 
     request_body = seen["body"]
-    assert request_body["response_format"]["json_schema"]["schema"] == json.loads(
-        probe.SCHEMA_PATH.read_text(encoding="utf-8")
-    )
+    schema = request_body["response_format"]["json_schema"]["schema"]
+    assert schema["properties"]["property"]["enum"] == ["semantic_capability"]
+    assert "transport_qualification" not in json.dumps(schema)
+    assert "bounded_handoff_success" not in json.dumps(schema)
+    assert "raw_response_integrity" not in json.dumps(schema)
+    assert "semantic_acceptance" not in json.dumps(schema)
     prompt = request_body["messages"][0]["content"]
     assert "semantic_capability" in prompt
     assert "not_asserted" in prompt
     assert "transport_qualification" not in prompt
+    assert "bounded_handoff_success" not in prompt
+    assert "raw_response_integrity" not in prompt
+    assert "semantic_acceptance" not in prompt
     assert "The supplied evidence establishes semantic capability." in prompt
     assert "frozen_experiment_gold" not in prompt
     assert "transport_qualification_implies_semantic_capability_not_established_v1" not in prompt
+    request_dump = json.dumps(request_body)
+    assert "frozen_experiment_gold" not in request_dump
+    assert "transport_qualification_implies_semantic_capability_not_established_v1" not in request_dump
     validation = json.loads((out_dir / "validation.json").read_text(encoding="utf-8"))
     assert validation["overall_validation_status"] == "passed"
     assert validation["semantic_score_status"] == "scored"
     assert result["validation"]["overall_validation_status"] == "passed"
+    assert result["validation"]["semantic_match"] is True
 
 
 def test_run_case_marks_mechanical_failure_not_scored(tmp_path: Path):
     candidate = tmp_path / "candidate.txt"
     candidate.write_text("The supplied evidence establishes semantic capability.", encoding="utf-8")
+    gold = tmp_path / "gold.json"
+    gold.write_text(
+        json.dumps(
+            {
+                "case_id": "p1",
+                "property": "semantic_capability",
+                "assertion_status": "established",
+                "evidence_id": "case_p1_evidence",
+                "typing_source": "frozen_experiment_gold",
+            }
+        ),
+        encoding="utf-8",
+    )
     case = probe.ClassificationCase(
         case_id="p1",
         candidate_path=candidate,
         property_name="semantic_capability",
-        gold_status="established",
+        gold_path=gold,
         evidence_id="case_p1_evidence",
     )
     out_dir = tmp_path / "out"
@@ -147,3 +186,28 @@ def test_run_case_marks_mechanical_failure_not_scored(tmp_path: Path):
     assert validation["overall_validation_status"] == "failed"
     assert validation["semantic_score_status"] == "not_scored"
     assert validation["semantic_score_reason"] == "mechanical_output_failure"
+
+
+def test_compile_established_and_not_established_emit_ir():
+    assert probe._compile_to_typed_assertions(
+        property_name="semantic_capability",
+        assertion_status="established",
+        evidence_id="case_p1_evidence",
+    ) == [
+        {
+            "property": "semantic_capability",
+            "epistemic_status": "established",
+            "evidence_refs": ["case_p1_evidence"],
+        }
+    ]
+    assert probe._compile_to_typed_assertions(
+        property_name="semantic_capability",
+        assertion_status="not_established",
+        evidence_id="case_p1_evidence",
+    ) == [
+        {
+            "property": "semantic_capability",
+            "epistemic_status": "not_established",
+            "evidence_refs": ["case_p1_evidence"],
+        }
+    ]

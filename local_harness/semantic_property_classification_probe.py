@@ -18,9 +18,10 @@ if __package__ in {None, ""}:
 from local_harness.validate_semantic_property_classification_output import validate as validate_classification_output
 
 
-SCHEMA_PATH = Path(__file__).resolve().parent / "schemas" / "semantic_property_classification_output_schema.json"
-SCHEMA = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
+SCHEMA_TEMPLATE_PATH = Path(__file__).resolve().parent / "schemas" / "semantic_property_classification_output_schema.json"
+SCHEMA_TEMPLATE = json.loads(SCHEMA_TEMPLATE_PATH.read_text(encoding="utf-8"))
 
+ALLOWED_STATUSES = ["established", "not_established", "not_asserted"]
 ALLOWED_PROPERTIES = [
     "transport_qualification",
     "bounded_handoff_success",
@@ -28,7 +29,6 @@ ALLOWED_PROPERTIES = [
     "raw_response_integrity",
     "semantic_acceptance",
 ]
-ALLOWED_STATUSES = ["established", "not_established", "not_asserted"]
 
 
 def _sha256_text(text: str) -> str:
@@ -43,11 +43,20 @@ def _read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def _case_specific_schema(property_name: str) -> dict[str, Any]:
+    if property_name not in ALLOWED_PROPERTIES:
+        raise ValueError(f"unsupported property: {property_name}")
+    schema = json.loads(json.dumps(SCHEMA_TEMPLATE))
+    schema["properties"]["property"]["enum"] = [property_name]
+    return schema
+
+
 def _call_local(
     *,
     endpoint: str,
     model: str,
     prompt_text: str,
+    schema: dict[str, Any],
     max_tokens: int,
     temperature: float,
     timeout_seconds: int,
@@ -65,7 +74,7 @@ def _call_local(
             "json_schema": {
                 "name": "zth_property_classification_output",
                 "strict": True,
-                "schema": SCHEMA,
+                "schema": schema,
             },
         },
     }
@@ -99,6 +108,7 @@ def _build_prompt(*, candidate_text: str, property_name: str, evidence_id: str) 
         "Use assertion_status=not_asserted if the candidate does not make either assertion about the queried property.\n"
         "Do not infer correctness.\n"
         "Do not explain your answer.\n"
+        "Return each queried property at most once.\n"
         "Return JSON only.\n\n"
         "## Queried Property\n"
         f"{property_name}\n\n"
@@ -117,8 +127,29 @@ class ClassificationCase:
     case_id: str
     candidate_path: Path
     property_name: str
-    gold_status: str
+    gold_path: Path
     evidence_id: str
+
+
+def _load_gold(path: Path) -> dict[str, Any]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError(f"gold must be a JSON object: {path}")
+    return payload
+
+
+def _compile_to_typed_assertions(property_name: str, assertion_status: str, evidence_id: str) -> list[dict[str, Any]]:
+    if assertion_status == "not_asserted":
+        return []
+    if assertion_status not in {"established", "not_established"}:
+        raise ValueError("unsupported assertion_status")
+    return [
+        {
+            "property": property_name,
+            "epistemic_status": assertion_status,
+            "evidence_refs": [evidence_id],
+        }
+    ]
 
 
 def run_case(
@@ -133,11 +164,14 @@ def run_case(
 ) -> dict[str, Any]:
     out_dir.mkdir(parents=True, exist_ok=False)
     candidate_text = _read_text(case.candidate_path)
+    gold = _load_gold(case.gold_path)
+    schema = _case_specific_schema(case.property_name)
     prompt_text = _build_prompt(candidate_text=candidate_text, property_name=case.property_name, evidence_id=case.evidence_id)
     response, request_body = _call_local(
         endpoint=endpoint,
         model=model,
         prompt_text=prompt_text,
+        schema=schema,
         max_tokens=max_tokens,
         temperature=temperature,
         timeout_seconds=timeout_seconds,
@@ -167,19 +201,26 @@ def run_case(
 
     validation_status = "passed" if not validation_problems else "failed"
     semantic_score_status = "scored" if validation_status == "passed" else "not_scored"
+    observed_status = None
+    if parsed_output is not None:
+        observed_status = parsed_output.get("assertion_status")
+    semantic_match = None
+    if validation_status == "passed":
+        semantic_match = observed_status == gold.get("assertion_status")
     model_call = {
         "case_id": case.case_id,
         "endpoint": endpoint,
         "model": model,
         "temperature": temperature,
         "max_tokens": max_tokens,
-        "schema_source_path": str(SCHEMA_PATH),
-        "schema_sha256": _sha256_file(SCHEMA_PATH),
-        "schema_artifact": SCHEMA,
+        "schema_source_path": str(SCHEMA_TEMPLATE_PATH),
+        "schema_sha256": _sha256_file(SCHEMA_TEMPLATE_PATH),
+        "schema_artifact": schema,
         "candidate_path": str(case.candidate_path),
         "candidate_sha256": _sha256_file(case.candidate_path),
         "property_name": case.property_name,
-        "gold_status": case.gold_status,
+        "gold_path": str(case.gold_path),
+        "gold_sha256": _sha256_file(case.gold_path),
         "evidence_id": case.evidence_id,
         "prompt_sha256": _sha256_text(prompt_text),
         "request_body_sha256": _sha256_text(json.dumps(request_body, sort_keys=True)),
@@ -189,6 +230,8 @@ def run_case(
         "endpoint_telemetry": telemetry,
         "request_body": request_body,
         "parsed_output": parsed_output,
+        "gold": gold,
+        "typed_ir_compilation": _compile_to_typed_assertions(case.property_name, str(observed_status) if observed_status is not None else "not_asserted", case.evidence_id) if validation_status == "passed" else [],
     }
     validation = {
         "case_id": case.case_id,
@@ -197,9 +240,14 @@ def run_case(
         "overall_validation_status": validation_status,
         "semantic_score_status": semantic_score_status,
         "semantic_score_reason": "semantic_comparison_completed" if validation_status == "passed" else "mechanical_output_failure",
+        "expected_property": case.property_name,
+        "expected_status": gold.get("assertion_status"),
+        "observed_property": parsed_output.get("property") if isinstance(parsed_output, dict) else None,
+        "observed_status": observed_status,
+        "semantic_match": semantic_match,
         "diagnostics": validation_problems,
-        "schema_source_path": str(SCHEMA_PATH),
-        "schema_sha256": _sha256_file(SCHEMA_PATH),
+        "schema_source_path": str(SCHEMA_TEMPLATE_PATH),
+        "schema_sha256": _sha256_file(SCHEMA_TEMPLATE_PATH),
     }
     (out_dir / "candidate.txt").write_text(candidate_text, encoding="utf-8")
     (out_dir / "prompt.txt").write_text(prompt_text, encoding="utf-8")
@@ -212,26 +260,8 @@ def run_case(
         "request_body_sha256": model_call["request_body_sha256"],
         "raw_output_sha256": model_call["raw_output_sha256"],
         "validation": validation,
+        "model_call": model_call,
     }
-
-
-def compile_classification_to_typed_assertions(
-    *,
-    property_name: str,
-    assertion_status: str,
-    evidence_id: str,
-) -> list[dict[str, Any]]:
-    if assertion_status == "not_asserted":
-        return []
-    if assertion_status not in {"established", "not_established"}:
-        raise ValueError("unsupported assertion_status")
-    return [
-        {
-            "property": property_name,
-            "epistemic_status": assertion_status,
-            "evidence_refs": [evidence_id],
-        }
-    ]
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
@@ -243,6 +273,35 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--timeout-seconds", type=int, default=60)
     return parser
+
+
+def _query_case(case_id: str, *, candidate_path: Path, property_name: str, gold_path: Path, evidence_id: str) -> ClassificationCase:
+    return ClassificationCase(
+        case_id=case_id,
+        candidate_path=candidate_path,
+        property_name=property_name,
+        gold_path=gold_path,
+        evidence_id=evidence_id,
+    )
+
+
+def load_default_cases() -> list[ClassificationCase]:
+    root = Path(__file__).resolve().parents[1]
+    corpus = root / "docs" / "reports" / "semantic_property_classification_20260831"
+    gold = corpus / "gold"
+    return [
+        _query_case("p1", candidate_path=corpus / "candidates/p1.txt", property_name="semantic_capability", gold_path=gold / "p1.json", evidence_id="case_p1_evidence"),
+        _query_case("p2", candidate_path=corpus / "candidates/p1.txt", property_name="transport_qualification", gold_path=gold / "p2.json", evidence_id="case_p2_evidence"),
+        _query_case("p3", candidate_path=corpus / "candidates/p3.txt", property_name="semantic_capability", gold_path=gold / "p3.json", evidence_id="case_p3_evidence"),
+        _query_case("p4", candidate_path=corpus / "candidates/p4.txt", property_name="transport_qualification", gold_path=gold / "p4.json", evidence_id="case_p4_evidence"),
+        _query_case("p5", candidate_path=corpus / "candidates/p4.txt", property_name="semantic_capability", gold_path=gold / "p5.json", evidence_id="case_p5_evidence"),
+        _query_case("p6_transport", candidate_path=corpus / "candidates/p6.txt", property_name="transport_qualification", gold_path=gold / "p6_transport.json", evidence_id="case_p6_transport_evidence"),
+        _query_case("p6_semantic", candidate_path=corpus / "candidates/p6.txt", property_name="semantic_capability", gold_path=gold / "p6_semantic.json", evidence_id="case_p6_semantic_evidence"),
+        _query_case("a1", candidate_path=root / ".work/semantic_claim_discipline_final_20260831/task_a/baseline/20260831T133000Z/raw_model_output.txt", property_name="semantic_capability", gold_path=gold / "a1_semantic_capability.json", evidence_id="case_a1_evidence"),
+        _query_case("a2", candidate_path=root / ".work/epistemic_schema_experiment_20260831_abs_fresh/20260831T040000Z/raw_model_output.txt", property_name="semantic_capability", gold_path=gold / "a2_semantic_capability.json", evidence_id="case_a2_evidence"),
+        _query_case("a3_integrity", candidate_path=root / ".work/semantic_claim_discipline_final_20260831/task_b/baseline/20260831T133000Z/raw_model_output.txt", property_name="raw_response_integrity", gold_path=gold / "a3_raw_response_integrity.json", evidence_id="case_a3_evidence"),
+        _query_case("a3_acceptance", candidate_path=root / ".work/semantic_claim_discipline_final_20260831/task_b/baseline/20260831T133000Z/raw_model_output.txt", property_name="semantic_acceptance", gold_path=gold / "a3_semantic_acceptance.json", evidence_id="case_a3_evidence"),
+    ]
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -267,90 +326,6 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"{case.case_id}: {case_out}")
     (args.out_dir / "report.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return 0
-
-
-def load_default_cases() -> list[ClassificationCase]:
-    root = Path(__file__).resolve().parents[1]
-    corpus = root / "docs" / "reports" / "semantic_property_classification_20260831"
-    return [
-        ClassificationCase(
-            case_id="p1_semantic_capability_established",
-            candidate_path=corpus / "candidates/p1.txt",
-            property_name="semantic_capability",
-            gold_status="established",
-            evidence_id="case_p1_evidence",
-        ),
-        ClassificationCase(
-            case_id="p2_transport_not_asserted",
-            candidate_path=corpus / "candidates/p1.txt",
-            property_name="transport_qualification",
-            gold_status="not_asserted",
-            evidence_id="case_p2_evidence",
-        ),
-        ClassificationCase(
-            case_id="p3_semantic_capability_not_established",
-            candidate_path=corpus / "candidates/p3.txt",
-            property_name="semantic_capability",
-            gold_status="not_established",
-            evidence_id="case_p3_evidence",
-        ),
-        ClassificationCase(
-            case_id="p4_transport_established",
-            candidate_path=corpus / "candidates/p4.txt",
-            property_name="transport_qualification",
-            gold_status="established",
-            evidence_id="case_p4_evidence",
-        ),
-        ClassificationCase(
-            case_id="p5_semantic_capability_not_asserted",
-            candidate_path=corpus / "candidates/p4.txt",
-            property_name="semantic_capability",
-            gold_status="not_asserted",
-            evidence_id="case_p5_evidence",
-        ),
-        ClassificationCase(
-            case_id="p6_transport_established",
-            candidate_path=corpus / "candidates/p6.txt",
-            property_name="transport_qualification",
-            gold_status="established",
-            evidence_id="case_p6_transport_evidence",
-        ),
-        ClassificationCase(
-            case_id="p6_semantic_not_established",
-            candidate_path=corpus / "candidates/p6.txt",
-            property_name="semantic_capability",
-            gold_status="not_established",
-            evidence_id="case_p6_semantic_evidence",
-        ),
-        ClassificationCase(
-            case_id="a1_semantic_capability_established",
-            candidate_path=root / ".work/semantic_claim_discipline_final_20260831/task_a/baseline/20260831T133000Z/raw_model_output.txt",
-            property_name="semantic_capability",
-            gold_status="established",
-            evidence_id="case_a1_evidence",
-        ),
-        ClassificationCase(
-            case_id="a2_semantic_capability_established",
-            candidate_path=root / ".work/epistemic_schema_experiment_20260831_abs_fresh/20260831T040000Z/raw_model_output.txt",
-            property_name="semantic_capability",
-            gold_status="established",
-            evidence_id="case_a2_evidence",
-        ),
-        ClassificationCase(
-            case_id="a3_raw_response_integrity_established",
-            candidate_path=root / ".work/semantic_claim_discipline_final_20260831/task_b/baseline/20260831T133000Z/raw_model_output.txt",
-            property_name="raw_response_integrity",
-            gold_status="established",
-            evidence_id="case_a3_evidence",
-        ),
-        ClassificationCase(
-            case_id="a3_semantic_acceptance_not_established",
-            candidate_path=root / ".work/semantic_claim_discipline_final_20260831/task_b/baseline/20260831T133000Z/raw_model_output.txt",
-            property_name="semantic_acceptance",
-            gold_status="not_established",
-            evidence_id="case_a3_evidence",
-        ),
-    ]
 
 
 if __name__ == "__main__":

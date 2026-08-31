@@ -1,0 +1,9 @@
+{
+  "assertion_status": "established",
+  "case_id": "a1_semantic_capability",
+  "evidence_id": "case_a1_evidence",
+  "property": "semantic_capability",
+  "source_candidate_path": ".work/semantic_claim_discipline_final_20260831/task_a/baseline/20260831T133000Z/raw_model_output.txt",
+  "source_candidate_sha256": "5a0912db03697edb38469b6f537940e019f6984c2f9f6b17cf06524797104384",
+  "typing_source": "frozen_experiment_gold"
+}

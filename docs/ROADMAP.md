@@ -218,6 +218,49 @@ not achieve adequate semantic or unsupported-certainty sensitivity. The
 semantic observer therefore remains advisory/research-only, has no automatic
 routing authority, and is not a dependency for practical supervised handoff.
 
+## Bifurcation, Atomization, and Recomposition
+
+Some repeated failure patterns are better treated as a signal that the current
+task boundary may bundle multiple causal mechanisms. That signal is a prompt
+to investigate decomposition, not proof that decomposition is always required.
+
+The working sequence is:
+
+1. Bifurcation: repeated failures or trajectory scattering suggest more than
+   one causal mechanism may be in play.
+1. Atomization: separate hidden responsibilities into independently testable
+   units while preserving frozen variables, provenance, and lineage.
+1. Generalization: ask whether the newly exposed boundary applies beyond the
+   originating case and whether it is reusable.
+1. Recomposition: reconnect successful atoms through explicit contracts only
+   after their independent behavior is understood.
+
+This yields a bounded research hypothesis: some apparent model capability
+floors may actually be decomposition floors. A model can fail an entangled
+task while succeeding on the isolated semantic or operational atoms that make
+up that task. This is a hypothesis to measure, not a universal claim.
+
+The roadmap should record capability-floor displacement when decomposition
+changes the smallest model required for each atom. The minimum useful fields
+are the atom name, the smallest successful model before decomposition, the
+smallest successful model after decomposition, and whether the atom became
+deterministic.
+
+The decomposition role remains prospective and shadow-only:
+
+- Planner asks what steps accomplish this task.
+- Decomposer asks whether this is actually one task.
+
+The Decomposer does not rewrite live tasks, launch child experiments, route
+authority, promote outputs, or alter production gates. It only records
+timestamped frozen observations for later scoring.
+
+This principle is directly suggested by ZTH's own lineage from semantic router
+entanglement to evidence-versus-candidate interpretation, semantic
+representation versus deterministic policy, epistemic polarity, invariant
+scope, candidate-versus-evidence typing, multi-label proposition extraction,
+and now per-property classification.
+
 Future semantic research should continue separately on stronger signals such
 as structured contradiction checks, claim/evidence validation,
 task-specific validators, combined weak signals, uncertainty calibration, and

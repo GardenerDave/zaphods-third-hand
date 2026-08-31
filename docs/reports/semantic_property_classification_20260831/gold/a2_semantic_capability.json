@@ -1,0 +1,9 @@
+{
+  "assertion_status": "established",
+  "case_id": "a2_semantic_capability",
+  "evidence_id": "case_a2_evidence",
+  "property": "semantic_capability",
+  "source_candidate_path": ".work/epistemic_schema_experiment_20260831_abs_fresh/20260831T040000Z/raw_model_output.txt",
+  "source_candidate_sha256": "0356824fe565b692850a57b277b56dea1a995b0619cc9ec4e41f0aa76bed8b19",
+  "typing_source": "frozen_experiment_gold"
+}

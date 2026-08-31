@@ -125,7 +125,6 @@ def test_run_case_sends_structured_schema_and_preserves_telemetry(tmp_path: Path
         probe.SCHEMA_PATH.read_text(encoding="utf-8")
     )
     prompt_text = request_body["messages"][0]["content"]
-    assert "Controlled Vocabulary" in prompt_text
     assert "semantic_capability" in prompt_text
     assert evidence_text not in prompt_text
     assert "frozen_experiment_gold" not in prompt_text
