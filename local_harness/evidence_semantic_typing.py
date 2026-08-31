@@ -100,8 +100,83 @@ class EvidenceTypingResult:
         }
 
 
+@dataclass(frozen=True)
+class TransportQualificationLink:
+    qualification_id: str
+    endpoint: str
+    model: str
+    qualified_at: str | None = None
+    valid: bool | None = None
+    scope: str | None = None
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "qualification_id": self.qualification_id,
+            "endpoint": self.endpoint,
+            "model": self.model,
+            "qualified_at": self.qualified_at,
+            "valid": self.valid,
+            "scope": self.scope,
+        }
+
+
+@dataclass(frozen=True)
+class HandoffCompletionLink:
+    handoff_id: str
+    downstream_attempt_id: str
+    endpoint: str
+    model: str
+    completed: bool
+    completed_at: str | None = None
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "handoff_id": self.handoff_id,
+            "downstream_attempt_id": self.downstream_attempt_id,
+            "endpoint": self.endpoint,
+            "model": self.model,
+            "completed": self.completed,
+            "completed_at": self.completed_at,
+        }
+
+
 def _source_ref(path: Path) -> str:
     return str(path.resolve())
+
+
+def validate_transport_qualification_linkage(
+    *,
+    qualification_link: TransportQualificationLink,
+    transaction_endpoint: str,
+    transaction_model: str,
+) -> bool:
+    if not qualification_link.valid:
+        return False
+    if qualification_link.endpoint != transaction_endpoint:
+        return False
+    if qualification_link.model != transaction_model:
+        return False
+    if not qualification_link.qualification_id.strip():
+        return False
+    return True
+
+
+def validate_handoff_completion_linkage(
+    *,
+    completion_link: HandoffCompletionLink,
+    prepared_handoff_id: str,
+    transaction_endpoint: str,
+    transaction_model: str,
+) -> bool:
+    if not completion_link.completed:
+        return False
+    if completion_link.handoff_id != prepared_handoff_id:
+        return False
+    if completion_link.endpoint != transaction_endpoint:
+        return False
+    if completion_link.model != transaction_model:
+        return False
+    return bool(completion_link.downstream_attempt_id.strip())
 
 
 def derive_typed_evidence_from_bundle(*, evidence_id: str, source_paths: list[Path]) -> EvidenceTypingResult:
@@ -120,11 +195,11 @@ def derive_typed_evidence_from_bundle(*, evidence_id: str, source_paths: list[Pa
     if local_model_call and output_validation and raw_output:
         call = _load_json(local_model_call)
         validation = _load_json(output_validation)
-        if call.get("raw_output_sha256") == _sha256(raw_output) and validation.get("validation_status") == "passed":
+        if call.get("call_status") == "completed" and call.get("raw_output_sha256") == _sha256(raw_output):
             derived.append(
                 DerivedProperty(
                     property="raw_response_integrity",
-                    derivation="raw_output_sha256_matches_preserved_artifact_and_validation_passed",
+                    derivation="raw_output_sha256_matches_preserved_artifact_and_call_completed",
                     rule_id="raw_response_integrity_v1",
                     source_refs=[_source_ref(raw_output), _source_ref(local_model_call), _source_ref(output_validation)],
                     derivation_method="deterministic",

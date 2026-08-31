@@ -16,7 +16,7 @@ def _canonical_json(value: Any) -> str:
 
 
 @dataclass(frozen=True)
-class DecompositionObservation:
+class DecompositionPrediction:
     record_type: str
     observation_id: str
     parent_task: str
@@ -26,15 +26,27 @@ class DecompositionObservation:
     predicted_effect: str = ""
     source_refs: list[str] = field(default_factory=list)
     prediction_status: str = "recorded"
-    observed_outcome: str | None = None
     capability_notes: str = ""
-    useful: bool | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)
 
 
-def freeze_decomposition_observation(observation: DecompositionObservation) -> dict[str, Any]:
+@dataclass(frozen=True)
+class DecompositionResolution:
+    record_type: str
+    observation_id: str
+    prediction_sha256: str
+    observed_outcome: str
+    capability_notes: str = ""
+    useful: bool | None = None
+    resolution_source_refs: list[str] = field(default_factory=list)
+
+    def as_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+def freeze_decomposition_observation(observation: DecompositionPrediction) -> dict[str, Any]:
     payload = observation.as_dict()
     serialized = _canonical_json(payload)
     return {
@@ -44,7 +56,7 @@ def freeze_decomposition_observation(observation: DecompositionObservation) -> d
     }
 
 
-def write_prediction_record(path: Path, observation: DecompositionObservation) -> str:
+def write_prediction_record(path: Path, observation: DecompositionPrediction) -> str:
     if observation.record_type != "prediction":
         raise ValueError("prediction record_type required")
     if path.exists():
@@ -54,13 +66,37 @@ def write_prediction_record(path: Path, observation: DecompositionObservation) -
     return frozen["observation_sha256"]
 
 
-def write_resolution_record(path: Path, resolution: dict[str, Any]) -> str:
-    if resolution.get("record_type") != "resolution":
+def write_resolution_record(path: Path, prediction_path: Path, resolution: DecompositionResolution) -> str:
+    if resolution.record_type != "resolution":
         raise ValueError("resolution record_type required")
-    if not resolution.get("prediction_sha256"):
-        raise ValueError("prediction_sha256 required")
+    if not prediction_path.exists():
+        raise FileNotFoundError(prediction_path)
+    prediction_payload = json.loads(prediction_path.read_text(encoding="utf-8"))
+    if not isinstance(prediction_payload, dict):
+        raise ValueError("prediction record must be a JSON object")
+    if prediction_payload.get("record_type") != "prediction":
+        raise ValueError("prediction record_type required")
+    if prediction_payload.get("observation_id") != resolution.observation_id:
+        raise ValueError("resolution observation_id must match prediction observation_id")
+    if prediction_payload.get("bifurcation_signal") is None or prediction_payload.get("proposed_decomposition") is None:
+        raise ValueError("prediction record missing required fields")
+    if "observed_outcome" in prediction_payload or "useful" in prediction_payload:
+        raise ValueError("prediction record must not contain outcome fields")
+    if _sha256_bytes(prediction_path.read_bytes()) != resolution.prediction_sha256:
+        raise ValueError("prediction_sha256 does not match prediction_path")
+    forbidden = {
+        "bifurcation_signal",
+        "proposed_decomposition",
+        "predicted_effect",
+        "frozen_variables",
+        "source_refs",
+        "prediction_status",
+    }
+    if forbidden & set(resolution.as_dict().keys()):
+        raise ValueError("resolution must not redefine prediction fields")
     if path.exists():
         raise FileExistsError(path)
-    serialized = _canonical_json(resolution)
+    payload = resolution.as_dict()
+    serialized = _canonical_json(payload)
     path.write_text(serialized, encoding="utf-8")
     return _sha256_bytes(serialized.encode("utf-8"))

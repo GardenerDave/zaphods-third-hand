@@ -6,6 +6,10 @@ from pathlib import Path
 from local_harness.evidence_semantic_typing import (
     build_source_inventory,
     derive_typed_evidence_from_bundle,
+    HandoffCompletionLink,
+    TransportQualificationLink,
+    validate_handoff_completion_linkage,
+    validate_transport_qualification_linkage,
 )
 
 
@@ -76,6 +80,20 @@ def test_provenance_binding_failure_is_conservative(tmp_path: Path):
     assert all(item.property != "raw_response_integrity" for item in result.derived_properties)
 
 
+def test_raw_response_integrity_survives_failed_output_validation():
+    bundle = [
+        ROOT / ".work/semantic_claim_discipline_final_20260831/task_a/patched/20260831T133000Z/raw_model_output.txt",
+        ROOT / ".work/semantic_claim_discipline_final_20260831/task_a/patched/20260831T133000Z/local_model_call.json",
+        ROOT / ".work/semantic_claim_discipline_final_20260831/task_a/patched/20260831T133000Z/output_validation.json",
+    ]
+    result = derive_typed_evidence_from_bundle(evidence_id="case_a2_evidence", source_paths=bundle)
+    derived = {item.property: item for item in result.derived_properties}
+    assert "raw_response_integrity" in derived
+    assert derived["raw_response_integrity"].derivation_method == "deterministic"
+    assert derived["raw_response_integrity"].semantic_source == "machine_observable"
+    assert derived["raw_response_integrity"].policy_trust == "trusted"
+
+
 def test_source_inventory_preserves_paths_and_hashes():
     projected = ROOT / ".work/semantic_claim_discipline_final_20260831/task_a/baseline/20260831T133000Z/evidence_projection.json"
     bundle = [
@@ -119,3 +137,52 @@ def test_transport_qualification_and_semantic_capability_remain_unknown_for_natu
     result = derive_typed_evidence_from_bundle(evidence_id="case_a1_evidence", source_paths=bundle)
     assert "transport_qualification" in result.unknown_properties
     assert "semantic_capability" in result.unknown_properties
+
+
+def test_future_transport_and_handoff_linkage_helpers_fail_closed():
+    qualification = TransportQualificationLink(
+        qualification_id="qual-1",
+        endpoint="http://192.168.1.16:8080/v1",
+        model="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+        valid=True,
+        scope="explicit-interface-v3",
+    )
+    assert validate_transport_qualification_linkage(
+        qualification_link=qualification,
+        transaction_endpoint="http://192.168.1.16:8080/v1",
+        transaction_model="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    )
+    assert not validate_transport_qualification_linkage(
+        qualification_link=TransportQualificationLink(
+            qualification_id="qual-1",
+            endpoint="http://192.168.1.16:8080/v1",
+            model="other-model",
+            valid=True,
+        ),
+        transaction_endpoint="http://192.168.1.16:8080/v1",
+        transaction_model="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    )
+    assert validate_handoff_completion_linkage(
+        completion_link=HandoffCompletionLink(
+            handoff_id="handoff-1",
+            downstream_attempt_id="attempt-1",
+            endpoint="http://192.168.1.16:8080/v1",
+            model="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+            completed=True,
+        ),
+        prepared_handoff_id="handoff-1",
+        transaction_endpoint="http://192.168.1.16:8080/v1",
+        transaction_model="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    )
+    assert not validate_handoff_completion_linkage(
+        completion_link=HandoffCompletionLink(
+            handoff_id="handoff-1",
+            downstream_attempt_id="",
+            endpoint="http://192.168.1.16:8080/v1",
+            model="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+            completed=True,
+        ),
+        prepared_handoff_id="handoff-1",
+        transaction_endpoint="http://192.168.1.16:8080/v1",
+        transaction_model="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    )
