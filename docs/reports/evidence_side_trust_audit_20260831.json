@@ -1,0 +1,241 @@
+{
+  "schema": "zth_evidence_side_trust_audit_v1",
+  "date": "2026-08-31",
+  "model_calls": 0,
+  "conclusion": "partially_recomposed; specific trust gap remains",
+  "evidence_inventory": [
+    {
+      "case_id": "A1",
+      "evidence_id": "case_a1_evidence",
+      "projected_evidence_path": ".work/semantic_claim_discipline_final_20260831/task_a/baseline/20260831T133000Z/evidence_projection.json",
+      "projected_evidence_sha256": "4b4844e57eff1ef14ed45135f600ee8d942358931847e457264612c5f1724134",
+      "source_type": "model_produced_and_evaluator_produced",
+      "structured_fields_available": [
+        "budget",
+        "evidence_sources",
+        "output_contract",
+        "rendered_patch_deltas",
+        "selected_prompt_patches",
+        "task_summary",
+        "task_title"
+      ],
+      "bundle_sources": [
+        {
+          "path": ".work/semantic_claim_discipline_final_20260831/task_a/baseline/20260831T133000Z/raw_model_output.txt",
+          "sha256": "5a0912db03697edb38469b6f537940e019f6984c2f9f6b17cf06524797104384",
+          "source_type": "model_produced_and_evaluator_produced"
+        },
+        {
+          "path": ".work/semantic_claim_discipline_final_20260831/task_a/baseline/20260831T133000Z/local_model_call.json",
+          "sha256": "e4adc66657d498973efc0367a3451bd3176e148d9dbd95b2921b994dd0419093",
+          "source_type": "model_produced_and_evaluator_produced"
+        },
+        {
+          "path": ".work/semantic_claim_discipline_final_20260831/task_a/baseline/20260831T133000Z/output_validation.json",
+          "sha256": "a581135d9f991d61a24c6665bc2d35ff9bb57ebbc4b4d23546e71d6f3cc0993c",
+          "source_type": "model_produced_and_evaluator_produced"
+        }
+      ],
+      "derived_properties": [
+        {
+          "property": "raw_response_integrity",
+          "derivation": "raw_output_sha256_matches_preserved_artifact_and_validation_passed",
+          "rule_id": "raw_response_integrity_v1",
+          "trust_class": "system_derived"
+        }
+      ],
+      "unknown_properties": [
+        "transport_qualification",
+        "bounded_handoff_success",
+        "semantic_capability",
+        "semantic_acceptance"
+      ]
+    },
+    {
+      "case_id": "A2",
+      "evidence_id": "case_a2_evidence",
+      "projected_evidence_path": ".work/semantic_claim_discipline_final_20260831/task_a/patched/20260831T133000Z/evidence_projection.json",
+      "projected_evidence_sha256": "55c08bd837cd6e2a2ea1a1870ef7d1750dfc3403b6955f3955a36cec3b937625",
+      "source_type": "model_produced_and_evaluator_produced",
+      "structured_fields_available": [
+        "budget",
+        "evidence_sources",
+        "output_contract",
+        "rendered_patch_deltas",
+        "selected_prompt_patches",
+        "task_summary",
+        "task_title"
+      ],
+      "bundle_sources": [
+        {
+          "path": ".work/semantic_claim_discipline_final_20260831/task_a/patched/20260831T133000Z/raw_model_output.txt",
+          "sha256": "0356824fe565b692850a57b277b56dea1a995b0619cc9ec4e41f0aa76bed8b19",
+          "source_type": "model_produced_and_evaluator_produced"
+        },
+        {
+          "path": ".work/semantic_claim_discipline_final_20260831/task_a/patched/20260831T133000Z/local_model_call.json",
+          "sha256": "c0ef65ebf6c5674b2834fa5380de04afce00d157ef7ea32212f2a41a8558d010",
+          "source_type": "model_produced_and_evaluator_produced"
+        },
+        {
+          "path": ".work/semantic_claim_discipline_final_20260831/task_a/patched/20260831T133000Z/output_validation.json",
+          "sha256": "8625121a43bdd542d2955e49ec4dfccd3fc2bf147e7bc5181a831209c52e995f",
+          "source_type": "model_produced_and_evaluator_produced"
+        }
+      ],
+      "derived_properties": [],
+      "unknown_properties": [
+        "transport_qualification",
+        "bounded_handoff_success",
+        "semantic_capability",
+        "raw_response_integrity",
+        "semantic_acceptance"
+      ]
+    },
+    {
+      "case_id": "A3",
+      "evidence_id": "case_a3_evidence",
+      "projected_evidence_path": ".work/semantic_claim_discipline_final_20260831/task_b/baseline/20260831T133000Z/evidence_projection.json",
+      "projected_evidence_sha256": "bf441830a675db4dc31fb2a0cf4005e43452870e5ae3de6209225db1c367da82",
+      "source_type": "model_produced_and_evaluator_produced",
+      "structured_fields_available": [
+        "budget",
+        "evidence_sources",
+        "output_contract",
+        "rendered_patch_deltas",
+        "selected_prompt_patches",
+        "task_summary",
+        "task_title"
+      ],
+      "bundle_sources": [
+        {
+          "path": ".work/semantic_claim_discipline_final_20260831/task_b/baseline/20260831T133000Z/raw_model_output.txt",
+          "sha256": "eb2ca82150fcb6e2fb1aebda882c946eed310c145ddea43d944ddfe008b60470",
+          "source_type": "model_produced_and_evaluator_produced"
+        },
+        {
+          "path": ".work/semantic_claim_discipline_final_20260831/task_b/baseline/20260831T133000Z/local_model_call.json",
+          "sha256": "90423081bf2d4dd2cb2022c63862c46d5b3d6de4ba29d8308cbfb15a53d9dd57",
+          "source_type": "model_produced_and_evaluator_produced"
+        },
+        {
+          "path": ".work/semantic_claim_discipline_final_20260831/task_b/baseline/20260831T133000Z/output_validation.json",
+          "sha256": "c727d6d4d2d4cf4bdfdf418bbcf7480c0e8001d942e24e233d7f10cd8e27202f",
+          "source_type": "model_produced_and_evaluator_produced"
+        }
+      ],
+      "derived_properties": [
+        {
+          "property": "raw_response_integrity",
+          "derivation": "raw_output_sha256_matches_preserved_artifact_and_validation_passed",
+          "rule_id": "raw_response_integrity_v1",
+          "trust_class": "system_derived"
+        }
+      ],
+      "unknown_properties": [
+        "transport_qualification",
+        "bounded_handoff_success",
+        "semantic_capability",
+        "semantic_acceptance"
+      ]
+    },
+    {
+      "case_id": "HANDOFF",
+      "evidence_id": "case_handoff_evidence",
+      "projected_evidence_path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/evidence_projection.json",
+      "projected_evidence_sha256": null,
+      "source_type": "operator_produced_and_model_produced",
+      "structured_fields_available": [
+        "downstream_use_gate",
+        "handoff_packet",
+        "review_decision",
+        "supervised_model_attempt",
+        "worker_b_call_intent"
+      ],
+      "bundle_sources": [
+        {
+          "path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/review_decision.json",
+          "sha256": "5054d1fa243d33fb48e40801b6cfccafdd9d828dc55a4987cab98e134ff269cc",
+          "source_type": "operator_produced_and_model_produced"
+        },
+        {
+          "path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/downstream_use_gate.json",
+          "sha256": "55bb5f75502979157d154ba2f9d01e09e3501a907c586b8c856efe262d796b2c",
+          "source_type": "operator_produced_and_model_produced"
+        },
+        {
+          "path": ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z/handoff_packet.json",
+          "sha256": "1e427124041f233fb2562e4916868ae1642be86fbf1e6476a298220006161d43",
+          "source_type": "operator_produced_and_model_produced"
+        }
+      ],
+      "derived_properties": [
+        {
+          "property": "bounded_handoff_success",
+          "derivation": "accepted_review_and_allowed_gate_with_prepared_handoff",
+          "rule_id": "bounded_handoff_success_v1",
+          "trust_class": "system_derived"
+        },
+        {
+          "property": "semantic_acceptance",
+          "derivation": "accepted_review_and_allowed_gate_with_prepared_handoff",
+          "rule_id": "semantic_acceptance_v1",
+          "trust_class": "system_derived"
+        }
+      ],
+      "unknown_properties": [
+        "transport_qualification",
+        "semantic_capability",
+        "raw_response_integrity"
+      ]
+    }
+  ],
+  "property_coverage": [
+    {
+      "property": "transport_qualification",
+      "system_derivable": false,
+      "structured_source": "none in the preserved A1/A2/A3 natural bundles; no trusted transport qualification artifact present",
+      "deterministic_rule": "none",
+      "trust_class": "unknown",
+      "remaining_semantic_gap": "transport qualification is not represented as a trusted evidence-side property for the natural candidate lineages"
+    },
+    {
+      "property": "bounded_handoff_success",
+      "system_derivable": true,
+      "structured_source": "structured handoff bundle",
+      "deterministic_rule": "bounded_handoff_success_v1",
+      "trust_class": "system_derived",
+      "remaining_semantic_gap": "does not generalize to transport qualification or semantic capability"
+    },
+    {
+      "property": "semantic_capability",
+      "system_derivable": false,
+      "structured_source": "none in preserved structured evidence for A1/A2/A3 natural bundles",
+      "deterministic_rule": "none",
+      "trust_class": "unknown",
+      "remaining_semantic_gap": "semantic capability remains untyped on the evidence side"
+    },
+    {
+      "property": "raw_response_integrity",
+      "system_derivable": true,
+      "structured_source": "raw model output plus local call and validation artifacts",
+      "deterministic_rule": "raw_response_integrity_v1",
+      "trust_class": "system_derived",
+      "remaining_semantic_gap": "captures preservation integrity only, not semantic correctness"
+    },
+    {
+      "property": "semantic_acceptance",
+      "system_derivable": true,
+      "structured_source": "structured handoff bundle",
+      "deterministic_rule": "semantic_acceptance_v1",
+      "trust_class": "system_derived",
+      "remaining_semantic_gap": "applies only to the bounded handoff/review lane"
+    }
+  ],
+  "replay_status": {
+    "end_to_end_recomposition": "blocked by missing trusted transport-qualification representation for the natural A1/A2/A3 evidence lineage",
+    "reason": "the deterministic invariant can consume typed candidate assertions and trusted handoff/raw-response evidence, but the natural bundles do not expose a system-derived transport_qualification layer",
+    "recomposition_mode": "partially_recomposed"
+  },
+  "next_action": "improve source instrumentation rather than asking a model to guess evidence semantics"
+}

@@ -1,0 +1,52 @@
+{
+  "schema": "zth_decomposition_telemetry_v1",
+  "date": "2026-08-31",
+  "model_calls": 0,
+  "observations": [
+    {
+      "observation_id": "semantic-router-per-property-recovery-20260831",
+      "parent_task": "multi-label proposition extraction",
+      "bifurcation_signal": "natural-case failures despite synthetic success",
+      "proposed_decomposition": "per-property classification",
+      "frozen_variables": [
+        "candidate prose",
+        "gold",
+        "endpoint",
+        "temperature"
+      ],
+      "prediction_status": "recorded",
+      "predicted_effect": "recover A1/A2 on the frozen natural corpus",
+      "source_refs": [
+        "docs/reports/semantic_property_classification_20260831_frozen_v1_report.md"
+      ],
+      "observed_outcome": {
+        "30b": "A1/A2 recovered; 4/4 natural exact",
+        "1.7b": "A1/A2 exact; 9/11 overall exact"
+      },
+      "capability_notes": "smaller-model sufficiency observed after decomposition; pre-decomposition smaller-model requirement remained unmeasured",
+      "useful": true
+    },
+    {
+      "observation_id": "transport-context-residual-20260831",
+      "parent_task": "per-property semantic classification",
+      "bifurcation_signal": "two transport-context misses remained on the 1.7B comparison",
+      "proposed_decomposition": "cross-property / distractor context isolation",
+      "frozen_variables": [
+        "queried property",
+        "candidate prose",
+        "gold",
+        "schema"
+      ],
+      "prediction_status": "retrospective observation",
+      "predicted_effect": "n/a",
+      "source_refs": [
+        "docs/reports/semantic_property_classification_20260831_frozen_1p7b_report.md"
+      ],
+      "observed_outcome": {
+        "1.7b": "P4 correct; P2 and P6 transport-context cases missed"
+      },
+      "capability_notes": "candidate hidden variable: cross-property / distractor context",
+      "useful": null
+    }
+  ]
+}
