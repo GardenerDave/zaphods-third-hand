@@ -8,6 +8,7 @@ import json
 import sys
 import socket
 import shutil
+import hashlib
 import urllib.error
 import urllib.request
 from copy import deepcopy
@@ -43,6 +44,16 @@ from local_harness.supervised_review_decision import (
 )
 from local_harness.triage_packet_schema import validate_triage_packet
 from local_harness.triage_router_rules import route_messy_input
+
+
+EVIDENCE_OUTPUT_CONTRACT = {
+    "format": "json",
+    "required_fields": [
+        "findings",
+        "reason",
+    ],
+    "requires_reason": True,
+}
 
 
 def _utc_timestamp() -> str:
@@ -419,6 +430,67 @@ def _build_retry_payload_skeleton(output_contract: dict[str, Any]) -> dict[str, 
     return skeleton
 
 
+def _read_evidence_source(path: Path, *, max_chars: int) -> dict[str, Any]:
+    if not path.is_file():
+        raise ValueError(f"missing evidence source: {path}")
+    text = path.read_text(encoding="utf-8")
+    excerpt = text if len(text) <= max_chars else text[:max_chars].rstrip() + "\n...[trimmed]"
+    return {
+        "path": str(path),
+        "sha256": _sha256_file(path),
+        "byte_length": len(path.read_bytes()),
+        "char_length": len(text),
+        "excerpt": excerpt,
+        "truncated": len(text) > max_chars,
+    }
+
+
+def _build_evidence_projection_packet(
+    *,
+    task_title: str,
+    task_summary: str,
+    evidence_sources: list[Path],
+    max_chars_per_source: int,
+) -> dict[str, Any]:
+    sources = [_read_evidence_source(path, max_chars=max_chars_per_source) for path in evidence_sources]
+    return {
+        "task_title": task_title,
+        "task_summary": task_summary,
+        "evidence_sources": sources,
+        "output_contract": deepcopy(EVIDENCE_OUTPUT_CONTRACT),
+    }
+
+
+def _render_evidence_observation_prompt(packet: dict[str, Any]) -> str:
+    evidence_json = json.dumps(packet, indent=2, sort_keys=True)
+    return (
+        "# ZTH Repository Observation Packet\n\n"
+        "## Role\n"
+        "You are a bounded model helper operating inside a supervised ZTH workflow.\n\n"
+        "## Task\n"
+        f"{packet['task_title']}\n\n"
+        "## Instructions\n"
+        f"{packet['task_summary']}\n\n"
+        "## Evidence Packet\n"
+        f"```json\n{evidence_json}\n```\n\n"
+        "## Required Output Contract\n"
+        f"```json\n{json.dumps(EVIDENCE_OUTPUT_CONTRACT, indent=2, sort_keys=True)}\n```\n\n"
+        "## Required Response Shape\n"
+        "- Return only JSON matching the output contract.\n"
+        "- Each finding must include a claim and supporting evidence objects with path and detail fields.\n"
+        "- Distinguish supplied evidence from model-generated claims.\n"
+        "- Do not claim filesystem authority or additional repository access.\n"
+        "- Do not include prose outside the JSON object.\n\n"
+        "## Authority Boundaries\n"
+        "- no filesystem authority\n"
+        "- no command execution authority\n"
+        "- no file modification authority\n"
+        "- no automatic patch promotion\n"
+        "- no automatic training\n"
+        "- no default failure-to-curriculum capture\n"
+    )
+
+
 def _load_structured_authorized_targets_for_retry(run_dir: Path) -> list[str] | None:
     manifest_path = run_dir / "run_manifest.json"
     if manifest_path.is_file():
@@ -641,6 +713,10 @@ def run_prepare(
     overwrite: bool = False,
     include_prompt_patches: list[str] | None = None,
     exclude_prompt_patches: list[str] | None = None,
+    evidence_files: list[Path] | None = None,
+    evidence_task_title: str | None = None,
+    evidence_task_summary: str | None = None,
+    evidence_max_chars: int = 12000,
 ) -> dict[str, Any]:
     ts, run_dir = _prepare_run_dir(out_dir=out_dir, timestamp=timestamp, overwrite=overwrite)
 
@@ -673,8 +749,21 @@ def run_prepare(
         include_prompt_patches=include_prompt_patches,
         exclude_prompt_patches=exclude_prompt_patches,
     )
-    prompt_to_paste = render_model_prompt_packet(prompt_projection_packet, patch_library)
-    projected_output_contract = build_model_prompt_output_contract(prompt_projection_packet, patch_library)
+    evidence_projection_packet = None
+    evidence_prompt_to_paste = None
+    evidence_output_contract = None
+    if evidence_files:
+        evidence_projection_packet = _build_evidence_projection_packet(
+            task_title=evidence_task_title or "Repository observation task",
+            task_summary=evidence_task_summary or messy_input,
+            evidence_sources=evidence_files,
+            max_chars_per_source=evidence_max_chars,
+        )
+        evidence_prompt_to_paste = _render_evidence_observation_prompt(evidence_projection_packet)
+        evidence_output_contract = deepcopy(EVIDENCE_OUTPUT_CONTRACT)
+
+    prompt_to_paste = evidence_prompt_to_paste or render_model_prompt_packet(prompt_projection_packet, patch_library)
+    projected_output_contract = evidence_output_contract or build_model_prompt_output_contract(prompt_projection_packet, patch_library)
 
     messy_input_path = run_dir / "messy_input.txt"
     prompt_path = run_dir / "model_prompt_packet.md"
@@ -698,6 +787,17 @@ def run_prepare(
     )
     prompt_projection_summary["canonical_output_contract_path"] = canonical_output_contract_path.name
     prompt_projection_summary["projected_output_contract_path"] = output_contract_path.name
+    if evidence_projection_packet is not None:
+        evidence_projection_path = run_dir / "evidence_projection.json"
+        evidence_projection_md_path = run_dir / "evidence_projection.md"
+        _write_json(evidence_projection_path, evidence_projection_packet)
+        evidence_projection_md_path.write_text(evidence_prompt_to_paste or "", encoding="utf-8")
+        prompt_projection_summary["evidence_projection_path"] = evidence_projection_path.name
+        prompt_projection_summary["evidence_projection_md_path"] = evidence_projection_md_path.name
+        prompt_projection_summary["evidence_source_count"] = len(evidence_projection_packet["evidence_sources"])
+        prompt_projection_summary["evidence_output_contract_sha256"] = _sha256_text(
+            json.dumps(EVIDENCE_OUTPUT_CONTRACT, indent=2, sort_keys=True) + "\n"
+        )
     _write_json(projection_summary_path, prompt_projection_summary)
     instructions_path.write_text(_operator_instructions_text(run_dir), encoding="utf-8")
     _write_json(canonical_output_contract_path, canonical_output_contract)
@@ -723,6 +823,14 @@ def run_prepare(
             "output_contract": str(output_contract_path),
             "triage_packet": str(triage_packet_path),
             "orchestration_packet": str(orchestration_packet_path),
+            **(
+                {
+                    "evidence_projection": str(evidence_projection_path),
+                    "evidence_projection_md": str(evidence_projection_md_path),
+                }
+                if evidence_projection_packet is not None
+                else {}
+            ),
         },
     }
     _write_json(manifest_path, manifest)
@@ -747,6 +855,10 @@ def run_session(
     write_prompt_copy: bool = False,
     include_prompt_patches: list[str] | None = None,
     exclude_prompt_patches: list[str] | None = None,
+    evidence_files: list[Path] | None = None,
+    evidence_task_title: str | None = None,
+    evidence_task_summary: str | None = None,
+    evidence_max_chars: int = 12000,
 ) -> dict[str, Any]:
     prepare_result = run_prepare(
         messy_input=messy_input,
@@ -755,6 +867,10 @@ def run_session(
         overwrite=overwrite,
         include_prompt_patches=include_prompt_patches,
         exclude_prompt_patches=exclude_prompt_patches,
+        evidence_files=evidence_files,
+        evidence_task_title=evidence_task_title,
+        evidence_task_summary=evidence_task_summary,
+        evidence_max_chars=evidence_max_chars,
     )
     run_dir = Path(prepare_result["run_dir"])
     model_prompt_packet_path = Path(prepare_result["model_prompt_packet_path"])
@@ -1568,6 +1684,27 @@ def build_arg_parser() -> argparse.ArgumentParser:
         default=[],
         help="Prompt patch IDs to exclude from prompt_to_paste.md projection.",
     )
+    prepare.add_argument(
+        "--evidence-file",
+        action="append",
+        type=Path,
+        default=[],
+        help="Repository evidence file to project into a bounded observation packet.",
+    )
+    prepare.add_argument(
+        "--evidence-task-title",
+        help="Task title for evidence-projection mode.",
+    )
+    prepare.add_argument(
+        "--evidence-task-summary",
+        help="Task summary for evidence-projection mode.",
+    )
+    prepare.add_argument(
+        "--evidence-max-chars",
+        type=int,
+        default=12000,
+        help="Maximum characters per projected evidence source.",
+    )
 
     session = subparsers.add_parser("session")
     session.add_argument("--messy-input")
@@ -1588,6 +1725,27 @@ def build_arg_parser() -> argparse.ArgumentParser:
         action="append",
         default=[],
         help="Prompt patch IDs to exclude from prompt_to_paste.md projection.",
+    )
+    session.add_argument(
+        "--evidence-file",
+        action="append",
+        type=Path,
+        default=[],
+        help="Repository evidence file to project into a bounded observation packet.",
+    )
+    session.add_argument(
+        "--evidence-task-title",
+        help="Task title for evidence-projection mode.",
+    )
+    session.add_argument(
+        "--evidence-task-summary",
+        help="Task summary for evidence-projection mode.",
+    )
+    session.add_argument(
+        "--evidence-max-chars",
+        type=int,
+        default=12000,
+        help="Maximum characters per projected evidence source.",
     )
 
     call_local = subparsers.add_parser("call-local")
@@ -1645,6 +1803,10 @@ def main(argv: Sequence[str] | None = None) -> int:
                 overwrite=bool(args.overwrite),
                 include_prompt_patches=args.include_prompt_patch,
                 exclude_prompt_patches=args.exclude_prompt_patch,
+                evidence_files=args.evidence_file or None,
+                evidence_task_title=args.evidence_task_title,
+                evidence_task_summary=args.evidence_task_summary,
+                evidence_max_chars=args.evidence_max_chars,
             )
             print(f"run_dir: {result['run_dir']}")
             print(f"model_prompt_packet_path: {result['model_prompt_packet_path']}")
@@ -1664,6 +1826,10 @@ def main(argv: Sequence[str] | None = None) -> int:
                 write_prompt_copy=bool(args.write_prompt_copy),
                 include_prompt_patches=args.include_prompt_patch,
                 exclude_prompt_patches=args.exclude_prompt_patch,
+                evidence_files=args.evidence_file or None,
+                evidence_task_title=args.evidence_task_title,
+                evidence_task_summary=args.evidence_task_summary,
+                evidence_max_chars=args.evidence_max_chars,
             )
             print(f"run_dir: {result['run_dir']}")
             print(f"model_prompt_packet_path: {result['model_prompt_packet_path']}")

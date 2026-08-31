@@ -497,6 +497,58 @@ def test_prepare_stores_tightened_output_contract(tmp_path: Path):
     ]
 
 
+def test_prepare_with_evidence_files_projects_bounded_observation_packet(tmp_path: Path):
+    run_dir = tmp_path / "runs"
+    source_a = tmp_path / "source_a.txt"
+    source_b = tmp_path / "source_b.txt"
+    source_a.write_text("alpha\nbeta\ngamma\n", encoding="utf-8")
+    source_b.write_text("delta\nepsilon\nzeta\n", encoding="utf-8")
+
+    result = run_script(
+        "prepare",
+        "--messy-input",
+        "Inspect repository evidence.",
+        "--out-dir",
+        run_dir,
+        "--timestamp",
+        "20260707T040405Z",
+        "--evidence-file",
+        source_a,
+        "--evidence-file",
+        source_b,
+        "--evidence-task-title",
+        "Read-only repo observation",
+        "--evidence-task-summary",
+        "Inspect supplied evidence only; do not browse the filesystem.",
+        "--evidence-max-chars",
+        "5",
+    )
+    assert result.returncode == 0
+    run_path = run_dir / "20260707T040405Z"
+    projection = json.loads((run_path / "evidence_projection.json").read_text(encoding="utf-8"))
+    assert projection["task_title"] == "Read-only repo observation"
+    assert projection["task_summary"] == "Inspect supplied evidence only; do not browse the filesystem."
+    assert len(projection["evidence_sources"]) == 2
+    assert projection["evidence_sources"][0]["path"] == str(source_a)
+    assert projection["evidence_sources"][0]["sha256"] == manual_attempt._sha256_file(source_a)
+    assert projection["evidence_sources"][0]["truncated"] is True
+    assert projection["evidence_sources"][0]["excerpt"].endswith("[trimmed]")
+    assert projection["output_contract"] == {
+        "format": "json",
+        "required_fields": ["findings", "reason"],
+        "requires_reason": True,
+    }
+    prompt = (run_path / "prompt_to_paste.md").read_text(encoding="utf-8")
+    assert "# ZTH Repository Observation Packet" in prompt
+    assert "Read-only repo observation" in prompt
+    assert "Inspect supplied evidence only; do not browse the filesystem." in prompt
+    assert "findings" in prompt
+    summary = json.loads((run_path / "prompt_projection_summary.json").read_text(encoding="utf-8"))
+    assert summary["evidence_projection_path"] == "evidence_projection.json"
+    assert summary["evidence_source_count"] == 2
+    assert "evidence_output_contract_sha256" in summary
+
+
 def test_prepare_refuses_overwrite_by_default(tmp_path: Path):
     out_dir = tmp_path / "runs"
     ts = "20260707T050505Z"
@@ -605,8 +657,32 @@ def test_session_mode_supports_deterministic_timestamp(tmp_path: Path):
         "--timestamp",
         ts,
     )
+
+
+def test_prepare_and_call_local_with_evidence_projection_uses_observation_contract(tmp_path: Path):
+    run_dir = tmp_path / "runs"
+    source = tmp_path / "evidence.txt"
+    source.write_text("line one\nline two\n", encoding="utf-8")
+    result = run_script(
+        "prepare",
+        "--messy-input",
+        "Inspect supplied evidence only.",
+        "--out-dir",
+        run_dir,
+        "--timestamp",
+        "20260707T040406Z",
+        "--evidence-file",
+        source,
+        "--evidence-task-title",
+        "Evidence inspection",
+        "--evidence-task-summary",
+        "Use only the supplied evidence packet.",
+    )
     assert result.returncode == 0
-    assert f"run_dir: {out_dir / ts}" in result.stdout
+    run_path = run_dir / "20260707T040406Z"
+    contract = json.loads((run_path / "output_contract.json").read_text(encoding="utf-8"))
+    assert contract == {"format": "json", "required_fields": ["findings", "reason"], "requires_reason": True}
+    assert "# ZTH Repository Observation Packet" in (run_path / "prompt_to_paste.md").read_text(encoding="utf-8")
 
 
 def test_session_mode_rejects_missing_messy_input(tmp_path: Path):
