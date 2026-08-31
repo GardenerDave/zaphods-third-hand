@@ -600,3 +600,68 @@ def test_worker_b_preflight_fails_on_objective_mismatch(tmp_path: Path) -> None:
 
     assert result["status"] == "failed"
     assert any(check["check_id"] == "preflight" for check in result["checks"])
+
+
+def test_worker_b_preflight_derives_authority_from_transaction_artifacts(tmp_path: Path) -> None:
+    run_dir = _prepare_and_accept_run(tmp_path, next_worker_objective="Produce a bounded downstream comparison report.")
+    build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
+    continuation_path = run_dir / "next_worker_continuation.md"
+    context_path = run_dir / "next_worker_context.json"
+    triage_path = run_dir / "triage_packet.json"
+    orchestration_path = run_dir / "orchestration_packet.json"
+
+    new_allowed = ["docs/reports/", "docs/notes/"]
+    new_held = ["production automation", "automatic curriculum capture", "automatic promotion", "implementation_packet", "implementation notes"]
+
+    triage = json.loads(triage_path.read_text(encoding="utf-8"))
+    triage["allowed_targets"] = new_allowed
+    triage_path.write_text(json.dumps(triage, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    orchestration = json.loads(orchestration_path.read_text(encoding="utf-8"))
+    orchestration["held_targets"] = new_held
+    orchestration_path.write_text(json.dumps(orchestration, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    context = json.loads(context_path.read_text(encoding="utf-8"))
+    context["task_state"]["allowed_targets"] = new_allowed
+    context["task_state"]["held_targets"] = new_held
+    context["constraints"]["allowed_targets"] = new_allowed
+    context["constraints"]["held_targets"] = new_held
+    context_path.write_text(json.dumps(context, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    continuation_text = continuation_path.read_text(encoding="utf-8")
+    continuation_text = continuation_text.replace(
+        json.dumps(["docs/reports/"], indent=2, sort_keys=True),
+        json.dumps(new_allowed, indent=2, sort_keys=True),
+    )
+    continuation_text = continuation_text.replace(
+        json.dumps(
+            [
+                "production automation",
+                "automatic curriculum capture",
+                "automatic promotion",
+                "implementation_packet",
+            ],
+            indent=2,
+            sort_keys=True,
+        ),
+        json.dumps(new_held, indent=2, sort_keys=True),
+    )
+    continuation_path.write_text(continuation_text, encoding="utf-8")
+
+    result = build_worker_b_preflight(run_dir=run_dir, expected_next_worker_identity="qwen3-30b")
+
+    assert result["status"] == "passed"
+    assert any(check["check_id"] == "authority" for check in result["checks"])
+
+
+def test_worker_b_preflight_writes_failed_artifact_when_reference_missing(tmp_path: Path) -> None:
+    run_dir = _prepare_and_accept_run(tmp_path, next_worker_objective="Produce a bounded downstream comparison report.")
+    build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
+    (run_dir / "raw_model_output.txt").unlink()
+
+    result = build_worker_b_preflight(run_dir=run_dir, expected_next_worker_identity="qwen3-30b", output_dir=run_dir)
+
+    assert result["status"] == "failed"
+    assert (run_dir / "worker_b_preflight.json").is_file()
+    preflight = json.loads((run_dir / "worker_b_preflight.json").read_text(encoding="utf-8"))
+    assert preflight["status"] == "failed"

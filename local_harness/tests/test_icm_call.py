@@ -220,6 +220,7 @@ class IcmCallTests(unittest.TestCase):
                             "http://localhost:8083/v1",
                             "--model",
                             "gemma-test.gguf",
+                            "--final-only",
                             "--prompt-file",
                             os.fspath(prompt_path),
                             "--render-request-only",
@@ -251,6 +252,7 @@ class IcmCallTests(unittest.TestCase):
                         "http://localhost:8083/v1",
                         "--model",
                         "gemma-test.gguf",
+                        "--final-only",
                         "--prompt-file",
                         os.fspath(prompt_path),
                     ]
@@ -260,6 +262,8 @@ class IcmCallTests(unittest.TestCase):
             self.assertIn("body", captured)
             self.assertEqual(rendered["request_body_sha256"], hashlib.sha256(captured["body"]).hexdigest())
             self.assertEqual(rendered["request_body_length"], len(captured["body"]))
+            self.assertIn("/no_think", rendered["prompt"])
+            self.assertTrue(rendered["prompt"].endswith("/no_think"))
 
     def test_main_expected_request_body_hash_fails_closed_before_http(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -280,6 +284,31 @@ class IcmCallTests(unittest.TestCase):
                 ]
             )
         self.assertEqual(1, exit_code)
+
+    def test_main_rejects_reuse_of_existing_request_intent_without_http(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            intent_path = Path(temp_dir) / "intent.json"
+            intent_path.write_text("{}", encoding="utf-8")
+            prompt_path = Path(temp_dir) / "prompt.md"
+            prompt_path.write_text("Reply with exactly: ok", encoding="utf-8")
+            with patch.object(icm_call.urllib.request, "urlopen", side_effect=AssertionError("no network expected")) as mocked_urlopen:
+                exit_code = icm_call.main(
+                    [
+                        "handoff",
+                        "--base-url",
+                        "http://localhost:8083/v1",
+                        "--model",
+                        "gemma-test.gguf",
+                        "--request-intent-out",
+                        os.fspath(intent_path),
+                        "--prompt-file",
+                        os.fspath(prompt_path),
+                    ]
+                )
+
+            self.assertEqual(1, exit_code)
+            self.assertFalse(mocked_urlopen.called)
+            self.assertEqual("{}", intent_path.read_text(encoding="utf-8"))
 
     def test_main_records_transport_error_with_request_intent(self):
         with tempfile.TemporaryDirectory() as temp_dir:

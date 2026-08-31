@@ -431,26 +431,55 @@ def _extract_markdown_section(text: str, heading: str) -> str:
     return text[section_start + 1 : end].strip()
 
 
+def _extract_json_code_block(text: str, heading: str, *, kind: str) -> Any:
+    section = _extract_markdown_section(text, heading)
+    if not section.startswith("```json\n") or not section.endswith("\n```"):
+        raise TransactionHandoffError(f"{kind} section {heading} must contain a JSON code block")
+    payload_text = section[len("```json\n") : -len("\n```")]
+    try:
+        return json.loads(payload_text)
+    except json.JSONDecodeError as exc:
+        raise TransactionHandoffError(f"{kind} section {heading} must contain valid JSON") from exc
+
+
+def _read_preflight_artifact(run_dir: Path, filename: str, *, kind: str, checks: list[dict[str, Any]]) -> dict[str, Any] | None:
+    path = run_dir / filename
+    if not path.is_file():
+        checks.append({"check_id": kind, "status": "failed", "message": f"missing {kind}: {path}"})
+        return None
+    try:
+        return _read_json(path, kind=kind)
+    except TransactionHandoffError as exc:
+        checks.append({"check_id": kind, "status": "failed", "message": str(exc)})
+        return None
+
+
 def build_worker_b_preflight(
     *,
     run_dir: Path,
     expected_next_worker_identity: str,
     output_dir: Path | None = None,
 ) -> dict[str, Any]:
-    run_manifest = _read_json(run_dir / "run_manifest.json", kind="run manifest")
-    transaction_manifest = _read_json(run_dir / "transaction_manifest.json", kind="transaction manifest")
-    next_worker_context = _read_json(run_dir / "next_worker_context.json", kind="next-worker context")
-    next_worker_continuation_path = run_dir / "next_worker_continuation.md"
-    if not next_worker_continuation_path.is_file():
-        raise TransactionHandoffError("missing next-worker continuation markdown")
-    continuation_text = next_worker_continuation_path.read_text(encoding="utf-8")
-
     checks: list[dict[str, Any]] = []
 
     def record(check_id: str, status: str, message: str) -> None:
         checks.append({"check_id": check_id, "status": status, "message": message})
 
     try:
+        run_manifest = _read_preflight_artifact(run_dir, "run_manifest.json", kind="run manifest", checks=checks)
+        transaction_manifest = _read_preflight_artifact(run_dir, "transaction_manifest.json", kind="transaction manifest", checks=checks)
+        next_worker_context = _read_preflight_artifact(run_dir, "next_worker_context.json", kind="next-worker context", checks=checks)
+        gate_record = _read_preflight_artifact(run_dir, "downstream_use_gate.json", kind="downstream use gate", checks=checks)
+        handoff_packet = _read_preflight_artifact(run_dir, "handoff_packet.json", kind="handoff packet", checks=checks)
+        triage_packet = _read_preflight_artifact(run_dir, "triage_packet.json", kind="triage packet", checks=checks)
+        orchestration_packet = _read_preflight_artifact(run_dir, "orchestration_packet.json", kind="orchestration packet", checks=checks)
+        next_worker_continuation_path = run_dir / "next_worker_continuation.md"
+        if not next_worker_continuation_path.is_file():
+            raise TransactionHandoffError("missing next-worker continuation markdown")
+        continuation_text = next_worker_continuation_path.read_text(encoding="utf-8")
+        if run_manifest is None or transaction_manifest is None or next_worker_context is None or gate_record is None or handoff_packet is None or triage_packet is None or orchestration_packet is None:
+            raise TransactionHandoffError("missing required Worker-B preflight artifacts")
+
         if run_manifest.get("report_type") != "manual_supervised_attempt_run_manifest.v1":
             raise TransactionHandoffError("run manifest report_type must be manual_supervised_attempt_run_manifest.v1")
         record("run_manifest", "passed", "Run manifest resolved.")
@@ -463,6 +492,10 @@ def build_worker_b_preflight(
             raise TransactionHandoffError("selected next worker identity mismatch")
         record("next_worker_identity", "passed", "Intended next worker identity matches.")
 
+        if next_worker_context.get("selected_next_worker_identity") != expected_next_worker_identity:
+            raise TransactionHandoffError("next-worker context selected_next_worker_identity mismatch")
+        record("worker_identity", "passed", "Worker identity agrees across artifacts.")
+
         previous_attempt = next_worker_context.get("previous_attempt", {})
         result_reference = previous_attempt.get("result_reference", {})
         raw_sha = result_reference.get("raw_output_sha256")
@@ -472,15 +505,32 @@ def build_worker_b_preflight(
             raise TransactionHandoffError("missing previous result sha256")
         if not isinstance(raw_ref_path, str) or not raw_ref_path.strip():
             raise TransactionHandoffError("missing previous result path")
-        if _sha256(Path(raw_ref_path)) != raw_sha:
+        raw_ref_file = Path(raw_ref_path)
+        if not raw_ref_file.is_file():
+            raise TransactionHandoffError("missing previous result evidence file")
+        if _sha256(raw_ref_file) != raw_sha:
             raise TransactionHandoffError("previous result sha256 does not match evidence")
         record("previous_result_binding", "passed", "Previous result sha256 matches evidence.")
+
+        attempt_id = previous_attempt.get("attempt_id")
+        if not isinstance(attempt_id, str) or not attempt_id.strip():
+            raise TransactionHandoffError("previous attempt must include attempt_id")
+        if transaction_manifest.get("records", {}).get("attempt_id") != attempt_id:
+            raise TransactionHandoffError("transaction manifest attempt_id mismatch")
+        if handoff_packet.get("source_attempt_id") not in {None, attempt_id}:
+            raise TransactionHandoffError("handoff packet source attempt id mismatch")
+        if next_worker_context.get("review", {}).get("decision_id") != transaction_manifest.get("records", {}).get("decision_id"):
+            raise TransactionHandoffError("review decision provenance mismatch")
+        record("previous_result_identity", "passed", "Attempt/result identity agrees across transaction artifacts.")
 
         objective = next_worker_context.get("handoff", {}).get("next_step_objective")
         if not isinstance(objective, str) or not objective.strip():
             raise TransactionHandoffError("missing next_step_objective")
-        if objective not in continuation_text:
-            raise TransactionHandoffError("continuation text does not contain next_step_objective")
+        handoff_objective = handoff_packet.get("next_step_objective")
+        if not isinstance(handoff_objective, str) or not handoff_objective.strip():
+            raise TransactionHandoffError("handoff packet missing next_step_objective")
+        if handoff_objective != objective:
+            raise TransactionHandoffError("handoff packet next_step_objective mismatch")
         perform_now = _extract_markdown_section(continuation_text, "Perform Now")
         if perform_now.strip() != objective.strip():
             raise TransactionHandoffError("Perform Now does not match next_step_objective")
@@ -490,21 +540,41 @@ def build_worker_b_preflight(
         held_targets = next_worker_context.get("constraints", {}).get("held_targets")
         if not isinstance(allowed_targets, list) or not isinstance(held_targets, list):
             raise TransactionHandoffError("missing authority targets in next-worker context")
-        if "docs/reports/" not in allowed_targets:
-            raise TransactionHandoffError("allowed targets do not preserve docs/reports/")
-        if held_targets != [
-            "production automation",
-            "automatic curriculum capture",
-            "automatic promotion",
-            "implementation_packet",
-        ]:
-            raise TransactionHandoffError("held targets do not preserve authoritative identity")
-        record("authority", "passed", "Allowed/held authority preserved.")
+        triage_allowed_targets = _require_list(triage_packet, "allowed_targets", kind="triage packet")
+        orchestration_held_targets = _require_list(orchestration_packet, "held_targets", kind="orchestration packet")
+        continuation_allowed_targets = _extract_json_code_block(continuation_text, "Allowed Targets", kind="continuation")
+        continuation_held_targets = _extract_json_code_block(continuation_text, "Held Targets", kind="continuation")
+        if not isinstance(continuation_allowed_targets, list) or not isinstance(continuation_held_targets, list):
+            raise TransactionHandoffError("continuation authority sections must decode to lists")
+        if next_worker_context.get("task_state", {}).get("allowed_targets") != triage_allowed_targets:
+            raise TransactionHandoffError("triage packet allowed targets disagree with next-worker context")
+        if next_worker_context.get("task_state", {}).get("held_targets") != orchestration_held_targets:
+            raise TransactionHandoffError("orchestration packet held targets disagree with next-worker context")
+        if allowed_targets != triage_allowed_targets:
+            raise TransactionHandoffError("allowed targets disagree across transaction artifacts")
+        if held_targets != orchestration_held_targets:
+            raise TransactionHandoffError("held targets disagree across transaction artifacts")
+        if continuation_allowed_targets != allowed_targets:
+            raise TransactionHandoffError("continuation allowed targets disagree with transaction scope")
+        if continuation_held_targets != held_targets:
+            raise TransactionHandoffError("continuation held targets disagree with transaction scope")
+        if _require_list(gate_record, "allowed_downstream_use", kind="downstream use gate") != _require_list(
+            handoff_packet, "allowed_downstream_use", kind="handoff packet"
+        ):
+            raise TransactionHandoffError("handoff packet allowed downstream use mismatch")
+        record("authority", "passed", "Allowed/held authority preserved across artifacts.")
 
         evidence_references = transaction_manifest.get("evidence_references", [])
         for required_artifact in ("run_manifest", "model_prompt_packet", "raw_model_output", "supervised_model_attempt", "output_validation", "review_decision", "downstream_use_gate", "handoff_packet"):
-            if not any(ref.get("artifact") == required_artifact for ref in evidence_references):
+            reference = next((ref for ref in evidence_references if ref.get("artifact") == required_artifact), None)
+            if reference is None:
                 raise TransactionHandoffError(f"missing evidence reference for {required_artifact}")
+            if not isinstance(reference.get("path"), str) or not reference["path"].strip():
+                raise TransactionHandoffError(f"missing path for {required_artifact}")
+            if not Path(reference["path"]).is_file():
+                raise TransactionHandoffError(f"missing referenced file for {required_artifact}")
+            if "sha256" in reference and reference["sha256"] != _sha256(Path(reference["path"])):
+                raise TransactionHandoffError(f"{required_artifact} sha256 does not match referenced file")
         record("evidence_references", "passed", "Required evidence references present.")
 
         status = "passed"

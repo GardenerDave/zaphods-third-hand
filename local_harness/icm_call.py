@@ -295,7 +295,9 @@ def _request_intent_record(
     record: dict[str, Any] = {
         "call_id": call_id,
         "timestamp": timestamp,
-        "worker_identity": spec.model,
+        "configured_worker_identity": spec.model,
+        "resolved_worker_identity": request_provenance["model"],
+        "worker_identity": request_provenance["model"],
         "endpoint": request_url.rsplit("/chat/completions", 1)[0],
         "request_url": request_url,
         "source_continuation_path": prompt_source_path,
@@ -322,7 +324,9 @@ def _request_intent_record(
 
 
 def _write_request_intent(path: Path, record: dict[str, Any]) -> None:
-    path.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    with path.open("x", encoding="utf-8") as handle:
+        json.dump(record, handle, indent=2, sort_keys=True)
+        handle.write("\n")
 
 
 def _transport_events_path(intent_path: Path) -> Path:
@@ -366,6 +370,8 @@ def call_worker(
     call_id = f"icm_call_{int(request_started_monotonic * 1_000_000)}"
     timestamp = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime())
     if request_intent_path is not None:
+        if request_intent_path.exists() or transport_events_path.exists():
+            raise ValueError(f"request intent path already exists: {request_intent_path}")
         _write_request_intent(
             request_intent_path,
             _request_intent_record(
