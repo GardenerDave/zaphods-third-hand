@@ -1,0 +1,52 @@
+{
+  "entries": [
+    {
+      "archive_path": "docs/reports/evidence/1p7b_structured_output_qualification_20260830/live_models.json",
+      "sha256": "f2533a8dda22f0b83a32d3d321f0a2c35138fbbdcd1c8c38257f7867d5ed28aa",
+      "size": 610,
+      "source_path": ".work/structured_output_qualification_20260830/live_models.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/1p7b_structured_output_qualification_20260830/qualification_schema.json",
+      "sha256": "914c7a718634ee4407942dca42a22805edce5399a3d960fe0fc4eaef0f212705",
+      "size": 184,
+      "source_path": ".work/structured_output_qualification_20260830/qualification_schema.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/1p7b_structured_output_qualification_20260830/control_unconstrained/prompt_to_paste.md",
+      "sha256": "6078f655edd0d9de618433e1d50ebb7ce68a1d464e81179748650b408af450b6",
+      "size": 66,
+      "source_path": ".work/structured_output_qualification_20260830/control_unconstrained/prompt_to_paste.md"
+    },
+    {
+      "archive_path": "docs/reports/evidence/1p7b_structured_output_qualification_20260830/control_unconstrained/raw_model_output.txt",
+      "sha256": "85dee76b361fa2e4f5817d0f947a3e318bd6c209e735c1f96c0e24e17a80309b",
+      "size": 22,
+      "source_path": ".work/structured_output_qualification_20260830/control_unconstrained/raw_model_output.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/1p7b_structured_output_qualification_20260830/control_unconstrained/local_model_call.json",
+      "sha256": "1ceb15e900c38eafe7dc9f96b1901960ee19d1538a448c8c6caedc47c05a6156",
+      "size": 2233,
+      "source_path": ".work/structured_output_qualification_20260830/control_unconstrained/local_model_call.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/1p7b_structured_output_qualification_20260830/control_constrained/prompt_to_paste.md",
+      "sha256": "6078f655edd0d9de618433e1d50ebb7ce68a1d464e81179748650b408af450b6",
+      "size": 66,
+      "source_path": ".work/structured_output_qualification_20260830/control_constrained/prompt_to_paste.md"
+    },
+    {
+      "archive_path": "docs/reports/evidence/1p7b_structured_output_qualification_20260830/control_constrained/raw_model_output.txt",
+      "sha256": "1aca51ef12da875499156982e31b7c89194bd88348f23fc0d7b05269f8abd7ba",
+      "size": 54,
+      "source_path": ".work/structured_output_qualification_20260830/control_constrained/raw_model_output.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/1p7b_structured_output_qualification_20260830/control_constrained/local_model_call.json",
+      "sha256": "b836cb06e1fc675aa90c57b66aa8c98ebdaaf1069a5a70af8837b9bcbbd728d4",
+      "size": 4156,
+      "source_path": ".work/structured_output_qualification_20260830/control_constrained/local_model_call.json"
+    }
+  ]
+}

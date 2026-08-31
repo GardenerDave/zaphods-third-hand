@@ -1,0 +1,12 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "forced_schema_value": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "forced_schema_value"
+  ],
+  "type": "object"
+}

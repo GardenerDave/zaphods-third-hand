@@ -1,0 +1,57 @@
+{
+  "authority_boundaries": [
+    "Local model call is not command execution authority.",
+    "Local model call is not file modification authority.",
+    "No automatic patch promotion authority is granted.",
+    "No automatic training authority is granted.",
+    "No default failure-to-curriculum capture authority is granted.",
+    "Ingest and explicit review are required before downstream use."
+  ],
+  "call_status": "completed",
+  "endpoint": "http://192.168.1.16:8081/v1",
+  "max_tokens": 32,
+  "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+  "prompt_length": 66,
+  "prompt_path": "prompt_to_paste.md",
+  "prompt_sha256": "6078f655edd0d9de618433e1d50ebb7ce68a1d464e81179748650b408af450b6",
+  "raw_output_length": 22,
+  "raw_output_path": "raw_model_output.txt",
+  "raw_output_sha256": "85dee76b361fa2e4f5817d0f947a3e318bd6c209e735c1f96c0e24e17a80309b",
+  "request_body_length": 192,
+  "request_body_sha256": "bf68c5d2cb7d924d3622eb211c49bfdb4b9af32a4089cc6697bd86d15157fd11",
+  "request_provenance": {
+    "api": "openai-chat",
+    "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "endpoint": "http://192.168.1.16:8081/v1",
+    "max_tokens": 32,
+    "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "prompt_length": 66,
+    "prompt_path": "prompt_to_paste.md",
+    "prompt_sha256": "6078f655edd0d9de618433e1d50ebb7ce68a1d464e81179748650b408af450b6",
+    "request_body_length": 192,
+    "request_body_sha256": "bf68c5d2cb7d924d3622eb211c49bfdb4b9af32a4089cc6697bd86d15157fd11",
+    "request_url": "http://192.168.1.16:8081/v1/chat/completions",
+    "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "response_format": null,
+    "structured_output_enabled": false,
+    "structured_output_mechanism": null,
+    "temperature": 0.0
+  },
+  "response_provenance": {
+    "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "raw_output_length": 22,
+    "raw_output_path": "raw_model_output.txt",
+    "raw_output_sha256": "85dee76b361fa2e4f5817d0f947a3e318bd6c209e735c1f96c0e24e17a80309b",
+    "structured_output": {
+      "enabled": false,
+      "mechanism": null
+    }
+  },
+  "review_required": true,
+  "source": "local_openai_compatible_endpoint",
+  "structured_output": {
+    "enabled": false,
+    "mechanism": null
+  },
+  "temperature": 0.0
+}

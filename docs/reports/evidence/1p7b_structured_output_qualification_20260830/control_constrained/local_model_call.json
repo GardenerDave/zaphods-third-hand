@@ -1,0 +1,121 @@
+{
+  "authority_boundaries": [
+    "Local model call is not command execution authority.",
+    "Local model call is not file modification authority.",
+    "No automatic patch promotion authority is granted.",
+    "No automatic training authority is granted.",
+    "No default failure-to-curriculum capture authority is granted.",
+    "Ingest and explicit review are required before downstream use."
+  ],
+  "call_status": "completed",
+  "endpoint": "http://192.168.1.16:8081/v1",
+  "max_tokens": 32,
+  "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+  "prompt_length": 66,
+  "prompt_path": "prompt_to_paste.md",
+  "prompt_sha256": "6078f655edd0d9de618433e1d50ebb7ce68a1d464e81179748650b408af450b6",
+  "raw_output_length": 54,
+  "raw_output_path": "raw_model_output.txt",
+  "raw_output_sha256": "1aca51ef12da875499156982e31b7c89194bd88348f23fc0d7b05269f8abd7ba",
+  "request_body_length": 459,
+  "request_body_sha256": "4d383af71b5bbaa7d29142faeb2b73fdce1fa4f6aa5cbd6d48b654c4051a700f",
+  "request_provenance": {
+    "api": "openai-chat",
+    "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "endpoint": "http://192.168.1.16:8081/v1",
+    "max_tokens": 32,
+    "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "prompt_length": 66,
+    "prompt_path": "prompt_to_paste.md",
+    "prompt_sha256": "6078f655edd0d9de618433e1d50ebb7ce68a1d464e81179748650b408af450b6",
+    "request_body_length": 459,
+    "request_body_sha256": "4d383af71b5bbaa7d29142faeb2b73fdce1fa4f6aa5cbd6d48b654c4051a700f",
+    "request_url": "http://192.168.1.16:8081/v1/chat/completions",
+    "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "response_format": {
+      "json_schema": {
+        "name": "zth_structured_output",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "forced_schema_value": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "forced_schema_value"
+          ],
+          "type": "object"
+        },
+        "strict": true
+      },
+      "type": "json_schema"
+    },
+    "structured_output_enabled": true,
+    "structured_output_mechanism": "openai_json_schema",
+    "temperature": 0.0
+  },
+  "response_provenance": {
+    "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "raw_output_length": 54,
+    "raw_output_path": "raw_model_output.txt",
+    "raw_output_sha256": "1aca51ef12da875499156982e31b7c89194bd88348f23fc0d7b05269f8abd7ba",
+    "structured_output": {
+      "enabled": true,
+      "mechanism": "openai_json_schema",
+      "response_format": {
+        "json_schema": {
+          "name": "zth_structured_output",
+          "schema": {
+            "additionalProperties": false,
+            "properties": {
+              "forced_schema_value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "forced_schema_value"
+            ],
+            "type": "object"
+          },
+          "strict": true
+        },
+        "type": "json_schema"
+      },
+      "schema_length": 184,
+      "schema_path": "response_schema.json",
+      "schema_sha256": "914c7a718634ee4407942dca42a22805edce5399a3d960fe0fc4eaef0f212705",
+      "schema_source_path": ".work/structured_output_qualification_20260830/qualification_schema.json"
+    }
+  },
+  "review_required": true,
+  "source": "local_openai_compatible_endpoint",
+  "structured_output": {
+    "enabled": true,
+    "mechanism": "openai_json_schema",
+    "response_format": {
+      "json_schema": {
+        "name": "zth_structured_output",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "forced_schema_value": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "forced_schema_value"
+          ],
+          "type": "object"
+        },
+        "strict": true
+      },
+      "type": "json_schema"
+    },
+    "schema_length": 184,
+    "schema_path": "response_schema.json",
+    "schema_sha256": "914c7a718634ee4407942dca42a22805edce5399a3d960fe0fc4eaef0f212705",
+    "schema_source_path": ".work/structured_output_qualification_20260830/qualification_schema.json"
+  },
+  "temperature": 0.0
+}
