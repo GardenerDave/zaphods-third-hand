@@ -265,11 +265,18 @@ def _run_call_local_in_process(
     urlopen_side_effect=None,
 ) -> subprocess.CompletedProcess[str]:
     seen_request: dict[str, object] | None = None
+    seen_request_raw: str | None = None
 
     def fake_urlopen(request, timeout=None):
         nonlocal seen_request
+        nonlocal seen_request_raw
         _ = timeout
-        seen_request = json.loads(request.data.decode("utf-8")) if getattr(request, "data", None) else None
+        if getattr(request, "data", None):
+            seen_request_raw = request.data.decode("utf-8")
+            seen_request = json.loads(seen_request_raw)
+        else:
+            seen_request_raw = None
+            seen_request = None
         if response_code >= 400:
             body = response_body or {}
             raise urllib.error.HTTPError(
@@ -313,8 +320,9 @@ def _run_call_local_in_process(
         except SystemExit as exc:
             exit_code = int(exc.code or 0)
     stdout_text = stdout.getvalue()
+    if seen_request_raw is not None:
+        stdout_text += f"request_payload_bytes: {seen_request_raw}\n"
     if seen_request is not None:
-        stdout_text += f"request_payload_raw: {json.dumps(seen_request)}\n"
         stdout_text += f"request_payload: {json.dumps(seen_request)}\n"
     return subprocess.CompletedProcess(
         args=[],
@@ -754,7 +762,7 @@ def test_call_local_reads_prompt_posts_to_chat_completions_and_writes_raw_output
     prompt = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
     assert body["messages"][0]["content"] == prompt
     assert "response_format" not in body
-    request_raw = result.stdout.split("request_payload_raw: ", 1)[1].splitlines()[0]
+    request_raw = result.stdout.split("request_payload_bytes: ", 1)[1].splitlines()[0]
 
     raw = (run_dir / "raw_model_output.txt").read_text(encoding="utf-8")
     assert raw == "{\"reason\":\"local\"}"
@@ -767,7 +775,7 @@ def test_call_local_reads_prompt_posts_to_chat_completions_and_writes_raw_output
     assert metadata["model"] == "qwen3-1.7b-gpu-40k"
     assert metadata["temperature"] == 0
     assert metadata["max_tokens"] == 1024
-    assert metadata["request_body_sha256"] == manual_attempt._sha256_text(request_raw)
+    assert metadata["request_body_sha256"] == manual_attempt._sha256_bytes(request_raw.encode("utf-8"))
     assert metadata["request_body_length"] == len(request_raw.encode("utf-8"))
     assert metadata["request_provenance"]["request_body_sha256"] == metadata["request_body_sha256"]
     assert metadata["request_provenance"]["request_body_length"] == metadata["request_body_length"]
@@ -822,7 +830,7 @@ def test_call_local_with_response_schema_encodes_response_format_and_records_pro
     assert body["response_format"]["json_schema"]["name"] == "zth_structured_output"
     assert body["response_format"]["json_schema"]["strict"] is True
     assert body["response_format"]["json_schema"]["schema"]["required"] == ["reason"]
-    request_raw = result.stdout.split("request_payload_raw: ", 1)[1].splitlines()[0]
+    request_raw = result.stdout.split("request_payload_bytes: ", 1)[1].splitlines()[0]
 
     metadata = json.loads((run_dir / "local_model_call.json").read_text(encoding="utf-8"))
     assert metadata["structured_output"]["enabled"] is True
@@ -835,7 +843,7 @@ def test_call_local_with_response_schema_encodes_response_format_and_records_pro
     assert metadata["request_provenance"]["structured_output_mechanism"] == "openai_json_schema"
     assert metadata["request_provenance"]["response_format"]["json_schema"]["name"] == "zth_structured_output"
     assert metadata["request_provenance"]["response_format"] == body["response_format"]
-    assert metadata["request_body_sha256"] == manual_attempt._sha256_text(request_raw)
+    assert metadata["request_body_sha256"] == manual_attempt._sha256_bytes(request_raw.encode("utf-8"))
     assert metadata["request_body_length"] == len(request_raw.encode("utf-8"))
     assert metadata["response_provenance"]["structured_output"]["enabled"] is True
     assert (run_dir / "response_schema.json").read_text(encoding="utf-8") == schema.read_text(encoding="utf-8")

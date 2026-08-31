@@ -91,6 +91,12 @@ def _sha256_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+def _sha256_bytes(data: bytes) -> str:
+    import hashlib
+
+    return hashlib.sha256(data).hexdigest()
+
+
 def _sha256_file(path: Path) -> str:
     import hashlib
 
@@ -734,7 +740,7 @@ def run_call_local(
     if response_format is not None:
         request_payload["response_format"] = response_format
     request_bytes = json.dumps(request_payload).encode("utf-8")
-    request_body_sha256 = _sha256_text(request_bytes.decode("utf-8"))
+    request_body_sha256 = _sha256_bytes(request_bytes)
     request = urllib.request.Request(
         request_url,
         data=request_bytes,
