@@ -284,6 +284,8 @@ def _is_epistemic_observation_contract(output_contract: dict[str, Any]) -> bool:
     ):
         return False
     properties = output_contract.get("properties")
+    if properties is None:
+        return True
     return isinstance(properties, dict) and "conclusion" in properties
 
 

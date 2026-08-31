@@ -813,6 +813,120 @@ def test_call_local_auto_attaches_evidence_response_schema(tmp_path: Path):
     assert request["request_provenance"]["structured_output_mechanism"] == "openai_json_schema"
 
 
+def test_epistemic_response_schema_runs_through_canonical_validation(tmp_path: Path):
+    run_dir = tmp_path / "runs"
+    source = tmp_path / "evidence.txt"
+    source.write_text("alpha\nbeta\n", encoding="utf-8")
+    schema = ROOT / "local_harness" / "schemas" / "repo_observation_output_epistemic_schema.json"
+
+    result = run_script(
+        "prepare",
+        "--messy-input",
+        "Assess what the supplied evidence demonstrates about transport qualification and model capability.",
+        "--out-dir",
+        run_dir,
+        "--timestamp",
+        "20260707T040409Z",
+        "--evidence-file",
+        source,
+        "--evidence-task-title",
+        "Evidence inspection",
+        "--evidence-task-summary",
+        "Use only the supplied evidence packet.",
+        "--response-schema-file",
+        schema,
+    )
+    assert result.returncode == 0
+    run_path = run_dir / "20260707T040409Z"
+    projected_contract = json.loads((run_path / "output_contract.json").read_text(encoding="utf-8"))
+    response_schema = json.loads((run_path / "response_schema.json").read_text(encoding="utf-8"))
+    assert projected_contract == {
+        "format": "json",
+        "required_fields": ["conclusion", "findings", "reason"],
+        "requires_reason": True,
+    }
+    assert response_schema == json.loads(schema.read_text(encoding="utf-8"))
+
+    attempt_record = {
+        "attempt_id": "manual_attempt_test",
+        "orchestration_id": "orch_manual_test",
+        "triage_id": "triage_manual_test",
+        "prompt_packet_id": "prompt_packet_manual_test",
+        "source_prompt_packet_path": str(run_path / "model_prompt_packet.md"),
+        "raw_model_output": json.dumps(
+            {
+                "conclusion": {
+                    "established": ["transport qualification occurred"],
+                    "not_established": ["semantic model capability"],
+                },
+                "findings": [
+                    {
+                        "claim": "transport qualification occurred",
+                        "evidence": [{"path": str(source), "detail": "alpha"}],
+                    }
+                ],
+                "reason": "bounded evidence",
+            }
+        ),
+        "model_metadata": {"model_id": "test", "provider": "test"},
+        "operator_metadata": {"operator": "test", "review_required": True},
+        "provenance": {
+            "source": "captured_model_output",
+            "input_artifact": "model_prompt_packet",
+            "raw_output_preserved": True,
+            "run_manifest_path": str(run_path / "run_manifest.json"),
+            "raw_output_source_path": str(run_path / "raw_model_output.txt"),
+        },
+        "validation_status": "not_validated",
+        "acceptance_status": "not_reviewed",
+        "authority_boundaries": [
+            "No command execution authority is granted.",
+            "No direct file modification authority is granted.",
+            "No automatic patch promotion authority is granted.",
+            "No automatic training authority is granted.",
+            "No default failure-to-curriculum capture authority is granted.",
+            "Human review is required before downstream use.",
+        ],
+    }
+    validation = manual_attempt.validate_supervised_attempt_output_against_contract(
+        attempt_record=attempt_record,
+        output_contract=projected_contract,
+        validation_id="validation_test",
+        validated_at="2026-08-31T00:00:00Z",
+        projected_source_paths=[str(source)],
+    )
+    assert any(
+        check["check_id"] == "epistemic_observation_schema" and check["status"] == "passed"
+        for check in validation["checks"]
+    )
+
+    invalid_attempt = dict(attempt_record)
+    invalid_attempt["raw_model_output"] = json.dumps(
+        {
+            "conclusion": {"established": [], "not_established": []},
+            "findings": [
+                {
+                    "claim": "transport qualification occurred",
+                    "evidence": [{"path": str(source), "detail": "alpha"}],
+                }
+            ],
+            "reason": "bounded evidence",
+        }
+    )
+    invalid_validation = manual_attempt.validate_supervised_attempt_output_against_contract(
+        attempt_record=invalid_attempt,
+        output_contract=projected_contract,
+        validation_id="validation_test_invalid",
+        validated_at="2026-08-31T00:00:00Z",
+        projected_source_paths=[str(source)],
+    )
+    assert any(
+        check["check_id"] == "epistemic_observation_schema" and check["status"] == "failed"
+        for check in invalid_validation["checks"]
+    )
+    assert any("established" in diag for diag in invalid_validation["diagnostics"])
+
+
 def test_session_mode_rejects_missing_messy_input(tmp_path: Path):
     result = run_script(
         "session",
