@@ -4,12 +4,15 @@
 
 - Structured-output request integrity: PASS
 - Schema conformance: PASS
+- Supervised-ingest provenance: INVALID for captured-model evidence; the archived supervised attempt was recorded as manual/operator-pasted output, not captured-model output.
 - Semantic correction retention: FAIL
 - Complete Worker-A frozen contract: FAIL
 
 ## Summary
 
-The qualified JSON-schema transport worked, but the 1.7B response did not satisfy the frozen semantic contract. It preserved the allowed target `docs/reports/` and the boolean `required_fields_present`, but it misclassified the held targets and reused those held-target strings in `claims`, `evidence_basis`, and `unverified_claims`.
+The qualified JSON-schema transport worked, but the archived supervised attempt was not recorded as truthful captured-model ingest. The preserved live acquisition evidence is still valid, but the committed supervised-attempt record uses manual/operator provenance.
+
+The 1.7B response itself did not satisfy the frozen semantic contract. It preserved the allowed target `docs/reports/` and the boolean `required_fields_present`, but it misclassified the held targets and reused those held-target strings in `claims`, `evidence_basis`, and `unverified_claims`.
 
 ## Experiment Identity
 
@@ -24,7 +27,7 @@ The qualified JSON-schema transport worked, but the 1.7B response did not satisf
 - `allowed_held_mapping_v1`
 - `required_fields_boolean_v1`
 
-Syntax-only prompt patches were superseded by deterministic structured decoding for this experiment.
+Syntax-only correction instructions were not applied in the archived prompt projection; their IDs were only mentioned in an exclusion instruction. The archived `prompt_to_paste.md` was hand-authored rather than projected from the canonical packet.
 
 ## Schema
 
@@ -59,6 +62,15 @@ The unchanged validator passed on structural checks and accepted the structured 
 - claims/evidence_basis/unverified_claims: FAIL
 - overall semantic contract: FAIL
 
+## Forensic Adjudication
+
+- Live structured acquisition: VALID
+- Supervised ingest provenance: INVALID
+- Prompt-projection design deviation: the archived prompt_to_paste.md did not preserve the canonical prompt packet as a machine-projected view; it was hand-authored and omitted baseline material that was present in model_prompt_packet.md.
+- Intended structured Worker-A semantic hypothesis: INCONCLUSIVE because the prompt projection was not cleanly generated from the canonical prepared packet.
+
+The observed raw-model behavior remains real: the held-target reproduction failed.
+
 ## Comparison
 
 | Criterion | Structured V1 |
@@ -78,4 +90,4 @@ The unchanged validator passed on structural checks and accepted the structured 
 
 ## Closeout
 
-The structured-output transport boundary is reproducibly intact, but the first structured Worker-A semantic experiment is a semantic failure. The model did not satisfy the frozen contract.
+The structured-output transport boundary is reproducibly intact. The archived supervised-attempt provenance is manual/operator-pasted rather than captured-model ingest, the prompt projection deviated from the canonical packet, and the observed raw model output still failed the frozen semantic contract.
