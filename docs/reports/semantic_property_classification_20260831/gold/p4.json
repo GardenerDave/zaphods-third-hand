@@ -1,6 +1,9 @@
 {
   "assertion_status": "established",
+  "case_id": "p4_transport_established",
   "evidence_id": "case_p4_evidence",
   "property": "transport_qualification",
+  "source_candidate_path": "docs/reports/semantic_property_classification_20260831/candidates/p4.txt",
+  "source_candidate_sha256": "261d53b34c85437badbe5d39eb5f1344b772f0e0c659c03b44e3f3b67abb67c8",
   "typing_source": "frozen_experiment_gold"
 }

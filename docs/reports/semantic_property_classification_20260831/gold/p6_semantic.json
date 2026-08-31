@@ -1,6 +1,9 @@
 {
   "assertion_status": "not_established",
+  "case_id": "p6_semantic_not_established",
   "evidence_id": "case_p6_semantic_evidence",
   "property": "semantic_capability",
+  "source_candidate_path": "docs/reports/semantic_property_classification_20260831/candidates/p6.txt",
+  "source_candidate_sha256": "cea583cc8b2d7d57c51def080d887abae6708904e8755f390e91745b403e5a0c",
   "typing_source": "frozen_experiment_gold"
 }

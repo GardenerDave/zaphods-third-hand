@@ -1,6 +1,9 @@
 {
   "assertion_status": "not_asserted",
+  "case_id": "p2_transport_not_asserted",
   "evidence_id": "case_p2_evidence",
   "property": "transport_qualification",
+  "source_candidate_path": "docs/reports/semantic_property_classification_20260831/candidates/p1.txt",
+  "source_candidate_sha256": "d5cb0008e6716361823b8bcc872811a241d1ce84d9d0dab9ea212e90adc78f03",
   "typing_source": "frozen_experiment_gold"
 }

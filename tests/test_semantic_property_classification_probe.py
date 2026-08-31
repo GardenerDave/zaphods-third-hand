@@ -38,6 +38,87 @@ def test_prompt_is_candidate_only_and_single_property():
     assert "transport_qualification_implies_semantic_capability_not_established_v1" not in prompt
 
 
+def test_effective_request_uses_case_specific_schema_and_template_hashes(tmp_path: Path):
+    candidate = tmp_path / "candidate.txt"
+    candidate.write_text("The supplied evidence establishes semantic capability.", encoding="utf-8")
+    gold = tmp_path / "gold.json"
+    gold.write_text(
+        json.dumps(
+            {
+                "case_id": "semantic_capability_case",
+                "property": "semantic_capability",
+                "assertion_status": "established",
+                "evidence_id": "case_semantic_capability_evidence",
+                "typing_source": "frozen_experiment_gold",
+                "source_candidate_path": str(candidate),
+                "source_candidate_sha256": probe._sha256_text(candidate.read_text(encoding="utf-8")),
+            }
+        ),
+        encoding="utf-8",
+    )
+    case = probe.ClassificationCase(
+        case_id="semantic_capability_case",
+        candidate_path=candidate,
+        property_name="semantic_capability",
+        gold_path=gold,
+        evidence_id="case_semantic_capability_evidence",
+    )
+    out_dir = tmp_path / "out"
+    seen: dict[str, object] = {}
+
+    def fake_urlopen(request, timeout=None):
+        _ = timeout
+        seen["body"] = json.loads(request.data.decode("utf-8"))
+        return _FakeResponse(
+            {
+                "choices": [
+                    {
+                        "finish_reason": "stop",
+                        "message": {
+                            "content": json.dumps(
+                                {
+                                    "property": "semantic_capability",
+                                    "assertion_status": "established",
+                                }
+                            )
+                        },
+                    }
+                ],
+                "usage": {"prompt_tokens": 7, "completion_tokens": 4, "total_tokens": 11},
+            }
+        )
+
+    with patch.object(probe.urllib.request, "urlopen", side_effect=fake_urlopen):
+        probe.run_case(
+            case=case,
+            endpoint="http://127.0.0.1:8080/v1",
+            model="test-model",
+            out_dir=out_dir,
+            max_tokens=32,
+            temperature=0.0,
+            timeout_seconds=5,
+        )
+
+    request_body = seen["body"]
+    schema = request_body["response_format"]["json_schema"]["schema"]
+    assert schema["properties"]["property"]["enum"] == ["semantic_capability"]
+    assert probe._schema_sha256(schema) == json.loads((out_dir / "model_call.json").read_text(encoding="utf-8"))["effective_schema_sha256"]
+    assert probe.SCHEMA_TEMPLATE["properties"]["property"]["enum"] == [
+        "transport_qualification",
+        "bounded_handoff_success",
+        "semantic_capability",
+        "raw_response_integrity",
+        "semantic_acceptance",
+    ]
+    request_dump = json.dumps(request_body)
+    assert "transport_qualification" not in request_dump
+    assert "bounded_handoff_success" not in request_dump
+    assert "raw_response_integrity" not in request_dump
+    assert "semantic_acceptance" not in request_dump
+    assert "frozen_experiment_gold" not in request_dump
+    assert "transport_qualification_implies_semantic_capability_not_established_v1" not in request_dump
+
+
 def test_compile_not_asserted_emits_no_ir():
     assert probe._compile_to_typed_assertions(
         property_name="semantic_capability",
@@ -46,28 +127,32 @@ def test_compile_not_asserted_emits_no_ir():
     ) == []
 
 
+def _write_gold(path: Path, payload: dict[str, object]) -> None:
+    path.write_text(json.dumps(payload), encoding="utf-8")
+
+
 def test_run_case_validates_and_preserves_schema(tmp_path: Path):
     candidate = tmp_path / "candidate.txt"
     candidate.write_text("The supplied evidence establishes semantic capability.", encoding="utf-8")
     gold = tmp_path / "gold.json"
-    gold.write_text(
-        json.dumps(
-            {
-                "case_id": "p1",
-                "property": "semantic_capability",
-                "assertion_status": "established",
-                "evidence_id": "case_p1_evidence",
-                "typing_source": "frozen_experiment_gold",
-            }
-        ),
-        encoding="utf-8",
+    _write_gold(
+        gold,
+        {
+            "case_id": "semantic_capability_case",
+            "property": "semantic_capability",
+            "assertion_status": "established",
+            "evidence_id": "case_semantic_capability_evidence",
+            "typing_source": "frozen_experiment_gold",
+            "source_candidate_path": str(candidate),
+            "source_candidate_sha256": probe._sha256_text(candidate.read_text(encoding="utf-8")),
+        },
     )
     case = probe.ClassificationCase(
-        case_id="p1",
+        case_id="semantic_capability_case",
         candidate_path=candidate,
         property_name="semantic_capability",
         gold_path=gold,
-        evidence_id="case_p1_evidence",
+        evidence_id="case_semantic_capability_evidence",
     )
     out_dir = tmp_path / "out"
     seen: dict[str, object] = {}
@@ -108,6 +193,14 @@ def test_run_case_validates_and_preserves_schema(tmp_path: Path):
     request_body = seen["body"]
     schema = request_body["response_format"]["json_schema"]["schema"]
     assert schema["properties"]["property"]["enum"] == ["semantic_capability"]
+    assert probe._schema_sha256(schema) == json.loads((out_dir / "model_call.json").read_text(encoding="utf-8"))["effective_schema_sha256"]
+    assert probe.SCHEMA_TEMPLATE["properties"]["property"]["enum"] == [
+        "transport_qualification",
+        "bounded_handoff_success",
+        "semantic_capability",
+        "raw_response_integrity",
+        "semantic_acceptance",
+    ]
     assert "transport_qualification" not in json.dumps(schema)
     assert "bounded_handoff_success" not in json.dumps(schema)
     assert "raw_response_integrity" not in json.dumps(schema)
@@ -136,24 +229,24 @@ def test_run_case_marks_mechanical_failure_not_scored(tmp_path: Path):
     candidate = tmp_path / "candidate.txt"
     candidate.write_text("The supplied evidence establishes semantic capability.", encoding="utf-8")
     gold = tmp_path / "gold.json"
-    gold.write_text(
-        json.dumps(
-            {
-                "case_id": "p1",
-                "property": "semantic_capability",
-                "assertion_status": "established",
-                "evidence_id": "case_p1_evidence",
-                "typing_source": "frozen_experiment_gold",
-            }
-        ),
-        encoding="utf-8",
+    _write_gold(
+        gold,
+        {
+            "case_id": "semantic_capability_case",
+            "property": "semantic_capability",
+            "assertion_status": "established",
+            "evidence_id": "case_semantic_capability_evidence",
+            "typing_source": "frozen_experiment_gold",
+            "source_candidate_path": str(candidate),
+            "source_candidate_sha256": probe._sha256_text(candidate.read_text(encoding="utf-8")),
+        },
     )
     case = probe.ClassificationCase(
-        case_id="p1",
+        case_id="semantic_capability_case",
         candidate_path=candidate,
         property_name="semantic_capability",
         gold_path=gold,
-        evidence_id="case_p1_evidence",
+        evidence_id="case_semantic_capability_evidence",
     )
     out_dir = tmp_path / "out"
 
@@ -200,6 +293,60 @@ def test_compile_established_and_not_established_emit_ir():
             "evidence_refs": ["case_p1_evidence"],
         }
     ]
+
+
+def test_run_case_rejects_bad_gold_binding_before_transport(tmp_path: Path):
+    candidate = tmp_path / "candidate.txt"
+    candidate.write_text("The supplied evidence establishes semantic capability.", encoding="utf-8")
+    good_candidate_sha = probe._sha256_text(candidate.read_text(encoding="utf-8"))
+    base_gold = {
+        "case_id": "semantic_capability_case",
+        "property": "semantic_capability",
+        "assertion_status": "established",
+        "evidence_id": "case_semantic_capability_evidence",
+        "typing_source": "frozen_experiment_gold",
+        "source_candidate_path": str(candidate),
+        "source_candidate_sha256": good_candidate_sha,
+    }
+    cases = [
+        ("property", {**base_gold, "property": "transport_qualification"}, "gold property must equal queried property"),
+        ("evidence", {**base_gold, "evidence_id": "wrong_evidence"}, "gold evidence_id must equal case.evidence_id"),
+        ("candidate_sha", {**base_gold, "source_candidate_sha256": "0" * 64}, "gold source_candidate_sha256 must match candidate content"),
+        ("case_id", {**base_gold, "case_id": "wrong_case_id"}, "gold case_id must equal case.case_id"),
+    ]
+    for suffix, gold_payload, expected_message in cases:
+        gold = tmp_path / f"gold_{suffix}.json"
+        _write_gold(gold, gold_payload)
+        case = probe.ClassificationCase(
+            case_id="semantic_capability_case",
+            candidate_path=candidate,
+            property_name="semantic_capability",
+            gold_path=gold,
+            evidence_id="case_semantic_capability_evidence",
+        )
+        called = False
+
+        def fail_call(*args, **kwargs):  # noqa: ANN001, ANN003
+            nonlocal called
+            called = True
+            raise AssertionError("transport should not be reached for bad gold binding")
+
+        with patch.object(probe, "_call_local", side_effect=fail_call):
+            try:
+                probe.run_case(
+                    case=case,
+                    endpoint="http://127.0.0.1:8080/v1",
+                    model="test-model",
+                    out_dir=tmp_path / f"out_{suffix}",
+                    max_tokens=32,
+                    temperature=0.0,
+                    timeout_seconds=5,
+                )
+            except ValueError as exc:
+                assert expected_message in str(exc)
+            else:
+                raise AssertionError("expected ValueError for bad gold binding")
+        assert called is False
     assert probe._compile_to_typed_assertions(
         property_name="semantic_capability",
         assertion_status="not_established",

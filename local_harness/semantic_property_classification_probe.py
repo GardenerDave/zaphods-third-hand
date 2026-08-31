@@ -39,8 +39,19 @@ def _sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _canonical_json(payload: Any) -> str:
+    return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
+
 def _read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
+
+
+def _resolve_candidate_path(path_text: str) -> Path:
+    path = Path(path_text)
+    if path.is_absolute():
+        return path
+    return (Path(__file__).resolve().parents[1] / path).resolve()
 
 
 def _case_specific_schema(property_name: str) -> dict[str, Any]:
@@ -49,6 +60,10 @@ def _case_specific_schema(property_name: str) -> dict[str, Any]:
     schema = json.loads(json.dumps(SCHEMA_TEMPLATE))
     schema["properties"]["property"]["enum"] = [property_name]
     return schema
+
+
+def _schema_sha256(schema: dict[str, Any]) -> str:
+    return _sha256_text(_canonical_json(schema))
 
 
 def _call_local(
@@ -138,6 +153,47 @@ def _load_gold(path: Path) -> dict[str, Any]:
     return payload
 
 
+def _validate_gold_binding(*, case: ClassificationCase, candidate_text: str, gold: dict[str, Any]) -> None:
+    problems: list[str] = []
+    if gold.get("typing_source") != "frozen_experiment_gold":
+        problems.append("gold typing_source must be frozen_experiment_gold")
+    if gold.get("case_id") != case.case_id:
+        problems.append("gold case_id must equal case.case_id")
+    if gold.get("property") != case.property_name:
+        problems.append("gold property must equal queried property")
+    if gold.get("evidence_id") != case.evidence_id:
+        problems.append("gold evidence_id must equal case.evidence_id")
+    if gold.get("assertion_status") not in ALLOWED_STATUSES:
+        problems.append("gold assertion_status must be an allowed status")
+    gold_candidate_path = gold.get("source_candidate_path")
+    if not isinstance(gold_candidate_path, str):
+        problems.append("gold source_candidate_path must be a string")
+    elif _resolve_candidate_path(gold_candidate_path) != case.candidate_path.resolve():
+        problems.append("gold source_candidate_path must equal case.candidate_path")
+    gold_candidate_sha = gold.get("source_candidate_sha256")
+    if not isinstance(gold_candidate_sha, str):
+        problems.append("gold source_candidate_sha256 must be a string")
+    elif gold_candidate_sha != _sha256_text(candidate_text):
+        problems.append("gold source_candidate_sha256 must match candidate content")
+    if problems:
+        raise ValueError("; ".join(problems))
+
+
+def _binding_error_message(*, case: ClassificationCase, gold: dict[str, Any], candidate_text: str) -> str:
+    if gold.get("case_id") != case.case_id:
+        return "gold case_id must equal case.case_id"
+    if gold.get("property") != case.property_name:
+        return "gold property must equal queried property"
+    if gold.get("evidence_id") != case.evidence_id:
+        return "gold evidence_id must equal case.evidence_id"
+    if gold.get("typing_source") != "frozen_experiment_gold":
+        return "gold typing_source must be frozen_experiment_gold"
+    gold_candidate_sha = gold.get("source_candidate_sha256")
+    if isinstance(gold_candidate_sha, str) and gold_candidate_sha != _sha256_text(candidate_text):
+        return "gold source_candidate_sha256 must match candidate content"
+    return "gold binding validation failed"
+
+
 def _compile_to_typed_assertions(property_name: str, assertion_status: str, evidence_id: str) -> list[dict[str, Any]]:
     if assertion_status == "not_asserted":
         return []
@@ -165,6 +221,7 @@ def run_case(
     out_dir.mkdir(parents=True, exist_ok=False)
     candidate_text = _read_text(case.candidate_path)
     gold = _load_gold(case.gold_path)
+    _validate_gold_binding(case=case, candidate_text=candidate_text, gold=gold)
     schema = _case_specific_schema(case.property_name)
     prompt_text = _build_prompt(candidate_text=candidate_text, property_name=case.property_name, evidence_id=case.evidence_id)
     response, request_body = _call_local(
@@ -213,9 +270,10 @@ def run_case(
         "model": model,
         "temperature": temperature,
         "max_tokens": max_tokens,
-        "schema_source_path": str(SCHEMA_TEMPLATE_PATH),
-        "schema_sha256": _sha256_file(SCHEMA_TEMPLATE_PATH),
-        "schema_artifact": schema,
+        "schema_template_path": str(SCHEMA_TEMPLATE_PATH),
+        "schema_template_sha256": _sha256_file(SCHEMA_TEMPLATE_PATH),
+        "effective_schema": schema,
+        "effective_schema_sha256": _schema_sha256(schema),
         "candidate_path": str(case.candidate_path),
         "candidate_sha256": _sha256_file(case.candidate_path),
         "property_name": case.property_name,
@@ -223,9 +281,9 @@ def run_case(
         "gold_sha256": _sha256_file(case.gold_path),
         "evidence_id": case.evidence_id,
         "prompt_sha256": _sha256_text(prompt_text),
-        "request_body_sha256": _sha256_text(json.dumps(request_body, sort_keys=True)),
+        "request_body_sha256": _sha256_text(_canonical_json(request_body)),
         "raw_output_sha256": _sha256_text(raw_output),
-        "response_body_sha256": _sha256_text(json.dumps(response, sort_keys=True)),
+        "response_body_sha256": _sha256_text(_canonical_json(response)),
         "endpoint_response": response,
         "endpoint_telemetry": telemetry,
         "request_body": request_body,
@@ -246,8 +304,10 @@ def run_case(
         "observed_status": observed_status,
         "semantic_match": semantic_match,
         "diagnostics": validation_problems,
-        "schema_source_path": str(SCHEMA_TEMPLATE_PATH),
-        "schema_sha256": _sha256_file(SCHEMA_TEMPLATE_PATH),
+        "schema_template_path": str(SCHEMA_TEMPLATE_PATH),
+        "schema_template_sha256": _sha256_file(SCHEMA_TEMPLATE_PATH),
+        "effective_schema_sha256": _schema_sha256(schema),
+        "effective_schema": schema,
     }
     (out_dir / "candidate.txt").write_text(candidate_text, encoding="utf-8")
     (out_dir / "prompt.txt").write_text(prompt_text, encoding="utf-8")
@@ -290,17 +350,17 @@ def load_default_cases() -> list[ClassificationCase]:
     corpus = root / "docs" / "reports" / "semantic_property_classification_20260831"
     gold = corpus / "gold"
     return [
-        _query_case("p1", candidate_path=corpus / "candidates/p1.txt", property_name="semantic_capability", gold_path=gold / "p1.json", evidence_id="case_p1_evidence"),
-        _query_case("p2", candidate_path=corpus / "candidates/p1.txt", property_name="transport_qualification", gold_path=gold / "p2.json", evidence_id="case_p2_evidence"),
-        _query_case("p3", candidate_path=corpus / "candidates/p3.txt", property_name="semantic_capability", gold_path=gold / "p3.json", evidence_id="case_p3_evidence"),
-        _query_case("p4", candidate_path=corpus / "candidates/p4.txt", property_name="transport_qualification", gold_path=gold / "p4.json", evidence_id="case_p4_evidence"),
-        _query_case("p5", candidate_path=corpus / "candidates/p4.txt", property_name="semantic_capability", gold_path=gold / "p5.json", evidence_id="case_p5_evidence"),
-        _query_case("p6_transport", candidate_path=corpus / "candidates/p6.txt", property_name="transport_qualification", gold_path=gold / "p6_transport.json", evidence_id="case_p6_transport_evidence"),
-        _query_case("p6_semantic", candidate_path=corpus / "candidates/p6.txt", property_name="semantic_capability", gold_path=gold / "p6_semantic.json", evidence_id="case_p6_semantic_evidence"),
-        _query_case("a1", candidate_path=root / ".work/semantic_claim_discipline_final_20260831/task_a/baseline/20260831T133000Z/raw_model_output.txt", property_name="semantic_capability", gold_path=gold / "a1_semantic_capability.json", evidence_id="case_a1_evidence"),
-        _query_case("a2", candidate_path=root / ".work/epistemic_schema_experiment_20260831_abs_fresh/20260831T040000Z/raw_model_output.txt", property_name="semantic_capability", gold_path=gold / "a2_semantic_capability.json", evidence_id="case_a2_evidence"),
-        _query_case("a3_integrity", candidate_path=root / ".work/semantic_claim_discipline_final_20260831/task_b/baseline/20260831T133000Z/raw_model_output.txt", property_name="raw_response_integrity", gold_path=gold / "a3_raw_response_integrity.json", evidence_id="case_a3_evidence"),
-        _query_case("a3_acceptance", candidate_path=root / ".work/semantic_claim_discipline_final_20260831/task_b/baseline/20260831T133000Z/raw_model_output.txt", property_name="semantic_acceptance", gold_path=gold / "a3_semantic_acceptance.json", evidence_id="case_a3_evidence"),
+        _query_case("p1_semantic_capability_established", candidate_path=corpus / "candidates/p1.txt", property_name="semantic_capability", gold_path=gold / "p1.json", evidence_id="case_p1_evidence"),
+        _query_case("p2_transport_not_asserted", candidate_path=corpus / "candidates/p1.txt", property_name="transport_qualification", gold_path=gold / "p2.json", evidence_id="case_p2_evidence"),
+        _query_case("p3_semantic_capability_not_established", candidate_path=corpus / "candidates/p3.txt", property_name="semantic_capability", gold_path=gold / "p3.json", evidence_id="case_p3_evidence"),
+        _query_case("p4_transport_established", candidate_path=corpus / "candidates/p4.txt", property_name="transport_qualification", gold_path=gold / "p4.json", evidence_id="case_p4_evidence"),
+        _query_case("p5_semantic_capability_not_asserted", candidate_path=corpus / "candidates/p4.txt", property_name="semantic_capability", gold_path=gold / "p5.json", evidence_id="case_p5_evidence"),
+        _query_case("p6_transport_established", candidate_path=corpus / "candidates/p6.txt", property_name="transport_qualification", gold_path=gold / "p6_transport.json", evidence_id="case_p6_transport_evidence"),
+        _query_case("p6_semantic_not_established", candidate_path=corpus / "candidates/p6.txt", property_name="semantic_capability", gold_path=gold / "p6_semantic.json", evidence_id="case_p6_semantic_evidence"),
+        _query_case("a1_semantic_capability", candidate_path=root / ".work/semantic_claim_discipline_final_20260831/task_a/baseline/20260831T133000Z/raw_model_output.txt", property_name="semantic_capability", gold_path=gold / "a1_semantic_capability.json", evidence_id="case_a1_evidence"),
+        _query_case("a2_semantic_capability", candidate_path=root / ".work/epistemic_schema_experiment_20260831_abs_fresh/20260831T040000Z/raw_model_output.txt", property_name="semantic_capability", gold_path=gold / "a2_semantic_capability.json", evidence_id="case_a2_evidence"),
+        _query_case("a3_raw_response_integrity", candidate_path=root / ".work/semantic_claim_discipline_final_20260831/task_b/baseline/20260831T133000Z/raw_model_output.txt", property_name="raw_response_integrity", gold_path=gold / "a3_raw_response_integrity.json", evidence_id="case_a3_evidence"),
+        _query_case("a3_semantic_acceptance", candidate_path=root / ".work/semantic_claim_discipline_final_20260831/task_b/baseline/20260831T133000Z/raw_model_output.txt", property_name="semantic_acceptance", gold_path=gold / "a3_semantic_acceptance.json", evidence_id="case_a3_evidence"),
     ]
 
 
