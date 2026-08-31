@@ -1,0 +1,64 @@
+{
+  "invariant_id": "transport_qualification_implies_semantic_capability_not_established_v1",
+  "status": "conceptual_only",
+  "scope": [
+    "bounded transport qualification",
+    "supervised handoff evidence",
+    "observation outputs derived from frozen candidate artifacts"
+  ],
+  "antecedent_evidence_class": [
+    "transport_success",
+    "bounded_handoff_success",
+    "validation_passed"
+  ],
+  "forbidden_unsupported_escalation": [
+    "semantic capability",
+    "general model capability",
+    "arbitrary-task generalization"
+  ],
+  "supported_exception_condition": [
+    "the supplied evidence explicitly and independently establishes the stronger property"
+  ],
+  "provenance": {
+    "source": "ZTH dogfood experiments on transport qualification, epistemic observation structure, and advisory semantic review",
+    "frozen_positive_control": {
+      "task": "transport qualification versus model capability",
+      "candidate_paths": [
+        ".work/epistemic_schema_experiment_20260831_abs_fresh/a0_final/20260831T050000Z",
+        ".work/epistemic_schema_experiment_20260831_abs_fresh/20260831T040000Z"
+      ]
+    }
+  },
+  "non_authorities": [
+    "does not grant acceptance",
+    "does not rewrite candidate output",
+    "does not auto-promote",
+    "does not train models",
+    "does not execute output"
+  ],
+  "machine_readability_assessment": {
+    "current_artifact_structure_sufficient": false,
+    "reason": [
+      "existing artifacts expose free-form claim strings and evidence text",
+      "the artifacts do not expose a trusted typed semantic layer for what the candidate asserts",
+      "the artifacts do not expose a trusted typed semantic layer for what the evidence establishes",
+      "the checker would need natural-language interpretation to compare asserted and established properties"
+    ],
+    "minimum_missing_representation": [
+      "a typed assertion/evidence layer"
+    ],
+    "candidate_side_representation": [
+      "asserted_property"
+    ],
+    "evidence_side_representation": [
+      "established_properties"
+    ],
+    "recommended_asserted_property_vocabulary": [
+      "transport_qualification",
+      "semantic_capability",
+      "bounded_handoff_success",
+      "authority_boundary",
+      "review_eligibility"
+    ]
+  }
+}
