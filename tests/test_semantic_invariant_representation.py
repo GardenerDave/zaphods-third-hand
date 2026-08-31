@@ -4,6 +4,8 @@ import hashlib
 import json
 from pathlib import Path
 
+import pytest
+
 from local_harness.typed_semantic_invariant import (
     evaluate_typed_invariant,
     load_json_object,
@@ -62,10 +64,67 @@ def test_t3_is_not_applicable():
     assert result.not_established_asserted_properties == ["semantic_acceptance"]
 
 
+def test_out_of_scope_positive_semantic_capability_is_not_applicable():
+    invariant = load_json_object(INVARIANT_PATH)
+    evidence = {
+        "evidence_id": "s0_evidence",
+        "evidence_scope": {"established_properties": ["raw_response_integrity"]},
+        "typing_source": "frozen_experiment_fixture",
+    }
+    assertions = {
+        "typing_source": "frozen_experiment_fixture",
+        "assertions": [
+            {
+                "property": "semantic_capability",
+                "epistemic_status": "established",
+                "evidence_refs": ["s0_evidence"],
+            }
+        ],
+    }
+    assert validate_typed_evidence_fixture(evidence) == []
+    assert validate_typed_assertion_fixture(assertions) == []
+    result = evaluate_typed_invariant(invariant=invariant, evidence=evidence, assertions=assertions)
+    assert result.result == "not_applicable"
+    assert result.applicable is False
+
+
+def test_out_of_scope_negative_semantic_capability_is_not_applicable():
+    invariant = load_json_object(INVARIANT_PATH)
+    evidence = {
+        "evidence_id": "s1_evidence",
+        "evidence_scope": {"established_properties": ["raw_response_integrity"]},
+        "typing_source": "frozen_experiment_fixture",
+    }
+    assertions = {
+        "typing_source": "frozen_experiment_fixture",
+        "assertions": [
+            {
+                "property": "semantic_capability",
+                "epistemic_status": "not_established",
+                "evidence_refs": ["s1_evidence"],
+            }
+        ],
+    }
+    assert validate_typed_evidence_fixture(evidence) == []
+    assert validate_typed_assertion_fixture(assertions) == []
+    result = evaluate_typed_invariant(invariant=invariant, evidence=evidence, assertions=assertions)
+    assert result.result == "not_applicable"
+    assert result.applicable is False
+
+
 def test_synthetic_transport_only_passes():
     invariant = load_json_object(INVARIANT_PATH)
-    evidence = load_json_object(ROOT / "controls_transport_only_evidence.json")
-    assertions = load_json_object(ROOT / "controls_transport_only_assertions.json")
+    evidence = load_json_object(ROOT / "t1_evidence.json")
+    assertions = {
+        "typing_source": "frozen_experiment_fixture",
+        "assertions": [
+            {
+                "property": "transport_qualification",
+                "epistemic_status": "established",
+                "evidence_refs": ["t1_evidence"],
+            }
+        ],
+    }
     result = evaluate_typed_invariant(invariant=invariant, evidence=evidence, assertions=assertions)
     assert result.result == "pass"
     assert result.violating_properties == []
@@ -75,8 +134,27 @@ def test_synthetic_transport_only_passes():
 
 def test_synthetic_semantic_capability_passes():
     invariant = load_json_object(INVARIANT_PATH)
-    evidence = load_json_object(ROOT / "controls_semantic_capability_evidence.json")
-    assertions = load_json_object(ROOT / "controls_semantic_capability_assertions.json")
+    evidence = {
+        "evidence_id": "capability_evidence",
+        "evidence_scope": {
+            "established_properties": [
+                "transport_qualification",
+                "bounded_handoff_success",
+                "semantic_capability",
+            ]
+        },
+        "typing_source": "frozen_experiment_fixture",
+    }
+    assertions = {
+        "typing_source": "frozen_experiment_fixture",
+        "assertions": [
+            {
+                "property": "semantic_capability",
+                "epistemic_status": "established",
+                "evidence_refs": ["capability_evidence"],
+            }
+        ],
+    }
     result = evaluate_typed_invariant(invariant=invariant, evidence=evidence, assertions=assertions)
     assert result.result == "pass"
     assert result.violating_properties == []
@@ -86,8 +164,24 @@ def test_synthetic_semantic_capability_passes():
 
 def test_checker_never_inspects_prose():
     invariant = load_json_object(INVARIANT_PATH)
-    evidence = {"evidence_id": "x", "evidence_scope": {"established_properties": ["transport_qualification"]}}
-    assertions = {"assertions": [{"property": "transport_qualification", "epistemic_status": "established", "evidence_refs": ["x"], "claim_text": "NO PROSE NEEDED"}]}
+    evidence = {
+        "evidence_id": "x",
+        "evidence_scope": {
+            "established_properties": ["transport_qualification", "bounded_handoff_success"]
+        },
+        "typing_source": "frozen_experiment_fixture",
+    }
+    assertions = {
+        "typing_source": "frozen_experiment_fixture",
+        "assertions": [
+            {
+                "property": "transport_qualification",
+                "epistemic_status": "established",
+                "evidence_refs": ["x"],
+                "claim_text": "NO PROSE NEEDED",
+            }
+        ],
+    }
     result = evaluate_typed_invariant(invariant=invariant, evidence=evidence, assertions=assertions)
     assert result.result == "pass"
     assert result.established_asserted_properties == ["transport_qualification"]
@@ -95,14 +189,14 @@ def test_checker_never_inspects_prose():
 
 def test_not_established_semantic_capability_passes_under_transport_evidence():
     invariant = load_json_object(INVARIANT_PATH)
-    evidence = load_json_object(ROOT / "controls_transport_only_evidence.json")
+    evidence = load_json_object(ROOT / "t1_evidence.json")
     assertions = {
         "typing_source": "frozen_experiment_fixture",
         "assertions": [
             {
                 "property": "semantic_capability",
                 "epistemic_status": "not_established",
-                "evidence_refs": ["controls_transport_only_evidence"],
+                "evidence_refs": ["t1_evidence"],
             }
         ],
     }
@@ -180,14 +274,14 @@ def test_t3_polarity_mutation_preserves_non_applicability():
 
 def test_polarity_mutation_pair():
     invariant = load_json_object(INVARIANT_PATH)
-    evidence = load_json_object(ROOT / "controls_transport_only_evidence.json")
+    evidence = load_json_object(ROOT / "t1_evidence.json")
     established = {
         "typing_source": "frozen_experiment_fixture",
         "assertions": [
             {
                 "property": "semantic_capability",
                 "epistemic_status": "established",
-                "evidence_refs": ["controls_transport_only_evidence"],
+                "evidence_refs": ["t1_evidence"],
             }
         ]
     }
@@ -197,7 +291,7 @@ def test_polarity_mutation_pair():
             {
                 "property": "semantic_capability",
                 "epistemic_status": "not_established",
-                "evidence_refs": ["controls_transport_only_evidence"],
+                "evidence_refs": ["t1_evidence"],
             }
         ]
     }
@@ -205,3 +299,30 @@ def test_polarity_mutation_pair():
     not_established_result = evaluate_typed_invariant(invariant=invariant, evidence=evidence, assertions=not_established)
     assert established_result.result == "hold"
     assert not_established_result.result == "pass"
+
+
+@pytest.mark.parametrize(
+    "evidence, assertions, expected",
+    [
+        (
+            {"evidence_id": "scope_evidence", "evidence_scope": {"established_properties": ["raw_response_integrity"]}, "typing_source": "frozen_experiment_fixture"},
+            {"typing_source": "frozen_experiment_fixture", "assertions": [{"property": "semantic_capability", "epistemic_status": "established", "evidence_refs": ["scope_evidence"]}]},
+            "not_applicable",
+        ),
+        (
+            {"evidence_id": "scope_evidence", "evidence_scope": {"established_properties": ["transport_qualification", "bounded_handoff_success"]}, "typing_source": "frozen_experiment_fixture"},
+            {"typing_source": "frozen_experiment_fixture", "assertions": [{"property": "semantic_capability", "epistemic_status": "established", "evidence_refs": ["scope_evidence"]}]},
+            "hold",
+        ),
+        (
+            {"evidence_id": "scope_evidence", "evidence_scope": {"established_properties": ["transport_qualification", "bounded_handoff_success"]}, "typing_source": "frozen_experiment_fixture"},
+            {"typing_source": "frozen_experiment_fixture", "assertions": [{"property": "semantic_capability", "epistemic_status": "not_established", "evidence_refs": ["scope_evidence"]}]},
+            "pass",
+        ),
+    ],
+)
+def test_result_applicability_consistency(evidence, assertions, expected):
+    invariant = load_json_object(INVARIANT_PATH)
+    result = evaluate_typed_invariant(invariant=invariant, evidence=evidence, assertions=assertions)
+    assert result.result == expected
+    assert (result.applicable is False) == (expected == "not_applicable")

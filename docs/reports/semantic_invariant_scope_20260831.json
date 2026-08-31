@@ -1,0 +1,39 @@
+{
+  "artifact_type": "semantic_invariant_scope_addendum",
+  "date": "2026-08-31",
+  "model_calls": 0,
+  "scope_defect": {
+    "issue": "applicability was being evaluated too late, allowing hold/pass outcomes to escape the frozen invariant scope",
+    "fix": "antecedent applicability now gates policy evaluation before hold/pass decisions"
+  },
+  "antecedent_semantics": {
+    "antecedent_match": "all",
+    "rationale": "The frozen invariant ID and evidence fixtures intentionally require both transport qualification and bounded handoff success to make the transport-versus-capability boundary explicit. Out-of-scope evidence must therefore resolve to not_applicable rather than being coerced into hold/pass."
+  },
+  "out_of_scope_controls": {
+    "S0_positive": "not_applicable",
+    "S1_negative": "not_applicable"
+  },
+  "corrected_frozen_matrix": {
+    "T1": "hold",
+    "T2": "hold",
+    "T3": "not_applicable",
+    "operational_in_scope_assertion": "pass",
+    "in_scope_capability_established_without_capability_evidence": "hold",
+    "in_scope_capability_not_established": "pass",
+    "in_scope_capability_established_with_independent_capability_evidence": "pass",
+    "out_of_scope_capability_established": "not_applicable",
+    "out_of_scope_capability_not_established": "not_applicable"
+  },
+  "result_applicability_rule": {
+    "not_applicable": "applicable == false",
+    "pass": "applicable == true",
+    "hold": "applicable == true"
+  },
+  "conclusion": "Given trusted typed inputs, the deterministic checker now both consumes epistemic polarity and respects the frozen invariant's declared evidence scope without inspecting natural language.",
+  "limitations": [
+    "This still does not solve semantic typing acquisition/trust.",
+    "This still does not change production observation contracts."
+  ]
+}
+

@@ -238,31 +238,36 @@ def evaluate_typed_invariant(
     else:
         antecedent_applies = bool(set(antecedent_properties) & set(established_properties))
 
-    violating_properties = sorted(
-        prop for prop in established_asserted_properties if prop in insufficient_for and prop not in established_properties
-    )
-
-    if violating_properties:
-        result = "hold"
-        reason = (
-            f"{invariant_id}: asserted properties {', '.join(violating_properties)} are not established by the supplied evidence"
-        )
-    elif established_asserted_properties and set(established_asserted_properties).issubset(set(established_properties)):
-        result = "pass"
-        reason = f"{invariant_id}: asserted properties are directly established by the supplied evidence"
-    elif not_established_asserted_properties and all(
-        prop in insufficient_for for prop in not_established_asserted_properties
-    ):
-        result = "pass"
-        reason = f"{invariant_id}: candidate explicitly marks the stronger property as not established"
-    else:
+    applicable = antecedent_applies
+    violating_properties: list[str] = []
+    if not applicable:
         result = "not_applicable"
         reason = f"{invariant_id}: the evidence/assertion pair is outside the frozen invariant scope"
+    else:
+        violating_properties = sorted(
+            prop for prop in established_asserted_properties if prop in insufficient_for and prop not in established_properties
+        )
+
+        if violating_properties:
+            result = "hold"
+            reason = (
+                f"{invariant_id}: asserted properties {', '.join(violating_properties)} are not established by the supplied evidence"
+            )
+        elif established_asserted_properties and set(established_asserted_properties).issubset(set(established_properties)):
+            result = "pass"
+            reason = f"{invariant_id}: asserted properties are directly established by the supplied evidence"
+        elif not_established_asserted_properties and all(
+            prop in insufficient_for for prop in not_established_asserted_properties
+        ):
+            result = "pass"
+            reason = f"{invariant_id}: candidate explicitly marks the stronger property as not established"
+        else:
+            result = "not_applicable"
+            reason = f"{invariant_id}: the evidence/assertion pair is outside the frozen invariant scope"
 
     if result not in ALLOWED_RESULTS:
         raise ValueError(f"unexpected result: {result}")
 
-    applicable = antecedent_applies
     return DeterministicInvariantResult(
         invariant_id=invariant_id,
         result=result,
