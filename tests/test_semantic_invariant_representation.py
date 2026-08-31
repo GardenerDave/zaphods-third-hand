@@ -44,6 +44,8 @@ def test_t1_and_t2_hold():
         assert result.result == "hold"
         assert result.violating_properties == ["semantic_capability"]
         assert result.applicable is True
+        assert result.established_asserted_properties == ["semantic_capability"]
+        assert result.not_established_asserted_properties == []
         assert "transport_qualification_implies_semantic_capability_not_established_v1" in result.reason
 
 
@@ -56,6 +58,8 @@ def test_t3_is_not_applicable():
     assert result.result == "not_applicable"
     assert result.violating_properties == []
     assert result.applicable is False
+    assert result.established_asserted_properties == []
+    assert result.not_established_asserted_properties == ["semantic_acceptance"]
 
 
 def test_synthetic_transport_only_passes():
@@ -65,6 +69,8 @@ def test_synthetic_transport_only_passes():
     result = evaluate_typed_invariant(invariant=invariant, evidence=evidence, assertions=assertions)
     assert result.result == "pass"
     assert result.violating_properties == []
+    assert result.established_asserted_properties == ["transport_qualification"]
+    assert result.not_established_asserted_properties == []
 
 
 def test_synthetic_semantic_capability_passes():
@@ -74,6 +80,8 @@ def test_synthetic_semantic_capability_passes():
     result = evaluate_typed_invariant(invariant=invariant, evidence=evidence, assertions=assertions)
     assert result.result == "pass"
     assert result.violating_properties == []
+    assert result.established_asserted_properties == ["semantic_capability"]
+    assert result.not_established_asserted_properties == []
 
 
 def test_checker_never_inspects_prose():
@@ -82,6 +90,28 @@ def test_checker_never_inspects_prose():
     assertions = {"assertions": [{"property": "transport_qualification", "epistemic_status": "established", "evidence_refs": ["x"], "claim_text": "NO PROSE NEEDED"}]}
     result = evaluate_typed_invariant(invariant=invariant, evidence=evidence, assertions=assertions)
     assert result.result == "pass"
+    assert result.established_asserted_properties == ["transport_qualification"]
+
+
+def test_not_established_semantic_capability_passes_under_transport_evidence():
+    invariant = load_json_object(INVARIANT_PATH)
+    evidence = load_json_object(ROOT / "controls_transport_only_evidence.json")
+    assertions = {
+        "typing_source": "frozen_experiment_fixture",
+        "assertions": [
+            {
+                "property": "semantic_capability",
+                "epistemic_status": "not_established",
+                "evidence_refs": ["controls_transport_only_evidence"],
+            }
+        ],
+    }
+    assert validate_typed_evidence_fixture(evidence) == []
+    assert validate_typed_assertion_fixture(assertions) == []
+    result = evaluate_typed_invariant(invariant=invariant, evidence=evidence, assertions=assertions)
+    assert result.result == "pass"
+    assert result.not_established_asserted_properties == ["semantic_capability"]
+    assert result.established_asserted_properties == []
 
 
 def test_wrong_evidence_reference_fails():
@@ -92,7 +122,7 @@ def test_wrong_evidence_reference_fails():
             {
                 "property": "transport_qualification",
                 "epistemic_status": "established",
-                "evidence_refs": ["wrong_evidence"],
+                "evidence_refs": ["controls_transport_only_evidence", "wrong_evidence"],
             }
         ]
     }
@@ -100,7 +130,7 @@ def test_wrong_evidence_reference_fails():
         evaluate_typed_invariant(invariant=invariant, evidence=evidence, assertions=assertions)
         raise AssertionError("expected ValueError")
     except ValueError as exc:
-        assert "do not resolve" in str(exc)
+        assert "exactly one evidence_refs entry" in str(exc)
 
 
 def test_unsupported_property_rejected():
@@ -146,3 +176,32 @@ def test_t3_polarity_mutation_preserves_non_applicability():
     }
     result = evaluate_typed_invariant(invariant=invariant, evidence=evidence, assertions=mutated)
     assert result.result == "not_applicable"
+
+
+def test_polarity_mutation_pair():
+    invariant = load_json_object(INVARIANT_PATH)
+    evidence = load_json_object(ROOT / "controls_transport_only_evidence.json")
+    established = {
+        "typing_source": "frozen_experiment_fixture",
+        "assertions": [
+            {
+                "property": "semantic_capability",
+                "epistemic_status": "established",
+                "evidence_refs": ["controls_transport_only_evidence"],
+            }
+        ]
+    }
+    not_established = {
+        "typing_source": "frozen_experiment_fixture",
+        "assertions": [
+            {
+                "property": "semantic_capability",
+                "epistemic_status": "not_established",
+                "evidence_refs": ["controls_transport_only_evidence"],
+            }
+        ]
+    }
+    established_result = evaluate_typed_invariant(invariant=invariant, evidence=evidence, assertions=established)
+    not_established_result = evaluate_typed_invariant(invariant=invariant, evidence=evidence, assertions=not_established)
+    assert established_result.result == "hold"
+    assert not_established_result.result == "pass"

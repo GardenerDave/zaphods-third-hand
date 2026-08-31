@@ -36,7 +36,8 @@ class DeterministicInvariantResult:
     applicable: bool
     evidence_id: str
     established_properties: list[str]
-    asserted_properties: list[str]
+    established_asserted_properties: list[str]
+    not_established_asserted_properties: list[str]
     violating_properties: list[str]
     reason: str
 
@@ -47,7 +48,8 @@ class DeterministicInvariantResult:
             "applicable": self.applicable,
             "evidence_id": self.evidence_id,
             "established_properties": list(self.established_properties),
-            "asserted_properties": list(self.asserted_properties),
+            "established_asserted_properties": list(self.established_asserted_properties),
+            "not_established_asserted_properties": list(self.not_established_asserted_properties),
             "violating_properties": list(self.violating_properties),
             "reason": self.reason,
         }
@@ -166,14 +168,12 @@ def validate_invariant_fixture(payload: dict[str, Any]) -> list[str]:
 
 def _resolve_refs(assertion: dict[str, Any], evidence_id: str) -> None:
     refs = assertion.get("evidence_refs")
-    if not isinstance(refs, list) or not refs:
-        raise ValueError("assertions entries must include a non-empty evidence_refs list")
-    resolved = []
-    for ref in refs:
-        if not isinstance(ref, str) or not ref.strip():
-            raise ValueError("assertions entries must include non-empty evidence_refs strings")
-        resolved.append(ref.strip())
-    if evidence_id not in resolved:
+    if not isinstance(refs, list) or len(refs) != 1:
+        raise ValueError("assertions entries must include exactly one evidence_refs entry")
+    ref = refs[0]
+    if not isinstance(ref, str) or not ref.strip():
+        raise ValueError("assertions entries must include non-empty evidence_refs strings")
+    if ref.strip() != evidence_id:
         raise ValueError(f"assertion evidence_refs do not resolve to supplied evidence_id: {evidence_id}")
 
 
@@ -211,7 +211,8 @@ def evaluate_typed_invariant(
     if not isinstance(assertion_list, list) or not assertion_list:
         raise ValueError("assertions must be a non-empty list")
 
-    asserted_properties: list[str] = []
+    established_asserted_properties: list[str] = []
+    not_established_asserted_properties: list[str] = []
     for assertion in assertion_list:
         if not isinstance(assertion, dict):
             raise ValueError("assertions entries must be objects")
@@ -225,8 +226,12 @@ def evaluate_typed_invariant(
         status = assertion.get("epistemic_status")
         if status not in ALLOWED_EPISTEMIC_STATUSES:
             raise ValueError("assertions entries must include a valid epistemic_status")
-        if prop not in asserted_properties:
-            asserted_properties.append(prop)
+        if status == "established":
+            if prop not in established_asserted_properties:
+                established_asserted_properties.append(prop)
+        else:
+            if prop not in not_established_asserted_properties:
+                not_established_asserted_properties.append(prop)
 
     if match_mode == "all":
         antecedent_applies = set(antecedent_properties).issubset(set(established_properties))
@@ -234,24 +239,22 @@ def evaluate_typed_invariant(
         antecedent_applies = bool(set(antecedent_properties) & set(established_properties))
 
     violating_properties = sorted(
-        prop for prop in asserted_properties if prop in insufficient_for and prop not in established_properties
+        prop for prop in established_asserted_properties if prop in insufficient_for and prop not in established_properties
     )
 
-    if violating_properties and antecedent_applies:
+    if violating_properties:
         result = "hold"
         reason = (
             f"{invariant_id}: asserted properties {', '.join(violating_properties)} are not established by the supplied evidence"
         )
-    elif set(asserted_properties).issubset(set(established_properties)) and asserted_properties:
+    elif established_asserted_properties and set(established_asserted_properties).issubset(set(established_properties)):
         result = "pass"
         reason = f"{invariant_id}: asserted properties are directly established by the supplied evidence"
-    elif antecedent_applies:
-        if any(prop in insufficient_for for prop in asserted_properties):
-            result = "hold"
-            reason = f"{invariant_id}: evidence establishes the antecedent but not the asserted stronger property"
-        else:
-            result = "pass"
-            reason = f"{invariant_id}: assertion is outside the forbidden relation for the supplied evidence"
+    elif not_established_asserted_properties and all(
+        prop in insufficient_for for prop in not_established_asserted_properties
+    ):
+        result = "pass"
+        reason = f"{invariant_id}: candidate explicitly marks the stronger property as not established"
     else:
         result = "not_applicable"
         reason = f"{invariant_id}: the evidence/assertion pair is outside the frozen invariant scope"
@@ -266,7 +269,8 @@ def evaluate_typed_invariant(
         applicable=applicable,
         evidence_id=evidence_id,
         established_properties=established_properties,
-        asserted_properties=asserted_properties,
+        established_asserted_properties=established_asserted_properties,
+        not_established_asserted_properties=not_established_asserted_properties,
         violating_properties=violating_properties,
         reason=reason,
     )
@@ -274,4 +278,3 @@ def evaluate_typed_invariant(
 
 def parse_fixture(path: Path) -> dict[str, Any]:
     return load_json_object(path)
-

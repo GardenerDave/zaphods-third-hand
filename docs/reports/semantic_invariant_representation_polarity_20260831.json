@@ -1,0 +1,69 @@
+{
+  "artifact_type": "semantic_invariant_representation_polarity_addendum",
+  "date": "2026-08-31",
+  "model_calls": 0,
+  "preserved_history": [
+    {
+      "step": 1,
+      "note": "Bare property IR introduced in 580d427."
+    },
+    {
+      "step": 2,
+      "note": "Corrected proposition/evidence IR added polarity and evidence IDs in 5312967."
+    },
+    {
+      "step": 3,
+      "note": "Audit found evaluator validated polarity syntax but initially did not consume epistemic status in policy evaluation."
+    },
+    {
+      "step": 4,
+      "note": "A paired established/not-established control fixed that gap."
+    },
+    {
+      "step": 5,
+      "note": "Evidence-ref resolution was tightened to exactly one ref equal to the supplied evidence_id."
+    }
+  ],
+  "pre_fix_control": {
+    "case": "not_established_semantic_capability_under_transport_evidence",
+    "observed_result": "validation failure",
+    "cause": "the frozen test control was missing typed provenance fields required by the validator during the first pass of the polarity audit"
+  },
+  "current_frozen_invariant": {
+    "id": "transport_qualification_implies_semantic_capability_not_established_v1",
+    "status": "conceptual_only",
+    "sha256": "66bbcd09a020d9388a9b0365eba2a6bc8e8680b563926b027eeda2dadaf74b01",
+    "antecedent_match": "all"
+  },
+  "corrected_evaluation_contract": {
+    "epistemic_status_vocabulary": [
+      "established",
+      "not_established"
+    ],
+    "authoritative_for_policy": [
+      "established_asserted_properties",
+      "not_established_asserted_properties",
+      "evidence_scope.established_properties",
+      "evidence_id"
+    ],
+    "evidence_ref_rule": "each assertion must contain exactly one evidence_ref equal to the supplied evidence_id",
+    "non_authoritative": [
+      "claim_text",
+      "reason"
+    ]
+  },
+  "frozen_results": {
+    "T1": "hold",
+    "T2": "hold",
+    "T3": "not_applicable",
+    "transport_only_positive": "pass",
+    "semantic_capability_established_under_transport_evidence": "hold",
+    "semantic_capability_not_established_under_transport_evidence": "pass"
+  },
+  "conclusion": "The checker now consumes epistemic polarity rather than flattening it, so it can distinguish an unsupported positive assertion from a correctly bounded negative assertion without natural-language interpretation.",
+  "limitations": [
+    "This still does not solve semantic typing acquisition/trust.",
+    "This still does not change production observation contracts."
+  ]
+}
+
