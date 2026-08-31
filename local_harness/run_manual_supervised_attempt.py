@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 import socket
 import shutil
@@ -54,6 +55,7 @@ EVIDENCE_OUTPUT_CONTRACT = {
     ],
     "requires_reason": True,
 }
+EVIDENCE_RESPONSE_SCHEMA_PATH = Path(__file__).resolve().parent / "schemas" / "repo_observation_output_schema.json"
 
 
 def _utc_timestamp() -> str:
@@ -445,6 +447,54 @@ def _read_evidence_source(path: Path, *, max_chars: int) -> dict[str, Any]:
     }
 
 
+def _estimate_tokens_from_text(text: str) -> int:
+    return max(1, math.ceil(len(text) / 4))
+
+
+def _prepare_evidence_budget(
+    *,
+    prompt_text: str,
+    evidence_projection_packet: dict[str, Any],
+    prompt_token_budget: int,
+    response_reserve_tokens: int,
+    overhead_tokens: int,
+) -> dict[str, Any]:
+    evidence_sources = evidence_projection_packet.get("evidence_sources", [])
+    supplied_chars = sum(
+        int(source.get("char_length", 0)) for source in evidence_sources if isinstance(source, dict)
+    )
+    supplied_excerpt_chars = sum(
+        len(str(source.get("excerpt", ""))) for source in evidence_sources if isinstance(source, dict)
+    )
+    estimated_prompt_tokens = _estimate_tokens_from_text(prompt_text)
+    available_prompt_tokens = max(0, prompt_token_budget - response_reserve_tokens - overhead_tokens)
+    budget = {
+        "estimation_method": "ceil(prompt_characters / 4)",
+        "estimated_prompt_tokens": estimated_prompt_tokens,
+        "prompt_token_budget": prompt_token_budget,
+        "response_reserve_tokens": response_reserve_tokens,
+        "overhead_tokens": overhead_tokens,
+        "available_prompt_tokens": available_prompt_tokens,
+        "supplied_evidence_characters": supplied_chars,
+        "supplied_excerpt_characters": supplied_excerpt_chars,
+        "any_source_truncated": any(bool(source.get("truncated")) for source in evidence_sources if isinstance(source, dict)),
+        "any_source_excluded": False,
+    }
+    if estimated_prompt_tokens > available_prompt_tokens:
+        budget["status"] = "failed"
+        budget["diagnostic"] = (
+            f"estimated prompt tokens {estimated_prompt_tokens} exceed available budget "
+            f"{available_prompt_tokens} (limit {prompt_token_budget}, reserve {response_reserve_tokens}, overhead {overhead_tokens})"
+        )
+    else:
+        budget["status"] = "passed"
+        budget["diagnostic"] = (
+            f"estimated prompt tokens {estimated_prompt_tokens} within available budget "
+            f"{available_prompt_tokens} (limit {prompt_token_budget}, reserve {response_reserve_tokens}, overhead {overhead_tokens})"
+        )
+    return budget
+
+
 def _build_evidence_projection_packet(
     *,
     task_title: str,
@@ -717,6 +767,9 @@ def run_prepare(
     evidence_task_title: str | None = None,
     evidence_task_summary: str | None = None,
     evidence_max_chars: int = 12000,
+    evidence_total_budget_tokens: int = 8192,
+    evidence_response_reserve_tokens: int = 900,
+    evidence_overhead_tokens: int = 512,
 ) -> dict[str, Any]:
     ts, run_dir = _prepare_run_dir(out_dir=out_dir, timestamp=timestamp, overwrite=overwrite)
 
@@ -749,6 +802,16 @@ def run_prepare(
         include_prompt_patches=include_prompt_patches,
         exclude_prompt_patches=exclude_prompt_patches,
     )
+    messy_input_path = run_dir / "messy_input.txt"
+    prompt_path = run_dir / "model_prompt_packet.md"
+    prompt_to_paste_path = run_dir / "prompt_to_paste.md"
+    instructions_path = run_dir / "operator_instructions.txt"
+    output_contract_path = run_dir / "output_contract.json"
+    canonical_output_contract_path = run_dir / "canonical_output_contract.json"
+    triage_packet_path = run_dir / "triage_packet.json"
+    orchestration_packet_path = run_dir / "orchestration_packet.json"
+    projection_summary_path = run_dir / "prompt_projection_summary.json"
+    manifest_path = run_dir / "run_manifest.json"
     evidence_projection_packet = None
     evidence_prompt_to_paste = None
     evidence_output_contract = None
@@ -760,25 +823,63 @@ def run_prepare(
             max_chars_per_source=evidence_max_chars,
         )
         evidence_prompt_to_paste = _render_evidence_observation_prompt(evidence_projection_packet)
+        evidence_budget = _prepare_evidence_budget(
+            prompt_text=evidence_prompt_to_paste,
+            evidence_projection_packet=evidence_projection_packet,
+            prompt_token_budget=evidence_total_budget_tokens,
+            response_reserve_tokens=evidence_response_reserve_tokens,
+            overhead_tokens=evidence_overhead_tokens,
+        )
+        evidence_projection_packet["budget"] = evidence_budget
+        if evidence_budget["status"] == "failed":
+            evidence_projection_path = run_dir / "evidence_projection.json"
+            evidence_projection_md_path = run_dir / "evidence_projection.md"
+            _write_json(evidence_projection_path, evidence_projection_packet)
+            evidence_projection_md_path.write_text(evidence_prompt_to_paste or "", encoding="utf-8")
+            prompt_projection_summary["evidence_projection_path"] = evidence_projection_path.name
+            prompt_projection_summary["evidence_projection_md_path"] = evidence_projection_md_path.name
+            prompt_projection_summary["evidence_source_count"] = len(evidence_projection_packet["evidence_sources"])
+            prompt_projection_summary["evidence_output_contract_sha256"] = _sha256_text(
+                json.dumps(EVIDENCE_OUTPUT_CONTRACT, indent=2, sort_keys=True) + "\n"
+            )
+            prompt_projection_summary["evidence_budget"] = evidence_budget
+            _write_json(projection_summary_path, prompt_projection_summary)
+            _write_json(canonical_output_contract_path, canonical_output_contract)
+            _write_json(output_contract_path, EVIDENCE_OUTPUT_CONTRACT)
+            _write_json(triage_packet_path, triage_packet)
+            _write_json(orchestration_packet_path, orchestration_packet)
+            _write_json(manifest_path, {
+                "report_type": "manual_supervised_attempt_run_manifest.v1",
+                "run_id": f"manual_supervised_attempt_{ts.lower()}",
+                "created_at": _utc_iso(),
+                "run_status": "prepared",
+                "triage_id": triage_packet["triage_id"],
+                "orchestration_id": orchestration_packet["orchestration_id"],
+                "prompt_packet_id": prompt_packet_id,
+                "artifacts": {
+                    "messy_input": str(messy_input_path),
+                    "model_prompt_packet": str(prompt_path),
+                    "prompt_to_paste": str(prompt_to_paste_path),
+                    "prompt_projection_summary": str(projection_summary_path),
+                    "operator_instructions": str(instructions_path),
+                    "canonical_output_contract": str(canonical_output_contract_path),
+                    "output_contract": str(output_contract_path),
+                    "triage_packet": str(triage_packet_path),
+                    "orchestration_packet": str(orchestration_packet_path),
+                    "evidence_projection": str(evidence_projection_path),
+                    "evidence_projection_md": str(evidence_projection_md_path),
+                },
+            })
+            raise ValueError(evidence_budget["diagnostic"])
         evidence_output_contract = deepcopy(EVIDENCE_OUTPUT_CONTRACT)
+        _write_json(run_dir / "response_schema.json", json.loads(EVIDENCE_RESPONSE_SCHEMA_PATH.read_text(encoding="utf-8")))
 
     prompt_to_paste = evidence_prompt_to_paste or render_model_prompt_packet(prompt_projection_packet, patch_library)
     projected_output_contract = evidence_output_contract or build_model_prompt_output_contract(prompt_projection_packet, patch_library)
 
-    messy_input_path = run_dir / "messy_input.txt"
-    prompt_path = run_dir / "model_prompt_packet.md"
-    prompt_to_paste_path = run_dir / "prompt_to_paste.md"
-    instructions_path = run_dir / "operator_instructions.txt"
-    output_contract_path = run_dir / "output_contract.json"
-    canonical_output_contract_path = run_dir / "canonical_output_contract.json"
-    triage_packet_path = run_dir / "triage_packet.json"
-    orchestration_packet_path = run_dir / "orchestration_packet.json"
-    manifest_path = run_dir / "run_manifest.json"
-
     messy_input_path.write_text(messy_input + "\n", encoding="utf-8")
     prompt_path.write_text(model_prompt_packet.rstrip() + "\n", encoding="utf-8")
     prompt_to_paste_path.write_text(prompt_to_paste.rstrip() + "\n", encoding="utf-8")
-    projection_summary_path = run_dir / "prompt_projection_summary.json"
     prompt_projection_summary["canonical_output_contract_sha256"] = _sha256_text(
         json.dumps(canonical_output_contract, indent=2, sort_keys=True) + "\n"
     )
@@ -798,6 +899,7 @@ def run_prepare(
         prompt_projection_summary["evidence_output_contract_sha256"] = _sha256_text(
             json.dumps(EVIDENCE_OUTPUT_CONTRACT, indent=2, sort_keys=True) + "\n"
         )
+        prompt_projection_summary["evidence_budget"] = evidence_projection_packet["budget"]
     _write_json(projection_summary_path, prompt_projection_summary)
     instructions_path.write_text(_operator_instructions_text(run_dir), encoding="utf-8")
     _write_json(canonical_output_contract_path, canonical_output_contract)
@@ -827,6 +929,7 @@ def run_prepare(
                 {
                     "evidence_projection": str(evidence_projection_path),
                     "evidence_projection_md": str(evidence_projection_md_path),
+                    "response_schema": str(run_dir / "response_schema.json"),
                 }
                 if evidence_projection_packet is not None
                 else {}
@@ -859,6 +962,9 @@ def run_session(
     evidence_task_title: str | None = None,
     evidence_task_summary: str | None = None,
     evidence_max_chars: int = 12000,
+    evidence_total_budget_tokens: int = 8192,
+    evidence_response_reserve_tokens: int = 900,
+    evidence_overhead_tokens: int = 512,
 ) -> dict[str, Any]:
     prepare_result = run_prepare(
         messy_input=messy_input,
@@ -871,6 +977,9 @@ def run_session(
         evidence_task_title=evidence_task_title,
         evidence_task_summary=evidence_task_summary,
         evidence_max_chars=evidence_max_chars,
+        evidence_total_budget_tokens=evidence_total_budget_tokens,
+        evidence_response_reserve_tokens=evidence_response_reserve_tokens,
+        evidence_overhead_tokens=evidence_overhead_tokens,
     )
     run_dir = Path(prepare_result["run_dir"])
     model_prompt_packet_path = Path(prepare_result["model_prompt_packet_path"])
@@ -919,6 +1028,8 @@ def run_call_local(
     response_schema_path: Path | None = None
     response_schema_source_path: Path | None = None
     response_format: dict[str, Any] | None = None
+    if response_schema_file is None and (run_dir / "response_schema.json").is_file():
+        response_schema_file = run_dir / "response_schema.json"
     if response_schema_file is not None:
         if not response_schema_file.is_file():
             raise ValueError(f"--response-schema-file does not exist: {response_schema_file}")
@@ -1333,6 +1444,17 @@ def run_ingest(
     )
     output_contract = _read_json(output_contract_path, kind="output contract")
     authorized_targets, authoritative_held_targets = _load_structured_authority_targets(run_dir, manifest)
+    projected_source_paths: list[str] | None = None
+    evidence_projection_artifact = artifacts.get("evidence_projection")
+    if isinstance(evidence_projection_artifact, str) and evidence_projection_artifact.strip():
+        evidence_projection_path = _resolve_run_file(run_dir, evidence_projection_artifact, field="artifacts.evidence_projection")
+        evidence_projection_payload = _read_json(evidence_projection_path, kind="evidence projection")
+        if isinstance(evidence_projection_payload.get("evidence_sources"), list):
+            projected_source_paths = [
+                source.get("path")
+                for source in evidence_projection_payload["evidence_sources"]
+                if isinstance(source, dict) and isinstance(source.get("path"), str)
+            ]
 
     if not raw_output_file.is_file():
         raise ValueError(f"--raw-output-file does not exist: {raw_output_file}")
@@ -1553,6 +1675,7 @@ def run_ingest(
         validated_at=_utc_iso(),
         authorized_targets=authorized_targets,
         authoritative_held_targets=authoritative_held_targets,
+        projected_source_paths=projected_source_paths,
     )
 
     attempt_path = run_dir / "supervised_model_attempt.json"
@@ -1705,6 +1828,24 @@ def build_arg_parser() -> argparse.ArgumentParser:
         default=12000,
         help="Maximum characters per projected evidence source.",
     )
+    prepare.add_argument(
+        "--evidence-total-budget-tokens",
+        type=int,
+        default=8192,
+        help="Maximum total token budget for evidence-mode prompts.",
+    )
+    prepare.add_argument(
+        "--evidence-response-reserve-tokens",
+        type=int,
+        default=900,
+        help="Reserved completion tokens for evidence-mode prompts.",
+    )
+    prepare.add_argument(
+        "--evidence-overhead-tokens",
+        type=int,
+        default=512,
+        help="Reserved prompt overhead tokens for evidence-mode prompts.",
+    )
 
     session = subparsers.add_parser("session")
     session.add_argument("--messy-input")
@@ -1746,6 +1887,24 @@ def build_arg_parser() -> argparse.ArgumentParser:
         type=int,
         default=12000,
         help="Maximum characters per projected evidence source.",
+    )
+    session.add_argument(
+        "--evidence-total-budget-tokens",
+        type=int,
+        default=8192,
+        help="Maximum total token budget for evidence-mode prompts.",
+    )
+    session.add_argument(
+        "--evidence-response-reserve-tokens",
+        type=int,
+        default=900,
+        help="Reserved completion tokens for evidence-mode prompts.",
+    )
+    session.add_argument(
+        "--evidence-overhead-tokens",
+        type=int,
+        default=512,
+        help="Reserved prompt overhead tokens for evidence-mode prompts.",
     )
 
     call_local = subparsers.add_parser("call-local")
@@ -1807,6 +1966,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 evidence_task_title=args.evidence_task_title,
                 evidence_task_summary=args.evidence_task_summary,
                 evidence_max_chars=args.evidence_max_chars,
+                evidence_total_budget_tokens=args.evidence_total_budget_tokens,
+                evidence_response_reserve_tokens=args.evidence_response_reserve_tokens,
+                evidence_overhead_tokens=args.evidence_overhead_tokens,
             )
             print(f"run_dir: {result['run_dir']}")
             print(f"model_prompt_packet_path: {result['model_prompt_packet_path']}")
@@ -1830,6 +1992,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 evidence_task_title=args.evidence_task_title,
                 evidence_task_summary=args.evidence_task_summary,
                 evidence_max_chars=args.evidence_max_chars,
+                evidence_total_budget_tokens=args.evidence_total_budget_tokens,
+                evidence_response_reserve_tokens=args.evidence_response_reserve_tokens,
+                evidence_overhead_tokens=args.evidence_overhead_tokens,
             )
             print(f"run_dir: {result['run_dir']}")
             print(f"model_prompt_packet_path: {result['model_prompt_packet_path']}")

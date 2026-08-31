@@ -549,6 +549,100 @@ def test_preserves_attempt_triage_and_orchestration_ids_and_not_reviewed_status(
     assert record["acceptance_status"] == "not_reviewed"
 
 
+def test_observation_contract_passes_when_findings_are_grounded():
+    attempt = make_attempt_record(
+        json.dumps(
+            {
+                "findings": [
+                    {
+                        "claim": "The document states a navigation rule.",
+                        "evidence": [
+                            {
+                                "path": "docs/README.md",
+                                "detail": "The navigation note is present.",
+                            }
+                        ],
+                    }
+                ],
+                "reason": "grounded",
+            }
+        )
+    )
+    output_contract = {"format": "json", "requires_reason": True, "required_fields": ["findings", "reason"]}
+    record = validate_supervised_attempt_output_against_contract(
+        attempt_record=attempt,
+        output_contract=output_contract,
+        validation_id="validation_observation_ok",
+        validated_at="2026-07-06T00:00:00Z",
+        projected_source_paths=["docs/README.md"],
+    )
+    assert record["validation_status"] == "passed"
+    assert any(check["check_id"] == "observation_schema" and check["status"] == "passed" for check in record["checks"])
+    assert any(check["check_id"] == "observation_grounding" and check["status"] == "passed" for check in record["checks"])
+
+
+def test_observation_contract_rejects_missing_claim():
+    attempt = make_attempt_record(
+        json.dumps(
+            {
+                "findings": [
+                    {
+                        "evidence": [
+                            {
+                                "path": "docs/README.md",
+                                "detail": "The navigation note is present.",
+                            }
+                        ]
+                    }
+                ],
+                "reason": "grounded",
+            }
+        )
+    )
+    output_contract = {"format": "json", "requires_reason": True, "required_fields": ["findings", "reason"]}
+    record = validate_supervised_attempt_output_against_contract(
+        attempt_record=attempt,
+        output_contract=output_contract,
+        validation_id="validation_observation_missing_claim",
+        validated_at="2026-07-06T00:00:00Z",
+        projected_source_paths=["docs/README.md"],
+    )
+    assert record["validation_status"] == "failed"
+    assert any(check["check_id"] == "observation_claim" and check["status"] == "failed" for check in record["checks"])
+
+
+def test_observation_contract_rejects_evidence_path_not_projected():
+    attempt = make_attempt_record(
+        json.dumps(
+            {
+                "findings": [
+                    {
+                        "claim": "The document states a navigation rule.",
+                        "evidence": [
+                            {
+                                "path": "docs/NOT_PROJECTED.md",
+                                "detail": "This path was not supplied.",
+                            }
+                        ],
+                    }
+                ],
+                "reason": "grounded",
+            }
+        )
+    )
+    output_contract = {"format": "json", "requires_reason": True, "required_fields": ["findings", "reason"]}
+    record = validate_supervised_attempt_output_against_contract(
+        attempt_record=attempt,
+        output_contract=output_contract,
+        validation_id="validation_observation_path_bad",
+        validated_at="2026-07-06T00:00:00Z",
+        projected_source_paths=["docs/README.md"],
+    )
+    assert record["validation_status"] == "failed"
+    assert any(check["check_id"] == "observation_grounding" and check["status"] == "failed" for check in record["checks"])
+    assert "cited evidence path not projected: docs/NOT_PROJECTED.md" in "\n".join(record["diagnostics"])
+
+
 def test_returns_structured_diagnostics():
     attempt = make_attempt_record('{"allowed_targets": []')
     output_contract = {"format": "json", "requires_reason": False, "required_fields": []}

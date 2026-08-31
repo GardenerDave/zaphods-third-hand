@@ -262,6 +262,156 @@ def _check_required_field_types(payload: dict[str, Any]) -> tuple[list[str], dic
     }
 
 
+def _is_observation_contract(output_contract: dict[str, Any]) -> bool:
+    required_fields = output_contract.get("required_fields")
+    return (
+        output_contract.get("format") == "json"
+        and isinstance(required_fields, list)
+        and "findings" in required_fields
+        and "reason" in required_fields
+    )
+
+
+def _check_observation_output(
+    payload: dict[str, Any],
+    *,
+    projected_source_paths: list[str] | None,
+) -> tuple[list[dict[str, str]], list[str]]:
+    checks: list[dict[str, str]] = []
+    diagnostics: list[str] = []
+    findings = payload.get("findings")
+    if not isinstance(findings, list):
+        checks.append(
+            {
+                "check_id": "observation_findings",
+                "status": "failed",
+                "message": "findings must be a list.",
+            }
+        )
+        diagnostics.append("findings must be a list.")
+        return checks, diagnostics
+
+    projected_set = {path for path in projected_source_paths or [] if isinstance(path, str) and path.strip()}
+    for finding_index, finding in enumerate(findings):
+        if not isinstance(finding, dict):
+            checks.append(
+                {
+                    "check_id": "observation_finding_shape",
+                    "status": "failed",
+                    "message": f"finding[{finding_index}] must be an object.",
+                }
+            )
+            diagnostics.append(f"finding[{finding_index}] must be an object.")
+            continue
+        claim = finding.get("claim")
+        if not isinstance(claim, str) or not claim.strip():
+            checks.append(
+                {
+                    "check_id": "observation_claim",
+                    "status": "failed",
+                    "message": f"finding[{finding_index}].claim must be a non-empty string.",
+                }
+            )
+            diagnostics.append(f"finding[{finding_index}].claim must be a non-empty string.")
+        evidence = finding.get("evidence")
+        if not isinstance(evidence, list) or not evidence:
+            checks.append(
+                {
+                    "check_id": "observation_evidence",
+                    "status": "failed",
+                    "message": f"finding[{finding_index}].evidence must be a non-empty list.",
+                }
+            )
+            diagnostics.append(f"finding[{finding_index}].evidence must be a non-empty list.")
+            continue
+        for evidence_index, evidence_item in enumerate(evidence):
+            if not isinstance(evidence_item, dict):
+                checks.append(
+                    {
+                        "check_id": "observation_evidence_item",
+                        "status": "failed",
+                        "message": f"finding[{finding_index}].evidence[{evidence_index}] must be an object.",
+                    }
+                )
+                diagnostics.append(
+                    f"finding[{finding_index}].evidence[{evidence_index}] must be an object."
+                )
+                continue
+            path = evidence_item.get("path")
+            detail = evidence_item.get("detail")
+            if not isinstance(path, str) or not path.strip():
+                checks.append(
+                    {
+                        "check_id": "observation_evidence_path",
+                        "status": "failed",
+                        "message": f"finding[{finding_index}].evidence[{evidence_index}].path must be a non-empty string.",
+                    }
+                )
+                diagnostics.append(
+                    f"finding[{finding_index}].evidence[{evidence_index}].path must be a non-empty string."
+                )
+            elif projected_set and path not in projected_set:
+                checks.append(
+                    {
+                        "check_id": "observation_grounding",
+                        "status": "failed",
+                        "message": f"finding[{finding_index}].evidence[{evidence_index}].path is not in the projected evidence set.",
+                    }
+                )
+                diagnostics.append(f"cited evidence path not projected: {path}")
+            if not isinstance(detail, str) or not detail.strip():
+                checks.append(
+                    {
+                        "check_id": "observation_evidence_detail",
+                        "status": "failed",
+                        "message": f"finding[{finding_index}].evidence[{evidence_index}].detail must be a non-empty string.",
+                    }
+                )
+                diagnostics.append(
+                    f"finding[{finding_index}].evidence[{evidence_index}].detail must be a non-empty string."
+                )
+
+    if not findings:
+        checks.append(
+            {
+                "check_id": "observation_findings",
+                "status": "failed",
+                "message": "findings must contain at least one item.",
+            }
+        )
+        diagnostics.append("findings must contain at least one item.")
+    else:
+        checks.append(
+            {
+                "check_id": "observation_findings",
+                "status": "passed",
+                "message": "findings is a list.",
+            }
+        )
+        if not any(check["status"] == "failed" and check["check_id"].startswith("observation_") for check in checks):
+            checks.append(
+                {
+                    "check_id": "observation_schema",
+                    "status": "passed",
+                    "message": "Observation findings/evidence shape is valid.",
+                }
+            )
+
+    if projected_set:
+        checks.append(
+            {
+                "check_id": "observation_grounding",
+                "status": "passed"
+                if not any(check["check_id"] == "observation_grounding" and check["status"] == "failed" for check in checks)
+                else "failed",
+                "message": "All cited evidence paths resolve to projected evidence sources."
+                if not any(check["check_id"] == "observation_grounding" and check["status"] == "failed" for check in checks)
+                else "Some cited evidence paths were not in the projected evidence set.",
+            }
+        )
+    return checks, diagnostics
+
+
 def _check_allowed_held_target_separation(
     payload: dict[str, Any],
 ) -> tuple[list[str], dict[str, Any]]:
@@ -319,6 +469,7 @@ def validate_supervised_attempt_output_against_contract(
     validated_at: str,
     authorized_targets: list[str] | None = None,
     authoritative_held_targets: list[str] | None = None,
+    projected_source_paths: list[str] | None = None,
 ) -> dict[str, Any]:
     try:
         validated_attempt = validate_supervised_model_attempt_record(attempt_record)
@@ -423,56 +574,64 @@ def validate_supervised_attempt_output_against_contract(
         checks.append(type_check)
         if invalid_types:
             diagnostics.extend(invalid_types)
-        overlap_targets, separation_check = _check_allowed_held_target_separation(parsed_output)
-        checks.append(separation_check)
-        if overlap_targets:
-            diagnostics.extend(
-                [f"Target cannot be both allowed and held: {target}" for target in overlap_targets]
+        if _is_observation_contract(output_contract):
+            observation_checks, observation_diagnostics = _check_observation_output(
+                parsed_output,
+                projected_source_paths=projected_source_paths,
             )
-        if authoritative_held_targets is None:
-            checks.append(
-                {
-                    "check_id": "held_target_preservation",
-                    "status": "not_applicable",
-                    "message": "Authoritative held targets were not available for this run.",
-                }
-            )
+            checks.extend(observation_checks)
+            diagnostics.extend(observation_diagnostics)
         else:
-            held_targets_value = parsed_output.get("held_targets")
-            if not isinstance(held_targets_value, list):
+            overlap_targets, separation_check = _check_allowed_held_target_separation(parsed_output)
+            checks.append(separation_check)
+            if overlap_targets:
+                diagnostics.extend(
+                    [f"Target cannot be both allowed and held: {target}" for target in overlap_targets]
+                )
+            if authoritative_held_targets is None:
                 checks.append(
                     {
                         "check_id": "held_target_preservation",
-                        "status": "failed",
-                        "message": "held_targets must be a list to evaluate held-target preservation.",
+                        "status": "not_applicable",
+                        "message": "Authoritative held targets were not available for this run.",
                     }
                 )
-                diagnostics.append("held_targets must be a list to evaluate held-target preservation.")
-            elif held_targets_value != authoritative_held_targets:
-                missing = [target for target in authoritative_held_targets if target not in held_targets_value]
-                unexpected = [target for target in held_targets_value if target not in authoritative_held_targets]
-                details: list[str] = []
-                if missing:
-                    details.append("missing authoritative held targets: " + ", ".join(missing))
-                if unexpected:
-                    details.append("unexpected held targets: " + ", ".join(unexpected))
-                checks.append(
-                    {
-                        "check_id": "held_target_preservation",
-                        "status": "failed",
-                        "message": "Held targets must match authoritative held targets exactly."
-                        + (" " + "; ".join(details) if details else ""),
-                    }
-                )
-                diagnostics.extend(details or ["Held targets do not match authoritative held targets exactly."])
             else:
-                checks.append(
-                    {
-                        "check_id": "held_target_preservation",
-                        "status": "passed",
-                        "message": "Held targets match authoritative held targets exactly.",
-                    }
-                )
+                held_targets_value = parsed_output.get("held_targets")
+                if not isinstance(held_targets_value, list):
+                    checks.append(
+                        {
+                            "check_id": "held_target_preservation",
+                            "status": "failed",
+                            "message": "held_targets must be a list to evaluate held-target preservation.",
+                        }
+                    )
+                    diagnostics.append("held_targets must be a list to evaluate held-target preservation.")
+                elif held_targets_value != authoritative_held_targets:
+                    missing = [target for target in authoritative_held_targets if target not in held_targets_value]
+                    unexpected = [target for target in held_targets_value if target not in authoritative_held_targets]
+                    details: list[str] = []
+                    if missing:
+                        details.append("missing authoritative held targets: " + ", ".join(missing))
+                    if unexpected:
+                        details.append("unexpected held targets: " + ", ".join(unexpected))
+                    checks.append(
+                        {
+                            "check_id": "held_target_preservation",
+                            "status": "failed",
+                            "message": "Held targets must match authoritative held targets exactly."
+                            + (" " + "; ".join(details) if details else ""),
+                        }
+                    )
+                    diagnostics.extend(details or ["Held targets do not match authoritative held targets exactly."])
+                else:
+                    checks.append(
+                        {
+                            "check_id": "held_target_preservation",
+                            "status": "passed",
+                            "message": "Held targets match authoritative held targets exactly.",
+                        }
+                    )
     elif contract_format == "json":
         checks.append(
             {

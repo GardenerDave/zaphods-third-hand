@@ -547,6 +547,44 @@ def test_prepare_with_evidence_files_projects_bounded_observation_packet(tmp_pat
     assert summary["evidence_projection_path"] == "evidence_projection.json"
     assert summary["evidence_source_count"] == 2
     assert "evidence_output_contract_sha256" in summary
+    assert summary["evidence_budget"]["status"] == "passed"
+    assert summary["evidence_budget"]["any_source_truncated"] is True
+
+
+def test_prepare_with_evidence_files_fails_early_when_total_budget_overflows(tmp_path: Path):
+    run_dir = tmp_path / "runs"
+    source = tmp_path / "oversize.txt"
+    source.write_text("x" * 2000, encoding="utf-8")
+
+    result = run_script(
+        "prepare",
+        "--messy-input",
+        "Inspect repository evidence.",
+        "--out-dir",
+        run_dir,
+        "--timestamp",
+        "20260707T040407Z",
+        "--evidence-file",
+        source,
+        "--evidence-task-title",
+        "Read-only repo observation",
+        "--evidence-task-summary",
+        "Inspect supplied evidence only; do not browse the filesystem.",
+        "--evidence-max-chars",
+        "2000",
+        "--evidence-total-budget-tokens",
+        "10",
+        "--evidence-response-reserve-tokens",
+        "5",
+        "--evidence-overhead-tokens",
+        "2",
+    )
+    assert result.returncode != 0
+    assert "exceed available budget" in result.stderr
+    run_path = run_dir / "20260707T040407Z"
+    projection = json.loads((run_path / "evidence_projection.json").read_text(encoding="utf-8"))
+    assert projection["budget"]["status"] == "failed"
+    assert projection["budget"]["estimated_prompt_tokens"] > projection["budget"]["available_prompt_tokens"]
 
 
 def test_prepare_refuses_overwrite_by_default(tmp_path: Path):
@@ -683,6 +721,51 @@ def test_prepare_and_call_local_with_evidence_projection_uses_observation_contra
     contract = json.loads((run_path / "output_contract.json").read_text(encoding="utf-8"))
     assert contract == {"format": "json", "required_fields": ["findings", "reason"], "requires_reason": True}
     assert "# ZTH Repository Observation Packet" in (run_path / "prompt_to_paste.md").read_text(encoding="utf-8")
+
+
+def test_call_local_auto_attaches_evidence_response_schema(tmp_path: Path):
+    run_dir = tmp_path / "runs"
+    source = tmp_path / "evidence.txt"
+    source.write_text("alpha\nbeta\n", encoding="utf-8")
+    result = run_script(
+        "prepare",
+        "--messy-input",
+        "Inspect supplied evidence only.",
+        "--out-dir",
+        run_dir,
+        "--timestamp",
+        "20260707T040408Z",
+        "--evidence-file",
+        source,
+        "--evidence-task-title",
+        "Evidence inspection",
+        "--evidence-task-summary",
+        "Use only the supplied evidence packet.",
+        "--evidence-max-chars",
+        "100",
+    )
+    assert result.returncode == 0
+    run_path = run_dir / "20260707T040408Z"
+    response_body = {"choices": [{"message": {"content": "{\"findings\": [], \"reason\": \"ok\"}"}}]}
+    mock_response = io.BytesIO(json.dumps(response_body).encode("utf-8"))
+    mock_response.status = 200  # type: ignore[attr-defined]
+    mock_response.getcode = lambda: 200  # type: ignore[assignment]
+    mock_response.__enter__ = lambda self=mock_response: self  # type: ignore[assignment]
+    mock_response.__exit__ = lambda exc_type, exc, tb: False  # type: ignore[assignment]
+    with patch("urllib.request.urlopen", return_value=mock_response):
+        call_result = manual_attempt.run_call_local(
+            run_dir=run_path,
+            endpoint="http://127.0.0.1:9999/v1",
+            model="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+            max_tokens=64,
+            timeout_seconds=5,
+            temperature=0,
+            overwrite=False,
+        )
+    assert call_result["endpoint"] == "http://127.0.0.1:9999/v1"
+    request = json.loads((run_path / "local_model_call.json").read_text(encoding="utf-8"))
+    assert request["request_provenance"]["structured_output_enabled"] is True
+    assert request["request_provenance"]["structured_output_mechanism"] == "openai_json_schema"
 
 
 def test_session_mode_rejects_missing_messy_input(tmp_path: Path):
