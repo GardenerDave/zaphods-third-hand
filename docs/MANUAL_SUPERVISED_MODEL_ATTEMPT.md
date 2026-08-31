@@ -228,7 +228,8 @@ Ingest supports two provenance classes:
 Captured-model ingest preserves the actual worker identity, acquisition provenance, and raw-response identity from the recorded model-call metadata. The manual path remains available for historical compatibility, but it is not used to represent a truthful captured worker result in a continuous supervised transaction.
 For captured-model ingest, `model_call_metadata_sha256` records the SHA-256 of the exact metadata file bytes, not a reserialized copy.
 When structured output is active, the captured metadata also records the exact schema artifact, schema SHA-256, schema length, and request-level structured-output mechanism used for the acquisition.
-The runner can also project `prompt_to_paste.md` from the canonical prepared packet while excluding specific prompt-patch IDs, instead of hand-writing a replacement prompt from scratch.
+The runner can project `prompt_to_paste.md` from the canonical prepared packet while explicitly including or excluding prompt-patch IDs, instead of hand-writing a replacement prompt from scratch.
+Canonical `model_prompt_packet.md` stays unchanged. `prompt_to_paste.md` is a deterministic projection that can add approved prompt patches with `--include-prompt-patch` and omit superseded patches with `--exclude-prompt-patch`.
 
 The transaction manifest is an index over the existing supervised artifacts.
 It references, but does not replace, the attempt, validation, review,
@@ -262,6 +263,7 @@ Validation also rejects duplicate JSON keys because they create provenance and c
 Validation also rejects held-target mutations by comparing the emitted `held_targets` exactly against the authoritative held-target set from the run state.
 When structured run artifacts provide authorized targets, validation can also reject `allowed_targets` values that exceed that authority.
 Validation also rejects targets that appear in both `allowed_targets` and `held_targets`, which prevents structurally valid but contradictory target-scope outputs.
+For the supervised transaction pipeline, held targets are preserved as an exact authoritative list; reordering changes can therefore fail when they change the authoritative list identity.
 
 Attempt provenance is recorded as manual operator-provided model output using:
 

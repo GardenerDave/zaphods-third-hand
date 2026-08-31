@@ -1,0 +1,31 @@
+{
+  "patch_id": "single_pass_json_object_v1",
+  "title": "Single-pass JSON object emission",
+  "status": "candidate",
+  "failure_signature": [
+    "model restarts the object after beginning JSON output",
+    "model appends a second top-level object or preamble after the object begins"
+  ],
+  "applies_to": {
+    "stage": ["output_contract"],
+    "task_type": ["repo_patch", "docs_update", "triage", "any"],
+    "model_size": ["small", "mid", "any"]
+  },
+  "prompt_delta": "Construct the response as one JSON object in one pass. Start with {, emit each required top-level key exactly once in the exact order specified below, then close the object with }. Do not emit format, required_fields_present, reason, or any other field as a preamble before this sequence. Do not restart the object, repeat a field, or append a second copy of any field after it has already been emitted. After reason, close the JSON object immediately. Emit no additional top-level key.",
+  "required_output_fields": [
+    "allowed_targets",
+    "held_targets",
+    "scope_expansion_required",
+    "claims",
+    "evidence_basis",
+    "unverified_claims",
+    "format",
+    "required_fields_present",
+    "reason"
+  ],
+  "validator_expectations": [
+    "response must be a single JSON object",
+    "top-level key order must be stable for generation",
+    "no second top-level object may be emitted"
+  ]
+}

@@ -1826,7 +1826,7 @@ def test_ingest_with_structured_model_call_metadata_records_structured_output_pr
     assert "manual_operator_provided_model_output" not in json.dumps(attempt)
 
 
-def test_prepare_can_project_prompt_without_selected_patch(tmp_path: Path):
+def test_prepare_projects_canonical_prompt_with_explicit_patch_includes(tmp_path: Path):
     result = run_script(
         "prepare",
         "--messy-input",
@@ -1835,17 +1835,82 @@ def test_prepare_can_project_prompt_without_selected_patch(tmp_path: Path):
         tmp_path / "runs",
         "--timestamp",
         "20260707T161616Z",
-        "--exclude-prompt-patch",
-        "output_contract_v1",
+        "--include-prompt-patch",
+        "allowed_held_mapping_v1",
+        "--include-prompt-patch",
+        "required_fields_boolean_v1",
+        "--include-prompt-patch",
+        "required_fields_boolean_v1",
     )
     assert result.returncode == 0
     run_dir = tmp_path / "runs" / "20260707T161616Z"
     prompt_packet = (run_dir / "model_prompt_packet.md").read_text(encoding="utf-8")
     prompt_copy = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
+    summary = json.loads((run_dir / "prompt_projection_summary.json").read_text(encoding="utf-8"))
     assert prompt_copy != prompt_packet
     assert "Patch: output_contract_v1" in prompt_packet
-    assert "Patch: output_contract_v1" not in prompt_copy
-    assert "required_fields_present" not in prompt_copy
+    assert "Patch: output_contract_v1" in prompt_copy
+    assert "Patch: allowed_held_mapping_v1" in prompt_copy
+    assert "Patch: required_fields_boolean_v1" in prompt_copy
+    assert "Patch: unique_json_keys_v1" not in prompt_copy
+    assert "Patch: single_pass_json_object_v1" not in prompt_copy
+    assert prompt_copy.count("Patch: allowed_held_mapping_v1") == 1
+    assert prompt_copy.count("Patch: required_fields_boolean_v1") == 1
+    assert "scope_boundary_v1" in prompt_copy
+    assert "unsupported_certainty_v1" in prompt_copy
+    assert "output_contract_v1" in prompt_copy
+    assert summary["canonical_selected_prompt_patches"] == [
+        "scope_boundary_v1",
+        "unsupported_certainty_v1",
+        "output_contract_v1",
+    ]
+    assert summary["explicitly_included_prompt_patches"] == [
+        "allowed_held_mapping_v1",
+        "required_fields_boolean_v1",
+    ]
+    assert summary["explicitly_excluded_prompt_patches"] == []
+    assert summary["final_selected_prompt_patches"] == [
+        "scope_boundary_v1",
+        "unsupported_certainty_v1",
+        "output_contract_v1",
+        "allowed_held_mapping_v1",
+        "required_fields_boolean_v1",
+    ]
+
+
+def test_prepare_projection_include_and_exclude_is_deterministic(tmp_path: Path):
+    result = run_script(
+        "prepare",
+        "--messy-input",
+        "The LoRA and prompt injection work got messy. Build a bounded design packet.",
+        "--out-dir",
+        tmp_path / "runs",
+        "--timestamp",
+        "20260707T171717Z",
+        "--include-prompt-patch",
+        "unique_json_keys_v1",
+        "--include-prompt-patch",
+        "single_pass_json_object_v1",
+        "--exclude-prompt-patch",
+        "single_pass_json_object_v1",
+    )
+    assert result.returncode == 0
+    run_dir = tmp_path / "runs" / "20260707T171717Z"
+    prompt_copy = (run_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
+    summary = json.loads((run_dir / "prompt_projection_summary.json").read_text(encoding="utf-8"))
+    assert "Patch: unique_json_keys_v1" in prompt_copy
+    assert "Patch: single_pass_json_object_v1" not in prompt_copy
+    assert summary["explicitly_included_prompt_patches"] == [
+        "unique_json_keys_v1",
+        "single_pass_json_object_v1",
+    ]
+    assert summary["explicitly_excluded_prompt_patches"] == ["single_pass_json_object_v1"]
+    assert summary["final_selected_prompt_patches"] == [
+        "scope_boundary_v1",
+        "unsupported_certainty_v1",
+        "output_contract_v1",
+        "unique_json_keys_v1",
+    ]
 
 
 def test_ingest_with_structured_model_call_metadata_rejects_tampered_schema_provenance(tmp_path: Path):

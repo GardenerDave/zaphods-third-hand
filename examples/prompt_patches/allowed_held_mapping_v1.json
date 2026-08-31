@@ -1,0 +1,27 @@
+{
+  "patch_id": "allowed_held_mapping_v1",
+  "title": "Allowed and held target mapping",
+  "status": "candidate",
+  "failure_signature": [
+    "model swaps allowed and held targets",
+    "model promotes held targets into allowed targets",
+    "model demotes allowed targets into held targets"
+  ],
+  "applies_to": {
+    "stage": ["target_selection"],
+    "task_type": ["repo_patch", "docs_update", "triage", "any"],
+    "model_size": ["small", "mid", "any"]
+  },
+  "prompt_delta": "Copy the supplied allowed_targets and held_targets into the output without swapping, promoting, demoting, inferring, or adding targets. The only allowed target is docs/reports/. The held targets production automation, automatic curriculum capture, automatic promotion, and implementation_packet must remain held and must not appear in allowed_targets.",
+  "required_output_fields": [
+    "allowed_targets",
+    "held_targets",
+    "scope_expansion_required",
+    "reason"
+  ],
+  "validator_expectations": [
+    "every authoritative held target must remain in held_targets",
+    "no authoritative held target may appear in allowed_targets",
+    "allowed_targets must not expand beyond the provided allowed authority"
+  ]
+}

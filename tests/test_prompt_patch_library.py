@@ -21,11 +21,15 @@ SCRIPT = ROOT / "local_harness" / "prompt_patch_library.py"
 PATCH_DIR = ROOT / "examples" / "prompt_patches"
 EXPECTED_PATCH_IDS = [
     "absence_of_evidence_v1",
+    "allowed_held_mapping_v1",
     "output_contract_v1",
     "placeholder_leakage_v1",
     "reason_required_v1",
+    "required_fields_boolean_v1",
     "scope_boundary_v1",
+    "single_pass_json_object_v1",
     "stop_condition_quality_v1",
+    "unique_json_keys_v1",
     "unsupported_certainty_v1",
 ]
 
@@ -106,7 +110,7 @@ def test_filters_by_stage():
     library = PromptPatchLibrary()
     library.load_dir(PATCH_DIR)
     selected = library.filter_by_stage("target_selection")
-    assert [p["patch_id"] for p in selected] == ["scope_boundary_v1"]
+    assert [p["patch_id"] for p in selected] == ["allowed_held_mapping_v1", "scope_boundary_v1"]
 
 
 def test_filters_by_task_type():

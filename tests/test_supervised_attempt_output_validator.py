@@ -282,9 +282,61 @@ def test_passes_when_allowed_and_held_targets_do_not_overlap():
     )
 
 
-def test_rejects_held_targets_that_do_not_match_authoritative_targets_exactly():
+@pytest.mark.parametrize(
+    "held_targets, expected_diagnostics",
+    [
+        (
+            ["docs/reports/production automation"],
+            [
+                "missing authoritative held targets: production automation",
+                "unexpected held targets: docs/reports/production automation",
+            ],
+        ),
+        (
+            ["production automation", "automatic curriculum capture", "automatic promotion"],
+            ["missing authoritative held targets: implementation_packet"],
+        ),
+        (
+            [
+                "production automation",
+                "automatic curriculum capture",
+                "automatic promotion",
+                "implementation_packet",
+                "unexpected extra",
+            ],
+            ["unexpected held targets: unexpected extra"],
+        ),
+        (
+            [
+                "automatic curriculum capture",
+                "production automation",
+                "automatic promotion",
+                "implementation_packet",
+            ],
+            [
+                "Held targets must match authoritative held targets exactly.",
+            ],
+        ),
+    ],
+)
+def test_rejects_held_targets_that_do_not_match_authoritative_targets_exactly(
+    held_targets,
+    expected_diagnostics,
+):
     attempt = make_attempt_record(
-        '{"allowed_targets": ["docs/reports/"], "held_targets": ["docs/reports/production automation"], "scope_expansion_required": true, "claims": [], "evidence_basis": [], "unverified_claims": [], "format": "json", "required_fields_present": true, "reason": "bounded"}'
+        json.dumps(
+            {
+                "allowed_targets": ["docs/reports/"],
+                "held_targets": held_targets,
+                "scope_expansion_required": True,
+                "claims": [],
+                "evidence_basis": [],
+                "unverified_claims": [],
+                "format": "json",
+                "required_fields_present": True,
+                "reason": "bounded",
+            }
+        )
     )
     output_contract = {"format": "json", "requires_reason": True, "required_fields": []}
     record = validate_supervised_attempt_output_against_contract(
@@ -306,8 +358,11 @@ def test_rejects_held_targets_that_do_not_match_authoritative_targets_exactly():
         for check in record["checks"]
     )
     diagnostics = "\n".join(record["diagnostics"])
-    assert "missing authoritative held targets: production automation" in diagnostics
-    assert "unexpected held targets: docs/reports/production automation" in diagnostics
+    for message in expected_diagnostics:
+        if message == "Held targets must match authoritative held targets exactly.":
+            assert message in diagnostics or "Held targets do not match authoritative held targets exactly." in diagnostics
+        else:
+            assert message in diagnostics
 
 
 def test_rejects_allowed_and_held_target_overlap():

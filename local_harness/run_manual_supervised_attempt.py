@@ -19,12 +19,11 @@ if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from local_harness.orchestration_packet import assemble_orchestration_packet, validate_orchestration_packet
-from local_harness.prompt_patch_library import PromptPatchLibrary
+from local_harness.prompt_patch_library import PromptPatchLibrary, render_prompt_deltas
 from local_harness.render_model_prompt_packet import (
     build_model_prompt_output_contract,
     render_model_prompt_packet,
 )
-from local_harness.prompt_patch_library import render_prompt_deltas
 from local_harness.render_supervised_attempt_output_validation import (
     render_supervised_attempt_output_validation,
 )
@@ -71,28 +70,62 @@ def _read_messy_input(*, messy_input: str | None, messy_input_file: Path | None)
     return value
 
 
-def _filter_prompt_patches(packet: dict[str, Any], excluded_patch_ids: set[str]) -> dict[str, Any]:
-    if not excluded_patch_ids:
-        return packet
+def _project_prompt_packet(
+    packet: dict[str, Any],
+    patch_library: PromptPatchLibrary,
+    *,
+    include_prompt_patches: list[str] | None = None,
+    exclude_prompt_patches: list[str] | None = None,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    canonical_selected = list(packet.get("selected_prompt_patches", []))
+    included_ids: list[str] = []
+    included_seen: set[str] = set()
+    for patch_id in include_prompt_patches or []:
+        if not isinstance(patch_id, str):
+            continue
+        normalized = patch_id.strip()
+        if not normalized or normalized in included_seen:
+            continue
+        included_seen.add(normalized)
+        included_ids.append(normalized)
+    excluded_ids = {
+        patch_id.strip()
+        for patch_id in (exclude_prompt_patches or [])
+        if isinstance(patch_id, str) and patch_id.strip()
+    }
+
     projected = deepcopy(packet)
-    selected_prompt_patches = [
-        patch_id
-        for patch_id in projected.get("selected_prompt_patches", [])
-        if patch_id not in excluded_patch_ids
-    ]
-    projected["selected_prompt_patches"] = selected_prompt_patches
-    selected_patches = []
-    patch_library = PromptPatchLibrary()
-    patch_library.load_dir("examples/prompt_patches")
-    for patch_id in selected_prompt_patches:
-        selected_patches.append(patch_library.get(patch_id))
+    final_selected: list[str] = []
+    seen: set[str] = set()
+    for patch_id in canonical_selected + included_ids:
+        if patch_id in excluded_ids or patch_id in seen:
+            continue
+        if patch_id not in patch_library.patch_ids:
+            raise ValueError(f"unknown prompt patch id in projection: {patch_id}")
+        seen.add(patch_id)
+        final_selected.append(patch_id)
+
+    projected["selected_prompt_patches"] = final_selected
+    selected_patches = [patch_library.get(patch_id) for patch_id in final_selected]
     projected["rendered_patch_deltas"] = (
         render_prompt_deltas(selected_patches) if selected_patches else "No prompt patches selected.\n"
     )
     projected["output_contract"] = build_model_prompt_output_contract(projected, patch_library)
-    projected["provenance"] = deepcopy(projected.get("provenance", {}))
-    projected["provenance"]["excluded_prompt_patches"] = sorted(excluded_patch_ids)
-    return projected
+    provenance = deepcopy(projected.get("provenance", {}))
+    provenance["prompt_projection"] = {
+        "canonical_selected_prompt_patches": canonical_selected,
+        "explicitly_included_prompt_patches": included_ids,
+        "explicitly_excluded_prompt_patches": sorted(excluded_ids),
+        "final_selected_prompt_patches": final_selected,
+    }
+    projected["provenance"] = provenance
+    projection_summary = {
+        "canonical_selected_prompt_patches": canonical_selected,
+        "explicitly_included_prompt_patches": included_ids,
+        "explicitly_excluded_prompt_patches": sorted(excluded_ids),
+        "final_selected_prompt_patches": final_selected,
+    }
+    return projected, projection_summary
 
 
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
@@ -606,6 +639,7 @@ def run_prepare(
     out_dir: Path,
     timestamp: str | None = None,
     overwrite: bool = False,
+    include_prompt_patches: list[str] | None = None,
     exclude_prompt_patches: list[str] | None = None,
 ) -> dict[str, Any]:
     ts, run_dir = _prepare_run_dir(out_dir=out_dir, timestamp=timestamp, overwrite=overwrite)
@@ -633,12 +667,12 @@ def run_prepare(
 
     model_prompt_packet = render_model_prompt_packet(orchestration_packet, patch_library)
     output_contract = build_model_prompt_output_contract(orchestration_packet, patch_library)
-    excluded_prompt_patches = {
-        patch_id.strip()
-        for patch_id in (exclude_prompt_patches or [])
-        if isinstance(patch_id, str) and patch_id.strip()
-    }
-    prompt_projection_packet = _filter_prompt_patches(orchestration_packet, excluded_prompt_patches)
+    prompt_projection_packet, prompt_projection_summary = _project_prompt_packet(
+        orchestration_packet,
+        patch_library,
+        include_prompt_patches=include_prompt_patches,
+        exclude_prompt_patches=exclude_prompt_patches,
+    )
     prompt_to_paste = render_model_prompt_packet(prompt_projection_packet, patch_library)
 
     messy_input_path = run_dir / "messy_input.txt"
@@ -653,6 +687,8 @@ def run_prepare(
     messy_input_path.write_text(messy_input + "\n", encoding="utf-8")
     prompt_path.write_text(model_prompt_packet.rstrip() + "\n", encoding="utf-8")
     prompt_to_paste_path.write_text(prompt_to_paste.rstrip() + "\n", encoding="utf-8")
+    projection_summary_path = run_dir / "prompt_projection_summary.json"
+    _write_json(projection_summary_path, prompt_projection_summary)
     instructions_path.write_text(_operator_instructions_text(run_dir), encoding="utf-8")
     _write_json(output_contract_path, output_contract)
     _write_json(triage_packet_path, triage_packet)
@@ -670,6 +706,7 @@ def run_prepare(
             "messy_input": str(messy_input_path),
             "model_prompt_packet": str(prompt_path),
             "prompt_to_paste": str(prompt_to_paste_path),
+            "prompt_projection_summary": str(projection_summary_path),
             "operator_instructions": str(instructions_path),
             "output_contract": str(output_contract_path),
             "triage_packet": str(triage_packet_path),
@@ -683,6 +720,7 @@ def run_prepare(
         "manifest_path": manifest_path,
         "model_prompt_packet_path": prompt_path,
         "prompt_to_paste_path": prompt_to_paste_path,
+        "prompt_projection_summary_path": projection_summary_path,
         "output_contract_path": output_contract_path,
     }
 
@@ -694,6 +732,7 @@ def run_session(
     timestamp: str | None = None,
     overwrite: bool = False,
     write_prompt_copy: bool = False,
+    include_prompt_patches: list[str] | None = None,
     exclude_prompt_patches: list[str] | None = None,
 ) -> dict[str, Any]:
     prepare_result = run_prepare(
@@ -701,6 +740,7 @@ def run_session(
         out_dir=out_dir,
         timestamp=timestamp,
         overwrite=overwrite,
+        include_prompt_patches=include_prompt_patches,
         exclude_prompt_patches=exclude_prompt_patches,
     )
     run_dir = Path(prepare_result["run_dir"])
@@ -715,6 +755,7 @@ def run_session(
         "manifest_path": Path(prepare_result["manifest_path"]),
         "model_prompt_packet_path": model_prompt_packet_path,
         "prompt_to_paste_path": prompt_to_paste_path,
+        "prompt_projection_summary_path": Path(prepare_result["prompt_projection_summary_path"]),
         "raw_output_file_path": raw_output_path,
         "ingest_command": _ingest_command(run_dir, raw_output_path),
         "write_prompt_copy": write_prompt_copy,
@@ -1503,6 +1544,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
     prepare.add_argument("--timestamp")
     prepare.add_argument("--overwrite", action="store_true")
     prepare.add_argument(
+        "--include-prompt-patch",
+        action="append",
+        default=[],
+        help="Prompt patch IDs to add to the projected prompt_to_paste.md.",
+    )
+    prepare.add_argument(
         "--exclude-prompt-patch",
         action="append",
         default=[],
@@ -1517,6 +1564,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
     session.add_argument("--overwrite", action="store_true")
     session.add_argument("--print-prompt", action="store_true")
     session.add_argument("--write-prompt-copy", action="store_true")
+    session.add_argument(
+        "--include-prompt-patch",
+        action="append",
+        default=[],
+        help="Prompt patch IDs to add to the projected prompt_to_paste.md.",
+    )
     session.add_argument(
         "--exclude-prompt-patch",
         action="append",
@@ -1577,6 +1630,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 out_dir=args.out_dir,
                 timestamp=args.timestamp,
                 overwrite=bool(args.overwrite),
+                include_prompt_patches=args.include_prompt_patch,
                 exclude_prompt_patches=args.exclude_prompt_patch,
             )
             print(f"run_dir: {result['run_dir']}")
@@ -1595,6 +1649,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 timestamp=args.timestamp,
                 overwrite=bool(args.overwrite),
                 write_prompt_copy=bool(args.write_prompt_copy),
+                include_prompt_patches=args.include_prompt_patch,
                 exclude_prompt_patches=args.exclude_prompt_patch,
             )
             print(f"run_dir: {result['run_dir']}")

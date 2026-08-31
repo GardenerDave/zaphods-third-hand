@@ -1,0 +1,30 @@
+{
+  "patch_id": "unique_json_keys_v1",
+  "title": "Unique top-level JSON keys",
+  "status": "candidate",
+  "failure_signature": [
+    "model repeats a required top-level JSON key",
+    "model emits a second copy of a top-level JSON field"
+  ],
+  "applies_to": {
+    "stage": ["output_contract"],
+    "task_type": ["repo_patch", "docs_update", "triage", "any"],
+    "model_size": ["small", "mid", "any"]
+  },
+  "prompt_delta": "Emit exactly one top-level JSON object. Emit every required top-level key exactly once. Do not repeat, redefine, append a second copy of, or emit multiple occurrences of any top-level key. Before finishing, ensure the object contains one and only one occurrence of each required key.",
+  "required_output_fields": [
+    "allowed_targets",
+    "held_targets",
+    "scope_expansion_required",
+    "claims",
+    "evidence_basis",
+    "unverified_claims",
+    "format",
+    "required_fields_present",
+    "reason"
+  ],
+  "validator_expectations": [
+    "top-level keys must be unique",
+    "duplicate top-level JSON keys must not appear"
+  ]
+}

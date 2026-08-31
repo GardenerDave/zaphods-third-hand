@@ -1,0 +1,23 @@
+{
+  "patch_id": "required_fields_boolean_v1",
+  "title": "Required fields present boolean contract",
+  "status": "candidate",
+  "failure_signature": [
+    "model emits required_fields_present as a list of field names",
+    "model emits required_fields_present as a string or object instead of a boolean"
+  ],
+  "applies_to": {
+    "stage": ["output_contract"],
+    "task_type": ["repo_patch", "docs_update", "triage", "any"],
+    "model_size": ["small", "mid", "any"]
+  },
+  "prompt_delta": "required_fields_present is a boolean status field. Emit exactly true when all required fields are present. Do not emit a list of field names in required_fields_present.",
+  "required_output_fields": [
+    "required_fields_present",
+    "reason"
+  ],
+  "validator_expectations": [
+    "required_fields_present must be a boolean",
+    "required_fields_present must be true when all required fields are present"
+  ]
+}
