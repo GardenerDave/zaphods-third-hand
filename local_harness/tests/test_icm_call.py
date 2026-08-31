@@ -71,6 +71,36 @@ class IcmCallTests(unittest.TestCase):
         self.assertEqual("gemma-test.gguf", response.configured_model)
         self.assertFalse(response.model_resolution_attempted)
 
+    def test_render_request_only_emits_exact_request_body_without_network(self):
+        spec = icm_call.resolve_worker_spec(
+            "handoff",
+            base_url="http://localhost:8083/v1",
+            model="gemma-test.gguf",
+            final_only=True,
+        )
+        rendered = None
+
+        def fail_urlopen(*args, **kwargs):
+            raise AssertionError("network must not be used in render-only mode")
+
+        with patch.object(icm_call.urllib.request, "urlopen", side_effect=fail_urlopen):
+            with tempfile.TemporaryDirectory() as temp_dir:
+                prompt = "Return exactly: ok"
+                result = icm_call.main(
+                    [
+                        "handoff",
+                        "--base-url",
+                        "http://localhost:8083/v1",
+                        "--model",
+                        "gemma-test.gguf",
+                        "--render-request-only",
+                        prompt,
+                    ]
+                )
+
+        self.assertEqual(0, result)
+        self.assertIsNone(rendered)
+
     def test_call_worker_reports_reasoning_only(self):
         payload = {
             "model": "gemma-test.gguf",
@@ -261,6 +291,68 @@ class IcmCallTests(unittest.TestCase):
             self.assertEqual("ok", written["status"])
             self.assertIn("configured_model", written)
             self.assertIn("resolved_model", written)
+
+    def test_call_worker_writes_request_intent_and_transitions(self):
+        payload = {
+            "model": "gemma-test.gguf",
+            "choices": [
+                {
+                    "finish_reason": "stop",
+                    "message": {"role": "assistant", "content": "ok"},
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            intent_path = Path(temp_dir) / "intent.json"
+            with patch.object(
+                icm_call.urllib.request,
+                "urlopen",
+                return_value=FakeHTTPResponse(payload),
+            ) as mocked_urlopen:
+                response = icm_call.call_worker(
+                    icm_call.resolve_worker_spec(
+                        "handoff",
+                        base_url="http://localhost:8083/v1",
+                        model="gemma-test.gguf",
+                        final_only=True,
+                    ),
+                    "Reply with exactly: ok",
+                    max_tokens=8,
+                    request_intent_out=intent_path,
+                )
+
+            self.assertEqual("ok", response.content)
+            self.assertTrue(mocked_urlopen.called)
+            intent = json.loads(intent_path.read_text(encoding="utf-8"))
+            self.assertEqual("completed", intent["state"])
+            self.assertTrue(intent["transport_started"])
+            self.assertIn("request_body_sha256", intent)
+            self.assertIn("transformed_user_message_sha256", intent)
+
+    def test_call_worker_records_transport_error_intent(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            intent_path = Path(temp_dir) / "intent.json"
+
+            def fail_urlopen(request, timeout=30):
+                raise icm_call.urllib.error.URLError("connection refused")
+
+            with patch.object(icm_call.urllib.request, "urlopen", side_effect=fail_urlopen):
+                response = icm_call.call_worker(
+                    icm_call.resolve_worker_spec(
+                        "handoff",
+                        base_url="http://localhost:8083/v1",
+                        model="gemma-test.gguf",
+                    ),
+                    "Reply with exactly: ok",
+                    max_tokens=8,
+                    request_intent_out=intent_path,
+                )
+
+            self.assertEqual("request_error", response.status)
+            intent = json.loads(intent_path.read_text(encoding="utf-8"))
+            self.assertEqual("transport_error", intent["state"])
+            self.assertTrue(intent["transport_started"])
+            self.assertIn("transport_error", intent)
 
 
 if __name__ == "__main__":

@@ -6,7 +6,12 @@ Date: 2026-08-30
 
 This fresh structured continuous-lineage experiment successfully completed Worker-A acquisition, captured-model ingest, validation, explicit review, gate, and handoff generation.
 
-Worker-B was not reached in the fresh run. No `worker_b_local_model_call.json` or equivalent 30B acquisition artifact was produced, and no 30B raw response exists for this experiment.
+Worker-B captured acquisition is absent, but the transmission boundary cannot be proven unused from local evidence alone. The conservative classification is:
+
+- Worker-B transport status: `HTTP_TRANSMISSION_POSSIBLE_UNRECORDED`
+- V1 resumability: `NOT RESUMABLE UNDER ONE-SHOT PROTOCOL`
+
+No `worker_b_local_model_call.json` or equivalent 30B acquisition artifact was produced, and no 30B raw response exists for this experiment.
 
 Final classification:
 
@@ -16,7 +21,7 @@ Final classification:
 - Explicit post-validation review: PASS
 - Gate: PASS
 - Automatic handoff/context/continuation generation: PASS
-- Worker-B acquisition integrity: NOT REACHED
+- Worker-B acquisition integrity: ABSENT / NOT CAPTURED
 - Worker-B downstream production: NOT REACHED
 - Authority preservation across handoff: PASS
 - Continuous lineage: NOT ACHIEVED END-TO-END
@@ -101,11 +106,10 @@ These artifacts resolve to the same fresh Worker-A result and preserve the autho
 
 ## Worker-B status
 
-Worker-B acquisition did not complete in this run.
+Worker-B acquisition is not captured in the preserved evidence set.
 
 No 30B raw response, request metadata, or downstream artifact exists for this experiment.
 
 ## Interpretation
 
-This run is a successful fresh structured Worker-A handoff preparation with validated review/gate/handoff generation, but it is not a completed continuous 1.7B -> ZTH -> 30B production handoff because the 30B acquisition was not reached.
-
+This run is a successful fresh structured Worker-A handoff preparation with validated review/gate/handoff generation, but it is not a completed continuous 1.7B -> ZTH -> 30B production handoff because the 30B acquisition is not captured in the preserved evidence. Under the one-shot protocol, the run is not resumable without a fresh experiment.
