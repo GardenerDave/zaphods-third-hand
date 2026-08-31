@@ -65,9 +65,11 @@ unattended promotion boundaries.
 ## Architectural Direction Update
 
 ZTH is moving from capability discovery toward integration and operational
-usefulness. The next roadmap sequence is now organized around supervised
-transaction handling, evidence-bearing handoff, and ZTH-specific authority
-semantics layered over mature external standards.
+usefulness. The roadmap now has a demonstrated bounded continuous handoff
+milestone, and the next sequence is organized around dogfooding the existing
+architecture on ZTH itself, supervised transaction handling, evidence-bearing
+handoff, and ZTH-specific authority semantics layered over mature external
+standards.
 
 The project should increasingly own:
 
@@ -88,20 +90,19 @@ adopted, ZTH should carry its own authority, provenance, validation,
 qualification, and review semantics on top of that boundary instead of
 replacing them.
 
-Priority order for the next phase:
+Current strategic order:
 
-1. Canonical supervised handoff transaction.
-1. Historian read-only context interface.
-1. Common model transport abstraction.
-1. First coding-agent / ACP adapter.
-1. End-to-end 1.7B -> handoff -> 30B/Codex demonstration.
-1. Runtime lifecycle consolidation.
-1. Evaluation-framework adoption for new experiments.
-1. Operational telemetry.
-1. Continue semantic escalation research independently.
-1. Only then revisit durable autonomous scheduling.
+1. Close the exact Worker-B raw-response capture gap and reproduce the bounded handoff once as a small evidence-closeout item.
+1. Dogfood ZTH on ZTH for low-risk, read-only repository observation tasks.
+1. Bring documentation ingestion and Project Historian integration into the dogfood loop.
+1. Expand into supervised self-hardening on docs, tests, CLI polish, diagnostics, provenance, and evidence packaging.
+1. Reduce operator choreography and improve task/status/review UX around the existing transaction flow.
+1. Accumulate telemetry and scorecard evidence from real dogfood transactions.
+1. Use that evidence for capability-aware, empirical routing.
+1. Explore stewardship and curriculum mechanisms after the dogfood corpus is meaningful.
+1. Broaden into systematic generalization research only after the above evidence exists.
 
-First major milestone acceptance target:
+Demonstrated bounded supervised handoff milestone:
 
 - one bounded 1.7B worker attempt is executed under the supervised handoff
   transaction;
@@ -118,6 +119,11 @@ First major milestone acceptance target:
 Automatic semantic routing is not required for this acceptance milestone. The
 handoff may be explicit or triggered only by already-qualified deterministic
 rules.
+
+This milestone is now demonstrated in one fresh lineage. It is not evidence of
+arbitrary-task generalization, unattended promotion, universal routing, or
+autonomous authority. The remaining closeout item is exact durable Worker-B
+raw-response capture plus one clean reproduction.
 
 Canonical transaction lifecycle:
 
@@ -400,7 +406,9 @@ transfer validation. No experiment is activated by this roadmap entry.
 
 Recent external project review produced 16 integrations for ZTH. These are not separate side projects. They are staged additions to the existing supervised packet, attempt, validation, and provenance workflow.
 
-The immediate objective is to strengthen the existing packet-to-attempt path. Later work adds measurement, lifecycle state, provenance, and retrieval only as the simpler plain-file system exposes the need.
+The immediate objective is to use the existing packet-to-attempt path on real ZTH work, then strengthen it further from dogfood evidence. Measurement, lifecycle state, provenance, and retrieval should follow observed needs rather than being built ahead of use.
+
+Documentation ingestion and Project Historian integration are part of that same dogfood loop, not a separate speculative project.
 
 The completed supervised local-worker evidence loop now closes that path end to end:
 
@@ -428,7 +436,7 @@ Phase 4:
 
 ### Phase 1 - Evidence-Bound Supervised Execution
 
-This is the active next milestone and the highest-value / lowest-effort target. It remains the low-friction, high-value vertical slice for the next implementation push.
+This foundation is established. The next active milestone is to dogfood it on ZTH itself with low-risk, read-only work before broadening into bounded writes.
 
 The Phase 1 milestone is complete when one real, already-understood coding task passes through the existing supervised workflow and ZTH can:
 
@@ -469,9 +477,9 @@ The Phase 1 milestone is complete when one real, already-understood coding task 
 
    A supervised attempt should preserve packet, raw model output, changed paths, verification results, claim verdicts, and review status as one coherent artifact bundle.
 
-### Phase 2 - Measured Prompt-Patch and Model Behavior
+### Phase 2 - Measured Dogfood and Model Behavior
 
-This phase measures whether ZTH changes model behavior rather than merely changing output language.
+This phase measures whether ZTH changes model behavior rather than merely changing output language, using dogfood tasks and read-only comparison work as the first evidence source.
 
 8. Prompt Patch A/B harness
 
