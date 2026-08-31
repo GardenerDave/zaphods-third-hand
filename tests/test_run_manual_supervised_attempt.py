@@ -1060,6 +1060,66 @@ def test_call_local_with_response_schema_encodes_response_format_and_records_pro
     assert (run_dir / "response_schema.json").read_text(encoding="utf-8") == schema.read_text(encoding="utf-8")
 
 
+def test_prepare_with_explicit_response_schema_projects_schema_provenance(tmp_path: Path):
+    run_dir = tmp_path / "runs"
+    evidence = tmp_path / "evidence.txt"
+    evidence.write_text("alpha\nbeta\n", encoding="utf-8")
+    schema = tmp_path / "epistemic_schema.json"
+    schema.write_text(
+        json.dumps(
+            {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["conclusion", "findings", "reason"],
+                "properties": {
+                    "conclusion": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "required": ["established", "not_established"],
+                        "properties": {
+                            "established": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+                            "not_established": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+                        },
+                    },
+                    "findings": {"type": "array"},
+                    "reason": {"type": "string"},
+                },
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    result = run_script(
+        "prepare",
+        "--messy-input",
+        "Inspect supplied evidence only.",
+        "--out-dir",
+        run_dir,
+        "--timestamp",
+        "20260707T040409Z",
+        "--evidence-file",
+        evidence,
+        "--evidence-task-title",
+        "Evidence inspection",
+        "--evidence-task-summary",
+        "Use only the supplied evidence packet.",
+        "--evidence-max-chars",
+        "100",
+        "--response-schema-file",
+        schema,
+    )
+    assert result.returncode == 0
+    run_path = run_dir / "20260707T040409Z"
+    projected_schema = json.loads((run_path / "response_schema.json").read_text(encoding="utf-8"))
+    summary = json.loads((run_path / "prompt_projection_summary.json").read_text(encoding="utf-8"))
+    evidence_packet = json.loads((run_path / "evidence_projection.json").read_text(encoding="utf-8"))
+    assert projected_schema["required"] == ["conclusion", "findings", "reason"]
+    assert summary["selected_response_schema_sha256"] == manual_attempt._sha256_file(schema)
+    assert evidence_packet["response_schema"] == projected_schema
+
+
 def test_call_local_preserves_endpoint_finish_reason_and_usage_when_present(tmp_path: Path):
     run_dir, _ = _session_run(tmp_path, timestamp="20260707T212122A")
     response_body = {

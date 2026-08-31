@@ -805,6 +805,7 @@ def run_prepare(
     evidence_total_budget_tokens: int = 8192,
     evidence_response_reserve_tokens: int = 900,
     evidence_overhead_tokens: int = 512,
+    response_schema_file: Path | None = None,
 ) -> dict[str, Any]:
     ts, run_dir = _prepare_run_dir(out_dir=out_dir, timestamp=timestamp, overwrite=overwrite)
 
@@ -849,16 +850,32 @@ def run_prepare(
     manifest_path = run_dir / "run_manifest.json"
     evidence_projection_packet = None
     evidence_prompt_to_paste = None
-    evidence_output_contract = None
+    evidence_output_contract: dict[str, Any] | None = None
+    selected_response_schema: dict[str, Any] | None = None
+    if response_schema_file is not None:
+        if not response_schema_file.is_file():
+            raise ValueError(f"--response-schema-file does not exist: {response_schema_file}")
+        selected_response_schema = _load_json_object_file(response_schema_file, kind="response schema")
     if evidence_files:
+        selected_output_contract: dict[str, Any] = deepcopy(EVIDENCE_OUTPUT_CONTRACT)
+        if selected_response_schema is not None:
+            selected_output_contract = {
+                "format": "json",
+                "required_fields": list(selected_response_schema.get("required") or []),
+                "requires_reason": True,
+            }
         evidence_projection_packet = _build_evidence_projection_packet(
             task_title=evidence_task_title or "Repository observation task",
             task_summary=evidence_task_summary or messy_input,
             evidence_sources=evidence_files,
             max_chars_per_source=evidence_max_chars,
         )
+        evidence_output_contract = deepcopy(selected_output_contract)
+        evidence_projection_packet["output_contract"] = deepcopy(selected_output_contract)
         evidence_projection_packet["selected_prompt_patches"] = list(prompt_projection_packet["selected_prompt_patches"])
         evidence_projection_packet["rendered_patch_deltas"] = prompt_projection_packet["rendered_patch_deltas"]
+        if selected_response_schema is not None:
+            evidence_projection_packet["response_schema"] = selected_response_schema
         evidence_prompt_to_paste = _render_evidence_observation_prompt(evidence_projection_packet)
         evidence_budget = _prepare_evidence_budget(
             prompt_text=evidence_prompt_to_paste,
@@ -908,11 +925,15 @@ def run_prepare(
                 },
             })
             raise ValueError(evidence_budget["diagnostic"])
-        evidence_output_contract = deepcopy(EVIDENCE_OUTPUT_CONTRACT)
-        _write_json(run_dir / "response_schema.json", json.loads(EVIDENCE_RESPONSE_SCHEMA_PATH.read_text(encoding="utf-8")))
+        _write_json(
+            run_dir / "response_schema.json",
+            selected_response_schema if selected_response_schema is not None else json.loads(EVIDENCE_RESPONSE_SCHEMA_PATH.read_text(encoding="utf-8")),
+        )
 
     prompt_to_paste = evidence_prompt_to_paste or render_model_prompt_packet(prompt_projection_packet, patch_library)
-    projected_output_contract = evidence_output_contract or build_model_prompt_output_contract(prompt_projection_packet, patch_library)
+    projected_output_contract = (
+        evidence_output_contract if evidence_output_contract is not None else build_model_prompt_output_contract(prompt_projection_packet, patch_library)
+    )
 
     messy_input_path.write_text(messy_input + "\n", encoding="utf-8")
     prompt_path.write_text(model_prompt_packet.rstrip() + "\n", encoding="utf-8")
@@ -934,8 +955,12 @@ def run_prepare(
         prompt_projection_summary["evidence_projection_md_path"] = evidence_projection_md_path.name
         prompt_projection_summary["evidence_source_count"] = len(evidence_projection_packet["evidence_sources"])
         prompt_projection_summary["evidence_output_contract_sha256"] = _sha256_text(
-            json.dumps(EVIDENCE_OUTPUT_CONTRACT, indent=2, sort_keys=True) + "\n"
+            json.dumps(projected_output_contract, indent=2, sort_keys=True) + "\n"
         )
+        if selected_response_schema is not None:
+            prompt_projection_summary["selected_response_schema_sha256"] = _sha256_text(
+                json.dumps(selected_response_schema, indent=2, sort_keys=True) + "\n"
+            )
         prompt_projection_summary["evidence_budget"] = evidence_projection_packet["budget"]
     _write_json(projection_summary_path, prompt_projection_summary)
     instructions_path.write_text(_operator_instructions_text(run_dir), encoding="utf-8")
@@ -983,6 +1008,7 @@ def run_prepare(
         "prompt_projection_summary_path": projection_summary_path,
         "canonical_output_contract_path": canonical_output_contract_path,
         "output_contract_path": output_contract_path,
+        "response_schema_path": run_dir / "response_schema.json",
     }
 
 
@@ -1002,6 +1028,7 @@ def run_session(
     evidence_total_budget_tokens: int = 8192,
     evidence_response_reserve_tokens: int = 900,
     evidence_overhead_tokens: int = 512,
+    response_schema_file: Path | None = None,
 ) -> dict[str, Any]:
     prepare_result = run_prepare(
         messy_input=messy_input,
@@ -1017,6 +1044,7 @@ def run_session(
         evidence_total_budget_tokens=evidence_total_budget_tokens,
         evidence_response_reserve_tokens=evidence_response_reserve_tokens,
         evidence_overhead_tokens=evidence_overhead_tokens,
+        response_schema_file=response_schema_file,
     )
     run_dir = Path(prepare_result["run_dir"])
     model_prompt_packet_path = Path(prepare_result["model_prompt_packet_path"])
@@ -1885,6 +1913,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
         default=512,
         help="Reserved prompt overhead tokens for evidence-mode prompts.",
     )
+    prepare.add_argument("--response-schema-file", type=Path)
 
     session = subparsers.add_parser("session")
     session.add_argument("--messy-input")
@@ -1945,6 +1974,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
         default=512,
         help="Reserved prompt overhead tokens for evidence-mode prompts.",
     )
+    session.add_argument("--response-schema-file", type=Path)
 
     call_local = subparsers.add_parser("call-local")
     call_local.add_argument("--run-dir", type=Path, required=True)
@@ -2008,6 +2038,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 evidence_total_budget_tokens=args.evidence_total_budget_tokens,
                 evidence_response_reserve_tokens=args.evidence_response_reserve_tokens,
                 evidence_overhead_tokens=args.evidence_overhead_tokens,
+                response_schema_file=args.response_schema_file,
             )
             print(f"run_dir: {result['run_dir']}")
             print(f"model_prompt_packet_path: {result['model_prompt_packet_path']}")
@@ -2034,6 +2065,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 evidence_total_budget_tokens=args.evidence_total_budget_tokens,
                 evidence_response_reserve_tokens=args.evidence_response_reserve_tokens,
                 evidence_overhead_tokens=args.evidence_overhead_tokens,
+                response_schema_file=args.response_schema_file,
             )
             print(f"run_dir: {result['run_dir']}")
             print(f"model_prompt_packet_path: {result['model_prompt_packet_path']}")

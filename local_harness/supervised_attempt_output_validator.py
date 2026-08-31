@@ -14,6 +14,7 @@ from local_harness.supervised_model_attempt import (
     SupervisedModelAttemptError,
     validate_supervised_model_attempt_record,
 )
+from local_harness.validate_epistemic_observation_output import validate as validate_epistemic_observation_output
 
 
 REQUIRED_VALIDATION_RECORD_KEYS = {
@@ -270,6 +271,20 @@ def _is_observation_contract(output_contract: dict[str, Any]) -> bool:
         and "findings" in required_fields
         and "reason" in required_fields
     )
+
+
+def _is_epistemic_observation_contract(output_contract: dict[str, Any]) -> bool:
+    required_fields = output_contract.get("required_fields")
+    if not (
+        output_contract.get("format") == "json"
+        and isinstance(required_fields, list)
+        and "conclusion" in required_fields
+        and "findings" in required_fields
+        and "reason" in required_fields
+    ):
+        return False
+    properties = output_contract.get("properties")
+    return isinstance(properties, dict) and "conclusion" in properties
 
 
 def _check_observation_output(
@@ -570,10 +585,33 @@ def validate_supervised_attempt_output_against_contract(
             diagnostics.append("Required fields check unavailable for non-JSON output format.")
 
     if isinstance(parsed_output, dict):
-        invalid_types, type_check = _check_required_field_types(parsed_output)
-        checks.append(type_check)
-        if invalid_types:
-            diagnostics.extend(invalid_types)
+        if _is_epistemic_observation_contract(output_contract):
+            problems = validate_epistemic_observation_output(
+                parsed_output,
+                set(projected_source_paths or []),
+            )
+            if problems:
+                checks.append(
+                    {
+                        "check_id": "epistemic_observation_schema",
+                        "status": "failed",
+                        "message": "Epistemic observation output failed validation: " + "; ".join(problems),
+                    }
+                )
+                diagnostics.extend(problems)
+            else:
+                checks.append(
+                    {
+                        "check_id": "epistemic_observation_schema",
+                        "status": "passed",
+                        "message": "Epistemic observation output shape is valid.",
+                    }
+                )
+        else:
+            invalid_types, type_check = _check_required_field_types(parsed_output)
+            checks.append(type_check)
+            if invalid_types:
+                diagnostics.extend(invalid_types)
         if _is_observation_contract(output_contract):
             observation_checks, observation_diagnostics = _check_observation_output(
                 parsed_output,
