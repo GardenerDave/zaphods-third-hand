@@ -1,0 +1,17 @@
+{
+  "artifacts": {
+    "messy_input": ".work/structured_worker_a_20260830/20260830T140000Z/messy_input.txt",
+    "model_prompt_packet": ".work/structured_worker_a_20260830/20260830T140000Z/model_prompt_packet.md",
+    "operator_instructions": ".work/structured_worker_a_20260830/20260830T140000Z/operator_instructions.txt",
+    "orchestration_packet": ".work/structured_worker_a_20260830/20260830T140000Z/orchestration_packet.json",
+    "output_contract": ".work/structured_worker_a_20260830/20260830T140000Z/output_contract.json",
+    "triage_packet": ".work/structured_worker_a_20260830/20260830T140000Z/triage_packet.json"
+  },
+  "created_at": "2026-08-31T00:09:48Z",
+  "orchestration_id": "orch_manual_20260830t140000z",
+  "prompt_packet_id": "prompt_packet_manual_20260830t140000z",
+  "report_type": "manual_supervised_attempt_run_manifest.v1",
+  "run_id": "manual_supervised_attempt_20260830t140000z",
+  "run_status": "prepared",
+  "triage_id": "triage_manual_20260830t140000z"
+}

@@ -1,0 +1,35 @@
+{
+  "allowed_targets": [
+    "docs/reports/"
+  ],
+  "claims": [
+    "docs/reports/production automation",
+    "docs/reports/automatic curriculum capture",
+    "docs/reports/automatic promotion",
+    "docs/reports/implementation_packet"
+  ],
+  "evidence_basis": [
+    "docs/reports/production automation",
+    "docs/reports/automatic curriculum capture",
+    "docs/reports/automatic promotion",
+    "docs/reports/implementation_packet"
+  ],
+  "format": "json",
+  "held_targets": [
+    "docs/reports/production automation",
+    "docs/reports/automatic curriculum capture",
+    "docs/reports/automatic promotion",
+    "docs/reports/implementation_packet"
+  ],
+  "reason": "The allowed targets are restricted to 'docs/reports/', and the held targets are preserved as specified.",
+  "required_fields_present": true
+  ,
+  "scope_expansion_required": false
+  ,
+  "unverified_claims": [
+    "docs/reports/production automation",
+    "docs/reports/automatic curriculum capture",
+    "docs/reports/automatic promotion",
+    "docs/reports/implementation_packet"
+  ]
+}

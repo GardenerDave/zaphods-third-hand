@@ -1,0 +1,34 @@
+{
+  "acceptance_status": "not_reviewed",
+  "attempt_id": "manual_attempt_20260831t001207z",
+  "authority_boundaries": [
+    "No command execution authority is granted.",
+    "No direct file modification authority is granted.",
+    "No automatic patch promotion authority is granted.",
+    "No automatic training authority is granted.",
+    "No default failure-to-curriculum capture authority is granted.",
+    "Human review is required before downstream use."
+  ],
+  "model_metadata": {
+    "model_id": "manual_operator_provided_model_output",
+    "provider": "manual_operator"
+  },
+  "operator_metadata": {
+    "operator": "manual",
+    "review_required": true
+  },
+  "orchestration_id": "orch_manual_20260830t140000z",
+  "output_format_claim": null,
+  "prompt_packet_id": "prompt_packet_manual_20260830t140000z",
+  "provenance": {
+    "input_artifact": "model_prompt_packet",
+    "raw_output_preserved": true,
+    "raw_output_source_path": ".work/structured_worker_a_20260830/20260830T140000Z/raw_model_output.txt",
+    "run_manifest_path": ".work/structured_worker_a_20260830/20260830T140000Z/run_manifest.json",
+    "source": "manual_operator_pasted_model_output"
+  },
+  "raw_model_output": "{\n  \"allowed_targets\": [\n    \"docs/reports/\"\n  ],\n  \"claims\": [\n    \"docs/reports/production automation\",\n    \"docs/reports/automatic curriculum capture\",\n    \"docs/reports/automatic promotion\",\n    \"docs/reports/implementation_packet\"\n  ],\n  \"evidence_basis\": [\n    \"docs/reports/production automation\",\n    \"docs/reports/automatic curriculum capture\",\n    \"docs/reports/automatic promotion\",\n    \"docs/reports/implementation_packet\"\n  ],\n  \"format\": \"json\",\n  \"held_targets\": [\n    \"docs/reports/production automation\",\n    \"docs/reports/automatic curriculum capture\",\n    \"docs/reports/automatic promotion\",\n    \"docs/reports/implementation_packet\"\n  ],\n  \"reason\": \"The allowed targets are restricted to 'docs/reports/', and the held targets are preserved as specified.\",\n  \"required_fields_present\": true\n  ,\n  \"scope_expansion_required\": false\n  ,\n  \"unverified_claims\": [\n    \"docs/reports/production automation\",\n    \"docs/reports/automatic curriculum capture\",\n    \"docs/reports/automatic promotion\",\n    \"docs/reports/implementation_packet\"\n  ]\n}\n",
+  "source_prompt_packet_path": ".work/structured_worker_a_20260830/20260830T140000Z/model_prompt_packet.md",
+  "triage_id": "triage_manual_20260830t140000z",
+  "validation_status": "not_validated"
+}
