@@ -146,6 +146,7 @@ def test_transport_qualification_reference_resolves_authoritatively():
         artifact_ref=str(artifact),
         artifact_sha256="a002ff5e7d190fae429a0f84e57eaa03c3fdcdb247d7a06756a7ed65ed022466",
         qualification_id="v3-explicit-interface",
+        qualification_selector="local",
     )
     verification = resolve_transport_qualification_reference(
         qualification_ref=ref,
@@ -217,7 +218,55 @@ def test_transport_qualification_reference_requires_matching_selector_and_scope(
     assert verification.policy_usable is False
 
 
+def test_transport_qualification_reference_missing_selector_fails_closed(tmp_path: Path):
+    artifact = tmp_path / "qualification.json"
+    artifact.write_text(
+        json.dumps(
+            {
+                "local": {
+                    "status": "ok",
+                    "request_url": "http://example.invalid/v1/chat/completions",
+                    "model": "test-model",
+                    "scope": "bounded-test-lane",
+                },
+                "external": {
+                    "status": "ok",
+                    "request_url": "http://example.invalid/v1/chat/completions",
+                    "model": "test-model",
+                    "scope": "bounded-test-lane",
+                },
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    ref = TransportQualificationRef(
+        artifact_ref=str(artifact),
+        artifact_sha256=manual_attempt._sha256_file(artifact),
+    )
+    try:
+        resolve_transport_qualification_reference(
+            qualification_ref=ref,
+            transaction_endpoint="http://example.invalid/v1/chat/completions",
+            transaction_model="test-model",
+            transaction_scope="bounded-test-lane",
+        )
+        raise AssertionError("expected selector failure")
+    except ValueError as exc:
+        assert "qualification_selector is required" in str(exc)
+
+
 def test_transport_qualification_ref_round_trip_and_evidence_join(tmp_path: Path):
+    out_dir = tmp_path / "runs"
+    prep = manual_attempt.run_prepare(
+        messy_input="The LoRA and prompt injection work got messy. Build a bounded design packet.",
+        out_dir=out_dir,
+        timestamp="20260831T120000Z",
+        overwrite=True,
+    )
+    run_dir = prep["run_dir"]
     qualification = tmp_path / "qualification.json"
     qualification.write_text(
         json.dumps(
@@ -241,12 +290,39 @@ def test_transport_qualification_ref_round_trip_and_evidence_join(tmp_path: Path
         qualification_selector="local",
         qualification_id="qual-test-1",
     )
-    attempt = {
-        "provenance": {
-            "transport_qualification_ref": ref.as_dict(),
-            "transport_qualification_scope": "bounded-test-lane",
-        }
-    }
+    raw_output = tmp_path / "raw_model_output.txt"
+    raw_output.write_text(
+        json.dumps(
+            {
+                "allowed_targets": ["docs/reports/"],
+                "held_targets": [
+                    "production automation",
+                    "automatic curriculum capture",
+                    "automatic promotion",
+                    "implementation_packet",
+                ],
+                "scope_expansion_required": False,
+                "claims": ["docs/reports/ stays the only allowed target."],
+                "evidence_basis": ["Allowed Targets lists docs/reports/."],
+                "unverified_claims": [],
+                "format": "json",
+                "required_fields_present": True,
+                "reason": "The output remains bounded and supervised.",
+            }
+        ),
+        encoding="utf-8",
+    )
+    ingest = manual_attempt.run_ingest(
+        run_dir=run_dir,
+        raw_output_file=raw_output,
+        transport_qualification_ref=ref.as_dict(),
+        transport_qualification_scope="bounded-test-lane",
+    )
+    assert ingest["attempt_path"].is_file()
+    attempt = json.loads((run_dir / "supervised_model_attempt.json").read_text(encoding="utf-8"))
+    reloaded = TransportQualificationRef.from_dict(attempt["provenance"]["transport_qualification_ref"])
+    assert reloaded.as_dict() == ref.as_dict()
+    assert attempt["provenance"]["transport_qualification_scope"] == "bounded-test-lane"
     transport_property, verification = derive_transport_qualification_from_attempt(
         attempt_record=attempt,
         transaction_endpoint="http://example.invalid/v1/chat/completions",
@@ -257,8 +333,6 @@ def test_transport_qualification_ref_round_trip_and_evidence_join(tmp_path: Path
     assert verification is not None
     assert verification.policy_usable is True
     assert verification.scope_match is True
-    reloaded = TransportQualificationRef.from_dict(attempt["provenance"]["transport_qualification_ref"])
-    assert reloaded.as_dict() == ref.as_dict()
 
 
 def test_transport_qualification_ref_bad_hash_fails_closed_on_join(tmp_path: Path):

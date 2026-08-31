@@ -50,7 +50,7 @@ class SupervisedModelAttemptError(ValueError):
 def validate_transport_qualification_ref(payload: Any) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise SupervisedModelAttemptError("transport_qualification_ref must be a JSON object")
-    allowed = {"artifact_ref", "artifact_sha256", "qualification_id", "qualification_selector"}
+    allowed = {"artifact_ref", "artifact_sha256", "qualification_id", "qualification_selector", "transport_qualification_scope"}
     unexpected = sorted(set(payload) - allowed)
     if unexpected:
         raise SupervisedModelAttemptError(
@@ -73,11 +73,19 @@ def validate_transport_qualification_ref(payload: Any) -> dict[str, Any]:
     qualification_selector = payload.get("qualification_selector")
     if qualification_selector is not None and (not isinstance(qualification_selector, str) or not qualification_selector.strip()):
         raise SupervisedModelAttemptError("transport_qualification_ref.qualification_selector must be a non-empty string when present")
+    transport_qualification_scope = payload.get("transport_qualification_scope")
+    if transport_qualification_scope is not None and (
+        not isinstance(transport_qualification_scope, str) or not transport_qualification_scope.strip()
+    ):
+        raise SupervisedModelAttemptError(
+            "transport_qualification_ref.transport_qualification_scope must be a non-empty string when present"
+        )
     return {
         "artifact_ref": artifact_ref,
         "artifact_sha256": artifact_sha256,
         "qualification_id": qualification_id,
         "qualification_selector": qualification_selector,
+        "transport_qualification_scope": transport_qualification_scope,
     }
 
 
@@ -202,6 +210,7 @@ def build_supervised_model_attempt_record(
     prompt_packet_id: str | None = None,
     source_prompt_packet_path: str | None = None,
     transport_qualification_ref: dict[str, Any] | None = None,
+    transport_qualification_scope: str | None = None,
     output_format_claim: str | None = None,
     provenance: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -212,6 +221,10 @@ def build_supervised_model_attempt_record(
         if transport_qualification_ref is not None
         else None
     )
+    if transport_qualification_scope is not None and not isinstance(transport_qualification_scope, str):
+        raise SupervisedModelAttemptError("transport_qualification_scope must be a string when present")
+    if isinstance(transport_qualification_scope, str) and not transport_qualification_scope.strip():
+        raise SupervisedModelAttemptError("transport_qualification_scope must be a non-empty string when present")
 
     record = {
         "attempt_id": attempt_id,
@@ -237,6 +250,7 @@ def build_supervised_model_attempt_record(
             "prompt_packet_id": prompt_packet_id,
             "source_prompt_packet_path": source_prompt_packet_path,
             "transport_qualification_ref": validated_transport_ref,
+            "transport_qualification_scope": transport_qualification_scope,
         },
     }
     return validate_supervised_model_attempt_record(record)

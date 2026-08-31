@@ -1507,12 +1507,21 @@ def _parse_transport_qualification_ref(value: str | dict[str, Any] | None) -> di
     return parsed
 
 
+def _parse_transport_qualification_scope(value: str | None) -> str | None:
+    if value is None:
+        return None
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError("transport qualification scope must be a non-empty string when present")
+    return value
+
+
 def run_ingest(
     *,
     run_dir: Path,
     raw_output_file: Path,
     model_call_metadata_file: Path | None = None,
     transport_qualification_ref: str | dict[str, Any] | None = None,
+    transport_qualification_scope: str | None = None,
     decision: str | None = None,
     decision_reason: str | None = None,
     operator: str | None = None,
@@ -1529,6 +1538,7 @@ def run_ingest(
     output_contract = _read_json(output_contract_path, kind="output contract")
     authorized_targets, authoritative_held_targets = _load_structured_authority_targets(run_dir, manifest)
     parsed_transport_qualification_ref = _parse_transport_qualification_ref(transport_qualification_ref)
+    parsed_transport_qualification_scope = _parse_transport_qualification_scope(transport_qualification_scope)
     projected_source_paths: list[str] | None = None
     evidence_projection_artifact = artifacts.get("evidence_projection")
     if isinstance(evidence_projection_artifact, str) and evidence_projection_artifact.strip():
@@ -1713,12 +1723,15 @@ def run_ingest(
                 "review_required": True,
             },
             transport_qualification_ref=parsed_transport_qualification_ref,
+            transport_qualification_scope=parsed_transport_qualification_scope,
             provenance={
                 "source": "manual_operator_pasted_model_output",
                 "input_artifact": "model_prompt_packet",
                 "raw_output_preserved": True,
                 "run_manifest_path": str(manifest_path),
                 "raw_output_source_path": str(raw_output_file),
+                "transport_qualification_ref": parsed_transport_qualification_ref,
+                "transport_qualification_scope": parsed_transport_qualification_scope,
             },
         )
     else:
@@ -1752,6 +1765,7 @@ def run_ingest(
                 "acquisition_request_provenance": model_call_metadata.get("request_provenance"),
                 "structured_output": model_call_metadata.get("structured_output"),
                 "transport_qualification_ref": parsed_transport_qualification_ref,
+                "transport_qualification_scope": parsed_transport_qualification_scope,
             },
         )
 
@@ -2026,6 +2040,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     ingest.add_argument("--raw-output-file", type=Path, required=True)
     ingest.add_argument("--model-call-metadata-file", type=Path)
     ingest.add_argument("--transport-qualification-ref")
+    ingest.add_argument("--transport-qualification-scope")
     ingest.add_argument("--decision", choices=sorted(ALLOWED_DECISIONS))
     ingest.add_argument("--decision-reason")
     ingest.add_argument("--operator")
@@ -2166,6 +2181,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             raw_output_file=args.raw_output_file,
             model_call_metadata_file=args.model_call_metadata_file,
             transport_qualification_ref=args.transport_qualification_ref,
+            transport_qualification_scope=args.transport_qualification_scope,
             decision=args.decision,
             decision_reason=args.decision_reason,
             operator=args.operator,

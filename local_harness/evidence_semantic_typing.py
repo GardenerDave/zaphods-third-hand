@@ -270,7 +270,13 @@ def resolve_transport_qualification_reference(
         kind="transport qualification",
     )
     diagnostics: list[str] = []
-    selector = qualification_ref.qualification_selector or "local"
+    branch_names = [name for name in ("local", "external") if isinstance(payload.get(name), dict)]
+    selector = qualification_ref.qualification_selector
+    if selector is None:
+        if len(branch_names) == 1:
+            selector = branch_names[0]
+        else:
+            raise ValueError("qualification_selector is required when the qualification artifact has multiple branches")
     if selector not in {"local", "external"}:
         raise ValueError("qualification_selector must be 'local' or 'external'")
     branch = payload.get(selector)
@@ -281,6 +287,7 @@ def resolve_transport_qualification_reference(
         or branch.get("transport_qualified") is True
         or branch.get("qualification_passed") is True
         or payload.get(f"{selector}_transport_qualified") is True
+        or payload.get(f"{selector}_qualified") is True
     )
     if not qualification_passed:
         diagnostics.append("qualification artifact did not indicate a passed transport qualification")
