@@ -1,10 +1,19 @@
 {
   "assertions": [
     {
-      "asserted_property": "semantic_acceptance",
+      "property": "raw_response_integrity",
+      "epistemic_status": "established",
       "claim_text": "preserving exact worker output establishes evidence integrity without implying correctness or acceptance",
       "evidence_refs": [
-        "frozen_good_control_evidence"
+        "t3_evidence"
+      ]
+    },
+    {
+      "property": "semantic_acceptance",
+      "epistemic_status": "not_established",
+      "claim_text": "preserving exact worker output does not itself establish semantic acceptance",
+      "evidence_refs": [
+        "t3_evidence"
       ]
     }
   ],
@@ -13,4 +22,3 @@
   },
   "typing_source": "frozen_experiment_fixture"
 }
-

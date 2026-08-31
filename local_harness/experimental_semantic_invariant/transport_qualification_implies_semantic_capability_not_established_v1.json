@@ -3,6 +3,7 @@
     "transport_qualification",
     "bounded_handoff_success"
   ],
+  "antecedent_match": "all",
   "id": "transport_qualification_implies_semantic_capability_not_established_v1",
   "insufficient_for": [
     "semantic_capability"
@@ -12,4 +13,3 @@
   },
   "status": "conceptual_only"
 }
-

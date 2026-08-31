@@ -1,4 +1,5 @@
 {
+  "evidence_id": "controls_semantic_capability_evidence",
   "evidence_scope": {
     "established_properties": [
       "semantic_capability"
@@ -10,4 +11,3 @@
   },
   "typing_source": "frozen_experiment_fixture"
 }
-

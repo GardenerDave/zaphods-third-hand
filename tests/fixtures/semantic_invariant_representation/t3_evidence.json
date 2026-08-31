@@ -1,8 +1,8 @@
 {
+  "evidence_id": "t3_evidence",
   "evidence_scope": {
     "established_properties": [
-      "raw_response_integrity",
-      "semantic_acceptance"
+      "raw_response_integrity"
     ]
   },
   "provenance": {
@@ -11,4 +11,3 @@
   },
   "typing_source": "frozen_experiment_fixture"
 }
-

@@ -1,4 +1,5 @@
 {
+  "evidence_id": "controls_transport_only_evidence",
   "evidence_scope": {
     "established_properties": [
       "transport_qualification"
@@ -10,4 +11,3 @@
   },
   "typing_source": "frozen_experiment_fixture"
 }
-

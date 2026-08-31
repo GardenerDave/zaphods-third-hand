@@ -1,10 +1,11 @@
 {
   "assertions": [
     {
-      "asserted_property": "semantic_capability",
+      "property": "semantic_capability",
+      "epistemic_status": "established",
       "claim_text": "transport qualification proves model capability",
       "evidence_refs": [
-        "frozen_positive_control_evidence"
+        "t1_evidence"
       ]
     }
   ],
@@ -13,4 +14,3 @@
   },
   "typing_source": "frozen_experiment_fixture"
 }
-

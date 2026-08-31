@@ -1,0 +1,66 @@
+{
+  "artifact_type": "semantic_invariant_representation_correction_addendum",
+  "date": "2026-08-31",
+  "model_calls": 0,
+  "preserved_first_pass": {
+    "report": "docs/reports/semantic_invariant_representation_sufficiency_20260831.json",
+    "commit": "580d427",
+    "status": "preserved_first-pass evidence"
+  },
+  "corrections": [
+    {
+      "issue": "T3 semantic inversion",
+      "detail": "The first typed IR represented the known-good control as if semantic_acceptance were established. The corrected representation now encodes raw_response_integrity as established and semantic_acceptance as not_established."
+    },
+    {
+      "issue": "post-hoc T3 expectation relaxation",
+      "detail": "The initial T3 expectation was loosened after observing the mismatch. The corrected experiment restores a single frozen T3 outcome: not_applicable."
+    },
+    {
+      "issue": "unused evidence_refs",
+      "detail": "The first pass stored evidence_refs but did not require deterministic resolution. The corrected representation requires evidence_id linkage and resolution of assertion evidence_refs."
+    },
+    {
+      "issue": "trace/result consistency",
+      "detail": "The corrected checker returns internally consistent result/applicability pairs and emits traces derived from the checker output."
+    }
+  ],
+  "corrected_representation": {
+    "typed_evidence": {
+      "fields": [
+        "evidence_id",
+        "evidence_scope.established_properties"
+      ]
+    },
+    "typed_assertions": {
+      "fields": [
+        "property",
+        "epistemic_status",
+        "evidence_refs"
+      ]
+    },
+    "epistemic_status_vocabulary": [
+      "established",
+      "not_established"
+    ]
+  },
+  "invariant": {
+    "id": "transport_qualification_implies_semantic_capability_not_established_v1",
+    "status": "conceptual_only",
+    "antecedent_match": "all",
+    "sha256": "66bbcd09a020d9388a9b0365eba2a6bc8e8680b563926b027eeda2dadaf74b01"
+  },
+  "frozen_results": {
+    "T1": "hold",
+    "T2": "hold",
+    "T3": "not_applicable",
+    "synthetic_transport_only": "pass",
+    "synthetic_independently_established_capability": "pass"
+  },
+  "conclusion": "A minimal typed proposition/evidence representation carrying property, epistemic status, evidence scope, and evidence linkage is sufficient to evaluate the frozen invariant without natural-language interpretation.",
+  "limitations": [
+    "This still does not establish semantic typing acquisition/trust.",
+    "This still does not change production observation contracts."
+  ]
+}
+

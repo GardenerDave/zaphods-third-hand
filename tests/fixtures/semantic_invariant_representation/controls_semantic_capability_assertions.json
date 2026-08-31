@@ -1,10 +1,11 @@
 {
   "assertions": [
     {
-      "asserted_property": "semantic_capability",
+      "property": "semantic_capability",
+      "epistemic_status": "established",
       "claim_text": "semantic capability is established",
       "evidence_refs": [
-        "synthetic_semantic_capability_evidence"
+        "controls_semantic_capability_evidence"
       ]
     }
   ],
@@ -13,4 +14,3 @@
   },
   "typing_source": "frozen_experiment_fixture"
 }
-

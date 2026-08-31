@@ -1,10 +1,11 @@
 {
   "assertions": [
     {
-      "asserted_property": "transport_qualification",
+      "property": "transport_qualification",
+      "epistemic_status": "established",
       "claim_text": "transport qualification succeeded",
       "evidence_refs": [
-        "synthetic_transport_only_evidence"
+        "controls_transport_only_evidence"
       ]
     }
   ],
@@ -13,4 +14,3 @@
   },
   "typing_source": "frozen_experiment_fixture"
 }
-
