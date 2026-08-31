@@ -1,0 +1,143 @@
+{
+  "experiment_id": "1p7b_to_30b_structured_continuous_v1_20260830",
+  "entries": [
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/canonical_output_contract.json",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/canonical_output_contract.json",
+      "sha256": "ed6708b775988f35ef5969190338709b6f732199068f75ac62d049d39a7daba5",
+      "size": 272
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/downstream_use_gate.json",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/downstream_use_gate.json",
+      "sha256": "eb4ee595bc72430c196d58699fccc85030eae11ede3793b6c3359e6c48613d6f",
+      "size": 1699
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/handoff_packet.json",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/handoff_packet.json",
+      "sha256": "b1a5796e4a87bdc6621665163d51967ac7f8027de0a4d61c402d734a58a5dbef",
+      "size": 2809
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/local_model_call.json",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/local_model_call.json",
+      "sha256": "845a7eb49531403d2f8360a56e84e217a496276d2c2406a38108fabd709b6066",
+      "size": 7938
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/messy_input.txt",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/messy_input.txt",
+      "sha256": "ba546ce0c60f663c6178c243b64e18f69f4764dba4fb310aff706e07b974db86",
+      "size": 77
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/model_prompt_packet.md",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/model_prompt_packet.md",
+      "sha256": "d5ba06be37a5fab59baa0ebba0acf97e4de52c477bc6894d9f520002cee6840d",
+      "size": 2713
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/next_worker_context.json",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/next_worker_context.json",
+      "sha256": "df6d0168fa8107060c834fb2c039174551ee74cd1e0751da49522c0cffbc3761",
+      "size": 15312
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/next_worker_context.md",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/next_worker_context.md",
+      "sha256": "3b4f776329ddb79e8e38ed061e8b9fe083af2a81facc6ae2f4166eb1cc5cec8b",
+      "size": 12270
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/next_worker_continuation.md",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/next_worker_continuation.md",
+      "sha256": "4c9b7cbfa008873162b6cd4cd306ccdd84c00752c56ec1e9fdb34ad5557458e3",
+      "size": 6087
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/operator_instructions.txt",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/operator_instructions.txt",
+      "sha256": "b04f864d33597018ba20424f88476691315cfebea48e90cb2b98af5e9544e0d2",
+      "size": 564
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/orchestration_packet.json",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/orchestration_packet.json",
+      "sha256": "0b05ae053715a5455f37d4c1c38709590639fd74b613f7a04be96e9369ea122a",
+      "size": 2941
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/output_contract.json",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/output_contract.json",
+      "sha256": "ed6708b775988f35ef5969190338709b6f732199068f75ac62d049d39a7daba5",
+      "size": 272
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/output_validation.json",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/output_validation.json",
+      "sha256": "ed3b9d134d96308614ce541b2526dd8197ad623f3d2d6461b43814f81354c991",
+      "size": 2393
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/output_validation_report.txt",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/output_validation_report.txt",
+      "sha256": "13f2ff848ad05ba2e3beb8c4f4668187c4b36361f38d1a659aad41bb8f7e4fd0",
+      "size": 1904
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/prompt_projection_summary.json",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/prompt_projection_summary.json",
+      "sha256": "4e16281f72a9bd5c6f41c8abe5450dc838e0f73e557ca9f592c3e2e40396925e",
+      "size": 817
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/prompt_to_paste.md",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/prompt_to_paste.md",
+      "sha256": "3e2576c2fb201c1a7e29fc9473c74c2d226a29f42597faa4daa089c6a9455d55",
+      "size": 3536
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/raw_model_output.txt",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/raw_model_output.txt",
+      "sha256": "c8ea66f83e9376053a68b6f8833809c08208121c55971ef017cf5f4e2e9fb43c",
+      "size": 422
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/response_schema.json",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/response_schema.json",
+      "sha256": "8a0eefccc8738cb56dbd83b9a908ed459f865149cd6482c5db767e81c3e65b59",
+      "size": 1028
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/review_decision.json",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/review_decision.json",
+      "sha256": "7c78265c62a8a2981ac6f72ec11dcb12078deb299ca1998cc752fc341beb60b4",
+      "size": 1603
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/run_manifest.json",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/run_manifest.json",
+      "sha256": "8dc6548e1dfa338fcaf115ed6e3cf3f91bdbd9b6287a93956f58b975abc2c561",
+      "size": 1636
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/supervised_model_attempt.json",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/supervised_model_attempt.json",
+      "sha256": "aac92807f05f1903ca5970c8859f4b4dd49eef15fb76679cd2c35cf4615cbcf6",
+      "size": 16115
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/transaction_manifest.json",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/transaction_manifest.json",
+      "sha256": "e27414d085f9afb58619b06bdfa765525e84c347463c8c3d626796935a1bfc54",
+      "size": 3755
+    },
+    {
+      "source_path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/triage_packet.json",
+      "archive_path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/1p7b_to_30b_structured_continuous_v1_20260830/triage_packet.json",
+      "sha256": "8674bfd9e13f6f8d6bb066703e30295f2e18c15009cf94271bf4f683c71311ea",
+      "size": 1446
+    }
+  ]
+}

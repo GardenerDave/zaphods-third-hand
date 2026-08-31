@@ -1,0 +1,69 @@
+{
+  "created_at": "2026-08-31T01:02:42Z",
+  "evidence_references": [
+    {
+      "artifact": "run_manifest",
+      "path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/run_manifest.json",
+      "sha256": "8dc6548e1dfa338fcaf115ed6e3cf3f91bdbd9b6287a93956f58b975abc2c561"
+    },
+    {
+      "artifact": "model_prompt_packet",
+      "path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/model_prompt_packet.md",
+      "sha256": "d5ba06be37a5fab59baa0ebba0acf97e4de52c477bc6894d9f520002cee6840d"
+    },
+    {
+      "artifact": "raw_model_output",
+      "path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/raw_model_output.txt",
+      "sha256": "c8ea66f83e9376053a68b6f8833809c08208121c55971ef017cf5f4e2e9fb43c"
+    },
+    {
+      "artifact": "supervised_model_attempt",
+      "attempt_id": "model_attempt_20260831t010334z",
+      "path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/supervised_model_attempt.json",
+      "sha256": "aac92807f05f1903ca5970c8859f4b4dd49eef15fb76679cd2c35cf4615cbcf6"
+    },
+    {
+      "artifact": "output_validation",
+      "path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/output_validation.json",
+      "sha256": "ed3b9d134d96308614ce541b2526dd8197ad623f3d2d6461b43814f81354c991",
+      "validation_id": "manual_validation_20260831t010334z"
+    },
+    {
+      "artifact": "review_decision",
+      "decision_id": "manual_decision_20260831t010414.874966z",
+      "path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/review_decision.json",
+      "sha256": "7c78265c62a8a2981ac6f72ec11dcb12078deb299ca1998cc752fc341beb60b4"
+    },
+    {
+      "artifact": "downstream_use_gate",
+      "gate_id": "manual_gate_20260831t010414.874966z",
+      "path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/downstream_use_gate.json",
+      "sha256": "eb4ee595bc72430c196d58699fccc85030eae11ede3793b6c3359e6c48613d6f"
+    },
+    {
+      "artifact": "handoff_packet",
+      "handoff_id": "manual_handoff_20260831t010414.874966z",
+      "path": "/home/navigator/agent-workspace/zaphods-third-hand/.work/operator_handoffs/1p7b_to_30b_structured_continuous_v1_20260830/20260831T010000Z/handoff_packet.json",
+      "sha256": "b1a5796e4a87bdc6621665163d51967ac7f8027de0a4d61c402d734a58a5dbef"
+    }
+  ],
+  "first_worker_identity": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+  "intended_next_worker_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "lifecycle_state": "HANDOFF",
+  "records": {
+    "attempt_id": "model_attempt_20260831t010334z",
+    "decision_id": "manual_decision_20260831t010414.874966z",
+    "gate_id": "manual_gate_20260831t010414.874966z",
+    "handoff_id": "manual_handoff_20260831t010414.874966z",
+    "validation_id": "manual_validation_20260831t010334z"
+  },
+  "run_id": "manual_supervised_attempt_20260831t010000z",
+  "schema_version": "zth.transaction_manifest.v0.1",
+  "task_reference": {
+    "orchestration_id": "orch_manual_20260831t010000z",
+    "prompt_packet_id": "prompt_packet_manual_20260831t010000z",
+    "triage_id": "triage_manual_20260831t010000z"
+  },
+  "transaction_id": "orch_manual_20260831t010000z",
+  "updated_at": "2026-08-31T01:04:14.876586Z"
+}

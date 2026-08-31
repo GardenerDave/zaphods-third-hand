@@ -1,0 +1,262 @@
+{
+  "authority_boundaries": [
+    "Local model call is not command execution authority.",
+    "Local model call is not file modification authority.",
+    "No automatic patch promotion authority is granted.",
+    "No automatic training authority is granted.",
+    "No default failure-to-curriculum capture authority is granted.",
+    "Ingest and explicit review are required before downstream use."
+  ],
+  "call_status": "completed",
+  "endpoint": "http://192.168.1.16:8081/v1",
+  "max_tokens": 1024,
+  "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+  "prompt_length": 3536,
+  "prompt_path": "prompt_to_paste.md",
+  "prompt_sha256": "3e2576c2fb201c1a7e29fc9473c74c2d226a29f42597faa4daa089c6a9455d55",
+  "raw_output_length": 422,
+  "raw_output_path": "raw_model_output.txt",
+  "raw_output_sha256": "c8ea66f83e9376053a68b6f8833809c08208121c55971ef017cf5f4e2e9fb43c",
+  "request_body_length": 4641,
+  "request_body_sha256": "beb200d919b8a1aaf85379709523a64aa108225df4d59e195ca5be77510d8e0c",
+  "request_provenance": {
+    "api": "openai-chat",
+    "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "endpoint": "http://192.168.1.16:8081/v1",
+    "max_tokens": 1024,
+    "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "prompt_length": 3536,
+    "prompt_path": "prompt_to_paste.md",
+    "prompt_sha256": "3e2576c2fb201c1a7e29fc9473c74c2d226a29f42597faa4daa089c6a9455d55",
+    "request_body_length": 4641,
+    "request_body_sha256": "beb200d919b8a1aaf85379709523a64aa108225df4d59e195ca5be77510d8e0c",
+    "request_url": "http://192.168.1.16:8081/v1/chat/completions",
+    "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "response_format": {
+      "json_schema": {
+        "name": "zth_structured_output",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "allowed_targets": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "claims": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "evidence_basis": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "format": {
+              "type": "string"
+            },
+            "held_targets": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "reason": {
+              "type": "string"
+            },
+            "required_fields_present": {
+              "type": "boolean"
+            },
+            "scope_expansion_required": {
+              "type": "boolean"
+            },
+            "unverified_claims": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "allowed_targets",
+            "held_targets",
+            "scope_expansion_required",
+            "claims",
+            "evidence_basis",
+            "unverified_claims",
+            "format",
+            "required_fields_present",
+            "reason"
+          ],
+          "type": "object"
+        },
+        "strict": true
+      },
+      "type": "json_schema"
+    },
+    "structured_output_enabled": true,
+    "structured_output_mechanism": "openai_json_schema",
+    "temperature": 0.0
+  },
+  "response_provenance": {
+    "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "raw_output_length": 422,
+    "raw_output_path": "raw_model_output.txt",
+    "raw_output_sha256": "c8ea66f83e9376053a68b6f8833809c08208121c55971ef017cf5f4e2e9fb43c",
+    "structured_output": {
+      "enabled": true,
+      "mechanism": "openai_json_schema",
+      "response_format": {
+        "json_schema": {
+          "name": "zth_structured_output",
+          "schema": {
+            "additionalProperties": false,
+            "properties": {
+              "allowed_targets": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "claims": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "evidence_basis": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "format": {
+                "type": "string"
+              },
+              "held_targets": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "required_fields_present": {
+                "type": "boolean"
+              },
+              "scope_expansion_required": {
+                "type": "boolean"
+              },
+              "unverified_claims": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "allowed_targets",
+              "held_targets",
+              "scope_expansion_required",
+              "claims",
+              "evidence_basis",
+              "unverified_claims",
+              "format",
+              "required_fields_present",
+              "reason"
+            ],
+            "type": "object"
+          },
+          "strict": true
+        },
+        "type": "json_schema"
+      },
+      "schema_length": 1028,
+      "schema_path": "response_schema.json",
+      "schema_sha256": "8a0eefccc8738cb56dbd83b9a908ed459f865149cd6482c5db767e81c3e65b59",
+      "schema_source_path": "docs/reports/evidence/1p7b_worker_a_structured_v2_20260830/response_schema.json"
+    }
+  },
+  "review_required": true,
+  "source": "local_openai_compatible_endpoint",
+  "structured_output": {
+    "enabled": true,
+    "mechanism": "openai_json_schema",
+    "response_format": {
+      "json_schema": {
+        "name": "zth_structured_output",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "allowed_targets": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "claims": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "evidence_basis": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "format": {
+              "type": "string"
+            },
+            "held_targets": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "reason": {
+              "type": "string"
+            },
+            "required_fields_present": {
+              "type": "boolean"
+            },
+            "scope_expansion_required": {
+              "type": "boolean"
+            },
+            "unverified_claims": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "allowed_targets",
+            "held_targets",
+            "scope_expansion_required",
+            "claims",
+            "evidence_basis",
+            "unverified_claims",
+            "format",
+            "required_fields_present",
+            "reason"
+          ],
+          "type": "object"
+        },
+        "strict": true
+      },
+      "type": "json_schema"
+    },
+    "schema_length": 1028,
+    "schema_path": "response_schema.json",
+    "schema_sha256": "8a0eefccc8738cb56dbd83b9a908ed459f865149cd6482c5db767e81c3e65b59",
+    "schema_source_path": "docs/reports/evidence/1p7b_worker_a_structured_v2_20260830/response_schema.json"
+  },
+  "temperature": 0.0
+}

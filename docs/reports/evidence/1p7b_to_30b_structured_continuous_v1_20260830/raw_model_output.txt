@@ -1,0 +1,11 @@
+{
+  "allowed_targets": ["docs/reports/"],
+  "held_targets": ["production automation", "automatic curriculum capture", "automatic promotion", "implementation_packet"],
+  "scope_expansion_required": false,
+  "claims": [],
+  "evidence_basis": [],
+  "unverified_claims": [],
+  "format": "json",
+  "required_fields_present": true,
+  "reason": "All required fields are present and the output conforms to the specified format."
+}
