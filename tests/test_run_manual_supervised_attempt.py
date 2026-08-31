@@ -2072,7 +2072,7 @@ def test_ingest_validation_fails_when_required_field_missing(tmp_path: Path):
     assert validation["validation_status"] == "failed"
 
 
-def test_ingest_with_explicit_accepted_review_writes_decision_gate_handoff(tmp_path: Path):
+def test_ingest_with_explicit_accepted_review_writes_decision_only(tmp_path: Path):
     run_dir = _prepare_run(tmp_path, timestamp="20260707T101010Z")
     source_raw = tmp_path / "raw_model_output.txt"
     source_raw.write_text(_valid_raw_output_json(), encoding="utf-8")
@@ -2092,8 +2092,34 @@ def test_ingest_with_explicit_accepted_review_writes_decision_gate_handoff(tmp_p
     )
     assert result.returncode == 0
     assert (run_dir / "review_decision.json").is_file()
-    assert (run_dir / "downstream_use_gate.json").is_file()
-    assert (run_dir / "handoff_packet.json").is_file()
+    assert not (run_dir / "downstream_use_gate.json").exists()
+    assert not (run_dir / "handoff_packet.json").exists()
+
+
+def test_ingest_with_explicit_accepted_observation_review_writes_decision_only(tmp_path: Path):
+    run_dir = _prepare_run(tmp_path, timestamp="20260707T101011Z")
+    source_raw = tmp_path / "raw_model_output.txt"
+    source_raw.write_text(_valid_raw_output_json(), encoding="utf-8")
+
+    result = run_script(
+        "ingest",
+        "--run-dir",
+        run_dir,
+        "--raw-output-file",
+        source_raw,
+        "--decision",
+        "accepted",
+        "--decision-reason",
+        "Output satisfies the required contract and remains within scope.",
+        "--operator",
+        "manual",
+    )
+    assert result.returncode == 0
+    assert (run_dir / "review_decision.json").is_file()
+    assert not (run_dir / "downstream_use_gate.json").exists()
+    assert not (run_dir / "handoff_packet.json").exists()
+    assert "gate_path" not in result.stdout
+    assert "handoff_path" not in result.stdout
 
 
 def test_ingest_rejects_explicit_accepted_review_when_validation_failed(tmp_path: Path):
@@ -2137,17 +2163,9 @@ def test_ingest_rejected_decision_keeps_gate_and_handoff_blocked(tmp_path: Path)
         "manual",
     )
     assert result.returncode == 0
-    gate = json.loads((run_dir / "downstream_use_gate.json").read_text(encoding="utf-8"))
-    handoff = json.loads((run_dir / "handoff_packet.json").read_text(encoding="utf-8"))
-    assert gate["gate_status"] == "blocked"
-    assert handoff["handoff_status"] == "blocked"
-    prohibited = handoff["prohibited_downstream_use"]
-    assert "no_command_execution" in prohibited
-    assert "no_direct_file_modification" in prohibited
-    assert "no_patch_application" in prohibited
-    assert "no_automatic_patch_promotion" in prohibited
-    assert "no_automatic_training" in prohibited
-    assert "no_default_failure_to_curriculum_capture" in prohibited
+    assert (run_dir / "review_decision.json").is_file()
+    assert not (run_dir / "downstream_use_gate.json").exists()
+    assert not (run_dir / "handoff_packet.json").exists()
 
 
 def test_ingest_revision_requested_decision_keeps_gate_and_handoff_blocked(tmp_path: Path):
@@ -2169,10 +2187,9 @@ def test_ingest_revision_requested_decision_keeps_gate_and_handoff_blocked(tmp_p
         "manual",
     )
     assert result.returncode == 0
-    gate = json.loads((run_dir / "downstream_use_gate.json").read_text(encoding="utf-8"))
-    handoff = json.loads((run_dir / "handoff_packet.json").read_text(encoding="utf-8"))
-    assert gate["gate_status"] == "blocked"
-    assert handoff["handoff_status"] == "blocked"
+    assert (run_dir / "review_decision.json").is_file()
+    assert not (run_dir / "downstream_use_gate.json").exists()
+    assert not (run_dir / "handoff_packet.json").exists()
 
 
 def test_ingest_marks_manual_operator_provenance_and_no_endpoint_usage_fields(tmp_path: Path):

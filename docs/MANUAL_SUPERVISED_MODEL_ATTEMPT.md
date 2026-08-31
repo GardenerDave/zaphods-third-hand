@@ -200,9 +200,12 @@ Ingest reads operator-provided raw model output and writes:
 - `output_validation.json`
 - `output_validation_report.txt`
 
-If explicit review metadata is provided, ingest also writes:
+If explicit review metadata is provided, ingest always writes:
 
 - `review_decision.json`
+
+If the review also requests a bounded downstream supervised step, ingest additionally writes:
+
 - `downstream_use_gate.json`
 - `handoff_packet.json`
 - `transaction_manifest.json`

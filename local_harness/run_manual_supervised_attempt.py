@@ -1826,53 +1826,53 @@ def run_ingest(
         },
     )
 
-    gate_record = build_supervised_downstream_use_gate_record(
-        gate_id=f"manual_gate_{ts}",
-        decision_record=review_decision,
-        requested_downstream_use="next_supervised_step_input",
-        operator_metadata={
-            "operator": resolved_operator,
-            "review_required": True,
-        },
-        gate_reason="Downstream use remains bounded to supervised next-step input handling.",
-        gated_at=_utc_iso(),
-    )
-
-    handoff_packet = build_supervised_handoff_packet(
-        handoff_id=f"manual_handoff_{ts}",
-        gate_record=gate_record,
-        next_step_type="next_supervised_step_input",
-        next_step_summary="Use reviewed output as bounded input for the next supervised step.",
-        next_step_objective=next_worker_objective,
-        handoff_payload={
-            "payload_kind": "reviewed_model_output_reference",
-            "raw_output_artifact": str(run_raw_output_path),
-        },
-        operator_metadata={
-            "operator": resolved_operator,
-            "review_required": True,
-        },
-        handoff_reason="Handoff remains supervised and bounded by downstream-use gate status.",
-    )
-
     decision_path = run_dir / "review_decision.json"
-    gate_path = run_dir / "downstream_use_gate.json"
-    handoff_path = run_dir / "handoff_packet.json"
-
     _write_json(decision_path, review_decision)
-    _write_json(gate_path, gate_record)
-    _write_json(handoff_path, handoff_packet)
 
     result.update(
         {
             "review_required": False,
             "decision": decision,
             "decision_path": decision_path,
-            "gate_path": gate_path,
-            "handoff_path": handoff_path,
         }
     )
-    if decision == "accepted":
+    gate_path: Path | None = None
+    handoff_path: Path | None = None
+    if decision == "accepted" and (next_worker is not None or next_worker_objective is not None):
+        gate_record = build_supervised_downstream_use_gate_record(
+            gate_id=f"manual_gate_{ts}",
+            decision_record=review_decision,
+            requested_downstream_use="next_supervised_step_input",
+            operator_metadata={
+                "operator": resolved_operator,
+                "review_required": True,
+            },
+            gate_reason="Downstream use remains bounded to supervised next-step input handling.",
+            gated_at=_utc_iso(),
+        )
+
+        handoff_packet = build_supervised_handoff_packet(
+            handoff_id=f"manual_handoff_{ts}",
+            gate_record=gate_record,
+            next_step_type="next_supervised_step_input",
+            next_step_summary="Use reviewed output as bounded input for the next supervised step.",
+            next_step_objective=next_worker_objective,
+            handoff_payload={
+                "payload_kind": "reviewed_model_output_reference",
+                "raw_output_artifact": str(run_raw_output_path),
+            },
+            operator_metadata={
+                "operator": resolved_operator,
+                "review_required": True,
+            },
+            handoff_reason="Handoff remains supervised and bounded by downstream-use gate status.",
+        )
+
+        gate_path = run_dir / "downstream_use_gate.json"
+        handoff_path = run_dir / "handoff_packet.json"
+        _write_json(gate_path, gate_record)
+        _write_json(handoff_path, handoff_packet)
+        result.update({"gate_path": gate_path, "handoff_path": handoff_path})
         transaction_result = build_transaction_handoff_artifacts(
             run_dir=run_dir,
             next_worker_identity=next_worker,
@@ -2207,8 +2207,10 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         print(f"decision: {result['decision']}")
         print(f"decision_path: {result['decision_path']}")
-        print(f"gate_path: {result['gate_path']}")
-        print(f"handoff_path: {result['handoff_path']}")
+        if "gate_path" in result:
+            print(f"gate_path: {result['gate_path']}")
+        if "handoff_path" in result:
+            print(f"handoff_path: {result['handoff_path']}")
         if "transaction_manifest_path" in result:
             print(f"transaction_manifest_path: {result['transaction_manifest_path']}")
             print(f"next_worker_context_path: {result['next_worker_context_path']}")
