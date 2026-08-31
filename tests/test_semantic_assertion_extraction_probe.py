@@ -54,7 +54,8 @@ def test_run_case_sends_structured_schema_and_preserves_telemetry(tmp_path: Path
     evidence = tmp_path / "evidence.txt"
     gold = tmp_path / "gold.json"
     candidate.write_text("The supplied evidence establishes semantic capability.", encoding="utf-8")
-    evidence.write_text("Frozen synthetic evidence context for extraction only.", encoding="utf-8")
+    evidence_text = "Frozen synthetic evidence context for extraction only."
+    evidence.write_text(evidence_text, encoding="utf-8")
     gold.write_text(
         json.dumps(
             {
@@ -123,12 +124,19 @@ def test_run_case_sends_structured_schema_and_preserves_telemetry(tmp_path: Path
     assert request_body["response_format"]["json_schema"]["schema"] == json.loads(
         probe.SCHEMA_PATH.read_text(encoding="utf-8")
     )
+    prompt_text = request_body["messages"][0]["content"]
+    assert "Controlled Vocabulary" in prompt_text
+    assert "semantic_capability" in prompt_text
+    assert evidence_text not in prompt_text
+    assert "frozen_experiment_gold" not in prompt_text
+    assert "transport_qualification_implies_semantic_capability_not_established_v1" not in prompt_text
     model_call = json.loads((out_dir / "model_call.json").read_text(encoding="utf-8"))
     validation = json.loads((out_dir / "validation.json").read_text(encoding="utf-8"))
     assert model_call["schema_sha256"] == probe._sha256_file(probe.SCHEMA_PATH)
     assert model_call["endpoint_telemetry"]["finish_reason"] == "stop"
     assert model_call["endpoint_telemetry"]["usage"]["prompt_tokens"] == 11
     assert validation["overall_validation_status"] == "passed"
+    assert validation["semantic_score_status"] == "scored"
     assert result["prompt_sha256"]
 
 
@@ -200,5 +208,70 @@ def test_run_case_rejects_wrong_evidence_ref(tmp_path: Path):
 
     validation = json.loads((out_dir / "validation.json").read_text(encoding="utf-8"))
     assert validation["overall_validation_status"] == "failed"
+    assert validation["semantic_score_status"] == "scored"
     assert any("must equal expected evidence id" in problem for problem in validation["diagnostics"])
     assert result["validation"]["overall_validation_status"] == "failed"
+
+
+def test_run_case_marks_mechanical_failure_as_not_scored(tmp_path: Path):
+    candidate = tmp_path / "candidate.txt"
+    evidence = tmp_path / "evidence.txt"
+    gold = tmp_path / "gold.json"
+    candidate.write_text("The supplied evidence establishes semantic capability.", encoding="utf-8")
+    evidence.write_text("Frozen synthetic evidence context for extraction only.", encoding="utf-8")
+    gold.write_text(
+        json.dumps(
+            {
+                "assertions": [
+                    {
+                        "property": "semantic_capability",
+                        "epistemic_status": "established",
+                        "evidence_refs": ["case_x1_evidence"],
+                    }
+                ],
+                "typing_source": "frozen_experiment_gold",
+            }
+        ),
+        encoding="utf-8",
+    )
+    case = probe.ExtractionCase(
+        case_id="x1",
+        candidate_path=candidate,
+        evidence_path=evidence,
+        evidence_id="case_x1_evidence",
+        gold_path=gold,
+    )
+    out_dir = tmp_path / "out"
+
+    class BadJsonResponse(_FakeResponse):
+        def __init__(self):
+            super().__init__(
+                {
+                    "choices": [
+                        {
+                            "finish_reason": "length",
+                            "message": {
+                                "content": '{"assertions": [{"property": "semantic_capability"'
+                            },
+                        }
+                    ],
+                    "usage": {"prompt_tokens": 11, "completion_tokens": 256, "total_tokens": 267},
+                }
+            )
+
+    with patch.object(probe.urllib.request, "urlopen", return_value=BadJsonResponse()):
+        probe.run_case(
+            case=case,
+            endpoint="http://127.0.0.1:8080/v1",
+            model="test-model",
+            out_dir=out_dir,
+            max_tokens=64,
+            temperature=0.0,
+            timeout_seconds=5,
+        )
+
+    validation = json.loads((out_dir / "validation.json").read_text(encoding="utf-8"))
+    assert validation["parse_status"] == "failed"
+    assert validation["semantic_score_status"] == "not_scored"
+    assert validation["semantic_score_reason"] == "mechanical_output_failure"
+    assert validation["overall_validation_status"] == "failed"

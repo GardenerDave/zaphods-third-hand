@@ -8,6 +8,7 @@
     "assertions": {
       "type": "array",
       "minItems": 0,
+      "uniqueItems": true,
       "items": {
         "type": "object",
         "additionalProperties": false,

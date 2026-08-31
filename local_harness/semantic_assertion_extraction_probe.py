@@ -81,22 +81,39 @@ def _extract_content(response: dict[str, Any]) -> str:
     return content
 
 
-def _build_prompt(*, candidate_text: str, evidence_text: str, evidence_id: str) -> str:
+CONTROLLED_PROPERTIES = [
+    "transport_qualification",
+    "bounded_handoff_success",
+    "semantic_capability",
+    "raw_response_integrity",
+    "semantic_acceptance",
+]
+CONTROLLED_EPISTEMIC_STATUSES = ["established", "not_established"]
+
+
+def _build_prompt(*, candidate_text: str, evidence_id: str) -> str:
     return (
         "# ZTH Candidate Assertion Extraction\n\n"
         "## Role\n"
         "Extract what the candidate text asserts. Do not judge whether it is correct.\n\n"
         "## Instructions\n"
         "Map each relevant assertion onto the supplied controlled vocabulary.\n"
+        "Return each distinct property + epistemic-status proposition expressed by the candidate at most once.\n"
         "Use established when the candidate asserts the property is established.\n"
         "Use not_established when the candidate explicitly says the property is not established by the evidence/context.\n"
         "Do not infer correctness.\n"
         "Do not repair the candidate.\n"
         "Do not apply policy.\n"
         "Return JSON only.\n\n"
-        "## Evidence Context\n"
-        f"Evidence ID: {evidence_id}\n"
-        f"```text\n{evidence_text}\n```\n\n"
+        "## Controlled Vocabulary\n"
+        "Properties:\n"
+        + "\n".join(f"- {item}" for item in CONTROLLED_PROPERTIES)
+        + "\n\n"
+        "Epistemic status:\n"
+        + "\n".join(f"- {item}" for item in CONTROLLED_EPISTEMIC_STATUSES)
+        + "\n\n"
+        "## Evidence Reference\n"
+        f"Evidence ID: {evidence_id}\n\n"
         "## Candidate Output\n"
         f"```json\n{candidate_text}\n```\n\n"
         "## Output Contract\n"
@@ -134,10 +151,8 @@ def run_case(
 ) -> dict[str, Any]:
     out_dir.mkdir(parents=True, exist_ok=False)
     candidate_text = _read_text(case.candidate_path)
-    evidence_text = _read_text(case.evidence_path)
     prompt_text = _build_prompt(
         candidate_text=candidate_text,
-        evidence_text=evidence_text,
         evidence_id=case.evidence_id,
     )
     response, request_body = _call_local(
@@ -208,6 +223,8 @@ def run_case(
         "gold_assertions": expected_assertions,
         "request_body": request_body,
     }
+    semantic_score_status = "not_scored" if parsed_output is None else "scored"
+    semantic_score_reason = "mechanical_output_failure" if parsed_output is None else "semantic_comparison_completed"
     validation = {
         "case_id": case.case_id,
         "parse_status": "passed" if parsed_output is not None else "failed",
@@ -215,12 +232,14 @@ def run_case(
         "grounding_status": "passed" if not any("evidence_refs" in problem or "must equal expected evidence id" in problem for problem in validation_problems) else "failed",
         "diagnostics": validation_problems,
         "overall_validation_status": "passed" if not validation_problems else "failed",
+        "semantic_score_status": semantic_score_status,
+        "semantic_score_reason": semantic_score_reason,
         "schema_source_path": str(SCHEMA_PATH),
         "schema_sha256": _sha256_file(SCHEMA_PATH),
         "expected_evidence_id": case.evidence_id,
     }
     (out_dir / "candidate.txt").write_text(candidate_text, encoding="utf-8")
-    (out_dir / "evidence.txt").write_text(evidence_text, encoding="utf-8")
+    (out_dir / "evidence.txt").write_text(_read_text(case.evidence_path), encoding="utf-8")
     (out_dir / "gold.json").write_text(json.dumps(candidate_gold, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (out_dir / "prompt.txt").write_text(prompt_text, encoding="utf-8")
     (out_dir / "raw_output.txt").write_text(raw_output, encoding="utf-8")
