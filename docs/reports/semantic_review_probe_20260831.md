@@ -40,6 +40,16 @@ The new advisory-review probe uses a frozen contract:
 - internal consistency: `consistent | inconsistent`
 - review reason: non-empty string
 
+## Schema-enforced rerun
+
+The first probe was prompt-constrained only: the frozen schema existed on disk,
+but the effective model request did not include it. That experiment-integrity
+gap was repaired and the probe was rerun with structured output enforced in the
+request body.
+
+The rerun used the same frozen cases unchanged, with the enforced reviewer
+schema and validator active.
+
 ## Reviewer contract
 
 - Schema file: `local_harness/schemas/review_semantic_escalation_output_schema.json`
@@ -73,11 +83,11 @@ The probe is advisory only and does not produce final authority.
 - Ground truth: `hold`
 - Reviewer verdict: `hold`
 - Correct detection: `partial`
-- Schema validity: no
-- Grounding: not fully applicable because the response used malformed evidence shapes
+- Schema validity: yes
+- Grounding: yes
 - Internal consistency: `inconsistent`
-- Unsupported claims identified: yes, but evidence was serialized as strings instead of arrays
-- Reviewer usefulness: limited, because the probe produced the right verdict but with a mechanically invalid evidence payload
+- Unsupported claims identified: yes, but the reviewer attributed the bad candidate to a schema mismatch in the candidate output rather than directly to the unsupported capability escalation
+- Reviewer usefulness: limited, because the probe became mechanically valid but still did not provide a clean, direct semantic detection of the known escalation
 
 ### R3
 
@@ -101,7 +111,7 @@ The probe is advisory only and does not produce final authority.
 
 ## Bounded conclusion
 
-The same 30B reviewer could preserve the known-good control, but it did not reliably detect the known bad transport-to-capability overclaim. The probe therefore does not justify reviewer-based enforcement yet.
+The same 30B reviewer could preserve the known-good control, but it did not reliably detect the known bad transport-to-capability overclaim. Even with structured-output enforcement, the reviewer did not justify reviewer-based enforcement yet.
 
 ## Separate dogfood finding
 
