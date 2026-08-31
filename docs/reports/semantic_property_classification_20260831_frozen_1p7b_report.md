@@ -78,7 +78,7 @@ It also matched the natural A3 controls.
 
 ## Decomposition Result
 
-The decomposed per-property contract remained recoverable on the frozen natural cases under the 1.7B model.
+After decomposition, the frozen natural semantic-classification atom was demonstrated to be within the 1.7B model's capability on this corpus: `4 / 4` exact, including A1 and A2.
 
 The same-model result remains:
 
@@ -86,8 +86,9 @@ The same-model result remains:
 
 ## Model-Floor Result
 
-The smaller model did not match the 30B on all frozen cases.
-The evidence does support that decomposition lowered the model requirement for the natural A1/A2 cases, but not uniformly across the synthetic transport probes.
+The bundled contract was unreliable on the 30B, while the decomposed contract was reliable on the 30B and remained correct on all frozen natural cases under the 1.7B.
+
+This does **not** establish a lower model-size floor, and it does **not** establish that the 1.7B could perform the earlier bundled task.
 
 ## Decomposer Telemetry Seed
 
@@ -115,11 +116,46 @@ Observed smaller-model outcome:
 
 - `9 / 11` exact overall; `4 / 4` natural exact
 
-Model-size requirement appears reduced for the natural semantic-capability atom, but not uniformly for the synthetic transport atoms.
+Smaller-model sufficiency was observed after decomposition; pre-decomposition smaller-model requirement remained unmeasured.
+
+## Residual Failures
+
+The two remaining misses were the synthetic transport-context cases:
+
+- `p2_transport_not_asserted`: gold `not_asserted`, observed `not_established`
+- `p6_transport_established`: gold `established`, observed `not_established`
+
+These suggest a candidate hypothesis of cross-property polarity interference or negative-clause/status bleed, but that is not yet established.
+
+Possible alternative explanations include:
+
+- lexical association with `not_established`
+- recency bias toward the final negative clause
+- confusion between `not_asserted` and `not_established`
+- property-label semantics
+- synthetic phrasing artifacts
+
+## Bifurcation Telemetry
+
+Parent atom:
+
+- per-property semantic classification
+
+Observed bifurcation:
+
+- natural semantic-capability/integrity/acceptance cases: all correct
+- simple transport P4: correct
+- two transport-context cases: incorrect
+
+Candidate hidden variable:
+
+- distractor / cross-property semantic context
+
+This is a decomposition signal, not proof that a new decomposition is required.
 
 ## Limits
 
 - No deterministic checker changes were made.
 - No production contract changes were made.
+- No before/after 1.7B floor comparison was measured on the bundled task.
 - This does not establish a global capability-floor displacement curve.
-
