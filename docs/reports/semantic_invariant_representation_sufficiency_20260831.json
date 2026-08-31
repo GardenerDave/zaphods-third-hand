@@ -1,0 +1,145 @@
+{
+  "artifact_type": "semantic_invariant_representation_sufficiency_report",
+  "date": "2026-08-31",
+  "frozen_invariant": {
+    "id": "transport_qualification_implies_semantic_capability_not_established_v1",
+    "status": "conceptual_only",
+    "sha256": "b70b9d1e1a271153cde1e1039cb57fcdaa07f538bce39a2cff4b6f2a3c951f28"
+  },
+  "model_calls": 0,
+  "minimum_missing_layer": "minimal typed assertion/evidence representation",
+  "trust_model": {
+    "authoritative_for_deterministic_gating": [
+      "typed evidence properties",
+      "typed assertions",
+      "invariant relationships",
+      "provenance"
+    ],
+    "non_authoritative": [
+      "free-form claim text",
+      "reason",
+      "explanatory detail",
+      "narrative evidence excerpts"
+    ],
+    "caveat": "A deterministic checker can only enforce against trusted typed evidence/assertion data. If the producing model supplies semantic typing, the system can check consistency only against that declared type; it cannot independently verify the prose-to-type mapping without semantic interpretation."
+  },
+  "vocabulary": [
+    "transport_qualification",
+    "bounded_handoff_success",
+    "semantic_capability",
+    "raw_response_integrity",
+    "semantic_acceptance"
+  ],
+  "representation": {
+    "typed_evidence": {
+      "concept": {
+        "evidence_scope": {
+          "established_properties": [
+            "transport_qualification",
+            "bounded_handoff_success"
+          ]
+        }
+      }
+    },
+    "typed_assertions": {
+      "concept": {
+        "assertions": [
+          {
+            "asserted_property": "semantic_capability",
+            "evidence_refs": [
+              "source-1"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "decision_trace_examples": {
+    "T1": {
+      "result": "hold",
+      "applicable": true,
+      "established_properties": [
+        "transport_qualification",
+        "bounded_handoff_success"
+      ],
+      "asserted_properties": [
+        "semantic_capability"
+      ],
+      "violating_properties": [
+        "semantic_capability"
+      ]
+    },
+    "T2": {
+      "result": "hold",
+      "applicable": true,
+      "established_properties": [
+        "transport_qualification",
+        "bounded_handoff_success"
+      ],
+      "asserted_properties": [
+        "semantic_capability"
+      ],
+      "violating_properties": [
+        "semantic_capability"
+      ]
+    },
+    "T3": {
+      "result": "pass",
+      "applicable": false,
+      "established_properties": [
+        "raw_response_integrity",
+        "semantic_acceptance"
+      ],
+      "asserted_properties": [
+        "semantic_acceptance"
+      ],
+      "violating_properties": []
+    },
+    "synthetic_transport_only": {
+      "result": "pass",
+      "applicable": true,
+      "established_properties": [
+        "transport_qualification"
+      ],
+      "asserted_properties": [
+        "transport_qualification"
+      ],
+      "violating_properties": []
+    },
+    "synthetic_semantic_capability": {
+      "result": "pass",
+      "applicable": false,
+      "established_properties": [
+        "semantic_capability"
+      ],
+      "asserted_properties": [
+        "semantic_capability"
+      ],
+      "violating_properties": []
+    }
+  },
+  "conclusion": "Given trusted typed semantic inputs, the minimal assertion/evidence representation is sufficient to evaluate the frozen transport-versus-capability invariant without interpreting natural language.",
+  "limitations": [
+    "This does not establish how to acquire trustworthy semantic typing from worker prose.",
+    "This does not establish that a model can self-report the correct typed properties honestly.",
+    "This does not change production observation contracts."
+  ],
+  "hashes": {
+    "invariant_file_sha256": "b70b9d1e1a271153cde1e1039cb57fcdaa07f538bce39a2cff4b6f2a3c951f28",
+    "typed_checker_sha256": "51ddabab0834742051f3c8f60010461208f7965b3e1bec7c6dde9034f171358a",
+    "test_sha256": "7fbaa5982a4f128f63350ce0fe393220f9dfd766a6a6033457a4fe12f0793da7",
+    "fixture_hashes": {
+      "t1_evidence.json": "c84e8bc921394dc298e2ed35cf89e38ab123b1ace6c3a70e15d9ef0c048e578e",
+      "t1_assertions.json": "9e49e81bd55f85e37d41ebacef922d7d202b0553cae047c60a3460d20745450a",
+      "t2_evidence.json": "57cdbe3cfeb62c537f120d9b82e141721b7b5ef4ba9d830734a840efdda8ee63",
+      "t2_assertions.json": "55dace112f4718b674a9de3775b547102f4c06e14f998e1e5514052731850828",
+      "t3_evidence.json": "a32eeab67d1bad9ec8ff70a1da131987df3a9c33303014a4d2664ee8b24b1b24",
+      "t3_assertions.json": "6898e0d2d133a571bbcde19c67aeb16c042d9c60798879e74f0eddb1411dbaec",
+      "controls_transport_only_evidence.json": "5c42cef2319e02c97deea3b63e0689d5045d6deda7065b4cde3e21f830499f6b",
+      "controls_transport_only_assertions.json": "27314273b7cdf81e6cd53232de92f1cb13b04b4721f08a015372abea58a7b226",
+      "controls_semantic_capability_evidence.json": "b88d1b6ff50dd3abb9af6aff4305f7e39775d403841631ea75f5da77b8e8456d",
+      "controls_semantic_capability_assertions.json": "92db8b1fc5c2d714854aee1bc13f6852ef3c9be1b523953e68b6a6a4202f8fb3"
+    }
+  }
+}
+

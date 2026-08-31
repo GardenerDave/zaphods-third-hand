@@ -1,0 +1,14 @@
+{
+  "evidence_scope": {
+    "established_properties": [
+      "raw_response_integrity",
+      "semantic_acceptance"
+    ]
+  },
+  "provenance": {
+    "candidate_artifact": "d3_good_task_b",
+    "evidence_artifact": "frozen_good_control_evidence"
+  },
+  "typing_source": "frozen_experiment_fixture"
+}
+

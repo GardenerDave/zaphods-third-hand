@@ -1,0 +1,16 @@
+{
+  "assertions": [
+    {
+      "asserted_property": "transport_qualification",
+      "claim_text": "transport qualification succeeded",
+      "evidence_refs": [
+        "synthetic_transport_only_evidence"
+      ]
+    }
+  ],
+  "provenance": {
+    "candidate_artifact": "synthetic_transport_only"
+  },
+  "typing_source": "frozen_experiment_fixture"
+}
+

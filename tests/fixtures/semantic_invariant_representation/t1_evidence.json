@@ -1,0 +1,14 @@
+{
+  "evidence_scope": {
+    "established_properties": [
+      "transport_qualification",
+      "bounded_handoff_success"
+    ]
+  },
+  "provenance": {
+    "candidate_artifact": "d1_current_contract_a0",
+    "evidence_artifact": "frozen_positive_control_evidence"
+  },
+  "typing_source": "frozen_experiment_fixture"
+}
+

@@ -1,0 +1,15 @@
+{
+  "antecedent_properties": [
+    "transport_qualification",
+    "bounded_handoff_success"
+  ],
+  "id": "transport_qualification_implies_semantic_capability_not_established_v1",
+  "insufficient_for": [
+    "semantic_capability"
+  ],
+  "provenance": {
+    "typing_source": "frozen_experiment_fixture"
+  },
+  "status": "conceptual_only"
+}
+
