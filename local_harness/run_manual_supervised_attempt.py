@@ -1496,6 +1496,7 @@ def run_ingest(
     run_dir: Path,
     raw_output_file: Path,
     model_call_metadata_file: Path | None = None,
+    transport_qualification_ref: str | None = None,
     decision: str | None = None,
     decision_reason: str | None = None,
     operator: str | None = None,
@@ -1694,6 +1695,7 @@ def run_ingest(
                 "operator": operator.strip() if isinstance(operator, str) and operator.strip() else "manual",
                 "review_required": True,
             },
+            transport_qualification_ref=transport_qualification_ref,
             provenance={
                 "source": "manual_operator_pasted_model_output",
                 "input_artifact": "model_prompt_packet",
@@ -1732,6 +1734,7 @@ def run_ingest(
                 "model_call_metadata": model_call_metadata,
                 "acquisition_request_provenance": model_call_metadata.get("request_provenance"),
                 "structured_output": model_call_metadata.get("structured_output"),
+                "transport_qualification_ref": transport_qualification_ref,
             },
         )
 
@@ -2005,6 +2008,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     ingest.add_argument("--run-dir", type=Path, required=True)
     ingest.add_argument("--raw-output-file", type=Path, required=True)
     ingest.add_argument("--model-call-metadata-file", type=Path)
+    ingest.add_argument("--transport-qualification-ref")
     ingest.add_argument("--decision", choices=sorted(ALLOWED_DECISIONS))
     ingest.add_argument("--decision-reason")
     ingest.add_argument("--operator")
@@ -2144,6 +2148,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             run_dir=args.run_dir,
             raw_output_file=args.raw_output_file,
             model_call_metadata_file=args.model_call_metadata_file,
+            transport_qualification_ref=args.transport_qualification_ref,
             decision=args.decision,
             decision_reason=args.decision_reason,
             operator=args.operator,

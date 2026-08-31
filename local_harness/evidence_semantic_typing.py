@@ -60,6 +60,18 @@ def _load_json(path: Path) -> dict[str, Any]:
     return payload
 
 
+def _load_json_or_jsonl(path: Path) -> dict[str, Any]:
+    if path.suffix.lower() != ".jsonl":
+        return _load_json(path)
+    lines = [line for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    if not lines:
+        raise ValueError(f"JSONL object sequence required: {path}")
+    payload = json.loads(lines[-1])
+    if not isinstance(payload, dict):
+        raise ValueError(f"JSONL object required: {path}")
+    return payload
+
+
 @dataclass(frozen=True)
 class DerivedProperty:
     property: str
@@ -101,42 +113,34 @@ class EvidenceTypingResult:
 
 
 @dataclass(frozen=True)
-class TransportQualificationLink:
-    qualification_id: str
-    endpoint: str
-    model: str
-    qualified_at: str | None = None
-    valid: bool | None = None
-    scope: str | None = None
+class TransportQualificationRef:
+    artifact_ref: str
+    artifact_sha256: str
+    qualification_id: str | None = None
+    qualification_selector: str | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
+            "artifact_ref": self.artifact_ref,
+            "artifact_sha256": self.artifact_sha256,
             "qualification_id": self.qualification_id,
-            "endpoint": self.endpoint,
-            "model": self.model,
-            "qualified_at": self.qualified_at,
-            "valid": self.valid,
-            "scope": self.scope,
+            "qualification_selector": self.qualification_selector,
         }
 
 
 @dataclass(frozen=True)
-class HandoffCompletionLink:
-    handoff_id: str
-    downstream_attempt_id: str
-    endpoint: str
-    model: str
-    completed: bool
-    completed_at: str | None = None
+class HandoffCompletionRef:
+    artifact_ref: str
+    artifact_sha256: str
+    handoff_id: str | None = None
+    downstream_attempt_id: str | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
+            "artifact_ref": self.artifact_ref,
+            "artifact_sha256": self.artifact_sha256,
             "handoff_id": self.handoff_id,
             "downstream_attempt_id": self.downstream_attempt_id,
-            "endpoint": self.endpoint,
-            "model": self.model,
-            "completed": self.completed,
-            "completed_at": self.completed_at,
         }
 
 
@@ -144,39 +148,216 @@ def _source_ref(path: Path) -> str:
     return str(path.resolve())
 
 
-def validate_transport_qualification_linkage(
+@dataclass(frozen=True)
+class TransportQualificationVerification:
+    artifact_integrity: bool
+    qualification_passed: bool
+    endpoint_match: bool | None
+    model_match: bool | None
+    scope_match: bool | None
+    freshness_match: bool | None
+    policy_usable: bool
+    diagnostics: list[str]
+    source_refs: list[str]
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "artifact_integrity": self.artifact_integrity,
+            "qualification_passed": self.qualification_passed,
+            "endpoint_match": self.endpoint_match,
+            "model_match": self.model_match,
+            "scope_match": self.scope_match,
+            "freshness_match": self.freshness_match,
+            "policy_usable": self.policy_usable,
+            "diagnostics": list(self.diagnostics),
+            "source_refs": list(self.source_refs),
+        }
+
+
+@dataclass(frozen=True)
+class HandoffCompletionVerification:
+    artifact_integrity: bool
+    completion_detected: bool
+    handoff_match: bool | None
+    downstream_attempt_match: bool | None
+    endpoint_match: bool | None
+    model_match: bool | None
+    policy_usable: bool
+    diagnostics: list[str]
+    source_refs: list[str]
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "artifact_integrity": self.artifact_integrity,
+            "completion_detected": self.completion_detected,
+            "handoff_match": self.handoff_match,
+            "downstream_attempt_match": self.downstream_attempt_match,
+            "endpoint_match": self.endpoint_match,
+            "model_match": self.model_match,
+            "policy_usable": self.policy_usable,
+            "diagnostics": list(self.diagnostics),
+            "source_refs": list(self.source_refs),
+        }
+
+
+def _resolve_artifact_ref(artifact_ref: str, artifact_sha256: str, *, kind: str) -> tuple[Path, dict[str, Any], list[str]]:
+    if not isinstance(artifact_ref, str) or not artifact_ref.strip():
+        raise ValueError(f"{kind}.artifact_ref must be a non-empty string")
+    if not isinstance(artifact_sha256, str) or not artifact_sha256.strip():
+        raise ValueError(f"{kind}.artifact_sha256 must be a non-empty string")
+    path = Path(artifact_ref)
+    if not path.is_file():
+        raise FileNotFoundError(path)
+    actual_sha = _sha256(path)
+    if actual_sha != artifact_sha256:
+        raise ValueError(f"{kind} artifact sha256 mismatch")
+    payload = _load_json_or_jsonl(path)
+    return path, payload, [str(path.resolve())]
+
+
+def _first_string(payload: dict[str, Any], paths: list[tuple[str, ...]]) -> str | None:
+    for path in paths:
+        cursor: Any = payload
+        for key in path:
+            if not isinstance(cursor, dict):
+                break
+            cursor = cursor.get(key)
+        if isinstance(cursor, str) and cursor.strip():
+            return cursor
+    return None
+
+
+def resolve_transport_qualification_reference(
     *,
-    qualification_link: TransportQualificationLink,
+    qualification_ref: TransportQualificationRef,
     transaction_endpoint: str,
     transaction_model: str,
-) -> bool:
-    if not qualification_link.valid:
-        return False
-    if qualification_link.endpoint != transaction_endpoint:
-        return False
-    if qualification_link.model != transaction_model:
-        return False
-    if not qualification_link.qualification_id.strip():
-        return False
-    return True
+    transaction_scope: str | None = None,
+) -> TransportQualificationVerification:
+    path, payload, source_refs = _resolve_artifact_ref(
+        qualification_ref.artifact_ref,
+        qualification_ref.artifact_sha256,
+        kind="transport qualification",
+    )
+    diagnostics: list[str] = []
+    qualification_passed = bool(
+        payload.get("local_transport_qualified") is True
+        or payload.get("external_transport_qualified") is True
+        or payload.get("qualification_passed") is True
+        or payload.get("passed") is True
+    )
+    if not qualification_passed:
+        diagnostics.append("qualification artifact did not indicate a passed transport qualification")
+    endpoint = _first_string(
+        payload,
+        [("local", "request_url"), ("request_url",), ("endpoint",), ("local", "endpoint")],
+    )
+    model = _first_string(
+        payload,
+        [("local", "model"), ("model",), ("external", "model"), ("local", "resolved_model")],
+    )
+    endpoint_match = endpoint == transaction_endpoint if endpoint is not None else None
+    model_match = model == transaction_model if model is not None else None
+    if endpoint_match is False:
+        diagnostics.append("endpoint mismatch")
+    if model_match is False:
+        diagnostics.append("model mismatch")
+    scope = _first_string(payload, [("scope",), ("lane",), ("qualification_scope",), ("local", "scope")])
+    if transaction_scope is None or scope is None:
+        scope_match: bool | None = None
+        diagnostics.append("scope match unresolved")
+    else:
+        scope_match = scope == transaction_scope
+        if scope_match is False:
+            diagnostics.append("scope mismatch")
+    freshness = _first_string(payload, [("valid_until",), ("expires_at",), ("qualified_until",)])
+    freshness_match: bool | None = None if freshness is None else True
+    policy_usable = bool(
+        qualification_passed
+        and endpoint_match is not False
+        and model_match is not False
+        and scope_match is not False
+        and freshness_match is not False
+        and scope_match is not None
+    )
+    if not policy_usable:
+        diagnostics.append("qualification not usable for policy consumption")
+    return TransportQualificationVerification(
+        artifact_integrity=True,
+        qualification_passed=qualification_passed,
+        endpoint_match=endpoint_match,
+        model_match=model_match,
+        scope_match=scope_match,
+        freshness_match=freshness_match,
+        policy_usable=policy_usable,
+        diagnostics=diagnostics,
+        source_refs=source_refs,
+    )
 
 
-def validate_handoff_completion_linkage(
+def resolve_handoff_completion_reference(
     *,
-    completion_link: HandoffCompletionLink,
+    completion_ref: HandoffCompletionRef,
     prepared_handoff_id: str,
     transaction_endpoint: str,
     transaction_model: str,
-) -> bool:
-    if not completion_link.completed:
-        return False
-    if completion_link.handoff_id != prepared_handoff_id:
-        return False
-    if completion_link.endpoint != transaction_endpoint:
-        return False
-    if completion_link.model != transaction_model:
-        return False
-    return bool(completion_link.downstream_attempt_id.strip())
+) -> HandoffCompletionVerification:
+    path, payload, source_refs = _resolve_artifact_ref(
+        completion_ref.artifact_ref,
+        completion_ref.artifact_sha256,
+        kind="handoff completion",
+    )
+    diagnostics: list[str] = []
+    completion_detected = bool(
+        payload.get("call_status") == "completed"
+        or payload.get("completed") is True
+        or payload.get("completion_status") == "completed"
+        or payload.get("state") == "completed"
+    )
+    if not completion_detected:
+        diagnostics.append("completion artifact did not indicate completion")
+    handoff_id = _first_string(payload, [("handoff_id",), ("source_handoff_id",), ("prepared_handoff_id",)])
+    downstream_attempt_id = _first_string(
+        payload,
+        [("downstream_attempt_id",), ("attempt_id",), ("source_attempt_id",)],
+    )
+    endpoint = _first_string(
+        payload,
+        [("endpoint",), ("request_url",), ("local", "request_url"), ("request_provenance", "request_url")],
+    )
+    model = _first_string(payload, [("model",), ("resolved_model",), ("local", "model")])
+    handoff_match = handoff_id == prepared_handoff_id if handoff_id is not None else None
+    if handoff_match is False:
+        diagnostics.append("handoff mismatch")
+    downstream_attempt_match = downstream_attempt_id is not None
+    if downstream_attempt_match is False:
+        diagnostics.append("missing downstream attempt binding")
+    endpoint_match = endpoint == transaction_endpoint if endpoint is not None else None
+    model_match = model == transaction_model if model is not None else None
+    if endpoint_match is False:
+        diagnostics.append("endpoint mismatch")
+    if model_match is False:
+        diagnostics.append("model mismatch")
+    policy_usable = bool(
+        completion_detected
+        and handoff_match is not False
+        and downstream_attempt_match is not False
+        and endpoint_match is not False
+        and model_match is not False
+    )
+    if not policy_usable:
+        diagnostics.append("completion not usable for policy consumption")
+    return HandoffCompletionVerification(
+        artifact_integrity=True,
+        completion_detected=completion_detected,
+        handoff_match=handoff_match,
+        downstream_attempt_match=downstream_attempt_match,
+        endpoint_match=endpoint_match,
+        model_match=model_match,
+        policy_usable=policy_usable,
+        diagnostics=diagnostics,
+        source_refs=source_refs,
+    )
 
 
 def derive_typed_evidence_from_bundle(*, evidence_id: str, source_paths: list[Path]) -> EvidenceTypingResult:
@@ -186,22 +367,20 @@ def derive_typed_evidence_from_bundle(*, evidence_id: str, source_paths: list[Pa
     by_name = {path.name: path for path in source_paths}
 
     local_model_call = by_name.get("local_model_call.json")
-    output_validation = by_name.get("output_validation.json")
     review_decision = by_name.get("review_decision.json")
     downstream_use_gate = by_name.get("downstream_use_gate.json")
     handoff_packet = by_name.get("handoff_packet.json")
     raw_output = by_name.get("raw_model_output.txt")
 
-    if local_model_call and output_validation and raw_output:
+    if local_model_call and raw_output:
         call = _load_json(local_model_call)
-        validation = _load_json(output_validation)
         if call.get("call_status") == "completed" and call.get("raw_output_sha256") == _sha256(raw_output):
             derived.append(
                 DerivedProperty(
                     property="raw_response_integrity",
                     derivation="raw_output_sha256_matches_preserved_artifact_and_call_completed",
                     rule_id="raw_response_integrity_v1",
-                    source_refs=[_source_ref(raw_output), _source_ref(local_model_call), _source_ref(output_validation)],
+                    source_refs=[_source_ref(raw_output), _source_ref(local_model_call)],
                     derivation_method="deterministic",
                     semantic_source="machine_observable",
                     policy_trust="trusted",

@@ -167,6 +167,7 @@ def build_supervised_model_attempt_record(
     operator_metadata: dict[str, Any],
     prompt_packet_id: str | None = None,
     source_prompt_packet_path: str | None = None,
+    transport_qualification_ref: str | None = None,
     output_format_claim: str | None = None,
     provenance: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -196,6 +197,7 @@ def build_supervised_model_attempt_record(
             "triage_id": triage_id,
             "prompt_packet_id": prompt_packet_id,
             "source_prompt_packet_path": source_prompt_packet_path,
+            "transport_qualification_ref": transport_qualification_ref,
         },
     }
     return validate_supervised_model_attempt_record(record)

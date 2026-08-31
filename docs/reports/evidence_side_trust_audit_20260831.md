@@ -3,6 +3,7 @@
 ## Evidence inventory
 
 The preserved natural A1/A2/A3 bundles expose structured artifacts and provenance, but not a trusted typed layer for transport qualification or semantic capability.
+Transport qualification is now represented by an authoritative artifact-resolution path for the explicit-interface V3 lane, but the natural A1/A2/A3 lineages remain unbound.
 
 ### A1
 
@@ -53,6 +54,7 @@ The handoff bundle exposes a bounded reviewer/gate lane, but not a proven downst
 
 - `semantic_acceptance` is present as an advisory reviewer-derived property
 - `bounded_handoff_success` is not established from the preserved artifacts
+- Prepared handoff artifacts do not self-attest success; downstream success requires authoritative completion linkage that is still unresolved for the preserved historical lane.
 
 That lane does not provide transport qualification or semantic capability for the natural A1/A2/A3 evidence lineage.
 

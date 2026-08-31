@@ -6,10 +6,10 @@ from pathlib import Path
 from local_harness.evidence_semantic_typing import (
     build_source_inventory,
     derive_typed_evidence_from_bundle,
-    HandoffCompletionLink,
-    TransportQualificationLink,
-    validate_handoff_completion_linkage,
-    validate_transport_qualification_linkage,
+    HandoffCompletionRef,
+    TransportQualificationRef,
+    resolve_handoff_completion_reference,
+    resolve_transport_qualification_reference,
 )
 
 
@@ -20,7 +20,6 @@ def test_task_b_bundle_derives_raw_response_integrity_only():
     bundle = [
         ROOT / ".work/semantic_claim_discipline_final_20260831/task_b/baseline/20260831T133000Z/raw_model_output.txt",
         ROOT / ".work/semantic_claim_discipline_final_20260831/task_b/baseline/20260831T133000Z/local_model_call.json",
-        ROOT / ".work/semantic_claim_discipline_final_20260831/task_b/baseline/20260831T133000Z/output_validation.json",
     ]
     result = derive_typed_evidence_from_bundle(evidence_id="case_a3_evidence", source_paths=bundle)
     derived = {item.property: item for item in result.derived_properties}
@@ -139,50 +138,76 @@ def test_transport_qualification_and_semantic_capability_remain_unknown_for_natu
     assert "semantic_capability" in result.unknown_properties
 
 
-def test_future_transport_and_handoff_linkage_helpers_fail_closed():
-    qualification = TransportQualificationLink(
-        qualification_id="qual-1",
-        endpoint="http://192.168.1.16:8080/v1",
-        model="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
-        valid=True,
-        scope="explicit-interface-v3",
+def test_transport_qualification_reference_resolves_authoritatively():
+    artifact = ROOT / "docs/research/EXPLICIT_INTERFACE_V3_TRANSPORT_REQUALIFICATION_FINAL_2026-08-24.json"
+    ref = TransportQualificationRef(
+        artifact_ref=str(artifact),
+        artifact_sha256="a002ff5e7d190fae429a0f84e57eaa03c3fdcdb247d7a06756a7ed65ed022466",
+        qualification_id="v3-explicit-interface",
     )
-    assert validate_transport_qualification_linkage(
-        qualification_link=qualification,
-        transaction_endpoint="http://192.168.1.16:8080/v1",
+    verification = resolve_transport_qualification_reference(
+        qualification_ref=ref,
+        transaction_endpoint="http://192.168.1.16:8080/v1/chat/completions",
         transaction_model="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
     )
-    assert not validate_transport_qualification_linkage(
-        qualification_link=TransportQualificationLink(
-            qualification_id="qual-1",
-            endpoint="http://192.168.1.16:8080/v1",
-            model="other-model",
-            valid=True,
-        ),
-        transaction_endpoint="http://192.168.1.16:8080/v1",
+    assert verification.artifact_integrity is True
+    assert verification.qualification_passed is True
+    assert verification.endpoint_match is True
+    assert verification.model_match is True
+    assert verification.policy_usable is False
+    assert verification.scope_match is None
+
+
+def test_transport_qualification_reference_hash_failure_fails_closed():
+    artifact = ROOT / "docs/research/EXPLICIT_INTERFACE_V3_TRANSPORT_REQUALIFICATION_FINAL_2026-08-24.json"
+    ref = TransportQualificationRef(
+        artifact_ref=str(artifact),
+        artifact_sha256="0" * 64,
+    )
+    try:
+        resolve_transport_qualification_reference(
+            qualification_ref=ref,
+            transaction_endpoint="http://192.168.1.16:8080/v1",
+            transaction_model="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+        )
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("expected transport qualification hash failure")
+
+
+def test_handoff_completion_reference_requires_authoritative_artifact():
+    base = ROOT / ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z"
+    completion_ref = HandoffCompletionRef(
+        artifact_ref=str(base / "worker_b_call_intent.transport_events.jsonl"),
+        artifact_sha256="ae0d74b23be5e36e63751e05ba91eb2e6dc141d754192f08dc98eb7dc470b008",
+        handoff_id="manual_handoff_20260831t020103z",
+        downstream_attempt_id="icm_call_28027750761",
+    )
+    verification = resolve_handoff_completion_reference(
+        completion_ref=completion_ref,
+        prepared_handoff_id="manual_handoff_20260831t020103z",
+        transaction_endpoint="http://192.168.1.16:8080/v1/chat/completions",
         transaction_model="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
     )
-    assert validate_handoff_completion_linkage(
-        completion_link=HandoffCompletionLink(
-            handoff_id="handoff-1",
-            downstream_attempt_id="attempt-1",
-            endpoint="http://192.168.1.16:8080/v1",
-            model="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
-            completed=True,
-        ),
-        prepared_handoff_id="handoff-1",
-        transaction_endpoint="http://192.168.1.16:8080/v1",
-        transaction_model="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    assert verification.completion_detected is True
+    assert verification.policy_usable is False
+
+
+def test_handoff_completion_reference_hash_failure_fails_closed():
+    base = ROOT / ".work/operator_handoffs/1p7b_to_30b_structured_continuous_v2_20260830/20260831T020000Z/20260831T020000Z"
+    completion_ref = HandoffCompletionRef(
+        artifact_ref=str(base / "worker_b_local_model_call.json"),
+        artifact_sha256="0" * 64,
     )
-    assert not validate_handoff_completion_linkage(
-        completion_link=HandoffCompletionLink(
-            handoff_id="handoff-1",
-            downstream_attempt_id="",
-            endpoint="http://192.168.1.16:8080/v1",
-            model="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
-            completed=True,
-        ),
-        prepared_handoff_id="handoff-1",
-        transaction_endpoint="http://192.168.1.16:8080/v1",
-        transaction_model="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
-    )
+    try:
+        resolve_handoff_completion_reference(
+            completion_ref=completion_ref,
+            prepared_handoff_id="manual_handoff_20260831t020103z",
+            transaction_endpoint="http://192.168.1.16:8080/v1/chat/completions",
+            transaction_model="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+        )
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("expected handoff completion hash failure")

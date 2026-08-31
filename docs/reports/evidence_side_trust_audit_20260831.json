@@ -234,8 +234,8 @@
     }
   ],
   "replay_status": {
-    "end_to_end_recomposition": "blocked by missing trusted transport-qualification representation for the natural A1/A2/A3 evidence lineage",
-    "reason": "the deterministic invariant can consume typed candidate assertions and trusted handoff/raw-response evidence, but the natural bundles do not expose a system-derived transport_qualification layer",
+    "end_to_end_recomposition": "blocked by missing trusted transport-qualification linkage for the natural A1/A2/A3 evidence lineage",
+    "reason": "the deterministic invariant can consume typed candidate assertions and trusted handoff/raw-response evidence, but the natural bundles do not expose a policy-usable transport_qualification binding to the authoritative V3 qualification artifact",
     "recomposition_mode": "partially_recomposed"
   },
   "schema": "zth_evidence_side_trust_audit_v1",
@@ -248,7 +248,7 @@
     ],
     "qualified_control": "TRANSPORT_OK",
     "qualified_path": "http://192.168.1.16:8080/v1 / Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
-    "reason": "different task family and no direct causal linkage to the preserved natural candidate bundles",
+    "reason": "different task family and no direct causal linkage to the preserved natural candidate bundles; the qualification artifact is authoritative for the explicit-interface V3 lane but not for A1/A2/A3",
     "scope": "explicit-interface V3 calibration lane"
   }
 }
