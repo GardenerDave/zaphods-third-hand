@@ -650,7 +650,15 @@ def validate_supervised_attempt_output_against_contract(
         )
 
     target_authority_status = "not_applicable"
-    if isinstance(parsed_output, dict):
+    if _is_observation_contract(output_contract):
+        checks.append(
+            {
+                "check_id": "target_authority",
+                "status": "not_applicable",
+                "message": "Target authority is not applicable to repository observation output.",
+            }
+        )
+    elif isinstance(parsed_output, dict):
         allowed_targets = parsed_output.get("allowed_targets")
         if authorized_targets is None:
             target_authority_status = "not_applicable"
