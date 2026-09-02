@@ -71,6 +71,12 @@ Core endpoint-backed workflows expect an existing endpoint. The optional
 small-model exploratory harness is the exception that can manage temporary
 local llama.cpp/tmux sessions. It is not a production model-server manager.
 
+The supervised task front door (`local_harness/zth_task.py`) is a composed
+workflow across both classes: its preflight observation, deterministic scope
+binding, packet creation/validation, and artifact-derived status are
+model-free; its single advisory semantic-interpretation step and its composed
+Historian ask use operator-supplied OpenAI-compatible endpoints.
+
 ## Common Evidence Boundary
 
 Every workflow follows the same control pattern:
@@ -125,6 +131,13 @@ validate_scaffold + repo_health_check + git_sync_cleanup
 This is not a new runtime or orchestration layer. The tools remain independent,
 no tool automatically invokes the next, and humans retain execution,
 acceptance, lifecycle, merge, release, promotion, and cleanup decisions.
+
+One narrow exception exists by design: the supervised task front door
+(`local_harness/zth_task.py`) is an operator-run composition command that
+calls the preflight, Historian ask-and-bind, and Agent Task Session modules'
+existing functions directly. It adds no new packet format or lifecycle, every
+composed member remains independently usable, and the front door itself
+executes no task, required check, agent, or Git operation.
 
 See [`VOGON_PRINTER.md`](VOGON_PRINTER.md).
 
