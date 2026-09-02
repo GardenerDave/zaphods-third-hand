@@ -296,7 +296,13 @@ Work classification:
   minimal read-only Historian context adapter
   (`local_harness/historian_context.py`) binds validated Historian query
   provenance (query id, cited canonical record ids, corpus fingerprint,
-  advisory answer) into plain-file evidence artifacts for supervised work.
+  advisory answer) into plain-file evidence artifacts for supervised work. The
+  ask-and-bind path is now consolidated into one command
+  (`local_harness/historian_context_query.py ask-bind`) that runs the
+  supported Historian ask, captures the exact structured query identity, and
+  binds it through the existing adapter, removing the previous manual
+  query-id and query-directory discovery ceremony while preserving the
+  advisory-answer and no-authority boundaries.
 - Exact Worker-B raw-response capture / joinability closeout: the transaction
   context now carries an explicit binding block that ties the preserved raw
   output to the transaction, review, gate, and handoff IDs for inspection and

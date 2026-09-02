@@ -25,6 +25,8 @@ This folder contains the manager-side helper scripts for supervised local-worker
 - `repo_health_check.py`: reports Markdown-link, public-surface privacy, boundary-language, scaffold, diff-hygiene, and optional test health without changing files.
 - `git_sync_cleanup.py`: reports local post-merge Git sync and branch-cleanup evidence and prints human-reviewable commands without executing cleanup.
 - `agent_task_session.py`: creates a scoped, model-free Agent Task Session review packet under `.work/agent_tasks/` without running agents, checks, or Git commands.
+- `historian_context_query.py`: one-command Project Historian ask plus exact-result ZTH context binding through the existing binder; see the Historian Context section below.
+- `historian_ask_runner.py`: structured single-query runner executed by the Historian retrieval runtime on behalf of `historian_context_query.py`.
 - `zth_agent_packet.py`: generates one independent role/context packet for an external agent.
 - `zth_compare_agent_outputs.py`: compares completed external-agent outputs that follow the ZTH contract.
 - `zth_coverage_auditor.py`: reports obvious pre-synthesis coverage areas and blind spots.
@@ -198,6 +200,47 @@ generally:
 python3 local_harness/repo_health_check.py \
   --task-session .work/agent_tasks/<task-id>
 ```
+
+## Historian Context
+
+Bind Project Historian query results into plain-file ZTH evidence, either
+directly from an existing query directory or as one consolidated ask-and-bind
+operation.
+
+Bind an existing Historian ask query directory:
+
+```text
+python3 local_harness/historian_context.py bind \
+  --query-dir <historian-repo>/.work/historian_queries/<query-id> \
+  --records-dir <historian-repo>/records \
+  --out-dir .work/<task>/evidence
+```
+
+Ask Project Historian and bind the exact result in one command:
+
+```text
+python3 local_harness/historian_context_query.py ask-bind \
+  --question "What historical decisions constrain this task?" \
+  --historian-repo <historian-repo> \
+  --output-dir .work/<task>/evidence
+```
+
+Repeat `--question` to ask and bind several questions in one command; each
+question produces its own independent `zth.historian_context.v0.1` artifact
+through the same binder. Add `--json` for a machine-readable summary
+(query id, exact query directory, context artifact paths, cited canonical
+record ids, retrieval corpus fingerprint).
+
+The consolidated command captures the exact query identity (request id and
+request directory) from the structured Historian service result — it never
+discovers queries by scanning or sorting Historian work directories. It
+requires the reasoner endpoint via `HISTORIAN_REASONER_ENDPOINT` or
+`--endpoint` (never hardcoded) and the supported bundled Historian retrieval
+runtime (override with `--historian-python`). It fails closed on Historian
+failures, missing query artifacts, identity mismatches, and binder failures,
+preserving failed query artifacts for inspection. The Historian answer remains
+advisory; a successful query or bind is not approval, and Project Historian
+and its canonical records are never modified.
 
 ## Configuration
 
