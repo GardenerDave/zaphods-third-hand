@@ -104,17 +104,19 @@ Current strategic order:
 
 Demonstrated bounded supervised handoff milestone:
 
-- one bounded 1.7B worker attempt is executed under the supervised handoff
-  transaction;
-- the result is captured and validated;
+- one bounded 1.7B semantic evidence-observation attempt is executed under the
+  supervised handoff transaction;
+- the raw response is preserved immutably and validated as semantic evidence;
+- ZTH deterministically binds authoritative scope/policy state around that
+  accepted semantic result;
 - a review or explicit handoff decision is made;
-- a second worker, such as 30B or Codex, receives the necessary task state,
-  Historian evidence references, constraints, authority boundaries, previous
-  attempt/result, validation state, and handoff reason automatically;
-- the operator does not manually reconstruct the handoff prompt or copy
-  context between models;
-- the second worker produces a validated result;
-- the Historian evidence is sealed as part of the transaction closeout.
+- a second worker, such as 30B or Codex, receives the exact generated
+  continuation in a separate recipient run directory with prompt and
+  continuation hashes preserved;
+- the operator does not manually reconstruct the downstream prompt or copy
+  context between model runs;
+- the second worker produces a validated semantic result;
+- the downstream run is separately reviewed and closed out.
 
 Automatic semantic routing is not required for this acceptance milestone. The
 handoff may be explicit or triggered only by already-qualified deterministic
@@ -122,8 +124,9 @@ rules.
 
 This milestone is now demonstrated in one fresh lineage. It is not evidence of
 arbitrary-task generalization, unattended promotion, universal routing, or
-autonomous authority. The remaining closeout item is exact durable Worker-B
-raw-response capture plus one clean reproduction.
+autonomous authority. The remaining closeout item is exact durable
+Historian-record capture plus one clean reproduction of the semantic-boundary
+pattern on a different task.
 
 Canonical transaction lifecycle:
 
