@@ -706,6 +706,9 @@ def test_worker_b_recipient_run_artifacts_write_separate_run_prompt_and_manifest
     assert recipient_manifest["continuation_sha256"] == result["continuation_sha256"]
     assert recipient_manifest["prompt_sha256"] == result["prompt_sha256"]
     assert recipient_manifest["source_transaction_binding"]["handoff_id"] == handoff_result["next_worker_context"]["transaction_binding"]["handoff_id"]
+    continuation_text = (run_dir / "next_worker_continuation.md").read_text(encoding="utf-8")
+    assert "Return the downstream semantic result only." in continuation_text
+    assert "Do not reproduce allowed_targets, held_targets" in continuation_text
 
 
 def test_authority_bound_semantic_result_keeps_authority_out_of_model_output(tmp_path: Path) -> None:
