@@ -266,6 +266,11 @@ def test_next_worker_context_contains_required_handoff_information(tmp_path: Pat
     assert context["validation"]["validation_status"] == "passed"
     assert context["downstream_use_gate"]["gate_status"] == "allowed"
     assert context["handoff"]["handoff_status"] == "prepared"
+    assert context["transaction_binding"]["transaction_id"] == context["transaction_id"]
+    assert context["transaction_binding"]["run_id"] == context["run_id"]
+    assert context["transaction_binding"]["attempt_id"] == context["previous_attempt"]["attempt_id"]
+    assert context["transaction_binding"]["handoff_id"] == context["handoff"]["handoff_id"]
+    assert context["transaction_binding"]["raw_output_sha256"] == context["previous_attempt"]["result_reference"]["raw_output_sha256"]
     assert context["constraints"]["allowed_targets"] == ["docs/reports/"]
     assert "production automation" in context["constraints"]["held_targets"]
     assert context["first_worker_identity"] == "manual_operator_provided_model_output"
@@ -461,6 +466,9 @@ def test_next_worker_continuation_contains_actual_previous_result_body(tmp_path:
     assert "validation_status" in continuation_text
     assert "handoff_scope" not in continuation_text
     assert "manual_operator_provided_model_output" in continuation_text
+    context_markdown = (run_dir / "next_worker_context.md").read_text(encoding="utf-8")
+    assert "## Transaction Binding" in context_markdown
+    assert "raw_output_sha256" in context_markdown
 
 
 def test_next_worker_continuation_preserves_authority_and_is_not_first_worker_prompt_dominant(tmp_path: Path) -> None:

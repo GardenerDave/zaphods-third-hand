@@ -279,6 +279,10 @@ Work classification:
 
 - Immediate: canonical supervised handoff transaction and Historian read-only
   context interface groundwork.
+- Exact Worker-B raw-response capture / joinability closeout: the transaction
+  context now carries an explicit binding block that ties the preserved raw
+  output to the transaction, review, gate, and handoff IDs for inspection and
+  regression protection.
 - Near-term: common model transport abstraction, first coding-agent / ACP
   adapter, the 1.7B -> handoff -> 30B/Codex demonstration, and runtime
   lifecycle consolidation.
