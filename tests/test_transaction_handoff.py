@@ -711,6 +711,7 @@ def test_worker_b_recipient_run_artifacts_write_separate_run_prompt_and_manifest
     continuation_text = (run_dir / "next_worker_continuation.md").read_text(encoding="utf-8")
     assert "Return the downstream semantic result only." in continuation_text
     assert "Do not reproduce allowed_targets, held_targets" in continuation_text
+    assert "evidence field that is a non-empty list" in continuation_text
     assert recipient_run_manifest["report_type"] == "manual_supervised_attempt_run_manifest.v1"
     assert recipient_run_manifest["orchestration_id"] == handoff_result["transaction_manifest"]["task_reference"]["orchestration_id"]
     assert recipient_run_manifest["triage_id"] == handoff_result["transaction_manifest"]["task_reference"]["triage_id"]

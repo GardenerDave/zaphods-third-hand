@@ -64,12 +64,12 @@ unattended promotion boundaries.
 
 ## Architectural Direction Update
 
-ZTH is moving from capability discovery toward integration and operational
-usefulness. The roadmap now has a demonstrated bounded continuous handoff
-milestone, and the next sequence is organized around dogfooding the existing
-architecture on ZTH itself, supervised transaction handling, evidence-bearing
-handoff, and ZTH-specific authority semantics layered over mature external
-standards.
+ZTH has completed the first authority-bound handoff milestone and is now
+demonstrating repeatability on distinct bounded tasks. The roadmap now has a
+demonstrated bounded continuous handoff milestone, and the next sequence is
+organized around dogfooding the existing architecture on ZTH itself,
+supervised transaction handling, evidence-bearing handoff, and ZTH-specific
+authority semantics layered over mature external standards.
 
 The project should increasingly own:
 
@@ -122,11 +122,11 @@ Automatic semantic routing is not required for this acceptance milestone. The
 handoff may be explicit or triggered only by already-qualified deterministic
 rules.
 
-This milestone is now demonstrated in one fresh lineage. It is not evidence of
-arbitrary-task generalization, unattended promotion, universal routing, or
-autonomous authority. The remaining closeout item is exact durable
-Historian-record capture plus one clean reproduction of the semantic-boundary
-pattern on a different task.
+This milestone is now demonstrated in one fresh lineage and a repeat
+lineage. It is not evidence of arbitrary-task generalization, unattended
+promotion, universal routing, or autonomous authority. The remaining closeout
+item is exact durable Historian-record capture plus continued repeatability
+checks on different bounded tasks.
 
 Canonical transaction lifecycle:
 

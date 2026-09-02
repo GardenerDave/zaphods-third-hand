@@ -740,7 +740,7 @@ def build_next_worker_continuation_context(
         "Required output fields:",
         "- findings",
         "- reason",
-        "Each finding must include a claim and evidence objects with path and detail fields.",
+        "Each finding must include a claim and an evidence field that is a non-empty list of objects with path and detail fields.",
         "Do not reproduce allowed_targets, held_targets, or other deterministic authority facts.",
         "State how you used the accepted prior result and report the bounded downstream conclusion.",
         "Do not redo the first-worker task or expand scope.",
