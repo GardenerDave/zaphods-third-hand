@@ -947,6 +947,7 @@ def build_worker_b_recipient_run_artifacts(
 
     source_manifest = _read_json(source_run_dir / "transaction_manifest.json", kind="transaction manifest")
     source_context = _read_json(source_run_dir / "next_worker_context.json", kind="next-worker context")
+    source_run_manifest = _read_json(source_run_dir / "run_manifest.json", kind="run manifest")
     recipient_manifest = {
         "schema_version": "zth.recipient_run_manifest.v0.1",
         "source_run_dir": str(source_run_dir),
@@ -958,11 +959,36 @@ def build_worker_b_recipient_run_artifacts(
         "prompt_path": str(prompt_path),
         "prompt_sha256": _sha256(prompt_path),
         "source_transaction_binding": source_context.get("transaction_binding"),
+        "source_run_manifest": {
+            "run_id": source_run_manifest.get("run_id"),
+            "orchestration_id": source_run_manifest.get("orchestration_id"),
+            "triage_id": source_run_manifest.get("triage_id"),
+            "prompt_packet_id": source_run_manifest.get("prompt_packet_id"),
+        },
     }
     manifest_path = recipient_run_dir / "recipient_run_manifest.json"
     _write_json(manifest_path, recipient_manifest)
+    run_manifest_path = recipient_run_dir / "run_manifest.json"
+    _write_json(
+        run_manifest_path,
+        {
+            "report_type": "recipient_supervised_attempt_run_manifest.v1",
+            "run_id": f"{source_manifest.get('transaction_id')}-recipient",
+            "source_transaction_id": source_manifest.get("transaction_id"),
+            "source_run_id": source_manifest.get("run_id"),
+            "source_run_manifest_path": str(source_run_dir / "run_manifest.json"),
+            "recipient_run_manifest_path": str(manifest_path),
+            "created_at": _utc_iso(),
+            "artifacts": {
+                "prompt_to_paste": str(prompt_path),
+                "recipient_run_manifest": str(manifest_path),
+                "continuation": str(continuation_path),
+            },
+        },
+    )
     return {
         "recipient_run_dir": recipient_run_dir,
+        "run_manifest_path": run_manifest_path,
         "recipient_manifest_path": manifest_path,
         "prompt_path": prompt_path,
         "prompt_sha256": recipient_manifest["prompt_sha256"],
