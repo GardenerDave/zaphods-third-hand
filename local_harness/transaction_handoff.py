@@ -983,6 +983,9 @@ def build_worker_b_recipient_run_artifacts(
         {
             "report_type": "manual_supervised_attempt_run_manifest.v1",
             "run_id": f"{source_manifest.get('transaction_id')}-recipient",
+            "orchestration_id": source_run_manifest.get("orchestration_id"),
+            "triage_id": source_run_manifest.get("triage_id"),
+            "prompt_packet_id": source_run_manifest.get("prompt_packet_id"),
             "source_transaction_id": source_manifest.get("transaction_id"),
             "source_run_id": source_manifest.get("run_id"),
             "source_run_manifest_path": str(source_run_dir / "run_manifest.json"),

@@ -712,6 +712,9 @@ def test_worker_b_recipient_run_artifacts_write_separate_run_prompt_and_manifest
     assert "Return the downstream semantic result only." in continuation_text
     assert "Do not reproduce allowed_targets, held_targets" in continuation_text
     assert recipient_run_manifest["report_type"] == "manual_supervised_attempt_run_manifest.v1"
+    assert recipient_run_manifest["orchestration_id"] == handoff_result["transaction_manifest"]["task_reference"]["orchestration_id"]
+    assert recipient_run_manifest["triage_id"] == handoff_result["transaction_manifest"]["task_reference"]["triage_id"]
+    assert recipient_run_manifest["prompt_packet_id"] == handoff_result["transaction_manifest"]["task_reference"]["prompt_packet_id"]
     assert recipient_run_manifest["source_transaction_id"] == handoff_result["transaction_manifest"]["transaction_id"]
     assert recipient_run_manifest["artifacts"]["prompt_to_paste"].endswith("prompt_to_paste.md")
     assert recipient_run_manifest["artifacts"]["output_contract"].endswith("output_contract.json")
