@@ -314,24 +314,32 @@ def build_next_worker_context(
     if not isinstance(raw_output_reference, str) or not raw_output_reference.strip():
         raise TransactionHandoffError("previous attempt must reference a raw model output artifact")
     raw_output_payload = _read_json(Path(raw_output_reference), kind="raw model output")
-    _require_exact_list_match(
-        left=allowed_targets,
-        right=_require_list(raw_output_payload, "allowed_targets", kind="raw model output"),
-        left_kind="task state",
-        right_kind="raw model output",
-        field="allowed_targets",
-    )
-    _require_exact_list_match(
-        left=held_targets,
-        right=_require_list(raw_output_payload, "held_targets", kind="raw model output"),
-        left_kind="task state",
-        right_kind="raw model output",
-        field="held_targets",
-    )
+    raw_allowed_targets = raw_output_payload.get("allowed_targets")
+    raw_held_targets = raw_output_payload.get("held_targets")
+    if raw_allowed_targets is None and raw_held_targets is None:
+        semantic_mode = True
+    else:
+        semantic_mode = False
+        _require_exact_list_match(
+            left=allowed_targets,
+            right=_require_list(raw_output_payload, "allowed_targets", kind="raw model output"),
+            left_kind="task state",
+            right_kind="raw model output",
+            field="allowed_targets",
+        )
+        _require_exact_list_match(
+            left=held_targets,
+            right=_require_list(raw_output_payload, "held_targets", kind="raw model output"),
+            left_kind="task state",
+            right_kind="raw model output",
+            field="held_targets",
+        )
     if _require_list(triage_packet, "allowed_targets", kind="triage packet") != allowed_targets:
         raise TransactionHandoffError("triage packet allowed targets disagree with raw model output")
     if _require_list(orchestration_packet, "held_targets", kind="orchestration packet") != held_targets:
         raise TransactionHandoffError("orchestration packet held targets disagree with raw model output")
+    if semantic_mode and (_require_list(triage_packet, "allowed_targets", kind="triage packet") != allowed_targets or _require_list(orchestration_packet, "held_targets", kind="orchestration packet") != held_targets):
+        raise TransactionHandoffError("authoritative scope does not match task state")
 
     gate_allowed_use = _require_list(gate_record, "allowed_downstream_use", kind="downstream use gate")
     handoff_allowed_use = _require_list(handoff_record, "allowed_downstream_use", kind="handoff packet")

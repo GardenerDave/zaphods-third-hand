@@ -760,3 +760,26 @@ def test_authority_bound_semantic_result_rejects_authority_contamination(tmp_pat
             transaction_manifest=handoff_result["transaction_manifest"],
             next_worker_context=handoff_result["next_worker_context"],
         )
+
+
+def test_transaction_handoff_supports_semantic_worker_raw_output_without_authority_fields(tmp_path: Path) -> None:
+    run_dir = _prepare_and_accept_run(tmp_path, next_worker_objective="Produce a bounded downstream comparison report.")
+    raw_path = run_dir / "raw_model_output.txt"
+    raw_path.write_text(
+        json.dumps(
+            {
+                "findings": [
+                    {
+                        "claim": "structured output enforcement was not active",
+                        "evidence": [{"path": "fresh/local_model_call.json", "detail": "structured_output_enabled: false"}],
+                    }
+                ],
+                "reason": "bounded diagnosis",
+            }
+        ),
+        encoding="utf-8",
+    )
+    handoff_result = build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
+    context = json.loads(handoff_result["next_worker_context_path"].read_text(encoding="utf-8"))
+    assert context["transaction_binding"]["raw_output_sha256"]
+    assert context["task_state"]["allowed_targets"] == json.loads((run_dir / "triage_packet.json").read_text(encoding="utf-8"))["allowed_targets"]
