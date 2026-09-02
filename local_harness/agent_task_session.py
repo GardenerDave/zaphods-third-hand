@@ -74,21 +74,29 @@ def clean_text(value: str, field: str) -> str:
     return cleaned
 
 
-def normalize_allowed_path(value: str) -> str:
+def _normalize_repo_relative(value: str, label: str) -> str:
     candidate = value.strip().replace("\\", "/")
     if not candidate:
-        raise ValueError("allowed paths must not be empty")
+        raise ValueError(f"{label}s must not be empty")
     path = PurePosixPath(candidate)
     if path.is_absolute():
-        raise ValueError(f"allowed path must be repository-relative: {value!r}")
+        raise ValueError(f"{label} must be repository-relative: {value!r}")
     if any(part in {"", ".", ".."} for part in path.parts):
-        raise ValueError(f"allowed path contains an unsafe segment: {value!r}")
+        raise ValueError(f"{label} contains an unsafe segment: {value!r}")
     if ".git" in path.parts:
-        raise ValueError(f"allowed path must not reference .git: {value!r}")
+        raise ValueError(f"{label} must not reference .git: {value!r}")
     normalized = path.as_posix()
     if normalized.startswith("-"):
-        raise ValueError(f"allowed path must not start with '-': {value!r}")
+        raise ValueError(f"{label} must not start with '-': {value!r}")
     return normalized
+
+
+def normalize_allowed_path(value: str) -> str:
+    return _normalize_repo_relative(value, "allowed path")
+
+
+def normalize_context_reference(value: str) -> str:
+    return _normalize_repo_relative(value, "context reference")
 
 
 def clean_check(value: str) -> str:
@@ -116,20 +124,27 @@ def derive_task_id(
     branch: str,
     allowed_paths: Sequence[str],
     required_checks: Sequence[str],
+    non_goals: Sequence[str] = (),
+    context_references: Sequence[str] = (),
 ) -> str:
-    payload = json.dumps(
-        {
-            "name": name,
-            "goal": goal,
-            "branch": branch,
-            "allowed_paths": list(allowed_paths),
-            "required_checks": list(required_checks),
-        },
+    payload = {
+        "name": name,
+        "goal": goal,
+        "branch": branch,
+        "allowed_paths": list(allowed_paths),
+        "required_checks": list(required_checks),
+    }
+    if non_goals:
+        payload["non_goals"] = list(non_goals)
+    if context_references:
+        payload["context_references"] = list(context_references)
+    encoded = json.dumps(
+        payload,
         ensure_ascii=False,
         sort_keys=True,
         separators=(",", ":"),
     )
-    digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()[:10]
+    digest = hashlib.sha256(encoded.encode("utf-8")).hexdigest()[:10]
     return f"{slugify(name)}-{digest}"
 
 
@@ -150,6 +165,8 @@ def render_task_metadata(
     branch: str,
     allowed_paths: Sequence[str],
     required_checks: Sequence[str],
+    non_goals: Sequence[str] = (),
+    context_references: Sequence[str] = (),
 ) -> str:
     payload = {
         "agent_execution_performed": False,
@@ -164,6 +181,10 @@ def render_task_metadata(
         "task_id": task_id,
         "task_session_contract_version": CONTRACT_VERSION,
     }
+    if non_goals:
+        payload["non_goals"] = list(non_goals)
+    if context_references:
+        payload["context_references"] = list(context_references)
     return json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
 
 
@@ -181,7 +202,24 @@ def render_prompt(
     branch: str,
     allowed_paths: Sequence[str],
     required_checks: Sequence[str],
+    non_goals: Sequence[str] = (),
+    context_references: Sequence[str] = (),
 ) -> str:
+    optional_sections = ""
+    if non_goals:
+        optional_sections += (
+            "## Non-Goals\n\n"
+            f"{bullet_list(non_goals, empty='No non-goals were recorded.')}\n"
+            "These are explicit constraints. Do not pursue them in this task.\n\n"
+        )
+    if context_references:
+        optional_sections += (
+            "## Context Evidence References\n\n"
+            f"{bullet_list(context_references, empty='No context references were recorded.')}\n"
+            "These references are advisory evidence for review, not authority. Read "
+            "them before working; they do not expand the allowed paths or grant any "
+            "approval.\n\n"
+        )
     return (
         f"# Agent Task Session: {name}\n\n"
         f"Task ID: `{task_id}`\n\n"
@@ -202,6 +240,7 @@ def render_prompt(
         f"{bullet_list(required_checks, empty='No checks were recorded; stop for human review.')}\n"
         "These commands are recorded instructions, not commands executed by this "
         "packet builder. Run them only within the active human-authorized task.\n\n"
+        f"{optional_sections}"
         "## Required Boundaries\n\n"
         "- Preserve unrelated user changes and existing evidence.\n"
         "- Do not broaden scope or infer authority from this packet.\n"
@@ -279,6 +318,8 @@ def create_task_session(
     allowed_paths: Sequence[str],
     required_checks: Sequence[str],
     task_id: str | None = None,
+    non_goals: Sequence[str] = (),
+    context_references: Sequence[str] = (),
     session_root: Path = DEFAULT_SESSION_ROOT,
 ) -> TaskSession:
     clean_name = clean_text(name, "task name")
@@ -289,6 +330,12 @@ def create_task_session(
     )
     normalized_checks = unique_values(
         [clean_check(value) for value in required_checks]
+    )
+    normalized_non_goals = unique_values(
+        [clean_text(value, "non-goals") for value in non_goals]
+    )
+    normalized_context_references = unique_values(
+        [normalize_context_reference(value) for value in context_references]
     )
     if not normalized_paths:
         raise ValueError("at least one allowed path is required")
@@ -303,6 +350,8 @@ def create_task_session(
             branch=clean_branch,
             allowed_paths=normalized_paths,
             required_checks=normalized_checks,
+            non_goals=normalized_non_goals,
+            context_references=normalized_context_references,
         )
     )
     output_dir = session_root / resolved_task_id
@@ -317,6 +366,8 @@ def create_task_session(
             branch=clean_branch,
             allowed_paths=normalized_paths,
             required_checks=normalized_checks,
+            non_goals=normalized_non_goals,
+            context_references=normalized_context_references,
         ),
         "codex_prompt.md": render_prompt(
             task_id=resolved_task_id,
@@ -325,6 +376,8 @@ def create_task_session(
             branch=clean_branch,
             allowed_paths=normalized_paths,
             required_checks=normalized_checks,
+            non_goals=normalized_non_goals,
+            context_references=normalized_context_references,
         ),
         "allowed_paths.txt": "".join(f"{path}\n" for path in normalized_paths),
         "required_checks.txt": "".join(f"{check}\n" for check in normalized_checks),
@@ -445,6 +498,28 @@ def validate_task_session(session_dir: Path) -> SessionValidation:
     if len(required_checks) != len(set(required_checks)):
         raise SessionValidationError("task.yaml required_checks must be unique")
 
+    non_goals: tuple[str, ...] = ()
+    if "non_goals" in metadata:
+        raw_non_goals = require_metadata_list(metadata, "non_goals")
+        try:
+            non_goals = tuple(clean_text(value, "task.yaml non_goals entry") for value in raw_non_goals)
+        except ValueError as exc:
+            raise SessionValidationError(str(exc)) from exc
+        if len(non_goals) != len(set(non_goals)):
+            raise SessionValidationError("task.yaml non_goals must be unique")
+
+    context_references: tuple[str, ...] = ()
+    if "context_references" in metadata:
+        raw_context_references = require_metadata_list(metadata, "context_references")
+        try:
+            context_references = tuple(
+                normalize_context_reference(value) for value in raw_context_references
+            )
+        except ValueError as exc:
+            raise SessionValidationError(str(exc)) from exc
+        if len(context_references) != len(set(context_references)):
+            raise SessionValidationError("task.yaml context_references must be unique")
+
     path_lines = tuple(texts["allowed_paths.txt"].splitlines())
     if path_lines != allowed_paths:
         raise SessionValidationError(
@@ -472,6 +547,8 @@ def validate_task_session(session_dir: Path) -> SessionValidation:
         branch=branch,
         allowed_paths=allowed_paths,
         required_checks=required_checks,
+        non_goals=non_goals,
+        context_references=context_references,
     )
     if texts["codex_prompt.md"] != expected_prompt:
         raise SessionValidationError(
@@ -576,6 +653,21 @@ def build_parser() -> argparse.ArgumentParser:
         help="Required check to record; repeat as needed. Checks are not executed.",
     )
     new_parser.add_argument(
+        "--non-goal",
+        action="append",
+        default=[],
+        help="Optional explicit non-goal constraint to record; repeat as needed.",
+    )
+    new_parser.add_argument(
+        "--context-ref",
+        action="append",
+        default=[],
+        help=(
+            "Optional repository-relative context evidence reference to record; "
+            "repeat as needed. References are advisory evidence, not authority."
+        ),
+    )
+    new_parser.add_argument(
         "--json",
         action="store_true",
         help="Print a machine-readable creation summary.",
@@ -636,6 +728,8 @@ def main(
             allowed_paths=args.allow,
             required_checks=args.check,
             task_id=args.task_id,
+            non_goals=args.non_goal,
+            context_references=args.context_ref,
             session_root=session_root,
         )
     except ValueError as exc:

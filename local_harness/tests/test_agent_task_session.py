@@ -403,5 +403,115 @@ class AgentTaskSessionTests(unittest.TestCase):
         self.assertIn("No required checks", " ".join(payload["warnings"]))
 
 
+class OptionalFieldTests(unittest.TestCase):
+    def create_session(self, root: Path, **overrides):
+        arguments = {
+            "name": "Add focused parser validation",
+            "goal": "Add parser checks without changing unrelated behavior.",
+            "branch": "agent-task-parser-validation",
+            "allowed_paths": [
+                "local_harness/example.py",
+                "local_harness/tests/test_example.py",
+            ],
+            "required_checks": [
+                "python3 -m pytest local_harness/tests/test_example.py",
+            ],
+            "session_root": root,
+        }
+        arguments.update(overrides)
+        return agent_task_session.create_task_session(**arguments)
+
+    def test_optional_fields_omitted_by_default(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            session = self.create_session(Path(temp_dir))
+            metadata = json.loads(
+                (session.output_dir / "task.yaml").read_text(encoding="utf-8")
+            )
+            prompt = (session.output_dir / "codex_prompt.md").read_text(encoding="utf-8")
+
+            self.assertNotIn("non_goals", metadata)
+            self.assertNotIn("context_references", metadata)
+            self.assertNotIn("## Non-Goals", prompt)
+            self.assertNotIn("## Context Evidence References", prompt)
+
+    def test_optional_fields_recorded_and_rendered(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            session = self.create_session(
+                Path(temp_dir),
+                non_goals=["Do not modify runtime modules."],
+                context_references=[".work/zth_tasks/demo/historian/index.json"],
+            )
+            metadata = json.loads(
+                (session.output_dir / "task.yaml").read_text(encoding="utf-8")
+            )
+            prompt = (session.output_dir / "codex_prompt.md").read_text(encoding="utf-8")
+
+            self.assertEqual(["Do not modify runtime modules."], metadata["non_goals"])
+            self.assertEqual(
+                [".work/zth_tasks/demo/historian/index.json"],
+                metadata["context_references"],
+            )
+            self.assertIn("## Non-Goals", prompt)
+            self.assertIn("- `Do not modify runtime modules.`", prompt)
+            self.assertIn("## Context Evidence References", prompt)
+            self.assertIn("advisory evidence for review, not authority", prompt)
+            agent_task_session.validate_task_session(session.output_dir)
+
+    def test_unsafe_context_reference_fails_closed(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with self.assertRaises(ValueError):
+                self.create_session(
+                    Path(temp_dir),
+                    context_references=["../outside/evidence.json"],
+                )
+
+    def test_validation_rejects_empty_optional_list(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            session = self.create_session(
+                Path(temp_dir),
+                non_goals=["Do not modify runtime modules."],
+            )
+            task_yaml = session.output_dir / "task.yaml"
+            metadata = json.loads(task_yaml.read_text(encoding="utf-8"))
+            metadata["non_goals"] = []
+            task_yaml.write_text(
+                json.dumps(metadata, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+
+        with self.assertRaises(agent_task_session.SessionValidationError):
+            agent_task_session.validate_task_session(session.output_dir)
+
+    def test_cli_records_non_goals_and_context_references(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                exit_code = agent_task_session.main(
+                    [
+                        "new",
+                        "--name", "Optional fields",
+                        "--goal", "Record optional constraint metadata.",
+                        "--branch", "optional-fields",
+                        "--allow", "local_harness/example.py",
+                        "--check", "python3 -m pytest local_harness/tests/test_example.py",
+                        "--non-goal", "Do not modify runtime modules.",
+                        "--context-ref", ".work/demo/index.json",
+                        "--json",
+                    ],
+                    session_root=Path(temp_dir),
+                )
+
+            payload = json.loads(output.getvalue())
+            metadata = json.loads(
+                (Path(temp_dir) / payload["task_id"] / "task.yaml").read_text(
+                    encoding="utf-8"
+                )
+            )
+
+        self.assertEqual(0, exit_code)
+        self.assertEqual(["Do not modify runtime modules."], metadata["non_goals"])
+        self.assertEqual([".work/demo/index.json"], metadata["context_references"])
+
+
 if __name__ == "__main__":
     unittest.main()

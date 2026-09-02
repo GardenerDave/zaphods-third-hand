@@ -29,6 +29,7 @@ This folder contains the manager-side helper scripts for supervised local-worker
 - `historian_ask_runner.py`: structured single-query runner executed by the Historian retrieval runtime on behalf of `historian_context_query.py`.
 - `zth_preflight.py`: single read-only, fail-closing ZTH + Project Historian baseline preflight; see the ZTH + Historian Baseline Preflight section below.
 - `zth_preflight_historian_runner.py`: structured baseline-validation runner executed by the Historian retrieval runtime on behalf of `zth_preflight.py`.
+- `zth_task.py`: supervised task front door that composes the preflight, Historian ask-and-bind, Agent Task Sessions, and execution/review records into one bounded prepare/status/handoff workflow; see the Supervised Task Front Door section below.
 - `zth_agent_packet.py`: generates one independent role/context packet for an external agent.
 - `zth_compare_agent_outputs.py`: compares completed external-agent outputs that follow the ZTH contract.
 - `zth_coverage_auditor.py`: reports obvious pre-synthesis coverage areas and blind spots.
@@ -202,6 +203,56 @@ generally:
 python3 local_harness/repo_health_check.py \
   --task-session .work/agent_tasks/<task-id>
 ```
+
+## Supervised Task Front Door
+
+`zth_task.py` is the single front door from an ordinary-language objective to
+a validated, context-backed, execution-ready Agent Task Session. It composes
+the existing mechanisms — baseline preflight, Historian ask-and-bind, Agent
+Task Session packets, and execution/review records — without forking a second
+task-packet implementation or lifecycle:
+
+```text
+python3 local_harness/zth_task.py prepare \
+  "<objective in ordinary language>" \
+  --historian-repo /path/to/project-historian \
+  --interpreter-endpoint http://127.0.0.1:8084/v1 \
+  --interpreter-model <MODEL_NAME>
+```
+
+The bare form `python3 local_harness/zth_task.py "<objective>"` is equivalent
+to `prepare`. The interpreter endpoint and model may also be supplied through
+`ZTH_TASK_INTERPRETER_ENDPOINT` / `ZTH_TASK_INTERPRETER_MODEL`.
+
+Preparation records the objective verbatim under
+`.work/zth_tasks/<task-id>/` (`objective.json`, `preflight.json`,
+`semantic_interpretation.json`, `historian/index.json`,
+`task_session_ref.json`, `task_summary.md`), asks the interpreter's proposed
+Historian questions, binds the cited evidence, deterministically validates
+the proposed scope (existing files or new files under existing directories
+only; no wildcards, `.git`, `.work`, `outputs/`, `sources/`, private
+configuration, or secret material), and creates plus validates a draft Agent
+Task Session that carries the bound scope, required checks, non-goals, and
+context references.
+
+Task state is always derived from these durable artifacts — never a mutable
+status flag:
+
+```text
+python3 local_harness/zth_task.py status <task-id>
+python3 local_harness/zth_task.py handoff <task-id>
+```
+
+`status` reports `created`, `context_bound`, `ready_for_execution`,
+`executed`, `reviewed` (with the recorded decision), or `blocked`, with the
+next required operator action. `handoff` emits the exact validated agent
+prompt and the exact `agent_task_session_record.py record-execution` command
+for the returned evidence. Preparation grants no execution authority: a
+validated packet is review material, not permission to act; execution
+evidence is not acceptance; a commit is not acceptance; human review remains
+a separate, required step. Preparation failures are preserved in the task
+workspace (`failure.json`) and never auto-repaired or deleted. Focused
+tests: `tests/test_zth_task.py`.
 
 ## Historian Context
 

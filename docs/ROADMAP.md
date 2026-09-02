@@ -310,7 +310,14 @@ Work classification:
   retrieval-state currency (classified `current`, `stale`, `missing`, or
   `invalid` through Historian's own `validate_state` fingerprint check run
   by the supported bundled runtime), with optional explicit HEAD/count
-  expectations and no hardcoded phase values.
+  expectations and no hardcoded phase values. The whole supervised task
+  ceremony — preflight, verbatim objective preservation, one advisory
+  strictly-contracted semantic interpretation, Historian ask-and-bind,
+  deterministic fail-closed scope binding, validated Agent Task Session
+  creation, artifact-derived resumable status, and exact external-agent
+  handoff — is now composed into one front door
+  (`local_harness/zth_task.py` prepare/status/handoff) that adds no new
+  lifecycle or packet format and grants no execution authority.
 - Exact Worker-B raw-response capture / joinability closeout: the transaction
   context now carries an explicit binding block that ties the preserved raw
   output to the transaction, review, gate, and handoff IDs for inspection and
@@ -426,6 +433,7 @@ explicit supervised acceptance without promotion or downstream mutation.
 - Transport-aware capability attempts and an opt-in deterministic context-complete retry rung are available; transport failures remain infrastructure evidence and cannot enter capability validation or scorecards.
 - Capability-mining Runs 1 and 2 are closed: Run 1's repaired holdout reached 8/10 deterministic retries, while Run 2's 20 fresh tasks reached 9/20. Teacher-free generalization replicated at lower strength; weight learning, permanent capability change, arbitrary out-of-distribution generalization, and universal patch applicability remain unproven.
 - v0.4.0 release notes and presentation notes added for the evidence-backed long-duration dogfood loop; the project remains review-only with queue writing, queue insertion, queue running, automatic handoff, and downstream-use authority unimplemented.
+- Supervised task front door added: `local_harness/zth_task.py` composes the baseline preflight, Historian ask-and-bind, Agent Task Sessions, and execution/review records into one bounded prepare/status/handoff workflow from an ordinary-language objective, with verbatim objective preservation, an advisory strictly-contracted interpretation step, deterministic fail-closed scope binding, preserved failures, and artifact-derived task state; `agent_task_session.py` gained only backward-compatible optional non-goals and context-reference fields; future work remains in a supported in-front-door coding-agent execution path, multi-step tasks, and dependency-aware scope.
 
 ## Completed Semantic Supplier/Interface Research
 
