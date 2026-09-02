@@ -703,6 +703,7 @@ def test_worker_b_recipient_run_artifacts_write_separate_run_prompt_and_manifest
     ).read_text(encoding="utf-8")
     recipient_manifest = json.loads((recipient_dir / "recipient_run_manifest.json").read_text(encoding="utf-8"))
     recipient_run_manifest = json.loads((recipient_dir / "run_manifest.json").read_text(encoding="utf-8"))
+    output_contract = json.loads((recipient_dir / "output_contract.json").read_text(encoding="utf-8"))
     assert recipient_manifest["recipient_identity"] == "qwen3-30b"
     assert recipient_manifest["continuation_sha256"] == result["continuation_sha256"]
     assert recipient_manifest["prompt_sha256"] == result["prompt_sha256"]
@@ -710,9 +711,11 @@ def test_worker_b_recipient_run_artifacts_write_separate_run_prompt_and_manifest
     continuation_text = (run_dir / "next_worker_continuation.md").read_text(encoding="utf-8")
     assert "Return the downstream semantic result only." in continuation_text
     assert "Do not reproduce allowed_targets, held_targets" in continuation_text
-    assert recipient_run_manifest["report_type"] == "recipient_supervised_attempt_run_manifest.v1"
+    assert recipient_run_manifest["report_type"] == "manual_supervised_attempt_run_manifest.v1"
     assert recipient_run_manifest["source_transaction_id"] == handoff_result["transaction_manifest"]["transaction_id"]
     assert recipient_run_manifest["artifacts"]["prompt_to_paste"].endswith("prompt_to_paste.md")
+    assert recipient_run_manifest["artifacts"]["output_contract"].endswith("output_contract.json")
+    assert output_contract == {"format": "json", "required_fields": ["findings", "reason"], "requires_reason": True}
 
 
 def test_authority_bound_semantic_result_keeps_authority_out_of_model_output(tmp_path: Path) -> None:

@@ -968,11 +968,20 @@ def build_worker_b_recipient_run_artifacts(
     }
     manifest_path = recipient_run_dir / "recipient_run_manifest.json"
     _write_json(manifest_path, recipient_manifest)
+    output_contract_path = recipient_run_dir / "output_contract.json"
+    _write_json(
+        output_contract_path,
+        {
+            "format": "json",
+            "required_fields": ["findings", "reason"],
+            "requires_reason": True,
+        },
+    )
     run_manifest_path = recipient_run_dir / "run_manifest.json"
     _write_json(
         run_manifest_path,
         {
-            "report_type": "recipient_supervised_attempt_run_manifest.v1",
+            "report_type": "manual_supervised_attempt_run_manifest.v1",
             "run_id": f"{source_manifest.get('transaction_id')}-recipient",
             "source_transaction_id": source_manifest.get("transaction_id"),
             "source_run_id": source_manifest.get("run_id"),
@@ -981,6 +990,8 @@ def build_worker_b_recipient_run_artifacts(
             "created_at": _utc_iso(),
             "artifacts": {
                 "prompt_to_paste": str(prompt_path),
+                "model_prompt_packet": str(prompt_path),
+                "output_contract": str(output_contract_path),
                 "recipient_run_manifest": str(manifest_path),
                 "continuation": str(continuation_path),
             },
