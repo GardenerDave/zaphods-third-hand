@@ -27,6 +27,8 @@ This folder contains the manager-side helper scripts for supervised local-worker
 - `agent_task_session.py`: creates a scoped, model-free Agent Task Session review packet under `.work/agent_tasks/` without running agents, checks, or Git commands.
 - `historian_context_query.py`: one-command Project Historian ask plus exact-result ZTH context binding through the existing binder; see the Historian Context section below.
 - `historian_ask_runner.py`: structured single-query runner executed by the Historian retrieval runtime on behalf of `historian_context_query.py`.
+- `zth_preflight.py`: single read-only, fail-closing ZTH + Project Historian baseline preflight; see the ZTH + Historian Baseline Preflight section below.
+- `zth_preflight_historian_runner.py`: structured baseline-validation runner executed by the Historian retrieval runtime on behalf of `zth_preflight.py`.
 - `zth_agent_packet.py`: generates one independent role/context packet for an external agent.
 - `zth_compare_agent_outputs.py`: compares completed external-agent outputs that follow the ZTH contract.
 - `zth_coverage_auditor.py`: reports obvious pre-synthesis coverage areas and blind spots.
@@ -241,6 +243,43 @@ failures, missing query artifacts, identity mismatches, and binder failures,
 preserving failed query artifacts for inspection. The Historian answer remains
 advisory; a successful query or bind is not approval, and Project Historian
 and its canonical records are never modified.
+
+## ZTH + Historian Baseline Preflight
+
+`zth_preflight.py` is a single read-only, fail-closing command that reports
+the operational baseline for both repositories — replacing the repeated
+per-repo status ceremony (`git status`, `git rev-parse HEAD`,
+Historian canonical/projection validation, and a separate retrieval-state
+currency check) with one invocation:
+
+```bash
+python3 local_harness/zth_preflight.py \
+  --historian-repo /path/to/project-historian-v1
+```
+
+- `--zth-repo` defaults to the repository containing the module.
+- Historian-side checks (canonical validation count, projection validation
+  count, count agreement, retrieval-state currency) run through the supported
+  bundled Historian retrieval runtime (`--historian-python` overrides it) via
+  `zth_preflight_historian_runner.py`, a structured JSON runner executed by
+  that runtime; nothing is inferred from timestamps.
+- Retrieval state is classified as `current`, `stale`, `missing`, or
+  `invalid` using Historian's own `historian.retrieval.validate_state` corpus
+  fingerprint check plus a minimal embeddings artifact consistency check.
+  Stale state is never silently rebuilt.
+- Optional expectations (`--expect-zth-head`, `--expect-historian-head`,
+  `--expect-record-count`) are explicit operator-supplied policy; phase
+  expectations are never hardcoded in the tool.
+- `--json` emits a machine-readable report (`zth.historian_baseline_preflight.v1`).
+- Exit code 0 means every requested invariant was observed; any drift (dirty
+  worktree, validation failure, count mismatch, non-current retrieval state,
+  unsupported runtime, subprocess failure) exits 1 with actionable errors.
+- The tool is an observer only: it mutates neither repository and grants no
+  execution, file-modification, commit, merge, lifecycle, review, promotion,
+  or training authority.
+
+Focused tests: `tests/test_zth_preflight.py` (including a deliberate
+negative control against real temporary Git fixture repositories).
 
 ## Configuration
 

@@ -302,7 +302,15 @@ Work classification:
   supported Historian ask, captures the exact structured query identity, and
   binds it through the existing adapter, removing the previous manual
   query-id and query-directory discovery ceremony while preserving the
-  advisory-answer and no-authority boundaries.
+  advisory-answer and no-authority boundaries. The recurring two-repo
+  baseline status ceremony is likewise consolidated into one read-only,
+  fail-closing preflight command
+  (`local_harness/zth_preflight.py`) that reports both repositories' Git
+  baseline and the Historian canonical/projection validation counts and
+  retrieval-state currency (classified `current`, `stale`, `missing`, or
+  `invalid` through Historian's own `validate_state` fingerprint check run
+  by the supported bundled runtime), with optional explicit HEAD/count
+  expectations and no hardcoded phase values.
 - Exact Worker-B raw-response capture / joinability closeout: the transaction
   context now carries an explicit binding block that ties the preserved raw
   output to the transaction, review, gate, and handoff IDs for inspection and
