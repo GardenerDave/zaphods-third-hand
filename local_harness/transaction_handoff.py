@@ -1073,3 +1073,271 @@ def build_authority_bound_semantic_result(
         _write_json(normalized_path, normalized_result)
         normalized_result["authority_bound_semantic_result_path"] = str(normalized_path)
     return normalized_result
+
+
+HANDOFF_COMPLETION_SCHEMA = "zth.handoff_completion.v0.1"
+RECIPIENT_RUN_MANIFEST_SCHEMA = "zth.recipient_run_manifest.v0.1"
+COMPLETION_BOUNDARIES = (
+    "This completion join is derived deterministic state, not model output and not review authority.",
+    "It proves that the exact prepared continuation was executed and completed by the bound recipient run; it does not claim broader model capability or repeatability.",
+    "It does not promote, merge, release, clean up, or train anything.",
+    "The source transaction manifest remains unmodified; the join is a separate durable record.",
+)
+
+
+def build_handoff_completion(
+    *,
+    source_run_dir: Path,
+    recipient_run_dir: Path,
+    output_dir: Path | None = None,
+) -> dict[str, Any]:
+    if not source_run_dir.is_dir():
+        raise TransactionHandoffError(f"missing source run dir: {source_run_dir}")
+    if not recipient_run_dir.is_dir():
+        raise TransactionHandoffError(f"missing recipient run dir: {recipient_run_dir}")
+    if recipient_run_dir.resolve() == source_run_dir.resolve():
+        raise TransactionHandoffError(
+            "downstream completion requires a separate recipient run distinct from the source run"
+        )
+
+    source_manifest = _read_json(source_run_dir / "transaction_manifest.json", kind="transaction manifest")
+    if source_manifest.get("schema_version") != TRANSACTION_MANIFEST_SCHEMA:
+        raise TransactionHandoffError("source transaction manifest schema_version is unsupported")
+    if source_manifest.get("lifecycle_state") != "HANDOFF":
+        raise TransactionHandoffError(
+            "handoff completion requires a prepared handoff (source lifecycle_state HANDOFF); "
+            f"found {source_manifest.get('lifecycle_state')!r}"
+        )
+    transaction_id = _require_nonempty(source_manifest, "transaction_id", kind="transaction manifest")
+    source_run_id = _require_nonempty(source_manifest, "run_id", kind="transaction manifest")
+    source_records = source_manifest.get("records")
+    if not isinstance(source_records, dict):
+        raise TransactionHandoffError("transaction manifest records must be an object")
+    for key in ("attempt_id", "validation_id", "decision_id", "gate_id", "handoff_id"):
+        _require_nonempty(source_records, key, kind="transaction manifest records")
+
+    continuation_path = source_run_dir / "next_worker_continuation.md"
+    if not continuation_path.is_file():
+        raise TransactionHandoffError(f"missing next-worker continuation: {continuation_path}")
+    continuation_text = continuation_path.read_text(encoding="utf-8")
+
+    handoff_packet = _read_json(source_run_dir / "handoff_packet.json", kind="handoff packet")
+    if handoff_packet.get("handoff_id") != source_records["handoff_id"]:
+        raise TransactionHandoffError("handoff packet id does not match transaction manifest records")
+    if handoff_packet.get("handoff_status") != "prepared":
+        raise TransactionHandoffError("handoff packet status must be prepared")
+
+    source_raw_output_path = source_run_dir / "raw_model_output.txt"
+    if not source_raw_output_path.is_file():
+        raise TransactionHandoffError(f"missing source raw model output: {source_raw_output_path}")
+
+    recipient_manifest = _read_json(recipient_run_dir / "recipient_run_manifest.json", kind="recipient run manifest")
+    if recipient_manifest.get("schema_version") != RECIPIENT_RUN_MANIFEST_SCHEMA:
+        raise TransactionHandoffError("recipient run manifest schema_version is unsupported")
+    if recipient_manifest.get("transaction_id") != transaction_id:
+        raise TransactionHandoffError("recipient run manifest transaction_id does not match source transaction")
+    recipient_identity = _require_nonempty(recipient_manifest, "recipient_identity", kind="recipient run manifest")
+    if recipient_manifest.get("continuation_sha256") != _sha256(continuation_path):
+        raise TransactionHandoffError("recipient run manifest continuation_sha256 does not match source continuation")
+    prompt_path = Path(_require_nonempty(recipient_manifest, "prompt_path", kind="recipient run manifest"))
+    if not prompt_path.is_file():
+        raise TransactionHandoffError(f"recipient prompt does not exist: {prompt_path}")
+    prompt_text = prompt_path.read_text(encoding="utf-8")
+    if recipient_manifest.get("prompt_sha256") != _sha256(prompt_path):
+        raise TransactionHandoffError("recipient run manifest prompt_sha256 does not match recipient prompt file")
+    if prompt_text != continuation_text:
+        raise TransactionHandoffError(
+            "recipient prompt is not byte-identical to the prepared continuation; cannot join this handoff"
+        )
+
+    binding = recipient_manifest.get("source_transaction_binding")
+    if not isinstance(binding, dict):
+        raise TransactionHandoffError("recipient run manifest must include source_transaction_binding")
+    for key in ("attempt_id", "validation_id", "decision_id", "gate_id", "handoff_id"):
+        if binding.get(key) != source_records[key]:
+            raise TransactionHandoffError(f"recipient transaction binding {key} does not match source records")
+    if binding.get("run_id") != source_run_id:
+        raise TransactionHandoffError("recipient transaction binding run_id does not match source run")
+    if binding.get("transaction_id") != transaction_id:
+        raise TransactionHandoffError("recipient transaction binding transaction_id does not match source transaction")
+    binding_raw_sha = binding.get("raw_output_sha256")
+    if not isinstance(binding_raw_sha, str) or not binding_raw_sha.strip():
+        raise TransactionHandoffError("recipient transaction binding must include raw_output_sha256")
+    if binding_raw_sha != _sha256(source_raw_output_path):
+        raise TransactionHandoffError("recipient transaction binding raw_output_sha256 does not match source raw output")
+
+    recipient_run_manifest = _read_json(recipient_run_dir / "run_manifest.json", kind="recipient run manifest")
+    if recipient_run_manifest.get("report_type") != "manual_supervised_attempt_run_manifest.v1":
+        raise TransactionHandoffError("recipient run manifest report_type is unsupported")
+    if recipient_run_manifest.get("source_transaction_id") != transaction_id:
+        raise TransactionHandoffError("recipient run manifest source_transaction_id does not match source transaction")
+
+    attempt = _read_json(recipient_run_dir / "supervised_model_attempt.json", kind="supervised model attempt")
+    attempt_id = _require_nonempty(attempt, "attempt_id", kind="supervised model attempt")
+    provenance = attempt.get("provenance")
+    if not isinstance(provenance, dict):
+        raise TransactionHandoffError("supervised model attempt must include provenance")
+    request_provenance = provenance.get("acquisition_request_provenance")
+    if not isinstance(request_provenance, dict):
+        raise TransactionHandoffError(
+            "cannot prove downstream execution consumed the exact prompt: attempt is missing acquisition request provenance"
+        )
+    if request_provenance.get("prompt_sha256") != _sha256(prompt_path):
+        raise TransactionHandoffError("downstream execution prompt_sha256 does not match the joined recipient prompt")
+    recipient_raw_output_path = recipient_run_dir / "raw_model_output.txt"
+    if not recipient_raw_output_path.is_file():
+        raise TransactionHandoffError(f"missing recipient raw model output: {recipient_raw_output_path}")
+    if provenance.get("raw_output_sha256") != _sha256(recipient_raw_output_path):
+        raise TransactionHandoffError("downstream raw output sha256 does not match preserved recipient raw output")
+    model_metadata = attempt.get("model_metadata")
+    if not isinstance(model_metadata, dict) or model_metadata.get("model_id") != recipient_identity:
+        raise TransactionHandoffError("downstream attempt model does not match recipient identity")
+
+    validation = _read_json(recipient_run_dir / "output_validation.json", kind="output validation")
+    if validation.get("validation_status") != "passed":
+        raise TransactionHandoffError("recipient output validation did not pass; downstream completion is not established")
+    validation_id = _require_nonempty(validation, "validation_id", kind="output validation")
+    if validation.get("attempt_id") != attempt_id:
+        raise TransactionHandoffError("output validation attempt_id does not match recipient attempt")
+
+    review = _read_json(recipient_run_dir / "review_decision.json", kind="review decision")
+    if review.get("decision") != "accepted":
+        raise TransactionHandoffError("recipient review decision is not accepted; downstream completion is not established")
+    if review.get("attempt_id") != attempt_id:
+        raise TransactionHandoffError("review decision attempt_id does not match recipient attempt")
+    if review.get("validation_id") != validation_id:
+        raise TransactionHandoffError("review decision validation_id does not match recipient validation")
+    decision_id = _require_nonempty(review, "decision_id", kind="review decision")
+
+    join_proofs = [
+        {"proof": "continuation_prompt_identity", "detail": "recipient prompt is byte-identical to the prepared continuation"},
+        {"proof": "source_transaction_binding", "detail": "recipient manifest binding matches source transaction records and raw output"},
+        {"proof": "downstream_execution_consumed_exact_prompt", "detail": "recipient acquisition provenance prompt_sha256 matches the joined prompt"},
+        {"proof": "downstream_raw_output_preserved", "detail": "recipient raw output sha256 matches the preserved raw output artifact"},
+        {"proof": "downstream_validation_passed", "detail": "recipient output validation passed for the bound attempt"},
+        {"proof": "downstream_review_accepted", "detail": "recipient review decision accepted the bound attempt and validation"},
+    ]
+    completion = {
+        "schema_version": HANDOFF_COMPLETION_SCHEMA,
+        "transaction_id": transaction_id,
+        "run_id": source_run_id,
+        "handoff_id": source_records["handoff_id"],
+        "downstream_attempt_id": attempt_id,
+        "completion_status": "completed",
+        "derived_lifecycle_state": "COMPLETE",
+        "endpoint": request_provenance.get("endpoint"),
+        "model": recipient_identity,
+        "source_run": {
+            "run_dir": str(source_run_dir),
+            "transaction_manifest": _artifact_reference(
+                source_run_dir / "transaction_manifest.json", artifact="transaction_manifest"
+            ),
+            "continuation": {"path": str(continuation_path), "sha256": _sha256(continuation_path)},
+            "handoff_packet": _artifact_reference(source_run_dir / "handoff_packet.json", artifact="handoff_packet"),
+            "raw_model_output": {"path": str(source_raw_output_path), "sha256": _sha256(source_raw_output_path)},
+        },
+        "recipient_run": {
+            "run_dir": str(recipient_run_dir),
+            "run_id": recipient_run_manifest.get("run_id"),
+            "recipient_identity": recipient_identity,
+            "recipient_run_manifest": _artifact_reference(
+                recipient_run_dir / "recipient_run_manifest.json", artifact="recipient_run_manifest"
+            ),
+            "prompt": {"path": str(prompt_path), "sha256": _sha256(prompt_path)},
+            "supervised_model_attempt": _artifact_reference(
+                recipient_run_dir / "supervised_model_attempt.json",
+                artifact="supervised_model_attempt",
+                id_key="attempt_id",
+                id_value=attempt_id,
+            ),
+            "raw_model_output": {"path": str(recipient_raw_output_path), "sha256": _sha256(recipient_raw_output_path)},
+            "output_validation": _artifact_reference(
+                recipient_run_dir / "output_validation.json",
+                artifact="output_validation",
+                id_key="validation_id",
+                id_value=validation_id,
+            ),
+            "review_decision": _artifact_reference(
+                recipient_run_dir / "review_decision.json",
+                artifact="review_decision",
+                id_key="decision_id",
+                id_value=decision_id,
+            ),
+        },
+        "ids": {
+            "source": deepcopy(source_records),
+            "recipient": {
+                "attempt_id": attempt_id,
+                "validation_id": validation_id,
+                "decision_id": decision_id,
+            },
+        },
+        "join_proofs": join_proofs,
+        "boundaries": list(COMPLETION_BOUNDARIES),
+        "completed_at": _utc_iso(),
+    }
+
+    completion_dir = output_dir if output_dir is not None else recipient_run_dir
+    completion_dir.mkdir(parents=True, exist_ok=True)
+    completion_path = completion_dir / "handoff_completion.json"
+    if completion_path.exists():
+        raise TransactionHandoffError(f"handoff completion already exists: {completion_path}")
+    _write_json(completion_path, completion)
+    completion["handoff_completion_path"] = str(completion_path)
+    return completion
+
+
+def _build_completion_parser() -> "argparse.ArgumentParser":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Supervised transaction handoff completion join.")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+    complete = subparsers.add_parser(
+        "complete-handoff",
+        help="Join a prepared transaction handoff with its reviewed recipient completion.",
+    )
+    complete.add_argument("--source-run-dir", type=Path, required=True, help="Source run directory (lifecycle HANDOFF).")
+    complete.add_argument("--recipient-run-dir", type=Path, required=True, help="Recipient run directory.")
+    complete.add_argument("--output-dir", type=Path, default=None, help="Output directory (defaults to the recipient run dir).")
+    complete.add_argument("--json", action="store_true", help="Print a machine-readable completion summary.")
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    import argparse
+    import sys
+
+    parser = _build_completion_parser()
+    args = parser.parse_args(argv)
+    try:
+        completion = build_handoff_completion(
+            source_run_dir=args.source_run_dir,
+            recipient_run_dir=args.recipient_run_dir,
+            output_dir=args.output_dir,
+        )
+    except TransactionHandoffError as exc:
+        print(f"transaction-handoff: error: {exc}", file=sys.stderr)
+        return 1
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    "schema_version": completion["schema_version"],
+                    "transaction_id": completion["transaction_id"],
+                    "completion_status": completion["completion_status"],
+                    "derived_lifecycle_state": completion["derived_lifecycle_state"],
+                    "join_proofs": [proof["proof"] for proof in completion["join_proofs"]],
+                    "handoff_completion_path": completion["handoff_completion_path"],
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+    else:
+        print(f"Handoff completion joined: {completion['handoff_completion_path']}")
+        print("This join is derived deterministic state; it grants no promotion or lifecycle authority.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

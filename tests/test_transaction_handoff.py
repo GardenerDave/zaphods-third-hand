@@ -9,10 +9,12 @@ import pytest
 
 import local_harness.run_manual_supervised_attempt as manual_attempt
 from local_harness.transaction_handoff import (
+    HANDOFF_COMPLETION_SCHEMA,
     NEXT_WORKER_CONTEXT_SCHEMA,
     TRANSACTION_MANIFEST_SCHEMA,
     TransactionHandoffError,
     build_authority_bound_semantic_result,
+    build_handoff_completion,
     build_worker_b_preflight,
     build_next_worker_continuation_context,
     build_worker_b_recipient_run_artifacts,
@@ -794,3 +796,311 @@ def test_transaction_handoff_supports_semantic_worker_raw_output_without_authori
     context = json.loads(handoff_result["next_worker_context_path"].read_text(encoding="utf-8"))
     assert context["transaction_binding"]["raw_output_sha256"]
     assert context["task_state"]["allowed_targets"] == json.loads((run_dir / "triage_packet.json").read_text(encoding="utf-8"))["allowed_targets"]
+
+
+# ---------------------------------------------------------------------------
+# Downstream completion join (handoff_completion.json)
+# ---------------------------------------------------------------------------
+
+RECIPIENT_ENDPOINT = "http://192.168.1.16:8080/v1"
+RECIPIENT_MODEL = "qwen3-30b"
+
+
+def _recipient_downstream_raw_output() -> str:
+    return json.dumps(
+        {
+            "findings": [
+                {
+                    "claim": "The bounded downstream comparison item is recorded as resolved.",
+                    "evidence": [
+                        {
+                            "path": "docs/ROADMAP.md",
+                            "detail": "The roadmap records the bounded item as closed after review.",
+                        }
+                    ],
+                }
+            ],
+            "reason": "Bounded downstream conclusion reached from the accepted previous result.",
+        }
+    )
+
+
+def _recipient_model_metadata(prompt_text: str, raw_text: str) -> dict:
+    return {
+        "source": "local_openai_compatible_endpoint",
+        "endpoint": RECIPIENT_ENDPOINT,
+        "model": RECIPIENT_MODEL,
+        "temperature": 0,
+        "max_tokens": 1024,
+        "prompt_path": "prompt_to_paste.md",
+        "prompt_sha256": manual_attempt._sha256_text(prompt_text),
+        "prompt_length": len(prompt_text),
+        "raw_output_path": "raw_model_output.txt",
+        "raw_output_sha256": manual_attempt._sha256_text(raw_text),
+        "raw_output_length": len(raw_text),
+        "call_status": "completed",
+        "review_required": True,
+        "request_provenance": {
+            "api": "openai-chat",
+            "endpoint": RECIPIENT_ENDPOINT,
+            "request_url": f"{RECIPIENT_ENDPOINT}/chat/completions",
+            "model": RECIPIENT_MODEL,
+            "configured_model": RECIPIENT_MODEL,
+            "resolved_model": RECIPIENT_MODEL,
+            "prompt_path": "prompt_to_paste.md",
+            "prompt_sha256": manual_attempt._sha256_text(prompt_text),
+            "prompt_length": len(prompt_text),
+            "max_tokens": 1024,
+            "temperature": 0,
+        },
+        "response_provenance": {
+            "raw_output_path": "raw_model_output.txt",
+            "raw_output_sha256": manual_attempt._sha256_text(raw_text),
+            "raw_output_length": len(raw_text),
+            "model": RECIPIENT_MODEL,
+        },
+        "authority_boundaries": [
+            "Local model call is not command execution authority.",
+            "Local model call is not file modification authority.",
+            "No automatic patch promotion authority is granted.",
+            "No automatic training authority is granted.",
+            "No default failure-to-curriculum capture authority is granted.",
+            "Ingest and explicit review are required before downstream use.",
+        ],
+    }
+
+
+def _build_completed_recipient_pair(
+    tmp_path: Path,
+    *,
+    decision: str | None = "accepted",
+) -> tuple[Path, Path]:
+    source_run_dir = _prepare_and_accept_model_run(
+        tmp_path,
+        next_worker_objective="Produce a bounded downstream comparison report.",
+    )
+    recipient_dir = tmp_path / "recipient"
+    build_worker_b_recipient_run_artifacts(
+        source_run_dir=source_run_dir,
+        recipient_run_dir=recipient_dir,
+        recipient_identity=RECIPIENT_MODEL,
+        continuation_path=source_run_dir / "next_worker_continuation.md",
+    )
+    prompt_text = (recipient_dir / "prompt_to_paste.md").read_text(encoding="utf-8")
+    raw_text = _recipient_downstream_raw_output()
+    raw_output = tmp_path / "recipient_raw_model_output.txt"
+    raw_output.write_text(raw_text, encoding="utf-8")
+    metadata_path = tmp_path / "recipient_local_model_call.json"
+    metadata_path.write_text(
+        json.dumps(_recipient_model_metadata(prompt_text, raw_text), indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    ingest_args = [
+        "ingest",
+        "--run-dir",
+        recipient_dir,
+        "--raw-output-file",
+        raw_output,
+        "--model-call-metadata-file",
+        metadata_path,
+        "--operator",
+        "manual",
+    ]
+    if decision is not None:
+        ingest_args += ["--decision", decision, "--decision-reason", "Downstream result stays bounded and reviewed."]
+    ingest = run_script(*ingest_args)
+    assert ingest.returncode == 0, ingest.stderr
+    return source_run_dir, recipient_dir
+
+
+def test_handoff_completion_joins_prepared_handoff_to_reviewed_recipient_completion(tmp_path: Path) -> None:
+    source_run_dir, recipient_dir = _build_completed_recipient_pair(tmp_path)
+
+    completion = build_handoff_completion(
+        source_run_dir=source_run_dir,
+        recipient_run_dir=recipient_dir,
+    )
+
+    completion_path = recipient_dir / "handoff_completion.json"
+    assert completion["handoff_completion_path"] == str(completion_path)
+    assert completion_path.is_file()
+    payload = json.loads(completion_path.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == HANDOFF_COMPLETION_SCHEMA
+    assert payload["completion_status"] == "completed"
+    assert payload["derived_lifecycle_state"] == "COMPLETE"
+    assert payload["model"] == RECIPIENT_MODEL
+    assert payload["endpoint"] == RECIPIENT_ENDPOINT
+    assert [proof["proof"] for proof in payload["join_proofs"]] == [
+        "continuation_prompt_identity",
+        "source_transaction_binding",
+        "downstream_execution_consumed_exact_prompt",
+        "downstream_raw_output_preserved",
+        "downstream_validation_passed",
+        "downstream_review_accepted",
+    ]
+
+    source_manifest = json.loads((source_run_dir / "transaction_manifest.json").read_text(encoding="utf-8"))
+    assert payload["transaction_id"] == source_manifest["transaction_id"]
+    assert payload["handoff_id"] == source_manifest["records"]["handoff_id"]
+    assert payload["ids"]["source"] == source_manifest["records"]
+    assert payload["source_run"]["continuation"]["sha256"] == source_manifest_continuation_sha(source_run_dir)
+
+    recipient_attempt = json.loads((recipient_dir / "supervised_model_attempt.json").read_text(encoding="utf-8"))
+    assert payload["downstream_attempt_id"] == recipient_attempt["attempt_id"]
+    assert payload["ids"]["recipient"]["attempt_id"] == recipient_attempt["attempt_id"]
+
+    assert payload["recipient_run"]["prompt"]["sha256"] == payload["source_run"]["continuation"]["sha256"]
+    assert payload["boundaries"]
+    assert "does not claim broader model capability" in " ".join(payload["boundaries"])
+
+    source_manifest_after = json.loads((source_run_dir / "transaction_manifest.json").read_text(encoding="utf-8"))
+    assert source_manifest_after == source_manifest
+
+
+def source_manifest_continuation_sha(source_run_dir: Path) -> str:
+    import hashlib
+
+    return hashlib.sha256((source_run_dir / "next_worker_continuation.md").read_bytes()).hexdigest()
+
+
+def test_handoff_completion_is_policy_consumable(tmp_path: Path) -> None:
+    from local_harness.evidence_semantic_typing import HandoffCompletionRef, resolve_handoff_completion_reference
+
+    source_run_dir, recipient_dir = _build_completed_recipient_pair(tmp_path)
+    completion = build_handoff_completion(source_run_dir=source_run_dir, recipient_run_dir=recipient_dir)
+    completion_path = Path(completion["handoff_completion_path"])
+
+    verification = resolve_handoff_completion_reference(
+        completion_ref=HandoffCompletionRef(
+            artifact_ref=str(completion_path),
+            artifact_sha256=manual_attempt._sha256_file(completion_path),
+        ),
+        prepared_handoff_id=completion["handoff_id"],
+        transaction_endpoint=RECIPIENT_ENDPOINT,
+        transaction_model=RECIPIENT_MODEL,
+    )
+    assert verification.artifact_integrity is True
+    assert verification.completion_detected is True
+    assert verification.handoff_match is True
+    assert verification.downstream_attempt_match is True
+    assert verification.endpoint_match is True
+    assert verification.model_match is True
+    assert verification.policy_usable is True
+
+
+def test_handoff_completion_fails_closed_on_tampered_recipient_prompt(tmp_path: Path) -> None:
+    source_run_dir, recipient_dir = _build_completed_recipient_pair(tmp_path)
+    (recipient_dir / "prompt_to_paste.md").write_text(
+        (recipient_dir / "prompt_to_paste.md").read_text(encoding="utf-8") + "\ntampered\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(TransactionHandoffError, match="prompt_sha256 does not match"):
+        build_handoff_completion(source_run_dir=source_run_dir, recipient_run_dir=recipient_dir)
+
+
+def test_handoff_completion_fails_closed_when_prompt_is_not_the_prepared_continuation(tmp_path: Path) -> None:
+    source_run_dir, recipient_dir = _build_completed_recipient_pair(tmp_path)
+    different_prompt = (source_run_dir / "next_worker_continuation.md").read_text(encoding="utf-8").replace(
+        "Continue from the accepted previous-worker result.",
+        "Rewrite the original worker task from scratch.",
+    )
+    (recipient_dir / "prompt_to_paste.md").write_text(different_prompt, encoding="utf-8")
+    recipient_manifest = json.loads((recipient_dir / "recipient_run_manifest.json").read_text(encoding="utf-8"))
+    recipient_manifest["prompt_sha256"] = manual_attempt._sha256_text(different_prompt)
+    (recipient_dir / "recipient_run_manifest.json").write_text(
+        json.dumps(recipient_manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    with pytest.raises(TransactionHandoffError, match="not byte-identical"):
+        build_handoff_completion(source_run_dir=source_run_dir, recipient_run_dir=recipient_dir)
+
+
+def test_handoff_completion_fails_closed_without_reviewed_recipient_decision(tmp_path: Path) -> None:
+    source_run_dir, recipient_dir = _build_completed_recipient_pair(tmp_path, decision=None)
+    with pytest.raises(TransactionHandoffError, match="missing review decision"):
+        build_handoff_completion(source_run_dir=source_run_dir, recipient_run_dir=recipient_dir)
+
+
+def test_handoff_completion_fails_closed_on_rejected_recipient_decision(tmp_path: Path) -> None:
+    source_run_dir, recipient_dir = _build_completed_recipient_pair(tmp_path, decision="rejected")
+    with pytest.raises(TransactionHandoffError, match="not accepted"):
+        build_handoff_completion(source_run_dir=source_run_dir, recipient_run_dir=recipient_dir)
+
+
+def test_handoff_completion_fails_closed_when_source_lifecycle_is_not_handoff(tmp_path: Path) -> None:
+    source_run_dir, recipient_dir = _build_completed_recipient_pair(tmp_path)
+    manifest_path = source_run_dir / "transaction_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["lifecycle_state"] = "ACCEPTED"
+    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    with pytest.raises(TransactionHandoffError, match="requires a prepared handoff"):
+        build_handoff_completion(source_run_dir=source_run_dir, recipient_run_dir=recipient_dir)
+
+
+def test_handoff_completion_fails_closed_on_missing_recipient_manifest(tmp_path: Path) -> None:
+    source_run_dir, _recipient_dir = _build_completed_recipient_pair(tmp_path)
+    empty_recipient = tmp_path / "empty_recipient"
+    empty_recipient.mkdir()
+    with pytest.raises(TransactionHandoffError, match="missing recipient run manifest"):
+        build_handoff_completion(source_run_dir=source_run_dir, recipient_run_dir=empty_recipient)
+
+
+def test_handoff_completion_fails_closed_when_recipient_run_is_the_source_run(tmp_path: Path) -> None:
+    source_run_dir, _recipient_dir = _build_completed_recipient_pair(tmp_path)
+    with pytest.raises(TransactionHandoffError, match="separate recipient run"):
+        build_handoff_completion(source_run_dir=source_run_dir, recipient_run_dir=source_run_dir)
+    assert not (source_run_dir / "handoff_completion.json").exists()
+
+
+def test_handoff_completion_refuses_to_overwrite_existing_completion(tmp_path: Path) -> None:
+    source_run_dir, recipient_dir = _build_completed_recipient_pair(tmp_path)
+    first = build_handoff_completion(source_run_dir=source_run_dir, recipient_run_dir=recipient_dir)
+    assert Path(first["handoff_completion_path"]).is_file()
+    with pytest.raises(TransactionHandoffError, match="already exists"):
+        build_handoff_completion(source_run_dir=source_run_dir, recipient_run_dir=recipient_dir)
+
+
+def test_handoff_completion_cli_joins_and_reports(tmp_path: Path) -> None:
+    source_run_dir, recipient_dir = _build_completed_recipient_pair(tmp_path)
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "local_harness" / "transaction_handoff.py"),
+            "complete-handoff",
+            "--source-run-dir",
+            str(source_run_dir),
+            "--recipient-run-dir",
+            str(recipient_dir),
+            "--json",
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    summary = json.loads(completed.stdout)
+    assert summary["completion_status"] == "completed"
+    assert summary["derived_lifecycle_state"] == "COMPLETE"
+    assert Path(summary["handoff_completion_path"]).is_file()
+
+
+def test_handoff_completion_cli_fails_closed_on_unjoined_pair(tmp_path: Path) -> None:
+    source_run_dir, recipient_dir = _build_completed_recipient_pair(tmp_path, decision=None)
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "local_harness" / "transaction_handoff.py"),
+            "complete-handoff",
+            "--source-run-dir",
+            str(source_run_dir),
+            "--recipient-run-dir",
+            str(recipient_dir),
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert completed.returncode == 1
+    assert "missing review decision" in completed.stderr
+    assert not (recipient_dir / "handoff_completion.json").exists()

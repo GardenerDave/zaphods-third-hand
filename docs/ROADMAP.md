@@ -124,9 +124,19 @@ rules.
 
 This milestone is now demonstrated in one fresh lineage and a repeat
 lineage. It is not evidence of arbitrary-task generalization, unattended
-promotion, universal routing, or autonomous authority. The remaining closeout
-item is exact durable Historian-record capture plus continued repeatability
-checks on different bounded tasks.
+promotion, universal routing, or autonomous authority.
+
+A deterministic downstream-completion join (`handoff_completion.json`,
+`zth.handoff_completion.v0.1`) now closes the recorded provenance gap between
+the prepared handoff and the reviewed recipient completion: it verifies the
+recipient run is separate from the source run, that the recipient prompt is
+byte-identical to the prepared continuation, that the recipient execution
+consumed that exact prompt, and that the recipient validation and review
+accepted the bound attempt, then derives `COMPLETE`
+without modifying the source transaction manifest. It grants no promotion or
+capability authority. The remaining closeout item is exact durable
+Historian-record capture plus continued repeatability checks on different
+bounded tasks.
 
 Canonical transaction lifecycle:
 
@@ -281,7 +291,12 @@ silently expanding autonomy.
 Work classification:
 
 - Immediate: canonical supervised handoff transaction and Historian read-only
-  context interface groundwork.
+  context interface groundwork. The supervised handoff transaction now reaches
+  a derived `COMPLETE` state through the downstream-completion join, and a
+  minimal read-only Historian context adapter
+  (`local_harness/historian_context.py`) binds validated Historian query
+  provenance (query id, cited canonical record ids, corpus fingerprint,
+  advisory answer) into plain-file evidence artifacts for supervised work.
 - Exact Worker-B raw-response capture / joinability closeout: the transaction
   context now carries an explicit binding block that ties the preserved raw
   output to the transaction, review, gate, and handoff IDs for inspection and
