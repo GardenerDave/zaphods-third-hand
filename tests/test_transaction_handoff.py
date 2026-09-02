@@ -12,6 +12,7 @@ from local_harness.transaction_handoff import (
     NEXT_WORKER_CONTEXT_SCHEMA,
     TRANSACTION_MANIFEST_SCHEMA,
     TransactionHandoffError,
+    build_authority_bound_semantic_result,
     build_worker_b_preflight,
     build_next_worker_continuation_context,
     build_worker_b_recipient_run_artifacts,
@@ -705,3 +706,54 @@ def test_worker_b_recipient_run_artifacts_write_separate_run_prompt_and_manifest
     assert recipient_manifest["continuation_sha256"] == result["continuation_sha256"]
     assert recipient_manifest["prompt_sha256"] == result["prompt_sha256"]
     assert recipient_manifest["source_transaction_binding"]["handoff_id"] == handoff_result["next_worker_context"]["transaction_binding"]["handoff_id"]
+
+
+def test_authority_bound_semantic_result_keeps_authority_out_of_model_output(tmp_path: Path) -> None:
+    run_dir = _prepare_and_accept_run(tmp_path, next_worker_objective="Produce a bounded downstream comparison report.")
+    handoff_result = build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
+    build_next_worker_continuation_context(
+        transaction_manifest=handoff_result["transaction_manifest"],
+        next_worker_context=handoff_result["next_worker_context"],
+        output_dir=run_dir,
+    )
+
+    semantic_output = {
+        "findings": [{"claim": "structured output enforcement was not active", "evidence": []}],
+        "reason": "bounded diagnosis",
+    }
+    result = build_authority_bound_semantic_result(
+        semantic_output=semantic_output,
+        raw_output_path=run_dir / "raw_model_output.txt",
+        transaction_manifest=handoff_result["transaction_manifest"],
+        next_worker_context=handoff_result["next_worker_context"],
+        output_dir=run_dir,
+    )
+
+    assert result["semantic_output"] == semantic_output
+    assert result["authority"]["allowed_targets"] == handoff_result["next_worker_context"]["task_state"]["allowed_targets"]
+    assert result["authority"]["held_targets"] == handoff_result["next_worker_context"]["task_state"]["held_targets"]
+    assert result["derived"]["scope_expansion_required"] is False
+    assert (run_dir / "authority_bound_semantic_result.json").is_file()
+
+
+def test_authority_bound_semantic_result_rejects_authority_contamination(tmp_path: Path) -> None:
+    run_dir = _prepare_and_accept_run(tmp_path, next_worker_objective="Produce a bounded downstream comparison report.")
+    handoff_result = build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
+    build_next_worker_continuation_context(
+        transaction_manifest=handoff_result["transaction_manifest"],
+        next_worker_context=handoff_result["next_worker_context"],
+        output_dir=run_dir,
+    )
+
+    semantic_output = {
+        "findings": [{"claim": "structured output enforcement was not active", "evidence": []}],
+        "reason": "bounded diagnosis",
+        "allowed_targets": ["docs/reports/"],
+    }
+    with pytest.raises(TransactionHandoffError, match="must not contain authoritative target fields"):
+        build_authority_bound_semantic_result(
+            semantic_output=semantic_output,
+            raw_output_path=run_dir / "raw_model_output.txt",
+            transaction_manifest=handoff_result["transaction_manifest"],
+            next_worker_context=handoff_result["next_worker_context"],
+        )

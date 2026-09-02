@@ -966,3 +966,66 @@ def build_worker_b_recipient_run_artifacts(
         "continuation_sha256": recipient_manifest["continuation_sha256"],
         "recipient_manifest": recipient_manifest,
     }
+
+
+def build_authority_bound_semantic_result(
+    *,
+    semantic_output: dict[str, Any],
+    raw_output_path: Path,
+    transaction_manifest: dict[str, Any],
+    next_worker_context: dict[str, Any],
+    output_dir: Path | None = None,
+) -> dict[str, Any]:
+    if transaction_manifest.get("schema_version") != TRANSACTION_MANIFEST_SCHEMA:
+        raise TransactionHandoffError("authority binding requires a transaction manifest")
+    if next_worker_context.get("schema_version") != NEXT_WORKER_CONTEXT_SCHEMA:
+        raise TransactionHandoffError("authority binding requires a next-worker context")
+    if not raw_output_path.is_file():
+        raise TransactionHandoffError(f"missing semantic raw output: {raw_output_path}")
+    if semantic_output.get("allowed_targets") is not None or semantic_output.get("held_targets") is not None:
+        raise TransactionHandoffError("semantic output must not contain authoritative target fields")
+    findings = semantic_output.get("findings")
+    reason = semantic_output.get("reason")
+    if not isinstance(findings, list) or not isinstance(reason, str) or not reason.strip():
+        raise TransactionHandoffError("semantic output must contain findings and reason")
+
+    task_state = next_worker_context.get("task_state", {})
+    authoritative_allowed_targets = task_state.get("allowed_targets")
+    authoritative_held_targets = task_state.get("held_targets")
+    if not isinstance(authoritative_allowed_targets, list) or not isinstance(authoritative_held_targets, list):
+        raise TransactionHandoffError("next-worker context must include authoritative target lists")
+
+    transaction_binding = next_worker_context.get("transaction_binding")
+    if not isinstance(transaction_binding, dict):
+        raise TransactionHandoffError("next-worker context must include transaction binding")
+
+    semantic_payload = {
+        "findings": deepcopy(findings),
+        "reason": reason,
+    }
+    normalized_result = {
+        "schema_version": "zth.authority_bound_semantic_result.v0.1",
+        "transaction_id": transaction_manifest.get("transaction_id"),
+        "run_id": transaction_manifest.get("run_id"),
+        "source_raw_output_path": str(raw_output_path),
+        "source_raw_output_sha256": _sha256(raw_output_path),
+        "source_transaction_binding": deepcopy(transaction_binding),
+        "semantic_output": semantic_payload,
+        "authority": {
+            "allowed_targets": list(authoritative_allowed_targets),
+            "held_targets": list(authoritative_held_targets),
+            "next_step_scope": next_worker_context.get("constraints", {}).get("next_step_scope"),
+        },
+        "derived": {
+            "scope_expansion_required": False,
+            "authority_conflict": False,
+            "normalized": True,
+        },
+    }
+    normalized_path = None
+    if output_dir is not None:
+        output_dir.mkdir(parents=True, exist_ok=True)
+        normalized_path = output_dir / "authority_bound_semantic_result.json"
+        _write_json(normalized_path, normalized_result)
+        normalized_result["authority_bound_semantic_result_path"] = str(normalized_path)
+    return normalized_result
