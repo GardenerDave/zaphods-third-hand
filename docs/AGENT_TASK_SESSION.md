@@ -86,6 +86,66 @@ implementation quality, or establish task completion.
 Add `--json` to `new` or `validate` for a machine-readable handoff. Repository
 paths are emitted relative to the checkout when practical.
 
+## Record Execution Evidence and Review Decisions
+
+After a supervised executor performs the task, the separate recorder tool
+`local_harness/agent_task_session_record.py` records what happened against the
+existing packet. It is model-free and fail-closed, and it never mutates the
+packet the builder produced.
+
+Record one execution-evidence entry, supplying one observed outcome per
+required check, in packet order:
+
+```bash
+python3 local_harness/agent_task_session_record.py record-execution \
+  .work/agent_tasks/<task-id> \
+  --outcome "passed: 30 passed in 0.51s" \
+  --outcome "passed: health ok" \
+  --evidence-file docs/reports/<report>.md \
+  --note "implementation and focused tests complete"
+```
+
+Record a human review decision against recorded execution evidence:
+
+```bash
+python3 local_harness/agent_task_session_record.py record-review \
+  .work/agent_tasks/<task-id> \
+  --decision accepted \
+  --reviewer <reviewer-identity> \
+  --reason "checks and evidence reviewed"
+```
+
+Validate the packet plus all recorded records and derive the session stage:
+
+```bash
+python3 local_harness/agent_task_session_record.py validate \
+  .work/agent_tasks/<task-id>
+```
+
+Records land under `execution/` and `review/` inside the task-session
+directory. The recorder:
+
+- validates the base packet first and fails closed if it is invalid;
+- binds each required check to one recorded outcome (outcomes are recorded
+  operator/agent input, not tool-verified results);
+- binds each evidence file by path, size, and sha256, and fails closed if a
+  bound file later drifts or disappears;
+- binds each record to the exact `task.yaml` hash at record time and fails
+  closed if the packet changes afterwards;
+- requires review decisions to reference existing execution evidence and
+  requires a superseding decision to explicitly supersede the latest one;
+- derives the session stage (`draft` -> `executed` -> `reviewed`) from the
+  validated records.
+
+Boundaries preserved by every record:
+
+- the source packet is never mutated; `task.yaml` remains a draft packet;
+- records are evidence, not authority, and grant no merge, release,
+  promotion, cleanup, deletion, or lifecycle authority;
+- reviewer identity is supplied input, not tool-verified identity;
+- the derived stage is recorded evidence, not a lifecycle promotion;
+- the recorder executes no checks, agents, shell commands, or Git operations.
+
 Repo health can validate an explicitly named private packet without scanning
 `.work/` generally:
 
