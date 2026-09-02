@@ -656,6 +656,11 @@ class TestHandoff:
 
 
 class TestInterpreterCall:
+    def test_system_prompt_constrains_historian_questions_to_canonical_records(self) -> None:
+        prompt = zth_task.interpreter_system_prompt()
+        assert "can only cite canonical project records" in prompt
+        assert "never questions about live tool output" in prompt
+
     def test_call_interpreter_model_contract(self, monkeypatch: pytest.MonkeyPatch) -> None:
         captured: dict[str, Any] = {}
 
