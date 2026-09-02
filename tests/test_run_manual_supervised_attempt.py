@@ -1319,6 +1319,39 @@ def test_prepare_with_explicit_response_schema_projects_schema_provenance(tmp_pa
     assert evidence_packet["response_schema"] == projected_schema
 
 
+def test_prepare_with_explicit_response_schema_writes_run_schema_artifact(tmp_path: Path):
+    run_dir = tmp_path / "runs"
+    schema = tmp_path / "schema.json"
+    schema.write_text(
+        json.dumps(
+            {
+                "type": "object",
+                "properties": {"reason": {"type": "string"}},
+                "required": ["reason"],
+                "additionalProperties": False,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_script(
+        "prepare",
+        "--messy-input",
+        "Inspect the supplied evidence.",
+        "--out-dir",
+        run_dir,
+        "--timestamp",
+        "20260707T040410Z",
+        "--response-schema-file",
+        schema,
+    )
+
+    assert result.returncode == 0
+    run_path = run_dir / "20260707T040410Z"
+    persisted_schema = json.loads((run_path / "response_schema.json").read_text(encoding="utf-8"))
+    assert persisted_schema == json.loads(schema.read_text(encoding="utf-8"))
+
+
 def test_call_local_preserves_endpoint_finish_reason_and_usage_when_present(tmp_path: Path):
     run_dir, _ = _session_run(tmp_path, timestamp="20260707T212122A")
     response_body = {

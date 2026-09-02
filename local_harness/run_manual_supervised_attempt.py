@@ -607,6 +607,38 @@ def _load_structured_authorized_targets_for_retry(run_dir: Path) -> list[str] | 
     return None
 
 
+def _load_structured_authority_targets_for_retry(run_dir: Path) -> tuple[list[str] | None, list[str] | None]:
+    manifest_path = run_dir / "run_manifest.json"
+    if manifest_path.is_file():
+        try:
+            manifest = _read_json(manifest_path, kind="run manifest")
+        except ValueError:
+            manifest = None
+        if isinstance(manifest, dict):
+            allowed_targets, held_targets = _load_structured_authority_targets(run_dir, manifest)
+            if allowed_targets or held_targets:
+                return allowed_targets, held_targets
+
+    for packet_name in ("triage_packet.json", "orchestration_packet.json"):
+        packet_path = run_dir / packet_name
+        if not packet_path.is_file():
+            continue
+        payload = _read_json(packet_path, kind="structured authority packet")
+        allowed_targets = None
+        held_targets = None
+        if isinstance(payload.get("allowed_targets"), list):
+            allowed_targets = [
+                target for target in payload["allowed_targets"] if isinstance(target, str) and target.strip()
+            ] or None
+        if isinstance(payload.get("held_targets"), list):
+            held_targets = [
+                target for target in payload["held_targets"] if isinstance(target, str) and target.strip()
+            ] or None
+        if allowed_targets or held_targets:
+            return allowed_targets, held_targets
+    return None, None
+
+
 def _trim_text(text: str, *, limit: int = 1200) -> str:
     stripped = text.strip()
     if len(stripped) <= limit:
@@ -692,6 +724,16 @@ def _run_retry_contract(*, run_dir: Path, retry_id: int) -> dict[str, Any]:
                 "Structured authorized targets available for this run:",
                 *[f"- {target}" for target in structured_authorized_targets],
                 "allowed_targets must be a subset of the structured authorized targets.",
+            ]
+        )
+    structured_allowed_targets, structured_held_targets = _load_structured_authority_targets_for_retry(run_dir)
+    if structured_held_targets:
+        prompt_sections.extend(
+            [
+                "",
+                "Structured held targets available for this run:",
+                *[f"- {target}" for target in structured_held_targets],
+                "held_targets must preserve these exact held targets.",
             ]
         )
     prompt_sections.extend(
@@ -863,6 +905,7 @@ def run_prepare(
         if not response_schema_file.is_file():
             raise ValueError(f"--response-schema-file does not exist: {response_schema_file}")
         selected_response_schema = _load_json_object_file(response_schema_file, kind="response schema")
+        _write_json(run_dir / "response_schema.json", selected_response_schema)
     if evidence_files:
         selected_output_contract: dict[str, Any] = deepcopy(EVIDENCE_OUTPUT_CONTRACT)
         if selected_response_schema is not None:

@@ -14,6 +14,7 @@ from local_harness.transaction_handoff import (
     TransactionHandoffError,
     build_worker_b_preflight,
     build_next_worker_continuation_context,
+    build_worker_b_recipient_run_artifacts,
     build_transaction_handoff_artifacts,
     derive_lifecycle_state,
 )
@@ -673,3 +674,34 @@ def test_worker_b_preflight_writes_failed_artifact_when_reference_missing(tmp_pa
     assert (run_dir / "worker_b_preflight.json").is_file()
     preflight = json.loads((run_dir / "worker_b_preflight.json").read_text(encoding="utf-8"))
     assert preflight["status"] == "failed"
+
+
+def test_worker_b_recipient_run_artifacts_write_separate_run_prompt_and_manifest(tmp_path: Path) -> None:
+    run_dir = _prepare_and_accept_run(
+        tmp_path,
+        next_worker_objective="Produce a bounded downstream comparison report.",
+    )
+    handoff_result = build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
+    continuation_result = build_next_worker_continuation_context(
+        transaction_manifest=handoff_result["transaction_manifest"],
+        next_worker_context=handoff_result["next_worker_context"],
+        output_dir=run_dir,
+    )
+
+    recipient_dir = tmp_path / "recipient"
+    result = build_worker_b_recipient_run_artifacts(
+        source_run_dir=run_dir,
+        recipient_run_dir=recipient_dir,
+        recipient_identity="qwen3-30b",
+        continuation_path=continuation_result["continuation_path"],
+    )
+
+    assert result["recipient_run_dir"] == recipient_dir
+    assert (recipient_dir / "prompt_to_paste.md").read_text(encoding="utf-8") == (
+        run_dir / "next_worker_continuation.md"
+    ).read_text(encoding="utf-8")
+    recipient_manifest = json.loads((recipient_dir / "recipient_run_manifest.json").read_text(encoding="utf-8"))
+    assert recipient_manifest["recipient_identity"] == "qwen3-30b"
+    assert recipient_manifest["continuation_sha256"] == result["continuation_sha256"]
+    assert recipient_manifest["prompt_sha256"] == result["prompt_sha256"]
+    assert recipient_manifest["source_transaction_binding"]["handoff_id"] == handoff_result["next_worker_context"]["transaction_binding"]["handoff_id"]

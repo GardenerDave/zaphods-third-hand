@@ -727,7 +727,17 @@ def build_next_worker_continuation_context(
         f"```json\n{json.dumps(authority_boundaries, indent=2, sort_keys=True)}\n```",
         "",
         "### Second-Worker Output Contract",
-        "Return the downstream continuation result only.",
+        "Return raw JSON only.",
+        "Use the same structured handoff shape as the upstream worker:",
+        "- allowed_targets",
+        "- held_targets",
+        "- scope_expansion_required",
+        "- claims",
+        "- evidence_basis",
+        "- unverified_claims",
+        "- format",
+        "- required_fields_present",
+        "- reason",
         "State how you used the accepted prior result, confirm scope compliance, and report any unresolved issue preventing continuation.",
         "Do not redo the first-worker task.",
         "",
@@ -910,4 +920,49 @@ def build_transaction_handoff_artifacts(
         "next_worker_context_md_path": context_md_path,
         "transaction_manifest": transaction_manifest,
         "next_worker_context": next_worker_context,
+    }
+
+
+def build_worker_b_recipient_run_artifacts(
+    *,
+    source_run_dir: Path,
+    recipient_run_dir: Path,
+    recipient_identity: str,
+    continuation_path: Path | None = None,
+) -> dict[str, Any]:
+    if not source_run_dir.is_dir():
+        raise TransactionHandoffError(f"missing source run dir: {source_run_dir}")
+    if continuation_path is None:
+        continuation_path = source_run_dir / "next_worker_continuation.md"
+    if not continuation_path.is_file():
+        raise TransactionHandoffError(f"missing next-worker continuation: {continuation_path}")
+    continuation_text = continuation_path.read_text(encoding="utf-8")
+    recipient_run_dir.mkdir(parents=True, exist_ok=True)
+    prompt_path = recipient_run_dir / "prompt_to_paste.md"
+    prompt_path.write_text(continuation_text, encoding="utf-8")
+
+    source_manifest = _read_json(source_run_dir / "transaction_manifest.json", kind="transaction manifest")
+    source_context = _read_json(source_run_dir / "next_worker_context.json", kind="next-worker context")
+    recipient_manifest = {
+        "schema_version": "zth.recipient_run_manifest.v0.1",
+        "source_run_dir": str(source_run_dir),
+        "recipient_run_dir": str(recipient_run_dir),
+        "recipient_identity": recipient_identity,
+        "transaction_id": source_manifest.get("transaction_id"),
+        "continuation_path": str(continuation_path),
+        "continuation_sha256": _sha256(continuation_path),
+        "prompt_path": str(prompt_path),
+        "prompt_sha256": _sha256(prompt_path),
+        "source_transaction_binding": source_context.get("transaction_binding"),
+    }
+    manifest_path = recipient_run_dir / "recipient_run_manifest.json"
+    _write_json(manifest_path, recipient_manifest)
+    return {
+        "recipient_run_dir": recipient_run_dir,
+        "recipient_manifest_path": manifest_path,
+        "prompt_path": prompt_path,
+        "prompt_sha256": recipient_manifest["prompt_sha256"],
+        "continuation_path": continuation_path,
+        "continuation_sha256": recipient_manifest["continuation_sha256"],
+        "recipient_manifest": recipient_manifest,
     }
