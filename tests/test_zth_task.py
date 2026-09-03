@@ -106,7 +106,11 @@ def fake_model_call(payload: dict[str, Any] | None = None):
     return call
 
 
-def fake_ask_bind(captured: list[Any] | None = None, questions_to_paths: dict[str, str] | None = None):
+def fake_ask_bind(
+    captured: list[Any] | None = None,
+    questions_to_paths: dict[str, str] | None = None,
+    insufficient_questions: frozenset[str] | set[str] = frozenset(),
+):
     paths = questions_to_paths or {
         question: f"ctx-{index}.json" for index, question in enumerate(["default"])
     }
@@ -120,7 +124,31 @@ def fake_ask_bind(captured: list[Any] | None = None, questions_to_paths: dict[st
                 }
             )
         bound = []
+        insufficient = []
         for index, question in enumerate(questions):
+            if question in insufficient_questions:
+                insufficient_path = output_dir / f"insufficient-{index}.json"
+                insufficient_path.parent.mkdir(parents=True, exist_ok=True)
+                insufficient_path.write_text("{}", encoding="utf-8")
+                insufficient.append(
+                    {
+                        "question": question,
+                        "outcome": "insufficient",
+                        "historian_query_id": f"op-q{index}",
+                        "historian_query_dir": "/historian/.work/historian_queries/op-q"
+                        + str(index),
+                        "historian_insufficient_path": str(insufficient_path),
+                        "historian_insufficient_schema": (
+                            "zth.historian_insufficient_context.v0.1"
+                        ),
+                        "cited_record_ids": [],
+                        "answer_sha256": "a" * 64,
+                        "retrieval_corpus_fingerprint": "f" * 64,
+                        "retrieval_revision": "0" * 40,
+                        "boundaries": [],
+                    }
+                )
+                continue
             context_path = output_dir / paths.get(question, f"ctx-{index}.json")
             context_path.parent.mkdir(parents=True, exist_ok=True)
             context_path.write_text("{}", encoding="utf-8")
@@ -138,7 +166,13 @@ def fake_ask_bind(captured: list[Any] | None = None, questions_to_paths: dict[st
                     "retrieval_revision": "0" * 40,
                 }
             )
-        return {"status": "ok", "bound": bound, "bound_count": len(bound)}
+        return {
+            "status": "ok",
+            "bound": bound,
+            "bound_count": len(bound),
+            "insufficient": insufficient,
+            "insufficient_count": len(insufficient),
+        }
 
     return bind
 
@@ -351,6 +385,7 @@ class TestHistorianIntegration:
             (result.workspace / "historian" / "index.json").read_text(encoding="utf-8")
         )
         assert index["bound_count"] == 1
+        assert index["insufficient_count"] == 0
         assert index["contexts"][0]["historian_query_id"] == "op-q0"
         assert index["contexts"][0]["cited_record_ids"] == ["REC-0"]
         assert index["advisory"].startswith("Historian answers are advisory")
@@ -379,7 +414,100 @@ class TestHistorianIntegration:
             (result.workspace / "historian" / "index.json").read_text(encoding="utf-8")
         )
         assert index["bound_count"] == 0
+        assert index["insufficient_count"] == 0
         assert index["questions_asked"] == 0
+
+    def test_mixed_bound_and_insufficient_outcomes_continue(self, tmp_path: Path) -> None:
+        second_question = (
+            "Does any canonical record already govern the auto-promote wording?"
+        )
+        payload = dict(VALID_INTERPRETATION)
+        payload["historian_questions"] = [
+            VALID_INTERPRETATION["historian_questions"][0],
+            second_question,
+        ]
+        result = prepare(
+            tmp_path,
+            model_call=fake_model_call(payload),
+            ask_bind=fake_ask_bind(insufficient_questions={second_question}),
+        )
+        assert result.exit_code == 0
+        assert result.payload["state"] == zth_task.STATE_READY_FOR_EXECUTION
+        index = json.loads(
+            (result.workspace / "historian" / "index.json").read_text(encoding="utf-8")
+        )
+        assert index["questions_asked"] == 2
+        assert index["bound_count"] == 1
+        assert index["insufficient_count"] == 1
+        assert index["contexts"][0]["historian_query_id"] == "op-q0"
+        assert index["contexts"][0]["cited_record_ids"] == ["REC-0"]
+        assert index["insufficient"][0]["historian_query_id"] == "op-q1"
+        assert index["insufficient"][0]["cited_record_ids"] == []
+        assert "context_path" not in index["insufficient"][0]
+        assert index["insufficient"][0]["insufficient_path"] == (
+            ".work/zth_tasks/"
+            + result.payload["task_id"]
+            + "/historian/insufficient-1.json"
+        )
+        assert (result.workspace / "historian" / "insufficient-1.json").is_file()
+        session_ref = json.loads(
+            (result.workspace / zth_task.SESSION_REF_FILE).read_text(encoding="utf-8")
+        )
+        session_dir = result.session_root / session_ref["session_task_id"]
+        metadata = json.loads((session_dir / "task.yaml").read_text(encoding="utf-8"))
+        assert metadata["context_references"] == [
+            ".work/zth_tasks/" + result.payload["task_id"] + "/historian/index.json",
+            ".work/zth_tasks/" + result.payload["task_id"] + "/historian/ctx-0.json",
+        ]
+
+    def test_all_insufficient_outcomes_continue_to_ready(self, tmp_path: Path) -> None:
+        question = VALID_INTERPRETATION["historian_questions"][0]
+        result = prepare(
+            tmp_path,
+            ask_bind=fake_ask_bind(insufficient_questions={question}),
+        )
+        assert result.exit_code == 0
+        assert result.payload["state"] == zth_task.STATE_READY_FOR_EXECUTION
+        index = json.loads(
+            (result.workspace / "historian" / "index.json").read_text(encoding="utf-8")
+        )
+        assert index["questions_asked"] == 1
+        assert index["bound_count"] == 0
+        assert index["insufficient_count"] == 1
+        assert index["contexts"] == []
+        assert index["insufficient"][0]["cited_record_ids"] == []
+        assert result.payload["historian"]["bound_count"] == 0
+        assert result.payload["historian"]["insufficient_count"] == 1
+        assert result.payload["historian"]["cited_record_ids"] == []
+
+    def test_insufficient_outcomes_grant_no_authority_or_evidence(
+        self, tmp_path: Path
+    ) -> None:
+        question = VALID_INTERPRETATION["historian_questions"][0]
+        result = prepare(
+            tmp_path,
+            ask_bind=fake_ask_bind(insufficient_questions={question}),
+        )
+        assert result.exit_code == 0
+        index = json.loads(
+            (result.workspace / "historian" / "index.json").read_text(encoding="utf-8")
+        )
+        entry = index["insufficient"][0]
+        assert entry["cited_record_ids"] == []
+        assert "context_path" not in entry
+        assert "historian_context_path" not in entry
+        assert "not bound evidence" in index["advisory"]
+        assert index["boundaries"] == list(zth_task.FRONTDOOR_BOUNDARIES)
+        session_ref = json.loads(
+            (result.workspace / zth_task.SESSION_REF_FILE).read_text(encoding="utf-8")
+        )
+        session_dir = result.session_root / session_ref["session_task_id"]
+        metadata = json.loads((session_dir / "task.yaml").read_text(encoding="utf-8"))
+        assert metadata["context_references"] == [
+            ".work/zth_tasks/" + result.payload["task_id"] + "/historian/index.json",
+        ]
+        summary = (result.workspace / zth_task.SUMMARY_FILE).read_text(encoding="utf-8")
+        assert "insufficient outcome(s) preserved" in summary
 
     def test_historian_failure_blocks(self, tmp_path: Path) -> None:
         def broken_bind(**_kwargs: Any) -> dict[str, Any]:

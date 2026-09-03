@@ -233,7 +233,13 @@ the proposed scope (existing files or new files under existing directories
 only; no wildcards, `.git`, `.work`, `outputs/`, `sources/`, private
 configuration, or secret material), and creates plus validates a draft Agent
 Task Session that carries the bound scope, required checks, non-goals, and
-context references.
+context references. Each Historian question resolves to exactly one outcome —
+`bound` (cited canonical records bind through the strict binder),
+`insufficient` (a contract-valid answer citing zero canonical records,
+preserved under `historian/` as a non-bound artifact while preparation
+continues), or `failed` (a true transport/schema/provenance failure, which
+blocks preparation) — and `historian/index.json` records the counts and
+entries for all three.
 
 Task state is always derived from these durable artifacts — never a mutable
 status flag:
@@ -283,6 +289,18 @@ question produces its own independent `zth.historian_context.v0.1` artifact
 through the same binder. Add `--json` for a machine-readable summary
 (query id, exact query directory, context artifact paths, cited canonical
 record ids, retrieval corpus fingerprint).
+
+Each question resolves to exactly one outcome:
+
+- `bound` — the answer cites canonical records and the existing strict
+  binder binds them into `zth.historian_context.v0.1` evidence;
+- `insufficient` — the answer is contract-valid but cites zero canonical
+  records; it is preserved as a separate
+  `zth.historian_insufficient_context.v0.1` artifact
+  (`historian_insufficient_<query-id>.json`), is never treated as bound
+  evidence, and does not block the remaining questions;
+- `failed` — any transport, schema, grounding, contract, or provenance
+  failure; preserved and blocking.
 
 The consolidated command captures the exact query identity (request id and
 request directory) from the structured Historian service result — it never

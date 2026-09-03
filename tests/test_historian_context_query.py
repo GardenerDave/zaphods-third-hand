@@ -16,6 +16,9 @@ from local_harness.historian_context import CONTEXT_BOUNDARIES
 from local_harness.historian_context_query import (
     ENDPOINT_ENV,
     HISTORIAN_CONTEXT_SCHEMA,
+    INSUFFICIENT_CONTEXT_SCHEMA,
+    OUTCOME_BOUND,
+    OUTCOME_INSUFFICIENT,
     RUNNER_SCRIPT,
     HistorianAskBindError,
     ask_and_bind,
@@ -76,6 +79,9 @@ def _make_query_dir(
     *,
     cited_record_ids: list[str] | None = None,
 ) -> Path:
+    effective_cited = (
+        sorted(CITED_RECORDS) if cited_record_ids is None else list(cited_record_ids)
+    )
     query_dir = repo / ".work" / "historian_queries" / query_id
     reasoner_dir = query_dir / "reasoner"
     reasoner_dir.mkdir(parents=True, exist_ok=True)
@@ -99,8 +105,8 @@ def _make_query_dir(
         "question": question,
         "parsed_response": {
             "answer": "Advisory answer over cited evidence.",
-            "cited_record_ids": cited_record_ids or sorted(CITED_RECORDS),
-            "evidence_used": cited_record_ids or sorted(CITED_RECORDS),
+            "cited_record_ids": effective_cited,
+            "evidence_used": effective_cited,
             "uncertainty_or_limitations": "The answer is advisory only.",
             "contradictions_or_missing_evidence": ["No broader claim is supported."],
         },
@@ -218,6 +224,87 @@ def test_single_ask_and_bind_success(tmp_path: Path, historian_repo: Path) -> No
     assert context["schema_version"] == HISTORIAN_CONTEXT_SCHEMA
     assert context["boundaries"] == list(CONTEXT_BOUNDARIES)
     assert "not approval" in " ".join(summary["boundaries"])
+    assert summary["outcome"] == OUTCOME_BOUND
+
+
+def test_insufficient_outcome_preserved_without_binding(
+    tmp_path: Path, historian_repo: Path
+) -> None:
+    query_dir = _make_query_dir(historian_repo, cited_record_ids=[])
+    output_dir = tmp_path / "evidence"
+    summary = _run_ask_and_bind(historian_repo, output_dir, _ask_result(query_dir))
+
+    assert summary["outcome"] == OUTCOME_INSUFFICIENT
+    assert summary["historian_query_id"] == QUERY_ID
+    assert summary["historian_query_dir"] == str(query_dir)
+    assert summary["historian_insufficient_path"] == str(
+        output_dir / f"historian_insufficient_{QUERY_ID}.json"
+    )
+    assert summary["historian_insufficient_schema"] == INSUFFICIENT_CONTEXT_SCHEMA
+    assert summary["cited_record_ids"] == []
+    assert "historian_context_path" not in summary
+    assert "historian_context_markdown_path" not in summary
+    assert summary["retrieval_corpus_fingerprint"] == "fingerprint-abc123"
+    assert summary["retrieval_revision"] == "rev-0007"
+    assert "not approval" in " ".join(summary["boundaries"])
+    assert not (output_dir / f"historian_context_{QUERY_ID}.json").exists()
+    assert not (output_dir / f"historian_context_{QUERY_ID}.md").exists()
+    artifact = json.loads(
+        Path(summary["historian_insufficient_path"]).read_text(encoding="utf-8")
+    )
+    assert artifact["schema_version"] == INSUFFICIENT_CONTEXT_SCHEMA
+    assert artifact["outcome"] == OUTCOME_INSUFFICIENT
+    assert artifact["cited_record_ids"] == []
+    assert (
+        artifact["advisory_answer"]["answer"] == "Advisory answer over cited evidence."
+    )
+    assert artifact["provenance"]["retrieval_corpus_fingerprint"] == "fingerprint-abc123"
+    assert artifact["provenance"]["retrieval_revision"] == "rev-0007"
+    assert "grants no authority" in artifact["note"]
+    assert artifact["boundaries"] == list(summary["boundaries"])
+
+
+def test_insufficient_artifact_is_never_overwritten(
+    tmp_path: Path, historian_repo: Path
+) -> None:
+    query_dir = _make_query_dir(historian_repo, cited_record_ids=[])
+    output_dir = tmp_path / "evidence"
+    output_dir.mkdir()
+    existing = output_dir / f"historian_insufficient_{QUERY_ID}.json"
+    existing.write_text("sentinel\n", encoding="utf-8")
+    with pytest.raises(HistorianAskBindError, match="already exists"):
+        _run_ask_and_bind(historian_repo, output_dir, _ask_result(query_dir))
+    assert existing.read_text(encoding="utf-8") == "sentinel\n"
+
+
+@pytest.mark.parametrize("key", ["schema_valid", "grounding_valid", "contract_valid"])
+def test_empty_citations_with_invalid_validation_fails_closed(
+    tmp_path: Path, historian_repo: Path, key: str
+) -> None:
+    query_dir = _make_query_dir(historian_repo, cited_record_ids=[])
+    result_path = query_dir / "reasoner" / f"{QUERY_ID}.result.json"
+    result = json.loads(result_path.read_text(encoding="utf-8"))
+    if key == "contract_valid":
+        result["validation"][key] = False
+    else:
+        result["validation"][key] = {"valid": False}
+    result_path.write_text(json.dumps(result) + "\n", encoding="utf-8")
+    output_dir = tmp_path / "evidence"
+    with pytest.raises(HistorianAskBindError):
+        _run_ask_and_bind(historian_repo, output_dir, _ask_result(query_dir))
+    assert not (output_dir / f"historian_insufficient_{QUERY_ID}.json").exists()
+    assert not (output_dir / f"historian_context_{QUERY_ID}.json").exists()
+
+
+def test_unreadable_result_file_fails_closed_through_binder(
+    tmp_path: Path, historian_repo: Path
+) -> None:
+    query_dir = _make_query_dir(historian_repo, cited_record_ids=[])
+    (query_dir / "reasoner" / f"{QUERY_ID}.result.json").unlink()
+    output_dir = tmp_path / "evidence"
+    with pytest.raises(HistorianAskBindError):
+        _run_ask_and_bind(historian_repo, output_dir, _ask_result(query_dir))
+    assert not (output_dir / f"historian_insufficient_{QUERY_ID}.json").exists()
 
 
 def test_runner_invocation_shape(tmp_path: Path, historian_repo: Path, endpoint: str) -> None:
@@ -587,12 +674,107 @@ def test_multiple_questions_bind_separate_artifacts(
         )
     assert summary["status"] == "ok"
     assert summary["bound_count"] == 2
+    assert summary["insufficient_count"] == 0
     assert [bound["historian_query_id"] for bound in summary["bound"]] == [
         QUERY_ID,
         OTHER_QUERY_ID,
     ]
     assert (output_dir / f"historian_context_{QUERY_ID}.json").is_file()
     assert (output_dir / f"historian_context_{OTHER_QUERY_ID}.json").is_file()
+
+
+def test_mixed_bound_and_insufficient_outcomes_continue(
+    tmp_path: Path, historian_repo: Path
+) -> None:
+    bound_dir = _make_query_dir(historian_repo, query_id=QUERY_ID)
+    insufficient_dir = _make_query_dir(
+        historian_repo,
+        query_id=OTHER_QUERY_ID,
+        question="Second question?",
+        cited_record_ids=[],
+    )
+    output_dir = tmp_path / "evidence"
+    results = {
+        QUESTION: _ask_result(bound_dir),
+        "Second question?": _ask_result(
+            insufficient_dir, query_id=OTHER_QUERY_ID, question="Second question?"
+        ),
+    }
+    with mock.patch.object(
+        subprocess,
+        "run",
+        side_effect=lambda *a, **k: _completed(
+            json.dumps(results[a[0][2]])
+        ),
+    ):
+        summary = ask_and_bind_many(
+            questions=[QUESTION, "Second question?"],
+            historian_repo=historian_repo,
+            output_dir=output_dir,
+            endpoint="http://explicit.example/v1",
+            historian_python=Path(sys.executable),
+        )
+    assert summary["status"] == "ok"
+    assert summary["bound_count"] == 1
+    assert summary["insufficient_count"] == 1
+    assert summary["bound"][0]["historian_query_id"] == QUERY_ID
+    assert summary["bound"][0]["outcome"] == OUTCOME_BOUND
+    assert summary["insufficient"][0]["historian_query_id"] == OTHER_QUERY_ID
+    assert summary["insufficient"][0]["outcome"] == OUTCOME_INSUFFICIENT
+    assert summary["insufficient"][0]["cited_record_ids"] == []
+    assert (output_dir / f"historian_context_{QUERY_ID}.json").is_file()
+    assert (
+        output_dir / f"historian_insufficient_{OTHER_QUERY_ID}.json"
+    ).is_file()
+    assert not (output_dir / f"historian_context_{OTHER_QUERY_ID}.json").exists()
+
+
+def test_all_insufficient_outcomes_continue_without_binding(
+    tmp_path: Path, historian_repo: Path
+) -> None:
+    first_dir = _make_query_dir(historian_repo, query_id=QUERY_ID, cited_record_ids=[])
+    second_dir = _make_query_dir(
+        historian_repo,
+        query_id=OTHER_QUERY_ID,
+        question="Second question?",
+        cited_record_ids=[],
+    )
+    output_dir = tmp_path / "evidence"
+    results = {
+        QUESTION: _ask_result(first_dir),
+        "Second question?": _ask_result(
+            second_dir, query_id=OTHER_QUERY_ID, question="Second question?"
+        ),
+    }
+    with mock.patch.object(
+        subprocess,
+        "run",
+        side_effect=lambda *a, **k: _completed(
+            json.dumps(results[a[0][2]])
+        ),
+    ):
+        summary = ask_and_bind_many(
+            questions=[QUESTION, "Second question?"],
+            historian_repo=historian_repo,
+            output_dir=output_dir,
+            endpoint="http://explicit.example/v1",
+            historian_python=Path(sys.executable),
+        )
+    assert summary["status"] == "ok"
+    assert summary["bound_count"] == 0
+    assert summary["insufficient_count"] == 2
+    assert summary["bound"] == []
+    assert [
+        entry["historian_query_id"] for entry in summary["insufficient"]
+    ] == [QUERY_ID, OTHER_QUERY_ID]
+    assert (
+        output_dir / f"historian_insufficient_{QUERY_ID}.json"
+    ).is_file()
+    assert (
+        output_dir / f"historian_insufficient_{OTHER_QUERY_ID}.json"
+    ).is_file()
+    assert not (output_dir / f"historian_context_{QUERY_ID}.json").exists()
+    assert not (output_dir / f"historian_context_{OTHER_QUERY_ID}.json").exists()
 
 
 def test_multi_question_stops_at_first_failure(
@@ -618,9 +800,11 @@ def test_multi_question_stops_at_first_failure(
             historian_python=Path(sys.executable),
         )
     assert summary["status"] == "failed"
+    assert summary["outcome"] == "failed"
     assert summary["failed_question_index"] == 1
     assert summary["failed_question"] == "Second question?"
     assert [bound["historian_query_id"] for bound in summary["bound"]] == [QUERY_ID]
+    assert summary["insufficient"] == []
     assert (output_dir / f"historian_context_{QUERY_ID}.json").is_file()
     assert not (output_dir / f"historian_context_{OTHER_QUERY_ID}.json").exists()
 

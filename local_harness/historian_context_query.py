@@ -15,6 +15,16 @@ For each question this wrapper:
 5. reports the resulting context artifact, query id, query directory, cited
    canonical record ids, and retrieval corpus fingerprint.
 
+Each question resolves to exactly one outcome:
+
+- ``bound`` — the answer cites canonical records and the existing strict
+  binder binds them into ``zth.historian_context.v0.1`` evidence;
+- ``insufficient`` — the answer is contract-valid but cites zero canonical
+  records; it is preserved as a separate non-bound artifact and never treated
+  as bound evidence or as a failure;
+- ``failed`` — any transport, schema, grounding, contract, or provenance
+  failure; preserved and blocking.
+
 The Historian answer remains advisory interpretation over evidence. The
 cited canonical records remain the evidence. A successful query is not
 approval. A successful bind is not approval. This wrapper grants no
@@ -25,10 +35,12 @@ authority, and it never modifies Project Historian.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Sequence
 
@@ -53,6 +65,12 @@ RUNNER_SCRIPT = Path(__file__).resolve().parent / "historian_ask_runner.py"
 DEFAULT_TIMEOUT_SECONDS = 600
 DEFAULT_MAX_TOKENS = 1536
 MAX_STDERR_TAIL = 400
+
+OUTCOME_BOUND = "bound"
+OUTCOME_INSUFFICIENT = "insufficient"
+OUTCOME_FAILED = "failed"
+INSUFFICIENT_CONTEXT_SCHEMA = "zth.historian_insufficient_context.v0.1"
+INSUFFICIENT_FILE_PREFIX = "historian_insufficient_"
 
 
 class HistorianAskBindError(ValueError):
@@ -248,6 +266,7 @@ def _summarize_context(context: dict[str, Any], question: str) -> dict[str, Any]
     provenance = context.get("provenance", {})
     return {
         "question": question,
+        "outcome": OUTCOME_BOUND,
         "historian_query_id": context["historian_query_id"],
         "historian_query_dir": provenance.get("query_dir"),
         "historian_context_path": context["historian_context_path"],
@@ -257,6 +276,140 @@ def _summarize_context(context: dict[str, Any], question: str) -> dict[str, Any]
         "retrieval_corpus_fingerprint": provenance.get("retrieval_corpus_fingerprint"),
         "retrieval_revision": provenance.get("retrieval_revision"),
         "retrieval_document_count": provenance.get("retrieval_document_count"),
+    }
+
+
+def _sha256_text(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def _utc_iso() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _read_query_result(request_dir: Path, request_id: str) -> dict[str, Any] | None:
+    """Read the query's own result artifact; None when unreadable."""
+    path = request_dir / "reasoner" / f"{request_id}.result.json"
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def insufficient_outcome(result: dict[str, Any]) -> bool:
+    """True only for a contract-valid answer that cites zero canonical records.
+
+    Anything else — invalid schema, invalid grounding, an invalid contract, a
+    missing or malformed parsed response, a missing answer, or a malformed
+    citation list — returns False so the strict binder stays the sole
+    validator and the question fails closed instead.
+    """
+    validation = result.get("validation")
+    if not isinstance(validation, dict):
+        return False
+    for key in ("schema_valid", "grounding_valid"):
+        section = validation.get(key)
+        if not isinstance(section, dict) or section.get("valid") is not True:
+            return False
+    if validation.get("contract_valid") is not True:
+        return False
+    parsed = result.get("parsed_response")
+    if not isinstance(parsed, dict):
+        return False
+    answer = parsed.get("answer")
+    if not isinstance(answer, str) or not answer.strip():
+        return False
+    cited = parsed.get("cited_record_ids")
+    if not isinstance(cited, list):
+        return False
+    return not cited
+
+
+def _preserve_insufficient_context(
+    *,
+    request_dir: Path,
+    request_id: str,
+    question: str,
+    result: dict[str, Any],
+    output_dir: Path,
+    overwrite: bool,
+) -> dict[str, Any]:
+    parsed = result["parsed_response"]
+    answer = parsed["answer"]
+    retrieval: dict[str, Any] | None = None
+    retrieval_path = request_dir / "retrieval.json"
+    if retrieval_path.is_file():
+        try:
+            loaded = json.loads(retrieval_path.read_text(encoding="utf-8"))
+            retrieval = loaded if isinstance(loaded, dict) else None
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            retrieval = None
+    result_path = request_dir / "reasoner" / f"{request_id}.result.json"
+    artifact: dict[str, Any] = {
+        "schema_version": INSUFFICIENT_CONTEXT_SCHEMA,
+        "historian_query_id": request_id,
+        "question": question,
+        "outcome": OUTCOME_INSUFFICIENT,
+        "note": (
+            "The Historian returned a contract-valid advisory answer that cites "
+            "zero canonical records. This artifact preserves that answer as a "
+            "separate non-bound outcome: it is not bound evidence, it cites no "
+            "canonical records, and it grants no authority."
+        ),
+        "advisory_answer": {
+            "answer": answer,
+            "answer_sha256": _sha256_text(answer),
+            "uncertainty_or_limitations": parsed.get("uncertainty_or_limitations"),
+            "contradictions_or_missing_evidence": parsed.get(
+                "contradictions_or_missing_evidence"
+            ),
+        },
+        "cited_record_ids": [],
+        "provenance": {
+            "source": "project-historian ask query directory",
+            "query_dir": str(request_dir),
+            "result_path": str(result_path),
+            "result_sha256": _sha256_text(result_path.read_text(encoding="utf-8")),
+            "retrieval_corpus_fingerprint": (
+                retrieval.get("corpus_fingerprint") if retrieval else None
+            ),
+            "retrieval_revision": retrieval.get("revision") if retrieval else None,
+            "retrieval_document_count": (
+                retrieval.get("document_count") if retrieval else None
+            ),
+        },
+        "boundaries": list(WRAPPER_BOUNDARIES),
+        "preserved_at": _utc_iso(),
+    }
+    output_dir.mkdir(parents=True, exist_ok=True)
+    artifact_path = output_dir / f"{INSUFFICIENT_FILE_PREFIX}{request_id}.json"
+    if artifact_path.exists() and not overwrite:
+        raise HistorianAskBindError(
+            f"insufficient context artifact already exists: {artifact_path}"
+        )
+    artifact_path.write_text(
+        json.dumps(artifact, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    artifact["historian_insufficient_path"] = str(artifact_path)
+    return artifact
+
+
+def _summarize_insufficient(artifact: dict[str, Any]) -> dict[str, Any]:
+    provenance = artifact["provenance"]
+    return {
+        "question": artifact["question"],
+        "outcome": OUTCOME_INSUFFICIENT,
+        "historian_query_id": artifact["historian_query_id"],
+        "historian_query_dir": provenance.get("query_dir"),
+        "historian_insufficient_path": artifact["historian_insufficient_path"],
+        "historian_insufficient_schema": artifact["schema_version"],
+        "cited_record_ids": [],
+        "answer_sha256": artifact["advisory_answer"]["answer_sha256"],
+        "retrieval_corpus_fingerprint": provenance.get("retrieval_corpus_fingerprint"),
+        "retrieval_revision": provenance.get("retrieval_revision"),
+        "retrieval_document_count": provenance.get("retrieval_document_count"),
+        "boundaries": list(WRAPPER_BOUNDARIES),
     }
 
 
@@ -306,6 +459,17 @@ def ask_and_bind(
         request_id=request_id,
         question=question,
     )
+    query_result = _read_query_result(request_dir, request_id)
+    if query_result is not None and insufficient_outcome(query_result):
+        artifact = _preserve_insufficient_context(
+            request_dir=request_dir,
+            request_id=request_id,
+            question=question,
+            result=query_result,
+            output_dir=output_dir,
+            overwrite=overwrite,
+        )
+        return _summarize_insufficient(artifact)
     try:
         context = bind_historian_context(
             query_dir=request_dir,
@@ -330,10 +494,15 @@ def ask_and_bind_many(
     timeout_seconds: int = DEFAULT_TIMEOUT_SECONDS,
     overwrite: bool = False,
 ) -> dict[str, Any]:
-    """Run ask-and-bind for each question, stopping at the first failure."""
+    """Run ask-and-bind for each question, stopping at the first failure.
+
+    Bound and insufficient outcomes both continue; only a true transport,
+    schema, grounding, contract, or provenance failure stops the run.
+    """
     if not questions:
         raise HistorianAskBindError("at least one question is required")
     summaries: list[dict[str, Any]] = []
+    insufficient: list[dict[str, Any]] = []
     for index, question in enumerate(questions):
         try:
             summary = ask_and_bind(
@@ -349,17 +518,24 @@ def ask_and_bind_many(
         except HistorianAskBindError as exc:
             return {
                 "status": "failed",
+                "outcome": OUTCOME_FAILED,
                 "bound": summaries,
+                "insufficient": insufficient,
                 "failed_question_index": index,
                 "failed_question": question,
                 "error": str(exc),
                 "boundaries": list(WRAPPER_BOUNDARIES),
             }
-        summaries.append(summary)
+        if summary.get("outcome") == OUTCOME_INSUFFICIENT:
+            insufficient.append(summary)
+        else:
+            summaries.append(summary)
     return {
         "status": "ok",
         "bound": summaries,
         "bound_count": len(summaries),
+        "insufficient": insufficient,
+        "insufficient_count": len(insufficient),
         "boundaries": list(WRAPPER_BOUNDARIES),
     }
 
@@ -467,8 +643,23 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"  query directory: {bound['historian_query_dir']}")
         print(f"  cited records: {', '.join(bound['cited_record_ids'])}")
         print(f"  corpus fingerprint: {bound['retrieval_corpus_fingerprint']}")
+    for insufficient_entry in summary.get("insufficient", []):
+        print(
+            f"Insufficient {insufficient_entry['historian_query_id']} -> "
+            f"{insufficient_entry['historian_insufficient_path']}"
+        )
+        print(f"  query directory: {insufficient_entry['historian_query_dir']}")
+        print(
+            "  cited records: <none>; contract-valid advisory answer preserved "
+            "separately, not bound evidence"
+        )
     if summary["status"] == "ok":
         print(f"Bound {summary['bound_count']} Historian context artifact(s).")
+        if summary.get("insufficient_count"):
+            print(
+                f"Preserved {summary['insufficient_count']} insufficient "
+                "outcome(s) without binding."
+            )
     else:
         print(
             f"Failed on question {summary['failed_question_index'] + 1}: "

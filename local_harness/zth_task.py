@@ -9,6 +9,10 @@ mechanisms into a bounded, evidence-backed task workflow:
       -> verbatim objective record + private task workspace
       -> advisory semantic interpretation (one model call, strictly contracted)
       -> Project Historian ask-and-bind (local_harness/historian_context_query.py)
+         with per-question bound / insufficient / failed outcomes: bound answers
+         bind through the strict binder, contract-valid zero-citation answers
+         are preserved as insufficient non-bound outcomes and preparation
+         continues, and a true failure blocks preparation
       -> deterministic scope binding into a validated Agent Task Session
          (local_harness/agent_task_session.py)
       -> operator-facing summary, resumable derived status, exact handoff
@@ -83,7 +87,7 @@ from local_harness.zth_preflight import (
 FRONTDOOR_SCHEMA = "zth.task_frontdoor.v0.1"
 OBJECTIVE_SCHEMA = "zth.task_objective.v0.1"
 INTERPRETATION_SCHEMA = "zth.task_semantic_interpretation.v0.1"
-HISTORIAN_INDEX_SCHEMA = "zth.task_historian_index.v0.1"
+HISTORIAN_INDEX_SCHEMA = "zth.task_historian_index.v0.2"
 SESSION_REF_SCHEMA = "zth.task_session_ref.v0.1"
 FAILURE_SCHEMA = "zth.task_failure.v0.1"
 
@@ -577,6 +581,7 @@ def gather_historian_context(
 ) -> dict[str, Any]:
     historian_dir = workspace / HISTORIAN_DIR_NAME
     entries: list[dict[str, Any]] = []
+    insufficient_entries: list[dict[str, Any]] = []
     if questions:
         try:
             summary = ask_bind(
@@ -613,15 +618,36 @@ def gather_historian_context(
                     "retrieval_revision": bound.get("retrieval_revision"),
                 }
             )
+        for insufficient in summary.get("insufficient", []):
+            insufficient_entries.append(
+                {
+                    "question": insufficient.get("question"),
+                    "historian_query_id": insufficient.get("historian_query_id"),
+                    "historian_query_dir": insufficient.get("historian_query_dir"),
+                    "insufficient_path": _repo_relative(
+                        Path(insufficient["historian_insufficient_path"]), repo_root
+                    ),
+                    "cited_record_ids": [],
+                    "answer_sha256": insufficient.get("answer_sha256"),
+                    "retrieval_corpus_fingerprint": insufficient.get(
+                        "retrieval_corpus_fingerprint"
+                    ),
+                    "retrieval_revision": insufficient.get("retrieval_revision"),
+                }
+            )
     index_payload = {
         "schema_version": HISTORIAN_INDEX_SCHEMA,
         "questions_asked": len(questions),
         "bound_count": len(entries),
+        "insufficient_count": len(insufficient_entries),
         "contexts": entries,
+        "insufficient": insufficient_entries,
         "advisory": (
             "Historian answers are advisory interpretation over evidence; the "
             "cited canonical records remain the evidence; a successful query or "
-            "bind is not approval."
+            "bind is not approval. A contract-valid answer that cites no "
+            "canonical records is preserved as an insufficient outcome, not "
+            "bound evidence; a true Historian failure blocks preparation."
         ),
         "boundaries": list(FRONTDOOR_BOUNDARIES),
     }
@@ -995,6 +1021,7 @@ def _status_payload(
         payload["historian"] = {
             "questions_asked": index_payload.get("questions_asked"),
             "bound_count": index_payload.get("bound_count"),
+            "insufficient_count": index_payload.get("insufficient_count", 0),
             "cited_record_ids": cited,
             "retrieval_corpus_fingerprint": (
                 contexts[0].get("retrieval_corpus_fingerprint")
@@ -1102,6 +1129,13 @@ def render_summary_text(payload: dict[str, Any]) -> str:
             f"  historian: {historian.get('bound_count')} question(s) bound, "
             f"{len(historian.get('cited_record_ids', []))} canonical record(s) cited"
         )
+        insufficient_count = historian.get("insufficient_count") or 0
+        if insufficient_count:
+            lines.append(
+                f"    {insufficient_count} insufficient outcome(s) preserved "
+                "without binding (contract-valid answers citing no canonical "
+                "records)"
+            )
     lines.append("")
     lines.append("semantic interpretation (advisory):")
     lines.append(f"  goal: {advisory.get('goal')}")

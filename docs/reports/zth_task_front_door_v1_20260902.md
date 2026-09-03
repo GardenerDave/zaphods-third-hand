@@ -1,9 +1,10 @@
 # Supervised ZTH Task Front Door V1
 
 - Date: 2026-09-02
-- Status: implemented, tested, and executed through one real dogfood
-  maintenance task (see the Dogfood section); commit for preservation follows
-  this report
+- Status: implemented and tested; the first dogfood maintenance task was
+  prepared through the front door but blocked at the Historian stage, and the
+  blocked attempts are preserved (see the Dogfood section); the
+  insufficiency-outcome repair and the dogfood rerun follow in later commits
 - Scope: add `local_harness/zth_task.py`, a single supervised front door that
   composes existing proven mechanisms into one bounded workflow from an
   ordinary-language objective to a validated, context-backed, execution-ready
@@ -227,11 +228,22 @@ their own checks and commit. No other out-of-scope file was touched.
 The front door's first real use is one genuine maintenance task — the
 pre-existing repo-health boundary-language defect in
 `docs/DOGFOOD_RUNNER.md` (a "must not" list bullet that reads as a positive
-auto-promotion claim outside the checker's negation window). The task is
-prepared through the front door with a live reasoner endpoint and the
-Project Historian, executed through the emitted handoff packet, and recorded
-through the existing recorder. Results follow in the same report in the
-dogfood commit.
+auto-promotion claim outside the checker's negation window). The first
+preparation attempts ran with a live reasoner endpoint and the real Project
+Historian, and blocked at the Historian stage: the Historian returned
+contract-valid advisory answers (`schema_valid`, `grounding_valid`, and
+`contract_valid` all true) that honestly cited zero canonical records, and
+the strict binder correctly refused to bind them as evidence. Those blocked
+attempts are preserved under `.work/zth_tasks/zth-task-fix-the-pre-existing-*`
+as failure workspaces; the wording of this report section originally
+described the dogfood as already executed, which was wrong, and this section
+now records the blocked attempts instead.
+
+The follow-up repair (`zth.historian_insufficient_context.v0.1`) classifies
+each question as bound, insufficient, or failed — preserving zero-citation
+contract-valid answers as separate non-bound artifacts while true failures
+still block — and the dogfood is rerun through the front door exactly once
+after that repair; the dogfood result is recorded in the dogfood commit.
 
 ## Exact capability claim
 
