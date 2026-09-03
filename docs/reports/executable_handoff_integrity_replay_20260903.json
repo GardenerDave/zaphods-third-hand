@@ -1,0 +1,47 @@
+{
+  "report_type": "executable_handoff_integrity_replay_20260903.v1",
+  "current_commit": "e2b3b04ab2820f433604f4308e274a133143d12a",
+  "implementation_change": {
+    "files": [
+      "local_harness/evidence_semantic_typing.py",
+      "tests/test_evidence_semantic_typing.py"
+    ],
+    "summary": "Added evidence-artifact executable qualification for output_validation.json via OutputValidationRef and resolve_output_validation_reference, plus positive, wrong-but-valid, and missing-artifact tests."
+  },
+  "dogfood_evidence": {
+    "initial_1p7b": {
+      "endpoint": "http://192.168.1.16:8081/v1",
+      "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "prompt_tokens_approx": 149,
+      "raw_source": "docs/reports/executable_handoff_integrity_replay_20260903_1p7b_raw.json",
+      "raw_sha256": "9dbb397d3aedd692e61d690c6273b7d6368a9292b58fc0419e3988ad9dc559ac",
+      "qualification": "failed",
+      "interpretation": "Partially correct semantic judgment, but the proposed negative control was not valid or constructible. Not a confirmed capability boundary."
+    },
+    "escalation_30b": {
+      "endpoint": "http://192.168.1.16:8080/v1",
+      "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "raw_source": "docs/reports/executable_handoff_integrity_replay_20260903_30b_raw.json",
+      "raw_sha256": "32229d0f249bc0460f636bcb13cb2a7f6cc1ad46ba941d489798863649331c75",
+      "qualification": "passed",
+      "interpretation": "Positive precedent for the bounded repository-binding audit task under its supplied context."
+    },
+    "controlled_1p7b_replay": {
+      "endpoint": "http://192.168.1.16:8081/v1",
+      "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "prompt_tokens_approx": 550,
+      "raw_request_intent_source": "docs/reports/executable_handoff_integrity_replay_20260903_1p7b_request_intent.json",
+      "raw_metadata_source": "docs/reports/executable_handoff_integrity_replay_20260903_1p7b_metadata.json",
+      "raw_response_source": "docs/reports/executable_handoff_integrity_replay_20260903_1p7b_response.json",
+      "raw_response_sha256": "b62b78840f217f04a32cd7b311e141c2e499a5c769dcb462a3242d6cc8989e6e",
+      "qualification": "passed",
+      "interpretation": "The earlier 1.7B miss is better explained by context insufficiency / context-contract mismatch than by a demonstrated hard capability boundary."
+    }
+  },
+  "capability_precedent_note": "The evidence supports a more precise precedent shape: worker + capability + context contract + qualification.",
+  "validation": {
+    "focused_tests": "61 passed",
+    "repo_health": "525 passed",
+    "diff_check": "passed"
+  }
+}

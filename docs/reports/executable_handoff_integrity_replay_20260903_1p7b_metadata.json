@@ -1,0 +1,38 @@
+{
+  "status": "request_error",
+  "request_url": "http://192.168.1.16:8081/v1/chat/completions",
+  "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+  "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+  "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+  "finish_reason": null,
+  "usage": null,
+  "timings": null,
+  "error": "<urlopen error [Errno 1] Operation not permitted>",
+  "model_resolution_attempted": false,
+  "model_resolution_error": null,
+  "request_provenance": {
+    "prompt_sha256": "fa71b0c6a65f7a48bd0e9a6a2248691698e7897a79e3fadaea72ea83ac0893a0",
+    "prompt_length": 2466,
+    "prompt_byte_length": 2466,
+    "api": "openai-chat",
+    "message_structure": [
+      "system",
+      "user"
+    ],
+    "system_message_sha256": "e8c1a9955d1a830189fecdfd11c537896d95cddd0419d5a63d957dd6f0fcb6c7",
+    "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "max_tokens": 250,
+    "temperature": 0.2,
+    "top_p": null,
+    "seed": null,
+    "stop": null,
+    "endpoint_alias": "JARVIS_LOCAL",
+    "request_body_sha256": "eb15ea62c1ee28e7e9f839fa7ab52d55c45a75a2b44de1d2a871079b04f79948",
+    "request_body_length": 2828,
+    "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "request_start_monotonic": 2350.980121288,
+    "response_capture_monotonic": 2350.987867271
+  },
+  "transport_classification": "transport_request_error"
+}

@@ -8,9 +8,11 @@ from local_harness.evidence_semantic_typing import (
     build_source_inventory,
     derive_typed_evidence_from_bundle,
     HandoffCompletionRef,
+    OutputValidationRef,
     TransportQualificationRef,
     derive_transport_qualification_from_attempt,
     resolve_handoff_completion_reference,
+    resolve_output_validation_reference,
     resolve_transport_qualification_reference,
 )
 
@@ -405,3 +407,61 @@ def test_handoff_completion_reference_hash_failure_fails_closed():
         pass
     else:
         raise AssertionError("expected handoff completion hash failure")
+
+
+def test_output_validation_reference_resolves_claim_and_status_from_artifact():
+    artifact = ROOT / ".work/semantic_claim_discipline_final_20260831/task_a/baseline/20260831T133000Z/output_validation.json"
+    payload = json.loads(artifact.read_text(encoding="utf-8"))
+    ref = OutputValidationRef(
+        artifact_ref=str(artifact),
+        artifact_sha256=manual_attempt._sha256_file(artifact),
+        validation_id=payload["validation_id"],
+        attempt_id=payload["attempt_id"],
+    )
+    verification = resolve_output_validation_reference(
+        validation_ref=ref,
+        expected_validation_status="passed",
+        expected_attempt_id=payload["attempt_id"],
+        expected_validation_id=payload["validation_id"],
+    )
+    assert verification.artifact_integrity is True
+    assert verification.validation_detected is True
+    assert verification.validation_status == "passed"
+    assert verification.acceptance_status == "not_reviewed"
+    assert verification.validation_id == payload["validation_id"]
+    assert verification.attempt_id == payload["attempt_id"]
+    assert verification.policy_usable is True
+
+
+def test_output_validation_reference_wrong_but_valid_artifact_fails_closed():
+    artifact = ROOT / ".work/semantic_claim_discipline_final_20260831/task_a/patched/20260831T133000Z/output_validation.json"
+    ref = OutputValidationRef(
+        artifact_ref=str(artifact),
+        artifact_sha256=manual_attempt._sha256_file(artifact),
+        validation_id="validation-attempt-1",
+        attempt_id="attempt-1",
+    )
+    verification = resolve_output_validation_reference(
+        validation_ref=ref,
+        expected_validation_status="passed",
+        expected_attempt_id="attempt-1",
+        expected_validation_id="validation-attempt-1",
+    )
+    assert verification.artifact_integrity is True
+    assert verification.validation_detected is True
+    assert verification.validation_status == "failed"
+    assert verification.policy_usable is False
+    assert "validation_status mismatch" in verification.diagnostics
+
+
+def test_output_validation_reference_missing_artifact_fails_closed(tmp_path: Path):
+    ref = OutputValidationRef(
+        artifact_ref=str(tmp_path / "missing-output_validation.json"),
+        artifact_sha256="0" * 64,
+    )
+    try:
+        resolve_output_validation_reference(validation_ref=ref)
+    except FileNotFoundError:
+        pass
+    else:
+        raise AssertionError("expected output validation missing-artifact failure")

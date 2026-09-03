@@ -174,6 +174,22 @@ class HandoffCompletionRef:
         }
 
 
+@dataclass(frozen=True)
+class OutputValidationRef:
+    artifact_ref: str
+    artifact_sha256: str
+    validation_id: str | None = None
+    attempt_id: str | None = None
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "artifact_ref": self.artifact_ref,
+            "artifact_sha256": self.artifact_sha256,
+            "validation_id": self.validation_id,
+            "attempt_id": self.attempt_id,
+        }
+
+
 def _source_ref(path: Path) -> str:
     return str(path.resolve())
 
@@ -224,6 +240,32 @@ class HandoffCompletionVerification:
             "downstream_attempt_match": self.downstream_attempt_match,
             "endpoint_match": self.endpoint_match,
             "model_match": self.model_match,
+            "policy_usable": self.policy_usable,
+            "diagnostics": list(self.diagnostics),
+            "source_refs": list(self.source_refs),
+        }
+
+
+@dataclass(frozen=True)
+class OutputValidationVerification:
+    artifact_integrity: bool
+    validation_detected: bool
+    validation_status: str | None
+    acceptance_status: str | None
+    validation_id: str | None
+    attempt_id: str | None
+    policy_usable: bool
+    diagnostics: list[str]
+    source_refs: list[str]
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "artifact_integrity": self.artifact_integrity,
+            "validation_detected": self.validation_detected,
+            "validation_status": self.validation_status,
+            "acceptance_status": self.acceptance_status,
+            "validation_id": self.validation_id,
+            "attempt_id": self.attempt_id,
             "policy_usable": self.policy_usable,
             "diagnostics": list(self.diagnostics),
             "source_refs": list(self.source_refs),
@@ -397,6 +439,58 @@ def resolve_handoff_completion_reference(
         downstream_attempt_match=downstream_attempt_match,
         endpoint_match=endpoint_match,
         model_match=model_match,
+        policy_usable=policy_usable,
+        diagnostics=diagnostics,
+        source_refs=source_refs,
+    )
+
+
+def resolve_output_validation_reference(
+    *,
+    validation_ref: OutputValidationRef,
+    expected_validation_status: str = "passed",
+    expected_attempt_id: str | None = None,
+    expected_validation_id: str | None = None,
+) -> OutputValidationVerification:
+    path, payload, source_refs = _resolve_artifact_ref(
+        validation_ref.artifact_ref,
+        validation_ref.artifact_sha256,
+        kind="output validation",
+    )
+    diagnostics: list[str] = []
+    validation_detected = payload.get("validation_status") in {"passed", "failed"}
+    if not validation_detected:
+        diagnostics.append("validation artifact did not expose a recognized validation_status")
+    validation_status = _first_string(payload, [("validation_status",)])
+    acceptance_status = _first_string(payload, [("acceptance_status",)])
+    validation_id = _first_string(payload, [("validation_id",)])
+    attempt_id = _first_string(payload, [("attempt_id",)])
+    raw_output_preserved = payload.get("raw_output_preserved") is True
+    if not raw_output_preserved:
+        diagnostics.append("validation artifact did not preserve raw output")
+    if validation_status != expected_validation_status:
+        diagnostics.append("validation_status mismatch")
+    if expected_attempt_id is not None and attempt_id != expected_attempt_id:
+        diagnostics.append("attempt_id mismatch")
+    if expected_validation_id is not None and validation_id != expected_validation_id:
+        diagnostics.append("validation_id mismatch")
+    policy_usable = bool(
+        validation_detected
+        and validation_status == expected_validation_status
+        and acceptance_status == "not_reviewed"
+        and raw_output_preserved
+        and (expected_attempt_id is None or attempt_id == expected_attempt_id)
+        and (expected_validation_id is None or validation_id == expected_validation_id)
+    )
+    if not policy_usable:
+        diagnostics.append("validation artifact not usable for policy consumption")
+    return OutputValidationVerification(
+        artifact_integrity=True,
+        validation_detected=validation_detected,
+        validation_status=validation_status,
+        acceptance_status=acceptance_status,
+        validation_id=validation_id,
+        attempt_id=attempt_id,
         policy_usable=policy_usable,
         diagnostics=diagnostics,
         source_refs=source_refs,
