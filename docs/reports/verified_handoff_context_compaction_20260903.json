@@ -1,0 +1,26 @@
+{
+  "report_type": "verified_handoff_context_compaction_20260903.v1",
+  "implementation": {
+    "files": [
+      "local_harness/transaction_handoff.py",
+      "local_harness/evidence_semantic_typing.py",
+      "tests/test_transaction_handoff.py"
+    ],
+    "summary": "Added verified compact handoff construction and deterministic verification for a transaction run, with preserved evidence references, protected state checks, and fail-closed handling for dropped references, unsupported claims, altered identity, and valid-but-wrong evidence."
+  },
+  "worker_experiment": {
+    "endpoint": "http://192.168.1.16:8081/v1",
+    "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "prompt_tokens": 43,
+    "qualification": "failed",
+    "failure_classification": "context-contract mismatch and domain drift",
+    "raw_source": "docs/reports/verified_handoff_context_compaction_20260903_1p7b_raw.json"
+  },
+  "validation": {
+    "transaction_handoff_tests": "passed",
+    "evidence_typing_tests": "passed",
+    "historian_adjacency_tests": "passed",
+    "diff_check": "passed"
+  }
+}
+

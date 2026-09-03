@@ -14,6 +14,7 @@ from local_harness.transaction_handoff import (
     TRANSACTION_MANIFEST_SCHEMA,
     TransactionHandoffError,
     build_authority_bound_semantic_result,
+    build_verified_compact_handoff_context,
     build_handoff_completion,
     build_worker_b_preflight,
     build_next_worker_continuation_context,
@@ -1083,6 +1084,68 @@ def test_handoff_completion_fails_closed_when_source_lifecycle_is_not_handoff(tm
     manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     with pytest.raises(TransactionHandoffError, match="requires a prepared handoff"):
         build_handoff_completion(source_run_dir=source_run_dir, recipient_run_dir=recipient_dir)
+
+
+def test_verified_compact_handoff_context_preserves_critical_state_and_evidence(tmp_path: Path) -> None:
+    source_run_dir, _recipient_dir = _build_completed_recipient_pair(tmp_path)
+    compact = build_verified_compact_handoff_context(source_run_dir=source_run_dir)
+    assert compact["schema_version"] == "zth.verified_compact_handoff_context.v0.1"
+    assert compact["critical_state"]["objective"]
+    assert compact["critical_state"]["validation_status"] == "passed"
+    assert compact["critical_state"]["handoff_status"] == "prepared"
+    assert compact["repository_binding"]["commit_sha"]
+    assert compact["verification"]["policy_usable"] is True
+    assert compact["verification"]["critical_state_preserved"] is True
+    assert compact["verification"]["resolved_validation"]["validation_status"] == "passed"
+    assert Path(compact["verified_compact_handoff_context_path"]).is_file()
+
+
+def test_verified_compact_handoff_context_fails_closed_when_evidence_reference_is_dropped(tmp_path: Path) -> None:
+    source_run_dir, _recipient_dir = _build_completed_recipient_pair(tmp_path)
+    compact = build_verified_compact_handoff_context(source_run_dir=source_run_dir)
+    compact["authoritative_evidence"].pop("output_validation")
+    from local_harness.transaction_handoff import verify_verified_compact_handoff_context
+
+    with pytest.raises(Exception, match="missing evidence references|compact handoff"):
+        verify_verified_compact_handoff_context(compact, source_run_dir=source_run_dir)
+
+
+def test_verified_compact_handoff_context_fails_closed_on_unsupported_claim(tmp_path: Path) -> None:
+    source_run_dir, _recipient_dir = _build_completed_recipient_pair(tmp_path)
+    compact = build_verified_compact_handoff_context(source_run_dir=source_run_dir)
+    compact["compact_claims"].append({"claim_type": "unsupported_semantic_claim", "value": "x", "source": "test"})
+    from local_harness.transaction_handoff import verify_verified_compact_handoff_context
+
+    with pytest.raises(Exception, match="unsupported claim type"):
+        verify_verified_compact_handoff_context(compact, source_run_dir=source_run_dir)
+
+
+def test_verified_compact_handoff_context_fails_closed_on_altered_identity(tmp_path: Path) -> None:
+    source_run_dir, _recipient_dir = _build_completed_recipient_pair(tmp_path)
+    compact = build_verified_compact_handoff_context(source_run_dir=source_run_dir)
+    compact["repository_binding"]["commit_sha"] = "0" * 40
+    from local_harness.transaction_handoff import verify_verified_compact_handoff_context
+
+    verification = verify_verified_compact_handoff_context(compact, source_run_dir=source_run_dir)
+    assert verification["policy_usable"] is False
+    assert "repository commit mismatch" in verification["diagnostics"]
+
+
+def test_verified_compact_handoff_context_fails_closed_on_valid_but_wrong_evidence(tmp_path: Path) -> None:
+    source_run_dir, _recipient_dir = _build_completed_recipient_pair(tmp_path)
+    compact = build_verified_compact_handoff_context(source_run_dir=source_run_dir)
+    wrong_artifact = ROOT / ".work/semantic_claim_discipline_final_20260831/task_a/patched/20260831T133000Z/output_validation.json"
+    compact["authoritative_evidence"]["output_validation"] = {
+        "artifact_ref": str(wrong_artifact),
+        "artifact_sha256": manual_attempt._sha256_file(wrong_artifact),
+        "validation_id": "wrong-validation-id",
+        "attempt_id": "wrong-attempt-id",
+    }
+    from local_harness.transaction_handoff import verify_verified_compact_handoff_context
+
+    verification = verify_verified_compact_handoff_context(compact, source_run_dir=source_run_dir)
+    assert verification["policy_usable"] is False
+    assert any("validation status mismatch" in detail or "validation_status mismatch" in detail for detail in verification["diagnostics"])
 
 
 def test_handoff_completion_fails_closed_on_missing_recipient_manifest(tmp_path: Path) -> None:

@@ -189,6 +189,36 @@ class OutputValidationRef:
             "attempt_id": self.attempt_id,
         }
 
+    @classmethod
+    def from_dict(cls, payload: dict[str, Any]) -> "OutputValidationRef":
+        if not isinstance(payload, dict):
+            raise ValueError("output validation ref must be a JSON object")
+        allowed = {"artifact_ref", "artifact_sha256", "validation_id", "attempt_id"}
+        unexpected = sorted(set(payload) - allowed)
+        truthy = [key for key in ("valid", "passed", "trusted", "policy_usable") if payload.get(key) is not None]
+        if unexpected:
+            raise ValueError(f"output validation ref contains unsupported fields: {', '.join(unexpected)}")
+        if truthy:
+            raise ValueError(f"output validation ref contains truth-bearing fields: {', '.join(truthy)}")
+        artifact_ref = payload.get("artifact_ref")
+        artifact_sha256 = payload.get("artifact_sha256")
+        if not isinstance(artifact_ref, str) or not artifact_ref.strip():
+            raise ValueError("output validation ref requires artifact_ref")
+        if not isinstance(artifact_sha256, str) or len(artifact_sha256) != 64 or any(c not in "0123456789abcdef" for c in artifact_sha256.lower()):
+            raise ValueError("output validation ref requires valid artifact_sha256")
+        validation_id = payload.get("validation_id")
+        if validation_id is not None and (not isinstance(validation_id, str) or not validation_id.strip()):
+            raise ValueError("output validation ref validation_id must be a non-empty string when present")
+        attempt_id = payload.get("attempt_id")
+        if attempt_id is not None and (not isinstance(attempt_id, str) or not attempt_id.strip()):
+            raise ValueError("output validation ref attempt_id must be a non-empty string when present")
+        return cls(
+            artifact_ref=artifact_ref,
+            artifact_sha256=artifact_sha256,
+            validation_id=validation_id,
+            attempt_id=attempt_id,
+        )
+
 
 def _source_ref(path: Path) -> str:
     return str(path.resolve())

@@ -11,9 +11,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from local_harness.evidence_semantic_typing import OutputValidationRef, resolve_output_validation_reference
+
 
 TRANSACTION_MANIFEST_SCHEMA = "zth.transaction_manifest.v0.1"
 NEXT_WORKER_CONTEXT_SCHEMA = "zth.next_worker_context.v0.1"
+VERIFIED_COMPACT_HANDOFF_CONTEXT_SCHEMA = "zth.verified_compact_handoff_context.v0.1"
 LIFECYCLE_STATES = {
     "CREATED",
     "EVIDENCE_BOUND",
@@ -31,6 +34,10 @@ LIFECYCLE_STATES = {
 
 class TransactionHandoffError(ValueError):
     """Raised when transaction-manifest or next-worker context construction fails."""
+
+
+class VerifiedCompactHandoffError(ValueError):
+    """Raised when compact handoff construction or verification fails closed."""
 
 
 def _utc_iso() -> str:
@@ -116,6 +123,15 @@ def _evidence_reference(path: Path, payload: dict[str, Any], *, id_field: str) -
     if path.is_file():
         reference["sha256"] = _sha256(path)
     return reference
+
+
+def _compact_evidence_reference(path: Path, *, artifact: str, id_key: str | None = None, id_value: Any = None) -> dict[str, Any]:
+    reference = _artifact_reference(path, artifact=artifact, id_key=id_key, id_value=id_value)
+    return {
+        "artifact_ref": reference["path"],
+        "artifact_sha256": reference["sha256"],
+        **({id_key: reference[id_key]} if id_key and id_key in reference else {}),
+    }
 
 
 def _artifact_reference(path: Path, *, artifact: str, id_key: str | None = None, id_value: Any = None) -> dict[str, Any]:
@@ -863,6 +879,235 @@ def build_next_worker_continuation_context(
         output_path.write_text(continuation_text, encoding="utf-8")
         result["continuation_path"] = output_path
     return result
+
+
+def build_verified_compact_handoff_context(
+    *,
+    source_run_dir: Path,
+    output_dir: Path | None = None,
+) -> dict[str, Any]:
+    if not source_run_dir.is_dir():
+        raise VerifiedCompactHandoffError(f"missing source run dir: {source_run_dir}")
+
+    transaction_manifest = _read_json(source_run_dir / "transaction_manifest.json", kind="transaction manifest")
+    next_worker_context = _read_json(source_run_dir / "next_worker_context.json", kind="next-worker context")
+    validation = _read_json(source_run_dir / "output_validation.json", kind="output validation")
+    handoff = _read_json(source_run_dir / "handoff_packet.json", kind="handoff packet")
+    review = _read_json(source_run_dir / "review_decision.json", kind="review decision")
+
+    if transaction_manifest.get("schema_version") != TRANSACTION_MANIFEST_SCHEMA:
+        raise VerifiedCompactHandoffError("source transaction manifest schema_version is unsupported")
+    if next_worker_context.get("schema_version") != NEXT_WORKER_CONTEXT_SCHEMA:
+        raise VerifiedCompactHandoffError("source next-worker context schema_version is unsupported")
+    if transaction_manifest.get("transaction_id") != next_worker_context.get("transaction_id"):
+        raise VerifiedCompactHandoffError("source transaction and context transaction_id do not match")
+
+    repository_binding = next_worker_context.get("repository_binding")
+    if not isinstance(repository_binding, dict):
+        raise VerifiedCompactHandoffError("source next-worker context must include repository_binding")
+    repository_reference = transaction_manifest.get("repository_reference")
+    if repository_reference != repository_binding:
+        raise VerifiedCompactHandoffError("source repository binding does not match transaction manifest")
+
+    evidence_references = next_worker_context.get("evidence_references")
+    if not isinstance(evidence_references, list) or not evidence_references:
+        raise VerifiedCompactHandoffError("source next-worker context must include evidence references")
+
+    compact_claims = [
+        {"claim_type": "transaction_id", "value": transaction_manifest.get("transaction_id"), "source": "transaction_manifest.transaction_id"},
+        {"claim_type": "run_id", "value": transaction_manifest.get("run_id"), "source": "transaction_manifest.run_id"},
+        {"claim_type": "repository_root", "value": repository_binding.get("repository_root"), "source": "next_worker_context.repository_binding.repository_root"},
+        {"claim_type": "repository_commit", "value": repository_binding.get("commit_sha"), "source": "next_worker_context.repository_binding.commit_sha"},
+        {"claim_type": "objective", "value": next_worker_context.get("handoff", {}).get("next_step_objective"), "source": "next_worker_context.handoff.next_step_objective"},
+        {"claim_type": "allowed_targets", "value": next_worker_context.get("constraints", {}).get("allowed_targets"), "source": "next_worker_context.constraints.allowed_targets"},
+        {"claim_type": "held_targets", "value": next_worker_context.get("constraints", {}).get("held_targets"), "source": "next_worker_context.constraints.held_targets"},
+        {"claim_type": "next_step_scope", "value": next_worker_context.get("constraints", {}).get("next_step_scope"), "source": "next_worker_context.constraints.next_step_scope"},
+        {"claim_type": "validation_status", "value": validation.get("validation_status"), "source": "output_validation.validation_status"},
+        {"claim_type": "handoff_status", "value": handoff.get("handoff_status"), "source": "handoff_packet.handoff_status"},
+        {"claim_type": "review_decision", "value": review.get("decision"), "source": "review_decision.decision"},
+    ]
+
+    compact = {
+        "schema_version": VERIFIED_COMPACT_HANDOFF_CONTEXT_SCHEMA,
+        "source_transaction_id": transaction_manifest.get("transaction_id"),
+        "source_run_id": transaction_manifest.get("run_id"),
+        "repository_binding": deepcopy(repository_binding),
+        "critical_state": {
+            "source_transaction_id": transaction_manifest.get("transaction_id"),
+            "source_run_id": transaction_manifest.get("run_id"),
+            "objective": next_worker_context.get("handoff", {}).get("next_step_objective"),
+            "allowed_targets": deepcopy(next_worker_context.get("constraints", {}).get("allowed_targets")),
+            "held_targets": deepcopy(next_worker_context.get("constraints", {}).get("held_targets")),
+            "next_step_scope": next_worker_context.get("constraints", {}).get("next_step_scope"),
+            "review_decision": review.get("decision"),
+            "validation_status": validation.get("validation_status"),
+            "handoff_status": handoff.get("handoff_status"),
+        },
+        "authoritative_evidence": {
+            "transaction_manifest": _compact_evidence_reference(
+                source_run_dir / "transaction_manifest.json",
+                artifact="transaction_manifest",
+                id_key="transaction_id",
+                id_value=transaction_manifest.get("transaction_id"),
+            ),
+            "next_worker_context": _compact_evidence_reference(
+                source_run_dir / "next_worker_context.json",
+                artifact="next_worker_context",
+                id_key="transaction_id",
+                id_value=transaction_manifest.get("transaction_id"),
+            ),
+            "output_validation": _compact_evidence_reference(
+                source_run_dir / "output_validation.json",
+                artifact="output_validation",
+                id_key="validation_id",
+                id_value=validation.get("validation_id"),
+            ) | {"attempt_id": validation.get("attempt_id")},
+            "handoff_packet": _compact_evidence_reference(
+                source_run_dir / "handoff_packet.json",
+                artifact="handoff_packet",
+                id_key="handoff_id",
+                id_value=handoff.get("handoff_id"),
+            ),
+            "review_decision": _compact_evidence_reference(
+                source_run_dir / "review_decision.json",
+                artifact="review_decision",
+                id_key="decision_id",
+                id_value=review.get("decision_id"),
+            ),
+        },
+        "compact_claims": compact_claims,
+        "unsupported_claims": [],
+        "boundaries": [
+            "This compact handoff is derived context, not authority.",
+            "Every material claim in the compact packet must be traceable to preserved evidence.",
+            "A receiver must re-resolve the preserved evidence references before relying on the compact packet.",
+        ],
+    }
+
+    for claim in compact_claims:
+        if claim["claim_type"] not in {
+            "transaction_id",
+            "run_id",
+            "repository_root",
+            "repository_commit",
+            "objective",
+            "allowed_targets",
+            "held_targets",
+            "next_step_scope",
+            "validation_status",
+            "handoff_status",
+            "review_decision",
+        }:
+            raise VerifiedCompactHandoffError(f"unsupported claim type in compact handoff: {claim['claim_type']}")
+
+    verification = verify_verified_compact_handoff_context(compact, source_run_dir=source_run_dir)
+    compact["verification"] = verification
+
+    compact_dir = output_dir if output_dir is not None else source_run_dir
+    compact_dir.mkdir(parents=True, exist_ok=True)
+    compact_path = compact_dir / "verified_compact_handoff_context.json"
+    _write_json(compact_path, compact)
+    compact["verified_compact_handoff_context_path"] = str(compact_path)
+    return compact
+
+
+def verify_verified_compact_handoff_context(
+    compact_context: dict[str, Any],
+    *,
+    source_run_dir: Path,
+) -> dict[str, Any]:
+    if compact_context.get("schema_version") != VERIFIED_COMPACT_HANDOFF_CONTEXT_SCHEMA:
+        raise VerifiedCompactHandoffError("compact handoff schema_version is unsupported")
+    transaction_manifest = _read_json(source_run_dir / "transaction_manifest.json", kind="transaction manifest")
+    next_worker_context = _read_json(source_run_dir / "next_worker_context.json", kind="next-worker context")
+    validation = _read_json(source_run_dir / "output_validation.json", kind="output validation")
+    handoff = _read_json(source_run_dir / "handoff_packet.json", kind="handoff packet")
+    review = _read_json(source_run_dir / "review_decision.json", kind="review decision")
+
+    diagnostics: list[str] = []
+    protected_state = compact_context.get("critical_state")
+    if not isinstance(protected_state, dict):
+        raise VerifiedCompactHandoffError("compact handoff critical_state must be an object")
+
+    checks = [
+        ("source_transaction_id", transaction_manifest.get("transaction_id")),
+        ("source_run_id", transaction_manifest.get("run_id")),
+        ("objective", next_worker_context.get("handoff", {}).get("next_step_objective")),
+        ("allowed_targets", next_worker_context.get("constraints", {}).get("allowed_targets")),
+        ("held_targets", next_worker_context.get("constraints", {}).get("held_targets")),
+        ("next_step_scope", next_worker_context.get("constraints", {}).get("next_step_scope")),
+        ("review_decision", review.get("decision")),
+        ("validation_status", validation.get("validation_status")),
+        ("handoff_status", handoff.get("handoff_status")),
+    ]
+    for field, expected in checks:
+        if protected_state.get(field) != expected:
+            diagnostics.append(f"{field} mismatch")
+
+    evidence = compact_context.get("authoritative_evidence")
+    if not isinstance(evidence, dict):
+        raise VerifiedCompactHandoffError("compact handoff authoritative_evidence must be an object")
+    required_evidence_keys = {"transaction_manifest", "next_worker_context", "output_validation", "handoff_packet", "review_decision"}
+    missing = sorted(required_evidence_keys - set(evidence))
+    if missing:
+        raise VerifiedCompactHandoffError(f"compact handoff missing evidence references: {', '.join(missing)}")
+
+    validation_ref = evidence["output_validation"]
+    if not isinstance(validation_ref, dict):
+        raise VerifiedCompactHandoffError("output_validation evidence reference must be an object")
+    resolved_validation = resolve_output_validation_reference(
+        validation_ref=OutputValidationRef.from_dict(validation_ref) if hasattr(OutputValidationRef, "from_dict") else OutputValidationRef(**validation_ref),
+        expected_validation_status="passed",
+        expected_attempt_id=validation.get("attempt_id"),
+        expected_validation_id=validation.get("validation_id"),
+    )
+    if not resolved_validation.policy_usable:
+        diagnostics.extend(resolved_validation.diagnostics)
+
+    repository_binding = compact_context.get("repository_binding")
+    if repository_binding != next_worker_context.get("repository_binding"):
+        diagnostics.append("repository binding mismatch")
+
+    compact_claims = compact_context.get("compact_claims")
+    if not isinstance(compact_claims, list) or not compact_claims:
+        raise VerifiedCompactHandoffError("compact handoff compact_claims must be a non-empty list")
+    allowed_claims = {
+        "transaction_id",
+        "run_id",
+        "repository_root",
+        "repository_commit",
+        "objective",
+        "allowed_targets",
+        "held_targets",
+        "next_step_scope",
+        "validation_status",
+        "handoff_status",
+        "review_decision",
+    }
+    for claim in compact_claims:
+        if not isinstance(claim, dict):
+            raise VerifiedCompactHandoffError("compact handoff claims must be objects")
+        claim_type = claim.get("claim_type")
+        if claim_type not in allowed_claims:
+            raise VerifiedCompactHandoffError(f"unsupported claim type in compact handoff: {claim_type!r}")
+        if claim_type == "repository_commit" and claim.get("value") != repository_binding.get("commit_sha"):
+            diagnostics.append("repository commit mismatch")
+        if claim_type == "repository_root" and claim.get("value") != repository_binding.get("repository_root"):
+            diagnostics.append("repository root mismatch")
+        if claim_type == "validation_status" and claim.get("value") != "passed":
+            diagnostics.append("validation status mismatch")
+
+    policy_usable = not diagnostics and resolved_validation.policy_usable and bool(compact_context.get("boundaries"))
+    if not policy_usable:
+        diagnostics.append("compact handoff not usable for policy consumption")
+    return {
+        "artifact_integrity": True,
+        "critical_state_preserved": not diagnostics,
+        "evidence_resolved": True,
+        "policy_usable": policy_usable,
+        "diagnostics": diagnostics,
+        "resolved_validation": resolved_validation.as_dict(),
+    }
 
 
 def render_next_worker_context(context: dict[str, Any]) -> str:
