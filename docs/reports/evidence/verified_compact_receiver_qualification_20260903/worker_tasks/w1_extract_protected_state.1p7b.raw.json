@@ -1,0 +1,36 @@
+{
+ "choices": [
+  {
+   "finish_reason": "stop",
+   "index": 0,
+   "message": {
+    "role": "assistant",
+    "content": "{\n  \"source_transaction_id\": \"orch_manual_20260903t061953z\",\n  \"source_run_id\": \"manual_supervised_attempt_20260903t061953z\",\n  \"objective\": \"Draft the receiver-side re-resolution checklist for a verified compact handoff context: list which preserved artifacts a fresh receiving agent must re-resolve before relying on the compact packet, citing only preserved run artifacts.\",\n  \"allowed_targets\": [\n    \"docs/\"\n  ],\n  \"held_targets\": [\n    \"production automation\",\n    \"automatic curriculum capture\",\n    \"automatic promotion\"\n  ],\n  \"next_step_scope\": \"bounded_supervised_input_only\",\n  \"review_decision\": \"accepted\",\n  \"validation_status\": \"passed\",\n  \"handoff_status\": \"prepared\",\n  \"repository_commit\": \"a32d0b55e8bf516eb173d1c1a410ba3ee4ee2083\"\n}"
+   }
+  }
+ ],
+ "created": 1788417087,
+ "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+ "system_fingerprint": "b9314-d55fb9717",
+ "object": "chat.completion",
+ "usage": {
+  "completion_tokens": 220,
+  "prompt_tokens": 1992,
+  "total_tokens": 2212,
+  "prompt_tokens_details": {
+   "cached_tokens": 3
+  }
+ },
+ "id": "chatcmpl-55exmgCYXER2ZuQh9F8sjs2dZigUsI3W",
+ "timings": {
+  "cache_n": 3,
+  "prompt_n": 1989,
+  "prompt_ms": 7342.021,
+  "prompt_per_token_ms": 3.691312719959779,
+  "prompt_per_second": 270.90633491786525,
+  "predicted_n": 220,
+  "predicted_ms": 24493.01,
+  "predicted_per_token_ms": 111.33186363636364,
+  "predicted_per_second": 8.982154500406443
+ }
+}

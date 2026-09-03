@@ -1,0 +1,123 @@
+{
+  "report_type": "verified_compact_receiver_qualification_20260903.v1",
+  "experiment": "cross-model receiving-agent qualification of zth.verified_compact_handoff_context.v0.1",
+  "source_transaction": {
+    "created_through": "real supervised transaction path (run_manual_supervised_attempt prepare -> call-local -> ingest), not pytest fixtures",
+    "transaction_id": "orch_manual_20260903t061953z",
+    "run_id": "manual_supervised_attempt_20260903t061953z",
+    "bounded_task": "Inspect docs/reports/verified_handoff_context_compaction_20260903.md and identify exactly one fail-closed verification behavior, citing only that file path",
+    "lifecycle_state": "HANDOFF",
+    "repository_binding": {
+      "branch": "main",
+      "commit_sha": "a32d0b55e8bf516eb173d1c1a410ba3ee4ee2083",
+      "commit_subject": "Add verified handoff context compaction",
+      "equals_head_at_run_time": true
+    },
+    "accepted_worker": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "accepted_finding": "fail-closed behavior: altered identities are rejected, cited to docs/reports/verified_handoff_context_compaction_20260903.md",
+    "durable_source_run": "docs/reports/evidence/verified_compact_receiver_qualification_20260903/source_run",
+    "next_worker_objective": "Draft the receiver-side re-resolution checklist for a verified compact handoff context: list which preserved artifacts a fresh receiving agent must re-resolve before relying on the compact packet, citing only preserved run artifacts."
+  },
+  "compact_packet": {
+    "schema_version": "zth.verified_compact_handoff_context.v0.1",
+    "path": "docs/reports/evidence/verified_compact_receiver_qualification_20260903/source_run/verified_compact_handoff_context.json",
+    "sha256": "4869193f4a78efd3e5db6eb04c064fec1036bd39210a0491091a5266e7cfed75",
+    "bytes": 5874,
+    "generation": "built by local_harness.transaction_handoff.build_verified_compact_handoff_context from the durable source run; not manually rewritten",
+    "verification": {
+      "policy_usable": true,
+      "critical_state_preserved": true,
+      "evidence_resolved": true,
+      "diagnostics": []
+    }
+  },
+  "receiver_reconstruction": {
+    "record": "docs/reports/evidence/verified_compact_receiver_qualification_20260903/receiver_reconstruction.json",
+    "items_recovered": 11,
+    "directly_present_in_compact_context": 10,
+    "recovered_through_authoritative_reference": 1,
+    "inference_required": 0,
+    "notes": "repository identity recovered from repository_binding because the dedicated repository_root claim is null-valued (see insufficiencies)"
+  },
+  "executable_qualification": {
+    "repository_binding_resolved": true,
+    "bound_commit_exists": true,
+    "bound_commit_equals_head": true,
+    "all_five_evidence_sha256_match": true,
+    "output_validation_recovered": {
+      "validation_status": "passed",
+      "validation_id": "manual_validation_20260903t062739z",
+      "attempt_id": "model_attempt_20260903t062739z",
+      "acceptance_status": "not_reviewed"
+    },
+    "valid_but_wrong_disambiguation": "output_validation.failed_3.json (same record shape, same directory) is distinguishable on sha256, validation_id, attempt_id, and validation_status; the packet reference cannot be redirected to it without verification failure"
+  },
+  "adversarial_qualification": {
+    "record": "docs/reports/evidence/verified_compact_receiver_qualification_20260903/adversarial_results.json",
+    "verification_weakened": false,
+    "cases": [
+      {"case": "dropped critical reference (output_validation)", "outcome": "fail_closed_hard_error"},
+      {"case": "altered identity (source_transaction_id)", "outcome": "rejected", "policy_usable": false},
+      {"case": "unsupported claim (promotion_authorized)", "outcome": "fail_closed_hard_error"},
+      {"case": "valid-but-wrong evidence (failed_3 with its own correct sha256 and ids)", "outcome": "rejected", "policy_usable": false, "diagnostic_count": 5},
+      {"case": "control (untampered packet)", "outcome": "qualified", "policy_usable": true}
+    ]
+  },
+  "continuation_test": {
+    "next_bounded_action": "Prepare a separate supervised recipient run for the intended next worker (Qwen3-Coder-30B-A3B-Instruct) executing the packet objective (draft the receiver-side re-resolution checklist), requiring output validation and explicit review before any downstream use; do not redo the previous worker task; no promotion or automation authority",
+    "action_performed": false,
+    "justifying_packet_fields": [
+      "critical_state.objective",
+      "critical_state.next_step_scope = bounded_supervised_input_only",
+      "critical_state.review_decision = accepted",
+      "critical_state.validation_status = passed",
+      "critical_state.handoff_status = prepared",
+      "critical_state.allowed_targets = [docs/]",
+      "critical_state.held_targets = [production automation, automatic curriculum capture, automatic promotion]",
+      "repository_binding (recipient-run machinery exists at bound commit)"
+    ],
+    "justifying_references": [
+      "authoritative_evidence.output_validation -> recovered validation_status passed with matching validation_id/attempt_id",
+      "authoritative_evidence.handoff_packet -> next_step_type = next_supervised_step_input",
+      "authoritative_evidence.next_worker_context -> selected_next_worker_identity = Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "authoritative_evidence.review_decision -> decision = accepted"
+    ]
+  },
+  "local_worker_data": {
+    "source_run_worker_chain": [
+      {"step": 1, "worker": "1.7B (Qwen_Qwen3-1.7B-Q4_K_M.gguf)", "assignment": "original evidence-observation prompt (estimated 1407 prompt tokens, full evidence packet, no truncation)", "result": "three findings, all citing hallucinated evidence path 'evidence_sources/byte_length'", "qualification": "failed", "failure_mode": "evidence-path hallucination; validator rejected unprojected citations (3 diagnostics)", "evidence": "raw_model_output.failed_1.txt, output_validation.failed_1.json"},
+      {"step": 2, "worker": "1.7B", "assignment": "supervised retry prompt 1 (~4554 chars, validator diagnostics + previous output)", "result": "verbatim repeat of the same hallucinated path", "qualification": "failed", "failure_mode": "no contract repair under diagnostic feedback; same defect repeated", "evidence": "raw_model_output.failed_2.txt, output_validation.failed_2.json, retry_prompt_to_paste_1.md"},
+      {"step": 3, "worker": "30B (Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf) [escalation]", "escalation_reason": "two consecutive 1.7B failures on the same defect with useful delegated work remaining", "assignment": "supervised retry prompt 2 (same shape as retry 1)", "result": "contract-valid JSON with empty findings; refused to fabricate evidence absent from the retry prompt", "qualification": "failed", "failure_mode": "honest non-completion; validator requires at least one finding; supervisor disposition revision_requested (preserved as review_decision.revision_requested_30b_empty_findings.json)", "evidence": "raw_model_output.failed_3.txt, output_validation.failed_3.json, retry_prompt_to_paste_2.md"},
+      {"step": 4, "worker": "30B [supervisor revision: original evidence prompt restored]", "assignment": "original evidence-observation prompt (prompt_to_paste.md restored byte-identical from evidence_projection.md)", "result": "exactly one finding citing the fail-closed 'altered identities are rejected' behavior with the correct evidence path", "qualification": "passed and accepted by supervisor", "failure_mode": "none", "evidence": "raw_model_output.txt, output_validation.json, review_decision.json"}
+    ],
+    "receiver_delegation_tasks": [
+      {"task": "w1_extract_protected_state", "worker": "1.7B", "prompt_tokens": 1992, "success_criteria": "all nine critical_state fields plus repository_commit exactly matched", "qualification": "passed", "failure_mode": "none", "raw": "worker_tasks/w1_extract_protected_state.1p7b.raw.json"},
+      {"task": "w2_identify_supporting_reference", "worker": "1.7B", "prompt_tokens": 1971, "success_criteria": "correct artifact_kind, artifact_ref, validation_id, attempt_id", "qualification": "passed", "failure_mode": "none", "raw": "worker_tasks/w2_identify_supporting_reference.1p7b.raw.json"},
+      {"task": "w3a_action_supported_check", "worker": "1.7B", "prompt_tokens": 2004, "success_criteria": "correct verdict AND accurate justifying fields AND accurate missing_state", "qualification": "failed", "failure_mode": "verdict correct but fabricated missing_state listing eight fields that are present in the packet", "raw": "worker_tasks/w3a_action_supported_check.1p7b.raw.json"},
+      {"task": "w3a_action_supported_check [escalation]", "worker": "30B", "prompt_tokens": 2000, "escalation_reason": "1.7B qualification failure with useful delegated work remaining (correct receiver-side justification under test)", "result": "supported=true, justifying_fields limited to real objective/validation/review/handoff-status fields, missing_state=[]", "qualification": "passed", "supervisor_disposition": "30B escalation supplied the qualified justification; 1.7B failure retained as capability evidence", "raw": "worker_tasks/w3a_action_supported_check.30b.raw.json"},
+      {"task": "w3b_action_unsupported_check", "worker": "1.7B", "prompt_tokens": 1960, "success_criteria": "correct verdict citing real packet state without fabrication", "qualification": "passed", "failure_mode": "none (strongest contradiction, held target 'automatic promotion', not cited; verdict still correct)", "raw": "worker_tasks/w3b_action_unsupported_check.1p7b.raw.json"},
+      {"task": "w4_discrepancy_detection (tampered packet: validation_status flipped to failed against referenced artifact)", "worker": "1.7B", "prompt_tokens": 2638, "success_criteria": "detect mismatch, name both values, prescribe fail-closed rejection", "qualification": "passed", "failure_mode": "none", "raw": "worker_tasks/w4_discrepancy_detection.1p7b.raw.json"}
+    ],
+    "supervisor_correction_burden": "source run: two 1.7B contract failures, one 30B honest-non-completion, one supervisor prompt revision before acceptance; delegation tasks: one 1.7B justification failure requiring 30B escalation"
+  },
+  "insufficiencies": [
+    {"issue": "repository_root claim is null-valued", "classification": "compaction defect (cosmetic, non-blocking)", "why_it_matters": "the claim says it sources repository_root from next_worker_context.repository_binding.repository_root, but the binding stores the root under 'path'; the claim therefore carries null", "should_have_been_protected": "the claim should carry the binding's path value", "reference_could_supply": "yes: repository_binding.path is present in the same packet", "receiver_impact": "none: repository identity fully recovered from repository_binding; verification passes because both compared values are null"},
+    {"issue": "no authoritative reference to the prepared continuation artifact (next_worker_continuation.md)", "classification": "reference defect (minor)", "why_it_matters": "the next bounded action dispatches the prepared continuation to the intended next worker; the packet references the transaction manifest, next-worker context, output validation, handoff packet, and review decision, but not the continuation prompt itself", "should_have_been_protected": "arguably yes: a continuation reference would remove the receiver's dependence on same-directory convention or deterministic regeneration", "reference_could_supply": "partially: the continuation is deterministically regenerable from two referenced artifacts (transaction_manifest + next_worker_context) using machinery at the bound commit, and it sits in the same directory as the referenced artifacts", "receiver_impact": "low: the objective, scope, statuses, and selected next worker are all present, so the next bounded action is determinable; locating the exact continuation prompt requires one same-directory convention step or deterministic regeneration"}
+  ],
+  "validation": {
+    "verified_compaction_tests": "5 passed (tests/test_transaction_handoff.py -k compact)",
+    "full_transaction_handoff_and_evidence_typing_tests": "64 passed, 2 failed",
+    "failed_tests_note": "test_handoff_completion_cli_* fail in this environment from a pre-existing subprocess import issue (ModuleNotFoundError: local_harness); both pass with PYTHONPATH set to the repository root; unrelated to this experiment; no code was modified",
+    "untampered_packet_verification": "policy_usable=true, diagnostics=[]"
+  },
+  "cross_model_verdict": {
+    "classification": "qualified for fresh-agent continuation",
+    "rationale": "a fresh GLM receiver recovered all eleven state targets from the compact packet and its references with zero inference; every executable reference resolved with matching sha256; the repository and exact commit resolved and matched HEAD; the material validation claim was recovered from the referenced artifact; the next bounded action was determined from packet state and references; all four tampered cases failed closed while the untampered control passed; the two defects found (null repository_root claim, missing continuation reference) are non-blocking for continuation planning"
+  },
+  "closeout": {
+    "committed": false,
+    "pushed": false,
+    "continuation_action_performed": false,
+    "note": "evidence is durable on disk under docs/reports/ and docs/reports/evidence/; commit/push and continuation execution await separate authorization"
+  }
+}

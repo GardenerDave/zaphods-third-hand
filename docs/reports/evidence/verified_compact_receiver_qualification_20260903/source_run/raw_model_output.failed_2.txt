@@ -1,0 +1,32 @@
+{
+  "findings": [
+    {
+      "claim": "The compact packet ensures that the source transaction and run identity are preserved during compaction.",
+      "evidence": [
+        {
+          "detail": "The compact packet explicitly derives from the preserved authoritative evidence, ensuring that the source transaction and run identity survive.",
+          "path": "evidence_sources/byte_length"
+        }
+      ]
+    },
+    {
+      "claim": "The compact packet maintains the repository binding integrity during compaction.",
+      "evidence": [
+        {
+          "detail": "The repository binding is preserved and not altered during the compaction process.",
+          "path": "evidence_sources/byte_length"
+        }
+      ]
+    },
+    {
+      "claim": "The compact packet ensures that the output-validation evidence still resolves as expected.",
+      "evidence": [
+        {
+          "detail": "The output-validation evidence still resolves and the expected validation status is recovered from the preserved artifact.",
+          "path": "evidence_sources/byte_length"
+        }
+      ]
+    }
+  ],
+  "reason": "The compact packet is explicitly derived from the preserved authoritative evidence, ensuring that the source transaction and run identity survive. The repository binding is preserved and not altered during the compaction process. The output-validation evidence still resolves and the expected validation status is recovered from the preserved artifact."
+}

@@ -1,0 +1,14 @@
+{
+  "format": "json",
+  "required_fields": [
+    "allowed_targets",
+    "held_targets",
+    "scope_expansion_required",
+    "final_content",
+    "unresolved_items",
+    "format",
+    "required_fields_present",
+    "reason"
+  ],
+  "requires_reason": true
+}

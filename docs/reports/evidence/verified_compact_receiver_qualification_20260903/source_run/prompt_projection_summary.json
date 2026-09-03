@@ -1,0 +1,36 @@
+{
+  "canonical_output_contract_path": "canonical_output_contract.json",
+  "canonical_output_contract_sha256": "1591c8401207e630a2b525b212a7858a59c95ecb560ce180a152f7691b186994",
+  "canonical_selected_prompt_patches": [
+    "scope_boundary_v1",
+    "placeholder_leakage_v1",
+    "output_contract_v1"
+  ],
+  "evidence_budget": {
+    "any_source_excluded": false,
+    "any_source_truncated": false,
+    "available_prompt_tokens": 6780,
+    "diagnostic": "estimated prompt tokens 1407 within available budget 6780 (limit 8192, reserve 900, overhead 512)",
+    "estimated_prompt_tokens": 1407,
+    "estimation_method": "ceil(prompt_characters / 4)",
+    "overhead_tokens": 512,
+    "prompt_token_budget": 8192,
+    "response_reserve_tokens": 900,
+    "status": "passed",
+    "supplied_evidence_characters": 2257,
+    "supplied_excerpt_characters": 2257
+  },
+  "evidence_output_contract_sha256": "1743ee802e7aca0da79185c9845fc36d2452798742da6b163fadcfb2f203134f",
+  "evidence_projection_md_path": "evidence_projection.md",
+  "evidence_projection_path": "evidence_projection.json",
+  "evidence_source_count": 1,
+  "explicitly_excluded_prompt_patches": [],
+  "explicitly_included_prompt_patches": [],
+  "final_selected_prompt_patches": [
+    "scope_boundary_v1",
+    "placeholder_leakage_v1",
+    "output_contract_v1"
+  ],
+  "projected_output_contract_path": "output_contract.json",
+  "projected_output_contract_sha256": "1743ee802e7aca0da79185c9845fc36d2452798742da6b163fadcfb2f203134f"
+}

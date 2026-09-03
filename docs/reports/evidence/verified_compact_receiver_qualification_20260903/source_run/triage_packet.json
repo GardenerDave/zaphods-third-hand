@@ -1,0 +1,43 @@
+{
+  "allowed_targets": [
+    "docs/"
+  ],
+  "bounded_outputs": [
+    "docs_update_packet"
+  ],
+  "confidence": "medium",
+  "held_targets": [
+    "production automation",
+    "automatic curriculum capture",
+    "automatic promotion"
+  ],
+  "messy_input": "Inspect docs/reports/verified_handoff_context_compaction_20260903.md and identify exactly one fail-closed verification behavior that the verified compact handoff context enforces. Cite only the file path docs/reports/verified_handoff_context_compaction_20260903.md in evidence.path. Return one bounded finding and a minimal reason.",
+  "normalized_intent": "Deterministic routing of messy input to documentation_planning_workflow (matched keywords: docs).",
+  "output_contract": {
+    "format": "json",
+    "requires_reason": true
+  },
+  "provenance": {
+    "matched_keywords": [
+      "docs"
+    ],
+    "router_rule_id": "route_docs_update",
+    "source": "manual_supervised_attempt_prepare"
+  },
+  "reason": "Deterministic keyword routing produced a bounded recommendation for supervised review. No execution, promotion, training, or curriculum authority is granted.",
+  "recommended_prompt_patches": [
+    "scope_boundary_v1",
+    "placeholder_leakage_v1",
+    "output_contract_v1"
+  ],
+  "recommended_workflow": "documentation_planning_workflow",
+  "requires_clarification": false,
+  "risk_flags": [],
+  "task_type": "docs_update",
+  "triage_id": "triage_manual_20260903t061953z",
+  "validation_hooks": [
+    "allowed_held_target_separation",
+    "required_reason",
+    "no_execution_authority"
+  ]
+}

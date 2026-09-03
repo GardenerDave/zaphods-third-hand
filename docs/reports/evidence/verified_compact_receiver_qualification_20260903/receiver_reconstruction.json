@@ -1,0 +1,112 @@
+{
+  "record_type": "verified_compact_receiver_reconstruction.v1",
+  "compact_packet": {
+    "path": "docs/reports/evidence/verified_compact_receiver_qualification_20260903/source_run/verified_compact_handoff_context.json",
+    "sha256": "4869193f4a78efd3e5db6eb04c064fec1036bd39210a0491091a5266e7cfed75",
+    "schema_version": "zth.verified_compact_handoff_context.v0.1"
+  },
+  "recovered_items": [
+    {
+      "item": "source transaction identity",
+      "value": "orch_manual_20260903t061953z",
+      "source": "directly present in compact context (critical_state.source_transaction_id)"
+    },
+    {
+      "item": "source run identity",
+      "value": "manual_supervised_attempt_20260903t061953z",
+      "source": "directly present in compact context (critical_state.source_run_id)"
+    },
+    {
+      "item": "repository identity",
+      "value": {
+        "path": "/home/navigator/agent-workspace/zaphods-third-hand",
+        "branch": "main"
+      },
+      "source": "directly present in compact context (repository_binding)"
+    },
+    {
+      "item": "exact relevant commit",
+      "value": "a32d0b55e8bf516eb173d1c1a410ba3ee4ee2083",
+      "source": "directly present in compact context (repository_binding.commit_sha)"
+    },
+    {
+      "item": "current/next objective",
+      "value": "Draft the receiver-side re-resolution checklist for a verified compact handoff context: list which preserved artifacts a fresh receiving agent must re-resolve before relying on the compact packet, citing only preserved run artifacts.",
+      "source": "directly present in compact context (critical_state.objective)"
+    },
+    {
+      "item": "allowed targets",
+      "value": [
+        "docs/"
+      ],
+      "source": "directly present in compact context (critical_state.allowed_targets)"
+    },
+    {
+      "item": "held targets",
+      "value": [
+        "production automation",
+        "automatic curriculum capture",
+        "automatic promotion"
+      ],
+      "source": "directly present in compact context (critical_state.held_targets)"
+    },
+    {
+      "item": "next-step scope",
+      "value": "bounded_supervised_input_only",
+      "source": "directly present in compact context (critical_state.next_step_scope)"
+    },
+    {
+      "item": "validation status",
+      "value": "passed",
+      "source": "directly present; verified through authoritative reference (output_validation)"
+    },
+    {
+      "item": "handoff status",
+      "value": "prepared",
+      "source": "directly present; verified through authoritative reference (handoff_packet)"
+    },
+    {
+      "item": "review decision",
+      "value": "accepted",
+      "source": "directly present; verified through authoritative reference (review_decision)"
+    },
+    {
+      "item": "evidence for material validation claim",
+      "value": {
+        "artifact_ref": "docs/reports/evidence/verified_compact_receiver_qualification_20260903/source_run/output_validation.json",
+        "validation_id": "manual_validation_20260903t062739z",
+        "attempt_id": "model_attempt_20260903t062739z"
+      },
+      "source": "recovered through authoritative reference"
+    }
+  ],
+  "inference_required": "none for the eleven recovery targets; repository identity recovered from repository_binding because the dedicated repository_root claim is null-valued (compaction defect, non-blocking)",
+  "executable_resolution": {
+    "repository_binding_resolved": true,
+    "bound_commit_exists": true,
+    "bound_commit_equals_head": true,
+    "bound_commit_subject": "Add verified handoff context compaction",
+    "evidence_sha256_matches": {
+      "handoff_packet": true,
+      "next_worker_context": true,
+      "output_validation": true,
+      "review_decision": true,
+      "transaction_manifest": true
+    },
+    "output_validation_recovered": {
+      "validation_status": "passed",
+      "validation_id": "manual_validation_20260903t062739z",
+      "attempt_id": "model_attempt_20260903t062739z",
+      "acceptance_status": "not_reviewed"
+    },
+    "valid_but_wrong_sibling_distinguishable": {
+      "artifact": "output_validation.failed_3.json",
+      "distinguished_by": [
+        "sha256",
+        "validation_id",
+        "attempt_id",
+        "validation_status=failed"
+      ]
+    }
+  }
+}

@@ -1,0 +1,270 @@
+{
+  "authority_boundaries": [
+    "Local model call is not command execution authority.",
+    "Local model call is not file modification authority.",
+    "No automatic patch promotion authority is granted.",
+    "No automatic training authority is granted.",
+    "No default failure-to-curriculum capture authority is granted.",
+    "Ingest and explicit review are required before downstream use."
+  ],
+  "call_status": "completed",
+  "endpoint": "http://192.168.1.16:8080/v1",
+  "max_tokens": 1024,
+  "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "prompt_length": 5626,
+  "prompt_path": "prompt_to_paste.md",
+  "prompt_sha256": "a19922343342f24d52055d4cfd514125364c628d7a3acdfd3e5c96353ce6f177",
+  "raw_output_length": 613,
+  "raw_output_path": "raw_model_output.txt",
+  "raw_output_sha256": "cfdd8163a65822a776a733f81f0f6b3b7817ddb8235d2883ef34260bc1adfa97",
+  "request_body_length": 6745,
+  "request_body_sha256": "53097a7f12ff7ba4412a7e78f4871776a8d580d8472f291bdf852003d5f07c74",
+  "request_provenance": {
+    "api": "openai-chat",
+    "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "endpoint": "http://192.168.1.16:8080/v1",
+    "max_tokens": 1024,
+    "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "prompt_length": 5626,
+    "prompt_path": "prompt_to_paste.md",
+    "prompt_sha256": "a19922343342f24d52055d4cfd514125364c628d7a3acdfd3e5c96353ce6f177",
+    "request_body_length": 6745,
+    "request_body_sha256": "53097a7f12ff7ba4412a7e78f4871776a8d580d8472f291bdf852003d5f07c74",
+    "request_url": "http://192.168.1.16:8080/v1/chat/completions",
+    "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "response_format": {
+      "json_schema": {
+        "name": "zth_structured_output",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "findings": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "claim": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "confidence": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "evidence": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "detail": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "path": {
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "path",
+                        "detail"
+                      ],
+                      "type": "object"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "claim",
+                  "evidence"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "reason": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "findings",
+            "reason"
+          ],
+          "type": "object"
+        },
+        "strict": true
+      },
+      "type": "json_schema"
+    },
+    "structured_output_enabled": true,
+    "structured_output_mechanism": "openai_json_schema",
+    "temperature": 0
+  },
+  "response_provenance": {
+    "endpoint_response": {
+      "created": 1788416796,
+      "finish_reason": "stop",
+      "id": "chatcmpl-uOKaN1bvObpnkUAvTDBRoaRlqCeURe31",
+      "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "response_body_sha256": "b019a9c3d9cb4eb1b7d9c5ee97a401b7c3aef5eb3b009b6742c9a6503f35ec7e",
+      "response_status": 200,
+      "system_fingerprint": "b9314-d55fb9717",
+      "usage": {
+        "completion_tokens": 135,
+        "prompt_tokens": 1350,
+        "total_tokens": 1485
+      }
+    },
+    "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "raw_output_length": 613,
+    "raw_output_path": "raw_model_output.txt",
+    "raw_output_sha256": "cfdd8163a65822a776a733f81f0f6b3b7817ddb8235d2883ef34260bc1adfa97",
+    "structured_output": {
+      "enabled": true,
+      "mechanism": "openai_json_schema",
+      "response_format": {
+        "json_schema": {
+          "name": "zth_structured_output",
+          "schema": {
+            "additionalProperties": false,
+            "properties": {
+              "findings": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "claim": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "confidence": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "evidence": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "detail": {
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "path": {
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "path",
+                          "detail"
+                        ],
+                        "type": "object"
+                      },
+                      "minItems": 1,
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "claim",
+                    "evidence"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "reason": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "findings",
+              "reason"
+            ],
+            "type": "object"
+          },
+          "strict": true
+        },
+        "type": "json_schema"
+      },
+      "schema_length": 1203,
+      "schema_path": "response_schema.json",
+      "schema_sha256": "d3ac717dc26f5ad807d8389163c88952cfcaea04cd60a5f8bba3586752d9687c",
+      "schema_source_path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/response_schema.json"
+    }
+  },
+  "review_required": true,
+  "source": "local_openai_compatible_endpoint",
+  "structured_output": {
+    "enabled": true,
+    "mechanism": "openai_json_schema",
+    "response_format": {
+      "json_schema": {
+        "name": "zth_structured_output",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "findings": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "claim": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "confidence": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "evidence": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "detail": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "path": {
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "path",
+                        "detail"
+                      ],
+                      "type": "object"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "claim",
+                  "evidence"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "reason": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "findings",
+            "reason"
+          ],
+          "type": "object"
+        },
+        "strict": true
+      },
+      "type": "json_schema"
+    },
+    "schema_length": 1203,
+    "schema_path": "response_schema.json",
+    "schema_sha256": "d3ac717dc26f5ad807d8389163c88952cfcaea04cd60a5f8bba3586752d9687c",
+    "schema_source_path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/response_schema.json"
+  },
+  "temperature": 0
+}

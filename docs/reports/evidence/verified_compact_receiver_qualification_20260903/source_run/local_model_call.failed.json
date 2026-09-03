@@ -1,0 +1,23 @@
+{
+  "authority_boundaries": [
+    "Failed local model call is evidence, not acceptance.",
+    "No command execution authority is granted.",
+    "No file modification authority is granted.",
+    "No patch promotion authority is granted.",
+    "No automatic training authority is granted.",
+    "No default failure-to-curriculum capture authority is granted.",
+    "Ingest and explicit review are required before downstream use."
+  ],
+  "call_status": "failed",
+  "endpoint": "http://192.168.1.16:8081/v1",
+  "error_message": "local endpoint timed out: timed out",
+  "failure_reason": "timeout",
+  "max_tokens": 1024,
+  "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+  "prompt_path": "prompt_to_paste.md",
+  "raw_output_path": "raw_model_output.txt",
+  "review_required": true,
+  "source": "local_openai_compatible_endpoint",
+  "temperature": 0,
+  "timeout_seconds": 30
+}

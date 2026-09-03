@@ -1,0 +1,41 @@
+{
+  "record_type": "verified_compact_adversarial_qualification.v1",
+  "verification_weakened": false,
+  "cases": [
+    {
+      "case": "dropped critical reference (output_validation)",
+      "outcome": "fail_closed_hard_error",
+      "error": "compact handoff missing evidence references: output_validation"
+    },
+    {
+      "case": "altered identity (source_transaction_id)",
+      "outcome": "rejected",
+      "policy_usable": false,
+      "diagnostics": [
+        "source_transaction_id mismatch",
+        "compact handoff not usable for policy consumption"
+      ]
+    },
+    {
+      "case": "unsupported claim (promotion_authorized)",
+      "outcome": "fail_closed_hard_error",
+      "error": "unsupported claim type in compact handoff: 'promotion_authorized'"
+    },
+    {
+      "case": "valid-but-wrong evidence (failed_3 artifact with its own correct sha256 and ids)",
+      "outcome": "rejected",
+      "policy_usable": false,
+      "diagnostics": [
+        "validation_status mismatch",
+        "attempt_id mismatch",
+        "validation_id mismatch",
+        "validation artifact not usable for policy consumption",
+        "compact handoff not usable for policy consumption"
+      ]
+    }
+  ],
+  "control_untampered": {
+    "policy_usable": true,
+    "diagnostics": []
+  }
+}

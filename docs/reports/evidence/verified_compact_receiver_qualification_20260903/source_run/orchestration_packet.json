@@ -1,0 +1,60 @@
+{
+  "allowed_targets": [
+    "docs/"
+  ],
+  "authority_boundaries": [
+    "no_automatic_patch_promotion",
+    "no_automatic_training",
+    "no_default_failure_to_curriculum_capture",
+    "no_direct_file_modification_authority",
+    "no_execution_authority"
+  ],
+  "held_targets": [
+    "production automation",
+    "automatic curriculum capture",
+    "automatic promotion"
+  ],
+  "orchestration_id": "orch_manual_20260903t061953z",
+  "output_contract": {
+    "format": "json",
+    "requires_reason": true
+  },
+  "provenance": {
+    "selected_patch_ids": [
+      "scope_boundary_v1",
+      "placeholder_leakage_v1",
+      "output_contract_v1"
+    ],
+    "selected_patch_statuses": {
+      "output_contract_v1": "candidate",
+      "placeholder_leakage_v1": "candidate",
+      "scope_boundary_v1": "candidate"
+    },
+    "source": "orchestration_assembler",
+    "triage_id": "triage_manual_20260903t061953z",
+    "triage_packet_provenance": {
+      "matched_keywords": [
+        "docs"
+      ],
+      "router_rule_id": "route_docs_update",
+      "source": "manual_supervised_attempt_prepare"
+    }
+  },
+  "recommended_workflow": "documentation_planning_workflow",
+  "rendered_patch_deltas": "## Applied Prompt Patches\n\n### Patch: scope_boundary_v1 (candidate)\n\nOnly include targets explicitly listed in allowed_targets. Related or plausible files must go in held_targets.\n\nRequired output fields: allowed_targets, held_targets, scope_expansion_required, reason\n\n### Patch: placeholder_leakage_v1 (candidate)\n\nReplace every template placeholder with real content before finishing. If a value is unknown, write 'unknown' plus the reason it is unknown. Do not emit angle-bracket placeholders, TODO stubs, or lorem-ipsum text in the final output.\n\nRequired output fields: final_content, unresolved_items, reason\n\n### Patch: output_contract_v1 (candidate)\n\nReturn exactly one output in the declared contract format. Include every required field, even when its value is empty or unknown. Do not add fields that grant authority. Do not wrap the structured output in commentary.\n\nRequired output fields: format, required_fields_present, reason\n\nThese patches constrain output shape only. They grant no execution,\npromotion, training, or curriculum-capture authority.\n",
+  "review_required": true,
+  "risk_flags": [],
+  "selected_prompt_patches": [
+    "scope_boundary_v1",
+    "placeholder_leakage_v1",
+    "output_contract_v1"
+  ],
+  "source_summary": "Deterministic routing of messy input to documentation_planning_workflow (matched keywords: docs).",
+  "task_type": "docs_update",
+  "triage_id": "triage_manual_20260903t061953z",
+  "validation_hooks": [
+    "allowed_held_target_separation",
+    "required_reason",
+    "no_execution_authority"
+  ]
+}

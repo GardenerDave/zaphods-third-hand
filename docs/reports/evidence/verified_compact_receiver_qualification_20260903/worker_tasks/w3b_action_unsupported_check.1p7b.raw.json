@@ -1,0 +1,36 @@
+{
+ "choices": [
+  {
+   "finish_reason": "stop",
+   "index": 0,
+   "message": {
+    "role": "assistant",
+    "content": "{\n  \"supported\": false,\n  \"justification\": \"The compact packet does not support the action of automatically promoting the accepted previous-worker output into repository commit authority without a further review step. The 'repository_commit' claim is present, but the 'handoff_status' is 'prepared', which indicates the compact packet is not yet authorized to be used for repository commit authority. The 'review_decision' is 'accepted', but the action requires a further review step, which is not provided in the packet.\"\n}"
+   }
+  }
+ ],
+ "created": 1788417159,
+ "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+ "system_fingerprint": "b9314-d55fb9717",
+ "object": "chat.completion",
+ "usage": {
+  "completion_tokens": 104,
+  "prompt_tokens": 1960,
+  "total_tokens": 2064,
+  "prompt_tokens_details": {
+   "cached_tokens": 38
+  }
+ },
+ "id": "chatcmpl-yoFOd8kBwU47MXkazBWABJ8IGOB92m8j",
+ "timings": {
+  "cache_n": 38,
+  "prompt_n": 1922,
+  "prompt_ms": 7146.875,
+  "prompt_per_token_ms": 3.7184573361082207,
+  "prompt_per_second": 268.9287275907302,
+  "predicted_n": 104,
+  "predicted_ms": 11111.437,
+  "predicted_per_token_ms": 106.84074038461539,
+  "predicted_per_second": 9.359725479251694
+ }
+}

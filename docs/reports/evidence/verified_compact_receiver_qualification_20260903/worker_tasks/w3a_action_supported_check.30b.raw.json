@@ -1,0 +1,36 @@
+{
+ "choices": [
+  {
+   "finish_reason": "stop",
+   "index": 0,
+   "message": {
+    "role": "assistant",
+    "content": "{\n  \"supported\": true,\n  \"justifying_fields\": [\n    \"compact_claims.objective\",\n    \"compact_claims.validation_status\",\n    \"compact_claims.review_decision\",\n    \"compact_claims.handoff_status\",\n    \"critical_state.objective\",\n    \"critical_state.validation_status\",\n    \"critical_state.review_decision\",\n    \"critical_state.handoff_status\"\n  ],\n  \"missing_state\": []\n}"
+   }
+  }
+ ],
+ "created": 1788417200,
+ "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+ "system_fingerprint": "b9314-d55fb9717",
+ "object": "chat.completion",
+ "usage": {
+  "completion_tokens": 86,
+  "prompt_tokens": 2000,
+  "total_tokens": 2086,
+  "prompt_tokens_details": {
+   "cached_tokens": 3
+  }
+ },
+ "id": "chatcmpl-jqEKX5f2F1xGI1f4ZY32ghHNgBpZtFI3",
+ "timings": {
+  "cache_n": 3,
+  "prompt_n": 1997,
+  "prompt_ms": 4805.534,
+  "prompt_per_token_ms": 2.4063765648472706,
+  "prompt_per_second": 415.5625576678887,
+  "predicted_n": 86,
+  "predicted_ms": 2383.066,
+  "predicted_per_token_ms": 27.71006976744186,
+  "predicted_per_second": 36.087963992604486
+ }
+}

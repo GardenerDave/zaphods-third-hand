@@ -1,0 +1,83 @@
+{
+  "created_at": "2026-09-03T06:19:53Z",
+  "evidence_references": [
+    {
+      "artifact": "repository_root",
+      "branch": "main",
+      "commit_sha": "a32d0b55e8bf516eb173d1c1a410ba3ee4ee2083",
+      "path": "/home/navigator/agent-workspace/zaphods-third-hand",
+      "resolved_commit_sha": "a32d0b55e8bf516eb173d1c1a410ba3ee4ee2083"
+    },
+    {
+      "artifact": "run_manifest",
+      "path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/run_manifest.json",
+      "sha256": "ed0743c772e6505303dfd37161988baccbab47e636e30976e76bb81e59335513"
+    },
+    {
+      "artifact": "model_prompt_packet",
+      "path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/model_prompt_packet.md",
+      "sha256": "16a7cb03a224677e9374565d8b653a7c87df15d04a0b3bc0c2500d83dfe68244"
+    },
+    {
+      "artifact": "raw_model_output",
+      "path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/raw_model_output.txt",
+      "sha256": "cfdd8163a65822a776a733f81f0f6b3b7817ddb8235d2883ef34260bc1adfa97"
+    },
+    {
+      "artifact": "supervised_model_attempt",
+      "attempt_id": "model_attempt_20260903t062739z",
+      "path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/supervised_model_attempt.json",
+      "sha256": "360d9bc256747baf3e44f2a957d3564545c385d9712cf39868876dec26c653ec"
+    },
+    {
+      "artifact": "output_validation",
+      "path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/output_validation.json",
+      "sha256": "7d91d01a28d4fe3b84960dda70ffb0a77acfa013a9725f953074d26ef67e9d0b",
+      "validation_id": "manual_validation_20260903t062739z"
+    },
+    {
+      "artifact": "review_decision",
+      "decision_id": "manual_decision_20260903t062739z",
+      "path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/review_decision.json",
+      "sha256": "a72788cec880a3f0282444977f5860a8c7f58fbedafd531f3045a1d7a12acf7e"
+    },
+    {
+      "artifact": "downstream_use_gate",
+      "gate_id": "manual_gate_20260903t062739z",
+      "path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/downstream_use_gate.json",
+      "sha256": "2eed75591e995b71b59674d85706deecbb258d48e8c20c35d68680af283699de"
+    },
+    {
+      "artifact": "handoff_packet",
+      "handoff_id": "manual_handoff_20260903t062739z",
+      "path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/handoff_packet.json",
+      "sha256": "34c64c7ae04c69d202db30d33534a213b57b333e38d5db945457e8254c473359"
+    }
+  ],
+  "first_worker_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "intended_next_worker_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "lifecycle_state": "HANDOFF",
+  "records": {
+    "attempt_id": "model_attempt_20260903t062739z",
+    "decision_id": "manual_decision_20260903t062739z",
+    "gate_id": "manual_gate_20260903t062739z",
+    "handoff_id": "manual_handoff_20260903t062739z",
+    "validation_id": "manual_validation_20260903t062739z"
+  },
+  "repository_reference": {
+    "artifact": "repository_root",
+    "branch": "main",
+    "commit_sha": "a32d0b55e8bf516eb173d1c1a410ba3ee4ee2083",
+    "path": "/home/navigator/agent-workspace/zaphods-third-hand",
+    "resolved_commit_sha": "a32d0b55e8bf516eb173d1c1a410ba3ee4ee2083"
+  },
+  "run_id": "manual_supervised_attempt_20260903t061953z",
+  "schema_version": "zth.transaction_manifest.v0.1",
+  "task_reference": {
+    "orchestration_id": "orch_manual_20260903t061953z",
+    "prompt_packet_id": "prompt_packet_manual_20260903t061953z",
+    "triage_id": "triage_manual_20260903t061953z"
+  },
+  "transaction_id": "orch_manual_20260903t061953z",
+  "updated_at": "2026-09-03T06:27:39.299730Z"
+}

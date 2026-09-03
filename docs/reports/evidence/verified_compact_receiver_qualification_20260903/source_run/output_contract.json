@@ -1,0 +1,8 @@
+{
+  "format": "json",
+  "required_fields": [
+    "findings",
+    "reason"
+  ],
+  "requires_reason": true
+}

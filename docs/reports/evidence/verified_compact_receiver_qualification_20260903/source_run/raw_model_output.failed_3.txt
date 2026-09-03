@@ -1,0 +1,4 @@
+{
+  "findings": [],
+  "reason": "No findings could be generated because the cited evidence paths are not in the projected evidence set. The allowed targets do not include any evidence sources that support the claims made in the previous attempt."
+}

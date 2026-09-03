@@ -1,0 +1,23 @@
+{
+  "artifacts": {
+    "canonical_output_contract": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/canonical_output_contract.json",
+    "evidence_projection": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/evidence_projection.json",
+    "evidence_projection_md": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/evidence_projection.md",
+    "messy_input": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/messy_input.txt",
+    "model_prompt_packet": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/model_prompt_packet.md",
+    "operator_instructions": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/operator_instructions.txt",
+    "orchestration_packet": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/orchestration_packet.json",
+    "output_contract": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/output_contract.json",
+    "prompt_projection_summary": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/prompt_projection_summary.json",
+    "prompt_to_paste": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/prompt_to_paste.md",
+    "response_schema": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/response_schema.json",
+    "triage_packet": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/triage_packet.json"
+  },
+  "created_at": "2026-09-03T06:19:53Z",
+  "orchestration_id": "orch_manual_20260903t061953z",
+  "prompt_packet_id": "prompt_packet_manual_20260903t061953z",
+  "report_type": "manual_supervised_attempt_run_manifest.v1",
+  "run_id": "manual_supervised_attempt_20260903t061953z",
+  "run_status": "prepared",
+  "triage_id": "triage_manual_20260903t061953z"
+}

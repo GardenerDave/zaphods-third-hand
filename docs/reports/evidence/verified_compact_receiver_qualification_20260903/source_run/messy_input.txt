@@ -1,0 +1,1 @@
+Inspect docs/reports/verified_handoff_context_compaction_20260903.md and identify exactly one fail-closed verification behavior that the verified compact handoff context enforces. Cite only the file path docs/reports/verified_handoff_context_compaction_20260903.md in evidence.path. Return one bounded finding and a minimal reason.

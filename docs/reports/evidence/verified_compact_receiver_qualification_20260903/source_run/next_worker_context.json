@@ -1,0 +1,204 @@
+{
+  "authority_boundaries": {
+    "attempt": [
+      "No command execution authority is granted.",
+      "No direct file modification authority is granted.",
+      "No automatic patch promotion authority is granted.",
+      "No automatic training authority is granted.",
+      "No default failure-to-curriculum capture authority is granted.",
+      "Human review is required before downstream use."
+    ],
+    "decision": [
+      "Review decision is not command execution authority.",
+      "No direct file modification authority is granted.",
+      "No automatic patch promotion authority is granted.",
+      "No automatic training authority is granted.",
+      "No default failure-to-curriculum capture authority is granted.",
+      "Downstream use must remain supervised."
+    ],
+    "gate": [
+      "Downstream-use gate is not command execution authority.",
+      "Downstream-use gate is not file modification authority.",
+      "Downstream-use gate is not patch application authority.",
+      "No automatic patch promotion authority is granted.",
+      "No automatic training authority is granted.",
+      "No default failure-to-curriculum capture authority is granted.",
+      "Downstream use must remain supervised."
+    ],
+    "handoff": [
+      "Handoff packet is not command execution authority.",
+      "Handoff packet is not file modification authority.",
+      "Handoff packet is not patch application authority.",
+      "No automatic patch promotion authority is granted.",
+      "No automatic training authority is granted.",
+      "No default failure-to-curriculum capture authority is granted.",
+      "Next step must remain supervised."
+    ],
+    "validation": [
+      "Validation is evidence, not acceptance.",
+      "No command execution authority is granted.",
+      "No direct file modification authority is granted.",
+      "No automatic patch promotion authority is granted.",
+      "No automatic training authority is granted.",
+      "No default failure-to-curriculum capture authority is granted.",
+      "Human review is required before downstream use."
+    ]
+  },
+  "constraints": {
+    "allowed_targets": [
+      "docs/"
+    ],
+    "authority_boundaries": [
+      "Handoff packet is not command execution authority.",
+      "Handoff packet is not file modification authority.",
+      "Handoff packet is not patch application authority.",
+      "No automatic patch promotion authority is granted.",
+      "No automatic training authority is granted.",
+      "No default failure-to-curriculum capture authority is granted.",
+      "Next step must remain supervised."
+    ],
+    "handoff_reason": "Handoff remains supervised and bounded by downstream-use gate status.",
+    "held_targets": [
+      "production automation",
+      "automatic curriculum capture",
+      "automatic promotion"
+    ],
+    "next_step_scope": "bounded_supervised_input_only"
+  },
+  "downstream_use_gate": {
+    "gate_id": "manual_gate_20260903t062739z",
+    "gate_reason": "Downstream use remains bounded to supervised next-step input handling.",
+    "gate_status": "allowed"
+  },
+  "evidence_references": [
+    {
+      "artifact": "repository_root",
+      "branch": "main",
+      "commit_sha": "a32d0b55e8bf516eb173d1c1a410ba3ee4ee2083",
+      "path": "/home/navigator/agent-workspace/zaphods-third-hand",
+      "resolved_commit_sha": "a32d0b55e8bf516eb173d1c1a410ba3ee4ee2083"
+    },
+    {
+      "artifact": "run_manifest",
+      "path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/run_manifest.json",
+      "sha256": "ed0743c772e6505303dfd37161988baccbab47e636e30976e76bb81e59335513"
+    },
+    {
+      "artifact": "model_prompt_packet",
+      "path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/model_prompt_packet.md",
+      "sha256": "16a7cb03a224677e9374565d8b653a7c87df15d04a0b3bc0c2500d83dfe68244"
+    },
+    {
+      "artifact": "raw_model_output",
+      "path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/raw_model_output.txt",
+      "sha256": "cfdd8163a65822a776a733f81f0f6b3b7817ddb8235d2883ef34260bc1adfa97"
+    },
+    {
+      "artifact": "supervised_model_attempt",
+      "attempt_id": "model_attempt_20260903t062739z",
+      "path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/supervised_model_attempt.json",
+      "sha256": "360d9bc256747baf3e44f2a957d3564545c385d9712cf39868876dec26c653ec"
+    },
+    {
+      "artifact": "output_validation",
+      "path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/output_validation.json",
+      "sha256": "7d91d01a28d4fe3b84960dda70ffb0a77acfa013a9725f953074d26ef67e9d0b",
+      "validation_id": "manual_validation_20260903t062739z"
+    },
+    {
+      "artifact": "review_decision",
+      "decision_id": "manual_decision_20260903t062739z",
+      "path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/review_decision.json",
+      "sha256": "a72788cec880a3f0282444977f5860a8c7f58fbedafd531f3045a1d7a12acf7e"
+    },
+    {
+      "artifact": "downstream_use_gate",
+      "gate_id": "manual_gate_20260903t062739z",
+      "path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/downstream_use_gate.json",
+      "sha256": "2eed75591e995b71b59674d85706deecbb258d48e8c20c35d68680af283699de"
+    },
+    {
+      "artifact": "handoff_packet",
+      "handoff_id": "manual_handoff_20260903t062739z",
+      "path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/handoff_packet.json",
+      "sha256": "34c64c7ae04c69d202db30d33534a213b57b333e38d5db945457e8254c473359"
+    }
+  ],
+  "first_worker_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "handoff": {
+    "handoff_id": "manual_handoff_20260903t062739z",
+    "handoff_packet_reference": {
+      "artifact": "handoff_packet",
+      "handoff_id": "manual_handoff_20260903t062739z",
+      "path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/handoff_packet.json",
+      "sha256": "34c64c7ae04c69d202db30d33534a213b57b333e38d5db945457e8254c473359"
+    },
+    "handoff_reason": "Handoff remains supervised and bounded by downstream-use gate status.",
+    "handoff_status": "prepared",
+    "next_step_objective": "Draft the receiver-side re-resolution checklist for a verified compact handoff context: list which preserved artifacts a fresh receiving agent must re-resolve before relying on the compact packet, citing only preserved run artifacts.",
+    "next_step_summary": "Use reviewed output as bounded input for the next supervised step."
+  },
+  "lifecycle_state": "HANDOFF",
+  "previous_attempt": {
+    "attempt_id": "model_attempt_20260903t062739z",
+    "result_reference": {
+      "raw_output_artifact": {
+        "artifact": "raw_model_output",
+        "path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/raw_model_output.txt",
+        "sha256": "cfdd8163a65822a776a733f81f0f6b3b7817ddb8235d2883ef34260bc1adfa97"
+      },
+      "raw_output_reference": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/raw_model_output.txt",
+      "raw_output_sha256": "cfdd8163a65822a776a733f81f0f6b3b7817ddb8235d2883ef34260bc1adfa97"
+    }
+  },
+  "ready_for_next_worker": true,
+  "repository_binding": {
+    "artifact": "repository_root",
+    "branch": "main",
+    "commit_sha": "a32d0b55e8bf516eb173d1c1a410ba3ee4ee2083",
+    "path": "/home/navigator/agent-workspace/zaphods-third-hand",
+    "resolved_commit_sha": "a32d0b55e8bf516eb173d1c1a410ba3ee4ee2083"
+  },
+  "review": {
+    "decision": "accepted",
+    "decision_id": "manual_decision_20260903t062739z",
+    "decision_reason": "Supervisor reviewed the raw output against the projected evidence: exactly one bounded finding citing the fail-closed 'altered identities are rejected' verification behavior, evidence path matches the projected evidence file, reason is minimal and accurate. Contract validation passed."
+  },
+  "run_id": "manual_supervised_attempt_20260903t061953z",
+  "schema_version": "zth.next_worker_context.v0.1",
+  "selected_next_worker_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "task_request": "# ZTH Model Prompt Packet\n\n## Role\nYou are a bounded model helper operating inside a supervised ZTH workflow.\n\n## Packet IDs\n- orchestration_id: orch_manual_20260903t061953z\n- triage_id: triage_manual_20260903t061953z\n\n## Task Summary\nDeterministic routing of messy input to documentation_planning_workflow (matched keywords: docs).\n\n## Workflow\n- recommended_workflow: documentation_planning_workflow\n- task_type: docs_update\n\n## Allowed Targets\n- docs/\n\n## Held Targets\n- production automation\n- automatic curriculum capture\n- automatic promotion\n\n## Risk Flags\n- <none>\n\n## Prompt Patch Instructions\n- scope_boundary_v1\n- placeholder_leakage_v1\n- output_contract_v1\n\n### Rendered Patch Deltas\n## Applied Prompt Patches\n\n### Patch: scope_boundary_v1 (candidate)\n\nOnly include targets explicitly listed in allowed_targets. Related or plausible files must go in held_targets.\n\nRequired output fields: allowed_targets, held_targets, scope_expansion_required, reason\n\n### Patch: placeholder_leakage_v1 (candidate)\n\nReplace every template placeholder with real content before finishing. If a value is unknown, write 'unknown' plus the reason it is unknown. Do not emit angle-bracket placeholders, TODO stubs, or lorem-ipsum text in the final output.\n\nRequired output fields: final_content, unresolved_items, reason\n\n### Patch: output_contract_v1 (candidate)\n\nReturn exactly one output in the declared contract format. Include every required field, even when its value is empty or unknown. Do not add fields that grant authority. Do not wrap the structured output in commentary.\n\nRequired output fields: format, required_fields_present, reason\n\nThese patches constrain output shape only. They grant no execution,\npromotion, training, or curriculum-capture authority.\n\n## Output Contract\n```json\n{\n  \"format\": \"json\",\n  \"required_fields\": [\n    \"allowed_targets\",\n    \"held_targets\",\n    \"scope_expansion_required\",\n    \"final_content\",\n    \"unresolved_items\",\n    \"format\",\n    \"required_fields_present\",\n    \"reason\"\n  ],\n  \"requires_reason\": true\n}\n```\n\n## Validation Hooks\n- allowed_held_target_separation\n- required_reason\n- no_execution_authority\n\n## Authority Boundaries\n- no_automatic_patch_promotion\n- no_automatic_training\n- no_default_failure_to_curriculum_capture\n- no_direct_file_modification_authority\n- no_execution_authority\n\n## Required Response Shape\n- Return only JSON matching the output contract.\n- Include a reason field when required.\n- Do not include prose outside the JSON object.\n\n## Review Requirement\n- Human review is required before any downstream model-facing action.\n",
+  "task_state": {
+    "allowed_targets": [
+      "docs/"
+    ],
+    "bounded_task_request": "Inspect docs/reports/verified_handoff_context_compaction_20260903.md and identify exactly one fail-closed verification behavior that the verified compact handoff context enforces. Cite only the file path docs/reports/verified_handoff_context_compaction_20260903.md in evidence.path. Return one bounded finding and a minimal reason.\n",
+    "held_targets": [
+      "production automation",
+      "automatic curriculum capture",
+      "automatic promotion"
+    ],
+    "orchestration_id": "orch_manual_20260903t061953z",
+    "prompt_packet_id": "prompt_packet_manual_20260903t061953z",
+    "run_manifest_path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/run_manifest.json",
+    "source_prompt_packet_path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/model_prompt_packet.md",
+    "task_request": "# ZTH Model Prompt Packet\n\n## Role\nYou are a bounded model helper operating inside a supervised ZTH workflow.\n\n## Packet IDs\n- orchestration_id: orch_manual_20260903t061953z\n- triage_id: triage_manual_20260903t061953z\n\n## Task Summary\nDeterministic routing of messy input to documentation_planning_workflow (matched keywords: docs).\n\n## Workflow\n- recommended_workflow: documentation_planning_workflow\n- task_type: docs_update\n\n## Allowed Targets\n- docs/\n\n## Held Targets\n- production automation\n- automatic curriculum capture\n- automatic promotion\n\n## Risk Flags\n- <none>\n\n## Prompt Patch Instructions\n- scope_boundary_v1\n- placeholder_leakage_v1\n- output_contract_v1\n\n### Rendered Patch Deltas\n## Applied Prompt Patches\n\n### Patch: scope_boundary_v1 (candidate)\n\nOnly include targets explicitly listed in allowed_targets. Related or plausible files must go in held_targets.\n\nRequired output fields: allowed_targets, held_targets, scope_expansion_required, reason\n\n### Patch: placeholder_leakage_v1 (candidate)\n\nReplace every template placeholder with real content before finishing. If a value is unknown, write 'unknown' plus the reason it is unknown. Do not emit angle-bracket placeholders, TODO stubs, or lorem-ipsum text in the final output.\n\nRequired output fields: final_content, unresolved_items, reason\n\n### Patch: output_contract_v1 (candidate)\n\nReturn exactly one output in the declared contract format. Include every required field, even when its value is empty or unknown. Do not add fields that grant authority. Do not wrap the structured output in commentary.\n\nRequired output fields: format, required_fields_present, reason\n\nThese patches constrain output shape only. They grant no execution,\npromotion, training, or curriculum-capture authority.\n\n## Output Contract\n```json\n{\n  \"format\": \"json\",\n  \"required_fields\": [\n    \"allowed_targets\",\n    \"held_targets\",\n    \"scope_expansion_required\",\n    \"final_content\",\n    \"unresolved_items\",\n    \"format\",\n    \"required_fields_present\",\n    \"reason\"\n  ],\n  \"requires_reason\": true\n}\n```\n\n## Validation Hooks\n- allowed_held_target_separation\n- required_reason\n- no_execution_authority\n\n## Authority Boundaries\n- no_automatic_patch_promotion\n- no_automatic_training\n- no_default_failure_to_curriculum_capture\n- no_direct_file_modification_authority\n- no_execution_authority\n\n## Required Response Shape\n- Return only JSON matching the output contract.\n- Include a reason field when required.\n- Do not include prose outside the JSON object.\n\n## Review Requirement\n- Human review is required before any downstream model-facing action.\n",
+    "triage_id": "triage_manual_20260903t061953z"
+  },
+  "transaction_binding": {
+    "attempt_id": "model_attempt_20260903t062739z",
+    "decision_id": "manual_decision_20260903t062739z",
+    "gate_id": "manual_gate_20260903t062739z",
+    "handoff_id": "manual_handoff_20260903t062739z",
+    "raw_output_sha256": "cfdd8163a65822a776a733f81f0f6b3b7817ddb8235d2883ef34260bc1adfa97",
+    "run_id": "manual_supervised_attempt_20260903t061953z",
+    "transaction_id": "orch_manual_20260903t061953z",
+    "validation_id": "manual_validation_20260903t062739z"
+  },
+  "transaction_id": "orch_manual_20260903t061953z",
+  "validation": {
+    "validation_id": "manual_validation_20260903t062739z",
+    "validation_report_reference": "supervised_attempt_output_validation",
+    "validation_status": "passed"
+  }
+}

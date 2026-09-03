@@ -1,0 +1,464 @@
+{
+  "acceptance_status": "not_reviewed",
+  "attempt_id": "model_attempt_20260903t062739z",
+  "authority_boundaries": [
+    "No command execution authority is granted.",
+    "No direct file modification authority is granted.",
+    "No automatic patch promotion authority is granted.",
+    "No automatic training authority is granted.",
+    "No default failure-to-curriculum capture authority is granted.",
+    "Human review is required before downstream use."
+  ],
+  "model_metadata": {
+    "model_id": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "provider": "local_model_call",
+    "request_url": null
+  },
+  "operator_metadata": {
+    "operator": "glm-receiving-supervisor",
+    "review_required": true
+  },
+  "orchestration_id": "orch_manual_20260903t061953z",
+  "output_format_claim": null,
+  "prompt_packet_id": "prompt_packet_manual_20260903t061953z",
+  "provenance": {
+    "acquisition_request_provenance": {
+      "api": "openai-chat",
+      "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "endpoint": "http://192.168.1.16:8080/v1",
+      "max_tokens": 1024,
+      "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "prompt_length": 5626,
+      "prompt_path": "prompt_to_paste.md",
+      "prompt_sha256": "a19922343342f24d52055d4cfd514125364c628d7a3acdfd3e5c96353ce6f177",
+      "request_body_length": 6745,
+      "request_body_sha256": "53097a7f12ff7ba4412a7e78f4871776a8d580d8472f291bdf852003d5f07c74",
+      "request_url": "http://192.168.1.16:8080/v1/chat/completions",
+      "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "response_format": {
+        "json_schema": {
+          "name": "zth_structured_output",
+          "schema": {
+            "additionalProperties": false,
+            "properties": {
+              "findings": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "claim": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "confidence": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "evidence": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "detail": {
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "path": {
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "path",
+                          "detail"
+                        ],
+                        "type": "object"
+                      },
+                      "minItems": 1,
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "claim",
+                    "evidence"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "reason": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "findings",
+              "reason"
+            ],
+            "type": "object"
+          },
+          "strict": true
+        },
+        "type": "json_schema"
+      },
+      "structured_output_enabled": true,
+      "structured_output_mechanism": "openai_json_schema",
+      "temperature": 0
+    },
+    "input_artifact": "model_prompt_packet",
+    "model_call_metadata": {
+      "authority_boundaries": [
+        "Local model call is not command execution authority.",
+        "Local model call is not file modification authority.",
+        "No automatic patch promotion authority is granted.",
+        "No automatic training authority is granted.",
+        "No default failure-to-curriculum capture authority is granted.",
+        "Ingest and explicit review are required before downstream use."
+      ],
+      "call_status": "completed",
+      "endpoint": "http://192.168.1.16:8080/v1",
+      "max_tokens": 1024,
+      "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "prompt_length": 5626,
+      "prompt_path": "prompt_to_paste.md",
+      "prompt_sha256": "a19922343342f24d52055d4cfd514125364c628d7a3acdfd3e5c96353ce6f177",
+      "raw_output_length": 613,
+      "raw_output_path": "raw_model_output.txt",
+      "raw_output_sha256": "cfdd8163a65822a776a733f81f0f6b3b7817ddb8235d2883ef34260bc1adfa97",
+      "request_body_length": 6745,
+      "request_body_sha256": "53097a7f12ff7ba4412a7e78f4871776a8d580d8472f291bdf852003d5f07c74",
+      "request_provenance": {
+        "api": "openai-chat",
+        "configured_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+        "endpoint": "http://192.168.1.16:8080/v1",
+        "max_tokens": 1024,
+        "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+        "prompt_length": 5626,
+        "prompt_path": "prompt_to_paste.md",
+        "prompt_sha256": "a19922343342f24d52055d4cfd514125364c628d7a3acdfd3e5c96353ce6f177",
+        "request_body_length": 6745,
+        "request_body_sha256": "53097a7f12ff7ba4412a7e78f4871776a8d580d8472f291bdf852003d5f07c74",
+        "request_url": "http://192.168.1.16:8080/v1/chat/completions",
+        "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+        "response_format": {
+          "json_schema": {
+            "name": "zth_structured_output",
+            "schema": {
+              "additionalProperties": false,
+              "properties": {
+                "findings": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "claim": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "confidence": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "evidence": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "detail": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "path": {
+                              "minLength": 1,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "path",
+                            "detail"
+                          ],
+                          "type": "object"
+                        },
+                        "minItems": 1,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "claim",
+                      "evidence"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "reason": {
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "findings",
+                "reason"
+              ],
+              "type": "object"
+            },
+            "strict": true
+          },
+          "type": "json_schema"
+        },
+        "structured_output_enabled": true,
+        "structured_output_mechanism": "openai_json_schema",
+        "temperature": 0
+      },
+      "response_provenance": {
+        "endpoint_response": {
+          "created": 1788416796,
+          "finish_reason": "stop",
+          "id": "chatcmpl-uOKaN1bvObpnkUAvTDBRoaRlqCeURe31",
+          "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+          "response_body_sha256": "b019a9c3d9cb4eb1b7d9c5ee97a401b7c3aef5eb3b009b6742c9a6503f35ec7e",
+          "response_status": 200,
+          "system_fingerprint": "b9314-d55fb9717",
+          "usage": {
+            "completion_tokens": 135,
+            "prompt_tokens": 1350,
+            "total_tokens": 1485
+          }
+        },
+        "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+        "raw_output_length": 613,
+        "raw_output_path": "raw_model_output.txt",
+        "raw_output_sha256": "cfdd8163a65822a776a733f81f0f6b3b7817ddb8235d2883ef34260bc1adfa97",
+        "structured_output": {
+          "enabled": true,
+          "mechanism": "openai_json_schema",
+          "response_format": {
+            "json_schema": {
+              "name": "zth_structured_output",
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "findings": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "claim": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "confidence": {
+                          "minLength": 1,
+                          "type": "string"
+                        },
+                        "evidence": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "detail": {
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              "path": {
+                                "minLength": 1,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "path",
+                              "detail"
+                            ],
+                            "type": "object"
+                          },
+                          "minItems": 1,
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "claim",
+                        "evidence"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "reason": {
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "findings",
+                  "reason"
+                ],
+                "type": "object"
+              },
+              "strict": true
+            },
+            "type": "json_schema"
+          },
+          "schema_length": 1203,
+          "schema_path": "response_schema.json",
+          "schema_sha256": "d3ac717dc26f5ad807d8389163c88952cfcaea04cd60a5f8bba3586752d9687c",
+          "schema_source_path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/response_schema.json"
+        }
+      },
+      "review_required": true,
+      "source": "local_openai_compatible_endpoint",
+      "structured_output": {
+        "enabled": true,
+        "mechanism": "openai_json_schema",
+        "response_format": {
+          "json_schema": {
+            "name": "zth_structured_output",
+            "schema": {
+              "additionalProperties": false,
+              "properties": {
+                "findings": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "claim": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "confidence": {
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "evidence": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "detail": {
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "path": {
+                              "minLength": 1,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "path",
+                            "detail"
+                          ],
+                          "type": "object"
+                        },
+                        "minItems": 1,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "claim",
+                      "evidence"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "reason": {
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "findings",
+                "reason"
+              ],
+              "type": "object"
+            },
+            "strict": true
+          },
+          "type": "json_schema"
+        },
+        "schema_length": 1203,
+        "schema_path": "response_schema.json",
+        "schema_sha256": "d3ac717dc26f5ad807d8389163c88952cfcaea04cd60a5f8bba3586752d9687c",
+        "schema_source_path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/response_schema.json"
+      },
+      "temperature": 0
+    },
+    "model_call_metadata_path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/local_model_call.json",
+    "model_call_metadata_sha256": "7060a0ec2e95805ad6f86f37203bfa3bf2d226238b28405eac78a616dd592260",
+    "raw_output_length": 613,
+    "raw_output_preserved": true,
+    "raw_output_sha256": "cfdd8163a65822a776a733f81f0f6b3b7817ddb8235d2883ef34260bc1adfa97",
+    "raw_output_source_path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/raw_model_output.txt",
+    "run_manifest_path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/run_manifest.json",
+    "source": "captured_model_output",
+    "structured_output": {
+      "enabled": true,
+      "mechanism": "openai_json_schema",
+      "response_format": {
+        "json_schema": {
+          "name": "zth_structured_output",
+          "schema": {
+            "additionalProperties": false,
+            "properties": {
+              "findings": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "claim": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "confidence": {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "evidence": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "detail": {
+                            "minLength": 1,
+                            "type": "string"
+                          },
+                          "path": {
+                            "minLength": 1,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "path",
+                          "detail"
+                        ],
+                        "type": "object"
+                      },
+                      "minItems": 1,
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "claim",
+                    "evidence"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "reason": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "findings",
+              "reason"
+            ],
+            "type": "object"
+          },
+          "strict": true
+        },
+        "type": "json_schema"
+      },
+      "schema_length": 1203,
+      "schema_path": "response_schema.json",
+      "schema_sha256": "d3ac717dc26f5ad807d8389163c88952cfcaea04cd60a5f8bba3586752d9687c",
+      "schema_source_path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/response_schema.json"
+    },
+    "transport_qualification_ref": null,
+    "transport_qualification_scope": null
+  },
+  "raw_model_output": "{\n  \"findings\": [\n    {\n      \"claim\": \"The verified compact handoff context enforces a fail-closed verification behavior that rejects altered identities.\",\n           \"evidence\": [\n        {\n          \"detail\": \"Verification is fail-closed and checks: ... altered identities are rejected.\",\n          \"path\": \"docs/reports/verified_handoff_context_compaction_20260903.md\"\n        }\n      ]\n    }\n  ],\n  \"reason\": \"The evidence explicitly states that the fail-closed verification process includes a check for 'altered identities are rejected,' which directly corresponds to the identified fail-closed behavior.\"\n}",
+  "source_prompt_packet_path": ".work/receiver_qualification_20260903/source_run/20260903T061953Z/model_prompt_packet.md",
+  "triage_id": "triage_manual_20260903t061953z",
+  "validation_status": "not_validated"
+}
