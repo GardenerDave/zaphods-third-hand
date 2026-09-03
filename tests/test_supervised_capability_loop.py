@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 import local_harness.supervised_capability_loop as loop
-from local_harness.icm_call import _request_provenance
+from local_harness.icm_call import _render_request_payload
 from local_harness.icm_spec import WorkerResponse, resolve_worker_spec
 from local_harness.prompt_patch_library import PromptPatchLibrary
 from local_harness.supervised_capability_loop import aggregate_scorecard, run_capability_loop
@@ -241,7 +241,7 @@ def test_transport_raw_evidence_is_durable_and_content_is_not_capability_failure
 
 def test_worker_request_provenance_contains_replay_fingerprint_without_private_url():
     spec = resolve_worker_spec("router", base_url="http://endpoint.invalid/v1", model="small-1.7b")
-    provenance = _request_provenance(spec, "Return JSON.", 128)
+    _, _, _, _, provenance = _render_request_payload(spec, "Return JSON.", 128, model=spec.model)
     assert provenance["prompt_sha256"]
     assert provenance["message_structure"] == ["system", "user"]
     assert provenance["model"] == "small-1.7b"
