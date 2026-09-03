@@ -929,6 +929,12 @@ def _build_completed_recipient_pair(
         tmp_path,
         next_worker_objective="Produce a bounded downstream comparison report.",
     )
+    build_transaction_handoff_artifacts(run_dir=source_run_dir, next_worker_identity=RECIPIENT_MODEL)
+    build_next_worker_continuation_context(
+        transaction_manifest=json.loads((source_run_dir / "transaction_manifest.json").read_text(encoding="utf-8")),
+        next_worker_context=json.loads((source_run_dir / "next_worker_context.json").read_text(encoding="utf-8")),
+        output_dir=source_run_dir,
+    )
     recipient_dir = tmp_path / "recipient"
     build_worker_b_recipient_run_artifacts(
         source_run_dir=source_run_dir,
@@ -1090,10 +1096,14 @@ def test_verified_compact_handoff_context_preserves_critical_state_and_evidence(
     source_run_dir, _recipient_dir = _build_completed_recipient_pair(tmp_path)
     compact = build_verified_compact_handoff_context(source_run_dir=source_run_dir)
     assert compact["schema_version"] == "zth.verified_compact_handoff_context.v0.1"
+    repository_root_claim = next(claim for claim in compact["compact_claims"] if claim["claim_type"] == "repository_root")
+    assert repository_root_claim["value"] == str(ROOT)
+    assert compact["repository_binding"]["path"] == str(ROOT)
     assert compact["critical_state"]["objective"]
     assert compact["critical_state"]["validation_status"] == "passed"
     assert compact["critical_state"]["handoff_status"] == "prepared"
     assert compact["repository_binding"]["commit_sha"]
+    assert compact["authoritative_evidence"]["next_worker_continuation"]["artifact_ref"].endswith("next_worker_continuation.md")
     assert compact["verification"]["policy_usable"] is True
     assert compact["verification"]["critical_state_preserved"] is True
     assert compact["verification"]["resolved_validation"]["validation_status"] == "passed"
@@ -1131,6 +1141,20 @@ def test_verified_compact_handoff_context_fails_closed_on_altered_identity(tmp_p
     assert "repository commit mismatch" in verification["diagnostics"]
 
 
+def test_verified_compact_handoff_context_fails_closed_on_altered_repository_root_claim(tmp_path: Path) -> None:
+    source_run_dir, _recipient_dir = _build_completed_recipient_pair(tmp_path)
+    compact = build_verified_compact_handoff_context(source_run_dir=source_run_dir)
+    for claim in compact["compact_claims"]:
+        if claim["claim_type"] == "repository_root":
+            claim["value"] = str(source_run_dir / "not-the-root")
+            break
+    from local_harness.transaction_handoff import verify_verified_compact_handoff_context
+
+    verification = verify_verified_compact_handoff_context(compact, source_run_dir=source_run_dir)
+    assert verification["policy_usable"] is False
+    assert "repository root mismatch" in verification["diagnostics"]
+
+
 def test_verified_compact_handoff_context_fails_closed_on_valid_but_wrong_evidence(tmp_path: Path) -> None:
     source_run_dir, _recipient_dir = _build_completed_recipient_pair(tmp_path)
     compact = build_verified_compact_handoff_context(source_run_dir=source_run_dir)
@@ -1146,6 +1170,43 @@ def test_verified_compact_handoff_context_fails_closed_on_valid_but_wrong_eviden
     verification = verify_verified_compact_handoff_context(compact, source_run_dir=source_run_dir)
     assert verification["policy_usable"] is False
     assert any("validation status mismatch" in detail or "validation_status mismatch" in detail for detail in verification["diagnostics"])
+
+
+def test_verified_compact_handoff_context_fails_closed_when_continuation_reference_is_dropped(tmp_path: Path) -> None:
+    source_run_dir, _recipient_dir = _build_completed_recipient_pair(tmp_path)
+    compact = build_verified_compact_handoff_context(source_run_dir=source_run_dir)
+    compact["authoritative_evidence"].pop("next_worker_continuation")
+    from local_harness.transaction_handoff import verify_verified_compact_handoff_context
+
+    with pytest.raises(Exception, match="missing evidence references|compact handoff"):
+        verify_verified_compact_handoff_context(compact, source_run_dir=source_run_dir)
+
+
+def test_verified_compact_handoff_context_fails_closed_on_altered_continuation_bytes(tmp_path: Path) -> None:
+    source_run_dir, _recipient_dir = _build_completed_recipient_pair(tmp_path)
+    compact = build_verified_compact_handoff_context(source_run_dir=source_run_dir)
+    compact["authoritative_evidence"]["next_worker_continuation"]["artifact_sha256"] = "0" * 64
+    from local_harness.transaction_handoff import verify_verified_compact_handoff_context
+
+    verification = verify_verified_compact_handoff_context(compact, source_run_dir=source_run_dir)
+    assert verification["policy_usable"] is False
+    assert "next worker continuation sha256 mismatch" in verification["diagnostics"]
+
+
+def test_verified_compact_handoff_context_fails_closed_on_valid_but_wrong_continuation_artifact(tmp_path: Path) -> None:
+    source_run_dir, _recipient_dir = _build_completed_recipient_pair(tmp_path)
+    compact = build_verified_compact_handoff_context(source_run_dir=source_run_dir)
+    wrong_artifact = source_run_dir / "transaction_manifest.json"
+    compact["authoritative_evidence"]["next_worker_continuation"] = {
+        "artifact_ref": str(wrong_artifact),
+        "artifact_sha256": manual_attempt._sha256_file(wrong_artifact),
+        "transaction_id": compact["source_transaction_id"],
+    }
+    from local_harness.transaction_handoff import verify_verified_compact_handoff_context
+
+    verification = verify_verified_compact_handoff_context(compact, source_run_dir=source_run_dir)
+    assert verification["policy_usable"] is False
+    assert "next worker continuation path mismatch" in verification["diagnostics"]
 
 
 def test_handoff_completion_fails_closed_on_missing_recipient_manifest(tmp_path: Path) -> None:

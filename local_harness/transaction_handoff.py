@@ -916,7 +916,7 @@ def build_verified_compact_handoff_context(
     compact_claims = [
         {"claim_type": "transaction_id", "value": transaction_manifest.get("transaction_id"), "source": "transaction_manifest.transaction_id"},
         {"claim_type": "run_id", "value": transaction_manifest.get("run_id"), "source": "transaction_manifest.run_id"},
-        {"claim_type": "repository_root", "value": repository_binding.get("repository_root"), "source": "next_worker_context.repository_binding.repository_root"},
+        {"claim_type": "repository_root", "value": repository_binding.get("path"), "source": "next_worker_context.repository_binding.path"},
         {"claim_type": "repository_commit", "value": repository_binding.get("commit_sha"), "source": "next_worker_context.repository_binding.commit_sha"},
         {"claim_type": "objective", "value": next_worker_context.get("handoff", {}).get("next_step_objective"), "source": "next_worker_context.handoff.next_step_objective"},
         {"claim_type": "allowed_targets", "value": next_worker_context.get("constraints", {}).get("allowed_targets"), "source": "next_worker_context.constraints.allowed_targets"},
@@ -973,6 +973,12 @@ def build_verified_compact_handoff_context(
                 artifact="review_decision",
                 id_key="decision_id",
                 id_value=review.get("decision_id"),
+            ),
+            "next_worker_continuation": _compact_evidence_reference(
+                source_run_dir / "next_worker_continuation.md",
+                artifact="next_worker_continuation",
+                id_key="transaction_id",
+                id_value=transaction_manifest.get("transaction_id"),
             ),
         },
         "compact_claims": compact_claims,
@@ -1047,7 +1053,14 @@ def verify_verified_compact_handoff_context(
     evidence = compact_context.get("authoritative_evidence")
     if not isinstance(evidence, dict):
         raise VerifiedCompactHandoffError("compact handoff authoritative_evidence must be an object")
-    required_evidence_keys = {"transaction_manifest", "next_worker_context", "output_validation", "handoff_packet", "review_decision"}
+    required_evidence_keys = {
+        "transaction_manifest",
+        "next_worker_context",
+        "output_validation",
+        "handoff_packet",
+        "review_decision",
+        "next_worker_continuation",
+    }
     missing = sorted(required_evidence_keys - set(evidence))
     if missing:
         raise VerifiedCompactHandoffError(f"compact handoff missing evidence references: {', '.join(missing)}")
@@ -1067,6 +1080,27 @@ def verify_verified_compact_handoff_context(
     repository_binding = compact_context.get("repository_binding")
     if repository_binding != next_worker_context.get("repository_binding"):
         diagnostics.append("repository binding mismatch")
+
+    continuation_ref = evidence["next_worker_continuation"]
+    if not isinstance(continuation_ref, dict):
+        raise VerifiedCompactHandoffError("next_worker_continuation evidence reference must be an object")
+    continuation_path_value = continuation_ref.get("artifact_ref")
+    if not isinstance(continuation_path_value, str) or not continuation_path_value.strip():
+        raise VerifiedCompactHandoffError("next_worker_continuation evidence reference must include artifact_ref")
+    continuation_path = Path(continuation_path_value)
+    expected_continuation_path = source_run_dir / "next_worker_continuation.md"
+    if continuation_path.resolve() != expected_continuation_path.resolve():
+        diagnostics.append("next worker continuation path mismatch")
+    if not continuation_path.is_file():
+        diagnostics.append("missing next worker continuation")
+    else:
+        continuation_sha256 = continuation_ref.get("artifact_sha256")
+        if not isinstance(continuation_sha256, str) or not continuation_sha256.strip():
+            raise VerifiedCompactHandoffError("next_worker_continuation evidence reference must include artifact_sha256")
+        if _sha256(continuation_path) != continuation_sha256:
+            diagnostics.append("next worker continuation sha256 mismatch")
+    if continuation_ref.get("transaction_id") != transaction_manifest.get("transaction_id"):
+        diagnostics.append("next worker continuation transaction mismatch")
 
     compact_claims = compact_context.get("compact_claims")
     if not isinstance(compact_claims, list) or not compact_claims:
@@ -1092,7 +1126,7 @@ def verify_verified_compact_handoff_context(
             raise VerifiedCompactHandoffError(f"unsupported claim type in compact handoff: {claim_type!r}")
         if claim_type == "repository_commit" and claim.get("value") != repository_binding.get("commit_sha"):
             diagnostics.append("repository commit mismatch")
-        if claim_type == "repository_root" and claim.get("value") != repository_binding.get("repository_root"):
+        if claim_type == "repository_root" and claim.get("value") != repository_binding.get("path"):
             diagnostics.append("repository root mismatch")
         if claim_type == "validation_status" and claim.get("value") != "passed":
             diagnostics.append("validation status mismatch")
