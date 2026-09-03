@@ -34,6 +34,13 @@ model. Existing packet and runner forms remain valid historical evidence, but
 they should increasingly become generated views or compatibility surfaces
 where a canonical transaction can represent the same work.
 
+The Project Historian is the translation layer between preserved historical
+evidence and the bounded context required by the next consumer. It should
+federate evidence from repositories, reports, experiments, sessions, handoffs,
+qualification evidence, and curated records while retaining provenance, then
+produce bounded representations appropriate for a specific consumer without
+turning compacted context into an authority source.
+
 At system boundaries, ZTH should prefer mature standards and keep its own
 semantics layered on top:
 
@@ -96,6 +103,17 @@ Evidence creation does not itself:
 - promote, approve, rank into a role, or assign a model;
 - certify a model or endpoint as production-ready;
 - approve unattended execution.
+
+Qualification should distinguish three layers that are related but distinct:
+
+- schema-valid handoff: the artifact parses and matches the declared shape;
+- semantically correct handoff: the artifact references the right objects and
+  preserves the intended meaning;
+- executable or reachable handoff: the receiver can actually resolve and use
+  the referenced project objects for the next operation.
+
+Compaction may remove evidence from active context, but it must never become
+the authority for claims that cannot be traced back to preserved evidence.
 
 The correction-aware supervised loop is the clearest end-to-end example of the
 current architecture in practice:

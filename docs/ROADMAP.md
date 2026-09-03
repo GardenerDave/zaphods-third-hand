@@ -84,6 +84,12 @@ The project should increasingly own:
 - teacher / worker learning trajectories;
 - Project Historian integration.
 
+The Project Historian should increasingly act as the trusted translation layer
+between preserved historical evidence and the bounded context required by the
+next agent. That means it should preserve immutable evidence while curating
+conservative, provenance-backed interpretations for distribution into
+task-specific bounded context.
+
 The project should increasingly avoid owning generic infrastructure that
 mature open-source tools or standards can provide. When a standard boundary is
 adopted, ZTH should carry its own authority, provenance, validation,
@@ -97,6 +103,8 @@ Current strategic order:
 1. Bring documentation ingestion and Project Historian integration into the dogfood loop.
 1. Expand into supervised self-hardening on docs, tests, CLI polish, diagnostics, provenance, and evidence packaging.
 1. Reduce operator choreography and improve task/status/review UX around the existing transaction flow.
+1. Add bounded verified handoff/context compaction so compacted context remains traceable back to preserved evidence.
+1. Tighten executable handoff integrity so qualification covers schema-valid, semantically correct, and reachable handoff artifacts.
 1. Accumulate telemetry and scorecard evidence from real dogfood transactions.
 1. Use that evidence for capability-aware, empirical routing.
 1. Explore stewardship and curriculum mechanisms after the dogfood corpus is meaningful.
@@ -137,6 +145,14 @@ without modifying the source transaction manifest. It grants no promotion or
 capability authority. The remaining closeout item is exact durable
 Historian-record capture plus continued repeatability checks on different
 bounded tasks.
+
+Future handoff qualification should extend beyond deserialization and metadata
+completeness. A handoff is only fully qualified when the receiver can resolve
+and use the referenced project objects needed for the next operation, including
+commits, evidence files, test artifacts, repositories, and oversized or oddly
+named paths when relevant. Schema-valid, semantically correct, and executable
+or reachable handoffs are separate qualification layers, and the roadmap
+should aim to qualify all three.
 
 Canonical transaction lifecycle:
 
@@ -220,6 +236,15 @@ Operational telemetry versus Project Historian:
 - Operational telemetry answers, "What is happening right now?"
 - Project Historian answers, "What evidence do we permanently trust about
   what happened?"
+
+The Historian should also be able to federate evidence from repositories,
+reports, experiments, sessions, handoffs, qualification evidence, and curated
+records while retaining provenance. It can then emit bounded representations
+for different consumers, such as handoff packets, project-state summaries,
+"what changed since X?" views, recovery context, architecture-history
+explanations, and provenance-backed memory injection. The Historian is not
+just storage; it is the component that knows where project knowledge came from
+and how later evidence changes its interpretation.
 
 OpenTelemetry plus Langfuse or an equivalent self-hostable system may be
 evaluated for the operational telemetry layer. Historian remains the durable
@@ -318,6 +343,9 @@ Work classification:
   handoff — is now composed into one front door
   (`local_harness/zth_task.py` prepare/status/handoff) that adds no new
   lifecycle or packet format and grants no execution authority.
+- Near-term: verified handoff/context compaction and executable handoff
+  integrity, with conservative Historian curation layered over preserved raw
+  evidence rather than replacing it.
 - Exact Worker-B raw-response capture / joinability closeout: the transaction
   context now carries an explicit binding block that ties the preserved raw
   output to the transaction, review, gate, and handoff IDs for inspection and
@@ -326,7 +354,8 @@ Work classification:
   adapter, the 1.7B -> handoff -> 30B/Codex demonstration, and runtime
   lifecycle consolidation.
 - Research parallel track: semantic escalation research, evaluation
-  framework qualification for new experiments, and operational telemetry
+  framework qualification for new experiments, negative observability tests
+  for disabled or isolated adaptive components, and operational telemetry
   selection.
 - Deferred: durable autonomous scheduling and any scheduler-first expansion.
 
@@ -342,6 +371,26 @@ historical evidence:
   evaluation frameworks for new work;
 - ad hoc telemetry capture that is superseded by a dedicated operational trace
   system.
+
+Project Historian stewardship direction:
+
+- Immutable evidence remains immutable evidence: raw experiment artifacts,
+  session and rollout records, commits, reports, model outputs, tool evidence,
+  preserved failures, and handoff artifacts stay authoritative historical
+  records.
+- Curated Historian interpretation is conservative: it may maintain durable
+  project facts, decisions, relationships, supersession links, current state
+  derived from evidence, unresolved questions, lessons supported by evidence,
+  provenance links, and candidate consolidation or archival relationships.
+- The Historian should recall existing knowledge before promoting a durable
+  record, deduplicate where appropriate, avoid promoting inferred facts as
+  established facts without evidence, and treat "nothing worth promoting" as a
+  valid outcome.
+- Transient state should not automatically become durable project memory, and
+  destructive cleanup is not implicit; consolidation or housekeeping may be
+  proposed separately from execution.
+- Raw supporting evidence must remain recoverable even when a curated record is
+  superseded or consolidated.
 
 ## LARQL Direct Editing Status
 
