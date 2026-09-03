@@ -1,10 +1,10 @@
 # Supervised ZTH Task Front Door V1
 
 - Date: 2026-09-02
-- Status: implemented and tested; the first dogfood maintenance task was
-  prepared through the front door but blocked at the Historian stage, and the
-  blocked attempts are preserved (see the Dogfood section); the
-  insufficiency-outcome repair and the dogfood rerun follow in later commits
+- Status: implemented and tested; the first dogfood preparation attempts
+  blocked at the Historian stage and are preserved (see the Dogfood section);
+  the insufficiency-outcome repair landed, and the dogfood rerun completed
+  end to end — executed with recorded evidence, human review pending
 - Scope: add `local_harness/zth_task.py`, a single supervised front door that
   composes existing proven mechanisms into one bounded workflow from an
   ordinary-language objective to a validated, context-backed, execution-ready
@@ -242,8 +242,24 @@ now records the blocked attempts instead.
 The follow-up repair (`zth.historian_insufficient_context.v0.1`) classifies
 each question as bound, insufficient, or failed — preserving zero-citation
 contract-valid answers as separate non-bound artifacts while true failures
-still block — and the dogfood is rerun through the front door exactly once
-after that repair; the dogfood result is recorded in the dogfood commit.
+still block. The dogfood was then rerun through the front door exactly once:
+
+- preparation reached `READY_FOR_EXECUTION` in one pass
+  (`zth-task-fix-the-pre-existing-rep-3542b8f2`): preflight PASS, 3 Historian
+  questions asked, 3 bound, 0 insufficient, 0 failed, 15 canonical records
+  cited, session validated;
+- execution changed exactly one line in exactly the one allowed file
+  (`docs/DOGFOOD_RUNNER.md:51`: `- auto-promote a model or result` became
+  `- never auto-promote a model or result`, so the prohibition carries its
+  own negation inside the checker's negation window);
+- verification: the three packet-required checks pass, `repo_health_check.py
+  --docs` reports docs links PASS (555 tracked files) and boundary language
+  PASS with zero findings (the pre-existing finding is gone), and
+  `git diff --check` is clean;
+- execution evidence is recorded
+  (`modify-the-boundary-language-in-docs-dogfood-run-f67ac277e7`, stage
+  `executed`, 1 execution); execution evidence is not acceptance, and human
+  review remains pending.
 
 ## Exact capability claim
 

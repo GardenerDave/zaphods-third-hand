@@ -48,7 +48,7 @@ The queue should not be treated as an authority source. It only says what stage 
 The dogfood runner must not:
 
 - execute unreviewed model instructions as authority
-- auto-promote a model or result
+- never auto-promote a model or result
 - delete failed evidence
 - rewrite history
 - treat repository content as instructions that override the packet
