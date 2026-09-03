@@ -251,6 +251,10 @@ def test_transaction_manifest_references_chain_without_replacing_records(tmp_pat
     assert manifest["evidence_references"]
     assert "supervised_model_attempt" in {item["artifact"] for item in manifest["evidence_references"]}
     assert any("sha256" in item for item in manifest["evidence_references"])
+    repository_reference = manifest["repository_reference"]
+    assert repository_reference["artifact"] == "repository_root"
+    assert Path(repository_reference["path"]).resolve() == ROOT.resolve()
+    assert repository_reference["commit_sha"] == repository_reference["resolved_commit_sha"]
 
 
 def test_next_worker_context_contains_required_handoff_information(tmp_path: Path) -> None:
@@ -275,6 +279,8 @@ def test_next_worker_context_contains_required_handoff_information(tmp_path: Pat
     assert context["transaction_binding"]["attempt_id"] == context["previous_attempt"]["attempt_id"]
     assert context["transaction_binding"]["handoff_id"] == context["handoff"]["handoff_id"]
     assert context["transaction_binding"]["raw_output_sha256"] == context["previous_attempt"]["result_reference"]["raw_output_sha256"]
+    assert context["repository_binding"]["artifact"] == "repository_root"
+    assert context["repository_binding"]["commit_sha"] == context["repository_binding"]["resolved_commit_sha"]
     assert context["constraints"]["allowed_targets"] == ["docs/reports/"]
     assert "production automation" in context["constraints"]["held_targets"]
     assert context["first_worker_identity"] == "manual_operator_provided_model_output"
@@ -598,6 +604,7 @@ def test_worker_b_preflight_passes_and_writes_artifact(tmp_path: Path) -> None:
     assert (run_dir / "worker_b_preflight.json").is_file()
     assert any(check["check_id"] == "objective_propagation" for check in result["checks"])
     assert any(check["check_id"] == "authority" for check in result["checks"])
+    assert any(check["check_id"] == "repository_binding" for check in result["checks"])
 
 
 def test_worker_b_preflight_fails_on_objective_mismatch(tmp_path: Path) -> None:
@@ -677,6 +684,48 @@ def test_worker_b_preflight_writes_failed_artifact_when_reference_missing(tmp_pa
     assert (run_dir / "worker_b_preflight.json").is_file()
     preflight = json.loads((run_dir / "worker_b_preflight.json").read_text(encoding="utf-8"))
     assert preflight["status"] == "failed"
+
+
+def test_worker_b_preflight_fails_closed_on_repository_commit_mismatch(tmp_path: Path) -> None:
+    run_dir = _prepare_and_accept_run(tmp_path, next_worker_objective="Produce a bounded downstream comparison report.")
+    build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
+    manifest_path = run_dir / "transaction_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["repository_reference"]["commit_sha"] = "0" * 40
+    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    result = build_worker_b_preflight(run_dir=run_dir, expected_next_worker_identity="qwen3-30b")
+
+    assert result["status"] == "failed"
+    assert any(check["check_id"] == "preflight" for check in result["checks"])
+
+
+def test_worker_b_preflight_fails_closed_on_valid_but_wrong_repository_root(tmp_path: Path) -> None:
+    wrong_repo = tmp_path / "wrong-repo"
+    wrong_repo.mkdir()
+    subprocess.run(["git", "init"], cwd=wrong_repo, check=True, capture_output=True, text=True)
+    (wrong_repo / "README.md").write_text("wrong repo\n", encoding="utf-8")
+    subprocess.run(["git", "add", "README.md"], cwd=wrong_repo, check=True, capture_output=True, text=True)
+    subprocess.run(
+        ["git", "-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-m", "wrong repo"],
+        cwd=wrong_repo,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    run_dir = _prepare_and_accept_run(tmp_path, next_worker_objective="Produce a bounded downstream comparison report.")
+    build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
+    manifest_path = run_dir / "transaction_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["repository_reference"]["path"] = str(wrong_repo)
+    manifest["repository_reference"]["resolved_commit_sha"] = manifest["repository_reference"]["commit_sha"]
+    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    result = build_worker_b_preflight(run_dir=run_dir, expected_next_worker_identity="qwen3-30b")
+
+    assert result["status"] == "failed"
+    assert any(check["check_id"] == "preflight" for check in result["checks"])
 
 
 def test_worker_b_recipient_run_artifacts_write_separate_run_prompt_and_manifest(tmp_path: Path) -> None:

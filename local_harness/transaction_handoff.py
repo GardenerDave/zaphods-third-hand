@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+import subprocess
 from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
@@ -54,6 +55,20 @@ def _read_json(path: Path, *, kind: str) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise TransactionHandoffError(f"{kind} must be a JSON object")
     return payload
+
+
+def _git(repo_root: Path, *args: str) -> str:
+    try:
+        completed = subprocess.run(
+            ["git", *args],
+            cwd=repo_root,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise TransactionHandoffError(f"git {' '.join(args)} failed in {repo_root}: {exc}") from exc
+    return completed.stdout.strip()
 
 
 def _require_nonempty(record: dict[str, Any], key: str, *, kind: str) -> str:
@@ -112,6 +127,60 @@ def _artifact_reference(path: Path, *, artifact: str, id_key: str | None = None,
         reference[id_key] = id_value
     if path.is_file():
         reference["sha256"] = _sha256(path)
+    return reference
+
+
+def _repository_reference(repo_root: Path) -> dict[str, Any]:
+    resolved_root = repo_root.resolve()
+    if not resolved_root.is_dir():
+        raise TransactionHandoffError(f"repository root does not exist: {resolved_root}")
+    commit_sha = _git(resolved_root, "rev-parse", "HEAD")
+    verified_commit = _git(resolved_root, "rev-parse", "--verify", commit_sha)
+    if verified_commit != commit_sha:
+        raise TransactionHandoffError("repository HEAD did not resolve to the expected commit SHA")
+    try:
+        subprocess.run(
+            ["git", "cat-file", "-e", f"{commit_sha}^{{commit}}"],
+            cwd=resolved_root,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise TransactionHandoffError(f"repository commit is not reachable: {commit_sha}") from exc
+    return {
+        "artifact": "repository_root",
+        "path": str(resolved_root),
+        "commit_sha": commit_sha,
+        "resolved_commit_sha": verified_commit,
+        "branch": _git(resolved_root, "branch", "--show-current") or None,
+    }
+
+
+def _require_repository_reference(
+    reference: dict[str, Any], *, kind: str, expected_repo_root: Path | None = None
+) -> dict[str, Any]:
+    if not isinstance(reference, dict):
+        raise TransactionHandoffError(f"{kind} reference must be a JSON object")
+    if reference.get("artifact") != "repository_root":
+        raise TransactionHandoffError(f"{kind} must reference repository_root")
+    path_value = reference.get("path")
+    commit_sha = reference.get("commit_sha")
+    resolved_commit_sha = reference.get("resolved_commit_sha")
+    if not isinstance(path_value, str) or not path_value.strip():
+        raise TransactionHandoffError(f"{kind} reference must include a path")
+    if not isinstance(commit_sha, str) or not commit_sha.strip():
+        raise TransactionHandoffError(f"{kind} reference must include commit_sha")
+    repo_root = Path(path_value)
+    if not repo_root.is_dir():
+        raise TransactionHandoffError(f"missing {kind}: {repo_root}")
+    if expected_repo_root is not None and repo_root.resolve() != expected_repo_root.resolve():
+        raise TransactionHandoffError(f"{kind} path does not match the expected repository root")
+    actual_commit = _git(repo_root, "rev-parse", "--verify", commit_sha)
+    if actual_commit != commit_sha:
+        raise TransactionHandoffError(f"{kind} commit_sha does not resolve to the claimed commit")
+    if not isinstance(resolved_commit_sha, str) or resolved_commit_sha != commit_sha:
+        raise TransactionHandoffError(f"{kind} reference must include the verified resolved_commit_sha")
     return reference
 
 
@@ -366,6 +435,7 @@ def build_next_worker_context(
         "transaction_id": transaction_manifest["transaction_id"],
         "lifecycle_state": transaction_manifest["lifecycle_state"],
         "run_id": transaction_manifest["run_id"],
+        "repository_binding": deepcopy(transaction_manifest["repository_reference"]),
         "transaction_binding": {
             "transaction_id": transaction_manifest["transaction_id"],
             "run_id": transaction_manifest["run_id"],
@@ -509,6 +579,14 @@ def build_worker_b_preflight(
         if transaction_manifest.get("intended_next_worker_identity") != expected_next_worker_identity:
             raise TransactionHandoffError("selected next worker identity mismatch")
         record("next_worker_identity", "passed", "Intended next worker identity matches.")
+
+        repository_reference = transaction_manifest.get("repository_reference")
+        _require_repository_reference(
+            repository_reference,
+            kind="transaction repository",
+            expected_repo_root=Path(__file__).resolve().parents[1],
+        )
+        record("repository_binding", "passed", "Repository root and commit SHA resolve.")
 
         if next_worker_context.get("selected_next_worker_identity") != expected_next_worker_identity:
             raise TransactionHandoffError("next-worker context selected_next_worker_identity mismatch")
@@ -804,6 +882,9 @@ def render_next_worker_context(context: dict[str, Any]) -> str:
         "## Transaction Binding",
         f"```json\n{json.dumps(context['transaction_binding'], indent=2, sort_keys=True)}\n```",
         "",
+        "## Repository Binding",
+        f"```json\n{json.dumps(context['repository_binding'], indent=2, sort_keys=True)}\n```",
+        "",
         "## Evidence References",
         f"```json\n{json.dumps(context['evidence_references'], indent=2, sort_keys=True)}\n```",
         "",
@@ -870,8 +951,10 @@ def build_transaction_handoff_artifacts(
         "source_prompt_packet_path": attempt.get("source_prompt_packet_path"),
         "run_manifest_path": str(run_dir / "run_manifest.json"),
     }
+    repository_reference = _repository_reference(Path(__file__).resolve().parents[1])
 
     evidence_references = [
+        repository_reference,
         _artifact_reference(run_dir / "run_manifest.json", artifact="run_manifest"),
         _artifact_reference(run_dir / "model_prompt_packet.md", artifact="model_prompt_packet"),
         _artifact_reference(run_dir / "raw_model_output.txt", artifact="raw_model_output"),
@@ -896,6 +979,7 @@ def build_transaction_handoff_artifacts(
         created_at=manifest.get("created_at"),
         updated_at=_utc_iso(),
     )
+    transaction_manifest["repository_reference"] = repository_reference
 
     next_worker_context = build_next_worker_context(
         transaction_manifest=transaction_manifest,
@@ -948,6 +1032,13 @@ def build_worker_b_recipient_run_artifacts(
     source_manifest = _read_json(source_run_dir / "transaction_manifest.json", kind="transaction manifest")
     source_context = _read_json(source_run_dir / "next_worker_context.json", kind="next-worker context")
     source_run_manifest = _read_json(source_run_dir / "run_manifest.json", kind="run manifest")
+    source_repository = _require_repository_reference(
+        source_manifest.get("repository_reference"),
+        kind="source transaction repository",
+        expected_repo_root=Path(__file__).resolve().parents[1],
+    )
+    if source_context.get("repository_binding") != source_repository:
+        raise TransactionHandoffError("source next-worker context repository binding does not match transaction manifest")
     recipient_manifest = {
         "schema_version": "zth.recipient_run_manifest.v0.1",
         "source_run_dir": str(source_run_dir),
@@ -965,6 +1056,7 @@ def build_worker_b_recipient_run_artifacts(
             "triage_id": source_run_manifest.get("triage_id"),
             "prompt_packet_id": source_run_manifest.get("prompt_packet_id"),
         },
+        "source_repository": source_repository,
     }
     manifest_path = recipient_run_dir / "recipient_run_manifest.json"
     _write_json(manifest_path, recipient_manifest)
