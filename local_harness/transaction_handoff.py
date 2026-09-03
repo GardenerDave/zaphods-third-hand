@@ -6,10 +6,14 @@ from __future__ import annotations
 import json
 import hashlib
 import subprocess
+import sys
 from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from local_harness.evidence_semantic_typing import OutputValidationRef, resolve_output_validation_reference
 
