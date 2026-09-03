@@ -4,7 +4,8 @@
 - Status: implemented and tested; the first dogfood preparation attempts
   blocked at the Historian stage and are preserved (see the Dogfood section);
   the insufficiency-outcome repair landed, and the dogfood rerun completed
-  end to end — executed with recorded evidence, human review pending
+  end to end — executed with recorded evidence and closed by recorded human
+  acceptance of both the repair and the dogfood (see the Dogfood section)
 - Scope: add `local_harness/zth_task.py`, a single supervised front door that
   composes existing proven mechanisms into one bounded workflow from an
   ordinary-language objective to a validated, context-backed, execution-ready
@@ -258,8 +259,22 @@ still block. The dogfood was then rerun through the front door exactly once:
   `git diff --check` is clean;
 - execution evidence is recorded
   (`modify-the-boundary-language-in-docs-dogfood-run-f67ac277e7`, stage
-  `executed`, 1 execution); execution evidence is not acceptance, and human
-  review remains pending.
+  `executed`, 1 execution); execution evidence is not acceptance.
+
+Human review is recorded for both sessions: the insufficiency-outcome repair
+(`distinguish-historian-insufficiency-from-failure-dc15362ab3`) was accepted
+(`review_20260903t021220z`, reviewer `david`, bound to
+`execution_20260903t020030z`) after verification that bound, insufficient,
+and failed outcomes are distinguished without weakening canonical provenance
+validation and that focused and adjacent tests passed; the dogfood
+(`modify-the-boundary-language-in-docs-dogfood-run-f67ac277e7`) was accepted
+(`review_20260903t021226z`, reviewer `david`, bound to
+`execution_20260903t020650z`) after verification that the task was prepared
+through the front door, reached `READY_FOR_EXECUTION`, changed only the
+bounded documentation target plus this phase report, passed all required
+checks, and removed the specific repo-health boundary-language finding. Both
+session records validate and derive `stage=reviewed` with `review=accepted`;
+the recorded reviews are human-supplied records, not tool decisions.
 
 ## Exact capability claim
 
