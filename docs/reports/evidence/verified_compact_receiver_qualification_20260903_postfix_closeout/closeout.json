@@ -1,0 +1,47 @@
+{
+  "report_type": "verified_compact_receiver_qualification_20260903_postfix_closeout.v1",
+  "implementation_commit": "abbc93d8c1c9c395f50252b3d585eb3f1b9a1672",
+  "source_receiver_qualification": {
+    "transaction_id": "orch_manual_20260903t061953z",
+    "run_id": "manual_supervised_attempt_20260903t061953z",
+    "compact_schema": "zth.verified_compact_handoff_context.v0.1",
+    "repository_root_claim": "/home/navigator/agent-workspace/zaphods-third-hand",
+    "repository_binding_path": "/home/navigator/agent-workspace/zaphods-third-hand",
+    "repository_root_matches_binding": true,
+    "continuation_reference": {
+      "artifact": "next_worker_continuation",
+      "path": "/home/navigator/agent-workspace/zaphods-third-hand/docs/reports/evidence/verified_compact_receiver_qualification_20260903/source_run/next_worker_continuation.md",
+      "sha256": "2cddefb69006ae72cc94c086c0ecf29c028610f4944ca7103144858415074eaa",
+      "bytes_match": true
+    },
+    "verifier": {
+      "policy_usable": true,
+      "diagnostics": []
+    },
+    "adversarial_classes_remain_fail_closed": true
+  },
+  "validation": {
+    "focused_tests": [
+      "PYTHONPATH=/home/navigator/agent-workspace/zaphods-third-hand pytest tests/test_transaction_handoff.py -k 'verified_compact_handoff_context or handoff_completion' -> 21 passed, 30 deselected",
+      "PYTHONPATH=/home/navigator/agent-workspace/zaphods-third-hand pytest tests/test_transaction_handoff.py -k 'transaction_handoff and not verified_compact_handoff_context and not handoff_completion' -> 30 passed, 21 deselected"
+    ],
+    "full_repo_health": {
+      "command": "PYTHONPATH=/home/navigator/agent-workspace/zaphods-third-hand pytest",
+      "result": "collected 3582 items / 1 error",
+      "failure": {
+        "location": "tests/test_supervised_capability_loop.py",
+        "error": "ImportError: cannot import name '_request_provenance' from 'local_harness.icm_call'"
+      }
+    },
+    "known_subprocess_path_issue_without_pythonpath": true
+  },
+  "worker_policy_note": {
+    "new_delegation_performed": false,
+    "meaning": "no new 1.7B/30B delegation was performed in this hardening slice"
+  },
+  "closeout": {
+    "both_receiver_findings_resolved": true,
+    "hardening_milestone_fully_closed": true,
+    "recommended_next_smallest_slice": "Separate the unrelated full-suite import failure in tests/test_supervised_capability_loop.py from the compact-handoff lineage, then restore full-suite green status if desired."
+  }
+}
