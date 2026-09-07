@@ -41,6 +41,11 @@ qualification evidence, and curated records while retaining provenance, then
 produce bounded representations appropriate for a specific consumer without
 turning compacted context into an authority source.
 
+Verified compact handoff context is now an implemented consumer-facing
+representation: it is derived from preserved evidence, fail-closed on missing
+or altered references, and must be re-resolved against authoritative
+artifacts before a fresh receiver relies on it.
+
 At system boundaries, ZTH should prefer mature standards and keep its own
 semantics layered on top:
 
@@ -111,6 +116,14 @@ Qualification should distinguish three layers that are related but distinct:
   preserves the intended meaning;
 - executable or reachable handoff: the receiver can actually resolve and use
   the referenced project objects for the next operation.
+
+Routing and supplier selection should likewise stay split:
+
+- eligibility/capability gate: required interface, authority, availability,
+  window, resource, and freshness constraints are checked first;
+- scheduling/ranking: only eligible suppliers are then compared using empirical
+  scorecards, current pressure, resource telemetry, warm state, latency,
+  request cost, reliability, and authorized operator overrides.
 
 Compaction may remove evidence from active context, but it must never become
 the authority for claims that cannot be traced back to preserved evidence.

@@ -84,6 +84,14 @@ The project should increasingly own:
 - teacher / worker learning trajectories;
 - Project Historian integration.
 
+The September 3 handoff work now also establishes the next layer of
+evidence-backed context handling:
+
+- verified compact handoff context compaction;
+- executable handoff integrity for evidence/test artifact reachability;
+- receiver-side qualification of compact handoff context from preserved
+  evidence references.
+
 The Project Historian should increasingly act as the trusted translation layer
 between preserved historical evidence and the bounded context required by the
 next agent. That means it should preserve immutable evidence while curating
@@ -103,8 +111,6 @@ Current strategic order:
 1. Bring documentation ingestion and Project Historian integration into the dogfood loop.
 1. Expand into supervised self-hardening on docs, tests, CLI polish, diagnostics, provenance, and evidence packaging.
 1. Reduce operator choreography and improve task/status/review UX around the existing transaction flow.
-1. Add bounded verified handoff/context compaction so compacted context remains traceable back to preserved evidence.
-1. Tighten executable handoff integrity so qualification covers schema-valid, semantically correct, and reachable handoff artifacts.
 1. Accumulate telemetry and scorecard evidence from real dogfood transactions.
 1. Use that evidence for capability-aware, empirical routing.
 1. Explore stewardship and curriculum mechanisms after the dogfood corpus is meaningful.
@@ -145,6 +151,19 @@ without modifying the source transaction manifest. It grants no promotion or
 capability authority. The remaining closeout item is exact durable
 Historian-record capture plus continued repeatability checks on different
 bounded tasks.
+
+September 3 evidence tightened the next handoff layer:
+
+- verified compact handoff context compaction now preserves repository
+  binding, protected state, authoritative evidence references, and
+  deterministic claims derived only from preserved evidence;
+- executable handoff qualification now extends to evidence/test artifact
+  reachability, not just file existence or hash identity;
+- compact receiver qualification now demonstrates that a fresh receiving
+  agent can recover the preserved state from the compact packet and its
+  authoritative references with zero inference;
+- the remaining work is to keep these artifacts repeatable on additional
+  bounded tasks, not to rediscover the basic handoff shape.
 
 Future handoff qualification should extend beyond deserialization and metadata
 completeness. A handoff is only fully qualified when the receiver can resolve
@@ -372,6 +391,26 @@ historical evidence:
 - ad hoc telemetry capture that is superseded by a dedicated operational trace
   system.
 
+Near-term routing and fleet direction:
+
+- separate capability eligibility from scheduling so only qualified workers
+  enter selection;
+- keep routing policies pluggable and experimentally comparable against
+  preserved dogfood evidence;
+- treat discovery, trust, engine availability, model inventory, capability
+  advertisement, resource telemetry, workload state, and administrative
+  authority as separate concerns;
+- prefer fail-closed handling for unknown or stale state instead of assuming
+  healthy or idle conditions;
+- preserve burst-aware local reservation when dispatching work so telemetry
+  lag does not cause concurrent over-selection of the same worker;
+- keep the front door singular: ordinary objective -> supervised front door ->
+  Historian orientation -> capability eligibility -> worker selection ->
+  execution/evaluation -> evidence-driven escalation when required ->
+  verified handoff -> review/closure;
+- reduce operator choreography around model size, endpoint choice, and worker
+  invocation by making the routing path inspectable but not autonomous.
+
 Project Historian stewardship direction:
 
 - Immutable evidence remains immutable evidence: raw experiment artifacts,
@@ -391,6 +430,16 @@ Project Historian stewardship direction:
   proposed separately from execution.
 - Raw supporting evidence must remain recoverable even when a curated record is
   superseded or consolidated.
+
+Decision memory direction:
+
+- preserve what was chosen, why, the important rejected alternatives, evidence
+  supporting the decision, confidence when meaningful, revisit conditions, and
+  supersession lineage;
+- do not retrofit unsupported rationale onto historical records;
+- historical ingestion remains evidence-bound;
+- retrieval should recover governing constraints and decisions, not just
+  event logs.
 
 ## LARQL Direct Editing Status
 
@@ -662,6 +711,46 @@ This phase improves retrieval and context construction after the execution/prove
 
    Future retrieval should combine semantic similarity, provenance/dependency relationships, and structured eligibility filters such as task, authority, version, scope, commit, environment, and attempt state.
 
+17. Graph-aware historian retrieval
+
+   Compare current semantic retrieval against semantic retrieval plus bounded
+   relationship expansion from seed records. The experiment should stay
+   bounded: start from semantic/lexical seeds, traverse only typed directional
+   relationships already represented in Project Historian, and assemble only
+   bounded evidence/context. Measure canonical evidence surfaced, answer
+   correctness, unsupported inference rate, context size, provenance/re-
+   resolution success, and downstream worker success. If graph expansion does
+   not materially improve useful retrieval, do not promote it.
+
+18. Portable work-profile artifact
+
+   Define a reviewable plain-file profile that packages role contract,
+   capability requirements, allowed tools/actions, authority constraints,
+   memory/Historian bindings, model/transport requirements, validation
+   contract, and escalation policy. The profile should reference existing
+   authority rather than create autonomous permissions.
+
+19. Pluggable routing-policy interface
+
+   Introduce a bounded routing-policy interface so policies can be compared
+   against preserved dogfood evidence without hardwiring one ranking formula.
+   Initial policies may include cheapest qualified, smallest qualified,
+   fastest qualified, lowest-current-pressure qualified,
+   evidence-weighted expected success/cost, and operator-pinned. The current
+   research policy remains important: when capability is unproven, broadly
+   attempt the 1.7B worker first and preserve failures as
+   capability-boundary evidence before escalation. Routing policy results must
+   not auto-promote.
+
+20. Telemetry-backed routing evidence
+
+   Connect operational telemetry work directly to routing so future policy
+   replay can answer who was eligible, who was selected, why, what resource
+   state was observed, whether the model was warm, what the request cost was,
+   what latency/throughput resulted, whether validation passed, whether
+   escalation was required, and whether a failure was capability, transport,
+   resource, or interface related.
+
 ### Next Phase - 120+ Task Supervised Dogfood
 
 The next high-scale dogfood phase should extend the supervised cron/watchdog batch while keeping the local worker model as a bounded evidence producer and keeping every authority-bearing decision under human review.
@@ -673,6 +762,11 @@ This next phase remains supervised and local-first:
 - no automatic repo edits, fixture imports, training capture, promotion, or downstream-use authority are granted;
 - deterministic validation and review bundles are required for each completed stage;
 - candidate export and candidate review remain review-only drafts, not import or promotion actions.
+
+The supervised front door should remain the only ordinary ingress: the operator
+should not have to choose chat-vs-agent paths, local model size, or worker
+identity for routine work. Those decisions belong to inspectable routing and
+escalation logic, not to an expanded front door.
 
 The completed supervised local-worker loop, the completed 120-task dogfood batch, and the malformed/partial packet plus review-bundle completeness regression coverage are now recorded in docs and tests. Remaining work is docs/index hygiene, roadmap maintenance, and future targeted regression coverage only.
 
