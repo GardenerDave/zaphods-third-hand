@@ -161,17 +161,39 @@ def select_supplier(candidates: list[dict[str, Any]]) -> tuple[dict[str, Any] | 
     return selected, f"Selected qualified {selected['supplier_type']} supplier using explicit supplier-type precedence."
 
 
-def plan_capabilities(runtime_packet: dict[str, Any], registry_index: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
+def assess_capability_eligibility(runtime_packet: dict[str, Any], registry_index: dict[str, list[dict[str, Any]]]) -> list[dict[str, Any]]:
+    """Emit the evidence-bearing eligibility stage before any supplier selection."""
     derived = derive_required_capabilities(runtime_packet)
     records = []
     for capability_id in derived:
         candidates = list(registry_index.get(capability_id, []))
-        selected, reason = select_supplier(candidates)
         qualified = [candidate for candidate in candidates if candidate["status"] == "QUALIFIED_EXPLORATORY"]
+        if qualified:
+            eligibility_status = "ELIGIBLE"
+            eligibility_reason = "At least one QUALIFIED_EXPLORATORY supplier exists in the registry."
+        else:
+            eligibility_status = "INELIGIBLE"
+            eligibility_reason = "No QUALIFIED_EXPLORATORY supplier exists for this capability."
         records.append({
             "capability_id": capability_id,
             "candidate_suppliers": [{"supplier_id": item["supplier_id"], "supplier_type": item["supplier_type"], "interface_id": item["interface_id"], "status": item["status"]} for item in candidates],
             "qualified_candidates": [{"supplier_id": item["supplier_id"], "supplier_type": item["supplier_type"], "interface_id": item["interface_id"]} for item in qualified],
+            "eligibility_status": eligibility_status,
+            "eligibility_reason": eligibility_reason,
+            "evidence_sources": [runtime_packet["packet_source"], {"registry_entry_count": len(candidates)}],
+        })
+    return records
+
+
+def plan_capabilities(runtime_packet: dict[str, Any], registry_index: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
+    derived = derive_required_capabilities(runtime_packet)
+    eligibility = assess_capability_eligibility(runtime_packet, registry_index)
+    records = []
+    for item in eligibility:
+        candidates = list(registry_index.get(item["capability_id"], []))
+        selected, reason = select_supplier(candidates)
+        records.append({
+            **item,
             "selected_supplier": None if selected is None else {"supplier_id": selected["supplier_id"], "supplier_type": selected["supplier_type"], "interface_id": selected["interface_id"]},
             "selection_reason": reason,
             "coverage_status": "COVERED" if selected is not None else "UNCOVERED",
@@ -187,6 +209,7 @@ def plan_capabilities(runtime_packet: dict[str, Any], registry_index: dict[str, 
         "task_id": runtime_packet["task_id"],
         "packet_source": runtime_packet["packet_source"],
         "derived_required_capabilities": derived,
+        "capability_eligibility": eligibility,
         "capabilities": records,
         "overall_coverage": "COMPLETE" if complete else "INCOMPLETE",
         "execution_steps": steps,

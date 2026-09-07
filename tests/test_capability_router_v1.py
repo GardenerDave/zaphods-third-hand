@@ -34,8 +34,10 @@ def test_registry_preserves_multiple_suppliers_and_prefers_deterministic():
     index["deterministic.direct_target_binding"] = synthetic
     runtime_packet = {"task_id": "synthetic", "packet_inputs": {"requires_target_binding": True}, "packet_source": {"triage_id": "t", "orchestration_id": "o"}}
     plan = plan_capabilities(runtime_packet, index)
+    assert plan["capability_eligibility"][0]["eligibility_status"] == "ELIGIBLE"
     assert len(plan["capabilities"][0]["candidate_suppliers"]) == 2
     assert plan["capabilities"][0]["selected_supplier"]["supplier_type"] == "DETERMINISTIC_CODE"
+    assert plan["capabilities"][0]["eligibility_reason"] == "At least one QUALIFIED_EXPLORATORY supplier exists in the registry."
 
 
 def test_incomplete_coverage_has_no_executable_model_steps():
@@ -44,6 +46,7 @@ def test_incomplete_coverage_has_no_executable_model_steps():
     assert plan["overall_coverage"] == "INCOMPLETE"
     assert plan["planned_model_calls"] == 0
     assert plan["execution_steps"] == []
+    assert any(item["eligibility_status"] == "INELIGIBLE" for item in plan["capability_eligibility"])
 
 
 def test_all_deterministic_and_review_workloads_are_lazy_model_free():
