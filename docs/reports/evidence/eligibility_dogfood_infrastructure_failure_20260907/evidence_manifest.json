@@ -1,0 +1,14 @@
+{
+  "schema": "zth_eligibility_dogfood_infrastructure_failure_v1",
+  "source_run_folder": "/tmp/zth_eligibility_dogfood_20260907_1p7b",
+  "classification": "infrastructure/environment failure",
+  "capability_evidence": false,
+  "preserved_artifacts": [
+    "worker_output.md",
+    "worker_metrics.json",
+    "model_request.md",
+    "task.md",
+    "input.md",
+    "evidence_note.md"
+  ]
+}

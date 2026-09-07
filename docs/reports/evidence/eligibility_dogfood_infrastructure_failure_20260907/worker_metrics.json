@@ -1,0 +1,15 @@
+{
+  "timestamp_utc": "2026-09-07T16:58:21.403532+00:00",
+  "run_folder": "/tmp/zth_eligibility_dogfood_20260907_1p7b",
+  "worker": "router",
+  "status": "request_error",
+  "request_url": "http://192.168.1.13:8082/v1/chat/completions",
+  "model": "Qwen/Qwen2.5-3B-Instruct-GGUF:Q4_K_M",
+  "finish_reason": null,
+  "usage": null,
+  "timings": null,
+  "input_est_tokens": 134,
+  "output_est_tokens": 17,
+  "token_estimate_method": "characters_divided_by_4",
+  "error": "<urlopen error [Errno 1] Operation not permitted>"
+}

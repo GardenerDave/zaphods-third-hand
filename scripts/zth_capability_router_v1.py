@@ -185,13 +185,25 @@ def assess_capability_eligibility(runtime_packet: dict[str, Any], registry_index
     return records
 
 
+def eligible_suppliers_for_capability(eligibility_record: dict[str, Any]) -> list[dict[str, Any]]:
+    """Project the eligible supplier set from eligibility evidence only."""
+    return [
+        candidate
+        for candidate in eligibility_record["candidate_suppliers"]
+        if candidate["status"] == "QUALIFIED_EXPLORATORY"
+    ]
+
+
 def plan_capabilities(runtime_packet: dict[str, Any], registry_index: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
     derived = derive_required_capabilities(runtime_packet)
     eligibility = assess_capability_eligibility(runtime_packet, registry_index)
     records = []
     for item in eligibility:
-        candidates = list(registry_index.get(item["capability_id"], []))
-        selected, reason = select_supplier(candidates)
+        eligible_candidates = eligible_suppliers_for_capability(item)
+        if eligible_candidates:
+            selected, reason = select_supplier(eligible_candidates)
+        else:
+            selected, reason = None, "No eligible suppliers were admitted by capability eligibility."
         records.append({
             **item,
             "selected_supplier": None if selected is None else {"supplier_id": selected["supplier_id"], "supplier_type": selected["supplier_type"], "interface_id": selected["interface_id"]},
