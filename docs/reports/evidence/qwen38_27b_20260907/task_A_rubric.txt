@@ -1,0 +1,1 @@
+PASS if the answer identifies the race on the read-modify-write sequence, recommends a standard-library lock-based fix, and gives a corrected example. It should stay under 300 words.

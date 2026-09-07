@@ -1,0 +1,21 @@
+You are reviewing a Python function that is supposed to return the first duplicate value encountered while scanning left to right, or None if there is no duplicate:
+
+```python
+def first_duplicate(items):
+    seen = set()
+    for item in items:
+        if item in seen:
+            return item
+        seen.add(item)
+    return None
+```
+
+It works on integers, but a teammate reports surprising failures when `items` can contain unhashable lists, and also when they need the first duplicate by earliest second occurrence rather than the first repeated value in the scan. Write a corrected implementation using only the standard library that:
+
+1. handles arbitrary Python objects, including unhashable lists;
+2. returns the value whose second occurrence appears earliest in the scan;
+3. preserves left-to-right tie breaking;
+4. includes a short explanation of the difference from the original function;
+5. gives at least three compact example inputs with outputs.
+
+Do not use external packages. Keep the answer under 350 words.

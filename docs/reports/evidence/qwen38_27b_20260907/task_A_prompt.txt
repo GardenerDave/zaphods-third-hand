@@ -1,0 +1,1 @@
+You are debugging a Python service. A shared dictionary is updated by four worker threads using counter[key] = counter.get(key, 0) + 1, but totals are occasionally too low. Explain the cause, give the smallest reliable fix using the standard library, and provide a corrected code example. Keep the answer under 300 words.

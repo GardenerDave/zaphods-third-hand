@@ -1,0 +1,30 @@
+{
+  "task_id": "A",
+  "reasoning_effort": "low",
+  "max_tokens": 768,
+  "request": {
+    "model": "local",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a careful coding assistant. Follow the user prompt exactly."
+      },
+      {
+        "role": "user",
+        "content": "You are debugging a Python service. A shared dictionary is updated by four worker threads using counter[key] = counter.get(key, 0) + 1, but totals are occasionally too low. Explain the cause, give the smallest reliable fix using the standard library, and provide a corrected code example. Keep the answer under 300 words.\n"
+      }
+    ],
+    "temperature": 0,
+    "max_tokens": 768,
+    "chat_template_kwargs": {
+      "reasoning_effort": "low"
+    }
+  },
+  "response": {
+    "error": "URLError",
+    "message": "<urlopen error [Errno 1] Operation not permitted>",
+    "client_elapsed_seconds": 0.008
+  },
+  "prompt_text": "You are debugging a Python service. A shared dictionary is updated by four worker threads using counter[key] = counter.get(key, 0) + 1, but totals are occasionally too low. Explain the cause, give the smallest reliable fix using the standard library, and provide a corrected code example. Keep the answer under 300 words.\n",
+  "rubric_text": "PASS if the answer identifies the race on the read-modify-write sequence, recommends a standard-library lock-based fix, and gives a corrected example. It should stay under 300 words.\n"
+}

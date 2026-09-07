@@ -53,6 +53,43 @@ class IcmCallTests(unittest.TestCase):
         self.assertEqual("gemma-test.gguf", spec.model)
         self.assertTrue(spec.append_no_think)
 
+    def test_resolve_worker_spec_selects_qwen38_request_policy(self):
+        routine = icm_call.resolve_worker_spec("qwen3_8_27b", request_policy_name="routine")
+        medium = icm_call.resolve_worker_spec("qwen3_8_27b", request_policy_name="serious")
+        exceptional = icm_call.resolve_worker_spec("qwen3_8_27b", request_policy_name="exceptional")
+
+        self.assertEqual("routine", routine.request_policy_name)
+        self.assertEqual({"reasoning_effort": "low"}, routine.request_policy["chat_template_kwargs"])
+        self.assertEqual(256, routine.request_policy["thinking_budget_tokens"])
+        self.assertEqual(1024, routine.request_policy["max_tokens"])
+        self.assertEqual({"reasoning_effort": "medium"}, medium.request_policy["chat_template_kwargs"])
+        self.assertEqual(512, medium.request_policy["thinking_budget_tokens"])
+        self.assertEqual(1536, medium.request_policy["max_tokens"])
+        self.assertEqual({"reasoning_effort": "xhigh"}, exceptional.request_policy["chat_template_kwargs"])
+        self.assertEqual(512, exceptional.request_policy["thinking_budget_tokens"])
+        self.assertEqual(1536, exceptional.request_policy["max_tokens"])
+
+    def test_render_request_payload_keeps_reasoning_and_output_budgets_distinct(self):
+        spec = icm_call.resolve_worker_spec("qwen3_8_27b", request_policy_name="serious")
+        _, payload, _, _, provenance = icm_call._render_request_payload(spec, "Explain the fix.", 1536, model=spec.model)
+
+        self.assertEqual({"reasoning_effort": "medium"}, payload["chat_template_kwargs"])
+        self.assertEqual(512, payload["thinking_budget_tokens"])
+        self.assertEqual(1536, payload["max_tokens"])
+        self.assertEqual({"reasoning_effort": "medium"}, provenance["chat_template_kwargs"])
+        self.assertEqual(512, provenance["thinking_budget_tokens"])
+        self.assertEqual(1536, provenance["max_tokens"])
+        self.assertNotEqual(provenance["thinking_budget_tokens"], provenance["max_tokens"])
+
+    def test_render_request_payload_keeps_legacy_workers_unchanged(self):
+        spec = icm_call.resolve_worker_spec("handoff", base_url="http://localhost:8083/v1", model="gemma-test.gguf")
+        _, payload, _, _, provenance = icm_call._render_request_payload(spec, "Reply with exactly: ok", 8, model=spec.model)
+
+        self.assertNotIn("chat_template_kwargs", payload)
+        self.assertNotIn("thinking_budget_tokens", payload)
+        self.assertIsNone(provenance["chat_template_kwargs"])
+        self.assertIsNone(provenance["thinking_budget_tokens"])
+
     def test_call_worker_returns_chat_content(self):
         payload = {
             "model": "gemma-test.gguf",
@@ -84,6 +121,36 @@ class IcmCallTests(unittest.TestCase):
         self.assertEqual("gemma-test.gguf", response.model)
         self.assertEqual("gemma-test.gguf", response.configured_model)
         self.assertFalse(response.model_resolution_attempted)
+
+    def test_main_accepts_request_policy_for_qwen38(self):
+        payload = {
+            "model": "Qwen3.8-27B-UD-IQ4_XS.gguf",
+            "choices": [
+                {
+                    "finish_reason": "stop",
+                    "message": {"role": "assistant", "content": "ok"},
+                }
+            ],
+        }
+        captured: dict[str, bytes] = {}
+
+        def fake_urlopen(request, timeout=30):
+            captured["body"] = request.data
+            return FakeHTTPResponse(payload)
+
+        with patch.object(icm_call.urllib.request, "urlopen", side_effect=fake_urlopen):
+            response = icm_call.call_worker(
+                icm_call.resolve_worker_spec("qwen3_8_27b", request_policy_name="routine"),
+                "Return exactly: ok",
+                max_tokens=1024,
+            )
+
+        body = json.loads(captured["body"].decode("utf-8"))
+        self.assertEqual({"reasoning_effort": "low"}, body["chat_template_kwargs"])
+        self.assertEqual(256, body["thinking_budget_tokens"])
+        self.assertEqual(1024, body["max_tokens"])
+        self.assertEqual({"reasoning_effort": "low"}, response.request_provenance["chat_template_kwargs"])
+        self.assertEqual(256, response.request_provenance["thinking_budget_tokens"])
 
     def test_main_writes_request_intent_before_transport(self):
         payload = {

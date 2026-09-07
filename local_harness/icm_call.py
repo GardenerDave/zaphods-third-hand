@@ -129,6 +129,9 @@ def _build_request_payload(
     max_tokens: int,
 ) -> tuple[dict[str, Any], str, dict[str, Any]]:
     actual_prompt = maybe_append_no_think(prompt, spec.append_no_think)
+    request_policy = dict(spec.request_policy or {})
+    chat_template_kwargs = request_policy.get("chat_template_kwargs")
+    thinking_budget_tokens = request_policy.get("thinking_budget_tokens")
     if spec.api == OPENAI_CHAT:
         payload = {
             "model": model,
@@ -140,6 +143,10 @@ def _build_request_payload(
             "temperature": 0.2,
             "stream": False,
         }
+        if isinstance(chat_template_kwargs, dict) and chat_template_kwargs:
+            payload["chat_template_kwargs"] = chat_template_kwargs
+        if thinking_budget_tokens is not None:
+            payload["thinking_budget_tokens"] = thinking_budget_tokens
         system_sha = _sha256_bytes(SYSTEM_PROMPT.encode("utf-8"))
         message_structure = ["system", "user"]
     elif spec.api == OPENAI_COMPLETIONS:
@@ -176,6 +183,8 @@ def _build_request_payload(
         "top_p": None,
         "seed": None,
         "stop": None,
+        "chat_template_kwargs": chat_template_kwargs if isinstance(chat_template_kwargs, dict) and chat_template_kwargs else None,
+        "thinking_budget_tokens": thinking_budget_tokens,
         "endpoint_alias": os.environ.get("ZTH_PUBLIC_HOST_ALIAS", "JARVIS_LOCAL"),
         "structured_output_enabled": False,
         "structured_output_mechanism": None,
@@ -218,6 +227,9 @@ def _render_request_payload(
 ) -> tuple[str, dict[str, Any], bytes, str, dict[str, Any]]:
     actual_prompt = maybe_append_no_think(prompt, spec.append_no_think)
     request_url = completion_url(spec)
+    request_policy = dict(spec.request_policy or {})
+    chat_template_kwargs = request_policy.get("chat_template_kwargs")
+    thinking_budget_tokens = request_policy.get("thinking_budget_tokens")
     request_payload = {
         "model": model,
         "messages": [
@@ -236,6 +248,11 @@ def _render_request_payload(
         "temperature": 0.2,
         "stream": False,
     }
+    if spec.api == OPENAI_CHAT:
+        if isinstance(chat_template_kwargs, dict) and chat_template_kwargs:
+            request_payload["chat_template_kwargs"] = chat_template_kwargs
+        if thinking_budget_tokens is not None:
+            request_payload["thinking_budget_tokens"] = thinking_budget_tokens
     if spec.api == OPENAI_COMPLETIONS:
         request_payload = {
             "model": model,
@@ -269,6 +286,8 @@ def _render_request_payload(
         "top_p": None,
         "seed": None,
         "stop": None,
+        "chat_template_kwargs": chat_template_kwargs if isinstance(chat_template_kwargs, dict) and chat_template_kwargs else None,
+        "thinking_budget_tokens": thinking_budget_tokens,
         "endpoint_alias": os.environ.get("ZTH_PUBLIC_HOST_ALIAS", "JARVIS_LOCAL"),
         "request_body_sha256": _sha256_bytes(request_bytes),
         "request_body_length": len(request_bytes),
@@ -544,6 +563,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--base-url", help="Override an OpenAI-compatible base URL.")
     parser.add_argument("--url", help="Override the exact completion URL.")
     parser.add_argument("--model", help="Override the model name sent to the worker.")
+    parser.add_argument(
+        "--request-policy",
+        help="Select a named request policy from the worker's configured policy set.",
+    )
     parser.add_argument("--max-tokens", type=int, default=512, help="Maximum response tokens.")
     parser.add_argument("--timeout", type=int, default=900, help="HTTP timeout in seconds.")
     parser.add_argument("--final-only", action="store_true", help="Append /no_think for workers that need it.")
@@ -574,6 +597,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         model=args.model,
         api=args.api,
         final_only=args.final_only,
+        request_policy_name=args.request_policy,
     )
 
     if args.list_models:

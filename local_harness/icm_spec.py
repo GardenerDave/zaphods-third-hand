@@ -30,6 +30,28 @@ DEFAULT_WORKERS: dict[str, dict[str, Any]] = {
         "base_url": "http://<LAN_HOST>:8083/v1",
         "model": "Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M",
     },
+    "qwen3_8_27b": {
+        "api": "openai-chat",
+        "base_url": "http://<LAN_HOST>:8080/v1",
+        "model": "Qwen3.8-27B-UD-IQ4_XS.gguf",
+        "request_policies": {
+            "routine": {
+                "chat_template_kwargs": {"reasoning_effort": "low"},
+                "thinking_budget_tokens": 256,
+                "max_tokens": 1024,
+            },
+            "serious": {
+                "chat_template_kwargs": {"reasoning_effort": "medium"},
+                "thinking_budget_tokens": 512,
+                "max_tokens": 1536,
+            },
+            "exceptional": {
+                "chat_template_kwargs": {"reasoning_effort": "xhigh"},
+                "thinking_budget_tokens": 512,
+                "max_tokens": 1536,
+            },
+        },
+    },
 }
 
 OPENAI_CHAT = "openai-chat"
@@ -55,6 +77,8 @@ class WorkerSpec:
     url: str | None = None
     append_no_think: bool = False
     configured_model: str | None = None
+    request_policy_name: str | None = None
+    request_policy: Mapping[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -133,6 +157,7 @@ def resolve_worker_spec(
     model: str | None = None,
     api: str | None = None,
     final_only: bool = False,
+    request_policy_name: str | None = None,
 ) -> WorkerSpec:
     if worker_name not in DEFAULT_WORKERS:
         raise KeyError(f"Unknown worker: {worker_name}")
@@ -145,6 +170,13 @@ def resolve_worker_spec(
         resolved_url = defaults.get("url")
     resolved_model = model or env_override(worker_name, "MODEL") or defaults.get("model")
     append_no_think = final_only or bool(defaults.get("append_no_think"))
+    policies = defaults.get("request_policies")
+    resolved_request_policy_name = request_policy_name or env_override(worker_name, "REQUEST_POLICY")
+    resolved_request_policy: Mapping[str, Any] | None = None
+    if resolved_request_policy_name is not None:
+        if not isinstance(policies, Mapping) or resolved_request_policy_name not in policies:
+            raise KeyError(f"Unknown request policy for {worker_name}: {resolved_request_policy_name}")
+        resolved_request_policy = policies[resolved_request_policy_name]
 
     if resolved_base_url:
         resolved_base_url = normalize_base_url(resolved_base_url)
@@ -157,6 +189,8 @@ def resolve_worker_spec(
         url=resolved_url,
         append_no_think=append_no_think,
         configured_model=resolved_model,
+        request_policy_name=resolved_request_policy_name,
+        request_policy=resolved_request_policy,
     )
 
 

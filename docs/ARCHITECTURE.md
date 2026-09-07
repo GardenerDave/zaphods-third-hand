@@ -125,6 +125,12 @@ Routing and supplier selection should likewise stay split:
   scorecards, current pressure, resource telemetry, warm state, latency,
   request cost, reliability, and authorized operator overrides.
 
+Request policies are part of this selection surface, not prompt content:
+worker choice, `chat_template_kwargs.reasoning_effort`,
+`thinking_budget_tokens`, and total `max_tokens` should remain separately
+represented in the request contract so bounded reasoning can be routed and
+audited without collapsing it into a single capability label.
+
 Compaction may remove evidence from active context, but it must never become
 the authority for claims that cannot be traced back to preserved evidence.
 

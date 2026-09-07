@@ -1,0 +1,272 @@
+[
+  {
+    "task_id": "A",
+    "reasoning_effort": "low",
+    "max_tokens": 768,
+    "request": {
+      "model": "local",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a careful coding assistant. Follow the user prompt exactly."
+        },
+        {
+          "role": "user",
+          "content": "You are debugging a Python service. A shared dictionary is updated by four worker threads using counter[key] = counter.get(key, 0) + 1, but totals are occasionally too low. Explain the cause, give the smallest reliable fix using the standard library, and provide a corrected code example. Keep the answer under 300 words.\n"
+        }
+      ],
+      "temperature": 0,
+      "max_tokens": 768,
+      "chat_template_kwargs": {
+        "reasoning_effort": "low"
+      }
+    },
+    "response": {
+      "error": "URLError",
+      "message": "<urlopen error [Errno 1] Operation not permitted>",
+      "client_elapsed_seconds": 0.008
+    },
+    "prompt_text": "You are debugging a Python service. A shared dictionary is updated by four worker threads using counter[key] = counter.get(key, 0) + 1, but totals are occasionally too low. Explain the cause, give the smallest reliable fix using the standard library, and provide a corrected code example. Keep the answer under 300 words.\n",
+    "rubric_text": "PASS if the answer identifies the race on the read-modify-write sequence, recommends a standard-library lock-based fix, and gives a corrected example. It should stay under 300 words.\n"
+  },
+  {
+    "task_id": "A",
+    "reasoning_effort": "medium",
+    "max_tokens": 768,
+    "request": {
+      "model": "local",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a careful coding assistant. Follow the user prompt exactly."
+        },
+        {
+          "role": "user",
+          "content": "You are debugging a Python service. A shared dictionary is updated by four worker threads using counter[key] = counter.get(key, 0) + 1, but totals are occasionally too low. Explain the cause, give the smallest reliable fix using the standard library, and provide a corrected code example. Keep the answer under 300 words.\n"
+        }
+      ],
+      "temperature": 0,
+      "max_tokens": 768,
+      "chat_template_kwargs": {
+        "reasoning_effort": "medium"
+      }
+    },
+    "response": {
+      "error": "URLError",
+      "message": "<urlopen error [Errno 1] Operation not permitted>",
+      "client_elapsed_seconds": 0.0
+    },
+    "prompt_text": "You are debugging a Python service. A shared dictionary is updated by four worker threads using counter[key] = counter.get(key, 0) + 1, but totals are occasionally too low. Explain the cause, give the smallest reliable fix using the standard library, and provide a corrected code example. Keep the answer under 300 words.\n",
+    "rubric_text": "PASS if the answer identifies the race on the read-modify-write sequence, recommends a standard-library lock-based fix, and gives a corrected example. It should stay under 300 words.\n"
+  },
+  {
+    "task_id": "A",
+    "reasoning_effort": "xhigh",
+    "max_tokens": 768,
+    "request": {
+      "model": "local",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a careful coding assistant. Follow the user prompt exactly."
+        },
+        {
+          "role": "user",
+          "content": "You are debugging a Python service. A shared dictionary is updated by four worker threads using counter[key] = counter.get(key, 0) + 1, but totals are occasionally too low. Explain the cause, give the smallest reliable fix using the standard library, and provide a corrected code example. Keep the answer under 300 words.\n"
+        }
+      ],
+      "temperature": 0,
+      "max_tokens": 768,
+      "chat_template_kwargs": {
+        "reasoning_effort": "xhigh"
+      }
+    },
+    "response": {
+      "error": "URLError",
+      "message": "<urlopen error [Errno 1] Operation not permitted>",
+      "client_elapsed_seconds": 0.0
+    },
+    "prompt_text": "You are debugging a Python service. A shared dictionary is updated by four worker threads using counter[key] = counter.get(key, 0) + 1, but totals are occasionally too low. Explain the cause, give the smallest reliable fix using the standard library, and provide a corrected code example. Keep the answer under 300 words.\n",
+    "rubric_text": "PASS if the answer identifies the race on the read-modify-write sequence, recommends a standard-library lock-based fix, and gives a corrected example. It should stay under 300 words.\n"
+  },
+  {
+    "task_id": "B",
+    "reasoning_effort": "low",
+    "max_tokens": 768,
+    "request": {
+      "model": "local",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a careful coding assistant. Follow the user prompt exactly."
+        },
+        {
+          "role": "user",
+          "content": "You are reviewing a Python function that is supposed to return the first duplicate value encountered while scanning left to right, or None if there is no duplicate:\n\n```python\ndef first_duplicate(items):\n    seen = set()\n    for item in items:\n        if item in seen:\n            return item\n        seen.add(item)\n    return None\n```\n\nIt works on integers, but a teammate reports surprising failures when `items` can contain unhashable lists, and also when they need the first duplicate by earliest second occurrence rather than the first repeated value in the scan. Write a corrected implementation using only the standard library that:\n\n1. handles arbitrary Python objects, including unhashable lists;\n2. returns the value whose second occurrence appears earliest in the scan;\n3. preserves left-to-right tie breaking;\n4. includes a short explanation of the difference from the original function;\n5. gives at least three compact example inputs with outputs.\n\nDo not use external packages. Keep the answer under 350 words.\n"
+        }
+      ],
+      "temperature": 0,
+      "max_tokens": 768,
+      "chat_template_kwargs": {
+        "reasoning_effort": "low"
+      }
+    },
+    "response": {
+      "error": "URLError",
+      "message": "<urlopen error [Errno 1] Operation not permitted>",
+      "client_elapsed_seconds": 0.0
+    },
+    "prompt_text": "You are reviewing a Python function that is supposed to return the first duplicate value encountered while scanning left to right, or None if there is no duplicate:\n\n```python\ndef first_duplicate(items):\n    seen = set()\n    for item in items:\n        if item in seen:\n            return item\n        seen.add(item)\n    return None\n```\n\nIt works on integers, but a teammate reports surprising failures when `items` can contain unhashable lists, and also when they need the first duplicate by earliest second occurrence rather than the first repeated value in the scan. Write a corrected implementation using only the standard library that:\n\n1. handles arbitrary Python objects, including unhashable lists;\n2. returns the value whose second occurrence appears earliest in the scan;\n3. preserves left-to-right tie breaking;\n4. includes a short explanation of the difference from the original function;\n5. gives at least three compact example inputs with outputs.\n\nDo not use external packages. Keep the answer under 350 words.\n",
+    "rubric_text": "PASS if the answer explains the original set-based approach fails on unhashable objects and does not implement earliest-second-occurrence semantics, then provides a standard-library-only replacement that compares items by equality and tracks earliest second occurrence correctly. Examples should be consistent with the code.\n"
+  },
+  {
+    "task_id": "B",
+    "reasoning_effort": "medium",
+    "max_tokens": 768,
+    "request": {
+      "model": "local",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a careful coding assistant. Follow the user prompt exactly."
+        },
+        {
+          "role": "user",
+          "content": "You are reviewing a Python function that is supposed to return the first duplicate value encountered while scanning left to right, or None if there is no duplicate:\n\n```python\ndef first_duplicate(items):\n    seen = set()\n    for item in items:\n        if item in seen:\n            return item\n        seen.add(item)\n    return None\n```\n\nIt works on integers, but a teammate reports surprising failures when `items` can contain unhashable lists, and also when they need the first duplicate by earliest second occurrence rather than the first repeated value in the scan. Write a corrected implementation using only the standard library that:\n\n1. handles arbitrary Python objects, including unhashable lists;\n2. returns the value whose second occurrence appears earliest in the scan;\n3. preserves left-to-right tie breaking;\n4. includes a short explanation of the difference from the original function;\n5. gives at least three compact example inputs with outputs.\n\nDo not use external packages. Keep the answer under 350 words.\n"
+        }
+      ],
+      "temperature": 0,
+      "max_tokens": 768,
+      "chat_template_kwargs": {
+        "reasoning_effort": "medium"
+      }
+    },
+    "response": {
+      "error": "URLError",
+      "message": "<urlopen error [Errno 1] Operation not permitted>",
+      "client_elapsed_seconds": 0.0
+    },
+    "prompt_text": "You are reviewing a Python function that is supposed to return the first duplicate value encountered while scanning left to right, or None if there is no duplicate:\n\n```python\ndef first_duplicate(items):\n    seen = set()\n    for item in items:\n        if item in seen:\n            return item\n        seen.add(item)\n    return None\n```\n\nIt works on integers, but a teammate reports surprising failures when `items` can contain unhashable lists, and also when they need the first duplicate by earliest second occurrence rather than the first repeated value in the scan. Write a corrected implementation using only the standard library that:\n\n1. handles arbitrary Python objects, including unhashable lists;\n2. returns the value whose second occurrence appears earliest in the scan;\n3. preserves left-to-right tie breaking;\n4. includes a short explanation of the difference from the original function;\n5. gives at least three compact example inputs with outputs.\n\nDo not use external packages. Keep the answer under 350 words.\n",
+    "rubric_text": "PASS if the answer explains the original set-based approach fails on unhashable objects and does not implement earliest-second-occurrence semantics, then provides a standard-library-only replacement that compares items by equality and tracks earliest second occurrence correctly. Examples should be consistent with the code.\n"
+  },
+  {
+    "task_id": "B",
+    "reasoning_effort": "xhigh",
+    "max_tokens": 768,
+    "request": {
+      "model": "local",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a careful coding assistant. Follow the user prompt exactly."
+        },
+        {
+          "role": "user",
+          "content": "You are reviewing a Python function that is supposed to return the first duplicate value encountered while scanning left to right, or None if there is no duplicate:\n\n```python\ndef first_duplicate(items):\n    seen = set()\n    for item in items:\n        if item in seen:\n            return item\n        seen.add(item)\n    return None\n```\n\nIt works on integers, but a teammate reports surprising failures when `items` can contain unhashable lists, and also when they need the first duplicate by earliest second occurrence rather than the first repeated value in the scan. Write a corrected implementation using only the standard library that:\n\n1. handles arbitrary Python objects, including unhashable lists;\n2. returns the value whose second occurrence appears earliest in the scan;\n3. preserves left-to-right tie breaking;\n4. includes a short explanation of the difference from the original function;\n5. gives at least three compact example inputs with outputs.\n\nDo not use external packages. Keep the answer under 350 words.\n"
+        }
+      ],
+      "temperature": 0,
+      "max_tokens": 768,
+      "chat_template_kwargs": {
+        "reasoning_effort": "xhigh"
+      }
+    },
+    "response": {
+      "error": "URLError",
+      "message": "<urlopen error [Errno 1] Operation not permitted>",
+      "client_elapsed_seconds": 0.0
+    },
+    "prompt_text": "You are reviewing a Python function that is supposed to return the first duplicate value encountered while scanning left to right, or None if there is no duplicate:\n\n```python\ndef first_duplicate(items):\n    seen = set()\n    for item in items:\n        if item in seen:\n            return item\n        seen.add(item)\n    return None\n```\n\nIt works on integers, but a teammate reports surprising failures when `items` can contain unhashable lists, and also when they need the first duplicate by earliest second occurrence rather than the first repeated value in the scan. Write a corrected implementation using only the standard library that:\n\n1. handles arbitrary Python objects, including unhashable lists;\n2. returns the value whose second occurrence appears earliest in the scan;\n3. preserves left-to-right tie breaking;\n4. includes a short explanation of the difference from the original function;\n5. gives at least three compact example inputs with outputs.\n\nDo not use external packages. Keep the answer under 350 words.\n",
+    "rubric_text": "PASS if the answer explains the original set-based approach fails on unhashable objects and does not implement earliest-second-occurrence semantics, then provides a standard-library-only replacement that compares items by equality and tracks earliest second occurrence correctly. Examples should be consistent with the code.\n"
+  },
+  {
+    "task_id": "C",
+    "reasoning_effort": "low",
+    "max_tokens": 768,
+    "request": {
+      "model": "local",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a careful coding assistant. Follow the user prompt exactly."
+        },
+        {
+          "role": "user",
+          "content": "You are given the following problem.\n\nDefine `score(nums)` for a non-empty list of integers as the number of contiguous subarrays whose sum is zero.\n\nWrite a function `score(nums)` that returns this count. Then, for the following input, give the exact output and show enough reasoning to justify it:\n\n`[3, -1, -2, 4, -4, 1, -1, 2, -2, 0]`\n\nConstraints:\n\n1. Use only the standard library.\n2. The algorithm must run in O(n) time.\n3. Explain why the algorithm is correct.\n4. Give the exact numeric answer for the sample input.\n\nKeep the whole answer under 350 words.\n"
+        }
+      ],
+      "temperature": 0,
+      "max_tokens": 768,
+      "chat_template_kwargs": {
+        "reasoning_effort": "low"
+      }
+    },
+    "response": {
+      "error": "URLError",
+      "message": "<urlopen error [Errno 1] Operation not permitted>",
+      "client_elapsed_seconds": 0.0
+    },
+    "prompt_text": "You are given the following problem.\n\nDefine `score(nums)` for a non-empty list of integers as the number of contiguous subarrays whose sum is zero.\n\nWrite a function `score(nums)` that returns this count. Then, for the following input, give the exact output and show enough reasoning to justify it:\n\n`[3, -1, -2, 4, -4, 1, -1, 2, -2, 0]`\n\nConstraints:\n\n1. Use only the standard library.\n2. The algorithm must run in O(n) time.\n3. Explain why the algorithm is correct.\n4. Give the exact numeric answer for the sample input.\n\nKeep the whole answer under 350 words.\n",
+    "rubric_text": "PASS if the answer derives the prefix-sum frequency method, explains why equal prefix sums imply zero-sum subarrays, and gives the exact count for the sample input. The count should match a direct enumeration or equivalent correct derivation.\n"
+  },
+  {
+    "task_id": "C",
+    "reasoning_effort": "medium",
+    "max_tokens": 768,
+    "request": {
+      "model": "local",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a careful coding assistant. Follow the user prompt exactly."
+        },
+        {
+          "role": "user",
+          "content": "You are given the following problem.\n\nDefine `score(nums)` for a non-empty list of integers as the number of contiguous subarrays whose sum is zero.\n\nWrite a function `score(nums)` that returns this count. Then, for the following input, give the exact output and show enough reasoning to justify it:\n\n`[3, -1, -2, 4, -4, 1, -1, 2, -2, 0]`\n\nConstraints:\n\n1. Use only the standard library.\n2. The algorithm must run in O(n) time.\n3. Explain why the algorithm is correct.\n4. Give the exact numeric answer for the sample input.\n\nKeep the whole answer under 350 words.\n"
+        }
+      ],
+      "temperature": 0,
+      "max_tokens": 768,
+      "chat_template_kwargs": {
+        "reasoning_effort": "medium"
+      }
+    },
+    "response": {
+      "error": "URLError",
+      "message": "<urlopen error [Errno 1] Operation not permitted>",
+      "client_elapsed_seconds": 0.0
+    },
+    "prompt_text": "You are given the following problem.\n\nDefine `score(nums)` for a non-empty list of integers as the number of contiguous subarrays whose sum is zero.\n\nWrite a function `score(nums)` that returns this count. Then, for the following input, give the exact output and show enough reasoning to justify it:\n\n`[3, -1, -2, 4, -4, 1, -1, 2, -2, 0]`\n\nConstraints:\n\n1. Use only the standard library.\n2. The algorithm must run in O(n) time.\n3. Explain why the algorithm is correct.\n4. Give the exact numeric answer for the sample input.\n\nKeep the whole answer under 350 words.\n",
+    "rubric_text": "PASS if the answer derives the prefix-sum frequency method, explains why equal prefix sums imply zero-sum subarrays, and gives the exact count for the sample input. The count should match a direct enumeration or equivalent correct derivation.\n"
+  },
+  {
+    "task_id": "C",
+    "reasoning_effort": "xhigh",
+    "max_tokens": 768,
+    "request": {
+      "model": "local",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a careful coding assistant. Follow the user prompt exactly."
+        },
+        {
+          "role": "user",
+          "content": "You are given the following problem.\n\nDefine `score(nums)` for a non-empty list of integers as the number of contiguous subarrays whose sum is zero.\n\nWrite a function `score(nums)` that returns this count. Then, for the following input, give the exact output and show enough reasoning to justify it:\n\n`[3, -1, -2, 4, -4, 1, -1, 2, -2, 0]`\n\nConstraints:\n\n1. Use only the standard library.\n2. The algorithm must run in O(n) time.\n3. Explain why the algorithm is correct.\n4. Give the exact numeric answer for the sample input.\n\nKeep the whole answer under 350 words.\n"
+        }
+      ],
+      "temperature": 0,
+      "max_tokens": 768,
+      "chat_template_kwargs": {
+        "reasoning_effort": "xhigh"
+      }
+    },
+    "response": {
+      "error": "URLError",
+      "message": "<urlopen error [Errno 1] Operation not permitted>",
+      "client_elapsed_seconds": 0.0
+    },
+    "prompt_text": "You are given the following problem.\n\nDefine `score(nums)` for a non-empty list of integers as the number of contiguous subarrays whose sum is zero.\n\nWrite a function `score(nums)` that returns this count. Then, for the following input, give the exact output and show enough reasoning to justify it:\n\n`[3, -1, -2, 4, -4, 1, -1, 2, -2, 0]`\n\nConstraints:\n\n1. Use only the standard library.\n2. The algorithm must run in O(n) time.\n3. Explain why the algorithm is correct.\n4. Give the exact numeric answer for the sample input.\n\nKeep the whole answer under 350 words.\n",
+    "rubric_text": "PASS if the answer derives the prefix-sum frequency method, explains why equal prefix sums imply zero-sum subarrays, and gives the exact count for the sample input. The count should match a direct enumeration or equivalent correct derivation.\n"
+  }
+]

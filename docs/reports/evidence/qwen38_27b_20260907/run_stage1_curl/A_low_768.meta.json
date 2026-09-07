@@ -1,0 +1,59 @@
+{
+  "prompt_text": "You are debugging a Python service. A shared dictionary is updated by four worker threads using counter[key] = counter.get(key, 0) + 1, but totals are occasionally too low. Explain the cause, give the smallest reliable fix using the standard library, and provide a corrected code example. Keep the answer under 300 words.\n",
+  "rubric_text": "PASS if the answer identifies the race on the read-modify-write sequence, recommends a standard-library lock-based fix, and gives a corrected example. It should stay under 300 words.\n",
+  "request": {
+    "model": "local",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a careful coding assistant. Follow the user prompt exactly."
+      },
+      {
+        "role": "user",
+        "content": "You are debugging a Python service. A shared dictionary is updated by four worker threads using counter[key] = counter.get(key, 0) + 1, but totals are occasionally too low. Explain the cause, give the smallest reliable fix using the standard library, and provide a corrected code example. Keep the answer under 300 words.\n"
+      }
+    ],
+    "temperature": 0,
+    "max_tokens": 768,
+    "chat_template_kwargs": {
+      "reasoning_effort": "low"
+    }
+  },
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "## Cause\n\n`counter[key] = counter.get(key, 0) + 1` is a **read-modify-write** sequence, not an atomic operation. Two threads can interleave like this:\n\n```\nThread A: reads counter[\"x\"] → 0\nThread B: reads counter[\"x\"] → 0\nThread A: writes counter[\"x\"] = 1\nThread B: writes counter[\"x\"] = 1   # lost update\n```\n\nThe GIL does not protect multi-step sequences; it only guarantees atomicity of individual bytecode instructions.\n\n## Fix\n\nWrap the read-modify-write in a `threading.Lock`.\n\n## Corrected Example\n\n```python\nimport threading\nfrom collections import defaultdict\n\ncounter = defaultdict(int)\nlock = threading.Lock()\n\ndef worker(n):\n    for _ in range(10_000):\n        with lock:\n            counter[\"key\"] += 1\n\nthreads = [threading.Thread(target=worker, args=(i,)) for i in range(4)]\nfor t in threads:\n    t.start()\nfor t in threads:\n    t.join()\n\nprint(counter[\"key\"])  # always 40000\n```\n\n### Why this works\n\nThe `with lock:` block makes the entire `+=` (which is itself a read-modify-write) mutually exclusive. Only one thread can execute the critical section at a time, so no increments are lost.\n\n### Alternatives (also stdlib)\n\n| Approach | Trade-off |\n|----------|-----------|\n| `threading.Lock` (above) | Simple, fine-grained; slight contention |\n| `queue.Queue` + single consumer | Decouples producers from aggregation; useful if you also need ordered processing |\n| `multiprocessing.Value` with `lock=True` | Only relevant if you move to processes, not threads |\n\nFor a hot path with many keys, you can reduce contention by using one lock per key (a dict of locks) or by batching increments locally per thread and merging at the end.",
+          "reasoning_content": "The user is asking about a classic race condition in Python with a shared dictionary updated by multiple threads. Let me think through this:\n\n1. **Cause**: `counter[key] = counter.get(key, 0) + 1` is not atomic. It's a read-modify-write sequence. Two threads can both read the same value, both increment it, and both write back the same result — losing one increment.\n\n2. **Smallest reliable fix using the standard library**: Options:\n   - `threading.Lock` around the read-modify-write\n   - `collections.Counter` with a lock (Counter itself isn't thread-safe for `+=` either)\n   - `threading.Lock` is the simplest and most direct fix\n\nActually, let me reconsider. `collections.Counter`'s `__iadd__` and `__setitem__` are not atomic either. The smallest fix is a `threading.Lock`.\n\nLet me write a concise answer under 300 words with a corrected code example.\n"
+        }
+      }
+    ],
+    "created": 1788810236,
+    "model": "Qwen3.8-27B-UD-IQ4_XS.gguf",
+    "system_fingerprint": "b9314-d55fb9717",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 653,
+      "prompt_tokens": 124,
+      "total_tokens": 777,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "id": "chatcmpl-WjmArxeZac2HX0cH25kJSg93a49qSi5S",
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 124,
+      "prompt_ms": 734.733,
+      "prompt_per_token_ms": 5.9252661290322575,
+      "prompt_per_second": 168.7687908396656,
+      "predicted_n": 653,
+      "predicted_ms": 19817.996,
+      "predicted_per_token_ms": 30.349151607963247,
+      "predicted_per_second": 32.94985022703607
+    }
+  }
+}

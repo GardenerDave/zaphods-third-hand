@@ -1,0 +1,1 @@
+PASS if the answer derives the prefix-sum frequency method, explains why equal prefix sums imply zero-sum subarrays, and gives the exact count for the sample input. The count should match a direct enumeration or equivalent correct derivation.

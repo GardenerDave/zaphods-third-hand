@@ -1,0 +1,1 @@
+PASS if the answer explains the original set-based approach fails on unhashable objects and does not implement earliest-second-occurrence semantics, then provides a standard-library-only replacement that compares items by equality and tracks earliest second occurrence correctly. Examples should be consistent with the code.

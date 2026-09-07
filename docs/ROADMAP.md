@@ -740,7 +740,11 @@ This phase improves retrieval and context construction after the execution/prove
    research policy remains important: when capability is unproven, broadly
    attempt the 1.7B worker first and preserve failures as
    capability-boundary evidence before escalation. Routing policy results must
-   not auto-promote.
+   not auto-promote. Qwen3.8-27B is now a bounded escalation worker with
+   explicit request-policy tuples for `reasoning_effort`,
+   `thinking_budget_tokens`, and total `max_tokens`; its `xhigh` capability
+   remains provisional and should not be treated as empirically superior until
+   future evidence says otherwise.
 
 20. Telemetry-backed routing evidence
 

@@ -251,7 +251,19 @@ def test_worker_request_provenance_contains_replay_fingerprint_without_private_u
     assert provenance["top_p"] is None
     assert provenance["seed"] is None
     assert provenance["stop"] is None
+    assert provenance["chat_template_kwargs"] is None
+    assert provenance["thinking_budget_tokens"] is None
     assert "endpoint.invalid" not in json.dumps(provenance)
+
+
+def test_qwen38_worker_request_provenance_carries_bounded_reasoning_policy():
+    spec = resolve_worker_spec("qwen3_8_27b", request_policy_name="exceptional")
+    _, payload, _, _, provenance = _render_request_payload(spec, "Explain the failure.", 1536, model=spec.model)
+    assert payload["chat_template_kwargs"] == {"reasoning_effort": "xhigh"}
+    assert payload["thinking_budget_tokens"] == 512
+    assert provenance["chat_template_kwargs"] == {"reasoning_effort": "xhigh"}
+    assert provenance["thinking_budget_tokens"] == 512
+    assert provenance["max_tokens"] == 1536
 
 
 def test_optional_context_complete_retry_is_default_off_and_fail_closed(tmp_path: Path):

@@ -1,0 +1,16 @@
+You are given the following problem.
+
+Define `score(nums)` for a non-empty list of integers as the number of contiguous subarrays whose sum is zero.
+
+Write a function `score(nums)` that returns this count. Then, for the following input, give the exact output and show enough reasoning to justify it:
+
+`[3, -1, -2, 4, -4, 1, -1, 2, -2, 0]`
+
+Constraints:
+
+1. Use only the standard library.
+2. The algorithm must run in O(n) time.
+3. Explain why the algorithm is correct.
+4. Give the exact numeric answer for the sample input.
+
+Keep the whole answer under 350 words.
