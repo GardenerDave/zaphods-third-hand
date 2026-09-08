@@ -19,6 +19,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
+from local_harness.binding_preflight import preflight_worker_binding
 from local_harness.icm_call import call_worker
 from local_harness.icm_spec import WorkerResponse, classify_worker_response, resolve_worker_spec
 from local_harness.prompt_patch_library import (
@@ -423,6 +424,7 @@ def run_capability_loop(
     existing_patch_ids: list[str] | None = None,
     patch_library: PromptPatchLibrary | None = None,
     deterministic_patch_retry: Mapping[str, Any] | None = None,
+    binding_preflight: Callable[[], dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     if max_worker_attempts < 1 or max_teacher_passes < 0:
         raise ValueError("retry ceilings must be non-negative and worker attempts must be positive")
@@ -432,6 +434,7 @@ def run_capability_loop(
     out_dir.mkdir(parents=True, exist_ok=True)
     trajectory = out_dir / "trajectory.jsonl"
     summary_path = out_dir / "trajectory_summary.json"
+    preflight_path = out_dir / "binding_preflight.json"
     prior = _records(trajectory)
     if summary_path.exists():
         summary = json.loads(summary_path.read_text(encoding="utf-8"))
@@ -454,6 +457,51 @@ def run_capability_loop(
     patch_retry_attempted = False
     patch_retry_passed = False
     patch_retry_failed = False
+    binding_preflight_result = None
+    if binding_preflight is not None:
+        if preflight_path.exists():
+            binding_preflight_result = json.loads(preflight_path.read_text(encoding="utf-8"))
+        else:
+            binding_preflight_result = binding_preflight()
+            _json_write(preflight_path, binding_preflight_result)
+        if binding_preflight_result.get("binding_status") != "VERIFIED":
+            disposition = "infrastructure_error"
+            summary = {
+                "schema": "supervised_capability_trajectory_v2",
+                "task_id": task_id,
+                "task_family": task["task_family"],
+                "endpoint_alias": os.environ.get("ZTH_PUBLIC_HOST_ALIAS", PUBLIC_ENDPOINT_ALIAS),
+                "capability_verdict_available": False,
+                "infrastructure_error_count": 1,
+                "external_teacher_infrastructure_failure": None,
+                "pass": False,
+                "first_attempt_pass": False,
+                "pass_after_existing_patch": False,
+                "patch_retry_attempted": False,
+                "patch_retry_passed": False,
+                "patch_retry_failed": False,
+                "teacher_escalation_avoided": True,
+                "pass_after_local_teacher_intervention": False,
+                "pass_after_external_teacher_intervention": False,
+                "successful_intervention_source": "none",
+                "intervention_attempts": {"none": False, "existing_patch": False, "deterministic_patch_retry": False, "local_teacher": False, "external_teacher": False},
+                "intervention_outcome": "not-applicable",
+                "candidate_prompt_patches": [],
+                "candidate_curriculum_examples": [],
+                "unresolved": False,
+                "disposition": disposition,
+                "attempt_count": 0,
+                "teacher_pass_count": 0,
+                "authority_boundaries": REQUIRED_AUTHORITY,
+                "review_state": disposition,
+                "trajectory_artifact": str(trajectory),
+                "generated_at": utc_now(),
+                "binding_preflight": binding_preflight_result,
+            }
+            _json_write(summary_path, summary)
+            if not any(r.get("transition") in {"ready_for_review", "unresolved"} for r in _records(trajectory)):
+                _transition(trajectory, transition=disposition, task_id=task_id, source="binding_preflight", disposition=disposition, successful_intervention_source="none", infrastructure_failure=True, binding_preflight=binding_preflight_result)
+            return summary
 
     # Durable artifact scan turns an interruption between a write and a JSONL
     # append into a recoverable transition instead of a repeated model call.

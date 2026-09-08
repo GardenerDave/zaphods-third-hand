@@ -10,6 +10,7 @@ import pytest
 import local_harness.supervised_capability_loop as loop
 from local_harness.icm_call import _render_request_payload
 from local_harness.icm_spec import WorkerResponse, resolve_worker_spec
+from local_harness.binding_preflight import preflight_worker_binding
 from local_harness.prompt_patch_library import PromptPatchLibrary
 from local_harness.supervised_capability_loop import aggregate_scorecard, run_capability_loop
 
@@ -44,6 +45,43 @@ def test_worker_success_without_escalation(tmp_path: Path):
     assert result["successful_intervention_source"] == "none"
     assert result["intervention_outcome"] == "no-effect"
     assert len(calls) == 1
+
+
+def test_binding_preflight_blocks_unverified_capability_attempt(tmp_path: Path):
+    worker_calls = 0
+
+    def worker(_prompt):
+        nonlocal worker_calls
+        worker_calls += 1
+        return response('{"answer":"ok"}', "small-1.7b")
+
+    result = run_capability_loop(
+        task(),
+        out_dir=tmp_path,
+        worker=worker,
+        local_teacher=lambda _p: pytest.fail("teacher must not be called"),
+        max_worker_attempts=1,
+        max_teacher_passes=0,
+        binding_preflight=lambda: {
+            "schema": "zth_worker_binding_preflight_v1",
+            "worker": "router",
+            "configured_base_url": "http://127.0.0.1:8081/v1",
+            "expected_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+            "endpoint_status": "ok",
+            "advertised_models": ["wrong-model"],
+            "binding_status": "UNVERIFIED",
+            "failure_class": "expected_model_not_advertised",
+            "reason": "expected model missing",
+            "checked_at": "2026-09-08T00:00:00+00:00",
+            "evidence": {"models_url": "http://127.0.0.1:8081/v1/models", "http_status": 200, "response_sha256": "0" * 64},
+        },
+    )
+    assert result["capability_verdict_available"] is False
+    assert result["disposition"] == "infrastructure_error"
+    assert worker_calls == 0
+    assert (tmp_path / "binding_preflight.json").is_file()
+    saved = json.loads((tmp_path / "binding_preflight.json").read_text())
+    assert saved["binding_status"] == "UNVERIFIED"
 
 
 @pytest.mark.parametrize(

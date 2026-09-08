@@ -212,6 +212,10 @@ Model gateway safeguards:
 - native or direct helpers remain available where exact backend behavior is
   scientifically required, including tokenization and template behavior.
 
+Static endpoint configuration is insufficient for capability use. Live worker
+bindings should be verified against `/v1/models` before a capability or
+scheduling decision relies on them.
+
 The model gateway is infrastructure, not the ZTH research router.
 
 Evaluation-framework direction for new experiments:

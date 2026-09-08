@@ -36,8 +36,8 @@
   },
   "missing_contemporaneous_runs": {
     "1.7B/router": {
-      "status": "endpoint_config_drift_unverified",
-      "failure_class": "configuration_endpoint_drift",
+      "status": "configured_endpoint_unreachable",
+      "failure_class": "configured_endpoint_unreachable",
       "attempted_tasks": ["A", "B", "C"],
       "verified_current_binding": null,
       "provenance_refs": [
@@ -47,8 +47,8 @@
       ]
     },
     "30B-A3B/handoff": {
-      "status": "endpoint_config_drift_unverified",
-      "failure_class": "configuration_endpoint_drift",
+      "status": "configured_endpoint_unreachable",
+      "failure_class": "configured_endpoint_unreachable",
       "attempted_tasks": ["A", "B", "C"],
       "verified_current_binding": null,
       "provenance_refs": [

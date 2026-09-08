@@ -136,9 +136,14 @@ A/B/C prompts, but all six calls failed before model response with
   - B: transport failure
   - C: transport failure
 
-Because these were uniform transport failures, they do not change capability
-qualification. They do, however, leave the contemporaneous comparison matrix
-incomplete.
+Because these were uniform preflight/network failures, they do not change
+capability qualification. The evidence proves:
+
+- configured endpoint unreachable;
+- current binding unverified.
+
+It does not by itself prove `.env.local` was stale or that a replacement
+endpoint exists.
 
 ## Validation
 
