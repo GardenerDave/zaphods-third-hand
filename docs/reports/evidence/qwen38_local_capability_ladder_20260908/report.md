@@ -1,6 +1,6 @@
 # Qwen3.8 Local Capability Ladder
 
-Date: 2026-09-07
+Date: 2026-09-08
 
 ## Starting Status
 
@@ -121,6 +121,25 @@ It is not enough yet to justify a fully general scheduler across the whole local
 stack, because the A/B/C ladder was not rerun contemporaneously for the 1.7B and
 30B-A3B workers in this turn.
 
+## Contemporaneous Run Attempt
+
+The missing 1.7B/router and 30B-A3B/handoff tuples were attempted on the exact
+A/B/C prompts, but all six calls failed before model response with
+`No route to host`.
+
+- 1.7B/router:
+  - A: transport failure
+  - B: transport failure
+  - C: transport failure
+- 30B-A3B/handoff:
+  - A: transport failure
+  - B: transport failure
+  - C: transport failure
+
+Because these were uniform transport failures, they do not change capability
+qualification. They do, however, leave the contemporaneous comparison matrix
+incomplete.
+
 ## Validation
 
 - `python3 -m pytest local_harness/tests/test_icm_call.py -q`
@@ -138,5 +157,5 @@ stack, because the A/B/C ladder was not rerun contemporaneously for the 1.7B and
 ## Ending Status
 
 - Working tree updated with the minimal policy-status correction, schema artifact,
-  ladder artifact, and documentation language fix.
+  ladder artifact, transport-failure evidence, and documentation language fix.
 - No automatic scheduling implementation was added.
