@@ -401,6 +401,16 @@ def _transition(
     return record
 
 
+def _artifact_reference(path: Path, *, artifact: str) -> dict[str, Any] | None:
+    if not path.is_file():
+        return None
+    return {
+        "artifact": artifact,
+        "path": str(path),
+        "sha256": sha256_text(path.read_text(encoding="utf-8")),
+    }
+
+
 def run_capability_loop(
     task: dict[str, Any],
     *,
@@ -654,12 +664,18 @@ def run_capability_loop(
         if teacher.get("corrected_reference_output") is not None:
             candidate_examples.append({"source": teacher.get("record_type"), "intervention_id": teacher.get("intervention_id"), "teacher_attempt": teacher.get("attempt"), "corrected_reference_output": teacher["corrected_reference_output"], "subsequent_worker_result": teacher.get("subsequent_worker_result", "not_run"), "review_state": "ready_for_review"})
     candidate_patches = [t["candidate_prompt_patch"] for t in all_teachers if t.get("candidate_prompt_patch")]
+    router_route_trace_reference = _artifact_reference(out_dir / "route_trace.json", artifact="route_trace")
+    capability_plan_reference = _artifact_reference(out_dir / "capability_plan.json", artifact="capability_plan")
     if not any(r.get("transition") in {"ready_for_review", "unresolved"} for r in _records(trajectory)):
         disposition = "ready_for_review" if final_pass else "infrastructure_error" if external_infrastructure else "unresolved"
         _transition(trajectory, transition=disposition, task_id=task_id, source=source, disposition=disposition, successful_intervention_source=source, infrastructure_failure=bool(external_infrastructure))
     summary = {
         "schema": "supervised_capability_trajectory_v2", "task_id": task_id, "task_family": task["task_family"], "endpoint_alias": os.environ.get("ZTH_PUBLIC_HOST_ALIAS", PUBLIC_ENDPOINT_ALIAS), "worker_model": attempts[0]["worker_model"] if attempts else None, "local_teacher_model": teacher_records[0].get("local_teacher_model") if teacher_records else None, "external_escalation_count": int(external_used), "external_teacher_call_count": external_teacher_call_count, "trials": 1, "capability_verdict_available": capability_verdict_available, "model_attempt_count": sum(bool(a.get("transport_valid")) for a in attempts), "infrastructure_error_count": infrastructure_error_count, "external_teacher_infrastructure_failure": external_infrastructure, "pass": final_pass if capability_verdict_available else False, "first_attempt_pass": bool(attempts and (attempts[0].get("validation") or {}).get("validation_status") == "passed"), "pass_after_existing_patch": existing_pass, "patch_retry_attempted": patch_retry_attempted, "patch_retry_passed": patch_retry_passed, "patch_retry_failed": patch_retry_failed, "teacher_escalation_avoided": patch_retry_passed and not teacher_records and not external_record, "pass_after_local_teacher_intervention": local_pass, "pass_after_external_teacher_intervention": external_pass, "successful_intervention_source": source, "intervention_attempts": intervention_attempts, "intervention_outcome": intervention_outcome, "candidate_prompt_patches": candidate_patches, "candidate_curriculum_examples": candidate_examples, "unresolved": not final_pass if capability_verdict_available else False, "disposition": "ready_for_review" if final_pass else "infrastructure_error" if external_infrastructure else "unresolved", "attempt_count": len(attempts), "teacher_pass_count": len(teacher_records), "authority_boundaries": REQUIRED_AUTHORITY, "review_state": "ready_for_review" if final_pass else "infrastructure_error" if external_infrastructure else "unresolved", "trajectory_artifact": str(trajectory), "generated_at": utc_now()
     }
+    if router_route_trace_reference is not None:
+        summary["router_route_trace_reference"] = router_route_trace_reference
+    if capability_plan_reference is not None:
+        summary["capability_plan_reference"] = capability_plan_reference
     _json_write(summary_path, summary)
     return summary
 

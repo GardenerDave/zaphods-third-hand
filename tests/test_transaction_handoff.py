@@ -239,6 +239,64 @@ def test_transaction_manifest_references_chain_without_replacing_records(tmp_pat
         tmp_path,
         next_worker_objective="Produce a bounded downstream comparison report.",
     )
+    (run_dir / "route_trace.json").write_text(
+        json.dumps(
+            {
+                "schema": "zth_router_v1_route_trace_v1",
+                "capability_eligibility": [
+                    {
+                        "capability_id": "semantic.minimal_action_object_extraction",
+                        "candidate_suppliers": [{"supplier_id": "s1", "supplier_type": "MODEL", "interface_id": "i1", "status": "QUALIFIED_EXPLORATORY"}],
+                        "qualified_candidates": [{"supplier_id": "s1", "supplier_type": "MODEL", "interface_id": "i1"}],
+                        "eligibility_status": "ELIGIBLE",
+                        "eligibility_reason": "At least one QUALIFIED_EXPLORATORY supplier exists in the registry.",
+                        "evidence_sources": [],
+                    }
+                ],
+                "capabilities": [
+                    {
+                        "capability_id": "semantic.minimal_action_object_extraction",
+                        "candidate_suppliers": [{"supplier_id": "s1", "supplier_type": "MODEL", "interface_id": "i1", "status": "QUALIFIED_EXPLORATORY"}],
+                        "qualified_candidates": [{"supplier_id": "s1", "supplier_type": "MODEL", "interface_id": "i1"}],
+                        "selected_supplier": {"supplier_id": "s1", "supplier_type": "MODEL", "interface_id": "i1"},
+                        "selection_reason": "Selected qualified MODEL supplier by explicit supplier-type precedence.",
+                        "eligibility_reason": "At least one QUALIFIED_EXPLORATORY supplier exists in the registry.",
+                        "coverage_status": "COVERED",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (run_dir / "capability_plan.json").write_text(
+        json.dumps(
+            {
+                "schema": "zth_router_v1_2_capability_plan_v1",
+                "capability_eligibility": [
+                    {
+                        "capability_id": "semantic.minimal_action_object_extraction",
+                        "candidate_suppliers": [{"supplier_id": "s1", "supplier_type": "MODEL", "interface_id": "i1", "status": "QUALIFIED_EXPLORATORY"}],
+                        "qualified_candidates": [{"supplier_id": "s1", "supplier_type": "MODEL", "interface_id": "i1"}],
+                        "eligibility_status": "ELIGIBLE",
+                        "eligibility_reason": "At least one QUALIFIED_EXPLORATORY supplier exists in the registry.",
+                        "evidence_sources": [],
+                    }
+                ],
+                "capabilities": [
+                    {
+                        "capability_id": "semantic.minimal_action_object_extraction",
+                        "candidate_suppliers": [{"supplier_id": "s1", "supplier_type": "MODEL", "interface_id": "i1", "status": "QUALIFIED_EXPLORATORY"}],
+                        "qualified_candidates": [{"supplier_id": "s1", "supplier_type": "MODEL", "interface_id": "i1"}],
+                        "selected_supplier": {"supplier_id": "s1", "supplier_type": "MODEL", "interface_id": "i1"},
+                        "selection_reason": "Selected qualified MODEL supplier by explicit supplier-type precedence.",
+                        "eligibility_reason": "At least one QUALIFIED_EXPLORATORY supplier exists in the registry.",
+                        "coverage_status": "COVERED",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
     result = build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
 
     manifest = json.loads(result["transaction_manifest_path"].read_text(encoding="utf-8"))
@@ -251,11 +309,15 @@ def test_transaction_manifest_references_chain_without_replacing_records(tmp_pat
     assert manifest["records"]["handoff_id"] is not None
     assert manifest["evidence_references"]
     assert "supervised_model_attempt" in {item["artifact"] for item in manifest["evidence_references"]}
+    assert "route_trace" in {item["artifact"] for item in manifest["evidence_references"]}
+    assert "capability_plan" in {item["artifact"] for item in manifest["evidence_references"]}
     assert any("sha256" in item for item in manifest["evidence_references"])
     repository_reference = manifest["repository_reference"]
     assert repository_reference["artifact"] == "repository_root"
     assert Path(repository_reference["path"]).resolve() == ROOT.resolve()
     assert repository_reference["commit_sha"] == repository_reference["resolved_commit_sha"]
+    assert result["next_worker_context"]["router_evidence"]["route_trace"]["artifact"] == "route_trace"
+    assert result["next_worker_context"]["router_evidence"]["capability_plan"]["artifact"] == "capability_plan"
 
 
 def test_next_worker_context_contains_required_handoff_information(tmp_path: Path) -> None:

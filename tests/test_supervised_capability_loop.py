@@ -266,6 +266,15 @@ def test_qwen38_worker_request_provenance_carries_bounded_reasoning_policy():
     assert provenance["max_tokens"] == 1536
 
 
+def test_supervised_trajectory_summary_can_reference_router_evidence(tmp_path: Path):
+    (tmp_path / "route_trace.json").write_text(json.dumps({"schema": "zth_router_v1_route_trace_v1", "capability_eligibility": [{"capability_id": "x", "candidate_suppliers": [{"supplier_id": "s1", "status": "QUALIFIED_EXPLORATORY"}], "qualified_candidates": [{"supplier_id": "s1"}], "eligibility_reason": "eligible"}], "capabilities": [{"capability_id": "x", "selected_supplier": {"supplier_id": "s1"}, "selection_reason": "selected"}]}), encoding="utf-8")
+    (tmp_path / "capability_plan.json").write_text(json.dumps({"schema": "zth_router_v1_capability_plan_v1", "capability_eligibility": [{"capability_id": "x", "candidate_suppliers": [{"supplier_id": "s1", "status": "QUALIFIED_EXPLORATORY"}], "qualified_candidates": [{"supplier_id": "s1"}], "eligibility_reason": "eligible"}], "capabilities": [{"capability_id": "x", "selected_supplier": {"supplier_id": "s1"}, "selection_reason": "selected"}]}), encoding="utf-8")
+    run_capability_loop(task(), out_dir=tmp_path, worker=lambda p: response('{"answer":"ok"}', "small-1.7b"), local_teacher=lambda p: pytest.fail("teacher called"))
+    summary = json.loads((tmp_path / "trajectory_summary.json").read_text(encoding="utf-8"))
+    assert summary["router_route_trace_reference"]["artifact"] == "route_trace"
+    assert summary["capability_plan_reference"]["artifact"] == "capability_plan"
+
+
 def test_optional_context_complete_retry_is_default_off_and_fail_closed(tmp_path: Path):
     prompts: list[str] = []
     patch = {"candidate_patch_id": "experimental", "prompt_delta": "Use the declared contract and evidence."}

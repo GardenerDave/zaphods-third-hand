@@ -150,6 +150,12 @@ def _artifact_reference(path: Path, *, artifact: str, id_key: str | None = None,
     return reference
 
 
+def _optional_artifact_reference(path: Path, *, artifact: str) -> dict[str, Any] | None:
+    if not path.is_file():
+        return None
+    return _artifact_reference(path, artifact=artifact)
+
+
 def _repository_reference(repo_root: Path) -> dict[str, Any]:
     resolved_root = repo_root.resolve()
     if not resolved_root.is_dir():
@@ -442,6 +448,14 @@ def build_next_worker_context(
     if gate_record.get("gate_scope") != handoff_record.get("handoff_scope"):
         raise TransactionHandoffError("handoff scope must match downstream-use gate scope")
 
+    route_trace_reference = next(
+        (reference for reference in transaction_manifest["evidence_references"] if reference.get("artifact") == "route_trace"),
+        None,
+    )
+    capability_plan_reference = next(
+        (reference for reference in transaction_manifest["evidence_references"] if reference.get("artifact") == "capability_plan"),
+        None,
+    )
     task_request = task_state.get("task_request")
     if not isinstance(task_request, str) or not task_request.strip():
         raise TransactionHandoffError("task state must include a non-empty task_request")
@@ -467,6 +481,10 @@ def build_next_worker_context(
             "raw_output_sha256": raw_output_reference.get("sha256"),
         },
         "task_state": deepcopy(task_state),
+        "router_evidence": {
+            "route_trace": route_trace_reference,
+            "capability_plan": capability_plan_reference,
+        },
         "task_request": task_request,
         "selected_next_worker_identity": next_worker_identity,
         "first_worker_identity": transaction_manifest["first_worker_identity"],
@@ -1234,11 +1252,14 @@ def build_transaction_handoff_artifacts(
         "source_prompt_packet_path": attempt.get("source_prompt_packet_path"),
         "run_manifest_path": str(run_dir / "run_manifest.json"),
     }
+    route_trace_reference = _optional_artifact_reference(run_dir / "route_trace.json", artifact="route_trace")
+    capability_plan_reference = _optional_artifact_reference(run_dir / "capability_plan.json", artifact="capability_plan")
     repository_reference = _repository_reference(Path(__file__).resolve().parents[1])
 
     evidence_references = [
         repository_reference,
         _artifact_reference(run_dir / "run_manifest.json", artifact="run_manifest"),
+        *[ref for ref in (route_trace_reference, capability_plan_reference) if ref is not None],
         _artifact_reference(run_dir / "model_prompt_packet.md", artifact="model_prompt_packet"),
         _artifact_reference(run_dir / "raw_model_output.txt", artifact="raw_model_output"),
         _artifact_reference(run_dir / "supervised_model_attempt.json", artifact="supervised_model_attempt", id_key="attempt_id", id_value=attempt["attempt_id"]),
