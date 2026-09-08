@@ -8,10 +8,18 @@ capability beyond binding verification and model advertisement.
 
 from __future__ import annotations
 
+import argparse
 from copy import deepcopy
+import json
 import os
 from datetime import datetime, timezone
+from pathlib import Path
+import sys
 from typing import Any, Iterable, Mapping
+import urllib.request
+
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from local_harness.binding_preflight import preflight_worker_binding
 from local_harness.icm_spec import resolve_worker_spec
@@ -141,7 +149,7 @@ def _configured_bindings_from_env(env: Mapping[str, str]) -> list[dict[str, Any]
 def collect_local_fleet_snapshot(
     *,
     bindings: Iterable[Mapping[str, Any]] | None = None,
-    opener: Any,
+    opener: Any = urllib.request.urlopen,
     timeout: int = 30,
     generated_at: str | None = None,
     env: Mapping[str, str] | None = None,
@@ -189,3 +197,59 @@ def verified_workers(snapshot: Mapping[str, Any]) -> list[dict[str, Any]]:
             continue
         admitted.append(deepcopy(worker))
     return admitted
+
+
+def _build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="Collect a bounded live snapshot for explicitly configured local workers."
+    )
+    parser.add_argument(
+        "--timeout",
+        type=int,
+        default=30,
+        help="Per-worker /v1/models timeout in seconds.",
+    )
+    parser.add_argument(
+        "--out",
+        type=Path,
+        default=None,
+        help="Optional path to write the JSON snapshot. Stdout is always emitted.",
+    )
+    parser.add_argument(
+        "--verified-only",
+        action="store_true",
+        help="Emit only workers with verified live bindings.",
+    )
+    return parser
+
+
+def _write_snapshot(path: Path, snapshot: Mapping[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(snapshot, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def main(
+    argv: list[str] | None = None,
+    *,
+    opener: Any = urllib.request.urlopen,
+    env: Mapping[str, str] | None = None,
+) -> int:
+    args = _build_parser().parse_args(argv)
+    snapshot = collect_local_fleet_snapshot(opener=opener, timeout=args.timeout, env=env)
+    payload: Mapping[str, Any]
+    if args.verified_only:
+        payload = {
+            "schema": "zth_local_fleet_snapshot_verified_workers_v1",
+            "generated_at": snapshot["generated_at"],
+            "workers": verified_workers(snapshot),
+        }
+    else:
+        payload = snapshot
+    if args.out is not None:
+        _write_snapshot(args.out, payload)
+    print(json.dumps(payload, indent=2, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from local_harness.local_fleet_snapshot import collect_local_fleet_snapshot, verified_workers
+import json
+
+from local_harness.local_fleet_snapshot import collect_local_fleet_snapshot, main, verified_workers
 
 
 class FakeResponse:
@@ -131,3 +133,56 @@ def test_eligibility_adapter_does_not_admit_static_config_only_workers():
         ],
     }
     assert verified_workers(snapshot) == []
+
+
+def test_cli_emits_snapshot_from_configured_environment(capsys, tmp_path):
+    opener = _opener_factory([
+        FakeResponse({"data": [{"id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf"}]}),
+        FakeResponse({"data": [{"id": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"}]}),
+    ])
+    out = tmp_path / "fleet.json"
+    rc = main(
+        ["--out", str(out), "--timeout", "5"],
+        opener=opener,
+        env={
+            "ZTH_CAPABILITY_WORKER_NAME": "router",
+            "ZTH_CAPABILITY_WORKER_BASE_URL": "http://127.0.0.1:8081/v1",
+            "ZTH_CAPABILITY_WORKER_MODEL": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+            "ZTH_CAPABILITY_TEACHER_NAME": "handoff",
+            "ZTH_CAPABILITY_TEACHER_BASE_URL": "http://127.0.0.1:8080/v1",
+            "ZTH_CAPABILITY_TEACHER_MODEL": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+        },
+    )
+    assert rc == 0
+    payload = json.loads(capsys.readouterr().out)
+    written = json.loads(out.read_text(encoding="utf-8"))
+    assert payload == written
+    assert payload["schema"] == "zth_local_fleet_snapshot_v1"
+    assert [worker["binding_status"] for worker in payload["workers"]] == ["VERIFIED", "VERIFIED"]
+    assert opener.calls == [
+        "http://127.0.0.1:8081/v1/models",
+        "http://127.0.0.1:8080/v1/models",
+    ]
+
+
+def test_cli_verified_only_filters_unverified_workers(capsys):
+    opener = _opener_factory([
+        FakeResponse({"data": [{"id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf"}]}),
+        FakeResponse({"data": [{"id": "other-model"}]}),
+    ])
+    rc = main(
+        ["--verified-only"],
+        opener=opener,
+        env={
+            "ZTH_CAPABILITY_WORKER_NAME": "router",
+            "ZTH_CAPABILITY_WORKER_BASE_URL": "http://127.0.0.1:8081/v1",
+            "ZTH_CAPABILITY_WORKER_MODEL": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+            "ZTH_CAPABILITY_TEACHER_NAME": "handoff",
+            "ZTH_CAPABILITY_TEACHER_BASE_URL": "http://127.0.0.1:8080/v1",
+            "ZTH_CAPABILITY_TEACHER_MODEL": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+        },
+    )
+    assert rc == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["schema"] == "zth_local_fleet_snapshot_verified_workers_v1"
+    assert [worker["worker"] for worker in payload["workers"]] == ["router"]

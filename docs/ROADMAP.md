@@ -216,6 +216,11 @@ Static endpoint configuration is insufficient for capability use. Live worker
 bindings should be verified against `/v1/models` before a capability or
 scheduling decision relies on them.
 
+The live fleet snapshot collector now has a bounded CLI that reads explicitly
+configured worker bindings, records `/v1/models` preflight evidence, and can
+write a JSON snapshot before any routing layer consumes availability. It does
+not route, schedule, promote, or administer workers.
+
 The model gateway is infrastructure, not the ZTH research router.
 
 Evaluation-framework direction for new experiments:
