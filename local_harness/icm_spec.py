@@ -35,6 +35,10 @@ DEFAULT_WORKERS: dict[str, dict[str, Any]] = {
         "base_url": "http://<LAN_HOST>:8080/v1",
         "model": "Qwen3.8-27B-UD-IQ4_XS.gguf",
         "request_policies": {
+            "direct": {
+                "append_no_think": True,
+                "max_tokens": 1024,
+            },
             "routine": {
                 "chat_template_kwargs": {"reasoning_effort": "low"},
                 "thinking_budget_tokens": 256,

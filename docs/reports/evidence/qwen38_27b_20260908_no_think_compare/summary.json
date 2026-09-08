@@ -1,0 +1,66 @@
+{
+  "date_utc": "2026-09-07",
+  "model": "Qwen3.8-27B-UD-IQ4_XS.gguf",
+  "endpoint": "http://192.168.137.3:8080/v1",
+  "mechanism": {
+    "name": "direct",
+    "true_no_think_signal": "/no_think",
+    "request_path": "local_harness.icm_call.py --final-only"
+  },
+  "tasks": {
+    "A": {
+      "status": "pass",
+      "finish_reason": "stop",
+      "prompt_tokens": 130,
+      "completion_tokens": 348,
+      "prompt_tokens_per_second": 154.2382466783692,
+      "generation_tokens_per_second": 33.11542180435465
+    },
+    "B": {
+      "status": "pass",
+      "finish_reason": "stop",
+      "prompt_tokens": 275,
+      "completion_tokens": 547,
+      "prompt_tokens_per_second": 388.89690835449056,
+      "generation_tokens_per_second": 32.447171615048184,
+      "baseline_low_256": {
+        "finish_reason": "stop",
+        "prompt_tokens": 269,
+        "completion_tokens": 539,
+        "prompt_tokens_per_second": 389.3501486452346,
+        "generation_tokens_per_second": 32.873113805988126,
+        "rubric_result": "PASS_WITH_EXCESS_REASONING"
+      }
+    },
+    "C": {
+      "status": "pass",
+      "finish_reason": "stop",
+      "prompt_tokens": 217,
+      "completion_tokens": 744,
+      "prompt_tokens_per_second": 304.4633255229291,
+      "generation_tokens_per_second": 32.656417877141465,
+      "baseline_low_256": {
+        "finish_reason": "stop",
+        "prompt_tokens": 211,
+        "completion_tokens": 810,
+        "prompt_tokens_per_second": 276.228266661081,
+        "generation_tokens_per_second": 32.12914360838683,
+        "rubric_result": "PASS"
+      }
+    }
+  },
+  "policy_decision": {
+    "justified": true,
+    "named_policy": "direct",
+    "position": "below_routine",
+    "semantics": [
+      "append /no_think once",
+      "keep output budget distinct",
+      "omit extra reasoning controls"
+    ]
+  },
+  "worker_ladder_plan": {
+    "qualification_set": ["A", "B", "C"],
+    "workers": ["1.7B local worker", "Qwen3.8-27B", "30B-A3B worker"]
+  }
+}

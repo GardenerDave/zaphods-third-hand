@@ -54,10 +54,14 @@ class IcmCallTests(unittest.TestCase):
         self.assertTrue(spec.append_no_think)
 
     def test_resolve_worker_spec_selects_qwen38_request_policy(self):
+        direct = icm_call.resolve_worker_spec("qwen3_8_27b", request_policy_name="direct")
         routine = icm_call.resolve_worker_spec("qwen3_8_27b", request_policy_name="routine")
         medium = icm_call.resolve_worker_spec("qwen3_8_27b", request_policy_name="serious")
         exceptional = icm_call.resolve_worker_spec("qwen3_8_27b", request_policy_name="exceptional")
 
+        self.assertEqual("direct", direct.request_policy_name)
+        self.assertTrue(direct.request_policy["append_no_think"])
+        self.assertEqual(1024, direct.request_policy["max_tokens"])
         self.assertEqual("routine", routine.request_policy_name)
         self.assertEqual({"reasoning_effort": "low"}, routine.request_policy["chat_template_kwargs"])
         self.assertEqual(256, routine.request_policy["thinking_budget_tokens"])
@@ -80,6 +84,23 @@ class IcmCallTests(unittest.TestCase):
         self.assertEqual(512, provenance["thinking_budget_tokens"])
         self.assertEqual(1536, provenance["max_tokens"])
         self.assertNotEqual(provenance["thinking_budget_tokens"], provenance["max_tokens"])
+
+    def test_render_request_payload_applies_direct_no_think_policy(self):
+        spec = icm_call.resolve_worker_spec("qwen3_8_27b", request_policy_name="direct")
+        _, payload, _, actual_prompt, provenance = icm_call._render_request_payload(
+            spec,
+            "Return exactly: ok",
+            1024,
+            model=spec.model,
+        )
+
+        self.assertIn("/no_think", actual_prompt)
+        self.assertTrue(actual_prompt.endswith("/no_think"))
+        self.assertNotIn("chat_template_kwargs", payload)
+        self.assertNotIn("thinking_budget_tokens", payload)
+        self.assertTrue(provenance["append_no_think"])
+        self.assertIsNone(provenance["chat_template_kwargs"])
+        self.assertIsNone(provenance["thinking_budget_tokens"])
 
     def test_render_request_payload_keeps_legacy_workers_unchanged(self):
         spec = icm_call.resolve_worker_spec("handoff", base_url="http://localhost:8083/v1", model="gemma-test.gguf")

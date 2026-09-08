@@ -128,8 +128,9 @@ def _build_request_payload(
     model: str | None,
     max_tokens: int,
 ) -> tuple[dict[str, Any], str, dict[str, Any]]:
-    actual_prompt = maybe_append_no_think(prompt, spec.append_no_think)
     request_policy = dict(spec.request_policy or {})
+    policy_append_no_think = bool(request_policy.get("append_no_think"))
+    actual_prompt = maybe_append_no_think(prompt, spec.append_no_think or policy_append_no_think)
     chat_template_kwargs = request_policy.get("chat_template_kwargs")
     thinking_budget_tokens = request_policy.get("thinking_budget_tokens")
     if spec.api == OPENAI_CHAT:
@@ -185,6 +186,7 @@ def _build_request_payload(
         "stop": None,
         "chat_template_kwargs": chat_template_kwargs if isinstance(chat_template_kwargs, dict) and chat_template_kwargs else None,
         "thinking_budget_tokens": thinking_budget_tokens,
+        "append_no_think": spec.append_no_think or policy_append_no_think,
         "endpoint_alias": os.environ.get("ZTH_PUBLIC_HOST_ALIAS", "JARVIS_LOCAL"),
         "structured_output_enabled": False,
         "structured_output_mechanism": None,
@@ -225,9 +227,10 @@ def _render_request_payload(
     *,
     model: str | None,
 ) -> tuple[str, dict[str, Any], bytes, str, dict[str, Any]]:
-    actual_prompt = maybe_append_no_think(prompt, spec.append_no_think)
-    request_url = completion_url(spec)
     request_policy = dict(spec.request_policy or {})
+    policy_append_no_think = bool(request_policy.get("append_no_think"))
+    actual_prompt = maybe_append_no_think(prompt, spec.append_no_think or policy_append_no_think)
+    request_url = completion_url(spec)
     chat_template_kwargs = request_policy.get("chat_template_kwargs")
     thinking_budget_tokens = request_policy.get("thinking_budget_tokens")
     request_payload = {
@@ -288,6 +291,7 @@ def _render_request_payload(
         "stop": None,
         "chat_template_kwargs": chat_template_kwargs if isinstance(chat_template_kwargs, dict) and chat_template_kwargs else None,
         "thinking_budget_tokens": thinking_budget_tokens,
+        "append_no_think": spec.append_no_think or policy_append_no_think,
         "endpoint_alias": os.environ.get("ZTH_PUBLIC_HOST_ALIAS", "JARVIS_LOCAL"),
         "request_body_sha256": _sha256_bytes(request_bytes),
         "request_body_length": len(request_bytes),
