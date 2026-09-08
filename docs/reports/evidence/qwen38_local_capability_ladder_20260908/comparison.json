@@ -1,0 +1,44 @@
+{
+  "schema": "zth.local_worker_policy_capability_ladder.v1",
+  "date_utc": "2026-09-07",
+  "qualifying_policy_status": {
+    "qwen3_8_27b/direct": "experimental_unqualified",
+    "qwen3_8_27b/routine": "qualified_on_preserved_bounded_set"
+  },
+  "task_results": {
+    "A": {
+      "smallest_qualifying_tuple": "Qwen3.8/direct",
+      "next_successful_escalation_tuple": null,
+      "direct_result": "qualified",
+      "routine_plus_hint_result": "qualified",
+      "serious_result": null,
+      "30b_result": null,
+      "notes": "Direct remained correct on A; additional reasoning was unnecessary."
+    },
+    "B": {
+      "smallest_qualifying_tuple": "Qwen3.8 routine + final-answer hint",
+      "next_successful_escalation_tuple": null,
+      "direct_result": "not_qualified",
+      "routine_plus_hint_result": "qualified",
+      "serious_result": null,
+      "30b_result": null,
+      "notes": "Direct regressed to reasoning_only; routine/no_think preserved correctness."
+    },
+    "C": {
+      "smallest_qualifying_tuple": "Qwen3.8 routine + final-answer hint",
+      "next_successful_escalation_tuple": null,
+      "direct_result": "not_qualified",
+      "routine_plus_hint_result": "qualified",
+      "serious_result": null,
+      "30b_result": null,
+      "notes": "Direct regressed to reasoning_only; routine/no_think preserved correctness."
+    }
+  },
+  "evidence_paths": [
+    "docs/reports/evidence/qwen38_27b_20260908_direct_policy_confirm/",
+    "docs/reports/evidence/qwen38_27b_20260908_no_think_compare/",
+    "docs/reports/evidence/qwen38_27b_20260907/",
+    "docs/reports/evidence/1p7b_structured_output_qualification_20260830/control_constrained/local_model_call.json",
+    "docs/reports/evidence/verified_compact_receiver_qualification_20260903/source_run/local_model_call.json"
+  ]
+}

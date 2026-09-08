@@ -1,0 +1,101 @@
+{
+  "schema": "zth.local_worker_policy_metric_schema.v1",
+  "purpose": "Normalize per-request telemetry across local workers without inventing missing fields.",
+  "fields": [
+    {
+      "name": "worker",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "model",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "request_policy",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "final_answer_hint_state",
+      "type": "string",
+      "allowed_values": ["none", "append_no_think", "unknown"],
+      "required": true
+    },
+    {
+      "name": "task_id",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "correctness",
+      "type": "string",
+      "allowed_values": ["pass", "fail", "not_run", "infrastructure_failure"],
+      "required": true
+    },
+    {
+      "name": "failure_class",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "prompt_tokens",
+      "type": "integer",
+      "required": false
+    },
+    {
+      "name": "prompt_eval_ms",
+      "type": "number",
+      "required": false
+    },
+    {
+      "name": "prefill_tokens_per_second",
+      "type": "number",
+      "required": false,
+      "derived_from": ["prompt_tokens", "prompt_eval_ms"]
+    },
+    {
+      "name": "completion_tokens",
+      "type": "integer",
+      "required": false
+    },
+    {
+      "name": "decode_ms",
+      "type": "number",
+      "required": false
+    },
+    {
+      "name": "decode_tokens_per_second",
+      "type": "number",
+      "required": false
+    },
+    {
+      "name": "total_latency_ms",
+      "type": "number",
+      "required": false
+    },
+    {
+      "name": "finish_reason",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "reasoning_tokens",
+      "type": "integer",
+      "required": false
+    },
+    {
+      "name": "provenance_ref",
+      "type": "string",
+      "required": true
+    }
+  ],
+  "notes": [
+    "If prompt_eval_ms is absent, do not derive prefill_tokens_per_second.",
+    "If decode_ms is absent, do not derive decode_tokens_per_second from completion tokens.",
+    "Infrastructure failures stay separate from capability failures.",
+    "Direct /no_think is tracked as request_policy=direct with final_answer_hint_state=append_no_think.",
+    "Routine / low/256 is tracked as request_policy=routine with final_answer_hint_state=none."
+  ]
+}

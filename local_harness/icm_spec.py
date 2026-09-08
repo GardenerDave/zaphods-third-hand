@@ -38,6 +38,7 @@ DEFAULT_WORKERS: dict[str, dict[str, Any]] = {
             "direct": {
                 "append_no_think": True,
                 "max_tokens": 1024,
+                "qualification_status": "experimental_unqualified",
             },
             "routine": {
                 "chat_template_kwargs": {"reasoning_effort": "low"},

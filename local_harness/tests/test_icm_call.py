@@ -62,6 +62,7 @@ class IcmCallTests(unittest.TestCase):
         self.assertEqual("direct", direct.request_policy_name)
         self.assertTrue(direct.request_policy["append_no_think"])
         self.assertEqual(1024, direct.request_policy["max_tokens"])
+        self.assertEqual("experimental_unqualified", direct.request_policy["qualification_status"])
         self.assertEqual("routine", routine.request_policy_name)
         self.assertEqual({"reasoning_effort": "low"}, routine.request_policy["chat_template_kwargs"])
         self.assertEqual(256, routine.request_policy["thinking_budget_tokens"])

@@ -9,7 +9,7 @@ Date: 2026-09-07
 
 ## Exact No-Think Mechanism
 
-- The true no-thinking baseline on the current local Qwen3.8 path is the prompt suffix `/no_think`.
+- The current final-answer-only request shape on the local Qwen3.8 path is the prompt suffix `/no_think`.
 - In this repo, the mechanism is surfaced by `local_harness.icm_call.py --final-only`, which appends `/no_think` once to the user prompt.
 - The request path does not currently expose a separate lower-level reasoning-disable field that supersedes the prompt contract.
 - The new named Qwen3.8 request policy added here is `direct`, and it maps to `append_no_think=True` with no extra reasoning-budget controls.
@@ -49,7 +49,7 @@ For `A`, the closest preserved comparator is the stage1 `low/768` run, which als
 
 ## Interpretation
 
-- The no-think baseline is not just a faster version of `low/256`; it is a distinct request shape with comparable or better correctness on this representative subset.
+- The `/no_think` request shape is not just a faster version of `low/256`; it is a distinct request shape with comparable or better correctness on this representative subset.
 - It is especially attractive for bounded structured tasks where visible output is the goal and hidden reasoning is not needed.
 - The evidence is not strong enough to claim a universal replacement for routine reasoning, because `B` did not clearly beat low/256 on token use.
 
@@ -57,6 +57,7 @@ For `A`, the closest preserved comparator is the stage1 `low/768` run, which als
 
 - Add a distinct Qwen3.8 request policy below `routine`: `direct`.
 - Semantics: append `/no_think`, keep the output budget independent, and do not attach reasoning-effort or thinking-budget controls.
+- Treat `direct` as an experimental unqualified policy until broader evidence establishes qualification beyond the bounded set.
 - Do not collapse this into worker eligibility or scheduling.
 
 ## Local Worker Ladder Plan
