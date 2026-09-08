@@ -36,9 +36,10 @@
   },
   "missing_contemporaneous_runs": {
     "1.7B/router": {
-      "status": "infrastructure_failure",
-      "failure_class": "transport_no_route_to_host",
+      "status": "endpoint_config_drift_unverified",
+      "failure_class": "configuration_endpoint_drift",
       "attempted_tasks": ["A", "B", "C"],
+      "verified_current_binding": null,
       "provenance_refs": [
         "session:50579",
         "session:85353",
@@ -46,9 +47,10 @@
       ]
     },
     "30B-A3B/handoff": {
-      "status": "infrastructure_failure",
-      "failure_class": "transport_no_route_to_host",
+      "status": "endpoint_config_drift_unverified",
+      "failure_class": "configuration_endpoint_drift",
       "attempted_tasks": ["A", "B", "C"],
+      "verified_current_binding": null,
       "provenance_refs": [
         "session:60205",
         "session:62688",
