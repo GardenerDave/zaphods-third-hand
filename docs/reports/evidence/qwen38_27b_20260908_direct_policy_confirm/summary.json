@@ -1,0 +1,34 @@
+{
+  "date_utc": "2026-09-07",
+  "model": "Qwen3.8-27B-UD-IQ4_XS.gguf",
+  "endpoint": "http://192.168.137.3:8080/v1",
+  "rendered_request_check": {
+    "no_think_count": 1,
+    "chat_template_kwargs_present": false,
+    "thinking_budget_tokens_present": false,
+    "max_tokens": 1024
+  },
+  "results": {
+    "A": {
+      "status": "pass",
+      "finish_reason": "stop",
+      "completion_tokens": 348,
+      "prompt_tokens": 130,
+      "prompt_tokens_per_second": 154.2382466783692,
+      "generation_tokens_per_second": 33.11542180435465
+    },
+    "B": {
+      "status": "fail_reasoning_only",
+      "finish_reason": "reasoning_only"
+    },
+    "C": {
+      "status": "fail_reasoning_only",
+      "finish_reason": "reasoning_only"
+    }
+  },
+  "comparison": {
+    "direct_qualified": false,
+    "reason": "B and C regressed to reasoning_only under direct"
+  },
+  "evidence_path": "docs/reports/evidence/qwen38_27b_20260908_direct_policy_confirm/run_direct/"
+}
