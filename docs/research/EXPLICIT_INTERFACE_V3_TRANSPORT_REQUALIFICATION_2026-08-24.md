@@ -14,10 +14,10 @@ This additive attempt preserves the failed qualification at commit
 
 ## Local transport
 
-A narrow LAN scan of documented model ports discovered `192.168.1.16` with
+A narrow LAN scan of documented model ports discovered `<LAN_HOST>` with
 ports 8080 and 8081 open. The non-inference request:
 
-`GET http://192.168.1.16:8080/v1/models`
+`GET http://<LAN_HOST>:8080/v1/models`
 
 returned exactly:
 `Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf`.
@@ -25,7 +25,7 @@ returned exactly:
 The Dev-side configuration now uses the concrete base URL explicitly. The
 request-construction regression proves that the same base URL produces:
 
-`http://192.168.1.16:8080/v1/chat/completions`
+`http://<LAN_HOST>:8080/v1/chat/completions`
 
 The one authorized completion used `Return exactly: TRANSPORT_OK` and returned
 `TRANSPORT_OK` with status `ok`. The response SHA256 is
@@ -66,7 +66,7 @@ New local run:
 
 - `/v1/models` response SHA256: `56a4a28d039d1e378d561319b17ae0da276c2806231105c6bbadd21979fb20a7`
 - local response SHA256: `52c39f2b1f4fa8585552879bc993f277904438f439a300241bf0d895a634139a`
-- local request URL: `http://192.168.1.16:8080/v1/chat/completions`
+- local request URL: `http://<LAN_HOST>:8080/v1/chat/completions`
 - harness SHA256: `053b7b282f8773842657f60e179dacd61e323d7cf278469fa163437eed50ab72`
 - regression-test SHA256: `1147739f844f61f1bf100d1d985ad1169bfb31d777bff9ca1f41c5be58fc798f`
 

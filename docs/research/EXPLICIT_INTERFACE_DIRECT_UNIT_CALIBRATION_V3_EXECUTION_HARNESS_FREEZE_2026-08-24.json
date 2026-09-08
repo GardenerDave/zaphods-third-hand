@@ -13,7 +13,7 @@
   "freeze_artifact": "docs/research/EXPLICIT_INTERFACE_DIRECT_UNIT_CALIBRATION_FREEZE_V3_2026-08-24.json",
   "freeze_sha256": "37478f3627d2eea645b0d6f51f772cf19c35e92ebfba65aabf23565e528bb5b2",
   "initial_v3_freeze_commit": "c4bd2c6c386b4df9493ce8e166dc34c4b2f58bab",
-  "local_endpoint_binding": "http://192.168.1.16:8080/v1",
+  "local_endpoint_binding": "http://<LAN_HOST>:8080/v1",
   "matched_runtime_message_bytes_across_arms": true,
   "matched_runtime_message_hash_across_arms": true,
   "one_shot_guard_ordering": "PREPARED; guard; RUNNING",

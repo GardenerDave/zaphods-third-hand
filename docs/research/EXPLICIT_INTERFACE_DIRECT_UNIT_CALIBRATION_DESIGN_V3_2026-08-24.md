@@ -43,7 +43,7 @@ inputs or scoring artifacts.
 ## Qualified transport bindings
 
 Local transport was qualified at
-`http://192.168.1.16:8080/v1` with model
+`http://<LAN_HOST>:8080/v1` with model
 `Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf`. External transport was qualified
 with `/home/navigator/bin/zth-codex-teacher` at the frozen SHA, Codex CLI
 `codex-cli 0.146.0`, authenticated isolated `CODEX_HOME=/tmp/zth_v3_codex_home`,

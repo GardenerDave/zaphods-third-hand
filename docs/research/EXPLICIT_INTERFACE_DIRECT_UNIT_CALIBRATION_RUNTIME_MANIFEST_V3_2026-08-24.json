@@ -351,7 +351,7 @@
   "initial_v3_freeze_commit": "c4bd2c6c386b4df9493ce8e166dc34c4b2f58bab",
   "interface_contract_path": "docs/research/EXPLICIT_INTERFACE_DIRECT_UNIT_CALIBRATION_INTERFACE_V3_2026-08-24.json",
   "interface_contract_sha256": "83e0e261fbd854e975680371b605b9607d13a25c7a3bafef9cc870bfdbc76047",
-  "local_base_url": "http://192.168.1.16:8080/v1",
+  "local_base_url": "http://<LAN_HOST>:8080/v1",
   "local_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
   "policy_information_included": false,
   "schema": "zth.explicit_interface_direct_unit_calibration.runtime.v3",

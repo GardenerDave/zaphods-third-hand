@@ -25,13 +25,13 @@ base URL and includes a model-free regression through `call_worker()` proving
 that the completion URL is derived from that same URL. No configured endpoint
 currently exposes the authoritative
 `Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf`: `config.env` exposes the 7B handoff
-model at `http://192.168.1.13:8083/v1`, and the documented host/port probes did
+model at `http://<LAN_HOST>:8083/v1`, and the documented host/port probes did
 not return `/v1/models`. Therefore no local completion was attempted.
 
 The actual V2 placeholder request was:
 `http://<LAN_HOST>:8083/v1/chat/completions`.
 The regression's concrete non-placeholder construction is:
-`http://192.168.1.13:8083/v1/chat/completions`.
+`http://<LAN_HOST>:8083/v1/chat/completions`.
 
 ### External
 

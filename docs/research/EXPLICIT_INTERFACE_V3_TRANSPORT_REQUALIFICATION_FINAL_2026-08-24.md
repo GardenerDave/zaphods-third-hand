@@ -46,7 +46,7 @@ transport control returned successfully and no repository mutation occurred.
 ## Local qualification
 
 The previous local result remains unchanged: endpoint
-`http://192.168.1.16:8080/v1`, exact 30B identity from `/v1/models`, and one
+`http://<LAN_HOST>:8080/v1`, exact 30B identity from `/v1/models`, and one
 successful `TRANSPORT_OK` response.
 
 ## Evidence locations

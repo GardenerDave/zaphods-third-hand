@@ -6,10 +6,10 @@
   "local_transport_qualified": true,
   "external_transport_qualified": true,
   "local": {
-    "base_url": "http://192.168.1.16:8080/v1",
+    "base_url": "http://<LAN_HOST>:8080/v1",
     "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
     "models_response_sha256": "56a4a28d039d1e378d561319b17ae0da276c2806231105c6bbadd21979fb20a7",
-    "request_url": "http://192.168.1.16:8080/v1/chat/completions",
+    "request_url": "http://<LAN_HOST>:8080/v1/chat/completions",
     "response": "TRANSPORT_OK",
     "response_sha256": "52c39f2b1f4fa8585552879bc993f277904438f439a300241bf0d895a634139a",
     "completion_calls": 1,

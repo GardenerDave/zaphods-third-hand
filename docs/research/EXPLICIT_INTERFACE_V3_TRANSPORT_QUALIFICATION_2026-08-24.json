@@ -7,15 +7,15 @@
   "local": {
     "transport_qualified": false,
     "authoritative_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf via JARVIS_LOCAL",
-    "configured_handoff_endpoint": "http://192.168.1.13:8083/v1",
+    "configured_handoff_endpoint": "http://<LAN_HOST>:8083/v1",
     "configured_handoff_model": "Qwen/Qwen2.5-7B-Instruct-GGUF:Q4_K_M",
     "models_get_attempted": false,
     "completion_attempted": false,
     "completion_calls": 0,
     "actual_v2_request_url": "http://<LAN_HOST>:8083/v1/chat/completions",
     "request_construction_regression": {
-      "validated_base_url": "http://192.168.1.13:8083/v1",
-      "constructed_completion_url": "http://192.168.1.13:8083/v1/chat/completions",
+      "validated_base_url": "http://<LAN_HOST>:8083/v1",
+      "constructed_completion_url": "http://<LAN_HOST>:8083/v1/chat/completions",
       "placeholder_absent": true,
       "call_worker_consumes_validated_base_url": true
     },

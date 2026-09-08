@@ -73,11 +73,11 @@
   "replays": 0,
   "resolved_local_identity_preflight": {
     "endpoint_alias": "JARVIS_LOCAL",
-    "frozen_base_url": "http://192.168.1.13:8083/v1",
+    "frozen_base_url": "http://<LAN_HOST>:8083/v1",
     "frozen_identity": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf via JARVIS_LOCAL",
     "identity_check": "configuration_only_no_inference",
     "resolved_api": "openai-chat",
-    "resolved_base_url": "http://192.168.1.13:8083/v1",
+    "resolved_base_url": "http://<LAN_HOST>:8083/v1",
     "resolved_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
     "worker_name": "handoff"
   },

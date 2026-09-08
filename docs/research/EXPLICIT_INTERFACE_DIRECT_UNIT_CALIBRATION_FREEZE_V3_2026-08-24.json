@@ -85,7 +85,7 @@
   },
   "initial_v3_freeze_commit": "c4bd2c6c386b4df9493ce8e166dc34c4b2f58bab",
   "local_supplier": {
-    "base_url": "http://192.168.1.16:8080/v1",
+    "base_url": "http://<LAN_HOST>:8080/v1",
     "endpoint_alias": "JARVIS_LOCAL",
     "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
     "supplier_id": "local_teacher",
@@ -433,7 +433,7 @@
       "wrapper_sha256": "2c5fcaf0727bdf466e21d660c927e63d23ecb67857949b2ef21e7e599297ceab"
     },
     "local": {
-      "base_url": "http://192.168.1.16:8080/v1",
+      "base_url": "http://<LAN_HOST>:8080/v1",
       "model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
       "models_response_sha256": "56a4a28d039d1e378d561319b17ae0da276c2806231105c6bbadd21979fb20a7",
       "qualification": "TRANSPORT_OK",
