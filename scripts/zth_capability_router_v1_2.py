@@ -188,15 +188,26 @@ def select_supplier(candidates: list[dict[str, Any]]) -> tuple[dict[str, Any] | 
 def plan_capabilities(planner_facts: dict[str, Any], index: dict[str, list[dict[str, Any]]]) -> tuple[dict[str, Any], dict[str, Any]]:
     required, derivations, unresolved = derive_capability_requirements(planner_facts)
     records: list[dict[str, Any]] = []
+    eligibility_records: list[dict[str, Any]] = []
     for capability_id in required:
         candidates = list(index.get(capability_id, []))
+        qualified_candidates = [{"supplier_id": e["supplier_id"], "supplier_type": e["supplier_type"], "interface_id": e["interface_id"]} for e in candidates if e["status"] == "QUALIFIED_EXPLORATORY"]
+        eligibility_records.append({
+            "capability_id": capability_id,
+            "candidate_suppliers": [{"supplier_id": e["supplier_id"], "supplier_type": e["supplier_type"], "interface_id": e["interface_id"], "status": e["status"]} for e in candidates],
+            "qualified_candidates": qualified_candidates,
+            "eligibility_status": "ELIGIBLE" if qualified_candidates else "INELIGIBLE",
+            "eligibility_reason": "At least one QUALIFIED_EXPLORATORY supplier exists in the registry." if qualified_candidates else "No QUALIFIED_EXPLORATORY supplier exists for this capability.",
+            "evidence_sources": [planner_facts["packet_source"], {"registry_entry_count": len(candidates)}],
+        })
         selected, reason = select_supplier(candidates)
         records.append({
             "capability_id": capability_id,
-            "candidate_suppliers": [{"supplier_id": e["supplier_id"], "supplier_type": e["supplier_type"], "interface_id": e["interface_id"], "status": e["status"]} for e in candidates],
-            "qualified_candidates": [{"supplier_id": e["supplier_id"], "supplier_type": e["supplier_type"], "interface_id": e["interface_id"]} for e in candidates if e["status"] == "QUALIFIED_EXPLORATORY"],
+            "candidate_suppliers": eligibility_records[-1]["candidate_suppliers"],
+            "qualified_candidates": qualified_candidates,
             "selected_supplier": None if selected is None else {"supplier_id": selected["supplier_id"], "supplier_type": selected["supplier_type"], "interface_id": selected["interface_id"]},
             "selection_reason": reason,
+            "eligibility_reason": eligibility_records[-1]["eligibility_reason"],
             "coverage_status": "COVERED" if selected else "UNCOVERED",
         })
     complete = bool(required) and not unresolved and all(item["coverage_status"] == "COVERED" for item in records)
@@ -219,6 +230,7 @@ def plan_capabilities(planner_facts: dict[str, Any], index: dict[str, list[dict[
         "task_id": planner_facts["task_id"],
         "packet_source": planner_facts["packet_source"],
         "derived_required_capabilities": required,
+        "capability_eligibility": eligibility_records,
         "capabilities": records,
         "unresolved_requirements": unresolved,
         "overall_coverage": "COMPLETE" if complete else "INCOMPLETE",
@@ -397,7 +409,17 @@ def execute(out: Path) -> None:
         facts = json.loads((task_dir / "planner_facts.json").read_text(encoding="utf-8"))
         plan = json.loads((task_dir / "capability_plan.json").read_text(encoding="utf-8"))
         contract = json.loads((task_dir / "success_contract.json").read_text(encoding="utf-8"))
-        trace = {"schema": "zth_router_v1_2_route_trace_v1", "task_id": runtime_task["task_id"], "runtime_inputs": ["runtime_task.json", "vogon_triage_packet.json", "orchestration_packet.json", "planner_facts.json", "capability_requirement_derivation.json"], "capability_plan": "capability_plan.json", "success_contract": "success_contract.json", "model_calls": [], "terminal_state": None}
+        trace = {
+            "schema": "zth_router_v1_2_route_trace_v1",
+            "task_id": runtime_task["task_id"],
+            "runtime_inputs": ["runtime_task.json", "vogon_triage_packet.json", "orchestration_packet.json", "planner_facts.json", "capability_requirement_derivation.json"],
+            "capability_plan": "capability_plan.json",
+            "capability_eligibility": plan["capability_eligibility"],
+            "capabilities": plan["capabilities"],
+            "success_contract": "success_contract.json",
+            "model_calls": [],
+            "terminal_state": None,
+        }
         def model_call(step: dict[str, Any]) -> dict[str, Any]:
             nonlocal total_calls
             total_calls += 1

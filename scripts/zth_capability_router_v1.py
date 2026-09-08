@@ -360,7 +360,21 @@ def execute(out: Path) -> None:
         task_dir = out / "tasks" / task["task_id"]
         plan = plans_by_id[task["task_id"]]
         runtime_packet = json.loads((task_dir / "runtime_packet.json").read_text(encoding="utf-8"))
-        trace = {"schema": "zth_router_v1_route_trace_v1", "task_id": task["task_id"], "input": task["input_request"], "packet": {"triage": "vogon_triage_packet.json", "orchestration": "orchestration_packet.json", "runtime": "runtime_packet.json"}, "capability_plan": "capability_plan.json", "selected_steps": plan["execution_steps"], "model_calls": [], "tool_calls": [], "deterministic_results": [], "validator_result": None, "terminal_state": None}
+        trace = {
+            "schema": "zth_router_v1_route_trace_v1",
+            "task_id": task["task_id"],
+            "input": task["input_request"],
+            "packet": {"triage": "vogon_triage_packet.json", "orchestration": "orchestration_packet.json", "runtime": "runtime_packet.json"},
+            "capability_plan": "capability_plan.json",
+            "capability_eligibility": plan["capability_eligibility"],
+            "capabilities": plan["capabilities"],
+            "selected_steps": plan["execution_steps"],
+            "model_calls": [],
+            "tool_calls": [],
+            "deterministic_results": [],
+            "validator_result": None,
+            "terminal_state": None,
+        }
         if plan["overall_coverage"] != "COMPLETE":
             trace["validator_result"] = {"status": "not_attempted", "reason": "incomplete capability coverage", "uncovered_capabilities": [record["capability_id"] for record in plan["capabilities"] if record["coverage_status"] == "UNCOVERED"]}
             trace["terminal_state"] = "ready_for_review"

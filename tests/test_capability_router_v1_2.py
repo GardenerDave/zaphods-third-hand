@@ -74,3 +74,25 @@ def test_unresolved_and_unqualified_routes_fail_closed_without_model():
     review_plans = [item[4] for item in binding["plans"] if item[4]["overall_coverage"] == "INCOMPLETE"]
     assert len(review_plans) == 2
     assert all(plan["planned_model_calls"] == 0 for plan in review_plans)
+
+
+def test_route_trace_preserves_capability_eligibility_and_selection_separation():
+    binding = validate_model_free()
+    _, _, _, _, plan, _, _ = next(item for item in binding["plans"] if item[0]["task_id"] == "router-v1-2-003")
+    trace = {
+        "schema": "zth_router_v1_2_route_trace_v1",
+        "task_id": "router-v1-2-003",
+        "capability_plan": "capability_plan.json",
+        "capability_eligibility": plan["capability_eligibility"],
+        "capabilities": plan["capabilities"],
+        "model_calls": [],
+        "terminal_state": None,
+    }
+
+    eligibility = trace["capability_eligibility"][0]
+    capability = trace["capabilities"][0]
+    assert eligibility["candidate_suppliers"]
+    assert eligibility["qualified_candidates"]
+    assert capability["selected_supplier"] is not None
+    assert capability["selected_supplier"]["supplier_id"] in {item["supplier_id"] for item in capability["qualified_candidates"]}
+    assert capability["eligibility_reason"] != capability["selection_reason"]

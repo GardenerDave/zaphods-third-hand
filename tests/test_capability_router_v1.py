@@ -170,6 +170,33 @@ def test_no_eligible_suppliers_produces_no_execution_step_and_explicit_reason(mo
     assert plan["capabilities"][0]["selection_reason"] == "No eligible suppliers were admitted by capability eligibility."
 
 
+def test_route_trace_preserves_capability_eligibility_and_selection_separation():
+    binding = validate_model_free()
+    task, runtime_packet, plan = next(item for item in binding["plans"] if item[0]["task_id"] == "router-v1-003")
+    trace = {
+        "schema": "zth_router_v1_route_trace_v1",
+        "task_id": task["task_id"],
+        "capability_plan": "capability_plan.json",
+        "capability_eligibility": plan["capability_eligibility"],
+        "capabilities": plan["capabilities"],
+        "selected_steps": plan["execution_steps"],
+        "model_calls": [],
+        "tool_calls": [],
+        "deterministic_results": [],
+        "validator_result": None,
+        "terminal_state": None,
+    }
+
+    eligibility = trace["capability_eligibility"][0]
+    capability = trace["capabilities"][0]
+    assert eligibility["candidate_suppliers"]
+    assert eligibility["qualified_candidates"]
+    assert capability["selected_supplier"] is not None
+    assert capability["selected_supplier"]["supplier_id"] in {item["supplier_id"] for item in capability["qualified_candidates"]}
+    assert capability["eligibility_reason"] != capability["selection_reason"]
+    assert trace["selected_steps"][0]["supplier_id"] == capability["selected_supplier"]["supplier_id"]
+
+
 def test_all_deterministic_and_review_workloads_are_lazy_model_free():
     binding = validate_model_free()
     selected = {"router-v1-001", "router-v1-002", "router-v1-007", "router-v1-009", "router-v1-010"}
