@@ -401,6 +401,9 @@ Near-term routing and fleet direction:
   enter selection;
 - keep routing policies pluggable and experimentally comparable against
   preserved dogfood evidence;
+- add a bounded live fleet snapshot over explicitly configured workers before
+  any routing layer consumes live availability, while keeping static config,
+  binding verification, capability qualification, and selection separate;
 - treat discovery, trust, engine availability, model inventory, capability
   advertisement, resource telemetry, workload state, and administrative
   authority as separate concerns;
