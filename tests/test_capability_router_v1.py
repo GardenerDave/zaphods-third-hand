@@ -20,16 +20,19 @@ def synthetic_packet() -> dict:
     }
 
 
-def synthetic_model_index(status: str = "QUALIFIED_EXPLORATORY") -> dict:
+def synthetic_model_index(status: str = "QUALIFIED_EXPLORATORY", *, worker_binding_ref: str | None = "router") -> dict:
+    entry = {
+        "capability_id": "semantic.minimal_action_object_extraction",
+        "supplier_id": "router_supplier",
+        "supplier_type": "MODEL",
+        "interface_id": "minimal_action_object_v0",
+        "status": status,
+    }
+    if worker_binding_ref is not None:
+        entry["worker_binding_ref"] = worker_binding_ref
     return {
         "semantic.minimal_action_object_extraction": [
-            {
-                "capability_id": "semantic.minimal_action_object_extraction",
-                "supplier_id": "router",
-                "supplier_type": "MODEL",
-                "interface_id": "minimal_action_object_v0",
-                "status": status,
-            }
+            entry
         ]
     }
 
@@ -275,8 +278,10 @@ def test_capable_live_worker_is_executable_with_supplied_fleet_snapshot():
     capability = plan["capabilities"][0]
     assert plan["overall_coverage"] == "COMPLETE"
     assert plan["overall_execution_status"] == "EXECUTABLE"
-    assert plan["execution_steps"][0]["supplier_id"] == "router"
+    assert plan["execution_steps"][0]["supplier_id"] == "router_supplier"
     assert capability["availability_constraints"][0]["availability_status"] == "AVAILABLE"
+    assert capability["selected_supplier_availability"]["worker"] == "router"
+    assert capability["selected_supplier_availability"]["mapping_source"] == "explicit_worker_binding_ref"
     assert capability["selected_supplier_availability"]["advertised_models"] == ["Qwen_Qwen3-1.7B-Q4_K_M.gguf"]
 
 
@@ -285,7 +290,8 @@ def test_capable_offline_worker_remains_capability_eligible_but_not_executable()
     plan = plan_capabilities(synthetic_packet(), synthetic_model_index(), fleet_snapshot=snapshot)
     capability = plan["capabilities"][0]
     assert plan["capability_eligibility"][0]["eligibility_status"] == "ELIGIBLE"
-    assert plan["capability_eligibility"][0]["qualified_candidates"][0]["supplier_id"] == "router"
+    assert plan["capability_eligibility"][0]["qualified_candidates"][0]["supplier_id"] == "router_supplier"
+    assert plan["capability_eligibility"][0]["qualified_candidates"][0]["worker_binding_ref"] == "router"
     assert plan["overall_coverage"] == "COMPLETE"
     assert plan["overall_execution_status"] == "BLOCKED_BY_AVAILABILITY"
     assert plan["execution_steps"] == []
@@ -299,6 +305,14 @@ def test_live_but_capability_ineligible_worker_does_not_become_eligible():
     assert plan["capability_eligibility"][0]["eligibility_status"] == "INELIGIBLE"
     assert plan["overall_coverage"] == "INCOMPLETE"
     assert plan["overall_execution_status"] == "INCOMPLETE_CAPABILITY"
+    assert plan["execution_steps"] == []
+
+
+def test_live_explicitly_bound_but_capability_ineligible_worker_remains_ineligible():
+    plan = plan_capabilities(synthetic_packet(), synthetic_model_index("NOT_QUALIFIED", worker_binding_ref="router"), fleet_snapshot=fleet_snapshot())
+    assert plan["capability_eligibility"][0]["candidate_suppliers"][0]["worker_binding_ref"] == "router"
+    assert plan["capability_eligibility"][0]["eligibility_status"] == "INELIGIBLE"
+    assert plan["capabilities"][0]["availability_constraints"] == []
     assert plan["execution_steps"] == []
 
 
@@ -336,14 +350,26 @@ def test_legacy_callers_without_fleet_snapshot_keep_capability_only_execution_se
     assert plan["overall_execution_status"] == "EXECUTABLE"
     assert capability["availability_constraints"][0]["availability_status"] == "NOT_SUPPLIED"
     assert capability["availability_constraints"][0]["execution_status"] == "LEGACY_UNCONSTRAINED"
-    assert plan["execution_steps"][0]["supplier_id"] == "router"
+    assert plan["execution_steps"][0]["supplier_id"] == "router_supplier"
 
 
-def test_qwen3_1_7b_supplier_can_map_to_router_worker_by_model_identity():
-    index = synthetic_model_index()
+def test_missing_explicit_binding_does_not_guess_from_model_identity():
+    index = synthetic_model_index(worker_binding_ref=None)
     index["semantic.minimal_action_object_extraction"][0]["supplier_id"] = "qwen3_1_7b_labeled_2_032b_minimal_atom"
     plan = plan_capabilities(synthetic_packet(), index, fleet_snapshot=fleet_snapshot())
-    availability = plan["capabilities"][0]["selected_supplier_availability"]
-    assert plan["overall_execution_status"] == "EXECUTABLE"
-    assert availability["worker"] == "router"
-    assert availability["mapping_source"] == "model_identity_fallback"
+    availability = plan["capabilities"][0]["availability_constraints"][0]
+    assert plan["overall_coverage"] == "COMPLETE"
+    assert plan["overall_execution_status"] == "BLOCKED_BY_AVAILABILITY"
+    assert availability["availability_status"] == "UNKNOWN"
+    assert availability["mapping_source"] == "none"
+    assert plan["execution_steps"] == []
+
+
+def test_same_model_on_multiple_workers_does_not_create_implicit_mapping():
+    snapshot = fleet_snapshot()
+    snapshot["workers"].append({**snapshot["workers"][0], "worker": "alternate-router"})
+    plan = plan_capabilities(synthetic_packet(), synthetic_model_index(worker_binding_ref=None), fleet_snapshot=snapshot)
+    availability = plan["capabilities"][0]["availability_constraints"][0]
+    assert availability["availability_status"] == "UNKNOWN"
+    assert availability["mapping_source"] == "none"
+    assert plan["execution_steps"] == []

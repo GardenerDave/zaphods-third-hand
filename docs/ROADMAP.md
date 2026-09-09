@@ -412,6 +412,9 @@ Near-term routing and fleet direction:
 - current Router V1/V1.2 plans may now accept an explicit fleet snapshot and
   record availability as an execution-time constraint after capability
   eligibility, preserving capability precedent for unavailable workers;
+- model supplier entries now use an explicit `worker_binding_ref` to connect
+  capability evidence to configured worker bindings; model names remain
+  verification evidence, not binding authority;
 - treat discovery, trust, engine availability, model inventory, capability
   advertisement, resource telemetry, workload state, and administrative
   authority as separate concerns;

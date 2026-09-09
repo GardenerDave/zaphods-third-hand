@@ -196,10 +196,10 @@ def plan_capabilities(
     eligibility_records: list[dict[str, Any]] = []
     for capability_id in required:
         candidates = list(index.get(capability_id, []))
-        qualified_candidates = [{"supplier_id": e["supplier_id"], "supplier_type": e["supplier_type"], "interface_id": e["interface_id"]} for e in candidates if e["status"] == "QUALIFIED_EXPLORATORY"]
+        qualified_candidates = [{"supplier_id": e["supplier_id"], "supplier_type": e["supplier_type"], "interface_id": e["interface_id"], **({"worker_binding_ref": e["worker_binding_ref"]} if "worker_binding_ref" in e else {})} for e in candidates if e["status"] == "QUALIFIED_EXPLORATORY"]
         eligibility_records.append({
             "capability_id": capability_id,
-            "candidate_suppliers": [{"supplier_id": e["supplier_id"], "supplier_type": e["supplier_type"], "interface_id": e["interface_id"], "status": e["status"]} for e in candidates],
+            "candidate_suppliers": [{"supplier_id": e["supplier_id"], "supplier_type": e["supplier_type"], "interface_id": e["interface_id"], "status": e["status"], **({"worker_binding_ref": e["worker_binding_ref"]} if "worker_binding_ref" in e else {})} for e in candidates],
             "qualified_candidates": qualified_candidates,
             "eligibility_status": "ELIGIBLE" if qualified_candidates else "INELIGIBLE",
             "eligibility_reason": "At least one QUALIFIED_EXPLORATORY supplier exists in the registry." if qualified_candidates else "No QUALIFIED_EXPLORATORY supplier exists for this capability.",
@@ -232,7 +232,7 @@ def plan_capabilities(
             "capability_id": capability_id,
             "candidate_suppliers": eligibility_records[-1]["candidate_suppliers"],
             "qualified_candidates": qualified_candidates,
-            "selected_supplier": None if selected is None else {"supplier_id": selected["supplier_id"], "supplier_type": selected["supplier_type"], "interface_id": selected["interface_id"]},
+            "selected_supplier": None if selected is None else {"supplier_id": selected["supplier_id"], "supplier_type": selected["supplier_type"], "interface_id": selected["interface_id"], **({"worker_binding_ref": selected["worker_binding_ref"]} if "worker_binding_ref" in selected else {})},
             "selection_reason": reason,
             "eligibility_reason": eligibility_records[-1]["eligibility_reason"],
             "coverage_status": "COVERED" if eligible_candidates else "UNCOVERED",
@@ -256,7 +256,8 @@ def plan_capabilities(
                 req, prod, deps = ["canonical_operands"], ["policy_result"], []
             else:
                 req, prod, deps = [], [], []
-            steps.append({"step_id": f"step_{cap.replace('.', '_')}", "capability_id": cap, "supplier_id": supplier["supplier_id"], "supplier_type": supplier["supplier_type"], "requires_inputs": req, "produces_outputs": prod, "depends_on": deps, "input_provenance": {name: ("PACKET" if name == "requested_target" else "ENVIRONMENT" if name == "canonical_operands" else "PRIOR_STEP" if name in {"object_expression", "action"} else "PACKET") for name in req}})
+            availability = item.get("selected_supplier_availability") or {}
+            steps.append({"step_id": f"step_{cap.replace('.', '_')}", "capability_id": cap, "supplier_id": supplier["supplier_id"], "supplier_type": supplier["supplier_type"], **({"worker_binding_ref": supplier["worker_binding_ref"]} if "worker_binding_ref" in supplier else {}), **({"worker": availability["worker"]} if isinstance(availability, dict) and availability.get("worker") else {}), "requires_inputs": req, "produces_outputs": prod, "depends_on": deps, "input_provenance": {name: ("PACKET" if name == "requested_target" else "ENVIRONMENT" if name == "canonical_operands" else "PRIOR_STEP" if name in {"object_expression", "action"} else "PACKET") for name in req}})
     plan = {
         "schema": "zth_router_v1_2_capability_plan_v1",
         "task_id": planner_facts["task_id"],

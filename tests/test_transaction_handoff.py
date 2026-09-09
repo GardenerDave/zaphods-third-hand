@@ -272,11 +272,14 @@ def test_transaction_manifest_references_chain_without_replacing_records(tmp_pat
         json.dumps(
             {
                 "schema": "zth_router_v1_2_capability_plan_v1",
+                "overall_coverage": "COMPLETE",
+                "overall_execution_status": "EXECUTABLE",
+                "availability_source": "fleet_snapshot",
                 "capability_eligibility": [
                     {
                         "capability_id": "semantic.minimal_action_object_extraction",
-                        "candidate_suppliers": [{"supplier_id": "s1", "supplier_type": "MODEL", "interface_id": "i1", "status": "QUALIFIED_EXPLORATORY"}],
-                        "qualified_candidates": [{"supplier_id": "s1", "supplier_type": "MODEL", "interface_id": "i1"}],
+                        "candidate_suppliers": [{"supplier_id": "s1", "supplier_type": "MODEL", "interface_id": "i1", "status": "QUALIFIED_EXPLORATORY", "worker_binding_ref": "router"}],
+                        "qualified_candidates": [{"supplier_id": "s1", "supplier_type": "MODEL", "interface_id": "i1", "worker_binding_ref": "router"}],
                         "eligibility_status": "ELIGIBLE",
                         "eligibility_reason": "At least one QUALIFIED_EXPLORATORY supplier exists in the registry.",
                         "evidence_sources": [],
@@ -285,16 +288,46 @@ def test_transaction_manifest_references_chain_without_replacing_records(tmp_pat
                 "capabilities": [
                     {
                         "capability_id": "semantic.minimal_action_object_extraction",
-                        "candidate_suppliers": [{"supplier_id": "s1", "supplier_type": "MODEL", "interface_id": "i1", "status": "QUALIFIED_EXPLORATORY"}],
-                        "qualified_candidates": [{"supplier_id": "s1", "supplier_type": "MODEL", "interface_id": "i1"}],
-                        "selected_supplier": {"supplier_id": "s1", "supplier_type": "MODEL", "interface_id": "i1"},
+                        "candidate_suppliers": [{"supplier_id": "s1", "supplier_type": "MODEL", "interface_id": "i1", "status": "QUALIFIED_EXPLORATORY", "worker_binding_ref": "router"}],
+                        "qualified_candidates": [{"supplier_id": "s1", "supplier_type": "MODEL", "interface_id": "i1", "worker_binding_ref": "router"}],
+                        "selected_supplier": {"supplier_id": "s1", "supplier_type": "MODEL", "interface_id": "i1", "worker_binding_ref": "router"},
                         "selection_reason": "Selected qualified MODEL supplier by explicit supplier-type precedence.",
                         "eligibility_reason": "At least one QUALIFIED_EXPLORATORY supplier exists in the registry.",
                         "coverage_status": "COVERED",
+                        "execution_status": "EXECUTABLE",
+                        "availability_constraints": [
+                            {
+                                "supplier_id": "s1",
+                                "supplier_type": "MODEL",
+                                "interface_id": "i1",
+                                "worker_binding_ref": "router",
+                                "worker": "router",
+                                "mapping_source": "explicit_worker_binding_ref",
+                                "binding_status": "VERIFIED",
+                                "availability_status": "AVAILABLE",
+                                "availability_reason": "Fleet snapshot verified the configured worker binding and expected model advertisement.",
+                                "advertised_models": ["small-1.7b"],
+                                "configured_model": "small-1.7b",
+                            }
+                        ],
+                        "selected_supplier_availability": {
+                            "worker": "router",
+                            "mapping_source": "explicit_worker_binding_ref",
+                            "binding_status": "VERIFIED",
+                            "availability_status": "AVAILABLE",
+                            "availability_reason": "Fleet snapshot verified the configured worker binding and expected model advertisement.",
+                            "advertised_models": ["small-1.7b"],
+                            "configured_model": "small-1.7b",
+                        },
                     }
                 ],
+                "execution_steps": [{"capability_id": "semantic.minimal_action_object_extraction", "supplier_id": "s1", "supplier_type": "MODEL"}],
             }
         ),
+        encoding="utf-8",
+    )
+    (run_dir / "fleet_snapshot.json").write_text(
+        json.dumps({"schema": "zth_local_fleet_snapshot_v1", "workers": [{"worker": "router", "binding_status": "VERIFIED"}]}),
         encoding="utf-8",
     )
     result = build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
@@ -311,6 +344,7 @@ def test_transaction_manifest_references_chain_without_replacing_records(tmp_pat
     assert "supervised_model_attempt" in {item["artifact"] for item in manifest["evidence_references"]}
     assert "route_trace" in {item["artifact"] for item in manifest["evidence_references"]}
     assert "capability_plan" in {item["artifact"] for item in manifest["evidence_references"]}
+    assert "fleet_snapshot" in {item["artifact"] for item in manifest["evidence_references"]}
     assert any("sha256" in item for item in manifest["evidence_references"])
     repository_reference = manifest["repository_reference"]
     assert repository_reference["artifact"] == "repository_root"
@@ -318,6 +352,13 @@ def test_transaction_manifest_references_chain_without_replacing_records(tmp_pat
     assert repository_reference["commit_sha"] == repository_reference["resolved_commit_sha"]
     assert result["next_worker_context"]["router_evidence"]["route_trace"]["artifact"] == "route_trace"
     assert result["next_worker_context"]["router_evidence"]["capability_plan"]["artifact"] == "capability_plan"
+    availability = result["next_worker_context"]["router_evidence"]["availability_summary"]
+    assert availability["overall_execution_status"] == "EXECUTABLE"
+    assert availability["capabilities"][0]["selected_supplier"]["worker_binding_ref"] == "router"
+    assert availability["capabilities"][0]["selected_supplier_availability"]["worker"] == "router"
+    assert availability["capabilities"][0]["selected_supplier_availability"]["binding_status"] == "VERIFIED"
+    assert availability["capabilities"][0]["selected_supplier_availability"]["advertised_models"] == ["small-1.7b"]
+    assert availability["capabilities"][0]["execution_step_created"] is True
 
 
 def test_next_worker_context_contains_required_handoff_information(tmp_path: Path) -> None:

@@ -107,7 +107,7 @@ def test_v1_2_plan_applies_supplied_fleet_snapshot_as_execution_constraint():
         "generated_at": "2026-09-08T00:00:00+00:00",
         "workers": [
             {
-                "worker": "qwen3_1_7b_labeled_2_032b_minimal_atom",
+                "worker": "router",
                 "configured_base_url": "http://127.0.0.1:8081/v1",
                 "expected_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
                 "binding_status": "UNVERIFIED",

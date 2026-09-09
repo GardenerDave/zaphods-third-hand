@@ -156,6 +156,72 @@ def _optional_artifact_reference(path: Path, *, artifact: str) -> dict[str, Any]
     return _artifact_reference(path, artifact=artifact)
 
 
+def _routing_availability_summary(capability_plan: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not isinstance(capability_plan, dict):
+        return None
+    capabilities = capability_plan.get("capabilities")
+    if not isinstance(capabilities, list):
+        return None
+    records = []
+
+    def compact_availability(value: Any) -> Any:
+        if not isinstance(value, dict):
+            return None
+        keys = [
+            "supplier_id",
+            "supplier_type",
+            "interface_id",
+            "worker_binding_ref",
+            "worker",
+            "mapping_source",
+            "binding_status",
+            "availability_status",
+            "availability_reason",
+            "execution_status",
+            "failure_class",
+            "configured_model",
+            "advertised_models",
+            "freshness",
+        ]
+        return {key: deepcopy(value[key]) for key in keys if key in value}
+
+    for capability in capabilities:
+        if not isinstance(capability, dict):
+            continue
+        selected = capability.get("selected_supplier")
+        availability = capability.get("selected_supplier_availability")
+        constraints = capability.get("availability_constraints")
+        records.append(
+            {
+                "capability_id": capability.get("capability_id"),
+                "eligibility_status": next(
+                    (
+                        record.get("eligibility_status")
+                        for record in capability_plan.get("capability_eligibility", [])
+                        if isinstance(record, dict) and record.get("capability_id") == capability.get("capability_id")
+                    ),
+                    None,
+                ),
+                "eligibility_reason": capability.get("eligibility_reason"),
+                "selected_supplier": deepcopy(selected) if isinstance(selected, dict) else None,
+                "availability_constraints": [compact_availability(item) for item in constraints] if isinstance(constraints, list) else [],
+                "selected_supplier_availability": compact_availability(availability),
+                "execution_status": capability.get("execution_status"),
+                "execution_step_created": any(
+                    isinstance(step, dict) and step.get("capability_id") == capability.get("capability_id")
+                    for step in capability_plan.get("execution_steps", [])
+                    if isinstance(step, dict)
+                ),
+            }
+        )
+    return {
+        "overall_coverage": capability_plan.get("overall_coverage"),
+        "overall_execution_status": capability_plan.get("overall_execution_status"),
+        "availability_source": capability_plan.get("availability_source"),
+        "capabilities": records,
+    }
+
+
 def _repository_reference(repo_root: Path) -> dict[str, Any]:
     resolved_root = repo_root.resolve()
     if not resolved_root.is_dir():
@@ -456,6 +522,11 @@ def build_next_worker_context(
         (reference for reference in transaction_manifest["evidence_references"] if reference.get("artifact") == "capability_plan"),
         None,
     )
+    fleet_snapshot_reference = next(
+        (reference for reference in transaction_manifest["evidence_references"] if reference.get("artifact") == "fleet_snapshot"),
+        None,
+    )
+    capability_plan = _read_json(Path(capability_plan_reference["path"]), kind="capability plan") if isinstance(capability_plan_reference, dict) else None
     task_request = task_state.get("task_request")
     if not isinstance(task_request, str) or not task_request.strip():
         raise TransactionHandoffError("task state must include a non-empty task_request")
@@ -484,6 +555,8 @@ def build_next_worker_context(
         "router_evidence": {
             "route_trace": route_trace_reference,
             "capability_plan": capability_plan_reference,
+            "fleet_snapshot": fleet_snapshot_reference,
+            "availability_summary": _routing_availability_summary(capability_plan),
         },
         "task_request": task_request,
         "selected_next_worker_identity": next_worker_identity,
@@ -1254,12 +1327,13 @@ def build_transaction_handoff_artifacts(
     }
     route_trace_reference = _optional_artifact_reference(run_dir / "route_trace.json", artifact="route_trace")
     capability_plan_reference = _optional_artifact_reference(run_dir / "capability_plan.json", artifact="capability_plan")
+    fleet_snapshot_reference = _optional_artifact_reference(run_dir / "fleet_snapshot.json", artifact="fleet_snapshot")
     repository_reference = _repository_reference(Path(__file__).resolve().parents[1])
 
     evidence_references = [
         repository_reference,
         _artifact_reference(run_dir / "run_manifest.json", artifact="run_manifest"),
-        *[ref for ref in (route_trace_reference, capability_plan_reference) if ref is not None],
+        *[ref for ref in (route_trace_reference, capability_plan_reference, fleet_snapshot_reference) if ref is not None],
         _artifact_reference(run_dir / "model_prompt_packet.md", artifact="model_prompt_packet"),
         _artifact_reference(run_dir / "raw_model_output.txt", artifact="raw_model_output"),
         _artifact_reference(run_dir / "supervised_model_attempt.json", artifact="supervised_model_attempt", id_key="attempt_id", id_value=attempt["attempt_id"]),

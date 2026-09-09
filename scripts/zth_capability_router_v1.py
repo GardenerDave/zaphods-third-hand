@@ -172,21 +172,8 @@ def fleet_worker_index(fleet_snapshot: Mapping[str, Any] | None) -> dict[str, di
 
 
 def _candidate_worker_ref(candidate: Mapping[str, Any], worker_index: Mapping[str, dict[str, Any]]) -> str | None:
-    for key in ("worker", "supplier_id", "interface_id"):
-        value = candidate.get(key)
-        if isinstance(value, str) and value in worker_index:
-            return value
-    supplier_id = str(candidate.get("supplier_id", "")).lower()
-    if "qwen3_1_7b" in supplier_id:
-        matches = [
-            name
-            for name, worker in worker_index.items()
-            if "qwen3" in " ".join(str(item).lower() for item in [worker.get("expected_model"), *list(worker.get("advertised_models") or [])])
-            and "1.7b" in " ".join(str(item).lower() for item in [worker.get("expected_model"), *list(worker.get("advertised_models") or [])]).replace("_", ".").replace("-", ".")
-        ]
-        if len(matches) == 1:
-            return matches[0]
-    return None
+    value = candidate.get("worker_binding_ref")
+    return value if isinstance(value, str) and value in worker_index else None
 
 
 def _runtime_safe_evidence(value: Any) -> Any:
@@ -210,7 +197,7 @@ def assess_supplier_availability(candidate: Mapping[str, Any], fleet_snapshot: M
     worker_ref = _candidate_worker_ref(candidate, worker_index)
     mapping_source = "none"
     if worker_ref is not None:
-        mapping_source = "exact_worker_reference" if worker_ref in {candidate.get("worker"), candidate.get("supplier_id"), candidate.get("interface_id")} else "model_identity_fallback"
+        mapping_source = "explicit_worker_binding_ref"
     if worker_ref is None:
         return {"availability_status": "UNKNOWN", "execution_status": "BLOCKED", "availability_reason": "No supplied fleet worker binding maps to this model supplier.", "worker": None, "mapping_source": mapping_source, "binding_status": None, "failure_class": None, "configured_base_url": None, "configured_model": None, "advertised_models": [], "evidence": {"fleet_snapshot_schema": fleet_snapshot.get("schema"), "worker_count": len(worker_index)}}
     worker = worker_index[worker_ref]
@@ -255,8 +242,8 @@ def assess_capability_eligibility(runtime_packet: dict[str, Any], registry_index
             eligibility_reason = "No QUALIFIED_EXPLORATORY supplier exists for this capability."
         records.append({
             "capability_id": capability_id,
-            "candidate_suppliers": [{"supplier_id": item["supplier_id"], "supplier_type": item["supplier_type"], "interface_id": item["interface_id"], "status": item["status"]} for item in candidates],
-            "qualified_candidates": [{"supplier_id": item["supplier_id"], "supplier_type": item["supplier_type"], "interface_id": item["interface_id"]} for item in qualified],
+            "candidate_suppliers": [{"supplier_id": item["supplier_id"], "supplier_type": item["supplier_type"], "interface_id": item["interface_id"], "status": item["status"], **({"worker_binding_ref": item["worker_binding_ref"]} if "worker_binding_ref" in item else {})} for item in candidates],
+            "qualified_candidates": [{"supplier_id": item["supplier_id"], "supplier_type": item["supplier_type"], "interface_id": item["interface_id"], **({"worker_binding_ref": item["worker_binding_ref"]} if "worker_binding_ref" in item else {})} for item in qualified],
             "eligibility_status": eligibility_status,
             "eligibility_reason": eligibility_reason,
             "evidence_sources": [runtime_packet["packet_source"], {"registry_entry_count": len(candidates)}],
@@ -309,7 +296,7 @@ def plan_capabilities(
         execution_status = "EXECUTABLE" if selected is not None and (selected_availability is None or _execution_allowed(selected_availability)) else "BLOCKED_BY_AVAILABILITY" if eligible_candidates else "NO_CAPABILITY_SUPPLIER"
         records.append({
             **item,
-            "selected_supplier": None if selected is None else {"supplier_id": selected["supplier_id"], "supplier_type": selected["supplier_type"], "interface_id": selected["interface_id"]},
+            "selected_supplier": None if selected is None else {"supplier_id": selected["supplier_id"], "supplier_type": selected["supplier_type"], "interface_id": selected["interface_id"], **({"worker_binding_ref": selected["worker_binding_ref"]} if "worker_binding_ref" in selected else {})},
             "selection_reason": reason,
             "coverage_status": "COVERED" if eligible_candidates else "UNCOVERED",
             "availability_constraints": availability_constraints,
@@ -323,7 +310,8 @@ def plan_capabilities(
     if executable_complete:
         for record in records:
             supplier = record["selected_supplier"]
-            steps.append({"capability_id": record["capability_id"], "supplier_id": supplier["supplier_id"], "supplier_type": supplier["supplier_type"]})
+            availability = record.get("selected_supplier_availability") or {}
+            steps.append({"capability_id": record["capability_id"], "supplier_id": supplier["supplier_id"], "supplier_type": supplier["supplier_type"], **({"worker_binding_ref": supplier["worker_binding_ref"]} if "worker_binding_ref" in supplier else {}), **({"worker": availability["worker"]} if isinstance(availability, dict) and availability.get("worker") else {})})
     return {
         "schema": "zth_router_v1_capability_plan_v1",
         "task_id": runtime_packet["task_id"],
