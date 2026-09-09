@@ -47,6 +47,44 @@ REQUIRED_AUTHORITY = [
 PUBLIC_ENDPOINT_ALIAS = "JARVIS_LOCAL"
 
 
+def binding_preflight_from_fleet_snapshot(snapshot: Mapping[str, Any], worker_name: str) -> dict[str, Any]:
+    """Reuse a collected fleet snapshot as deterministic binding preflight evidence."""
+    workers = snapshot.get("workers", [])
+    if not isinstance(workers, list):
+        raise ValueError("fleet snapshot workers must be a list")
+    entry = next((item for item in workers if isinstance(item, dict) and item.get("worker") == worker_name), None)
+    if entry is None:
+        return {
+            "schema": "zth_worker_binding_preflight_v1",
+            "worker": worker_name,
+            "configured_base_url": None,
+            "expected_model": None,
+            "endpoint_status": "unknown",
+            "advertised_models": [],
+            "binding_status": "UNVERIFIED",
+            "failure_class": "fleet_worker_not_found",
+            "reason": "Supplied fleet snapshot did not contain the requested worker binding.",
+            "checked_at": snapshot.get("generated_at"),
+            "evidence": {"fleet_snapshot_schema": snapshot.get("schema"), "worker_count": len(workers)},
+        }
+    preflight = ((entry.get("evidence") or {}).get("preflight") or {})
+    if isinstance(preflight, dict) and preflight:
+        return dict(preflight)
+    return {
+        "schema": "zth_worker_binding_preflight_v1",
+        "worker": worker_name,
+        "configured_base_url": entry.get("configured_base_url"),
+        "expected_model": entry.get("expected_model"),
+        "endpoint_status": "unknown",
+        "advertised_models": list(entry.get("advertised_models") or []),
+        "binding_status": entry.get("binding_status", "UNVERIFIED"),
+        "failure_class": entry.get("failure_class"),
+        "reason": "Derived from supplied fleet snapshot entry without embedded preflight evidence.",
+        "checked_at": entry.get("checked_at") or snapshot.get("generated_at"),
+        "evidence": {"fleet_snapshot_schema": snapshot.get("schema")},
+    }
+
+
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -425,6 +463,8 @@ def run_capability_loop(
     patch_library: PromptPatchLibrary | None = None,
     deterministic_patch_retry: Mapping[str, Any] | None = None,
     binding_preflight: Callable[[], dict[str, Any]] | None = None,
+    fleet_snapshot: Mapping[str, Any] | None = None,
+    fleet_worker_name: str | None = None,
 ) -> dict[str, Any]:
     if max_worker_attempts < 1 or max_teacher_passes < 0:
         raise ValueError("retry ceilings must be non-negative and worker attempts must be positive")
@@ -435,6 +475,7 @@ def run_capability_loop(
     trajectory = out_dir / "trajectory.jsonl"
     summary_path = out_dir / "trajectory_summary.json"
     preflight_path = out_dir / "binding_preflight.json"
+    fleet_snapshot_path = out_dir / "fleet_snapshot.json"
     prior = _records(trajectory)
     if summary_path.exists():
         summary = json.loads(summary_path.read_text(encoding="utf-8"))
@@ -458,6 +499,11 @@ def run_capability_loop(
     patch_retry_passed = False
     patch_retry_failed = False
     binding_preflight_result = None
+    if fleet_snapshot is not None and not fleet_snapshot_path.exists():
+        _json_write(fleet_snapshot_path, fleet_snapshot)
+    if binding_preflight is None and fleet_snapshot is not None:
+        worker_name = fleet_worker_name or os.environ.get("ZTH_CAPABILITY_WORKER_NAME", "router")
+        binding_preflight = lambda snapshot=fleet_snapshot, name=worker_name: binding_preflight_from_fleet_snapshot(snapshot, name)
     if binding_preflight is not None:
         if preflight_path.exists():
             binding_preflight_result = json.loads(preflight_path.read_text(encoding="utf-8"))
@@ -498,6 +544,8 @@ def run_capability_loop(
                 "generated_at": utc_now(),
                 "binding_preflight": binding_preflight_result,
             }
+            if fleet_snapshot is not None:
+                summary["fleet_snapshot_reference"] = _artifact_reference(fleet_snapshot_path, artifact="fleet_snapshot")
             _json_write(summary_path, summary)
             if not any(r.get("transition") in {"ready_for_review", "unresolved"} for r in _records(trajectory)):
                 _transition(trajectory, transition=disposition, task_id=task_id, source="binding_preflight", disposition=disposition, successful_intervention_source="none", infrastructure_failure=True, binding_preflight=binding_preflight_result)
@@ -724,6 +772,8 @@ def run_capability_loop(
         summary["router_route_trace_reference"] = router_route_trace_reference
     if capability_plan_reference is not None:
         summary["capability_plan_reference"] = capability_plan_reference
+    if fleet_snapshot is not None:
+        summary["fleet_snapshot_reference"] = _artifact_reference(fleet_snapshot_path, artifact="fleet_snapshot")
     _json_write(summary_path, summary)
     return summary
 

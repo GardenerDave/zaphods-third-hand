@@ -10,7 +10,7 @@ import subprocess
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 from local_harness.orchestration_packet import assemble_orchestration_packet, validate_orchestration_packet
 from local_harness.prompt_patch_library import PromptPatchLibrary
@@ -161,6 +161,85 @@ def select_supplier(candidates: list[dict[str, Any]]) -> tuple[dict[str, Any] | 
     return selected, f"Selected qualified {selected['supplier_type']} supplier using explicit supplier-type precedence."
 
 
+def fleet_worker_index(fleet_snapshot: Mapping[str, Any] | None) -> dict[str, dict[str, Any]]:
+    """Index a supplied live fleet snapshot without probing the network."""
+    if fleet_snapshot is None:
+        return {}
+    workers = fleet_snapshot.get("workers", [])
+    if not isinstance(workers, list):
+        return {}
+    return {str(worker["worker"]): dict(worker) for worker in workers if isinstance(worker, dict) and isinstance(worker.get("worker"), str)}
+
+
+def _candidate_worker_ref(candidate: Mapping[str, Any], worker_index: Mapping[str, dict[str, Any]]) -> str | None:
+    for key in ("worker", "supplier_id", "interface_id"):
+        value = candidate.get(key)
+        if isinstance(value, str) and value in worker_index:
+            return value
+    supplier_id = str(candidate.get("supplier_id", "")).lower()
+    if "qwen3_1_7b" in supplier_id:
+        matches = [
+            name
+            for name, worker in worker_index.items()
+            if "qwen3" in " ".join(str(item).lower() for item in [worker.get("expected_model"), *list(worker.get("advertised_models") or [])])
+            and "1.7b" in " ".join(str(item).lower() for item in [worker.get("expected_model"), *list(worker.get("advertised_models") or [])]).replace("_", ".").replace("-", ".")
+        ]
+        if len(matches) == 1:
+            return matches[0]
+    return None
+
+
+def _runtime_safe_evidence(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {
+            ("configured_model" if key == "expected_model" else key): _runtime_safe_evidence(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, list):
+        return [_runtime_safe_evidence(item) for item in value]
+    return value
+
+
+def assess_supplier_availability(candidate: Mapping[str, Any], fleet_snapshot: Mapping[str, Any] | None) -> dict[str, Any]:
+    """Describe execution-time availability without changing capability evidence."""
+    if candidate.get("supplier_type") != "MODEL":
+        return {"availability_status": "NOT_REQUIRED", "execution_status": "EXECUTABLE", "availability_reason": "Non-model suppliers do not require a live model binding.", "worker": None, "binding_status": None, "failure_class": None, "configured_base_url": None, "configured_model": None, "advertised_models": [], "evidence": None}
+    if fleet_snapshot is None:
+        return {"availability_status": "NOT_SUPPLIED", "execution_status": "LEGACY_UNCONSTRAINED", "availability_reason": "No fleet snapshot supplied; legacy capability-only planning is retained.", "worker": None, "binding_status": None, "failure_class": None, "configured_base_url": None, "configured_model": None, "advertised_models": [], "evidence": None}
+    worker_index = fleet_worker_index(fleet_snapshot)
+    worker_ref = _candidate_worker_ref(candidate, worker_index)
+    mapping_source = "none"
+    if worker_ref is not None:
+        mapping_source = "exact_worker_reference" if worker_ref in {candidate.get("worker"), candidate.get("supplier_id"), candidate.get("interface_id")} else "model_identity_fallback"
+    if worker_ref is None:
+        return {"availability_status": "UNKNOWN", "execution_status": "BLOCKED", "availability_reason": "No supplied fleet worker binding maps to this model supplier.", "worker": None, "mapping_source": mapping_source, "binding_status": None, "failure_class": None, "configured_base_url": None, "configured_model": None, "advertised_models": [], "evidence": {"fleet_snapshot_schema": fleet_snapshot.get("schema"), "worker_count": len(worker_index)}}
+    worker = worker_index[worker_ref]
+    binding_status = worker.get("binding_status")
+    availability = worker.get("availability")
+    failure_class = worker.get("failure_class")
+    if binding_status == "VERIFIED" and availability == "AVAILABLE":
+        availability_status = "AVAILABLE"
+        execution_status = "EXECUTABLE"
+        reason = "Fleet snapshot verified the configured worker binding and expected model advertisement."
+    elif failure_class == "expected_model_not_advertised":
+        availability_status = "BINDING_IDENTITY_MISMATCH"
+        execution_status = "BLOCKED"
+        reason = "The worker responded, but /v1/models did not advertise the expected configured model."
+    elif availability == "UNAVAILABLE":
+        availability_status = "UNAVAILABLE"
+        execution_status = "BLOCKED"
+        reason = "The supplied fleet snapshot reports the worker binding is unavailable."
+    else:
+        availability_status = "UNKNOWN"
+        execution_status = "BLOCKED"
+        reason = "The supplied fleet snapshot did not verify an executable worker binding."
+    return {"availability_status": availability_status, "execution_status": execution_status, "availability_reason": reason, "worker": worker_ref, "mapping_source": mapping_source, "binding_status": binding_status, "failure_class": failure_class, "configured_base_url": worker.get("configured_base_url"), "configured_model": worker.get("expected_model"), "advertised_models": list(worker.get("advertised_models") or []), "freshness": worker.get("freshness"), "evidence": _runtime_safe_evidence(worker.get("evidence"))}
+
+
+def _execution_allowed(availability: Mapping[str, Any]) -> bool:
+    return availability.get("execution_status") in {"EXECUTABLE", "LEGACY_UNCONSTRAINED"}
+
+
 def assess_capability_eligibility(runtime_packet: dict[str, Any], registry_index: dict[str, list[dict[str, Any]]]) -> list[dict[str, Any]]:
     """Emit the evidence-bearing eligibility stage before any supplier selection."""
     derived = derive_required_capabilities(runtime_packet)
@@ -194,25 +273,54 @@ def eligible_suppliers_for_capability(eligibility_record: dict[str, Any]) -> lis
     ]
 
 
-def plan_capabilities(runtime_packet: dict[str, Any], registry_index: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
+def plan_capabilities(
+    runtime_packet: dict[str, Any],
+    registry_index: dict[str, list[dict[str, Any]]],
+    *,
+    fleet_snapshot: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
     derived = derive_required_capabilities(runtime_packet)
     eligibility = assess_capability_eligibility(runtime_packet, registry_index)
     records = []
     for item in eligibility:
         eligible_candidates = eligible_suppliers_for_capability(item)
-        if eligible_candidates:
-            selected, reason = select_supplier(eligible_candidates)
+        availability_constraints = [
+            {
+                "supplier_id": candidate["supplier_id"],
+                "supplier_type": candidate["supplier_type"],
+                "interface_id": candidate["interface_id"],
+                **assess_supplier_availability(candidate, fleet_snapshot),
+            }
+            for candidate in eligible_candidates
+        ]
+        executable_candidates = [
+            candidate
+            for candidate, availability in zip(eligible_candidates, availability_constraints)
+            if _execution_allowed(availability)
+        ]
+        selection_candidates = executable_candidates if fleet_snapshot is not None else eligible_candidates
+        if selection_candidates:
+            selected, reason = select_supplier(selection_candidates)
         else:
-            selected, reason = None, "No eligible suppliers were admitted by capability eligibility."
+            selected, reason = None, "No eligible suppliers were admitted by capability eligibility." if not eligible_candidates else "Capability-eligible suppliers are blocked by live availability constraints."
+        selected_availability = None
+        if selected is not None:
+            selected_availability = next((constraint for constraint in availability_constraints if constraint["supplier_id"] == selected["supplier_id"]), None)
+        execution_status = "EXECUTABLE" if selected is not None and (selected_availability is None or _execution_allowed(selected_availability)) else "BLOCKED_BY_AVAILABILITY" if eligible_candidates else "NO_CAPABILITY_SUPPLIER"
         records.append({
             **item,
             "selected_supplier": None if selected is None else {"supplier_id": selected["supplier_id"], "supplier_type": selected["supplier_type"], "interface_id": selected["interface_id"]},
             "selection_reason": reason,
-            "coverage_status": "COVERED" if selected is not None else "UNCOVERED",
+            "coverage_status": "COVERED" if eligible_candidates else "UNCOVERED",
+            "availability_constraints": availability_constraints,
+            "selected_supplier_availability": selected_availability,
+            "execution_status": execution_status,
         })
-    complete = bool(records) and all(record["coverage_status"] == "COVERED" for record in records)
+    capability_complete = bool(records) and all(item["eligibility_status"] == "ELIGIBLE" for item in eligibility)
+    selection_complete = bool(records) and all(record["selected_supplier"] is not None for record in records)
+    executable_complete = selection_complete and all(record["execution_status"] == "EXECUTABLE" for record in records)
     steps = []
-    if complete:
+    if executable_complete:
         for record in records:
             supplier = record["selected_supplier"]
             steps.append({"capability_id": record["capability_id"], "supplier_id": supplier["supplier_id"], "supplier_type": supplier["supplier_type"]})
@@ -223,7 +331,9 @@ def plan_capabilities(runtime_packet: dict[str, Any], registry_index: dict[str, 
         "derived_required_capabilities": derived,
         "capability_eligibility": eligibility,
         "capabilities": records,
-        "overall_coverage": "COMPLETE" if complete else "INCOMPLETE",
+        "overall_coverage": "COMPLETE" if capability_complete else "INCOMPLETE",
+        "overall_execution_status": "EXECUTABLE" if executable_complete else "BLOCKED_BY_AVAILABILITY" if capability_complete else "INCOMPLETE_CAPABILITY",
+        "availability_source": "fleet_snapshot" if fleet_snapshot is not None else "not_supplied_legacy",
         "execution_steps": steps,
         "planned_model_calls": sum(step["supplier_type"] == "MODEL" for step in steps),
         "planned_tool_calls": sum(step["supplier_type"] == "TOOL" for step in steps),

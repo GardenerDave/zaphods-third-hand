@@ -11,7 +11,7 @@ import subprocess
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Mapping
 
 from local_harness.stage_a_power_telemetry import PowerSampler, integrate_energy_joules, read_gpu_power
 from scripts import zth_capability_router_v1 as v1
@@ -185,7 +185,12 @@ def select_supplier(candidates: list[dict[str, Any]]) -> tuple[dict[str, Any] | 
     return selected, f"Selected qualified {selected['supplier_type']} supplier by explicit type precedence."
 
 
-def plan_capabilities(planner_facts: dict[str, Any], index: dict[str, list[dict[str, Any]]]) -> tuple[dict[str, Any], dict[str, Any]]:
+def plan_capabilities(
+    planner_facts: dict[str, Any],
+    index: dict[str, list[dict[str, Any]]],
+    *,
+    fleet_snapshot: Mapping[str, Any] | None = None,
+) -> tuple[dict[str, Any], dict[str, Any]]:
     required, derivations, unresolved = derive_capability_requirements(planner_facts)
     records: list[dict[str, Any]] = []
     eligibility_records: list[dict[str, Any]] = []
@@ -200,7 +205,29 @@ def plan_capabilities(planner_facts: dict[str, Any], index: dict[str, list[dict[
             "eligibility_reason": "At least one QUALIFIED_EXPLORATORY supplier exists in the registry." if qualified_candidates else "No QUALIFIED_EXPLORATORY supplier exists for this capability.",
             "evidence_sources": [planner_facts["packet_source"], {"registry_entry_count": len(candidates)}],
         })
-        selected, reason = select_supplier(candidates)
+        eligible_candidates = [entry for entry in candidates if entry["status"] == "QUALIFIED_EXPLORATORY"]
+        availability_constraints = [
+            {
+                "supplier_id": entry["supplier_id"],
+                "supplier_type": entry["supplier_type"],
+                "interface_id": entry["interface_id"],
+                **v1.assess_supplier_availability(entry, fleet_snapshot),
+            }
+            for entry in eligible_candidates
+        ]
+        executable_candidates = [
+            entry
+            for entry, availability in zip(eligible_candidates, availability_constraints)
+            if v1._execution_allowed(availability)
+        ]
+        selection_candidates = executable_candidates if fleet_snapshot is not None else candidates
+        selected, reason = select_supplier(selection_candidates)
+        if selected is None and eligible_candidates:
+            reason = "Capability-eligible suppliers are blocked by live availability constraints."
+        selected_availability = None
+        if selected is not None:
+            selected_availability = next((constraint for constraint in availability_constraints if constraint["supplier_id"] == selected["supplier_id"]), None)
+        execution_status = "EXECUTABLE" if selected is not None and (selected_availability is None or v1._execution_allowed(selected_availability)) else "BLOCKED_BY_AVAILABILITY" if eligible_candidates else "NO_CAPABILITY_SUPPLIER"
         records.append({
             "capability_id": capability_id,
             "candidate_suppliers": eligibility_records[-1]["candidate_suppliers"],
@@ -208,11 +235,16 @@ def plan_capabilities(planner_facts: dict[str, Any], index: dict[str, list[dict[
             "selected_supplier": None if selected is None else {"supplier_id": selected["supplier_id"], "supplier_type": selected["supplier_type"], "interface_id": selected["interface_id"]},
             "selection_reason": reason,
             "eligibility_reason": eligibility_records[-1]["eligibility_reason"],
-            "coverage_status": "COVERED" if selected else "UNCOVERED",
+            "coverage_status": "COVERED" if eligible_candidates else "UNCOVERED",
+            "availability_constraints": availability_constraints,
+            "selected_supplier_availability": selected_availability,
+            "execution_status": execution_status,
         })
-    complete = bool(required) and not unresolved and all(item["coverage_status"] == "COVERED" for item in records)
+    capability_complete = bool(required) and not unresolved and all(item["eligibility_status"] == "ELIGIBLE" for item in eligibility_records)
+    selection_complete = bool(required) and not unresolved and all(item["selected_supplier"] is not None for item in records)
+    executable_complete = selection_complete and all(item["execution_status"] == "EXECUTABLE" for item in records)
     steps: list[dict[str, Any]] = []
-    if complete:
+    if executable_complete:
         for item in records:
             supplier = item["selected_supplier"]
             cap = item["capability_id"]
@@ -233,7 +265,9 @@ def plan_capabilities(planner_facts: dict[str, Any], index: dict[str, list[dict[
         "capability_eligibility": eligibility_records,
         "capabilities": records,
         "unresolved_requirements": unresolved,
-        "overall_coverage": "COMPLETE" if complete else "INCOMPLETE",
+        "overall_coverage": "COMPLETE" if capability_complete else "INCOMPLETE",
+        "overall_execution_status": "EXECUTABLE" if executable_complete else "BLOCKED_BY_AVAILABILITY" if capability_complete else "INCOMPLETE_CAPABILITY",
+        "availability_source": "fleet_snapshot" if fleet_snapshot is not None else "not_supplied_legacy",
         "execution_steps": steps,
         "planned_model_calls": sum(step["supplier_type"] == "MODEL" for step in steps),
         "planned_tool_calls": sum(step["supplier_type"] == "TOOL" for step in steps),

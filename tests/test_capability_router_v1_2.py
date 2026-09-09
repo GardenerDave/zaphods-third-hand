@@ -96,3 +96,33 @@ def test_route_trace_preserves_capability_eligibility_and_selection_separation()
     assert capability["selected_supplier"] is not None
     assert capability["selected_supplier"]["supplier_id"] in {item["supplier_id"] for item in capability["qualified_candidates"]}
     assert capability["eligibility_reason"] != capability["selection_reason"]
+
+
+def test_v1_2_plan_applies_supplied_fleet_snapshot_as_execution_constraint():
+    task = next(item for item in load_tasks() if item["task_id"] == "router-v1-2-003")
+    triage, orchestration = v1.make_packets({"task_id": task["task_id"], "input_request": task["input_request"]})
+    facts = build_planner_facts(task, triage, orchestration)
+    snapshot = {
+        "schema": "zth_local_fleet_snapshot_v1",
+        "generated_at": "2026-09-08T00:00:00+00:00",
+        "workers": [
+            {
+                "worker": "qwen3_1_7b_labeled_2_032b_minimal_atom",
+                "configured_base_url": "http://127.0.0.1:8081/v1",
+                "expected_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+                "binding_status": "UNVERIFIED",
+                "availability": "UNAVAILABLE",
+                "advertised_models": [],
+                "failure_class": "connection_refused",
+                "checked_at": "2026-09-08T00:00:00+00:00",
+                "evidence": {"preflight": {"binding_status": "UNVERIFIED", "failure_class": "connection_refused"}},
+            }
+        ],
+    }
+    plan, _ = plan_capabilities(facts, registry_index(), fleet_snapshot=snapshot)
+    semantic = next(item for item in plan["capabilities"] if item["capability_id"] == "semantic.minimal_action_object_extraction")
+    assert plan["overall_coverage"] == "COMPLETE"
+    assert plan["overall_execution_status"] == "BLOCKED_BY_AVAILABILITY"
+    assert semantic["availability_constraints"][0]["availability_status"] == "UNAVAILABLE"
+    assert semantic["selected_supplier"] is None
+    assert plan["execution_steps"] == []

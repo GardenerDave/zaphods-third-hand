@@ -12,7 +12,7 @@ from local_harness.icm_call import _render_request_payload
 from local_harness.icm_spec import WorkerResponse, resolve_worker_spec
 from local_harness.binding_preflight import preflight_worker_binding
 from local_harness.prompt_patch_library import PromptPatchLibrary
-from local_harness.supervised_capability_loop import aggregate_scorecard, run_capability_loop
+from local_harness.supervised_capability_loop import aggregate_scorecard, binding_preflight_from_fleet_snapshot, run_capability_loop
 
 
 def response(content: str, model: str) -> WorkerResponse:
@@ -82,6 +82,89 @@ def test_binding_preflight_blocks_unverified_capability_attempt(tmp_path: Path):
     assert (tmp_path / "binding_preflight.json").is_file()
     saved = json.loads((tmp_path / "binding_preflight.json").read_text())
     assert saved["binding_status"] == "UNVERIFIED"
+
+
+def fleet_snapshot(binding_status: str = "VERIFIED", availability: str = "AVAILABLE", failure_class: str = "binding_verified") -> dict:
+    return {
+        "schema": "zth_local_fleet_snapshot_v1",
+        "generated_at": "2026-09-08T00:00:01+00:00",
+        "workers": [
+            {
+                "worker": "router",
+                "configured_base_url": "http://127.0.0.1:8081/v1",
+                "expected_model": "small-1.7b",
+                "binding_status": binding_status,
+                "availability": availability,
+                "advertised_models": ["small-1.7b"] if availability == "AVAILABLE" else [],
+                "failure_class": failure_class,
+                "checked_at": "2026-09-08T00:00:00+00:00",
+                "evidence": {
+                    "preflight": {
+                        "schema": "zth_worker_binding_preflight_v1",
+                        "worker": "router",
+                        "configured_base_url": "http://127.0.0.1:8081/v1",
+                        "expected_model": "small-1.7b",
+                        "endpoint_status": "ok" if availability == "AVAILABLE" else "error",
+                        "advertised_models": ["small-1.7b"] if availability == "AVAILABLE" else [],
+                        "binding_status": binding_status,
+                        "failure_class": failure_class,
+                        "reason": "fixture",
+                        "checked_at": "2026-09-08T00:00:00+00:00",
+                        "evidence": {"models_url": "http://127.0.0.1:8081/v1/models", "http_status": 200 if availability == "AVAILABLE" else None, "response_sha256": "0" * 64},
+                    }
+                },
+            }
+        ],
+    }
+
+
+def test_supplied_fleet_snapshot_blocks_unavailable_worker_without_worker_call(tmp_path: Path):
+    worker_calls = 0
+
+    def worker(_prompt):
+        nonlocal worker_calls
+        worker_calls += 1
+        return response('{"answer":"ok"}', "small-1.7b")
+
+    result = run_capability_loop(
+        task(),
+        out_dir=tmp_path,
+        worker=worker,
+        local_teacher=lambda _p: pytest.fail("teacher must not be called"),
+        max_worker_attempts=1,
+        max_teacher_passes=0,
+        fleet_snapshot=fleet_snapshot(binding_status="UNVERIFIED", availability="UNAVAILABLE", failure_class="connection_refused"),
+        fleet_worker_name="router",
+    )
+    assert worker_calls == 0
+    assert result["capability_verdict_available"] is False
+    assert result["binding_preflight"]["failure_class"] == "connection_refused"
+    assert result["fleet_snapshot_reference"]["artifact"] == "fleet_snapshot"
+    assert (tmp_path / "fleet_snapshot.json").is_file()
+
+
+def test_supplied_verified_fleet_snapshot_reuses_preflight_and_allows_worker_call(tmp_path: Path):
+    calls = []
+    result = run_capability_loop(
+        task(),
+        out_dir=tmp_path,
+        worker=lambda p: (calls.append(p) or response('{"answer":"ok"}', "small-1.7b")),
+        local_teacher=lambda _p: pytest.fail("teacher must not be called"),
+        max_worker_attempts=1,
+        max_teacher_passes=0,
+        fleet_snapshot=fleet_snapshot(),
+        fleet_worker_name="router",
+    )
+    assert result["capability_verdict_available"] is True
+    assert result["fleet_snapshot_reference"]["artifact"] == "fleet_snapshot"
+    assert json.loads((tmp_path / "binding_preflight.json").read_text())["binding_status"] == "VERIFIED"
+    assert len(calls) == 1
+
+
+def test_binding_preflight_from_fleet_snapshot_reports_missing_worker():
+    preflight = binding_preflight_from_fleet_snapshot(fleet_snapshot(), "missing")
+    assert preflight["binding_status"] == "UNVERIFIED"
+    assert preflight["failure_class"] == "fleet_worker_not_found"
 
 
 @pytest.mark.parametrize(

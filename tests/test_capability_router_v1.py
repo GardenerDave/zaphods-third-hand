@@ -12,6 +12,64 @@ from scripts.zth_capability_router_v1 import (
 )
 
 
+def synthetic_packet() -> dict:
+    return {
+        "task_id": "synthetic",
+        "packet_inputs": {"semantic_request_shape": "single_action_object"},
+        "packet_source": {"triage_id": "t", "orchestration_id": "o"},
+    }
+
+
+def synthetic_model_index(status: str = "QUALIFIED_EXPLORATORY") -> dict:
+    return {
+        "semantic.minimal_action_object_extraction": [
+            {
+                "capability_id": "semantic.minimal_action_object_extraction",
+                "supplier_id": "router",
+                "supplier_type": "MODEL",
+                "interface_id": "minimal_action_object_v0",
+                "status": status,
+            }
+        ]
+    }
+
+
+def fleet_snapshot(*, binding_status: str = "VERIFIED", availability: str = "AVAILABLE", failure_class: str = "binding_verified", advertised_models: list[str] | None = None) -> dict:
+    advertised_models = advertised_models or ["Qwen_Qwen3-1.7B-Q4_K_M.gguf"]
+    return {
+        "schema": "zth_local_fleet_snapshot_v1",
+        "generated_at": "2026-09-08T00:00:01+00:00",
+        "workers": [
+            {
+                "worker": "router",
+                "configured_base_url": "http://127.0.0.1:8081/v1",
+                "expected_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+                "binding_status": binding_status,
+                "availability": availability,
+                "advertised_models": advertised_models,
+                "failure_class": failure_class,
+                "checked_at": "2026-09-08T00:00:00+00:00",
+                "freshness": {"state": "fresh", "age_seconds": 1.0, "stale": False},
+                "evidence": {
+                    "preflight": {
+                        "schema": "zth_worker_binding_preflight_v1",
+                        "worker": "router",
+                        "configured_base_url": "http://127.0.0.1:8081/v1",
+                        "expected_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+                        "endpoint_status": "ok" if advertised_models else "error",
+                        "advertised_models": advertised_models,
+                        "binding_status": binding_status,
+                        "failure_class": failure_class,
+                        "reason": "fixture",
+                        "checked_at": "2026-09-08T00:00:00+00:00",
+                        "evidence": {"models_url": "http://127.0.0.1:8081/v1/models", "http_status": 200, "response_sha256": "0" * 64},
+                    }
+                },
+            }
+        ],
+    }
+
+
 def test_v1_plans_from_packet_facts_not_expectations():
     binding = validate_model_free()
     task, runtime_packet, plan = next(item for item in binding["plans"] if item[0]["task_id"] == "router-v1-003")
@@ -210,3 +268,82 @@ def test_lazy_backend_gate_does_not_touch_unavailable_endpoint_for_no_model_plan
     def unavailable_endpoint():
         raise AssertionError("unavailable model endpoint was touched")
     assert lazy_model_backend_gate(no_model_plans, unavailable_endpoint) is False
+
+
+def test_capable_live_worker_is_executable_with_supplied_fleet_snapshot():
+    plan = plan_capabilities(synthetic_packet(), synthetic_model_index(), fleet_snapshot=fleet_snapshot())
+    capability = plan["capabilities"][0]
+    assert plan["overall_coverage"] == "COMPLETE"
+    assert plan["overall_execution_status"] == "EXECUTABLE"
+    assert plan["execution_steps"][0]["supplier_id"] == "router"
+    assert capability["availability_constraints"][0]["availability_status"] == "AVAILABLE"
+    assert capability["selected_supplier_availability"]["advertised_models"] == ["Qwen_Qwen3-1.7B-Q4_K_M.gguf"]
+
+
+def test_capable_offline_worker_remains_capability_eligible_but_not_executable():
+    snapshot = fleet_snapshot(binding_status="UNVERIFIED", availability="UNAVAILABLE", failure_class="connection_refused", advertised_models=[])
+    plan = plan_capabilities(synthetic_packet(), synthetic_model_index(), fleet_snapshot=snapshot)
+    capability = plan["capabilities"][0]
+    assert plan["capability_eligibility"][0]["eligibility_status"] == "ELIGIBLE"
+    assert plan["capability_eligibility"][0]["qualified_candidates"][0]["supplier_id"] == "router"
+    assert plan["overall_coverage"] == "COMPLETE"
+    assert plan["overall_execution_status"] == "BLOCKED_BY_AVAILABILITY"
+    assert plan["execution_steps"] == []
+    assert capability["coverage_status"] == "COVERED"
+    assert capability["availability_constraints"][0]["availability_status"] == "UNAVAILABLE"
+    assert capability["availability_constraints"][0]["failure_class"] == "connection_refused"
+
+
+def test_live_but_capability_ineligible_worker_does_not_become_eligible():
+    plan = plan_capabilities(synthetic_packet(), synthetic_model_index("NOT_QUALIFIED"), fleet_snapshot=fleet_snapshot())
+    assert plan["capability_eligibility"][0]["eligibility_status"] == "INELIGIBLE"
+    assert plan["overall_coverage"] == "INCOMPLETE"
+    assert plan["overall_execution_status"] == "INCOMPLETE_CAPABILITY"
+    assert plan["execution_steps"] == []
+
+
+def test_transport_preflight_failure_does_not_mutate_capability_history():
+    snapshot = fleet_snapshot(binding_status="UNVERIFIED", availability="UNAVAILABLE", failure_class="transport_timeout", advertised_models=[])
+    plan = plan_capabilities(synthetic_packet(), synthetic_model_index(), fleet_snapshot=snapshot)
+    candidate = plan["capability_eligibility"][0]["candidate_suppliers"][0]
+    assert candidate["status"] == "QUALIFIED_EXPLORATORY"
+    assert plan["capabilities"][0]["availability_constraints"][0]["failure_class"] == "transport_timeout"
+    assert plan["overall_execution_status"] == "BLOCKED_BY_AVAILABILITY"
+
+
+def test_binding_identity_mismatch_is_surfaced_without_negative_capability_evidence():
+    snapshot = fleet_snapshot(binding_status="UNVERIFIED", availability="AVAILABLE", failure_class="expected_model_not_advertised", advertised_models=["wrong-model"])
+    plan = plan_capabilities(synthetic_packet(), synthetic_model_index(), fleet_snapshot=snapshot)
+    availability = plan["capabilities"][0]["availability_constraints"][0]
+    assert plan["capability_eligibility"][0]["eligibility_status"] == "ELIGIBLE"
+    assert availability["availability_status"] == "BINDING_IDENTITY_MISMATCH"
+    assert availability["advertised_models"] == ["wrong-model"]
+    assert plan["execution_steps"] == []
+
+
+def test_supplied_fleet_snapshot_is_deterministic_and_no_live_probe_is_required(monkeypatch):
+    monkeypatch.setattr("local_harness.binding_preflight.preflight_worker_binding", lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("live preflight must not run")))
+    first = plan_capabilities(synthetic_packet(), synthetic_model_index(), fleet_snapshot=fleet_snapshot())
+    second = plan_capabilities(synthetic_packet(), synthetic_model_index(), fleet_snapshot=fleet_snapshot())
+    assert first == second
+
+
+def test_legacy_callers_without_fleet_snapshot_keep_capability_only_execution_semantics():
+    plan = plan_capabilities(synthetic_packet(), synthetic_model_index())
+    capability = plan["capabilities"][0]
+    assert plan["availability_source"] == "not_supplied_legacy"
+    assert plan["overall_coverage"] == "COMPLETE"
+    assert plan["overall_execution_status"] == "EXECUTABLE"
+    assert capability["availability_constraints"][0]["availability_status"] == "NOT_SUPPLIED"
+    assert capability["availability_constraints"][0]["execution_status"] == "LEGACY_UNCONSTRAINED"
+    assert plan["execution_steps"][0]["supplier_id"] == "router"
+
+
+def test_qwen3_1_7b_supplier_can_map_to_router_worker_by_model_identity():
+    index = synthetic_model_index()
+    index["semantic.minimal_action_object_extraction"][0]["supplier_id"] = "qwen3_1_7b_labeled_2_032b_minimal_atom"
+    plan = plan_capabilities(synthetic_packet(), index, fleet_snapshot=fleet_snapshot())
+    availability = plan["capabilities"][0]["selected_supplier_availability"]
+    assert plan["overall_execution_status"] == "EXECUTABLE"
+    assert availability["worker"] == "router"
+    assert availability["mapping_source"] == "model_identity_fallback"
