@@ -144,15 +144,18 @@ def test_transport_qualification_and_semantic_capability_remain_unknown_for_natu
 
 def test_transport_qualification_reference_resolves_authoritatively():
     artifact = ROOT / "docs/research/EXPLICIT_INTERFACE_V3_TRANSPORT_REQUALIFICATION_FINAL_2026-08-24.json"
+    # sha pinned to the post-redaction artifact (commit ec29eff redacted the
+    # LAN host from this research public surface), so the endpoint literal
+    # must match the redacted request_url for endpoint_match to hold.
     ref = TransportQualificationRef(
         artifact_ref=str(artifact),
-        artifact_sha256="a002ff5e7d190fae429a0f84e57eaa03c3fdcdb247d7a06756a7ed65ed022466",
+        artifact_sha256="499313650a94eed44b6bb3c6225978890cbcc6de21f676227113351a0860d181",
         qualification_id="v3-explicit-interface",
         qualification_selector="local",
     )
     verification = resolve_transport_qualification_reference(
         qualification_ref=ref,
-        transaction_endpoint="http://192.168.1.16:8080/v1/chat/completions",
+        transaction_endpoint="http://<LAN_HOST>:8080/v1/chat/completions",
         transaction_model="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
     )
     assert verification.artifact_integrity is True
