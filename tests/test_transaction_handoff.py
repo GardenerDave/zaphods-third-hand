@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
 import sys
@@ -390,6 +391,39 @@ def test_next_worker_context_contains_required_handoff_information(tmp_path: Pat
     assert context["first_worker_identity"] == "manual_operator_provided_model_output"
     assert context["previous_attempt"]["result_reference"]["raw_output_reference"].endswith("raw_model_output.txt")
     assert context["handoff"]["handoff_packet_reference"]["path"].endswith("handoff_packet.json")
+
+
+def test_transaction_binding_ties_preserved_raw_output_to_review_gate_and_handoff_ids(tmp_path: Path) -> None:
+    run_dir = _prepare_and_accept_run(
+        tmp_path,
+        next_worker_objective="Produce a bounded downstream comparison report.",
+    )
+    result = build_transaction_handoff_artifacts(run_dir=run_dir, next_worker_identity="qwen3-30b")
+    context = json.loads(result["next_worker_context_path"].read_text(encoding="utf-8"))
+    binding = context["transaction_binding"]
+
+    # The preserved raw output is the run-dir raw_model_output.txt. Its exact
+    # on-disk sha256 must equal the sha recorded in the transaction binding, so
+    # the preserved bytes are bound to this transaction for regression
+    # protection rather than re-derived later.
+    raw_model_output = run_dir / "raw_model_output.txt"
+    assert raw_model_output.is_file()
+    assert hashlib.sha256(raw_model_output.read_bytes()).hexdigest() == binding["raw_output_sha256"]
+
+    # Every binding ID must be present (non-null) and point at the corresponding
+    # record in the same context: transaction, run, attempt, review
+    # (validation + decision), gate, and handoff.
+    assert binding["transaction_id"] == context["transaction_id"]
+    assert binding["run_id"] == context["run_id"]
+    assert binding["attempt_id"] == context["previous_attempt"]["attempt_id"]
+    assert binding["validation_id"] == context["validation"]["validation_id"]
+    assert binding["decision_id"] == context["review"]["decision_id"]
+    assert binding["gate_id"] == context["downstream_use_gate"]["gate_id"]
+    assert binding["handoff_id"] == context["handoff"]["handoff_id"]
+    assert all(
+        isinstance(value, str) and value.strip()
+        for value in binding.values()
+    )
 
 
 def test_transaction_id_is_stable_across_reconstruction(tmp_path: Path) -> None:

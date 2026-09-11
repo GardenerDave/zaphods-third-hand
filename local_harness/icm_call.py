@@ -59,6 +59,12 @@ def _read_json_response(request: urllib.request.Request, timeout: int) -> Any:
         return json.loads(response.read().decode("utf-8"))
 
 
+def _read_json_response_with_bytes(request: urllib.request.Request, timeout: int) -> tuple[bytes, Any]:
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        raw_body = response.read()
+    return raw_body, json.loads(raw_body.decode("utf-8"))
+
+
 def _sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
@@ -356,6 +362,24 @@ def _transport_events_path(intent_path: Path) -> Path:
     return intent_path.with_name(intent_path.stem + ".transport_events.jsonl")
 
 
+def _raw_response_path(intent_path: Path) -> Path:
+    return intent_path.with_name(intent_path.stem + ".raw_response.json")
+
+
+def _write_raw_response_bytes(path: Path, raw_body: bytes) -> str:
+    with path.open("xb") as handle:
+        handle.write(raw_body)
+    return _sha256_bytes(raw_body)
+
+
+def _persist_raw_response(intent_path: Path | None, raw_body: bytes) -> tuple[str, str | None]:
+    if intent_path is None:
+        return _sha256_bytes(raw_body), None
+    path = _raw_response_path(intent_path)
+    sha = _write_raw_response_bytes(path, raw_body)
+    return sha, os.fspath(path)
+
+
 def _write_transport_event(path: Path | None, event: dict[str, Any]) -> None:
     if path is None:
         return
@@ -430,7 +454,7 @@ def call_worker(
     )
 
     try:
-        result = _read_json_response(request, timeout)
+        raw_response_bytes, result = _read_json_response_with_bytes(request, timeout)
     except urllib.error.HTTPError as exc:
         request_provenance["response_capture_monotonic"] = time.monotonic()
         body = exc.read().decode("utf-8", errors="replace")
@@ -502,6 +526,12 @@ def call_worker(
                 "finish_reason": finish_reason,
             },
         )
+        raw_response_sha256, raw_response_path = _persist_raw_response(
+            request_intent_path,
+            raw_response_bytes,
+        )
+        request_provenance["raw_response_sha256"] = raw_response_sha256
+        request_provenance["raw_response_path"] = raw_response_path
         _write_transport_event(
             transport_events_path,
             {
@@ -512,6 +542,8 @@ def call_worker(
                 "finish_reason": finish_reason,
                 "raw_output_sha256": _sha256_bytes(content.encode("utf-8")),
                 "raw_output_length": len(content),
+                "raw_response_sha256": raw_response_sha256,
+                "raw_response_path": raw_response_path,
             },
         )
         response_model = result.get("model", model) if isinstance(result, dict) else model
@@ -533,6 +565,12 @@ def call_worker(
         )
     except Exception as exc:
         request_provenance["response_capture_monotonic"] = time.monotonic()
+        raw_response_sha256, raw_response_path = _persist_raw_response(
+            request_intent_path,
+            raw_response_bytes,
+        )
+        request_provenance["raw_response_sha256"] = raw_response_sha256
+        request_provenance["raw_response_path"] = raw_response_path
         _write_transport_event(
             transport_events_path,
             {
@@ -541,6 +579,8 @@ def call_worker(
                 "state": "transport_error",
                 "error_message": str(exc),
                 "worker_identity": model,
+                "raw_response_sha256": raw_response_sha256,
+                "raw_response_path": raw_response_path,
             },
         )
         return WorkerResponse(

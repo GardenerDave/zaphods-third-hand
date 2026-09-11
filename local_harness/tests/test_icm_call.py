@@ -226,6 +226,135 @@ class IcmCallTests(unittest.TestCase):
             self.assertEqual("gemma-test.gguf", json.loads(transport_lines[-1])["worker_identity"])
             self.assertEqual(hashlib.sha256(prompt_path.read_bytes()).hexdigest(), intent["source_continuation_sha256"])
 
+    def test_call_worker_persists_exact_raw_response_bytes(self):
+        payload = {
+            "model": "gemma-test.gguf",
+            "choices": [
+                {
+                    "finish_reason": "stop",
+                    "message": {"role": "assistant", "content": "ok"},
+                }
+            ],
+            "usage": {"prompt_tokens": 3, "completion_tokens": 2},
+        }
+        exact_body = json.dumps(payload).encode("utf-8")
+        with tempfile.TemporaryDirectory() as temp_dir:
+            intent_path = Path(temp_dir) / "worker_b_call_intent.json"
+            with patch.object(
+                icm_call.urllib.request,
+                "urlopen",
+                return_value=FakeHTTPResponse(payload),
+            ):
+                response = icm_call.call_worker(
+                    icm_call.resolve_worker_spec(
+                        "handoff",
+                        base_url="http://localhost:8083/v1",
+                    ),
+                    "Reply with exactly: ok",
+                    request_intent_out=intent_path,
+                )
+
+            self.assertEqual("ok", response.status)
+            raw_response_path = intent_path.with_name("worker_b_call_intent.raw_response.json")
+            self.assertTrue(raw_response_path.is_file())
+            written_bytes = raw_response_path.read_bytes()
+            self.assertEqual(written_bytes, exact_body)
+            self.assertEqual(hashlib.sha256(written_bytes).hexdigest(), response.request_provenance["raw_response_sha256"])
+            self.assertEqual(
+                os.fspath(raw_response_path),
+                response.request_provenance["raw_response_path"],
+            )
+            self.assertEqual(json.loads(written_bytes.decode("utf-8")), response.raw_response)
+            transport_lines = intent_path.with_name(
+                "worker_b_call_intent.transport_events.jsonl"
+            ).read_text(encoding="utf-8").splitlines()
+            completed = json.loads(transport_lines[-1])
+            self.assertEqual("completed", completed["state"])
+            self.assertEqual(hashlib.sha256(written_bytes).hexdigest(), completed["raw_response_sha256"])
+            self.assertEqual(os.fspath(raw_response_path), completed["raw_response_path"])
+
+    def test_main_persists_exact_raw_response_bytes(self):
+        payload = {
+            "model": "gemma-test.gguf",
+            "choices": [
+                {
+                    "finish_reason": "stop",
+                    "message": {"role": "assistant", "content": "ok"},
+                }
+            ],
+        }
+        exact_body = json.dumps(payload).encode("utf-8")
+        with tempfile.TemporaryDirectory() as temp_dir:
+            intent_path = Path(temp_dir) / "worker_b_call_intent.json"
+            prompt_path = Path(temp_dir) / "prompt.md"
+            prompt_path.write_text("Reply with exactly: ok", encoding="utf-8")
+
+            with patch.object(
+                icm_call.urllib.request,
+                "urlopen",
+                return_value=FakeHTTPResponse(payload),
+            ):
+                exit_code = icm_call.main(
+                    [
+                        "handoff",
+                        "--base-url",
+                        "http://localhost:8083/v1",
+                        "--model",
+                        "gemma-test.gguf",
+                        "--request-intent-out",
+                        os.fspath(intent_path),
+                        "--prompt-file",
+                        os.fspath(prompt_path),
+                    ]
+                )
+
+            self.assertEqual(0, exit_code)
+            raw_response_path = intent_path.with_name("worker_b_call_intent.raw_response.json")
+            self.assertTrue(raw_response_path.is_file())
+            self.assertEqual(raw_response_path.read_bytes(), exact_body)
+            self.assertEqual(json.loads(raw_response_path.read_text(encoding="utf-8")), payload)
+            transport_lines = intent_path.with_name(
+                "worker_b_call_intent.transport_events.jsonl"
+            ).read_text(encoding="utf-8").splitlines()
+            completed = json.loads(transport_lines[-1])
+            self.assertEqual("completed", completed["state"])
+            self.assertEqual(hashlib.sha256(exact_body).hexdigest(), completed["raw_response_sha256"])
+
+    def test_call_worker_persists_raw_bytes_on_parse_error(self):
+        malformed = {"error": "bad request"}
+        exact_body = json.dumps(malformed).encode("utf-8")
+        with tempfile.TemporaryDirectory() as temp_dir:
+            intent_path = Path(temp_dir) / "worker_b_call_intent.json"
+            with patch.object(
+                icm_call.urllib.request,
+                "urlopen",
+                return_value=FakeHTTPResponse(malformed),
+            ):
+                response = icm_call.call_worker(
+                    icm_call.resolve_worker_spec(
+                        "handoff",
+                        base_url="http://localhost:8083/v1",
+                    ),
+                    "Reply with exactly: ok",
+                    request_intent_out=intent_path,
+                )
+
+            self.assertEqual("parse_error", response.status)
+            self.assertEqual(malformed, response.raw_response)
+            raw_response_path = intent_path.with_name("worker_b_call_intent.raw_response.json")
+            self.assertTrue(raw_response_path.is_file())
+            self.assertEqual(raw_response_path.read_bytes(), exact_body)
+            self.assertEqual(
+                hashlib.sha256(exact_body).hexdigest(),
+                response.request_provenance["raw_response_sha256"],
+            )
+            transport_lines = intent_path.with_name(
+                "worker_b_call_intent.transport_events.jsonl"
+            ).read_text(encoding="utf-8").splitlines()
+            transport_error = json.loads(transport_lines[-1])
+            self.assertEqual("transport_error", transport_error["state"])
+            self.assertEqual(hashlib.sha256(exact_body).hexdigest(), transport_error["raw_response_sha256"])
+
     def test_main_with_prompt_file_and_positional_prompt_fails_closed(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             prompt_path = Path(temp_dir) / "prompt.md"
