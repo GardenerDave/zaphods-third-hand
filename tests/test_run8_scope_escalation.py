@@ -16,7 +16,7 @@ from scripts.zth_run4a_intervention_calibration import Run4ADriverError
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PREREG = ROOT / "docs/research/RUN_8_VALIDATION_GATED_ESCALATION_PREREGISTRATION_2026-08-20.json"
+PREREG = ROOT / "docs/research/RUN_8_VALIDATION_GATED_ESCALATION_PREREGISTRATION_2026-09-09.json"
 HISTORICAL_PREREG = ROOT / "docs/research/RUN_7_VALIDATION_GATED_ESCALATION_PREREGISTRATION_2026-08-20.json"
 PACK = ROOT / "local_harness/fixtures/capability_loop/run8_scope"
 
@@ -105,7 +105,10 @@ def test_run8_dry_run_is_zero_call_and_historical_binding_is_separate():
     assert json.loads(result.stdout) == {"control": "external_direct", "model_calls": 0, "pair_order_seed": 20260827, "status": "dry_run_valid", "treatment": "validation_gated_economic_escalation"}
     historical = subprocess.run(["python3", "scripts/zth_run7_scope_escalation.py", "--preregistration", str(HISTORICAL_PREREG), "--output-dir", "/tmp/run8-historical-mismatch"], cwd=ROOT, capture_output=True, text=True)
     assert historical.returncode != 0
-    assert "Run 7 driver binding mismatch" in historical.stderr
+    # The repaired tree changed the validators pinned by the 2026-08-20
+    # preregistration before the driver sha check, so the deterministic
+    # first fail-closed message is the validator binding mismatch.
+    assert "Run 7 validator binding mismatch: local_harness/supervised_capability_loop.py" in historical.stderr
 
 
 def test_run8_repaired_escalation_contract_and_artifact_integrity(tmp_path: Path):

@@ -16,7 +16,7 @@ from scripts.zth_run4a_intervention_calibration import Run4ADriverError
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PREREG = ROOT / "docs/research/RUN_5_MIXED_ECONOMIC_ROUTING_PREREGISTRATION_2026-08-20.json"
+PREREG = ROOT / "docs/research/RUN_5_MIXED_ECONOMIC_ROUTING_PREREGISTRATION_2026-09-09.json"
 
 
 def _response(content: str, *, model: str = "fixture-model") -> WorkerResponse:

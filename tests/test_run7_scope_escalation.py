@@ -22,6 +22,7 @@ from scripts.zth_run4a_intervention_calibration import Run4ADriverError
 
 ROOT = Path(__file__).resolve().parents[1]
 PREREG = ROOT / "docs/research/RUN_7_VALIDATION_GATED_ESCALATION_PREREGISTRATION_2026-08-20.json"
+PREREG_CURRENT = ROOT / "docs/research/RUN_7_VALIDATION_GATED_ESCALATION_PREREGISTRATION_2026-09-09.json"
 REPAIR_FREEZE = ROOT / "docs/research/RUN_7_ESCALATION_PATH_REPAIR_FREEZE_2026-08-20.json"
 PACK = ROOT / "local_harness/fixtures/capability_loop/run7_scope"
 FAMILY = "scope-authority-boundary"
@@ -40,7 +41,7 @@ def _context() -> dict:
 
 
 def _repair_validation_preregistration() -> Path:
-    payload = json.loads(PREREG.read_text())
+    payload = json.loads(PREREG_CURRENT.read_text())
     payload["driver"]["sha256"] = driver.sha256_file(ROOT / payload["driver"]["path"])
     path = Path("/tmp/run7_scope_repair_validation_preregistration.json")
     path.write_text(json.dumps(payload, indent=2) + "\n")
@@ -112,7 +113,10 @@ def test_run7_fixture_pack_is_intervention_blind_and_bound():
 def test_run7_historical_binding_rejects_repaired_driver_without_calls():
     result = subprocess.run(["python3", "scripts/zth_run7_scope_escalation.py", "--preregistration", str(PREREG), "--output-dir", "/tmp/run7-scope-dry"], cwd=ROOT, capture_output=True, text=True)
     assert result.returncode != 0
-    assert "Run 7 driver binding mismatch" in result.stderr
+    # The repaired tree changed the validators pinned by the 2026-08-20
+    # preregistration before the driver sha check, so the deterministic
+    # first fail-closed message is the validator binding mismatch.
+    assert "Run 7 validator binding mismatch: local_harness/supervised_capability_loop.py" in result.stderr
 
 
 def test_run7_repair_validation_dry_run_makes_zero_model_calls():

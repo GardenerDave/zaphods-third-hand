@@ -9,7 +9,7 @@ from local_harness.run4a_fixture_pack import PERMUTATIONS, TARGET_BLOCKS, verify
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PREREG = ROOT / "docs/research/RUN_4A_PREREGISTRATION_2026-08-19.json"
+PREREG = ROOT / "docs/research/RUN_4A_PREREGISTRATION_2026-09-09.json"
 PACK = ROOT / "local_harness/fixtures/capability_loop/reviewed_v4a"
 
 
