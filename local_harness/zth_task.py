@@ -48,6 +48,7 @@ import os
 import sys
 import urllib.error
 import urllib.request
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Any, Callable, Sequence
@@ -99,6 +100,7 @@ TASK_ID_MAX_LENGTH = 64
 OBJECTIVE_FILE = "objective.json"
 PREFLIGHT_FILE = "preflight.json"
 INTERPRETATION_FILE = "semantic_interpretation.json"
+RAW_RESPONSE_SUFFIX = ".raw_response.json"
 HISTORIAN_DIR_NAME = "historian"
 HISTORIAN_INDEX_FILE = "historian/index.json"
 SESSION_REF_FILE = "task_session_ref.json"
@@ -187,7 +189,16 @@ INTERPRETATION_JSON_SCHEMA = {
     "required": list(INTERPRETATION_KEYS),
 }
 
-ModelCall = Callable[..., str]
+@dataclass(frozen=True)
+class InterpreterModelResult:
+    """Parsed interpreter content plus exact response-body provenance (L109)."""
+
+    content: str
+    raw_response_bytes: bytes
+    raw_response_sha256: str
+
+
+ModelCall = Callable[..., InterpreterModelResult]
 
 
 class ZthTaskError(ValueError):
@@ -201,6 +212,25 @@ def _utc_now_iso(*, microseconds: bool = False) -> str:
 
 def _sha256_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def _sha256_bytes(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def _raw_response_path(interpretation_path: Path) -> Path:
+    return interpretation_path.with_name(
+        interpretation_path.stem + RAW_RESPONSE_SUFFIX
+    )
+
+
+def _persist_raw_response(
+    interpretation_path: Path, raw_response_bytes: bytes
+) -> tuple[str, str]:
+    path = _raw_response_path(interpretation_path)
+    with path.open("xb") as handle:
+        handle.write(raw_response_bytes)
+    return _sha256_bytes(raw_response_bytes), _display(path)
 
 
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
@@ -316,7 +346,7 @@ def call_interpreter_model(
     user_prompt: str,
     max_tokens: int,
     timeout_seconds: int,
-) -> str:
+) -> InterpreterModelResult:
     payload = {
         "model": model,
         "messages": [
@@ -375,7 +405,11 @@ def call_interpreter_model(
     content = message.get("content") if isinstance(message, dict) else None
     if not isinstance(content, str) or not content.strip():
         raise ZthTaskError("task interpreter endpoint returned empty content")
-    return content
+    return InterpreterModelResult(
+        content=content,
+        raw_response_bytes=body,
+        raw_response_sha256=_sha256_bytes(body),
+    )
 
 
 def _authority_hit(field: str) -> bool:
@@ -680,6 +714,7 @@ def record_failure(
     stage: str,
     error: str,
     raw_model_output: str | None = None,
+    raw_response: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     failure_path = workspace / FAILURE_FILE
     if failure_path.exists():
@@ -698,6 +733,8 @@ def record_failure(
     }
     if raw_model_output is not None:
         payload["raw_model_output"] = raw_model_output
+    if raw_response is not None:
+        payload["raw_response"] = raw_response
     _write_json(failure_path, payload)
     return payload
 
@@ -758,9 +795,19 @@ def prepare_task(
         },
     )
 
-    def _blocked(stage: str, error: str, raw: str | None = None) -> tuple[dict[str, Any], int]:
+    def _blocked(
+        stage: str,
+        error: str,
+        raw: str | None = None,
+        raw_response: dict[str, str] | None = None,
+    ) -> tuple[dict[str, Any], int]:
         failure = record_failure(
-            workspace, task_id=task_id, stage=stage, error=error, raw_model_output=raw
+            workspace,
+            task_id=task_id,
+            stage=stage,
+            error=error,
+            raw_model_output=raw,
+            raw_response=raw_response,
         )
         payload = _status_payload(
             workspace,
@@ -772,6 +819,8 @@ def prepare_task(
             "stage": failure["stage"],
             "error": failure["error"],
         }
+        if raw_response is not None:
+            payload["failure"]["raw_response"] = raw_response
         return payload, 1
 
     if result.status != STATUS_PASS:
@@ -803,12 +852,24 @@ def prepare_task(
         )
     except ZthTaskError as exc:
         return _blocked(STAGE_INTERPRETATION, str(exc))
+    interpretation_path = workspace / INTERPRETATION_FILE
+    raw_response_sha256, raw_response_path = _persist_raw_response(
+        interpretation_path, raw_output.raw_response_bytes
+    )
     try:
-        interpretation = parse_interpretation(raw_output)
+        interpretation = parse_interpretation(raw_output.content)
     except ZthTaskError as exc:
-        return _blocked(STAGE_INTERPRETATION, str(exc), raw=raw_output)
+        return _blocked(
+            STAGE_INTERPRETATION,
+            str(exc),
+            raw=raw_output.content,
+            raw_response={
+                "raw_response_sha256": raw_response_sha256,
+                "raw_response_path": raw_response_path,
+            },
+        )
     _write_json(
-        workspace / INTERPRETATION_FILE,
+        interpretation_path,
         {
             "schema_version": INTERPRETATION_SCHEMA,
             "task_id": task_id,
@@ -823,7 +884,7 @@ def prepare_task(
                 "max_candidate_paths": MAX_CANDIDATE_PATHS,
             },
             "advisory": interpretation,
-            "raw_model_output": raw_output,
+            "raw_model_output": raw_output.content,
             "provenance": {
                 "module": MODULE_NAME,
                 "model": model,
@@ -833,6 +894,8 @@ def prepare_task(
                 "seed": 42,
                 "max_tokens": interpreter_max_tokens,
                 "called_at": _utc_now_iso(),
+                "raw_response_sha256": raw_response_sha256,
+                "raw_response_path": raw_response_path,
             },
             "boundaries": list(FRONTDOOR_BOUNDARIES),
         },

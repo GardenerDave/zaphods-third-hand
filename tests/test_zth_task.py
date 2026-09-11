@@ -97,11 +97,22 @@ VALID_INTERPRETATION = {
 }
 
 
+def _envelope_bytes(content: str) -> bytes:
+    return json.dumps(
+        {"choices": [{"message": {"role": "assistant", "content": content}}]}
+    ).encode("utf-8")
+
+
 def fake_model_call(payload: dict[str, Any] | None = None):
     effective = json.dumps(payload if payload is not None else VALID_INTERPRETATION)
+    body = _envelope_bytes(effective)
 
-    def call(**_kwargs: Any) -> str:
-        return effective
+    def call(**_kwargs: Any) -> zth_task.InterpreterModelResult:
+        return zth_task.InterpreterModelResult(
+            content=effective,
+            raw_response_bytes=body,
+            raw_response_sha256=zth_task._sha256_bytes(body),
+        )
 
     return call
 
@@ -282,7 +293,7 @@ class TestPrepare:
         assert "ZTH_TASK_INTERPRETER_ENDPOINT" in failure["error"]
 
     def test_model_transport_failure_preserved(self, tmp_path: Path) -> None:
-        def broken_call(**_kwargs: Any) -> str:
+        def broken_call(**_kwargs: Any) -> zth_task.InterpreterModelResult:
             raise zth_task.ZthTaskError("task interpreter endpoint call failed: refused")
 
         result = prepare(tmp_path, model_call=broken_call)
@@ -371,6 +382,39 @@ class TestSemanticInterpretation:
         assert failure["stage"] == zth_task.STAGE_INTERPRETATION
         assert failure["raw_model_output"] == json.dumps({"goal": "only goal"})
         assert not (result.workspace / zth_task.INTERPRETATION_FILE).exists()
+        # Raw-response provenance is captured even when the interpretation parse fails.
+        raw_path = result.workspace / (
+            "semantic_interpretation" + zth_task.RAW_RESPONSE_SUFFIX
+        )
+        assert raw_path.exists()
+        on_disk = zth_task._sha256_bytes(raw_path.read_bytes())
+        assert failure["raw_response"]["raw_response_sha256"] == on_disk
+        assert failure["raw_response"]["raw_response_path"] == zth_task._display(raw_path)
+        assert result.payload["failure"]["raw_response"]["raw_response_sha256"] == on_disk
+
+    def test_successful_interpretation_binds_raw_response(
+        self, tmp_path: Path
+    ) -> None:
+        result = prepare(tmp_path)
+        assert result.exit_code == 0
+        interpretation = json.loads(
+            (result.workspace / zth_task.INTERPRETATION_FILE).read_text(encoding="utf-8")
+        )
+        provenance = interpretation["provenance"]
+        raw_path = result.workspace / (
+            "semantic_interpretation" + zth_task.RAW_RESPONSE_SUFFIX
+        )
+        assert raw_path.exists()
+        on_disk = zth_task._sha256_bytes(raw_path.read_bytes())
+        assert provenance["raw_response_sha256"] == on_disk
+        assert provenance["raw_response_path"] == zth_task._display(raw_path)
+        expected_body = _envelope_bytes(
+            json.dumps(VALID_INTERPRETATION)
+        )
+        assert raw_path.read_bytes() == expected_body
+        assert provenance["raw_response_sha256"] == zth_task._sha256_bytes(
+            expected_body
+        )
 
 
 class TestHistorianIntegration:
@@ -809,14 +853,13 @@ class TestInterpreterCall:
             captured["url"] = request.full_url
             captured["timeout"] = timeout
             captured["payload"] = json.loads(request.data.decode("utf-8"))
-            return FakeResponse(
-                json.dumps(
-                    {"choices": [{"message": {"content": '{"goal": "ok"}'}}]}
-                ).encode("utf-8")
-            )
+            return FakeResponse(body)
 
+        body = json.dumps(
+            {"choices": [{"message": {"content": '{"goal": "ok"}'}}]}
+        ).encode("utf-8")
         monkeypatch.setattr(zth_task.urllib.request, "urlopen", fake_urlopen)
-        content = zth_task.call_interpreter_model(
+        result = zth_task.call_interpreter_model(
             endpoint="http://endpoint.invalid/v1/",
             model="m",
             system_prompt="s",
@@ -824,7 +867,10 @@ class TestInterpreterCall:
             max_tokens=128,
             timeout_seconds=30,
         )
-        assert content == '{"goal": "ok"}'
+        assert isinstance(result, zth_task.InterpreterModelResult)
+        assert result.content == '{"goal": "ok"}'
+        assert result.raw_response_bytes == body
+        assert result.raw_response_sha256 == zth_task._sha256_bytes(body)
         assert captured["url"] == "http://endpoint.invalid/v1/chat/completions"
         assert captured["timeout"] == 30
         assert captured["payload"]["temperature"] == 0
