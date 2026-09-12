@@ -387,6 +387,52 @@ def test_qwen38_worker_request_provenance_carries_bounded_reasoning_policy():
     assert provenance["max_tokens"] == 1536
 
 
+def test_qwen38_teacher_request_policy_env_override_binds_bounded_reasoning(monkeypatch: pytest.MonkeyPatch):
+    # Mirrors the loop's teacher wiring (supervised_capability_loop.py:495-496):
+    # resolve_worker_spec(name, base_url=..., model=...) with NO request_policy_name,
+    # so the policy can only arrive via the ICM_QWEN3_8_27B_REQUEST_POLICY env var.
+    base_url = "http://192.168.137.3:8080/v1"
+    model = "Qwen3.8-27B-UD-IQ4_XS.gguf"
+
+    # (a) Dogfood root cause: env UNSET -> no policy -> unbounded reasoning.
+    monkeypatch.delenv("ICM_QWEN3_8_27B_REQUEST_POLICY", raising=False)
+    spec = resolve_worker_spec("qwen3_8_27b", base_url=base_url, model=model)
+    assert spec.request_policy_name is None
+    assert spec.request_policy is None
+    _, payload, _, actual_prompt, provenance = _render_request_payload(spec, "Explain the failure.", 1200, model=model)
+    assert payload.get("thinking_budget_tokens") is None
+    assert provenance["thinking_budget_tokens"] is None
+    assert provenance["chat_template_kwargs"] is None
+    assert provenance["append_no_think"] is False
+    assert provenance["max_tokens"] == 1200
+    assert "/no_think" not in actual_prompt
+
+    # (b) Config-only fix: env = routine -> bounded reasoning via env path only.
+    monkeypatch.setenv("ICM_QWEN3_8_27B_REQUEST_POLICY", "routine")
+    spec = resolve_worker_spec("qwen3_8_27b", base_url=base_url, model=model)
+    assert spec.request_policy_name == "routine"
+    assert spec.request_policy["thinking_budget_tokens"] == 256
+    _, payload, _, actual_prompt, provenance = _render_request_payload(spec, "Explain the failure.", 1200, model=model)
+    assert payload["thinking_budget_tokens"] == 256
+    assert payload["chat_template_kwargs"] == {"reasoning_effort": "low"}
+    assert provenance["thinking_budget_tokens"] == 256
+    assert provenance["chat_template_kwargs"] == {"reasoning_effort": "low"}
+    assert provenance["append_no_think"] is False
+    assert provenance["max_tokens"] == 1200
+    assert "/no_think" not in actual_prompt
+
+    # (c) Config-only fix: env = direct -> append_no_think flows via env path.
+    monkeypatch.setenv("ICM_QWEN3_8_27B_REQUEST_POLICY", "direct")
+    spec = resolve_worker_spec("qwen3_8_27b", base_url=base_url, model=model)
+    assert spec.request_policy_name == "direct"
+    _, payload, _, actual_prompt, provenance = _render_request_payload(spec, "Explain the failure.", 1200, model=model)
+    assert provenance["append_no_think"] is True
+    assert "/no_think" in actual_prompt
+    assert provenance["thinking_budget_tokens"] is None
+    assert provenance["chat_template_kwargs"] is None
+    assert provenance["max_tokens"] == 1200
+
+
 def test_supervised_trajectory_summary_can_reference_router_evidence(tmp_path: Path):
     (tmp_path / "route_trace.json").write_text(json.dumps({"schema": "zth_router_v1_route_trace_v1", "capability_eligibility": [{"capability_id": "x", "candidate_suppliers": [{"supplier_id": "s1", "status": "QUALIFIED_EXPLORATORY"}], "qualified_candidates": [{"supplier_id": "s1"}], "eligibility_reason": "eligible"}], "capabilities": [{"capability_id": "x", "selected_supplier": {"supplier_id": "s1"}, "selection_reason": "selected"}]}), encoding="utf-8")
     (tmp_path / "capability_plan.json").write_text(json.dumps({"schema": "zth_router_v1_capability_plan_v1", "capability_eligibility": [{"capability_id": "x", "candidate_suppliers": [{"supplier_id": "s1", "status": "QUALIFIED_EXPLORATORY"}], "qualified_candidates": [{"supplier_id": "s1"}], "eligibility_reason": "eligible"}], "capabilities": [{"capability_id": "x", "selected_supplier": {"supplier_id": "s1"}, "selection_reason": "selected"}]}), encoding="utf-8")

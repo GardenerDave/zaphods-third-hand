@@ -26,11 +26,11 @@ True reference (validator-only):
 `file_count:10`, `largest_file:run_manual_supervised_attempt.py` / `2269`,
 `smallest_file:icm_spec.py` / `230`.
 
-The worker got `file_count` and the **smallest** correct (the first row of the
-ascending-sorted list) but **misidentified the largest file**: it reported
-`zth_task.py`/`1515` (second-to-last row) instead of the true maximum
-`run_manual_supervised_attempt.py`/`2269` (last row) — a small-model max-scan
-failure on a filename-ascending numeric list.
+The worker got `file_count` and the **smallest** (`icm_spec.py`/`230`) correct
+but **misidentified the largest file**: it reported `zth_task.py`/`1515` — the
+8th of the 10 presented rows — instead of the true maximum
+`run_manual_supervised_attempt.py`/`2269` — a small-model max-selection
+failure: it failed to select the actual maximum.
 
 ## Outcome
 

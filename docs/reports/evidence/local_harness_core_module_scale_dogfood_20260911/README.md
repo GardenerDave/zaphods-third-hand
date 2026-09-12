@@ -33,12 +33,10 @@ The run did **not** pass, and its terminal disposition is an
 - Deterministic validation: `json_parse` **passed**;
   `reference_output_exact_match` **failed**.
 - The worker got `file_count` (10) and the smallest
-  (`icm_spec.py` / 230, the first row of the ascending-sorted evidence) right,
-  but **misidentified the largest file**: it reported `zth_task.py` / 1515
-  (the second-to-last row) instead of the true maximum
-  `run_manual_supervised_attempt.py` / 2269 (the last row). A classic small-model
-  max-scan failure on a filename-ascending numeric list: it latched onto a late
-  row rather than the actual maximum.
+  (`icm_spec.py` / 230) right, but **misidentified the largest file**: it
+  reported `zth_task.py` / 1515 — the 8th of the 10 presented rows — instead of
+  the true maximum `run_manual_supervised_attempt.py` / 2269. This is a
+  small-model max-selection failure: it failed to select the actual maximum.
 
 ## Routing behaviour (the loop's own mechanism under test)
 
@@ -71,8 +69,9 @@ pre-escalation was applied:
 ## Reading this run
 
 - **The capability verdict** is about the 1.7B worker: it **failed exact-match
-  on the largest-file field** (picked a late row over the true max). That is the
-  genuine, reproducible capability boundary this run isolates.
+  on the largest-file field** (reported `zth_task.py` / 1515 over the true
+  maximum `run_manual_supervised_attempt.py` / 2269). That is the genuine,
+  reproducible capability boundary this run isolates.
 - **The `infrastructure_error` disposition is a routing/config artifact**, not a
   model-success signal. It is caused by the **unconfigured external-teacher
   tier** forcing a terminal failure once the worker's baseline and the local
