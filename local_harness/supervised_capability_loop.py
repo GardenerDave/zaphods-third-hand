@@ -12,6 +12,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shlex
 import subprocess
 import time
@@ -297,13 +298,79 @@ def _teacher_prompt(
     )
 
 
+_TEACHER_JSON_FENCE_RE = re.compile(r"```[ \t]*json[ \t]*\r?\n?(.*?)```", re.DOTALL | re.IGNORECASE)
+
+
+def _teacher_json_fence_bodies(text: str) -> list[str]:
+    return [match.strip() for match in _TEACHER_JSON_FENCE_RE.findall(text)]
+
+
+def _teacher_embedded_json_objects(text: str) -> list[dict[str, Any]]:
+    objects: list[dict[str, Any]] = []
+    decoder = json.JSONDecoder()
+    index = 0
+    length = len(text)
+    while index < length:
+        brace = text.find("{", index)
+        if brace < 0:
+            break
+        try:
+            value, end = decoder.raw_decode(text, brace)
+        except json.JSONDecodeError:
+            index = brace + 1
+            continue
+        if isinstance(value, dict):
+            objects.append(value)
+            index = end
+        else:
+            index = brace + 1
+    return objects
+
+
+def _extract_teacher_json_object(raw: str) -> tuple[dict[str, Any] | None, str]:
+    """Recover at most one top-level JSON object from visible teacher content.
+
+    Preference order: (1) bare JSON object, (2) a single explicit ``json``
+    markdown fence, (3) otherwise one unambiguous top-level JSON object
+    recoverable from the visible content.  Only the visible ``raw`` string is
+    scanned; no hidden reasoning channel is consulted.  A valid-JSON document
+    whose top level is not an object is rejected.  Ambiguous or absent objects
+    are rejected.
+    """
+    text = raw.strip()
+    bare: Any = None
+    bare_is_json = False
+    if text:
+        try:
+            bare = json.loads(text)
+            bare_is_json = True
+        except json.JSONDecodeError:
+            bare_is_json = False
+    if bare_is_json:
+        if isinstance(bare, dict):
+            return bare, ""
+        return None, "Teacher output was not a JSON object."
+    fenced = _teacher_json_fence_bodies(raw)
+    if len(fenced) == 1:
+        try:
+            value = json.loads(fenced[0])
+        except json.JSONDecodeError as exc:
+            return None, f"Teacher json fence was not valid JSON: {exc.msg}"
+        if isinstance(value, dict):
+            return value, ""
+        return None, "Teacher json fence was not a JSON object."
+    objects = _teacher_embedded_json_objects(raw)
+    if len(objects) == 1:
+        return objects[0], ""
+    if len(objects) > 1:
+        return None, "Teacher output contained multiple competing JSON objects."
+    return None, "Teacher output had no recoverable JSON object."
+
+
 def _parse_teacher(raw: str) -> dict[str, Any]:
-    try:
-        payload = json.loads(raw)
-    except json.JSONDecodeError as exc:
-        return {"teacher_parse_status": "failed", "teacher_diagnosis": f"Teacher output was not JSON: {exc.msg}"}
-    if not isinstance(payload, dict):
-        return {"teacher_parse_status": "failed", "teacher_diagnosis": "Teacher output was not a JSON object."}
+    payload, diagnosis = _extract_teacher_json_object(raw)
+    if payload is None:
+        return {"teacher_parse_status": "failed", "teacher_diagnosis": diagnosis}
     result = {"teacher_parse_status": "passed"}
     for key in ("failure_classification", "teacher_diagnosis", "retry_guidance", "corrected_reference_output"):
         if key in payload:

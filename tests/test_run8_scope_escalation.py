@@ -151,3 +151,91 @@ def test_run8_parser_never_collapses_repaired_guidance_to_status_only():
     assert parsed["teacher_diagnosis"] == "diagnosis"
     assert parsed["retry_guidance"] == "guidance"
     assert set(parsed) != {"teacher_parse_status"}
+
+
+def _valid_payload() -> dict:
+    return {
+        "failure_classification": "scope_boundary",
+        "teacher_diagnosis": "diagnosis",
+        "retry_guidance": "guidance",
+        "corrected_reference_output": {
+            "allowed_targets": ["approved"],
+            "held_targets": ["held"],
+            "scope_expansion_required": False,
+            "review_status": "review_only",
+        },
+    }
+
+
+def test_parse_teacher_bare_json_object_success():
+    parsed = _parse_teacher(json.dumps(_valid_payload()))
+    assert parsed["teacher_parse_status"] == "passed"
+    assert parsed["failure_classification"] == "scope_boundary"
+    assert parsed["teacher_diagnosis"] == "diagnosis"
+    assert parsed["retry_guidance"] == "guidance"
+    assert parsed["corrected_reference_output"]["allowed_targets"] == ["approved"]
+
+
+def test_parse_teacher_reasoning_tag_then_fenced_json_success():
+    think_tag = "\n" + chr(60) + "/thinking>" + "\n\n"
+    raw = ("I need to diagnose why the worker expanded scope." + think_tag
+           + "```json\n" + json.dumps(_valid_payload()) + "\n```\n")
+    parsed = _parse_teacher(raw)
+    assert parsed["teacher_parse_status"] == "passed"
+    assert parsed["teacher_diagnosis"] == "diagnosis"
+    assert parsed["retry_guidance"] == "guidance"
+    assert parsed["corrected_reference_output"]["review_status"] == "review_only"
+
+
+def test_parse_teacher_prose_preamble_then_fenced_json_success():
+    raw = (
+        "Here is the diagnosis of the recorded failure.\n\n"
+        "```json\n" + json.dumps(_valid_payload()) + "\n```\n\n"
+        "Let me know if further clarification is needed."
+    )
+    parsed = _parse_teacher(raw)
+    assert parsed["teacher_parse_status"] == "passed"
+    assert parsed["teacher_diagnosis"] == "diagnosis"
+    assert parsed["corrected_reference_output"]["held_targets"] == ["held"]
+
+
+def test_parse_teacher_single_unambiguous_embedded_json_object_success():
+    raw = "Diagnosis follows. " + json.dumps(_valid_payload()) + " End of analysis."
+    parsed = _parse_teacher(raw)
+    assert parsed["teacher_parse_status"] == "passed"
+    assert parsed["teacher_diagnosis"] == "diagnosis"
+    assert parsed["retry_guidance"] == "guidance"
+
+
+def test_parse_teacher_malformed_json_rejection():
+    raw = "Diagnosis:\n```json\n{\"failure_classification\": broken\n```\n"
+    parsed = _parse_teacher(raw)
+    assert parsed["teacher_parse_status"] == "failed"
+    assert "teacher_diagnosis" in parsed
+    assert "corrected_reference_output" not in parsed
+
+
+def test_parse_teacher_two_competing_json_objects_rejection():
+    first = json.dumps({"failure_classification": "scope_boundary", "teacher_diagnosis": "a"})
+    second = json.dumps({"failure_classification": "retry", "teacher_diagnosis": "b"})
+    parsed = _parse_teacher("Option A: " + first + " Option B: " + second)
+    assert parsed["teacher_parse_status"] == "failed"
+    assert "teacher_diagnosis" in parsed
+    assert "corrected_reference_output" not in parsed
+
+
+def test_parse_teacher_valid_json_non_object_rejection():
+    parsed = _parse_teacher(json.dumps(["not", "an", "object"]))
+    assert parsed["teacher_parse_status"] == "failed"
+    assert "teacher_diagnosis" in parsed
+    assert "corrected_reference_output" not in parsed
+
+
+def test_parse_teacher_reasoning_only_prose_remains_failed():
+    raw = ("I considered the recorded scope boundary and concluded the worker "
+           "expanded beyond the approved targets. No machine-readable payload "
+           "is available for this turn.")
+    parsed = _parse_teacher(raw)
+    assert parsed["teacher_parse_status"] == "failed"
+    assert "teacher_diagnosis" in parsed
+    assert "corrected_reference_output" not in parsed
