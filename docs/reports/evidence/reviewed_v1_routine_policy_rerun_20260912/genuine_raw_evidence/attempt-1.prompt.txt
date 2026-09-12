@@ -1,0 +1,22 @@
+You are a bounded, read-only repository observer. Do not modify any file or state.
+
+Task: Using ONLY the evidence from the local_harness/fixtures/capability_loop/reviewed_v1/ directory and its README.md, report a coverage/consistency summary of that fixture corpus. Do not fetch anything. Do not add keys. Do not emit prose.
+
+Ground the answer strictly in the directory contents and the README text. Count files by the literal JSON files present, group them by filename prefix, and read the README to determine how many source families it names.
+
+Instructions:
+1. Count the total number of JSON files in the directory.
+2. Determine how many distinct values of the "task_family" field exist across those files.
+3. Group the files by filename prefix (the token before the first underscore in the filename) and report the count for each group.
+4. Read the directory's README.md and count how many source families it explicitly names.
+5. Decide whether the README-named source families cover (partition) all of the files.
+6. Emit a single JSON object and nothing else (no markdown, no code fences, no prose, no extra or missing keys).
+
+Output EXACTLY one JSON object with these keys and nothing else:
+{
+  "total_files": <integer: total number of JSON files in the directory>,
+  "distinct_task_families": <integer: number of distinct "task_family" values across the files>,
+  "filename_prefix_groups": <object: mapping from filename prefix to the number of files with that prefix>,
+  "readme_named_source_families": <integer: number of source families the README explicitly names>,
+  "cover_all_files": <boolean: true if the README-named source families cover all files, else false>
+}

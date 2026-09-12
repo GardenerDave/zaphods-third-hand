@@ -1,0 +1,31 @@
+{
+  "expected_output": {
+    "total_files": 24,
+    "distinct_task_families": 8,
+    "filename_prefix_groups": {
+      "blocked": 4,
+      "frontdoor": 5,
+      "logic": 6,
+      "prompt": 6,
+      "queue": 3
+    },
+    "readme_named_source_families": 4,
+    "cover_all_files": false
+  },
+  "output_contract": {
+    "format": "json",
+    "required_fields": [
+      "total_files",
+      "distinct_task_families",
+      "filename_prefix_groups",
+      "readme_named_source_families",
+      "cover_all_files"
+    ]
+  },
+  "prompt": "You are a bounded, read-only repository observer. Do not modify any file or state.\n\nTask: Using ONLY the evidence from the local_harness/fixtures/capability_loop/reviewed_v1/ directory and its README.md, report a coverage/consistency summary of that fixture corpus. Do not fetch anything. Do not add keys. Do not emit prose.\n\nGround the answer strictly in the directory contents and the README text. Count files by the literal JSON files present, group them by filename prefix, and read the README to determine how many source families it names.\n\nInstructions:\n1. Count the total number of JSON files in the directory.\n2. Determine how many distinct values of the \"task_family\" field exist across those files.\n3. Group the files by filename prefix (the token before the first underscore in the filename) and report the count for each group.\n4. Read the directory's README.md and count how many source families it explicitly names.\n5. Decide whether the README-named source families cover (partition) all of the files.\n6. Emit a single JSON object and nothing else (no markdown, no code fences, no prose, no extra or missing keys).\n\nOutput EXACTLY one JSON object with these keys and nothing else:\n{\n  \"total_files\": <integer: total number of JSON files in the directory>,\n  \"distinct_task_families\": <integer: number of distinct \"task_family\" values across the files>,\n  \"filename_prefix_groups\": <object: mapping from filename prefix to the number of files with that prefix>,\n  \"readme_named_source_families\": <integer: number of source families the README explicitly names>,\n  \"cover_all_files\": <boolean: true if the README-named source families cover all files, else false>\n}",
+  "task_family": "readme-family-coverage",
+  "task_id": "documentation-consistency",
+  "validator": {
+    "kind": "exact_json"
+  }
+}

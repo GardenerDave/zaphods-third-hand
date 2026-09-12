@@ -1,0 +1,83 @@
+{
+  "content": "{\n  \"total_files\": 24,\n  \"distinct_task_families\": 8,\n  \"filename_prefix_groups\": {\"blocked\": 4, \"frontdoor\": 5, \"logic\": 6, \"prompt\": 6, \"queue\": 3},\n  \"readme_named_source_families\": 4,\n  \"cover_all_files\": false\n}",
+  "metadata": {
+    "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "endpoint_alias": "JARVIS_LOCAL",
+    "error": null,
+    "finish_reason": "stop",
+    "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "model_resolution_attempted": false,
+    "model_resolution_error": null,
+    "request_provenance": {
+      "api": "openai-chat",
+      "append_no_think": false,
+      "chat_template_kwargs": null,
+      "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "endpoint_alias": "JARVIS_LOCAL",
+      "max_tokens": 768,
+      "message_structure": [
+        "system",
+        "user"
+      ],
+      "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "prompt_byte_length": 3453,
+      "prompt_length": 3453,
+      "prompt_sha256": "61fecce737c550f7b6d4423fb6a48cd592992248cc171777a840582c8286096c",
+      "raw_response_path": null,
+      "raw_response_sha256": "2ff5f9d2b5691a54ba4e74396f3f70e4369f3702cfe4cb011bf9e8908e74ffbd",
+      "request_body_length": 3789,
+      "request_body_sha256": "4950b03984837421f433479b8a94f2c0df34abed232bee9d411ff7d3aadcd968",
+      "request_start_monotonic": 4074.730481316,
+      "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "response_capture_monotonic": 4081.778698966,
+      "seed": null,
+      "stop": null,
+      "system_message_sha256": "e8c1a9955d1a830189fecdfd11c537896d95cddd0419d5a63d957dd6f0fcb6c7",
+      "temperature": 0.2,
+      "thinking_budget_tokens": null,
+      "top_p": null
+    },
+    "request_url": null,
+    "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "resource_telemetry": {
+      "adapter_server_identity": "JARVIS_LOCAL",
+      "cached_tokens": 383,
+      "completion_tokens": 79,
+      "elapsed_ms": 7048.319,
+      "hardware_device_identity": null,
+      "model_identity": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "prompt_tokens": 793,
+      "request_start_monotonic": 4074.730475729,
+      "response_capture_monotonic": 4081.778794735,
+      "role": "worker",
+      "schema": "zth_resource_telemetry_v1",
+      "server_generation_ms": 5689.318,
+      "server_prompt_ms": 1341.41,
+      "timeout_seconds": 900,
+      "total_tokens": 872,
+      "transport_classification": "model_response"
+    },
+    "status": "ok",
+    "timings": {
+      "cache_n": 383,
+      "predicted_ms": 5689.318,
+      "predicted_n": 79,
+      "predicted_per_second": 13.885671358148727,
+      "predicted_per_token_ms": 72.0166835443038,
+      "prompt_ms": 1341.41,
+      "prompt_n": 410,
+      "prompt_per_second": 305.6485340052631,
+      "prompt_per_token_ms": 3.2717317073170733
+    },
+    "transport_classification": "model_response",
+    "usage": {
+      "completion_tokens": 79,
+      "prompt_tokens": 793,
+      "prompt_tokens_details": {
+        "cached_tokens": 383
+      },
+      "total_tokens": 872
+    }
+  },
+  "status": "ok"
+}

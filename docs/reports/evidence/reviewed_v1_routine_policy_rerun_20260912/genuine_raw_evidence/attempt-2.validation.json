@@ -1,0 +1,45 @@
+{
+  "acceptance_status": "not_reviewed",
+  "checks": [
+    {
+      "check_id": "json_parse",
+      "status": "passed"
+    },
+    {
+      "check_id": "reference_output_exact_match",
+      "status": "failed"
+    }
+  ],
+  "diagnostics": [
+    "Output does not equal the deterministic fixture reference output."
+  ],
+  "reference_facts": {
+    "expected_output": {
+      "cover_all_files": false,
+      "distinct_task_families": 8,
+      "filename_prefix_groups": {
+        "blocked": 4,
+        "frontdoor": 5,
+        "logic": 6,
+        "prompt": 6,
+        "queue": 3
+      },
+      "readme_named_source_families": 4,
+      "total_files": 24
+    }
+  },
+  "review_required": true,
+  "semantic_checks": [],
+  "structural_checks": [
+    {
+      "check_id": "json_parse",
+      "status": "passed"
+    },
+    {
+      "check_id": "reference_output_exact_match",
+      "status": "failed"
+    }
+  ],
+  "validation_status": "failed",
+  "validator": "deterministic_fixture_exact_match_v1"
+}

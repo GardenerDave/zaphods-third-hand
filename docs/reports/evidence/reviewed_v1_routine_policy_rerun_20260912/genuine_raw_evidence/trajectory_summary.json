@@ -1,0 +1,70 @@
+{
+  "attempt_count": 3,
+  "authority_boundaries": [
+    "Deterministic validation is authoritative.",
+    "Models cannot declare success.",
+    "No automatic prompt-patch promotion or training is performed.",
+    "No automatic queue insertion or invented work is performed.",
+    "All outputs remain review-required evidence."
+  ],
+  "candidate_curriculum_examples": [
+    {
+      "corrected_reference_output": {
+        "cover_all_files": false,
+        "distinct_task_families": 8,
+        "filename_prefix_groups": {
+          "blocked": 4,
+          "frontdoor": 5,
+          "logic": 6,
+          "prompt": 6,
+          "queue": 3
+        },
+        "readme_named_source_families": 4,
+        "total_files": 24
+      },
+      "intervention_id": "local_teacher:1",
+      "review_state": "ready_for_review",
+      "source": "local_teacher",
+      "subsequent_worker_result": "passed",
+      "teacher_attempt": 1
+    }
+  ],
+  "candidate_prompt_patches": [],
+  "capability_verdict_available": true,
+  "disposition": "ready_for_review",
+  "endpoint_alias": "JARVIS_LOCAL",
+  "external_escalation_count": 0,
+  "external_teacher_call_count": 0,
+  "external_teacher_infrastructure_failure": null,
+  "first_attempt_pass": false,
+  "generated_at": "2026-09-12T12:36:45.006419+00:00",
+  "infrastructure_error_count": 0,
+  "intervention_attempts": {
+    "deterministic_patch_retry": false,
+    "existing_patch": false,
+    "external_teacher": false,
+    "local_teacher": true,
+    "none": true
+  },
+  "intervention_outcome": "helped",
+  "local_teacher_model": "Qwen3.8-27B-UD-IQ4_XS.gguf",
+  "model_attempt_count": 3,
+  "pass": true,
+  "pass_after_existing_patch": false,
+  "pass_after_external_teacher_intervention": false,
+  "pass_after_local_teacher_intervention": true,
+  "patch_retry_attempted": false,
+  "patch_retry_failed": false,
+  "patch_retry_passed": false,
+  "review_state": "ready_for_review",
+  "schema": "supervised_capability_trajectory_v2",
+  "successful_intervention_source": "local_teacher",
+  "task_family": "readme-family-coverage",
+  "task_id": "documentation-consistency",
+  "teacher_escalation_avoided": false,
+  "teacher_pass_count": 1,
+  "trajectory_artifact": ".work/dogfood/reviewedv1_routine_rerun_corrected_20260912_routine/trajectory.jsonl",
+  "trials": 1,
+  "unresolved": false,
+  "worker_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf"
+}

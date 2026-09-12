@@ -1,0 +1,104 @@
+{
+  "schema": "zth_evidence_archive_v1",
+  "topic": "reviewed_v1_routine_policy_rerun_20260912",
+  "date": "20260912",
+  "note": "Durable, tracked preservation of one bounded ZTH supervised-capability-loop dogfood rerun of the reviewed_v1 multi-source-reconciliation task. The rerun corrected the local-teacher request policy (set ICM_QWEN3_8_27B_REQUEST_POLICY=routine) that was omitted in the comparable run, and observed the routing tiers: the 1.7B worker failed the exact-match baseline (phantom filename prefix groups, 5/3 vs 24/8), the correctly-configured 27B local teacher produced a parseable intervention (teacher_parse_status:passed, failure_classification:model_capability_insufficient, candidate_prompt_patch:null) and embedded its computed answer as corrected_reference_output, and the 1.7B worker echoed that reference on rerun (byte-identical to corrected_reference_output) so the terminal disposition was ready_for_review with successful_intervention_source:local_teacher. The originally frozen fixture and its raw worker prompt were lost (cleaned /tmp, never committed); the frozen SHA 3f262c29 is unreproducible byte-exactly, so the fixture was task-identically reconstructed under a new SHA (c1197915) per Option A, not prompt-tuned; the raw rerun outputs are therefore not byte-identical to the lost original run. The genuine 1.7B counting/grounding failure is preserved (first_attempt_pass:false in both runs). See README.md and genuine_raw_evidence/NOTE.md.",
+  "entries": [
+    {
+      "archive_path": "docs/reports/evidence/reviewed_v1_routine_policy_rerun_20260912/genuine_raw_evidence/fixture.json",
+      "sha256": "c1197915dc6752851026d14b78436fa27467ecdee5700f82e535702dfd2c246d",
+      "size": 2380,
+      "source_path": ".work/dogfood/reviewedv1_recon_20260912/fixture.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/reviewed_v1_routine_policy_rerun_20260912/genuine_raw_evidence/attempt-1.metadata.json",
+      "sha256": "b364762e59db5d31bf00f62aa27a561d6efad1a67c0885791266a74b2dd3261c",
+      "size": 1618,
+      "source_path": ".work/dogfood/reviewedv1_routine_rerun_corrected_20260912_routine/attempt-1.metadata.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/reviewed_v1_routine_policy_rerun_20260912/genuine_raw_evidence/attempt-1.prompt.txt",
+      "sha256": "845d723b159f7a1aaee3ba44c454b20782d272ea353a719c68c5779e1a8aed78",
+      "size": 1679,
+      "source_path": ".work/dogfood/reviewedv1_routine_rerun_corrected_20260912_routine/attempt-1.prompt.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/reviewed_v1_routine_policy_rerun_20260912/genuine_raw_evidence/attempt-1.raw.json",
+      "sha256": "d393d91f5878e8bfdd6817f5ed54c6160c6e02f42cc6374d877992f60ef67e65",
+      "size": 3045,
+      "source_path": ".work/dogfood/reviewedv1_routine_rerun_corrected_20260912_routine/attempt-1.raw.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/reviewed_v1_routine_policy_rerun_20260912/genuine_raw_evidence/attempt-1.validation.json",
+      "sha256": "891c9bb10ccc70a1f00033f30bbfec84fa0df8cd45ebaab40f25b214db6c056b",
+      "size": 981,
+      "source_path": ".work/dogfood/reviewedv1_routine_rerun_corrected_20260912_routine/attempt-1.validation.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/reviewed_v1_routine_policy_rerun_20260912/genuine_raw_evidence/attempt-2.metadata.json",
+      "sha256": "08492ffedc3815933c7d58f42e2bcecd78362006385202fcf23b5112e026d295",
+      "size": 1618,
+      "source_path": ".work/dogfood/reviewedv1_routine_rerun_corrected_20260912_routine/attempt-2.metadata.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/reviewed_v1_routine_policy_rerun_20260912/genuine_raw_evidence/attempt-2.prompt.txt",
+      "sha256": "845d723b159f7a1aaee3ba44c454b20782d272ea353a719c68c5779e1a8aed78",
+      "size": 1679,
+      "source_path": ".work/dogfood/reviewedv1_routine_rerun_corrected_20260912_routine/attempt-2.prompt.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/reviewed_v1_routine_policy_rerun_20260912/genuine_raw_evidence/attempt-2.raw.json",
+      "sha256": "ffe48397a8259c0a020a7a25e2ffc13acba0205f5b7e7e5f32f53b54dc6c7852",
+      "size": 3029,
+      "source_path": ".work/dogfood/reviewedv1_routine_rerun_corrected_20260912_routine/attempt-2.raw.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/reviewed_v1_routine_policy_rerun_20260912/genuine_raw_evidence/attempt-2.validation.json",
+      "sha256": "891c9bb10ccc70a1f00033f30bbfec84fa0df8cd45ebaab40f25b214db6c056b",
+      "size": 981,
+      "source_path": ".work/dogfood/reviewedv1_routine_rerun_corrected_20260912_routine/attempt-2.validation.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/reviewed_v1_routine_policy_rerun_20260912/genuine_raw_evidence/attempt-3.metadata.json",
+      "sha256": "abe697853e7051e6cab9b9711598dab55ed622ca51400c1c33d54eacfce9e1ff",
+      "size": 1636,
+      "source_path": ".work/dogfood/reviewedv1_routine_rerun_corrected_20260912_routine/attempt-3.metadata.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/reviewed_v1_routine_policy_rerun_20260912/genuine_raw_evidence/attempt-3.prompt.txt",
+      "sha256": "61fecce737c550f7b6d4423fb6a48cd592992248cc171777a840582c8286096c",
+      "size": 3453,
+      "source_path": ".work/dogfood/reviewedv1_routine_rerun_corrected_20260912_routine/attempt-3.prompt.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/reviewed_v1_routine_policy_rerun_20260912/genuine_raw_evidence/attempt-3.raw.json",
+      "sha256": "459852557becc383257a82df10e9ef2d877e3111511414760b48ae2af860e5fe",
+      "size": 3050,
+      "source_path": ".work/dogfood/reviewedv1_routine_rerun_corrected_20260912_routine/attempt-3.raw.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/reviewed_v1_routine_policy_rerun_20260912/genuine_raw_evidence/attempt-3.validation.json",
+      "sha256": "c407f2a88d261e5f2af30cf2f05341e1c9449d04edf7048dc793c747c5f08d58",
+      "size": 906,
+      "source_path": ".work/dogfood/reviewedv1_routine_rerun_corrected_20260912_routine/attempt-3.validation.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/reviewed_v1_routine_policy_rerun_20260912/genuine_raw_evidence/local-teacher-1.json",
+      "sha256": "17113241c808309fb5b7fb4132f7d798c116d59a1122b7e32e2fee5a1fff998c",
+      "size": 6677,
+      "source_path": ".work/dogfood/reviewedv1_routine_rerun_corrected_20260912_routine/local-teacher-1.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/reviewed_v1_routine_policy_rerun_20260912/genuine_raw_evidence/trajectory.jsonl",
+      "sha256": "96aea7246f8effd920d17ed432c120ecd994ef785db0087c99ae4847a6237d70",
+      "size": 22709,
+      "source_path": ".work/dogfood/reviewedv1_routine_rerun_corrected_20260912_routine/trajectory.jsonl"
+    },
+    {
+      "archive_path": "docs/reports/evidence/reviewed_v1_routine_policy_rerun_20260912/genuine_raw_evidence/trajectory_summary.json",
+      "sha256": "8e1200521e56b92a21e18ade578192481b2d2ed20defeb30ffd45a7d16960b4c",
+      "size": 2355,
+      "source_path": ".work/dogfood/reviewedv1_routine_rerun_corrected_20260912_routine/trajectory_summary.json"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+You are a bounded, read-only repository observer. Do not modify any file or state.
+
+Task: Using ONLY the evidence from the local_harness/fixtures/capability_loop/reviewed_v1/ directory and its README.md, report a coverage/consistency summary of that fixture corpus. Do not fetch anything. Do not add keys. Do not emit prose.
+
+Ground the answer strictly in the directory contents and the README text. Count files by the literal JSON files present, group them by filename prefix, and read the README to determine how many source families it names.
+
+Instructions:
+1. Count the total number of JSON files in the directory.
+2. Determine how many distinct values of the "task_family" field exist across those files.
+3. Group the files by filename prefix (the token before the first underscore in the filename) and report the count for each group.
+4. Read the directory's README.md and count how many source families it explicitly names.
+5. Decide whether the README-named source families cover (partition) all of the files.
+6. Emit a single JSON object and nothing else (no markdown, no code fences, no prose, no extra or missing keys).
+
+Output EXACTLY one JSON object with these keys and nothing else:
+{
+  "total_files": <integer: total number of JSON files in the directory>,
+  "distinct_task_families": <integer: number of distinct "task_family" values across the files>,
+  "filename_prefix_groups": <object: mapping from filename prefix to the number of files with that prefix>,
+  "readme_named_source_families": <integer: number of source families the README explicitly names>,
+  "cover_all_files": <boolean: true if the README-named source families cover all files, else false>
+}
+
+## Local teacher intervention
+{"candidate_patch_diagnostic": "patch must be a JSON object", "candidate_patch_status": "invalid_candidate", "corrected_reference_output": {"cover_all_files": false, "distinct_task_families": 8, "filename_prefix_groups": {"blocked": 4, "frontdoor": 5, "logic": 6, "prompt": 6, "queue": 3}, "readme_named_source_families": 4, "total_files": 24}, "failure_classification": "model_capability_insufficient", "retry_guidance": "No prompt modification will resolve this. The task requires actual filesystem access (directory listing, file reading, field extraction) which the model cannot perform in a single inference call without tool use. Options: (1) Pre-compute the answer and embed it as a few-shot example in the prompt, reducing the task to pattern-matching; (2) Use a tool-augmented agent that can actually list files and read contents; (3) Use a larger model with stronger instruction-following and arithmetic; (4) Decompose into sub-tasks where the harness provides the raw file list and the model only performs counting/grouping.", "teacher_diagnosis": "The 1.7B quantized model (Qwen3-1.7B-Q4_K_M) cannot perform the required filesystem enumeration and content analysis. It hallucinated a plausible but incorrect summary (5 files, 3 families, prefixes 'capability_loop'/'reviewed'/'test') instead of the true corpus (24 files, 8 families, prefixes blocked/frontdoor/logic/prompt/queue). The model appears to have inferred filenames from the directory path components rather than actually listing the directory. Both attempts produced identical output, confirming deterministic failure at this capability level. The prompt is well-formed and unambiguous; the failure is purely a model-capability gap.", "teacher_parse_status": "passed"}
