@@ -1,0 +1,39 @@
+{
+  "acceptance_status": "not_reviewed",
+  "checks": [
+    {
+      "check_id": "json_parse",
+      "status": "passed"
+    },
+    {
+      "check_id": "reference_output_exact_match",
+      "status": "failed"
+    }
+  ],
+  "diagnostics": [
+    "Output does not equal the deterministic fixture reference output."
+  ],
+  "reference_facts": {
+    "expected_output": {
+      "file_count": 10,
+      "largest_file": "run_manual_supervised_attempt.py",
+      "largest_lines": 2269,
+      "smallest_file": "icm_spec.py",
+      "smallest_lines": 230
+    }
+  },
+  "review_required": true,
+  "semantic_checks": [],
+  "structural_checks": [
+    {
+      "check_id": "json_parse",
+      "status": "passed"
+    },
+    {
+      "check_id": "reference_output_exact_match",
+      "status": "failed"
+    }
+  ],
+  "validation_status": "failed",
+  "validator": "deterministic_fixture_exact_match_v1"
+}

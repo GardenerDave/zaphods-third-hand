@@ -1,0 +1,25 @@
+{
+  "expected_output": {
+    "file_count": 10,
+    "largest_file": "run_manual_supervised_attempt.py",
+    "largest_lines": 2269,
+    "smallest_file": "icm_spec.py",
+    "smallest_lines": 230
+  },
+  "output_contract": {
+    "format": "json",
+    "required_fields": [
+      "file_count",
+      "largest_file",
+      "largest_lines",
+      "smallest_file",
+      "smallest_lines"
+    ]
+  },
+  "prompt": "You are a bounded, read-only repository observer. Do not modify any file or state.\n\nTask: Using ONLY the raw evidence block below, describe the scale of a fixed set of ten core top-level modules in the local_harness directory. Do not fetch anything. Do not add keys. Do not emit prose.\n\nEVIDENCE BLOCK 1 - literal output of `wc -l` for ten fixed core top-level local_harness modules (basename form, sorted by filename):\n    230 icm_spec.py\n    823 supervised_attempt_output_validator.py\n    844 supervised_capability_loop.py\n    920 context_distiller_manifest.py\n    998 affordance_candidate_probe_runner.py\n   1114 logic_probe.py\n   1291 report_distiller_metrics.py\n   1515 zth_task.py\n   1813 transaction_handoff.py\n   2269 run_manual_supervised_attempt.py\n\nInstructions:\n1. Count how many files are listed.\n2. Identify the single file with the most lines and its exact line count.\n3. Identify the single file with the fewest lines and its exact line count.\n4. Emit a single JSON object and nothing else (no markdown, no code fences, no prose, no extra or missing keys).\n\nOutput EXACTLY one JSON object with these keys and nothing else:\n{\n  \"file_count\": <integer: the number of files listed>,\n  \"largest_file\": <string: basename of the file with the most lines>,\n  \"largest_lines\": <integer: the line count of that file>,\n  \"smallest_file\": <string: basename of the file with the fewest lines>,\n  \"smallest_lines\": <integer: the line count of that file>\n}\n",
+  "task_family": "repository-observation",
+  "task_id": "local-harness-core-module-scale-dogfood-20260911",
+  "validator": {
+    "kind": "exact_json"
+  }
+}

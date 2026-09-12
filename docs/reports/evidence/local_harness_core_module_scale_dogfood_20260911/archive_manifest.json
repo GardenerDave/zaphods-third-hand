@@ -1,0 +1,140 @@
+{
+  "schema": "zth_evidence_archive_v1",
+  "topic": "local_harness_core_module_scale_dogfood_20260911",
+  "date": "20260911",
+  "note": "Durable, tracked preservation of one bounded ZTH supervised-capability-loop dogfood run: a read-only repository-observation task (count files, name the largest and smallest by wc -l line count over 10 curated core local_harness/*.py modules) run against the raw-evidence 1.7B worker. The worker failed the exact-match validation (misidentified the largest file), the local 27B teacher's intervention failed to parse (reasoning-only output), and the external-teacher tier was unconfigured, so the loop's terminal disposition was infrastructure_error. See README.md.",
+  "entries": [
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/fixture.json",
+      "sha256": "7df440cb647c42cc01b3172ed33df1f3cde6cff62af83dd93b4ab5457f7c885d",
+      "size": 2060,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/fixture.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/attempt-1.prompt.txt",
+      "sha256": "495144cf0c5184a47adb8da1e81cd3dfdf11fc7cfbec0a9b282657589848d8d2",
+      "size": 1459,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/attempt-1.prompt.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/attempt-1.raw.json",
+      "sha256": "56dc795493c398868fad785570ca20627188ac22046f0269475435618d965c8e",
+      "size": 2963,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/attempt-1.raw.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/attempt-1.metadata.json",
+      "sha256": "4bf6c90010e87e522bb424fabc00dabf2ea59e161ee92f2a2607a8e089fd522d",
+      "size": 1618,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/attempt-1.metadata.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/attempt-1.validation.json",
+      "sha256": "26637cf1de26ecd19d8ba458871806b09a72d6cceded95b5fe91cd253a8db733",
+      "size": 877,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/attempt-1.validation.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/attempt-2.prompt.txt",
+      "sha256": "495144cf0c5184a47adb8da1e81cd3dfdf11fc7cfbec0a9b282657589848d8d2",
+      "size": 1459,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/attempt-2.prompt.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/attempt-2.raw.json",
+      "sha256": "a8306164fea0993a6e43ce862d7833926ae7c5b1508c5e0ddd96e6e8540c2236",
+      "size": 2951,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/attempt-2.raw.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/attempt-2.metadata.json",
+      "sha256": "e4ddd8dfde44a698b03dbaa22bd03d26980d509ab31193a888be836c2c466799",
+      "size": 1618,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/attempt-2.metadata.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/attempt-2.validation.json",
+      "sha256": "26637cf1de26ecd19d8ba458871806b09a72d6cceded95b5fe91cd253a8db733",
+      "size": 877,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/attempt-2.validation.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/attempt-3.prompt.txt",
+      "sha256": "3fc2b40783c4369d14c800f17e183d85de2a39a06281642e79a3257312ed46cb",
+      "size": 1594,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/attempt-3.prompt.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/attempt-3.raw.json",
+      "sha256": "ef1e74b7af2804442a8c23ec5458c57bb83159b2a73848264f67d15594366a8c",
+      "size": 2965,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/attempt-3.raw.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/attempt-3.metadata.json",
+      "sha256": "a3e0167a7d4ea0e4ce6fd40000d67f75f91973b383c8f9a187ecca6bce5d1c2f",
+      "size": 1635,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/attempt-3.metadata.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/attempt-3.validation.json",
+      "sha256": "26637cf1de26ecd19d8ba458871806b09a72d6cceded95b5fe91cd253a8db733",
+      "size": 877,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/attempt-3.validation.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/attempt-4.prompt.txt",
+      "sha256": "3fc2b40783c4369d14c800f17e183d85de2a39a06281642e79a3257312ed46cb",
+      "size": 1594,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/attempt-4.prompt.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/attempt-4.raw.json",
+      "sha256": "9b53e17bde43fe162c2487025cf76d65d2137cda49c7d8b867da733780e8910d",
+      "size": 2953,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/attempt-4.raw.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/attempt-4.metadata.json",
+      "sha256": "a3832d3810cc83226cdf0e4c9dd0df023ab2967096aad21f84acfecc9eca72c5",
+      "size": 1636,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/attempt-4.metadata.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/attempt-4.validation.json",
+      "sha256": "26637cf1de26ecd19d8ba458871806b09a72d6cceded95b5fe91cd253a8db733",
+      "size": 877,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/attempt-4.validation.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/local-teacher-1.json",
+      "sha256": "eec757dad60f8a473373dced13c64a9a46e631af23e511e8be243b9ccb01fe7f",
+      "size": 8770,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/local-teacher-1.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/local-teacher-2.json",
+      "sha256": "853f3ab8f1c17f3779e8c5d8b6aa0d748e10b2df1fc03f974fdffc98ccec5d16",
+      "size": 9138,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/local-teacher-2.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/external-teacher.infrastructure.json",
+      "sha256": "263e054490a9d1498d239b39452d983db9798f754c3f3f556a9c12a413321cc9",
+      "size": 1105,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/external-teacher.infrastructure.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/trajectory.jsonl",
+      "sha256": "cb1cd3d646aaee26966344302d4fba34444207f4cbef50d5cfa0389435b6b637",
+      "size": 40617,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/trajectory.jsonl"
+    },
+    {
+      "archive_path": "docs/reports/evidence/local_harness_core_module_scale_dogfood_20260911/genuine_raw_evidence/trajectory_summary.json",
+      "sha256": "1c5ecb2d129bb447879505a4b0f91046d49cb458b674b5e534d1b7d7c4b07bcd",
+      "size": 2997,
+      "source_path": "/tmp/zth_dogfood/local_harness_core_module_scale_dogfood_20260911/out/trajectory_summary.json"
+    }
+  ]
+}

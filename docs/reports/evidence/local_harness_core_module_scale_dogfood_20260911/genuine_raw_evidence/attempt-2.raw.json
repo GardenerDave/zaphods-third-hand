@@ -1,0 +1,83 @@
+{
+  "content": "{\n  \"file_count\": 10,\n  \"largest_file\": \"zth_task.py\",\n  \"largest_lines\": 1515,\n  \"smallest_file\": \"icm_spec.py\",\n  \"smallest_lines\": 230\n}",
+  "metadata": {
+    "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "endpoint_alias": "JARVIS_LOCAL",
+    "error": null,
+    "finish_reason": "stop",
+    "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "model_resolution_attempted": false,
+    "model_resolution_error": null,
+    "request_provenance": {
+      "api": "openai-chat",
+      "append_no_think": false,
+      "chat_template_kwargs": null,
+      "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "endpoint_alias": "JARVIS_LOCAL",
+      "max_tokens": 768,
+      "message_structure": [
+        "system",
+        "user"
+      ],
+      "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "prompt_byte_length": 1459,
+      "prompt_length": 1459,
+      "prompt_sha256": "495144cf0c5184a47adb8da1e81cd3dfdf11fc7cfbec0a9b282657589848d8d2",
+      "raw_response_path": null,
+      "raw_response_sha256": "bcc35c2d9f8818bb6ae4c7c64bf3939a73f93470f80ab62050ea86713112e95a",
+      "request_body_length": 1751,
+      "request_body_sha256": "fa355c6f164ea55a6810910f84c06966f84357b070b5678f7f336e2b0096d0ff",
+      "request_start_monotonic": 4046.983251783,
+      "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "response_capture_monotonic": 4050.813309552,
+      "seed": null,
+      "stop": null,
+      "system_message_sha256": "e8c1a9955d1a830189fecdfd11c537896d95cddd0419d5a63d957dd6f0fcb6c7",
+      "temperature": 0.2,
+      "thinking_budget_tokens": null,
+      "top_p": null
+    },
+    "request_url": null,
+    "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "resource_telemetry": {
+      "adapter_server_identity": "JARVIS_LOCAL",
+      "cached_tokens": 408,
+      "completion_tokens": 59,
+      "elapsed_ms": 3830.125,
+      "hardware_device_identity": null,
+      "model_identity": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "prompt_tokens": 409,
+      "request_start_monotonic": 4046.983245787,
+      "response_capture_monotonic": 4050.813370585,
+      "role": "worker",
+      "schema": "zth_resource_telemetry_v1",
+      "server_generation_ms": 3724.32,
+      "server_prompt_ms": 64.155,
+      "timeout_seconds": 900,
+      "total_tokens": 468,
+      "transport_classification": "model_response"
+    },
+    "status": "ok",
+    "timings": {
+      "cache_n": 408,
+      "predicted_ms": 3724.32,
+      "predicted_n": 59,
+      "predicted_per_second": 15.841818103707523,
+      "predicted_per_token_ms": 63.12406779661017,
+      "prompt_ms": 64.155,
+      "prompt_n": 1,
+      "prompt_per_second": 15.587249629802821,
+      "prompt_per_token_ms": 64.155
+    },
+    "transport_classification": "model_response",
+    "usage": {
+      "completion_tokens": 59,
+      "prompt_tokens": 409,
+      "prompt_tokens_details": {
+        "cached_tokens": 408
+      },
+      "total_tokens": 468
+    }
+  },
+  "status": "ok"
+}

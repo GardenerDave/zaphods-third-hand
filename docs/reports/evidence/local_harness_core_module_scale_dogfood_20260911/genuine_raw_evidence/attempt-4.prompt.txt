@@ -1,0 +1,34 @@
+You are a bounded, read-only repository observer. Do not modify any file or state.
+
+Task: Using ONLY the raw evidence block below, describe the scale of a fixed set of ten core top-level modules in the local_harness directory. Do not fetch anything. Do not add keys. Do not emit prose.
+
+EVIDENCE BLOCK 1 - literal output of `wc -l` for ten fixed core top-level local_harness modules (basename form, sorted by filename):
+    230 icm_spec.py
+    823 supervised_attempt_output_validator.py
+    844 supervised_capability_loop.py
+    920 context_distiller_manifest.py
+    998 affordance_candidate_probe_runner.py
+   1114 logic_probe.py
+   1291 report_distiller_metrics.py
+   1515 zth_task.py
+   1813 transaction_handoff.py
+   2269 run_manual_supervised_attempt.py
+
+Instructions:
+1. Count how many files are listed.
+2. Identify the single file with the most lines and its exact line count.
+3. Identify the single file with the fewest lines and its exact line count.
+4. Emit a single JSON object and nothing else (no markdown, no code fences, no prose, no extra or missing keys).
+
+Output EXACTLY one JSON object with these keys and nothing else:
+{
+  "file_count": <integer: the number of files listed>,
+  "largest_file": <string: basename of the file with the most lines>,
+  "largest_lines": <integer: the line count of that file>,
+  "smallest_file": <string: basename of the file with the fewest lines>,
+  "smallest_lines": <integer: the line count of that file>
+}
+
+
+## Local teacher intervention
+{"teacher_diagnosis": "Teacher output was not JSON: Expecting value", "teacher_parse_status": "failed"}

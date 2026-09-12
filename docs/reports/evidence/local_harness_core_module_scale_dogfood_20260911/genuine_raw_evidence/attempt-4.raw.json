@@ -1,0 +1,83 @@
+{
+  "content": "{\n  \"file_count\": 10,\n  \"largest_file\": \"zth_task.py\",\n  \"largest_lines\": 1515,\n  \"smallest_file\": \"icm_spec.py\",\n  \"smallest_lines\": 230\n}",
+  "metadata": {
+    "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "endpoint_alias": "JARVIS_LOCAL",
+    "error": null,
+    "finish_reason": "stop",
+    "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "model_resolution_attempted": false,
+    "model_resolution_error": null,
+    "request_provenance": {
+      "api": "openai-chat",
+      "append_no_think": false,
+      "chat_template_kwargs": null,
+      "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "endpoint_alias": "JARVIS_LOCAL",
+      "max_tokens": 768,
+      "message_structure": [
+        "system",
+        "user"
+      ],
+      "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "prompt_byte_length": 1594,
+      "prompt_length": 1594,
+      "prompt_sha256": "3fc2b40783c4369d14c800f17e183d85de2a39a06281642e79a3257312ed46cb",
+      "raw_response_path": null,
+      "raw_response_sha256": "7d8c0f0a529d6a5968366b4ca993c7eb88bbee13462256043405cb326780d3ed",
+      "request_body_length": 1897,
+      "request_body_sha256": "351c9fea231f8b752466f61f178093f1be838c2b54221a6d4b726f7130586abf",
+      "request_start_monotonic": 4167.329726133,
+      "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "response_capture_monotonic": 4171.185993526,
+      "seed": null,
+      "stop": null,
+      "system_message_sha256": "e8c1a9955d1a830189fecdfd11c537896d95cddd0419d5a63d957dd6f0fcb6c7",
+      "temperature": 0.2,
+      "thinking_budget_tokens": null,
+      "top_p": null
+    },
+    "request_url": null,
+    "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "resource_telemetry": {
+      "adapter_server_identity": "JARVIS_LOCAL",
+      "cached_tokens": 437,
+      "completion_tokens": 59,
+      "elapsed_ms": 3856.347,
+      "hardware_device_identity": null,
+      "model_identity": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "prompt_tokens": 438,
+      "request_start_monotonic": 4167.329721849,
+      "response_capture_monotonic": 4171.186068495,
+      "role": "worker",
+      "schema": "zth_resource_telemetry_v1",
+      "server_generation_ms": 3726.934,
+      "server_prompt_ms": 86.773,
+      "timeout_seconds": 900,
+      "total_tokens": 497,
+      "transport_classification": "model_response"
+    },
+    "status": "ok",
+    "timings": {
+      "cache_n": 437,
+      "predicted_ms": 3726.934,
+      "predicted_n": 59,
+      "predicted_per_second": 15.830706956441944,
+      "predicted_per_token_ms": 63.168372881355936,
+      "prompt_ms": 86.773,
+      "prompt_n": 1,
+      "prompt_per_second": 11.52432208175354,
+      "prompt_per_token_ms": 86.773
+    },
+    "transport_classification": "model_response",
+    "usage": {
+      "completion_tokens": 59,
+      "prompt_tokens": 438,
+      "prompt_tokens_details": {
+        "cached_tokens": 437
+      },
+      "total_tokens": 497
+    }
+  },
+  "status": "ok"
+}
