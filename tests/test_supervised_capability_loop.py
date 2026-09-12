@@ -259,6 +259,74 @@ def test_two_local_teacher_passes_are_distinct_and_exactly_once(tmp_path: Path):
     assert [e["subsequent_worker_result"] for e in result["candidate_curriculum_examples"]] == ["failed", "passed"]
 
 
+def test_guidance_only_teacher_payload_strips_reference_keeps_guidance():
+    from local_harness.supervised_capability_loop import _guidance_only_teacher_payload
+    payload = {
+        "failure_classification": "prompt_contract_gap",
+        "teacher_diagnosis": "Use the bounded reference.",
+        "retry_guidance": "Return JSON only.",
+        "corrected_reference_output": {"answer": "ok"},
+        "candidate_prompt_patch": {"instruction": "Return JSON."},
+        "candidate_prompt_patch_raw": "not json",
+        "teacher_parse_status": "parsed_json",
+    }
+    stripped = _guidance_only_teacher_payload(payload)
+    assert stripped["failure_classification"] == "prompt_contract_gap"
+    assert stripped["teacher_diagnosis"] == "Use the bounded reference."
+    assert stripped["retry_guidance"] == "Return JSON only."
+    assert stripped["teacher_parse_status"] == "parsed_json"
+    assert "corrected_reference_output" not in stripped
+    assert "candidate_prompt_patch" not in stripped
+    assert "candidate_prompt_patch_raw" not in stripped
+    assert _guidance_only_teacher_payload("raw text") == "raw text"
+    assert _guidance_only_teacher_payload(None) is None
+
+
+def test_local_teacher_retry_prompt_carries_no_reference(tmp_path: Path):
+    outputs = iter(['{"answer":"wrong"}', '{"answer":"ok"}'])
+    prompts: list[str] = []
+
+    def worker(p: str) -> WorkerResponse:
+        prompts.append(p)
+        return response(next(outputs), "small-1.7b")
+
+    def teacher(p: str) -> WorkerResponse:
+        return response(teacher_payload(True), "large-30b")
+
+    result = run_capability_loop(task(), out_dir=tmp_path, worker=worker, local_teacher=teacher, max_worker_attempts=1, max_teacher_passes=1)
+    assert result["successful_intervention_source"] == "local_teacher"
+    assert len(prompts) >= 2
+    retry_prompt = prompts[1]
+    assert "## Local teacher intervention" in retry_prompt
+    assert "retry_guidance" in retry_prompt
+    assert "teacher_diagnosis" in retry_prompt
+    assert "failure_classification" in retry_prompt
+    assert "corrected_reference_output" not in retry_prompt
+    assert json.dumps(task()["expected_output"]) not in retry_prompt
+
+
+def test_external_teacher_retry_prompt_carries_no_reference(tmp_path: Path):
+    outputs = iter(['{"answer":"wrong"}', '{"answer":"ok"}'])
+    prompts: list[str] = []
+
+    def worker(p: str) -> WorkerResponse:
+        prompts.append(p)
+        return response(next(outputs), "small-1.7b")
+
+    def external(p: str):
+        return "codex-cli-0.146.0", teacher_payload(True)
+
+    result = run_capability_loop(task(), out_dir=tmp_path, worker=worker, local_teacher=lambda _p: pytest.fail("local teacher called"), external_teacher=external, max_worker_attempts=1, max_teacher_passes=0)
+    assert result["successful_intervention_source"] == "external_teacher"
+    assert len(prompts) >= 2
+    external_retry_prompt = prompts[-1]
+    assert "## External teacher intervention" in external_retry_prompt
+    assert "retry_guidance" in external_retry_prompt
+    assert "teacher_diagnosis" in external_retry_prompt
+    assert "corrected_reference_output" not in external_retry_prompt
+    assert json.dumps(task()["expected_output"]) not in external_retry_prompt
+
+
 def test_local_teacher_exhausted_then_external_resolution(tmp_path: Path):
     outputs = iter(['{"answer":"wrong"}', '{"answer":"wrong"}', '{"answer":"ok"}'])
     external_prompts: list[dict] = []
