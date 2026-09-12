@@ -1,0 +1,83 @@
+{
+  "content": "{\n  \"declared_model\": \"Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf\",\n  \"declared_base_url\": \"http://192.168.137.3:8080/v1\",\n  \"actual_model_8080\": \"Qwen3.8-27B-UD-IQ4_XS.gguf\",\n  \"actual_model_8081\": \"Qwen_Qwen3-1.7B-Q4_K_M.gguf\",\n  \"mismatch_detected\": true\n}",
+  "metadata": {
+    "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "endpoint_alias": "JARVIS_LOCAL",
+    "error": null,
+    "finish_reason": "stop",
+    "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "model_resolution_attempted": false,
+    "model_resolution_error": null,
+    "request_provenance": {
+      "api": "openai-chat",
+      "append_no_think": false,
+      "chat_template_kwargs": null,
+      "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "endpoint_alias": "JARVIS_LOCAL",
+      "max_tokens": 768,
+      "message_structure": [
+        "system",
+        "user"
+      ],
+      "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "prompt_byte_length": 1423,
+      "prompt_length": 1423,
+      "prompt_sha256": "3a29e2ea045a03f634b507acddac64a0549ce147d6b97ca29785a353ebe28c54",
+      "raw_response_path": null,
+      "raw_response_sha256": "d7a1438c8d83151091ce0c2c2cc2e6215d5a0d10b2ca057a5c17b085d83affab",
+      "request_body_length": 1723,
+      "request_body_sha256": "295645ef24c42faa0ad5177f4144dd8ea65edba2a51f111a32bc7383f17ec990",
+      "request_start_monotonic": 10371.60521716,
+      "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "response_capture_monotonic": 10382.431016333,
+      "seed": null,
+      "stop": null,
+      "system_message_sha256": "e8c1a9955d1a830189fecdfd11c537896d95cddd0419d5a63d957dd6f0fcb6c7",
+      "temperature": 0.2,
+      "thinking_budget_tokens": null,
+      "top_p": null
+    },
+    "request_url": null,
+    "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "resource_telemetry": {
+      "adapter_server_identity": "JARVIS_LOCAL",
+      "cached_tokens": 0,
+      "completion_tokens": 128,
+      "elapsed_ms": 10825.854,
+      "hardware_device_identity": null,
+      "model_identity": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "prompt_tokens": 535,
+      "request_start_monotonic": 10371.605211361,
+      "response_capture_monotonic": 10382.431065694,
+      "role": "worker",
+      "schema": "zth_resource_telemetry_v1",
+      "server_generation_ms": 8713.602,
+      "server_prompt_ms": 2062.065,
+      "timeout_seconds": 900,
+      "total_tokens": 663,
+      "transport_classification": "model_response"
+    },
+    "status": "ok",
+    "timings": {
+      "cache_n": 0,
+      "predicted_ms": 8713.602,
+      "predicted_n": 128,
+      "predicted_per_second": 14.689677127782517,
+      "predicted_per_token_ms": 68.075015625,
+      "prompt_ms": 2062.065,
+      "prompt_n": 535,
+      "prompt_per_second": 259.4486594748468,
+      "prompt_per_token_ms": 3.8543271028037385
+    },
+    "transport_classification": "model_response",
+    "usage": {
+      "completion_tokens": 128,
+      "prompt_tokens": 535,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 663
+    }
+  },
+  "status": "ok"
+}

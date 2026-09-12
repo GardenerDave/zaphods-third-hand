@@ -1,0 +1,25 @@
+{
+  "task_id": "config-env-model-label-mismatch-dogfood-20260911",
+  "task_family": "repository-observation",
+  "prompt": "You are a bounded, read-only repository observer. Do not modify any file or state.\n\nTask: verify one model-label consistency fact about the local ZTH fleet and emit a single bounded JSON verdict. Base your verdict ONLY on the two evidence facts given below; do not fetch anything and do not add keys.\n\nEvidence fact 1 (local config declaration): the file `config.env` declares the primary endpoint and model as exactly:\n    ZTH_BASE_URL=\"http://192.168.137.3:8080/v1\"\n    ZTH_MODEL=\"Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf\"\nThat is, the config declares the 30B model (Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf) at host 192.168.137.3, port 8080.\n\nEvidence fact 2 (live endpoints): two read-only GETs to the live `/v1/models` endpoints returned exactly:\n    port 8080 model id: \"Qwen3.8-27B-UD-IQ4_XS.gguf\"\n    port 8081 model id: \"Qwen_Qwen3-1.7B-Q4_K_M.gguf\"\n\nThe declared model (Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf) does NOT match what port 8080 actually serves (Qwen3.8-27B-UD-IQ4_XS.gguf). Therefore a mismatch is detected.\n\nOutput EXACTLY this JSON object and nothing else (no markdown, no code fences, no prose, no extra or missing keys, values verbatim):\n{\n  \"declared_model\": \"Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf\",\n  \"declared_base_url\": \"http://192.168.137.3:8080/v1\",\n  \"actual_model_8080\": \"Qwen3.8-27B-UD-IQ4_XS.gguf\",\n  \"actual_model_8081\": \"Qwen_Qwen3-1.7B-Q4_K_M.gguf\",\n  \"mismatch_detected\": true\n}",
+  "output_contract": {
+    "format": "json",
+    "required_fields": [
+      "declared_model",
+      "declared_base_url",
+      "actual_model_8080",
+      "actual_model_8081",
+      "mismatch_detected"
+    ]
+  },
+  "validator": {
+    "kind": "exact_json"
+  },
+  "expected_output": {
+    "declared_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "declared_base_url": "http://192.168.137.3:8080/v1",
+    "actual_model_8080": "Qwen3.8-27B-UD-IQ4_XS.gguf",
+    "actual_model_8081": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "mismatch_detected": true
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "task_id": "config-env-model-label-mismatch-dogfood-raw-20260911",
+  "task_family": "repository-observation",
+  "prompt": "You are a bounded, read-only repository observer. Do not modify any file or state.\n\nTask: Using ONLY the three raw evidence blocks below, determine whether the primary model declared in the local config matches the model actually served by that declared config endpoint. Do not fetch anything. Do not add keys. Do not emit prose.\n\nEVIDENCE BLOCK 1 - literal lines from config.env (local-only runtime config):\nexport ZTH_BASE_URL=\"http://192.168.137.3:8080/v1\"\nexport ZTH_MODEL=\"Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf\"\n\nEVIDENCE BLOCK 2 - literal response body of GET http://192.168.137.3:8080/v1/models :\n{\"models\":[{\"name\":\"Qwen3.8-27B-UD-IQ4_XS.gguf\",\"model\":\"Qwen3.8-27B-UD-IQ4_XS.gguf\",\"modified_at\":\"\",\"size\":\"\",\"digest\":\"\",\"type\":\"model\",\"description\":\"\",\"tags\":[\"\"],\"capabilities\":[\"completion\"],\"parameters\":\"\",\"details\":{\"parent_model\":\"\",\"format\":\"gguf\",\"family\":\"\",\"families\":[],\"parameter_size\":\"\",\"quantization_level\":\"\"}}],\"object\":\"list\",\"data\":[{\"id\":\"Qwen3.8-27B-UD-IQ4_XS.gguf\",\"aliases\":[],\"tags\":[],\"object\":\"model\",\"created\":1789181948,\"owned_by\":\"llamacpp\",\"meta\":{\"vocab_type\":2,\"n_vocab\":248320,\"n_ctx\":32768,\"n_ctx_train\":262144,\"n_embd\":5120,\"n_params\":27320697856,\"size\":14241849344}}]}\n\nEVIDENCE BLOCK 3 - literal response body of GET http://192.168.137.3:8081/v1/models :\n{\"models\":[{\"name\":\"Qwen_Qwen3-1.7B-Q4_K_M.gguf\",\"model\":\"Qwen_Qwen3-1.7B-Q4_K_M.gguf\",\"modified_at\":\"\",\"size\":\"\",\"digest\":\"\",\"type\":\"model\",\"description\":\"\",\"tags\":[\"\"],\"capabilities\":[\"completion\"],\"parameters\":\"\",\"details\":{\"parent_model\":\"\",\"format\":\"gguf\",\"family\":\"\",\"families\":[],\"parameter_size\":\"\",\"quantization_level\":\"\"}}],\"object\":\"list\",\"data\":[{\"id\":\"Qwen_Qwen3-1.7B-Q4_K_M.gguf\",\"aliases\":[],\"tags\":[],\"object\":\"model\",\"created\":1789181948,\"owned_by\":\"llamacpp\",\"meta\":{\"vocab_type\":2,\"n_vocab\":151936,\"n_ctx\":32768,\"n_ctx_train\":32768,\"n_embd\":2048,\"n_params\":2031739904,\"size\":1276487680}}]}\n\nInstructions:\n1. Identify which endpoint (port) the declared config endpoint (EVIDENCE BLOCK 1) points to.\n2. Identify which model id that endpoint actually serves (from the matching EVIDENCE BLOCK 2 or 3).\n3. Compare the declared model id against the actual model id served by that endpoint.\n4. Emit a single JSON object and nothing else (no markdown, no code fences, no prose, no extra or missing keys).\n\nOutput EXACTLY one JSON object with these keys and nothing else:\n{\n  \"declared_model\": <string: the model id declared in config.env>,\n  \"declared_base_url\": <string: the endpoint URL declared in config.env>,\n  \"actual_model_at_endpoint\": <string: the model id actually served by the declared endpoint>,\n  \"match\": <boolean: true if declared_model == actual_model_at_endpoint, else false>\n}",
+  "output_contract": {
+    "format": "json",
+    "required_fields": [
+      "declared_model",
+      "declared_base_url",
+      "actual_model_at_endpoint",
+      "match"
+    ]
+  },
+  "validator": {
+    "kind": "exact_json"
+  },
+  "expected_output": {
+    "declared_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "declared_base_url": "http://192.168.137.3:8080/v1",
+    "actual_model_at_endpoint": "Qwen3.8-27B-UD-IQ4_XS.gguf",
+    "match": false
+  }
+}

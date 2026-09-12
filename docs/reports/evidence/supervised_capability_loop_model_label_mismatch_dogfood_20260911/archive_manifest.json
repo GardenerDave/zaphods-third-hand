@@ -1,0 +1,92 @@
+{
+  "schema": "zth_evidence_archive_v1",
+  "topic": "supervised_capability_loop_model_label_mismatch_dogfood_20260911",
+  "date": "20260911",
+  "note": "Durable, tracked preservation of two bounded ZTH supervised-capability-loop dogfood runs (an earlier spoon-fed orchestration smoke and a corrected genuine raw-evidence run) that originally lived in git-ignored .work/ run folders. See README.md.",
+  "entries": [
+    {
+      "archive_path": "docs/reports/evidence/supervised_capability_loop_model_label_mismatch_dogfood_20260911/smoke_orchestration_only/fixture.json",
+      "sha256": "34fb8b678952528a93379e5f49fe3f511441a082c931c1891db4641ea268398e",
+      "size": 2149,
+      "source_path": ".work/dogfood/config_env_model_label_mismatch_20260911/fixture.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/supervised_capability_loop_model_label_mismatch_dogfood_20260911/smoke_orchestration_only/attempt-1.prompt.txt",
+      "sha256": "3a29e2ea045a03f634b507acddac64a0549ce147d6b97ca29785a353ebe28c54",
+      "size": 1423,
+      "source_path": ".work/dogfood/config_env_model_label_mismatch_20260911/run/attempt-1.prompt.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/supervised_capability_loop_model_label_mismatch_dogfood_20260911/smoke_orchestration_only/attempt-1.raw.json",
+      "sha256": "e56435abfd41ee278acc4b71c61a0c88ad0db41652b9d7c8f1c1d91520dd4547",
+      "size": 3088,
+      "source_path": ".work/dogfood/config_env_model_label_mismatch_20260911/run/attempt-1.raw.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/supervised_capability_loop_model_label_mismatch_dogfood_20260911/smoke_orchestration_only/attempt-1.metadata.json",
+      "sha256": "3f14ecf25cad271ce3200ffc845db38fef1c4742241939a1b6574e4afcc1e6e7",
+      "size": 1619,
+      "source_path": ".work/dogfood/config_env_model_label_mismatch_20260911/run/attempt-1.metadata.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/supervised_capability_loop_model_label_mismatch_dogfood_20260911/smoke_orchestration_only/attempt-1.validation.json",
+      "sha256": "23435a0918ec46a6c7e788540a00194ec998d9735b10d7df833caf16e3c7f682",
+      "size": 899,
+      "source_path": ".work/dogfood/config_env_model_label_mismatch_20260911/run/attempt-1.validation.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/supervised_capability_loop_model_label_mismatch_dogfood_20260911/smoke_orchestration_only/trajectory.jsonl",
+      "sha256": "708171207679d92e36bb81b9ef05a5bd70b0cd754301c11a38f73e8eba78b3c1",
+      "size": 5398,
+      "source_path": ".work/dogfood/config_env_model_label_mismatch_20260911/run/trajectory.jsonl"
+    },
+    {
+      "archive_path": "docs/reports/evidence/supervised_capability_loop_model_label_mismatch_dogfood_20260911/smoke_orchestration_only/trajectory_summary.json",
+      "sha256": "33e904736ad40693325597e52641e92fad3e35b1b33ad2d23ec2c97e453e9f50",
+      "size": 1787,
+      "source_path": ".work/dogfood/config_env_model_label_mismatch_20260911/run/trajectory_summary.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/supervised_capability_loop_model_label_mismatch_dogfood_20260911/genuine_raw_evidence/fixture.json",
+      "sha256": "a88538eb463d86b20857528b1c1a6898c2696bcaee691c91f97f358804000d8b",
+      "size": 3549,
+      "source_path": ".work/dogfood/config_env_model_label_mismatch_dogfood_raw_20260911/fixture.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/supervised_capability_loop_model_label_mismatch_dogfood_20260911/genuine_raw_evidence/attempt-1.prompt.txt",
+      "sha256": "054459d304414c1207e4ba86085f95973dcc7dcdc951ac9e4f30a5cb29ff1390",
+      "size": 2709,
+      "source_path": ".work/dogfood/config_env_model_label_mismatch_dogfood_raw_20260911/run/attempt-1.prompt.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/supervised_capability_loop_model_label_mismatch_dogfood_20260911/genuine_raw_evidence/attempt-1.raw.json",
+      "sha256": "26826cf20953ec5b4b8c234b4aa58d7f72e23aceb6771e5db9320f48a67c6dbc",
+      "size": 3025,
+      "source_path": ".work/dogfood/config_env_model_label_mismatch_dogfood_raw_20260911/run/attempt-1.raw.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/supervised_capability_loop_model_label_mismatch_dogfood_20260911/genuine_raw_evidence/attempt-1.metadata.json",
+      "sha256": "34d4b3e5887ac87cd28e0dee28d91d5df5e3e53626c8229e631d3e14c8866baf",
+      "size": 1618,
+      "source_path": ".work/dogfood/config_env_model_label_mismatch_dogfood_raw_20260911/run/attempt-1.metadata.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/supervised_capability_loop_model_label_mismatch_dogfood_20260911/genuine_raw_evidence/attempt-1.validation.json",
+      "sha256": "572ca7b0a90804e8e237220b0894e433830d79d2fd9b5b83aa05b37a58ea1cd8",
+      "size": 837,
+      "source_path": ".work/dogfood/config_env_model_label_mismatch_dogfood_raw_20260911/run/attempt-1.validation.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/supervised_capability_loop_model_label_mismatch_dogfood_20260911/genuine_raw_evidence/trajectory.jsonl",
+      "sha256": "deb4746596750de7e502c54f4acf02677ab6ad802bbc514c6282a8402f07a6cb",
+      "size": 5238,
+      "source_path": ".work/dogfood/config_env_model_label_mismatch_dogfood_raw_20260911/run/trajectory.jsonl"
+    },
+    {
+      "archive_path": "docs/reports/evidence/supervised_capability_loop_model_label_mismatch_dogfood_20260911/genuine_raw_evidence/trajectory_summary.json",
+      "sha256": "9559e8aa73a9bf12e33408c02f773f07db441eec64baa845c9972a3894e3f7f1",
+      "size": 1803,
+      "source_path": ".work/dogfood/config_env_model_label_mismatch_dogfood_raw_20260911/run/trajectory_summary.json"
+    }
+  ]
+}

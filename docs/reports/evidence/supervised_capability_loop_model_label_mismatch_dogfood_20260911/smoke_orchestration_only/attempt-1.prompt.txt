@@ -1,0 +1,23 @@
+You are a bounded, read-only repository observer. Do not modify any file or state.
+
+Task: verify one model-label consistency fact about the local ZTH fleet and emit a single bounded JSON verdict. Base your verdict ONLY on the two evidence facts given below; do not fetch anything and do not add keys.
+
+Evidence fact 1 (local config declaration): the file `config.env` declares the primary endpoint and model as exactly:
+    ZTH_BASE_URL="http://192.168.137.3:8080/v1"
+    ZTH_MODEL="Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"
+That is, the config declares the 30B model (Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf) at host 192.168.137.3, port 8080.
+
+Evidence fact 2 (live endpoints): two read-only GETs to the live `/v1/models` endpoints returned exactly:
+    port 8080 model id: "Qwen3.8-27B-UD-IQ4_XS.gguf"
+    port 8081 model id: "Qwen_Qwen3-1.7B-Q4_K_M.gguf"
+
+The declared model (Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf) does NOT match what port 8080 actually serves (Qwen3.8-27B-UD-IQ4_XS.gguf). Therefore a mismatch is detected.
+
+Output EXACTLY this JSON object and nothing else (no markdown, no code fences, no prose, no extra or missing keys, values verbatim):
+{
+  "declared_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+  "declared_base_url": "http://192.168.137.3:8080/v1",
+  "actual_model_8080": "Qwen3.8-27B-UD-IQ4_XS.gguf",
+  "actual_model_8081": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+  "mismatch_detected": true
+}

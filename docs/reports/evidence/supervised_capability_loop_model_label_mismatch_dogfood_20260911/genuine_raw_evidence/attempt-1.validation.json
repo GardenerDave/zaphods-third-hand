@@ -1,0 +1,36 @@
+{
+  "acceptance_status": "not_reviewed",
+  "checks": [
+    {
+      "check_id": "json_parse",
+      "status": "passed"
+    },
+    {
+      "check_id": "reference_output_exact_match",
+      "status": "passed"
+    }
+  ],
+  "diagnostics": [],
+  "reference_facts": {
+    "expected_output": {
+      "actual_model_at_endpoint": "Qwen3.8-27B-UD-IQ4_XS.gguf",
+      "declared_base_url": "http://192.168.137.3:8080/v1",
+      "declared_model": "Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+      "match": false
+    }
+  },
+  "review_required": true,
+  "semantic_checks": [],
+  "structural_checks": [
+    {
+      "check_id": "json_parse",
+      "status": "passed"
+    },
+    {
+      "check_id": "reference_output_exact_match",
+      "status": "passed"
+    }
+  ],
+  "validation_status": "passed",
+  "validator": "deterministic_fixture_exact_match_v1"
+}
