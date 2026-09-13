@@ -17,10 +17,26 @@ leaked `corrected_reference_output` into the worker retry prompt. A rerun under
 the current HEAD (guidance-only invariant) **does not** reproduce it. See
 "Reading this run" and "Post-invariant confirmation".
 
+**Correction (2026-09-13, evidence-packaging):** the `reviewed_v1` run is **not**
+a genuine 1.7B multi-source-reconciliation capability boundary. The worker was a
+**pure LLM call with no filesystem access, no tools, and none of the 24 fixture
+contents supplied as evidence** — its prompt handed it only a filesystem path
+(`local_harness/fixtures/capability_loop/reviewed_v1/`) and told it to count what
+is "in" that directory. A model that has never seen the corpus **cannot** be
+scored on multi-source reconciliation from a path string; the defensible
+classification of this run is **`invalid capability test / insufficient evidence
+packaging`**. The observed hallucinated file counts (5/3, phantom prefixes) are
+useful as a record of what a reference-blind 1.7B emits when handed only a path,
+but they do **not** establish that the 1.7B would fail if given the actual 24
+files. See "Reading this run", item (c).
+
 ## Task and fixture
 
-- **Classification: genuine raw-evidence interpretation by the 1.7B worker.**
-  The prompt hands the worker the curated corpus
+- **Classification (design intent): genuine raw-evidence interpretation by the
+  1.7B worker.** *As run, the evidence was never packaged into the call: the
+  worker is a pure LLM invocation with no filesystem access and no tools, so the
+  design intent does not yield a valid capability test (see the correction above
+  and item (c)).* The prompt hands the worker the curated corpus
   `local_harness/fixtures/capability_loop/reviewed_v1/` (24 JSON files +
   `README.md`) and asks it to report, as a single bounded JSON verdict:
   `total_files`, `distinct_task_families`, `filename_prefix_groups`,
@@ -63,8 +79,17 @@ the current HEAD (guidance-only invariant) **does not** reproduce it. See
   phantom prefix groups `capability_loop`/`reviewed`/`test` inferred from the
   path components) instead of the true 24 / 8 with the real prefix groups
   (`blocked`, `frontdoor`, `logic`, `prompt`, `queue`). The 27B teacher's own
-  `teacher_diagnosis` names this: the model "has no filesystem access". This is
-  the genuine 1.7B capability boundary, preserved in both runs.
+  `teacher_diagnosis` names this: the model "has no filesystem access".
+  **Reclassification (2026-09-13):** this is therefore **not** a genuine 1.7B
+  multi-source-reconciliation capability boundary. The worker was handed only a
+  path string with none of the 24 fixture contents as evidence, so the observed
+  hallucination is an artifact of **insufficient evidence packaging** (an
+  **invalid capability test**), not proof the 1.7B could not reconcile the
+  corpus if the evidence had been supplied in-prompt. The counts remain useful
+  as a record of reference-blind 1.7B output on a path-only prompt; they are not
+  a capability verdict. The genuine 1.7B capability boundary is preserved
+  separately in the **control-flow enumeration** run (a different task in which
+  the 1.7B genuinely failed, then passed after reference-blind 27B guidance).
 - **Local teacher (pass 1):** the 27B teacher
   (`Qwen3.8-27B-UD-IQ4_XS.gguf`), under the **`routine`** request policy,
   emitted a **parseable** intervention
@@ -159,13 +184,21 @@ pre-computing and embedding the answer. The loop's
 `successful_intervention_source: local_teacher` correctly attributes the
 correct answer to the 27B, not to the 1.7B.
 
-**(c) The capability boundary stands.** `first_attempt_pass: false` in **both**
-the original run and this rerun. The 1.7B **cannot solve the task on its own**
-(phantom prefix groups, 5/3 vs 24/8). The pass on attempt 3 came **from the
-27B's supplied reference answer**, not from the 1.7B acquiring the
-capability. This is a rescue-by-teacher-supplied-reference, not a
-worker-capability gain. The genuine 1.7B counting/grounding failure is
-preserved as durable capability-boundary evidence.
+**(c) This is an *invalid capability test / insufficient evidence
+ packaging*, not a capability boundary.** `first_attempt_pass: false` in **both**
+the original run and this rerun — but the worker was never handed the
+evidence it was asked to count: a **path string only**, with no filesystem
+access, no tools, and none of the 24 fixture contents supplied in-prompt. So
+"the 1.7B cannot solve the task on its own" is **not** established by this
+run. The pass on attempt 3 came **from the 27B's supplied reference answer**,
+not from the 1.7B acquiring the capability — this is a
+rescue-by-teacher-supplied-reference, not a worker-capability gain. The
+observed hallucinated counts (5/3, phantom prefixes) are a useful record of
+reference-blind 1.7B output on a path-only prompt, but they are **not**
+durable capability-boundary evidence. The genuine 1.7B capability boundary is
+preserved **separately** in the **control-flow enumeration** run (a different
+task in which the 1.7B genuinely failed, then passed after reference-blind
+27B guidance).
 
 **(d) Routing lesson (now evidenced).** A local-teacher failure is
 **configuration before model**: a missing `routine` request policy silently
@@ -227,9 +260,13 @@ disposable, **not** committed):
 
 Two consequences:
 
-1. **The 1.7B capability boundary is now confirmed under guidance-only mode.**
-   With the reference stripped from the retry prompt, the 1.7B has nothing to
-   echo and genuinely fails (4/4 attempts). The prior "pass" is proven to be the
+1. **The post-invariant rerun confirms the run is an *invalid capability test /
+   insufficient evidence packaging*, not a capability boundary.** With the
+   reference stripped from the retry prompt, the 1.7B has nothing to echo and
+   fails all 4 attempts — but the worker was still handed only a path string
+   with none of the 24 fixture contents in-prompt, no filesystem access, and no
+   tools, so the 4/4 failure proves the **evidence was never packaged**, not
+   that the 1.7B lacks the capability. The prior "pass" is proven to be the
    reference leak, not a capability the 1.7B ever had.
 2. **The terminal `infrastructure_error` is a framework escalation artifact, NOT
    a 27B failure.** The loop exhausted its tiers as designed: worker baseline
