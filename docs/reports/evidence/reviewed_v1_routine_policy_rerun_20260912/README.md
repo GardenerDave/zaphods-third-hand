@@ -8,9 +8,14 @@ correctly-configured 27B local teacher rescues a subsequent 1.7B worker
 attempt. The rerun's raw run outputs are preserved byte-identically in
 `genuine_raw_evidence/`, and this README is the closeout reading.
 
-The run **passed**, and its terminal disposition is a genuine
-**`ready_for_review`** rescue — but the honest mechanism must be stated before
-it is used as any kind of capability claim. See "Reading this run".
+The run **passed**, and its terminal disposition is a **`ready_for_review`**
+terminal state — but the honest mechanism must be stated before it is used as
+any kind of capability claim. **Correction (2026-09-13):** that "pass" is a
+**pre-invariant teacher-reference echo**, not a 27B-guidance rescue and not 1.7B
+capability. It reproduces **only** under the pre-`47cf409` prompt builder that
+leaked `corrected_reference_output` into the worker retry prompt. A rerun under
+the current HEAD (guidance-only invariant) **does not** reproduce it. See
+"Reading this run" and "Post-invariant confirmation".
 
 ## Task and fixture
 
@@ -50,11 +55,16 @@ it is used as any kind of capability claim. See "Reading this run".
    "readme_named_source_families": 2, "cover_all_files": true}
   ```
   Deterministic validation: `json_parse` **passed**; `reference_output_exact_match`
-  **failed**. This is the genuine 1.7B counting/grounding failure: it reports
-  5 files / 3 families and invents **phantom prefix groups**
-  (`capability_loop`, `reviewed`, `test`) inferred from the directory path
-  components, instead of the true 24 / 8 with the real prefix groups
-  (`blocked`, `frontdoor`, `logic`, `prompt`, `queue`).
+  **failed**. **Corrected characterization (2026-09-13):** this is **not** a
+  counting error and not a conflation of `task_family` values with filename
+  prefix groups. The worker is a **pure LLM call with no filesystem access and
+  no tools**; it has never observed the corpus. It **hallucinates** a plausible
+  directory listing from the path string in the prompt (`total_files:5`,
+  phantom prefix groups `capability_loop`/`reviewed`/`test` inferred from the
+  path components) instead of the true 24 / 8 with the real prefix groups
+  (`blocked`, `frontdoor`, `logic`, `prompt`, `queue`). The 27B teacher's own
+  `teacher_diagnosis` names this: the model "has no filesystem access". This is
+  the genuine 1.7B capability boundary, preserved in both runs.
 - **Local teacher (pass 1):** the 27B teacher
   (`Qwen3.8-27B-UD-IQ4_XS.gguf`), under the **`routine`** request policy,
   emitted a **parseable** intervention
@@ -122,12 +132,22 @@ of the `routine` request policy — not evidence that the 27B regressed or
 cannot solve the task. This rerun, with the policy set, inverts that: one
 teacher pass produced a fully parseable, correctly-classified intervention.
 
-**(b) The rerun outcome is a successful rescue.** With the correct
-`routine` policy, one local-teacher pass produced a parseable intervention,
-and the 1.7B passed the patched prompt on rerun
-(`pass_after_local_teacher_intervention: true`, `successful_intervention_source:
-local_teacher`, `intervention_outcome: helped`). The comparable run's terminal
-`infrastructure_error` is reversed to `ready_for_review`.
+**(b) The rerun outcome is a pre-invariant teacher-reference echo (not a
+reproducible "rescue").** With the correct `routine` policy, one local-teacher
+pass produced a parseable intervention, and the 1.7B passed the patched prompt
+on rerun (`pass_after_local_teacher_intervention: true`,
+`successful_intervention_source: local_teacher`, `intervention_outcome: helped`).
+**Correction (2026-09-13):** that pass is not a durable property of a
+correctly-configured 27B teacher. It exists **only** because the pre-`47cf409`
+prompt builder leaked the teacher's `corrected_reference_output` verbatim into
+the worker's retry prompt, which the 1.7B then echoed. Under the current
+guidance-only invariant that leak is stripped, so the same fixture + same
+teacher produces **no** pass (see section (g)). Calling this a "successful
+rescue" is therefore misleading: the 27B supplied the reference answer, the
+1.7B copied it, and the loop's `successful_intervention_source: local_teacher`
+correctly attributes the answer to the 27B — not to 1.7B capability. The
+comparable run's terminal `infrastructure_error` is reversed to
+`ready_for_review` **only under the pre-invariant builder**.
 
 **The honest mechanism (stated plainly):** the "rescue" works because the 27B
 **computed the correct answer itself** and **embedded it as the
@@ -153,9 +173,20 @@ degrades the 27B to `reasoning_only`, making its intervention unparseable and
 forcing a spurious `infrastructure_error`. With
 `ICM_QWEN3_8_27B_REQUEST_POLICY=routine`, one teacher pass produced a
 parseable, correctly-classified intervention and the 1.7B passed the patched
-prompt on rerun. The correct diagnosis of the earlier failure is
-**misconfigured-escalation** (omitted `routine` policy), not teacher
-regression.
+prompt on rerun (pre-invariant reference leak only — see (b)/(g)). The correct
+diagnosis of the earlier failure is **misconfigured-escalation** (omitted
+`routine` policy), not teacher regression.
+
+**(d, updated 2026-09-13 — post-invariant routing lesson).** Under the current
+guidance-only framework, a local-teacher pass that does **not** change the
+worker outcome (because the reference is stripped) correctly falls through the
+escalation chain to the next tier. When the terminal tier (external teacher) is
+**unconfigured** (`ZTH_EXTERNAL_TEACHER_COMMAND` unset), the expected terminal
+state is `infrastructure_error` — a framework escalation artifact, **not** a 27B
+failure and **not** a capability verdict (`capability_verdict_available:false`).
+A worker pass that only exists because the teacher's reference leaked into the
+retry prompt must **never** be credited as 1.7B capability; under guidance-only
+that pass does not reproduce, which is exactly what (g) shows.
 
 **(e) Fixture-loss blocker record (Option A).** The frozen fixture + raw worker
 prompt were lost (cleaned `/tmp`, never committed); the frozen SHA
@@ -172,6 +203,48 @@ configured, was sufficient to close out the run (`ready_for_review`). Per the
 binding instruction, the external teacher was **not** pursued because the
 local teacher works. `external_escalation_count:0`,
 `external_teacher_call_count:0`.
+
+**(g) Post-invariant confirmation (2026-09-13).** A bounded rerun of the
+**same** task-identical fixture, same raw worker prompt, same 1.7B worker
+endpoint, same 27B teacher endpoint, same `routine` policy, and the existing
+`_parse_teacher` fix — but under the **current HEAD `47cf409`**
+(guidance-only invariant, committed 2026-09-12 11:16, **after** the passing
+run at 08:36) — **does not** reproduce the "rescue". Source run folder (scratch,
+disposable, **not** committed):
+`.work/dogfood/reviewedv1_routine_verify_20260912_routine`. Results:
+
+- `disposition`: `infrastructure_error`; `pass: false`; `unresolved: false`
+- `first_attempt_pass`: `false`
+- `pass_after_local_teacher_intervention`: `false`
+- `successful_intervention_source`: `none`
+- `intervention_outcome`: `not-applicable`
+- `teacher_intervention_mode`: `guidance_only`
+- `teacher_pass_count`: `2`; `attempt_count`: `4`
+- `external_escalation_count`: `1`; `external_teacher_call_count`: `1`
+- All **four** worker attempts hallucinated `total_files:5` (no reference to
+  echo). `candidate_curriculum_examples`: `local_teacher:1 →
+  subsequent_worker_result: failed`.
+
+Two consequences:
+
+1. **The 1.7B capability boundary is now confirmed under guidance-only mode.**
+   With the reference stripped from the retry prompt, the 1.7B has nothing to
+   echo and genuinely fails (4/4 attempts). The prior "pass" is proven to be the
+   reference leak, not a capability the 1.7B ever had.
+2. **The terminal `infrastructure_error` is a framework escalation artifact, NOT
+   a 27B failure.** The loop exhausted its tiers as designed: worker baseline
+   failed → local 27B teacher (parseable, `guidance_only`) → post-teacher worker
+   retry failed (×2 passes) → escalated to the **unconfigured** external teacher
+   (`ZTH_EXTERNAL_TEACHER_COMMAND` unset) → `infrastructure_error`. The 27B
+   teacher was consulted and parsed correctly (`teacher_parse_status:passed`);
+   it did not fail. The `infrastructure_error` is the expected terminal state of
+   the escalation chain when the external teacher is unconfigured, not evidence
+   that the 27B regressed or cannot solve the task.
+
+The full (unstripped) teacher payload — including `corrected_reference_output` —
+is preserved unchanged in the durable teacher record `local-teacher-1.json`;
+only the **worker-facing** retry prompt is stripped by
+`_guidance_only_teacher_payload`.
 
 ## Provenance (from `attempt-3.metadata.json` and the run environment)
 
