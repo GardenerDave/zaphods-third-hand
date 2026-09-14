@@ -1,0 +1,25 @@
+{
+  "schema": "zth_evidence_archive_v1",
+  "task_id": "doc_code_endpoint_consistency_20260915",
+  "task_family": "doc_code_reconciliation",
+  "entries": [
+    {
+      "archive_path": "genuine_raw_evidence/fixture.json",
+      "sha256": "32ba9dc586410f1376720d50ced64d94edf0b65bfa79275f618dbc9959b07173",
+      "size": 7233,
+      "source_path": ".work/dogfood/doc_code_endpoint_consistency_20260915/fixture.json"
+    },
+    {
+      "archive_path": "genuine_raw_evidence/trajectory.jsonl",
+      "sha256": "41b391b510c91d19f815e1bc93af6c2cfd2d863223ae2ece8f2fd8d8ae27de82",
+      "size": 40656,
+      "source_path": ".work/dogfood/doc_code_endpoint_consistency_20260915/run/trajectory.jsonl"
+    },
+    {
+      "archive_path": "genuine_raw_evidence/trajectory_summary.json",
+      "sha256": "59c78254fab3cd0091d5d0a1712c3b6d8bd1fed92b0f06bddbd9b09f66520760",
+      "size": 3699,
+      "source_path": ".work/dogfood/doc_code_endpoint_consistency_20260915/run/trajectory_summary.json"
+    }
+  ]
+}

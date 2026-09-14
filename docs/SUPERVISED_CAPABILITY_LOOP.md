@@ -9,9 +9,11 @@ small worker -> deterministic validator -> bounded retry
              -> optional external teacher adapter -> new worker attempt
 ```
 
-The worker is normally the local 1.7B endpoint and the local teacher is
-normally the 30B endpoint. Their endpoint URLs and model IDs are explicit
-environment configuration; no endpoint is silently discovered or substituted.
+The worker and the local teacher are each selected from an explicit worker
+spec or environment configuration, and a deployment may override the code
+fallback default for either role. Their endpoint URLs and model IDs are
+explicit environment configuration; no endpoint is silently discovered or
+substituted.
 Existing prompt patches are resolved by ID from `PromptPatchLibrary`, checked
 for stage/task/model applicability, rendered, and applied only to the
 `existing_patch` attempt. Their IDs and hashes are recorded. A teacher-produced
