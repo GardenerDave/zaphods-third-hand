@@ -1,0 +1,56 @@
+{
+  "schema": "zth_evidence_archive_v1",
+  "topic": "diff_semantic_comprehension_20260915",
+  "date": "20260914",
+  "note": "Durable, tracked preservation of one genuine bounded ZTH supervised-capability-loop run of the diff_semantic_comprehension task: extract 7 exact facts (2 new symbol names, 2 counts, 1 summary key/value pair, 1 boolean) from the inlined ~10.4K-char unified diff of commit 47cf409 (guidance-only teacher retry-prompt fix). Worker Qwen_Qwen3-1.7B-Q4_K_M.gguf (coder slot 8081) PASSED ON THE FIRST ATTEMPT with no intervention (model_attempt_count 1, teacher_pass_count 0, first_attempt_pass true, disposition ready_for_review). Both deterministic checks passed (json_parse, reference_output_exact_match). All 7 expected values were independently re-verified against the real diff via git show 47cf409 (function name, constant name, frozenset cardinality 3, 2 removed json.dumps call sites, summary key, summary value, reference-preservation comment). Local 27B teacher configured (qwen3_8_27b, routine policy) but never invoked because the worker passed. External teacher unconfigured (ZTH_EXTERNAL_TEACHER_COMMAND not set) - no effect since no intervention was needed. Capability finding: the 1.7B handles bounded single-diff semantic comprehension (symbol extraction, small counts, key/value, boolean) correctly on first attempt - new information relative to the previously probed file-counting and current-vs-superseded families where it failed. See README.md.",
+  "entries": [
+    {
+      "archive_path": "docs/reports/evidence/diff_semantic_comprehension_20260915/genuine_raw_evidence/attempt-1.metadata.json",
+      "sha256": "00e52263a7ec3e9250884a2c0b194a98d7377b44fe0a632f348c6f5244c9a236",
+      "size": 1622,
+      "source_path": ".work/dogfood/diff_semantic_comprehension_20260915/run/attempt-1.metadata.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/diff_semantic_comprehension_20260915/genuine_raw_evidence/attempt-1.prompt.txt",
+      "sha256": "ced791347bfc8f9a6c16203cf8f2acf1dd5b4fa33c157e7840413ec2b058b740",
+      "size": 12625,
+      "source_path": ".work/dogfood/diff_semantic_comprehension_20260915/run/attempt-1.prompt.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/diff_semantic_comprehension_20260915/genuine_raw_evidence/attempt-1.raw.json",
+      "sha256": "5854b2b636c756c06dcd2f76868246646883a2e8a03e5d667807a5bf4f458c06",
+      "size": 3230,
+      "source_path": ".work/dogfood/diff_semantic_comprehension_20260915/run/attempt-1.raw.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/diff_semantic_comprehension_20260915/genuine_raw_evidence/attempt-1.validation.json",
+      "sha256": "b418afce554b14211d3d3e5700c94a20c0935b659eb071c3a9f461b2a3c287b0",
+      "size": 1017,
+      "source_path": ".work/dogfood/diff_semantic_comprehension_20260915/run/attempt-1.validation.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/diff_semantic_comprehension_20260915/genuine_raw_evidence/fixture.json",
+      "sha256": "981fd27374974fd52aa5b6eca3d810ab2f5411615f1388502721e1a26bf6c997",
+      "size": 14063,
+      "source_path": ".work/dogfood/diff_semantic_comprehension_20260915/fixture.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/diff_semantic_comprehension_20260915/genuine_raw_evidence/run_stdout.txt",
+      "sha256": "2079f876e3cbd96cdec7c775c9694367a93ce640b1e6209bf442e6511a86ff85",
+      "size": 1824,
+      "source_path": ".work/dogfood/diff_semantic_comprehension_20260915/run_stdout.log"
+    },
+    {
+      "archive_path": "docs/reports/evidence/diff_semantic_comprehension_20260915/genuine_raw_evidence/trajectory.jsonl",
+      "sha256": "36274a9c81f12bfecc1d221464939f29da4907c88735eabd38ce4dbab2b0e46a",
+      "size": 5695,
+      "source_path": ".work/dogfood/diff_semantic_comprehension_20260915/run/trajectory.jsonl"
+    },
+    {
+      "archive_path": "docs/reports/evidence/diff_semantic_comprehension_20260915/genuine_raw_evidence/trajectory_summary.json",
+      "sha256": "2079f876e3cbd96cdec7c775c9694367a93ce640b1e6209bf442e6511a86ff85",
+      "size": 1824,
+      "source_path": ".work/dogfood/diff_semantic_comprehension_20260915/run/trajectory_summary.json"
+    }
+  ]
+}

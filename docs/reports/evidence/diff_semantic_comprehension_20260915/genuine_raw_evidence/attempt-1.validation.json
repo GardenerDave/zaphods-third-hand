@@ -1,0 +1,39 @@
+{
+  "acceptance_status": "not_reviewed",
+  "checks": [
+    {
+      "check_id": "json_parse",
+      "status": "passed"
+    },
+    {
+      "check_id": "reference_output_exact_match",
+      "status": "passed"
+    }
+  ],
+  "diagnostics": [],
+  "reference_facts": {
+    "expected_output": {
+      "call_sites_no_longer_serializing_full_payload": 2,
+      "new_helper_function_name": "_guidance_only_teacher_payload",
+      "new_module_constant_name": "_REFERENCE_BEARING_FIELDS",
+      "reference_bearing_field_count": 3,
+      "reference_still_preserved_in_teacher_records": true,
+      "summary_key_added": "teacher_intervention_mode",
+      "summary_value_added": "guidance_only"
+    }
+  },
+  "review_required": true,
+  "semantic_checks": [],
+  "structural_checks": [
+    {
+      "check_id": "json_parse",
+      "status": "passed"
+    },
+    {
+      "check_id": "reference_output_exact_match",
+      "status": "passed"
+    }
+  ],
+  "validation_status": "passed",
+  "validator": "deterministic_fixture_exact_match_v1"
+}
