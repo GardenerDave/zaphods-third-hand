@@ -1,0 +1,129 @@
+{
+  "attempt_count": 4,
+  "authority_boundaries": [
+    "Deterministic validation is authoritative.",
+    "Models cannot declare success.",
+    "No automatic prompt-patch promotion or training is performed.",
+    "No automatic queue insertion or invented work is performed.",
+    "All outputs remain review-required evidence."
+  ],
+  "candidate_curriculum_examples": [
+    {
+      "corrected_reference_output": {
+        "code_terminal_dispositions": [
+          "infrastructure_error",
+          "ready_for_review",
+          "unresolved"
+        ],
+        "code_value_absent_from_doc": "infrastructure_error",
+        "doc_external_failure_close_matches_code": false,
+        "doc_terminal_dispositions": [
+          "ready_for_review",
+          "unresolved"
+        ],
+        "external_infra_disposition": "infrastructure_error",
+        "idempotent_return_on_infrastructure_error": false,
+        "in_terminal_set": false,
+        "mismatch_summary": "The document names only ready_for_review and unresolved as terminal dispositions, but the code can also end a run in infrastructure_error, which is absent from the TERMINAL_DISPOSITIONS set, so a run ending in infrastructure_error is not treated as terminal on restart and is re-executed instead of skipped."
+      },
+      "intervention_id": "local_teacher:1",
+      "review_state": "ready_for_review",
+      "source": "local_teacher",
+      "subsequent_worker_result": "failed",
+      "teacher_attempt": 1
+    },
+    {
+      "corrected_reference_output": {
+        "code_terminal_dispositions": [
+          "infrastructure_error",
+          "ready_for_review",
+          "unresolved"
+        ],
+        "code_value_absent_from_doc": "infrastructure_error",
+        "doc_external_failure_close_matches_code": false,
+        "doc_terminal_dispositions": [
+          "ready_for_review",
+          "unresolved"
+        ],
+        "external_infra_disposition": "infrastructure_error",
+        "idempotent_return_on_infrastructure_error": false,
+        "in_terminal_set": false,
+        "mismatch_summary": "The document names only ready_for_review and unresolved as terminal dispositions, but the code can also end a run in infrastructure_error, which is absent from the TERMINAL_DISPOSITIONS set, so a run ending in infrastructure_error is not treated as terminal on restart and is re-executed instead of skipped."
+      },
+      "intervention_id": "local_teacher:2",
+      "review_state": "ready_for_review",
+      "source": "local_teacher",
+      "subsequent_worker_result": "failed",
+      "teacher_attempt": 2
+    }
+  ],
+  "candidate_prompt_patches": [],
+  "capability_verdict_available": false,
+  "disposition": "infrastructure_error",
+  "endpoint_alias": "JARVIS_LOCAL",
+  "external_escalation_count": 1,
+  "external_teacher_call_count": 1,
+  "external_teacher_infrastructure_failure": {
+    "adapter_identity": "codex-unconfigured",
+    "capability_verdict_available": false,
+    "classification": "external_teacher_infrastructure_error",
+    "completed_at": "2026-09-14T12:43:12.203670+00:00",
+    "error": "external teacher unavailable: ZTH_EXTERNAL_TEACHER_COMMAND is not configured",
+    "exit_code": null,
+    "resource_telemetry": {
+      "adapter_server_identity": null,
+      "cached_tokens": null,
+      "completion_tokens": null,
+      "elapsed_ms": 0.322,
+      "hardware_device_identity": null,
+      "model_identity": null,
+      "prompt_tokens": null,
+      "request_start_monotonic": 7267.67362154,
+      "response_capture_monotonic": 7267.673944013,
+      "role": "external_teacher",
+      "schema": "zth_resource_telemetry_v1",
+      "server_generation_ms": null,
+      "server_prompt_ms": null,
+      "timeout_seconds": 900,
+      "total_tokens": null,
+      "transport_classification": "external_teacher_infrastructure_error"
+    },
+    "response_present": false,
+    "schema": "zth_external_teacher_infrastructure_failure_v1",
+    "started_at": "2026-09-14T12:43:12.203335+00:00",
+    "stderr": "",
+    "timeout_seconds": 900
+  },
+  "first_attempt_pass": false,
+  "generated_at": "2026-09-14T12:43:12.204329+00:00",
+  "infrastructure_error_count": 0,
+  "intervention_attempts": {
+    "deterministic_patch_retry": false,
+    "existing_patch": false,
+    "external_teacher": false,
+    "local_teacher": true,
+    "none": true
+  },
+  "intervention_outcome": "not-applicable",
+  "local_teacher_model": "Qwen3.8-27B-UD-IQ4_XS.gguf",
+  "model_attempt_count": 4,
+  "pass": false,
+  "pass_after_existing_patch": false,
+  "pass_after_external_teacher_intervention": false,
+  "pass_after_local_teacher_intervention": false,
+  "patch_retry_attempted": false,
+  "patch_retry_failed": false,
+  "patch_retry_passed": false,
+  "review_state": "infrastructure_error",
+  "schema": "supervised_capability_trajectory_v2",
+  "successful_intervention_source": "none",
+  "task_family": "doc_code_reconciliation",
+  "task_id": "doc_code_terminal_disposition_mismatch_20260915",
+  "teacher_escalation_avoided": false,
+  "teacher_intervention_mode": "guidance_only",
+  "teacher_pass_count": 2,
+  "trajectory_artifact": "/tmp/zth_terminal_disposition_20260915/run/trajectory.jsonl",
+  "trials": 1,
+  "unresolved": false,
+  "worker_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf"
+}

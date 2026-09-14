@@ -1,0 +1,49 @@
+{
+  "acceptance_status": "not_reviewed",
+  "checks": [
+    {
+      "check_id": "json_parse",
+      "status": "passed"
+    },
+    {
+      "check_id": "reference_output_exact_match",
+      "status": "failed"
+    }
+  ],
+  "diagnostics": [
+    "Output does not equal the deterministic fixture reference output."
+  ],
+  "reference_facts": {
+    "expected_output": {
+      "code_terminal_dispositions": [
+        "infrastructure_error",
+        "ready_for_review",
+        "unresolved"
+      ],
+      "code_value_absent_from_doc": "infrastructure_error",
+      "doc_external_failure_close_matches_code": false,
+      "doc_terminal_dispositions": [
+        "ready_for_review",
+        "unresolved"
+      ],
+      "external_infra_disposition": "infrastructure_error",
+      "idempotent_return_on_infrastructure_error": false,
+      "in_terminal_set": false,
+      "mismatch_summary": "The document names only ready_for_review and unresolved as terminal dispositions, but the code can also end a run in infrastructure_error, which is absent from the TERMINAL_DISPOSITIONS set, so a run ending in infrastructure_error is not treated as terminal on restart and is re-executed instead of skipped."
+    }
+  },
+  "review_required": true,
+  "semantic_checks": [],
+  "structural_checks": [
+    {
+      "check_id": "json_parse",
+      "status": "passed"
+    },
+    {
+      "check_id": "reference_output_exact_match",
+      "status": "failed"
+    }
+  ],
+  "validation_status": "failed",
+  "validator": "deterministic_fixture_exact_match_v1"
+}

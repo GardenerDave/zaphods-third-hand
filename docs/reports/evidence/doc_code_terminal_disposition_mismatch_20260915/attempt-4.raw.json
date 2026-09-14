@@ -1,0 +1,83 @@
+{
+  "content": "{\n  \"doc_terminal_dispositions\": [\"ready_for_review\", \"unresolved\"],\n  \"code_terminal_dispositions\": [\"ready_for_review\", \"unresolved\"],\n  \"code_value_absent_from_doc\": \"unresolved\",\n  \"in_terminal_set\": true,\n  \"idempotent_return_on_infrastructure_error\": false,\n  \"external_infra_disposition\": \"unresolved\",\n  \"doc_external_failure_close_matches_code\": true,\n  \"mismatch_summary\": \"The document names 'unresolved' as a terminal disposition, but the code assigns it as a possible disposition. The mismatch results in the run being treated as terminal and skipped on restart.\"\n}",
+  "metadata": {
+    "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "endpoint_alias": "JARVIS_LOCAL",
+    "error": null,
+    "finish_reason": "stop",
+    "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "model_resolution_attempted": false,
+    "model_resolution_error": null,
+    "request_provenance": {
+      "api": "openai-chat",
+      "append_no_think": false,
+      "chat_template_kwargs": null,
+      "configured_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "endpoint_alias": "JARVIS_LOCAL",
+      "max_tokens": 768,
+      "message_structure": [
+        "system",
+        "user"
+      ],
+      "model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "prompt_byte_length": 8977,
+      "prompt_length": 8977,
+      "prompt_sha256": "3fd1fd403902bc188ecc2016dbd414049ad1129b025102dd19e2f6fd089436f8",
+      "raw_response_path": null,
+      "raw_response_sha256": "dc1616da255370e5fce8993530b6a6082c889ee5b15c6e98dcf2c4e4bd285743",
+      "request_body_length": 9541,
+      "request_body_sha256": "ed4f6b9cebc8a21f8d63801cacc918524d2ace887b492aa5cddfb168dab4cfed",
+      "request_start_monotonic": 7252.560990972,
+      "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "response_capture_monotonic": 7267.670187669,
+      "seed": null,
+      "stop": null,
+      "system_message_sha256": "e8c1a9955d1a830189fecdfd11c537896d95cddd0419d5a63d957dd6f0fcb6c7",
+      "temperature": 0.2,
+      "thinking_budget_tokens": null,
+      "top_p": null
+    },
+    "request_url": null,
+    "resolved_model": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "resource_telemetry": {
+      "adapter_server_identity": "JARVIS_LOCAL",
+      "cached_tokens": 2072,
+      "completion_tokens": 136,
+      "elapsed_ms": 15109.24,
+      "hardware_device_identity": null,
+      "model_identity": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "prompt_tokens": 2073,
+      "request_start_monotonic": 7252.560986357,
+      "response_capture_monotonic": 7267.670226693,
+      "role": "worker",
+      "schema": "zth_resource_telemetry_v1",
+      "server_generation_ms": 14928.093,
+      "server_prompt_ms": 160.027,
+      "timeout_seconds": 300,
+      "total_tokens": 2209,
+      "transport_classification": "model_response"
+    },
+    "status": "ok",
+    "timings": {
+      "cache_n": 2072,
+      "predicted_ms": 14928.093,
+      "predicted_n": 136,
+      "predicted_per_second": 9.110339813665416,
+      "predicted_per_token_ms": 109.76538970588236,
+      "prompt_ms": 160.027,
+      "prompt_n": 1,
+      "prompt_per_second": 6.248945490448487,
+      "prompt_per_token_ms": 160.027
+    },
+    "transport_classification": "model_response",
+    "usage": {
+      "completion_tokens": 136,
+      "prompt_tokens": 2073,
+      "prompt_tokens_details": {
+        "cached_tokens": 2072
+      },
+      "total_tokens": 2209
+    }
+  },
+  "status": "ok"
+}

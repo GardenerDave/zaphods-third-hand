@@ -1,0 +1,149 @@
+You are checking whether two current artifacts in the ZTH repository agree about
+which terminal dispositions a supervised capability-loop run can end in.
+Answer ONLY from the inlined excerpts below. Do not use any outside knowledge
+about the repository, its deployment, or any other file.
+
+EXCERPT A -- docs/SUPERVISED_CAPABILITY_LOOP.md, lines 24-44 (terminal-state
+prose and the durable-transition diagram):
+--- BEGIN EXCERPT A ---
+Each attempt and teacher response is appended to `trajectory.jsonl`, with raw
+artifact references, SHA-256 hashes, model identity, escalation level,
+deterministic verdict, teacher fields, review state, and available usage/timing
+metadata. Existing terminal summaries make a restart idempotent; prior failed
+artifacts are retained.
+
+Fixtures select either the simple `exact_json` validator or the
+`zth_output_contract` adapter, which delegates to the existing supervised ZTH
+output-contract validator. The model cannot select a validator. Model claims,
+teacher diagnoses, corrected references, and candidate patches are evidence
+only. A successful run is `ready_for_review`; exhausted or unavailable
+escalation is `unresolved`.
+
+Durable transitions are:
+
+```text
+worker_call_started -> worker_output_captured -> worker_output_validated
+  -> local_teacher_started -> local_teacher_response_captured
+  -> local_teacher_retry_completed
+  -> external_teacher_started -> external_teacher_response_captured
+  -> external_teacher_retry_completed -> ready_for_review | unresolved
+--- END EXCERPT A ---
+
+EXCERPT B -- docs/SUPERVISED_CAPABILITY_LOOP.md, lines 52-58 (the "External
+teacher boundary" paragraph):
+--- BEGIN EXCERPT B ---
+
+There is no built-in assumption about Codex authentication or shell UX. The
+external path is available only when the operator configures
+`ZTH_EXTERNAL_TEACHER_COMMAND` and, optionally,
+`ZTH_EXTERNAL_TEACHER_IDENTITY`. The command receives the teacher packet on
+stdin and must return JSON on stdout. Missing, empty, timed-out, or non-zero
+commands fail closed to `unresolved` and preserve the diagnostic.
+--- END EXCERPT B ---
+
+EXCERPT C -- local_harness/supervised_capability_loop.py, line 40:
+--- BEGIN EXCERPT C ---
+TERMINAL_DISPOSITIONS = {"ready_for_review", "unresolved"}
+--- END EXCERPT C ---
+
+EXCERPT D -- local_harness/supervised_capability_loop.py, lines 714-717
+(the restart idempotency check at the top of run_capability_loop):
+--- BEGIN EXCERPT D ---
+    if summary_path.exists():
+        summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        if summary.get("task_id") == task_id and summary.get("disposition") in TERMINAL_DISPOSITIONS:
+            return summary
+--- END EXCERPT D ---
+
+EXCERPT E -- local_harness/supervised_capability_loop.py, lines 741-755
+(the binding preflight terminal return):
+--- BEGIN EXCERPT E ---
+    if binding_preflight is not None:
+        if preflight_path.exists():
+            binding_preflight_result = json.loads(preflight_path.read_text(encoding="utf-8"))
+        else:
+            binding_preflight_result = binding_preflight()
+            _json_write(preflight_path, binding_preflight_result)
+        if binding_preflight_result.get("binding_status") != "VERIFIED":
+            disposition = "infrastructure_error"
+            summary = {
+                "schema": "supervised_capability_trajectory_v2",
+                "task_id": task_id,
+                "task_family": task["task_family"],
+                "endpoint_alias": os.environ.get("ZTH_PUBLIC_HOST_ALIAS", PUBLIC_ENDPOINT_ALIAS),
+                "capability_verdict_available": False,
+                "infrastructure_error_count": 1,
+--- END EXCERPT E ---
+
+EXCERPT F -- local_harness/supervised_capability_loop.py, lines 989-1009
+(final_pass, the external_infrastructure availability check, and the final
+disposition ternary):
+--- BEGIN EXCERPT F ---
+    final_pass = baseline_pass or existing_pass or patch_retry_passed or local_pass or external_pass
+    source = "none" if baseline_pass else "existing_patch" if existing_pass else "deterministic_patch_retry" if patch_retry_passed else "local_teacher" if local_pass else "external_teacher" if external_pass else "none"
+    intervention_attempts = {
+        source_name: any(a.get("intervention_source") == source_name for a in attempts)
+        for source_name in ("none", "existing_patch", "deterministic_patch_retry", "local_teacher", "external_teacher")
+    }
+    capability_verdict_available = any(a.get("transport_valid") for a in attempts) and external_infrastructure is None
+    infrastructure_error_count = sum(not a.get("transport_valid") for a in attempts)
+    intervention_outcome = "no-effect" if capability_verdict_available else "not-applicable"
+    if source != "none":
+        intervention_outcome = "helped" if final_pass else "no-effect"
+    candidate_examples = []
+    all_teachers = [*teacher_records, *([external_record] if external_record else [])]
+    for teacher in all_teachers:
+        if teacher.get("corrected_reference_output") is not None:
+            candidate_examples.append({"source": teacher.get("record_type"), "intervention_id": teacher.get("intervention_id"), "teacher_attempt": teacher.get("attempt"), "corrected_reference_output": teacher["corrected_reference_output"], "subsequent_worker_result": teacher.get("subsequent_worker_result", "not_run"), "review_state": "ready_for_review"})
+    candidate_patches = [t["candidate_prompt_patch"] for t in all_teachers if t.get("candidate_prompt_patch")]
+    router_route_trace_reference = _artifact_reference(out_dir / "route_trace.json", artifact="route_trace")
+    capability_plan_reference = _artifact_reference(out_dir / "capability_plan.json", artifact="capability_plan")
+    if not any(r.get("transition") in {"ready_for_review", "unresolved"} for r in _records(trajectory)):
+        disposition = "ready_for_review" if final_pass else "infrastructure_error" if external_infrastructure else "unresolved"
+--- END EXCERPT F ---
+
+Note on EXCERPT D: it is inside a function whose first line is
+"def run_capability_loop(...)" and whose body begins with
+"if max_worker_attempts < 1 or max_teacher_passes < 0:". The check on line
+716 tests whether a pre-existing summary is terminal and, if so, returns it.
+
+Answer these eight questions using only the excerpts:
+
+1. doc_terminal_dispositions (array of strings): list every distinct
+   disposition string that EXCERPT A explicitly names as a terminal state of a
+   run, in the order they are named across the prose and the diagram.
+2. code_terminal_dispositions (array of strings): list every distinct
+   disposition string that the code in EXCERPTS C through F assigns to a run's
+   terminal "disposition" field, sorted alphabetically.
+3. code_value_absent_from_doc (string): the single disposition string that
+   appears in the code's terminal dispositions (question 2) but is NOT named as
+   a terminal state in EXCERPT A.
+4. in_terminal_set (true or false): is the string from question 3 a member of
+   the set literal in EXCERPT C (TERMINAL_DISPOSITIONS)?
+5. idempotent_return_on_infrastructure_error (true or false): suppose the
+   summary file exists and its "disposition" value is the string from question
+   3. Does the check in EXCERPT D return the existing summary early (i.e. is the
+   run treated as terminal and skipped)?
+6. external_infra_disposition (string): per EXCERPT F, what is the exact
+   "disposition" string assigned when final_pass is false and
+   external_infrastructure is truthy (a non-None value)?
+7. doc_external_failure_close_matches_code (true or false): EXCERPT B says a
+   missing, empty, timed-out, or non-zero external teacher command "fails closed
+   to" a particular disposition. Does that disposition match what EXCERPT F
+   actually assigns for that same situation (an external-teacher
+   infrastructure failure)?
+8. mismatch_summary (string, one sentence): in one sentence, state the specific
+   mismatch between the terminal dispositions the document (EXCERPT A) says a run
+   can end in and the terminal dispositions the code (EXCERPTS C-F) can actually
+   produce, and the concrete operational consequence that follows for a run
+   ending in that disposition on restart.
+
+Output exactly one JSON object and nothing else, with exactly these keys:
+doc_terminal_dispositions, code_terminal_dispositions,
+code_value_absent_from_doc, in_terminal_set,
+idempotent_return_on_infrastructure_error, external_infra_disposition,
+doc_external_failure_close_matches_code, mismatch_summary.
+
+
+## Local teacher intervention
+{"candidate_patch_diagnostic": "patch must be a JSON object", "candidate_patch_status": "invalid_candidate", "failure_classification": "model_capability_insufficient", "retry_guidance": "reference_withheld: teacher guidance disclosed a hidden expected value and was withheld from the worker", "teacher_diagnosis": "reference_withheld: teacher guidance disclosed a hidden expected value and was withheld from the worker", "teacher_parse_status": "passed"}
