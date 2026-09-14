@@ -186,3 +186,64 @@ def test_cli_verified_only_filters_unverified_workers(capsys):
     payload = json.loads(capsys.readouterr().out)
     assert payload["schema"] == "zth_local_fleet_snapshot_verified_workers_v1"
     assert [worker["worker"] for worker in payload["workers"]] == ["router"]
+
+
+def test_middle_tier_ladder_worker_slot_9b_teacher_slot_27b_both_verified():
+    # 1.7B -> 9B -> 27B must stay expressible through the existing role slots:
+    # the worker slot takes the registered 9B (registry defaults, no env URL/model)
+    # and the teacher slot takes the 27B. No new routing mechanism is introduced.
+    snapshot = collect_local_fleet_snapshot(
+        opener=_opener_factory([
+            FakeResponse({"data": [{"id": "qwen3.5-9b-claude-4.6-opus-reasoning-distilled"}]}),
+            FakeResponse({"data": [{"id": "Qwen3.8-27B-UD-IQ4_XS.gguf"}]}),
+        ]),
+        env={
+            "ZTH_CAPABILITY_WORKER_NAME": "qwen3_5_9b_rx580",
+            "ZTH_CAPABILITY_TEACHER_NAME": "qwen3_8_27b",
+            "ZTH_CAPABILITY_TEACHER_BASE_URL": "http://192.168.56.1:8080/v1",
+            "ZTH_CAPABILITY_TEACHER_MODEL": "Qwen3.8-27B-UD-IQ4_XS.gguf",
+        },
+    )
+    assert [worker["worker"] for worker in snapshot["workers"]] == ["qwen3_5_9b_rx580", "qwen3_8_27b"]
+    for worker in snapshot["workers"]:
+        assert worker["binding_status"] == "VERIFIED"
+        assert worker["availability"] == "AVAILABLE"
+    nine_b = snapshot["workers"][0]
+    assert nine_b["configured_base_url"] == "http://192.168.56.1:1234/v1"
+    assert nine_b["expected_model"] == "qwen3.5-9b-claude-4.6-opus-reasoning-distilled"
+    assert [worker["worker"] for worker in verified_workers(snapshot)] == ["qwen3_5_9b_rx580", "qwen3_8_27b"]
+
+
+def test_middle_tier_ladder_router_1p7b_worker_9b_teacher_both_verified():
+    # The 1.7B-first research behavior stays intact: router slot with the 1.7B
+    # gguf endpoint, and the 9B promoted into the teacher slot (registry defaults).
+    snapshot = collect_local_fleet_snapshot(
+        opener=_opener_factory([
+            FakeResponse({"data": [{"id": "Qwen_Qwen3-1.7B-Q4_K_M.gguf"}]}),
+            FakeResponse({"data": [{"id": "qwen3.5-9b-claude-4.6-opus-reasoning-distilled"}]}),
+        ]),
+        env={
+            "ZTH_CAPABILITY_WORKER_NAME": "router",
+            "ZTH_CAPABILITY_WORKER_BASE_URL": "http://127.0.0.1:8081/v1",
+            "ZTH_CAPABILITY_WORKER_MODEL": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+            "ZTH_CAPABILITY_TEACHER_NAME": "qwen3_5_9b_rx580",
+        },
+    )
+    assert [worker["worker"] for worker in snapshot["workers"]] == ["router", "qwen3_5_9b_rx580"]
+    for worker in snapshot["workers"]:
+        assert worker["binding_status"] == "VERIFIED"
+        assert worker["availability"] == "AVAILABLE"
+    assert [worker["worker"] for worker in verified_workers(snapshot)] == ["router", "qwen3_5_9b_rx580"]
+
+
+def test_9b_wrong_advertised_model_remains_unverified():
+    snapshot = collect_local_fleet_snapshot(
+        opener=_opener_factory([FakeResponse({"data": [{"id": "some-other-model"}]})]),
+        env={"ZTH_CAPABILITY_WORKER_NAME": "qwen3_5_9b_rx580"},
+    )
+    worker = snapshot["workers"][0]
+    assert worker["worker"] == "qwen3_5_9b_rx580"
+    assert worker["expected_model"] == "qwen3.5-9b-claude-4.6-opus-reasoning-distilled"
+    assert worker["binding_status"] == "UNVERIFIED"
+    assert worker["failure_class"] == "expected_model_not_advertised"
+    assert verified_workers(snapshot) == []

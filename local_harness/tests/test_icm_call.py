@@ -127,6 +127,72 @@ class IcmCallTests(unittest.TestCase):
         self.assertIsNone(spec.request_policy_name)
         self.assertIsNone(spec.request_policy)
 
+    def test_qwen35_9b_rx580_is_registered_with_verified_binding(self):
+        # Registration: the RX580-hosted 9B model is a distinct fleet worker bound to
+        # the verified live endpoint and advertised model name. No scattered
+        # endpoint/model literals may replace this entry.
+        entry = icm_call.DEFAULT_WORKERS["qwen3_5_9b_rx580"]
+
+        self.assertEqual("openai-chat", entry["api"])
+        self.assertEqual("http://192.168.56.1:1234/v1", entry["base_url"])
+        self.assertEqual("qwen3.5-9b-claude-4.6-opus-reasoning-distilled", entry["model"])
+
+    def test_qwen35_9b_rx580_resolves_to_routine_policy_without_env(self):
+        # Smallest observed contract: only a 2048 token budget is known to work on this
+        # host (512 exhausted in hidden reasoning before visible output). No 27B policy
+        # controls (reasoning_effort / thinking_budget_tokens) are observed working
+        # here, so none are registered; the routine footgun-guard default must bind.
+        spec = icm_call.resolve_worker_spec("qwen3_5_9b_rx580")
+
+        self.assertEqual("qwen3_5_9b_rx580", spec.name)
+        self.assertEqual("openai-chat", spec.api)
+        self.assertEqual("http://192.168.56.1:1234/v1", spec.base_url)
+        self.assertEqual("qwen3.5-9b-claude-4.6-opus-reasoning-distilled", spec.model)
+        self.assertEqual("routine", spec.request_policy_name)
+        self.assertEqual({"max_tokens": 2048}, dict(spec.request_policy))
+        self.assertNotIn("chat_template_kwargs", spec.request_policy)
+        self.assertNotIn("thinking_budget_tokens", spec.request_policy)
+        self.assertFalse(spec.append_no_think)
+
+    def test_qwen35_9b_rx580_env_model_and_base_url_overrides_apply(self):
+        # Operator env overrides follow the same ICM_<WORKER>_* convention as every
+        # other worker and beat the registry binding.
+        with patch.dict(
+            os.environ,
+            {
+                "ICM_QWEN3_5_9B_RX580_BASE_URL": "http://10.0.0.9:1234/v1",
+                "ICM_QWEN3_5_9B_RX580_MODEL": "alt-9b-model",
+            },
+        ):
+            spec = icm_call.resolve_worker_spec("qwen3_5_9b_rx580")
+
+        self.assertEqual("http://10.0.0.9:1234/v1", spec.base_url)
+        self.assertEqual("alt-9b-model", spec.model)
+        self.assertEqual("routine", spec.request_policy_name)
+        self.assertEqual(2048, spec.request_policy["max_tokens"])
+
+    def test_qwen35_9b_rx580_env_unknown_request_policy_still_raises(self):
+        # The routine default must not mask an invalid operator env override, and no
+        # unobserved policy controls exist for this worker to override to.
+        with patch.dict(os.environ, {"ICM_QWEN3_5_9B_RX580_REQUEST_POLICY": "does-not-exist"}):
+            with self.assertRaises(KeyError):
+                icm_call.resolve_worker_spec("qwen3_5_9b_rx580")
+
+    def test_qwen35_9b_rx580_explicit_worker_slot_args_win_over_registry(self):
+        # The supervised-loop worker slot selects the 9B baseline by registry name plus
+        # explicit base_url/model args (the run3 pattern); args must beat the registry
+        # defaults while the routine policy stays bound.
+        spec = icm_call.resolve_worker_spec(
+            "qwen3_5_9b_rx580",
+            base_url="http://192.168.56.1:1234/v1",
+            model="qwen3.5-9b-claude-4.6-opus-reasoning-distilled",
+        )
+
+        self.assertEqual("http://192.168.56.1:1234/v1", spec.base_url)
+        self.assertEqual("qwen3.5-9b-claude-4.6-opus-reasoning-distilled", spec.model)
+        self.assertEqual("routine", spec.request_policy_name)
+        self.assertEqual(2048, spec.request_policy["max_tokens"])
+
     def test_render_request_payload_keeps_reasoning_and_output_budgets_distinct(self):
         spec = icm_call.resolve_worker_spec("qwen3_8_27b", request_policy_name="serious")
         _, payload, _, _, provenance = icm_call._render_request_payload(spec, "Explain the fix.", 1536, model=spec.model)
@@ -226,6 +292,102 @@ class IcmCallTests(unittest.TestCase):
         self.assertEqual(1024, body["max_tokens"])
         self.assertEqual({"reasoning_effort": "low"}, response.request_provenance["chat_template_kwargs"])
         self.assertEqual(256, response.request_provenance["thinking_budget_tokens"])
+
+    def test_call_worker_qwen35_9b_rx580_binds_observed_contract_and_provenance(self):
+        # The 9B request carries exactly the observed contract: the distilled model
+        # name, the caller-supplied 2048 budget (matching the routine policy), and NO
+        # unobserved controls (chat_template_kwargs / thinking_budget_tokens) in the
+        # body or the provenance. `reasoning_content` must survive in the raw response
+        # for provenance even when visible content is present.
+        payload = {
+            "model": "qwen3.5-9b-claude-4.6-opus-reasoning-distilled",
+            "choices": [
+                {
+                    "finish_reason": "stop",
+                    "message": {
+                        "role": "assistant",
+                        "content": "ok",
+                        "reasoning_content": "hidden reasoning trace",
+                    },
+                }
+            ],
+            "usage": {"prompt_tokens": 10, "completion_tokens": 1},
+        }
+        captured: dict[str, bytes] = {}
+
+        def fake_urlopen(request, timeout=30):
+            captured["url"] = request.full_url
+            captured["body"] = request.data
+            return FakeHTTPResponse(payload)
+
+        with patch.object(icm_call.urllib.request, "urlopen", side_effect=fake_urlopen):
+            response = icm_call.call_worker(
+                icm_call.resolve_worker_spec("qwen3_5_9b_rx580"),
+                "Reply with exactly: ok",
+                max_tokens=2048,
+            )
+
+        body = json.loads(captured["body"].decode("utf-8"))
+        self.assertEqual("http://192.168.56.1:1234/v1/chat/completions", captured["url"])
+        self.assertEqual("qwen3.5-9b-claude-4.6-opus-reasoning-distilled", body["model"])
+        self.assertEqual(2048, body["max_tokens"])
+        self.assertNotIn("chat_template_kwargs", body)
+        self.assertNotIn("thinking_budget_tokens", body)
+        self.assertEqual("ok", response.status)
+        self.assertEqual("ok", response.content)
+        self.assertEqual("stop", response.finish_reason)
+        self.assertEqual("qwen3.5-9b-claude-4.6-opus-reasoning-distilled", response.model)
+        self.assertEqual("qwen3.5-9b-claude-4.6-opus-reasoning-distilled", response.configured_model)
+        self.assertEqual(
+            "hidden reasoning trace",
+            response.raw_response["choices"][0]["message"]["reasoning_content"],
+        )
+        self.assertEqual(
+            "qwen3.5-9b-claude-4.6-opus-reasoning-distilled",
+            response.request_provenance["model"],
+        )
+        self.assertEqual(2048, response.request_provenance["max_tokens"])
+        self.assertIsNone(response.request_provenance["chat_template_kwargs"])
+        self.assertIsNone(response.request_provenance["thinking_budget_tokens"])
+        self.assertFalse(response.request_provenance["append_no_think"])
+        self.assertEqual("model_response", response.metadata()["transport_classification"])
+
+    def test_call_worker_qwen35_9b_rx580_reasoning_only_preserves_provenance(self):
+        # When the 2048 budget is exhausted in hidden reasoning, the visible content is
+        # empty and the response classifies as model_response (reasoning_only) with the
+        # reasoning trace preserved for provenance.
+        payload = {
+            "model": "qwen3.5-9b-claude-4.6-opus-reasoning-distilled",
+            "choices": [
+                {
+                    "finish_reason": "length",
+                    "message": {
+                        "role": "assistant",
+                        "content": "",
+                        "reasoning_content": "hidden reasoning that consumed the budget",
+                    },
+                }
+            ],
+            "usage": {"prompt_tokens": 10, "completion_tokens": 2048},
+        }
+        with patch.object(
+            icm_call.urllib.request,
+            "urlopen",
+            return_value=FakeHTTPResponse(payload),
+        ):
+            response = icm_call.call_worker(
+                icm_call.resolve_worker_spec("qwen3_5_9b_rx580"),
+                "Reply with exactly: ok",
+                max_tokens=2048,
+            )
+
+        self.assertEqual("reasoning_only", response.status)
+        self.assertEqual("length", response.finish_reason)
+        self.assertIn(
+            "hidden reasoning that consumed the budget",
+            response.raw_response["choices"][0]["message"]["reasoning_content"],
+        )
+        self.assertEqual("model_response", response.metadata()["transport_classification"])
 
     def test_main_writes_request_intent_before_transport(self):
         payload = {

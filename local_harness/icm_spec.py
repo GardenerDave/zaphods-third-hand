@@ -57,6 +57,21 @@ DEFAULT_WORKERS: dict[str, dict[str, Any]] = {
             },
         },
     },
+    # RX580-hosted 9B middle-tier local worker. Registered from live observation only:
+    # a 512-token budget exhausts in hidden reasoning before visible output, so the
+    # routine policy sets a 2048 max_tokens floor; `reasoning_content` is exposed and
+    # preserved (no /no_think). No `reasoning_effort` or `thinking_budget_tokens`
+    # controls are registered because none were observed working on this host.
+    "qwen3_5_9b_rx580": {
+        "api": "openai-chat",
+        "base_url": "http://192.168.56.1:1234/v1",
+        "model": "qwen3.5-9b-claude-4.6-opus-reasoning-distilled",
+        "request_policies": {
+            "routine": {
+                "max_tokens": 2048,
+            },
+        },
+    },
 }
 
 OPENAI_CHAT = "openai-chat"
