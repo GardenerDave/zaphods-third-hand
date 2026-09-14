@@ -1,0 +1,88 @@
+{
+  "parsed": {
+    "teacher_parse_status": "passed"
+  },
+  "raw": {
+    "content": "[reasoning_content only]\nWe need answer user's request. Need produce JSON only with allowed fields: failure_classification, teacher_diagnosis, candidate_prompt_patch, retry_guidance, corrected_reference_output. Need diagnose bounded worker failure from provided failed transitions. Need not claim success or acceptance. Need likely include corrected_reference_output exact expected object. Need maybe candidate_prompt_patch review-only. Need ensure JSON only, no markdown. Need think through details.\n\nWe have task: four statements S1-S4, evidence. Expected output from validation: S1 superseded, S2 superseded, S3 current, S4 current, pivotal_commit 47cf409. Worker outputs:\nattempt1: S1 superseded, S2 current, S3 superseded, S4 superseded, pivotal 002a1b7.\nattempt2: S1 superseded, S2 current, S3 superseded, S4 current, pivotal 002a1b7.\nattempt3 after local teacher prompt: S1 superseded, S2 current, S3 superseded, S4 superseded, pivotal 7c68f2b.\nTeacher previous attempt was reasoning_only due length, no final JSON. Need now produce final JSON.\n\nNeed classify failure. Could be \"semantic_exact_match_failure\" or \"model_semantic_misclassification\". Need maybe include that worker consistently misassigns S2/S3 and pivotal. Need explain: S2 superseded because 002a1b7 reclassifies as invalid capability test/insufficient evidence packaging, not capability boundary. S3 current because 7c68f2b documents non-reproduction under current HEAD after reference leak stripped. S4 current because 002a1b7 latest reclassification. S1 superseded because 47cf409/7c68f2b invalidate durable rescue framing. Pivotal invariant 47cf409 because it changed prompt builder to stop carrying corrected_reference_output into worker retry prompt, making earlier rescue non-reproducible. 002a1b7 is later reclassification, not pivotal invariant; 7c68f2b documents non-reproduction but pivotal invariant is builder change.\n\nNeed candidate_prompt_patch. Should be review-only, maybe a string to append to worker prompt. Need avoid leaking expected answer? The prompt patch can include guidance but maybe not exact answer? It can include corrected_reference_output? The allowed field corrected_reference_output can contain expected output. Candidate prompt patch should not automatically promote. Could propose adding a section: \"Decision rules: A statement is current only if the latest dated evidence still supports it and no later evidence invalidates it. A statement is superseded if later evidence invalidates or replaces it. For pivotal_commit, choose the commit that changed the invariant that made the earlier rescue non-reproducible, not the latest reclassification or documentation commit. In this fixture, the invariant change is the prompt-builder change that stops carrying the teacher's corrected_reference_output into the worker retry prompt.\" But if we include \"In this fixture\" maybe too specific? It's okay review-only. But maybe candidate prompt patch should be generic enough. Need maybe include exact insertion text. Could be:\n\"Append to the worker prompt after OUTPUT REQUIREMENT:\nDECISION RULES:\n1. Use only the dated evidence. The latest dated evidence controls unless it only documents a consequence of an earlier invariant change.\n2. Mark a statement current only if it remains the authoritative position after all later evidence. Mark it superseded if later evidence invalidates or replaces it.\n3. The pivotal invariant is the commit that changed the mechanism that made the earlier rescue position no longer reproducible. Do not select a later reclassification, documentation, or non-reproduction commit unless it itself changed that mechanism.\n4. If a later commit reclassifies the run as an invalid capability test, that reclassification supersedes any earlier capability-boundary claim, but it is not automatically the pivotal invariant.\"\nThis is good. But maybe include \"Do not output markdown\". Already in prompt.\n\nNeed retry_guidance. Could be string or list. Allowed fields no schema. Use string maybe. Need review-only, no automatic queue insertion. \"Retry the same deterministic fixture with exact_json validator and the corrected_reference_output as the expected reference. Do not accept near matches. If the same model still fails, keep the attempt as review-required evidence and escalate to a larger model or manual review; do not auto-promote the patch.\" Need maybe mention temperature? Could say keep temperature 0.2, max_tokens enough. But no invented work. Could say \"Use the candidate_prompt_patch only after human review; do not auto-promote.\" Good.\n\nNeed corrected_reference_output. Should be object exactly expected: {\"S1\":\"superseded\",\"S2\":\"superseded\",\"S3\":\"current\",\"S4\":\"current\",\"pivotal_commit\":\"47cf409\"}.\n\nNeed ensure JSON valid. Fields strings except corrected_reference_output object. Could include candidate_prompt_patch as string with newlines escaped. Need no trailing commas. Need maybe failure_classification string. Need maybe teacher_diagnosis string. Need maybe retry_guidance string.\n\nNeed consider authority: deterministic validation authoritative, models cannot declare success. So don't say \"will pass\". Use \"expected reference\" not success. \"review-required\". Good.\n\nNeed maybe include \"candidate_prompt_patch\" as null? But likely should propose. Need ensure no extra fields. Only allowed fields. Could include all five.\n\nNeed think if corrected_reference_output should be string? The task output contract required fields S1... The allowed field corrected_reference_output likely should be the corrected output object. In previous teacher reasoning considered object. Use object.\n\nNeed maybe include \"failure_classification\": \"",
+    "metadata": {
+      "configured_model": "Qwen3.8-27B-UD-IQ4_XS.gguf",
+      "endpoint_alias": "JARVIS_LOCAL",
+      "error": null,
+      "finish_reason": "length",
+      "model": "Qwen3.8-27B-UD-IQ4_XS.gguf",
+      "model_resolution_attempted": false,
+      "model_resolution_error": null,
+      "request_provenance": {
+        "api": "openai-chat",
+        "append_no_think": false,
+        "chat_template_kwargs": null,
+        "configured_model": "Qwen3.8-27B-UD-IQ4_XS.gguf",
+        "endpoint_alias": "JARVIS_LOCAL",
+        "max_tokens": 1200,
+        "message_structure": [
+          "system",
+          "user"
+        ],
+        "model": "Qwen3.8-27B-UD-IQ4_XS.gguf",
+        "prompt_byte_length": 20671,
+        "prompt_length": 20671,
+        "prompt_sha256": "d59fb6d30988ae2f824f7f4be16023b34f4848f11adc58fd81a724d7a4de2533",
+        "raw_response_path": null,
+        "raw_response_sha256": "a26799124cc37c477778f30477f1de7e1343d5e5e6c0e5801afa320060362aeb",
+        "request_body_length": 22355,
+        "request_body_sha256": "2ca6e7f43bd505dd5692eb10311d896a5c32a658ca2dfe6fa459ce2b44f1784f",
+        "request_start_monotonic": 2088.870397847,
+        "resolved_model": "Qwen3.8-27B-UD-IQ4_XS.gguf",
+        "response_capture_monotonic": 2145.023774665,
+        "seed": null,
+        "stop": null,
+        "system_message_sha256": "e8c1a9955d1a830189fecdfd11c537896d95cddd0419d5a63d957dd6f0fcb6c7",
+        "temperature": 0.2,
+        "thinking_budget_tokens": null,
+        "top_p": null
+      },
+      "request_url": null,
+      "resolved_model": "Qwen3.8-27B-UD-IQ4_XS.gguf",
+      "resource_telemetry": {
+        "adapter_server_identity": "JARVIS_LOCAL",
+        "cached_tokens": 58,
+        "completion_tokens": 1200,
+        "elapsed_ms": 56153.547,
+        "hardware_device_identity": null,
+        "model_identity": "Qwen3.8-27B-UD-IQ4_XS.gguf",
+        "prompt_tokens": 7265,
+        "request_start_monotonic": 2088.870274367,
+        "response_capture_monotonic": 2145.023821222,
+        "role": "local_teacher",
+        "schema": "zth_resource_telemetry_v1",
+        "server_generation_ms": 44283.679,
+        "server_prompt_ms": 11785.321,
+        "timeout_seconds": 300,
+        "total_tokens": 8465,
+        "transport_classification": "model_response"
+      },
+      "status": "reasoning_only",
+      "timings": {
+        "cache_n": 58,
+        "predicted_ms": 44283.679,
+        "predicted_n": 1200,
+        "predicted_per_second": 27.098019566079863,
+        "predicted_per_token_ms": 36.90306583333333,
+        "prompt_ms": 11785.321,
+        "prompt_n": 7207,
+        "prompt_per_second": 611.5234366548013,
+        "prompt_per_token_ms": 1.6352603024836965
+      },
+      "transport_classification": "model_response",
+      "usage": {
+        "completion_tokens": 1200,
+        "prompt_tokens": 7265,
+        "prompt_tokens_details": {
+          "cached_tokens": 58
+        },
+        "total_tokens": 8465
+      }
+    },
+    "status": "reasoning_only"
+  }
+}

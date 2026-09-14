@@ -700,21 +700,23 @@ def test_qwen38_worker_request_provenance_carries_bounded_reasoning_policy():
 
 
 def test_qwen38_teacher_request_policy_env_override_binds_bounded_reasoning(monkeypatch: pytest.MonkeyPatch):
-    # Mirrors the loop's teacher wiring (supervised_capability_loop.py:495-496):
+    # Mirrors the loop's teacher wiring (supervised_capability_loop.py):
     # resolve_worker_spec(name, base_url=..., model=...) with NO request_policy_name,
-    # so the policy can only arrive via the ICM_QWEN3_8_27B_REQUEST_POLICY env var.
+    # so the policy arrives via the `routine` default or the ICM_QWEN3_8_27B_REQUEST_POLICY env var.
     base_url = "http://192.168.137.3:8080/v1"
     model = "Qwen3.8-27B-UD-IQ4_XS.gguf"
 
-    # (a) Dogfood root cause: env UNSET -> no policy -> unbounded reasoning.
+    # (a) Dogfood fix: env UNSET -> defaults to the `routine` policy -> bounded reasoning.
+    # The loop's plain resolve_worker_spec(name, base_url=..., model=...) teacher wiring
+    # can no longer silently fall back to an unbounded no-policy request.
     monkeypatch.delenv("ICM_QWEN3_8_27B_REQUEST_POLICY", raising=False)
     spec = resolve_worker_spec("qwen3_8_27b", base_url=base_url, model=model)
-    assert spec.request_policy_name is None
-    assert spec.request_policy is None
+    assert spec.request_policy_name == "routine"
+    assert spec.request_policy["thinking_budget_tokens"] == 256
     _, payload, _, actual_prompt, provenance = _render_request_payload(spec, "Explain the failure.", 1200, model=model)
-    assert payload.get("thinking_budget_tokens") is None
-    assert provenance["thinking_budget_tokens"] is None
-    assert provenance["chat_template_kwargs"] is None
+    assert payload["thinking_budget_tokens"] == 256
+    assert provenance["thinking_budget_tokens"] == 256
+    assert provenance["chat_template_kwargs"] == {"reasoning_effort": "low"}
     assert provenance["append_no_think"] is False
     assert provenance["max_tokens"] == 1200
     assert "/no_think" not in actual_prompt

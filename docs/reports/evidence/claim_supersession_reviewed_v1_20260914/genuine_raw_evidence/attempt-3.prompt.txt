@@ -1,0 +1,27 @@
+You are given four dated position statements (S1..S4) about the terminal status of one specific dogfood run in this repository, plus a factual evidence block describing what later commits actually changed.
+
+Using ONLY the evidence below, decide for each statement whether it is CURRENT (still the authoritative position as of the latest dated evidence) or SUPERSEDED (an earlier position that later evidence has invalidated or replaced). Then name the single commit that is the pivotal invariant, meaning the change that makes the earlier 'rescue' position no longer reproducible.
+
+Do not use any knowledge outside the evidence block. Do not invent facts.
+
+POSITION STATEMENTS:
+S1 (2026-09-12): "This rerun is a durable 27B-guidance rescue: a correctly-configured 27B local teacher rescues a subsequent 1.7B worker attempt, and the terminal disposition is a genuine ready_for_review rescue."
+S2 (2026-09-12): "The 1.7B worker's failure on this run is a genuine capability boundary for multi-source reconciliation, specifically a counting or grounding error."
+S3 (2026-09-13): "The 2026-09-12 'rescue' pass is a pre-invariant teacher-reference echo and does not reproduce under the current HEAD."
+S4 (2026-09-13): "This run is an 'invalid capability test / insufficient evidence packaging' outcome, not a 1.7B capability verdict."
+
+FACTUAL EVIDENCE (what the commits actually changed, in chronological order):
+- 5b72d43 (2026-09-12 08:59): produced the original closeout that framed the run as a 27B rescue.
+- 47cf409 (2026-09-12 11:16): changed the prompt builder so the teacher's corrected_reference_output is no longer carried into the worker retry prompt; only answer-free guidance is allowed. The earlier pass existed only because the pre-47cf409 builder leaked the reference into the worker retry prompt, which the 1.7B then echoed.
+- 7c68f2b (2026-09-13 07:08): documented that under the current HEAD the same fixture plus same teacher does not reproduce a pass, because the reference leak is stripped.
+- 002a1b7 (2026-09-13 07:30): reclassified the run. The worker in this run was a toolless pure-LLM call handed only a filesystem path, not the file contents, so the run cannot establish a 1.7B multi-source-reconciliation capability boundary; the observed hallucinated file counts are recorded but do not prove the 1.7B would fail if given the actual files.
+
+OUTPUT REQUIREMENT: Respond with ONLY a single valid JSON object, no markdown fences, no commentary. It must have exactly these keys:
+- "S1": "current" or "superseded"
+- "S2": "current" or "superseded"
+- "S3": "current" or "superseded"
+- "S4": "current" or "superseded"
+- "pivotal_commit": the 7-character commit SHA that is the pivotal invariant
+
+## Local teacher intervention
+{"teacher_parse_status": "passed"}

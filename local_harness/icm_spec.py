@@ -164,6 +164,15 @@ def resolve_worker_spec(
     final_only: bool = False,
     request_policy_name: str | None = None,
 ) -> WorkerSpec:
+    """Resolve a worker spec, binding request settings and the request policy.
+
+    Request-policy precedence: explicit `request_policy_name` arg >
+    `ICM_<WORKER>_REQUEST_POLICY` env override > the worker's `routine` policy.
+    Policy-capable workers (those whose defaults define a `routine` request policy,
+    e.g. `qwen3_8_27b`) therefore never resolve to an unbounded no-policy request
+    when neither an arg nor the env var is set. Legacy workers without
+    `request_policies` (e.g. `handoff`) stay policy-less.
+    """
     if worker_name not in DEFAULT_WORKERS:
         raise KeyError(f"Unknown worker: {worker_name}")
 
@@ -177,6 +186,14 @@ def resolve_worker_spec(
     append_no_think = final_only or bool(defaults.get("append_no_think"))
     policies = defaults.get("request_policies")
     resolved_request_policy_name = request_policy_name or env_override(worker_name, "REQUEST_POLICY")
+    # Footgun guard: a policy-capable worker invoked without an explicit policy name or
+    # `ICM_<WORKER>_REQUEST_POLICY` env override must not silently fall back to an
+    # unbounded no-policy request. Default to the `routine` policy (bounded reasoning +
+    # token caps) when the worker advertises one, so a plain resolve_worker_spec(name)
+    # call cannot run unqualified. Precedence: explicit arg > env var > routine.
+    # Legacy workers without `request_policies` (e.g. `handoff`) stay policy-less.
+    if resolved_request_policy_name is None and "routine" in (defaults.get("request_policies") or {}):
+        resolved_request_policy_name = "routine"
     resolved_request_policy: Mapping[str, Any] | None = None
     if resolved_request_policy_name is not None:
         if not isinstance(policies, Mapping) or resolved_request_policy_name not in policies:

@@ -1,0 +1,146 @@
+{
+  "schema": "zth_evidence_archive_v1",
+  "topic": "claim_supersession_reviewed_v1_20260914",
+  "date": "20260914",
+  "note": "Durable, tracked preservation of one genuine bounded ZTH supervised-capability-loop run of the reviewed_v1 current-vs-superseded (temporal-reconciliation) task. The 1.7B worker produced well-formed exact_json on all four attempts (4/4 valid JSON) and matched the expected answer on none (0/4 exact): S1 superseded correct every time; S2 current (expected superseded); S3 superseded (expected current); S4 flipped; pivotal_commit never the invariant-establishing 47cf409 (worker chose 002a1b7 then 7c68f2b). The genuine temporal/causal reconciliation weakness is preserved verbatim in genuine_raw_evidence. The two 27B local-teacher artifacts (local-teacher-{1,2}.json) are reclassified in README.md from a model-capability failure to a CONFIG/OMISSION failure: the loop invoked the teacher with no request_policy_name and ICM_QWEN3_8_27B_REQUEST_POLICY unset, so resolve_worker_spec resolved resolved_request_policy_name=None and bound no policy (request_provenance shows thinking_budget_tokens:null, chat_template_kwargs:null). Unbounded reasoning then consumed the whole 1200-token max_tokens budget in the reasoning channel (finish_reason:length, status:reasoning_only, completion_tokens:1200), truncating the structured JSON; the 27B reasoning channel nonetheless derived the correct pivotal commit 47cf409, so the model was capable and the request configuration was not. Fixed by the default-routine guard in icm_spec.py:resolve_worker_spec (explicit arg > env var > routine). Terminal review state is infrastructure_error (external teacher unconfigured: ZTH_EXTERNAL_TEACHER_COMMAND not set), which masked the worker verdict and is not a model verdict. See README.md and genuine_raw_evidence/NOTE.md.",
+  "entries": [
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/fixture.json",
+      "sha256": "674332a7b531d3db7f0910d2e62e27e57fb79d0c9e3ec9039f93076387f793a1",
+      "size": 3242,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/fixture.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/attempt-1.metadata.json",
+      "sha256": "539e09386e96b1f777b45d19cbb9f41c16ab212ac94c658b616c351031fd94d4",
+      "size": 1618,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/attempt-1.metadata.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/attempt-1.prompt.txt",
+      "sha256": "bc35f7d2be3d7d171c33888805891069db953a040c6fb87ff831e0389630dfd3",
+      "size": 2713,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/attempt-1.prompt.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/attempt-1.raw.json",
+      "sha256": "1fcccf4125d37d7c201cf5928b06864f3cbd08f0ea53603a19e3f9b1cf9367db",
+      "size": 2949,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/attempt-1.raw.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/attempt-1.validation.json",
+      "sha256": "680f7f955b76a50d6b259680d1df25740297ce31411f1570fbe53a1a2297e41b",
+      "size": 832,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/attempt-1.validation.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/attempt-2.metadata.json",
+      "sha256": "988c22fe6d38afb9f425ab4c810e2a55dc8b039edd52a48def8330b4ceb54ea8",
+      "size": 1618,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/attempt-2.metadata.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/attempt-2.prompt.txt",
+      "sha256": "bc35f7d2be3d7d171c33888805891069db953a040c6fb87ff831e0389630dfd3",
+      "size": 2713,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/attempt-2.prompt.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/attempt-2.raw.json",
+      "sha256": "81b200b44ef643174900abdcdbc1cfd5162a92fb3c37a10c464ea32d03ebfc6a",
+      "size": 2935,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/attempt-2.raw.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/attempt-2.validation.json",
+      "sha256": "680f7f955b76a50d6b259680d1df25740297ce31411f1570fbe53a1a2297e41b",
+      "size": 832,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/attempt-2.validation.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/attempt-3.metadata.json",
+      "sha256": "9939792ab5c603eef10eaf234222c2ea622b2f2b3e96abaece8a75d1b9ea39eb",
+      "size": 1636,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/attempt-3.metadata.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/attempt-3.prompt.txt",
+      "sha256": "74ca6cca7302f759ab807ea68f62a2525feb45ac29df30ed9468a91387f19837",
+      "size": 2779,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/attempt-3.prompt.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/attempt-3.raw.json",
+      "sha256": "3b1e5aace8547d90889e6bfb6a5e72f466495c5b0de23f54b05515ff7a2c6550",
+      "size": 2951,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/attempt-3.raw.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/attempt-3.validation.json",
+      "sha256": "680f7f955b76a50d6b259680d1df25740297ce31411f1570fbe53a1a2297e41b",
+      "size": 832,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/attempt-3.validation.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/attempt-4.metadata.json",
+      "sha256": "56efc51146fb67affcd1e44f944d37f2ef106912ec676f5ce5a678cfd5299ca3",
+      "size": 1636,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/attempt-4.metadata.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/attempt-4.prompt.txt",
+      "sha256": "74ca6cca7302f759ab807ea68f62a2525feb45ac29df30ed9468a91387f19837",
+      "size": 2779,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/attempt-4.prompt.txt"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/attempt-4.raw.json",
+      "sha256": "43e7e7e1786263eb3dd19283d089f1e3229495edc13a31cd413eb44d0c8ff955",
+      "size": 2938,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/attempt-4.raw.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/attempt-4.validation.json",
+      "sha256": "680f7f955b76a50d6b259680d1df25740297ce31411f1570fbe53a1a2297e41b",
+      "size": 832,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/attempt-4.validation.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/local-teacher-1.json",
+      "sha256": "97f54982a0de922f11ce3dac728e4a4895882451899a251837d0d7c1b898e898",
+      "size": 8346,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/local-teacher-1.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/local-teacher-2.json",
+      "sha256": "bfccb41218973d2fa05346cf2f863506c2c394e97fa591a09e410c874e3dfc09",
+      "size": 8844,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/local-teacher-2.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/external-teacher.infrastructure.json",
+      "sha256": "d0404a87bef35e398d38c616e69a73550e4dca9a64028caa16be6896f1cb11e4",
+      "size": 1105,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/external-teacher.infrastructure.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/trajectory.jsonl",
+      "sha256": "c63e8956af8c4ea698593ba06e45747c867671aafc8587749fbece7850fc026f",
+      "size": 39206,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/trajectory.jsonl"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/trajectory_summary.json",
+      "sha256": "ffe2f143bf0f69fff8794f54b905c3dc1f266ee8fb41ee96669624909e48a02d",
+      "size": 3029,
+      "source_path": ".work/dogfood/claim_supersession_reviewed_v1_20260914/run/trajectory_summary.json"
+    },
+    {
+      "archive_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/NOTE.md",
+      "sha256": "8da5877e564e748ca7da3e38e4bc5426cf13e62f3b3fa8d1b71356845383af3b",
+      "size": 2442,
+      "source_path": "docs/reports/evidence/claim_supersession_reviewed_v1_20260914/genuine_raw_evidence/NOTE.md"
+    }
+  ]
+}

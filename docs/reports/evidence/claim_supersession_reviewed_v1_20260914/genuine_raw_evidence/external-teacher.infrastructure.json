@@ -1,0 +1,31 @@
+{
+  "adapter_identity": "codex-unconfigured",
+  "capability_verdict_available": false,
+  "classification": "external_teacher_infrastructure_error",
+  "completed_at": "2026-09-14T07:15:06.499223+00:00",
+  "error": "external teacher unavailable: ZTH_EXTERNAL_TEACHER_COMMAND is not configured",
+  "exit_code": null,
+  "resource_telemetry": {
+    "adapter_server_identity": null,
+    "cached_tokens": null,
+    "completion_tokens": null,
+    "elapsed_ms": 0.221,
+    "hardware_device_identity": null,
+    "model_identity": null,
+    "prompt_tokens": null,
+    "request_start_monotonic": 2149.32604432,
+    "response_capture_monotonic": 2149.326265408,
+    "role": "external_teacher",
+    "schema": "zth_resource_telemetry_v1",
+    "server_generation_ms": null,
+    "server_prompt_ms": null,
+    "timeout_seconds": 900,
+    "total_tokens": null,
+    "transport_classification": "external_teacher_infrastructure_error"
+  },
+  "response_present": false,
+  "schema": "zth_external_teacher_infrastructure_failure_v1",
+  "started_at": "2026-09-14T07:15:06.498996+00:00",
+  "stderr": "",
+  "timeout_seconds": 900
+}

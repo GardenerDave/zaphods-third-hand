@@ -74,6 +74,59 @@ class IcmCallTests(unittest.TestCase):
         self.assertEqual(512, exceptional.request_policy["thinking_budget_tokens"])
         self.assertEqual(1536, exceptional.request_policy["max_tokens"])
 
+    def test_resolve_worker_spec_defaults_qwen38_to_routine_when_no_policy_given(self):
+        # Regression: a plain `qwen3_8_27b` invocation (no explicit policy arg, no
+        # `ICM_QWEN3_8_27B_REQUEST_POLICY` env override) must NOT silently fall back
+        # to an unbounded no-policy request. It must default to the already-qualified
+        # `routine` policy (bounded reasoning + token caps).
+        spec = icm_call.resolve_worker_spec("qwen3_8_27b")
+
+        self.assertEqual("routine", spec.request_policy_name)
+        self.assertEqual({"reasoning_effort": "low"}, spec.request_policy["chat_template_kwargs"])
+        self.assertEqual(256, spec.request_policy["thinking_budget_tokens"])
+        self.assertEqual(1024, spec.request_policy["max_tokens"])
+
+    def test_resolve_worker_spec_explicit_policy_arg_beats_routine_default(self):
+        # Precedence: an explicit `request_policy_name` arg wins over the routine default.
+        spec = icm_call.resolve_worker_spec("qwen3_8_27b", request_policy_name="serious")
+
+        self.assertEqual("serious", spec.request_policy_name)
+        self.assertEqual(512, spec.request_policy["thinking_budget_tokens"])
+        self.assertEqual(1536, spec.request_policy["max_tokens"])
+
+    def test_resolve_worker_spec_env_override_beats_routine_default(self):
+        # Precedence: an `ICM_QWEN3_8_27B_REQUEST_POLICY` env override wins over the
+        # routine default (an operator can still force a specific policy).
+        with patch.dict(os.environ, {"ICM_QWEN3_8_27B_REQUEST_POLICY": "serious"}):
+            spec = icm_call.resolve_worker_spec("qwen3_8_27b")
+
+        self.assertEqual("serious", spec.request_policy_name)
+        self.assertEqual(512, spec.request_policy["thinking_budget_tokens"])
+        self.assertEqual(1536, spec.request_policy["max_tokens"])
+
+    def test_resolve_worker_spec_explicit_arg_beats_env_override(self):
+        # Precedence: an explicit `request_policy_name` arg wins over the env override.
+        with patch.dict(os.environ, {"ICM_QWEN3_8_27B_REQUEST_POLICY": "serious"}):
+            spec = icm_call.resolve_worker_spec("qwen3_8_27b", request_policy_name="exceptional")
+
+        self.assertEqual("exceptional", spec.request_policy_name)
+        self.assertEqual(512, spec.request_policy["thinking_budget_tokens"])
+        self.assertEqual(1536, spec.request_policy["max_tokens"])
+
+    def test_resolve_worker_spec_qwen38_env_unknown_policy_still_raises(self):
+        # The routine default must not mask an invalid operator env override.
+        with patch.dict(os.environ, {"ICM_QWEN3_8_27B_REQUEST_POLICY": "does-not-exist"}):
+            with self.assertRaises(KeyError):
+                icm_call.resolve_worker_spec("qwen3_8_27b")
+
+    def test_resolve_worker_spec_legacy_worker_stays_policy_less(self):
+        # Workers without `request_policies` (e.g. `handoff`) keep the legacy
+        # no-policy behavior; the routine default applies only to policy-capable workers.
+        spec = icm_call.resolve_worker_spec("handoff", base_url="http://localhost:8083/v1", model="gemma-test.gguf")
+
+        self.assertIsNone(spec.request_policy_name)
+        self.assertIsNone(spec.request_policy)
+
     def test_render_request_payload_keeps_reasoning_and_output_budgets_distinct(self):
         spec = icm_call.resolve_worker_spec("qwen3_8_27b", request_policy_name="serious")
         _, payload, _, _, provenance = icm_call._render_request_payload(spec, "Explain the fix.", 1536, model=spec.model)
