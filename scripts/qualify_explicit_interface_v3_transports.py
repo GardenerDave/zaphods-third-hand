@@ -313,7 +313,7 @@ def request_path_regression() -> dict[str, Any]:
         captured["url"] = request.full_url
         raise urllib.error.URLError("model-free request construction regression")
 
-    with patch("local_harness.icm_call._read_json_response", side_effect=capture_and_fail):
+    with patch("local_harness.icm_call._read_json_response_with_bytes", side_effect=capture_and_fail):
         response = call_worker(spec, PROMPT, max_tokens=1, timeout=1)
     return {
         "validated_base_url": spec.base_url,
