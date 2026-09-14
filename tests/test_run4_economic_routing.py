@@ -27,7 +27,7 @@ from scripts.zth_run4_economic_routing import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PREREG = ROOT / "docs/research/RUN_4_ECONOMIC_ROUTING_PREREGISTRATION_2026-09-09.json"
+PREREG = ROOT / "docs/research/RUN_4_ECONOMIC_ROUTING_PREREGISTRATION_2026-09-14.json"
 PACK = ROOT / "local_harness/fixtures/capability_loop/reviewed_run4_economic_triage"
 POLICY = ROOT / "docs/research/RUN_4_ECONOMIC_ROUTING_POLICY_FREEZE_2026-08-19.json"
 COMPARATIVE = ROOT / "docs/research/RUN_4A_COMPARATIVE_EVIDENCE_FREEZE_2026-08-19.json"

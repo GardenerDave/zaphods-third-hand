@@ -22,7 +22,7 @@ from scripts.zth_run4a_intervention_calibration import Run4ADriverError
 
 ROOT = Path(__file__).resolve().parents[1]
 PREREG = ROOT / "docs/research/RUN_7_VALIDATION_GATED_ESCALATION_PREREGISTRATION_2026-08-20.json"
-PREREG_CURRENT = ROOT / "docs/research/RUN_7_VALIDATION_GATED_ESCALATION_PREREGISTRATION_2026-09-09.json"
+PREREG_CURRENT = ROOT / "docs/research/RUN_7_VALIDATION_GATED_ESCALATION_PREREGISTRATION_2026-09-14.json"
 REPAIR_FREEZE = ROOT / "docs/research/RUN_7_ESCALATION_PATH_REPAIR_FREEZE_2026-08-20.json"
 PACK = ROOT / "local_harness/fixtures/capability_loop/run7_scope"
 FAMILY = "scope-authority-boundary"

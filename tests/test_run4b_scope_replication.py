@@ -22,7 +22,7 @@ from scripts.zth_run4b_scope_replication import aggregate_results, execution_res
 
 ROOT = Path(__file__).resolve().parents[1]
 PACK = ROOT / "local_harness/fixtures/capability_loop/reviewed_run4b_scope"
-PREREG = ROOT / "docs/research/RUN_4B_SCOPE_INTERVENTION_REPLICATION_PREREGISTRATION_2026-09-09.json"
+PREREG = ROOT / "docs/research/RUN_4B_SCOPE_INTERVENTION_REPLICATION_PREREGISTRATION_2026-09-14.json"
 
 
 def _response(content: str, *, model: str = "fixture-model") -> WorkerResponse:
