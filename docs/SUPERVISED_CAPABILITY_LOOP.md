@@ -31,8 +31,9 @@ Fixtures select either the simple `exact_json` validator or the
 `zth_output_contract` adapter, which delegates to the existing supervised ZTH
 output-contract validator. The model cannot select a validator. Model claims,
 teacher diagnoses, corrected references, and candidate patches are evidence
-only. A successful run is `ready_for_review`; exhausted or unavailable
-escalation is `unresolved`.
+only. A successful run is `ready_for_review`; exhausted escalation is
+`unresolved`, and an external-teacher infrastructure failure is
+`infrastructure_error`.
 
 Durable transitions are:
 
@@ -41,7 +42,7 @@ worker_call_started -> worker_output_captured -> worker_output_validated
   -> local_teacher_started -> local_teacher_response_captured
   -> local_teacher_retry_completed
   -> external_teacher_started -> external_teacher_response_captured
-  -> external_teacher_retry_completed -> ready_for_review | unresolved
+  -> external_teacher_retry_completed -> ready_for_review | unresolved | infrastructure_error
 ```
 
 Raw, validation, and teacher artifacts are scanned on restart, so an
@@ -55,7 +56,7 @@ external path is available only when the operator configures
 `ZTH_EXTERNAL_TEACHER_COMMAND` and, optionally,
 `ZTH_EXTERNAL_TEACHER_IDENTITY`. The command receives the teacher packet on
 stdin and must return JSON on stdout. Missing, empty, timed-out, or non-zero
-commands fail closed to `unresolved` and preserve the diagnostic.
+commands fail closed to `infrastructure_error` and preserve the diagnostic.
 
 Sequential reviewed fixture batch
 

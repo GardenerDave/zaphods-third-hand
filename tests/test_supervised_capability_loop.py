@@ -596,6 +596,52 @@ def test_external_teacher_unavailable_fails_closed(tmp_path: Path):
     assert any(r.get("transition") == "external_teacher_infrastructure_failed" for r in records(tmp_path / "trajectory.jsonl"))
 
 
+def test_infrastructure_error_restart_is_idempotent(tmp_path: Path):
+    """A run terminating in ``infrastructure_error`` must be skipped on restart.
+
+    Before the fix, ``infrastructure_error`` was absent from
+    ``TERMINAL_DISPOSITIONS``, so a restart on the same out_dir re-ran the worker
+    and re-attempted the external teacher, re-incurring model/teacher cost and
+    appending duplicate trajectory records. Treating ``infrastructure_error`` as
+    terminal makes the idempotency check return the prior summary, so a restart
+    performs no additional worker/teacher calls and adds no records.
+    """
+    worker_calls = 0
+    external_calls = 0
+
+    def worker(_p):
+        nonlocal worker_calls
+        worker_calls += 1
+        return response('{"answer":"wrong"}', "small-1.7b")
+
+    def external(_p):
+        nonlocal external_calls
+        external_calls += 1
+        raise RuntimeError("not configured")
+
+    kwargs = dict(worker=worker, max_worker_attempts=1, max_teacher_passes=0, external_teacher=external)
+    first = run_capability_loop(task(), out_dir=tmp_path, **kwargs)
+    assert first["disposition"] == "infrastructure_error"
+    assert first["capability_verdict_available"] is False
+    assert first["unresolved"] is False
+    assert worker_calls == 1
+    assert external_calls == 1
+    first_records = records(tmp_path / "trajectory.jsonl")
+    assert any(r.get("transition") == "external_teacher_infrastructure_failed" for r in first_records)
+    assert (tmp_path / "external-teacher.infrastructure.json").exists()
+
+    second = run_capability_loop(task(), out_dir=tmp_path, **kwargs)
+    # The restart must short-circuit: no new worker/teacher calls, no new
+    # trajectory records, and the prior summary is returned intact.
+    assert worker_calls == 1
+    assert external_calls == 1
+    assert second == first
+    assert second["disposition"] == "infrastructure_error"
+    assert second["capability_verdict_available"] is False
+    assert second["unresolved"] is False
+    assert records(tmp_path / "trajectory.jsonl") == first_records
+
+
 @pytest.mark.parametrize(
     ("status", "error", "classification"),
     [

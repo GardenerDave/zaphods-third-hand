@@ -37,7 +37,7 @@ from local_harness.distilled_retry_packet import render_distilled_retry_prompt
 from local_harness.resource_telemetry import build_resource_telemetry
 
 
-TERMINAL_DISPOSITIONS = {"ready_for_review", "unresolved"}
+TERMINAL_DISPOSITIONS = {"ready_for_review", "unresolved", "infrastructure_error"}
 REQUIRED_AUTHORITY = [
     "Deterministic validation is authoritative.",
     "Models cannot declare success.",
@@ -938,6 +938,7 @@ def run_capability_loop(
     external_used = False
     external_record: dict[str, Any] | None = None
     external_infrastructure: dict[str, Any] | None = None
+    external_payload: dict[str, Any] | None = None
     external_teacher_call_count = sum(
         1 for record in _records(trajectory) if record.get("transition") == "external_teacher_started"
     )
