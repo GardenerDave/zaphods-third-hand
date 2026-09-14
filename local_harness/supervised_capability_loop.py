@@ -457,6 +457,103 @@ def _guidance_only_teacher_payload(parsed: object) -> object:
     return {key: value for key, value in parsed.items() if key not in _REFERENCE_BEARING_FIELDS}
 
 
+def _collect_reference_scalars(node: Any, values: set) -> None:
+    """Recursively collect concrete scalar leaves from a reference structure.
+
+    Booleans and ``None`` are skipped (``bool`` is an ``int`` subclass but is not
+    an answer value), as are containers; only int/float/str leaves are kept.
+    """
+    if isinstance(node, bool) or node is None:
+        return
+    if isinstance(node, (int, float, str)):
+        values.add(node)
+    elif isinstance(node, dict):
+        for value in node.values():
+            _collect_reference_scalars(value, values)
+    elif isinstance(node, (list, tuple)):
+        for value in node:
+            _collect_reference_scalars(value, values)
+
+
+def _hidden_reference_scalars(task: dict) -> set:
+    """Gather the hidden reference scalar values for the answer-bearing detector.
+
+    The reference the detector compares against is the union of the fixture's
+    ``expected_output`` and the validator's ``reference_facts`` — the values the
+    fixture knows and the worker is graded on, independent of what the teacher
+    prompt happened to be shown. Scalar 0/1 are excluded from the detection set:
+    they are far too common in ordinary prose (e.g. "1 file", "0 matches") to
+    treat as an answer disclosure without constant false positives. This keeps
+    the detector conservative in the safe direction for values that carry real
+    information while not over-flagging the trivially common integers.
+    """
+    values: set = set()
+    expected = task.get("expected_output")
+    if isinstance(expected, (int, float, str)) and not isinstance(expected, bool):
+        values.add(expected)
+    elif isinstance(expected, (dict, list, tuple)):
+        _collect_reference_scalars(expected, values)
+    validator = task.get("validator")
+    if isinstance(validator, dict):
+        reference_facts = validator.get("reference_facts")
+        if isinstance(reference_facts, (int, float, str)) and not isinstance(reference_facts, bool):
+            values.add(reference_facts)
+        elif isinstance(reference_facts, (dict, list, tuple)):
+            _collect_reference_scalars(reference_facts, values)
+    return {value for value in values if value not in (0, 1)}
+
+
+def _reference_bearing_free_text(text: Any, hidden_values: set) -> bool:
+    """Conservatively flag free-text teacher guidance that discloses the hidden answer.
+
+    Returns True when ``text`` contains a hidden expected scalar value rendered
+    as a standalone number (digits not split by punctuation) or a hidden string
+    value rendered verbatim. Method guidance that names fields or describes a
+    counting approach without revealing the expected value returns False. Numeric
+    values are matched as whole tokens (not substrings), so a hidden ``8`` does
+    not match ``18`` and a hidden ``18`` does not match ``180``. A dot is treated
+    as part of the number only when it is a genuine decimal separator (a digit on
+    its far side, e.g. ``18.5``); a sentence-ending period such as "the correct
+    18." still matches the hidden ``18``.
+    """
+    if not isinstance(text, str) or not hidden_values:
+        return False
+    for value in hidden_values:
+        if isinstance(value, bool):
+            continue
+        if isinstance(value, (int, float)):
+            number = repr(value) if isinstance(value, float) else str(value)
+            pattern = rf"(?<!\d)(?<!\.){re.escape(number)}(?!\d)(?!\.\d)"
+            if re.search(pattern, text):
+                return True
+        elif isinstance(value, str) and len(value) >= 3:
+            if value in text:
+                return True
+    return False
+
+
+def _strip_reference_bearing_free_text(parsed: Any, hidden_values: set) -> tuple[Any, bool]:
+    """Return ``(payload, any_reference_bearing)`` for the worker-facing retry.
+
+    Structured reference-bearing fields are always withheld (existing behaviour).
+    On top of that, if any free-text guidance field discloses a hidden expected
+    value, that field is replaced with a neutral non-answer-bearing placeholder so
+    the worker never sees the answer, and ``any_reference_bearing`` is set so the
+    caller can classify the intervention as a teacher-reference rescue. Method
+    guidance that does not reveal a value is left untouched and remains usable as
+    ordinary guidance-only.
+    """
+    payload = _guidance_only_teacher_payload(parsed)
+    if not isinstance(payload, dict):
+        return payload, False
+    any_reference_bearing = False
+    for key in ("teacher_diagnosis", "retry_guidance", "failure_classification"):
+        if _reference_bearing_free_text(payload.get(key), hidden_values):
+            payload[key] = "reference_withheld: teacher guidance disclosed a hidden expected value and was withheld from the worker"
+            any_reference_bearing = True
+    return payload, any_reference_bearing
+
+
 def _external_teacher(raw_prompt: str) -> tuple[str, str]:
     command = os.environ.get("ZTH_EXTERNAL_TEACHER_COMMAND")
     identity = os.environ.get("ZTH_EXTERNAL_TEACHER_IDENTITY", "codex-unconfigured")
@@ -792,6 +889,9 @@ def run_capability_loop(
     if model_failure and not baseline_pass and not existing_pass and selected_patches and not existing_attempt:
         existing_pass = worker_attempt(patched_prompt, "existing_patch", 0, "existing_patch:1")
     local_pass = any(a.get("intervention_id", "").startswith("local_teacher:") and a.get("validation", {}).get("validation_status") == "passed" for a in attempts)
+    hidden_reference = _hidden_reference_scalars(task)
+    local_teacher_mode: str | None = None
+    external_teacher_mode: str | None = None
     for teacher_pass in range(1, max_teacher_passes + 1):
         if baseline_pass or existing_pass or patch_retry_passed or local_pass or not model_failure:
             break
@@ -827,7 +927,10 @@ def run_capability_loop(
         if teacher_record is None:
             teacher_record = {"record_type": "local_teacher", "attempt": teacher_pass, "intervention_id": intervention_id, "local_teacher_model": teacher_payload.get("raw", {}).get("metadata", {}).get("model"), "teacher_evidence": teacher_payload, "failure_classification": parsed.get("failure_classification"), "teacher_diagnosis": parsed.get("teacher_diagnosis"), "corrected_reference_output": parsed.get("corrected_reference_output"), "candidate_prompt_patch": parsed.get("candidate_prompt_patch"), "subsequent_worker_result": "not_run", "review_state": "ready_for_review"}
             teacher_records.append(teacher_record)
-        intervention = json.dumps(_guidance_only_teacher_payload(parsed), sort_keys=True)
+        local_payload, local_reference_bearing = _strip_reference_bearing_free_text(parsed, hidden_reference)
+        local_teacher_mode = "teacher_reference_rescue" if local_reference_bearing else "guidance_only"
+        teacher_record["intervention_mode"] = local_teacher_mode
+        intervention = json.dumps(local_payload, sort_keys=True)
         local_pass = worker_attempt(patched_prompt + "\n\n## Local teacher intervention\n" + intervention, "local_teacher", 1, intervention_id)
         teacher_record["subsequent_worker_result"] = "passed" if local_pass else "failed"
         _transition(trajectory, transition="local_teacher_retry_completed", task_id=task_id, attempt=teacher_pass, source="local_teacher", validation=attempts[-1]["validation"], worker_attempt=attempts[-1]["attempt"])
@@ -876,9 +979,11 @@ def run_capability_loop(
             if not external_path.exists():
                 _json_write(external_path, external_payload)
                 _transition(trajectory, transition="external_teacher_response_captured", task_id=task_id, attempt=1, source="external_teacher", artifact_ref=external_path.name, artifact_hash=sha256_text(external_path.read_text()), evidence=external_payload)
+            external_sanitized, external_reference_bearing = _strip_reference_bearing_free_text(external_payload["parsed"], hidden_reference)
+            external_teacher_mode = "teacher_reference_rescue" if external_reference_bearing else "guidance_only"
             if not any(a.get("intervention_id") == "external_teacher:1" for a in attempts):
-                external_pass = worker_attempt(patched_prompt + "\n\n## External teacher intervention\n" + json.dumps(_guidance_only_teacher_payload(external_payload["parsed"]), sort_keys=True), "external_teacher", 2, "external_teacher:1")
-            external_record = {"record_type": "external_teacher", "attempt": 1, "intervention_id": "external_teacher:1", "external_teacher": external_payload.get("identity"), "corrected_reference_output": external_payload["parsed"].get("corrected_reference_output"), "candidate_prompt_patch": external_payload["parsed"].get("candidate_prompt_patch"), "subsequent_worker_result": "passed" if external_pass else "failed", "review_state": "ready_for_review"}
+                external_pass = worker_attempt(patched_prompt + "\n\n## External teacher intervention\n" + json.dumps(external_sanitized, sort_keys=True), "external_teacher", 2, "external_teacher:1")
+            external_record = {"record_type": "external_teacher", "attempt": 1, "intervention_id": "external_teacher:1", "external_teacher": external_payload.get("identity"), "intervention_mode": external_teacher_mode, "corrected_reference_output": external_payload["parsed"].get("corrected_reference_output"), "candidate_prompt_patch": external_payload["parsed"].get("candidate_prompt_patch"), "subsequent_worker_result": "passed" if external_pass else "failed", "review_state": "ready_for_review"}
             _transition(trajectory, transition="external_teacher_retry_completed", task_id=task_id, attempt=1, source="external_teacher", validation=attempts[-1]["validation"], worker_attempt=attempts[-1]["attempt"])
 
     final_pass = baseline_pass or existing_pass or patch_retry_passed or local_pass or external_pass
@@ -903,8 +1008,12 @@ def run_capability_loop(
     if not any(r.get("transition") in {"ready_for_review", "unresolved"} for r in _records(trajectory)):
         disposition = "ready_for_review" if final_pass else "infrastructure_error" if external_infrastructure else "unresolved"
         _transition(trajectory, transition=disposition, task_id=task_id, source=source, disposition=disposition, successful_intervention_source=source, infrastructure_failure=bool(external_infrastructure))
+    teacher_intervention_mode = "teacher_reference_rescue" if (
+        (local_pass and local_teacher_mode == "teacher_reference_rescue")
+        or (external_pass and external_teacher_mode == "teacher_reference_rescue")
+    ) else "guidance_only"
     summary = {
-        "schema": "supervised_capability_trajectory_v2", "task_id": task_id, "task_family": task["task_family"], "endpoint_alias": os.environ.get("ZTH_PUBLIC_HOST_ALIAS", PUBLIC_ENDPOINT_ALIAS), "worker_model": attempts[0]["worker_model"] if attempts else None, "local_teacher_model": teacher_records[0].get("local_teacher_model") if teacher_records else None, "external_escalation_count": int(external_used), "external_teacher_call_count": external_teacher_call_count, "trials": 1, "capability_verdict_available": capability_verdict_available, "model_attempt_count": sum(bool(a.get("transport_valid")) for a in attempts), "infrastructure_error_count": infrastructure_error_count, "external_teacher_infrastructure_failure": external_infrastructure, "pass": final_pass if capability_verdict_available else False, "first_attempt_pass": bool(attempts and (attempts[0].get("validation") or {}).get("validation_status") == "passed"), "pass_after_existing_patch": existing_pass, "patch_retry_attempted": patch_retry_attempted, "patch_retry_passed": patch_retry_passed, "patch_retry_failed": patch_retry_failed, "teacher_escalation_avoided": patch_retry_passed and not teacher_records and not external_record, "pass_after_local_teacher_intervention": local_pass, "pass_after_external_teacher_intervention": external_pass, "teacher_intervention_mode": "guidance_only", "successful_intervention_source": source, "intervention_attempts": intervention_attempts, "intervention_outcome": intervention_outcome, "candidate_prompt_patches": candidate_patches, "candidate_curriculum_examples": candidate_examples, "unresolved": not final_pass if capability_verdict_available else False, "disposition": "ready_for_review" if final_pass else "infrastructure_error" if external_infrastructure else "unresolved", "attempt_count": len(attempts), "teacher_pass_count": len(teacher_records), "authority_boundaries": REQUIRED_AUTHORITY, "review_state": "ready_for_review" if final_pass else "infrastructure_error" if external_infrastructure else "unresolved", "trajectory_artifact": str(trajectory), "generated_at": utc_now()
+        "schema": "supervised_capability_trajectory_v2", "task_id": task_id, "task_family": task["task_family"], "endpoint_alias": os.environ.get("ZTH_PUBLIC_HOST_ALIAS", PUBLIC_ENDPOINT_ALIAS), "worker_model": attempts[0]["worker_model"] if attempts else None, "local_teacher_model": teacher_records[0].get("local_teacher_model") if teacher_records else None, "external_escalation_count": int(external_used), "external_teacher_call_count": external_teacher_call_count, "trials": 1, "capability_verdict_available": capability_verdict_available, "model_attempt_count": sum(bool(a.get("transport_valid")) for a in attempts), "infrastructure_error_count": infrastructure_error_count, "external_teacher_infrastructure_failure": external_infrastructure, "pass": final_pass if capability_verdict_available else False, "first_attempt_pass": bool(attempts and (attempts[0].get("validation") or {}).get("validation_status") == "passed"), "pass_after_existing_patch": existing_pass, "patch_retry_attempted": patch_retry_attempted, "patch_retry_passed": patch_retry_passed, "patch_retry_failed": patch_retry_failed, "teacher_escalation_avoided": patch_retry_passed and not teacher_records and not external_record, "pass_after_local_teacher_intervention": local_pass, "pass_after_external_teacher_intervention": external_pass, "teacher_intervention_mode": teacher_intervention_mode, "successful_intervention_source": source, "intervention_attempts": intervention_attempts, "intervention_outcome": intervention_outcome, "candidate_prompt_patches": candidate_patches, "candidate_curriculum_examples": candidate_examples, "unresolved": not final_pass if capability_verdict_available else False, "disposition": "ready_for_review" if final_pass else "infrastructure_error" if external_infrastructure else "unresolved", "attempt_count": len(attempts), "teacher_pass_count": len(teacher_records), "authority_boundaries": REQUIRED_AUTHORITY, "review_state": "ready_for_review" if final_pass else "infrastructure_error" if external_infrastructure else "unresolved", "trajectory_artifact": str(trajectory), "generated_at": utc_now()
     }
     if router_route_trace_reference is not None:
         summary["router_route_trace_reference"] = router_route_trace_reference

@@ -34,6 +34,26 @@ def teacher_payload(corrected: bool = True) -> str:
     return json.dumps(payload)
 
 
+def counting_task() -> dict:
+    """Fixture whose hidden expected output carries the counting values 18 and 8.
+
+    The values 18 and 8 live solely in ``expected_output`` (the ``exact_json``
+    validator has no ``reference_facts``), mirroring the frozen dogfood counting
+    fixture. These are the values the reference-bearing detector must flag when a
+    teacher's free text discloses them.
+    """
+    return {
+        "task_id": "task-count-18",
+        "task_family": "json-fixture",
+        "prompt": "Count the fields. Return JSON.",
+        "output_contract": {"format": "json"},
+        "expected_output": {"field_count": 18, "usage_count": 8},
+    }
+
+
+COUNTING_CORRECTED = {"field_count": 18, "usage_count": 8}
+
+
 def records(path: Path) -> list[dict]:
     return [json.loads(line) for line in path.read_text().splitlines()]
 
@@ -325,6 +345,230 @@ def test_external_teacher_retry_prompt_carries_no_reference(tmp_path: Path):
     assert "teacher_diagnosis" in external_retry_prompt
     assert "corrected_reference_output" not in external_retry_prompt
     assert json.dumps(task()["expected_output"]) not in external_retry_prompt
+
+
+def test_local_teacher_guidance_only_when_diagnosis_hides_answer(tmp_path: Path):
+    # (a) A diagnosis that explains the counting mistake WITHOUT revealing the
+    # hidden expected count (18/8) is method guidance: it stays usable in the
+    # worker retry prompt and the intervention is classified guidance_only.
+    prompts: list[str] = []
+
+    def worker(p: str) -> WorkerResponse:
+        prompts.append(p)
+        return response(next(outputs), "small-1.7b")
+
+    outputs = iter(['{"field_count":11,"usage_count":7}', '{"field_count":18,"usage_count":8}'])
+    diagnosis = (
+        "The model undercounts the first list, losing track partway through "
+        "enumeration of the longer list. This is a known limitation of small "
+        "quantized models on sequential counting, not a prompt ambiguity."
+    )
+    payload = {
+        "failure_classification": "model_counting_error",
+        "teacher_diagnosis": diagnosis,
+        "retry_guidance": "Count the items twice: once in order and once reversed, and report the value that both passes agree on.",
+        "corrected_reference_output": COUNTING_CORRECTED,
+    }
+
+    result = run_capability_loop(counting_task(), out_dir=tmp_path, worker=worker, local_teacher=lambda p: response(json.dumps(payload), "large-30b"), max_worker_attempts=1, max_teacher_passes=1)
+    assert result["successful_intervention_source"] == "local_teacher"
+    assert result["teacher_intervention_mode"] == "guidance_only"
+    assert len(prompts) >= 2
+    retry_prompt = prompts[1]
+    assert "## Local teacher intervention" in retry_prompt
+    assert diagnosis in retry_prompt  # method guidance is preserved and usable
+    assert "reference_withheld" not in retry_prompt
+    assert "corrected_reference_output" not in retry_prompt
+    assert "18" not in retry_prompt
+
+
+def test_local_teacher_reference_rescue_withholds_diagnosis_answer(tmp_path: Path):
+    # (b) A diagnosis that states "the correct 18" discloses a hidden expected
+    # value. The worker retry prompt must NOT carry 18, the diagnosis field is
+    # replaced with the neutral placeholder, and the intervention is classified
+    # teacher_reference_rescue (never credited as new capability).
+    prompts: list[str] = []
+
+    def worker(p: str) -> WorkerResponse:
+        prompts.append(p)
+        return response(next(outputs), "small-1.7b")
+
+    outputs = iter(['{"field_count":11,"usage_count":7}', '{"field_count":18,"usage_count":8}'])
+    payload = {
+        "failure_classification": "model_counting_error",
+        "teacher_diagnosis": "The model reported 11 instead of the correct 18, losing track of the second list.",
+        "retry_guidance": "Recount carefully and report the count you verify twice.",
+        "corrected_reference_output": COUNTING_CORRECTED,
+    }
+
+    result = run_capability_loop(counting_task(), out_dir=tmp_path, worker=worker, local_teacher=lambda p: response(json.dumps(payload), "large-30b"), max_worker_attempts=1, max_teacher_passes=1)
+    assert result["successful_intervention_source"] == "local_teacher"
+    assert result["teacher_intervention_mode"] == "teacher_reference_rescue"
+    assert len(prompts) >= 2
+    retry_prompt = prompts[1]
+    assert "18" not in retry_prompt  # the hidden answer must not leak to the worker
+    assert "reference_withheld" in retry_prompt
+    assert "corrected_reference_output" not in retry_prompt
+    # method guidance that does not reveal a value is preserved
+    assert "Recount carefully and report the count you verify twice." in retry_prompt
+    # durable record retains the full original teacher response (provenance);
+    # the classification itself rides on the summary, not the raw-evidence file.
+    record = json.loads((tmp_path / "local-teacher-1.json").read_text())
+    assert "the correct 18" in record["parsed"]["teacher_diagnosis"]
+    assert record["parsed"]["corrected_reference_output"] == COUNTING_CORRECTED
+
+
+def test_local_teacher_reference_rescue_withholds_retry_guidance_answer(tmp_path: Path):
+    # (c) retry_guidance that embeds the exact expected JSON is reference-bearing:
+    # the whole field is withheld and the mode is teacher_reference_rescue.
+    prompts: list[str] = []
+
+    def worker(p: str) -> WorkerResponse:
+        prompts.append(p)
+        return response(next(outputs), "small-1.7b")
+
+    outputs = iter(['{"field_count":11,"usage_count":7}', '{"field_count":18,"usage_count":8}'])
+    payload = {
+        "failure_classification": "model_counting_error",
+        "teacher_diagnosis": "The model loses track partway through enumeration.",
+        "retry_guidance": "Report exactly {\"field_count\":18,\"usage_count\":8}.",
+        "corrected_reference_output": COUNTING_CORRECTED,
+    }
+
+    result = run_capability_loop(counting_task(), out_dir=tmp_path, worker=worker, local_teacher=lambda p: response(json.dumps(payload), "large-30b"), max_worker_attempts=1, max_teacher_passes=1)
+    assert result["teacher_intervention_mode"] == "teacher_reference_rescue"
+    retry_prompt = prompts[1]
+    assert "18" not in retry_prompt
+    assert "reference_withheld" in retry_prompt
+    assert "corrected_reference_output" not in retry_prompt
+    # the method-only diagnosis (no hidden value) is preserved
+    assert "The model loses track partway through enumeration." in retry_prompt
+
+
+def test_local_teacher_paraphrased_method_guidance_is_allowed(tmp_path: Path):
+    # (d) A paraphrased method description that references the field name and the
+    # counting approach but reveals neither 18 nor 8 is guidance_only.
+    prompts: list[str] = []
+
+    def worker(p: str) -> WorkerResponse:
+        prompts.append(p)
+        return response(next(outputs), "small-1.7b")
+
+    outputs = iter(['{"field_count":11,"usage_count":7}', '{"field_count":18,"usage_count":8}'])
+    payload = {
+        "failure_classification": "model_counting_error",
+        "teacher_diagnosis": "The model conflates the two lists and reports a blended total rather than the per-list field count.",
+        "retry_guidance": "Enumerate each list independently and emit one integer per field.",
+        "corrected_reference_output": COUNTING_CORRECTED,
+    }
+
+    result = run_capability_loop(counting_task(), out_dir=tmp_path, worker=worker, local_teacher=lambda p: response(json.dumps(payload), "large-30b"), max_worker_attempts=1, max_teacher_passes=1)
+    assert result["teacher_intervention_mode"] == "guidance_only"
+    retry_prompt = prompts[1]
+    # the full method diagnosis survives intact (naming the field is method guidance)
+    assert "per-list field count" in retry_prompt
+    assert "blended total" in retry_prompt
+    assert "reference_withheld" not in retry_prompt
+    assert "18" not in retry_prompt
+    assert "corrected_reference_output" not in retry_prompt
+
+
+def test_structured_corrected_reference_output_stays_withheld(tmp_path: Path):
+    # (e) Regardless of free-text handling, the structured
+    # corrected_reference_output is always withheld from the worker retry prompt
+    # (existing behaviour preserved alongside the new detector).
+    prompts: list[str] = []
+
+    def worker(p: str) -> WorkerResponse:
+        prompts.append(p)
+        return response(next(outputs), "small-1.7b")
+
+    outputs = iter(['{"field_count":11,"usage_count":7}', '{"field_count":18,"usage_count":8}'])
+    payload = {
+        "failure_classification": "model_counting_error",
+        "teacher_diagnosis": "The model miscounts the second list.",
+        "retry_guidance": "Recount each list independently.",
+        "corrected_reference_output": COUNTING_CORRECTED,
+    }
+
+    result = run_capability_loop(counting_task(), out_dir=tmp_path, worker=worker, local_teacher=lambda p: response(json.dumps(payload), "large-30b"), max_worker_attempts=1, max_teacher_passes=1)
+    assert result["teacher_intervention_mode"] == "guidance_only"
+    retry_prompt = prompts[1]
+    assert "corrected_reference_output" not in retry_prompt
+    assert "18" not in retry_prompt  # the reference value is never in the worker prompt
+    assert "reference_withheld" not in retry_prompt  # method-only guidance is not flagged
+
+
+def test_teacher_record_retains_full_original_response(tmp_path: Path):
+    # (f) The durable teacher record on disk preserves the full original teacher
+    # response — including the answer-bearing diagnosis and the structured
+    # reference — even though the worker-facing retry was sanitized.
+    prompts: list[str] = []
+
+    def worker(p: str) -> WorkerResponse:
+        prompts.append(p)
+        return response(next(outputs), "small-1.7b")
+
+    outputs = iter(['{"field_count":11,"usage_count":7}', '{"field_count":18,"usage_count":8}'])
+    diagnosis = "The correct value of field_count is 18, not 11."
+    payload = {
+        "failure_classification": "model_counting_error",
+        "teacher_diagnosis": diagnosis,
+        "retry_guidance": "Recount and verify twice.",
+        "corrected_reference_output": COUNTING_CORRECTED,
+    }
+
+    result = run_capability_loop(counting_task(), out_dir=tmp_path, worker=worker, local_teacher=lambda p: response(json.dumps(payload), "large-30b"), max_worker_attempts=1, max_teacher_passes=1)
+    assert result["teacher_intervention_mode"] == "teacher_reference_rescue"
+    record = json.loads((tmp_path / "local-teacher-1.json").read_text())
+    # full original free text retained
+    assert record["parsed"]["teacher_diagnosis"] == diagnosis
+    assert "18" in record["parsed"]["teacher_diagnosis"]
+    # full structured reference retained
+    assert record["parsed"]["corrected_reference_output"] == COUNTING_CORRECTED
+    # mode is classified on the summary (the durable file is raw evidence only)
+    assert result["teacher_intervention_mode"] == "teacher_reference_rescue"
+    # but the worker never saw the answer
+    assert "18" not in prompts[1]
+
+
+def test_external_teacher_reference_rescue_withholds_answer(tmp_path: Path):
+    # External-teacher path: an answer-bearing diagnosis is withheld from the
+    # worker and the intervention is classified teacher_reference_rescue.
+    prompts: list[str] = []
+
+    def worker(p: str) -> WorkerResponse:
+        prompts.append(p)
+        return response(next(outputs), "small-1.7b")
+
+    outputs = iter(['{"field_count":11,"usage_count":7}', '{"field_count":18,"usage_count":8}'])
+    payload = {
+        "failure_classification": "model_counting_error",
+        "teacher_diagnosis": "The model reported 11 instead of the correct 18.",
+        "retry_guidance": "Recount carefully.",
+        "corrected_reference_output": COUNTING_CORRECTED,
+    }
+
+    result = run_capability_loop(
+        counting_task(),
+        out_dir=tmp_path,
+        worker=worker,
+        local_teacher=lambda _p: pytest.fail("local teacher called"),
+        external_teacher=lambda p: ("codex-cli-0.146.0", json.dumps(payload)),
+        max_worker_attempts=1,
+        max_teacher_passes=0,
+    )
+    assert result["successful_intervention_source"] == "external_teacher"
+    assert result["teacher_intervention_mode"] == "teacher_reference_rescue"
+    retry_prompt = prompts[-1]
+    assert "18" not in retry_prompt
+    assert "reference_withheld" in retry_prompt
+    assert "corrected_reference_output" not in retry_prompt
+    record = json.loads((tmp_path / "external-teacher.json").read_text())
+    # durable file retains the full original parsed response (provenance); the
+    # intervention_mode classification lives in the trajectory summary, asserted above
+    assert "the correct 18" in record["parsed"]["teacher_diagnosis"]
+    assert record["parsed"]["corrected_reference_output"] == COUNTING_CORRECTED
 
 
 def test_local_teacher_exhausted_then_external_resolution(tmp_path: Path):
