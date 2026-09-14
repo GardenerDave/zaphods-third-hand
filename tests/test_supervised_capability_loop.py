@@ -772,3 +772,291 @@ def test_scorecard_counts_only_durable_worker_intervention_sources(tmp_path: Pat
     assert scorecard["by_intervention_source"]["local_teacher"]["trials"] == 0
     assert scorecard["external_escalation_count"] == 1
     assert scorecard["external_teacher_call_count"] == 1
+
+
+# ---------------------------------------------------------------------------
+# Nested-fence teacher JSON extraction regressions.
+#
+# These pin the JSON-aware recovery contract in _extract_teacher_json_object:
+# visible content only, (1) bare object, (2) a single explicit ```json fence
+# recovered via json.JSONDecoder().raw_decode (so triple backticks embedded in
+# a string value do NOT terminate extraction), (3) one unambiguous embedded
+# object; and the rejections (malformed, competing, schema-invalid, absent,
+# and the hidden reasoning channel).
+# ---------------------------------------------------------------------------
+
+
+def test_teacher_extraction_bare_json_object():
+    from local_harness.supervised_capability_loop import _extract_teacher_json_object
+    raw = '{"failure_classification": "wrong_reference", "teacher_diagnosis": "Use the bounded reference.", "retry_guidance": "Return JSON only."}'
+    payload, diagnosis = _extract_teacher_json_object(raw)
+    assert diagnosis == ""
+    assert payload is not None
+    assert payload["failure_classification"] == "wrong_reference"
+    assert payload["retry_guidance"] == "Return JSON only."
+
+
+def test_teacher_extraction_ordinary_json_fence():
+    from local_harness.supervised_capability_loop import _extract_teacher_json_object
+    raw = "```json\n{\"failure_classification\": \"prompt_contract_gap\", \"retry_guidance\": \"Return JSON only.\"}\n```"
+    payload, diagnosis = _extract_teacher_json_object(raw)
+    assert diagnosis == ""
+    assert payload is not None
+    assert payload["failure_classification"] == "prompt_contract_gap"
+    # The whole fence must round-trip through _parse_teacher as a passed parse.
+    from local_harness.supervised_capability_loop import _parse_teacher
+    parsed = _parse_teacher(raw)
+    assert parsed["teacher_parse_status"] == "passed"
+    assert parsed["failure_classification"] == "prompt_contract_gap"
+
+
+def test_teacher_extraction_fenced_json_with_one_nested_plain_block():
+    from local_harness.supervised_capability_loop import _extract_teacher_json_object, _parse_teacher
+    # A single explicit ```json fence whose string value embeds ONE plain
+    # (untagged) ``` block. The nested fence must not truncate the object.
+    diagnosis_value = "The worker omitted a block.\n\n```\n- one item\n- two items\n```\n\nAdd both items."
+    payload_obj = {
+        "failure_classification": "prompt_contract_gap",
+        "teacher_diagnosis": diagnosis_value,
+        "retry_guidance": "Return JSON only.",
+    }
+    raw = "```json\n" + json.dumps(payload_obj, indent=2) + "\n```"
+    payload, diagnosis = _extract_teacher_json_object(raw)
+    assert diagnosis == ""
+    assert payload is not None
+    assert payload == payload_obj
+    assert "```" in payload["teacher_diagnosis"]
+    assert "- one item" in payload["teacher_diagnosis"]
+    assert "- two items" in payload["teacher_diagnosis"]
+    assert payload["retry_guidance"] == "Return JSON only."
+    parsed = _parse_teacher(raw)
+    assert parsed["teacher_parse_status"] == "passed"
+    assert parsed["teacher_diagnosis"] == diagnosis_value
+
+
+def test_teacher_extraction_candidate_prompt_patch_with_multiple_nested_fenced_blocks():
+    from local_harness.supervised_capability_loop import _extract_teacher_json_object
+    # Mirrors the preserved spec-field-count-disagreement shape: one explicit
+    # ```json fence whose candidate_prompt_patch string value embeds MULTIPLE
+    # nested ``` fenced blocks (a NOTE TEMPLATE block plus an evidence list).
+    # raw_decode must honor the JSON string and recover the whole object.
+    patch_value = (
+        "You are a bounded, read-only repository observer.\n\n"
+        "Raw evidence A \u2014 verbatim NOTE TEMPLATE:\n\n"
+        "```\n"
+        "## Supervised Role-Run Evidence Note\n\n"
+        "- Role used:\n"
+        "- Source prompt file:\n"
+        "- Human supervisor:\n"
+        "```\n\n"
+        "Raw evidence B \u2014 verbatim 'Evidence To Record' list:\n\n"
+        "- Active packet path.\n"
+        "- Output summary.\n"
+        "- Human decision.\n\n"
+        "Output EXACTLY one JSON object:\n"
+        "{\n"
+        "  \"a\": <integer>,\n"
+        "  \"b\": <integer>\n"
+        "}"
+    )
+    payload_obj = {
+        "failure_classification": "model_capability_insufficient",
+        "teacher_diagnosis": "The small model miscounts.",
+        "candidate_prompt_patch": patch_value,
+        "retry_guidance": "Escalate to a larger model.",
+        "corrected_reference_output": {"a": 18, "b": 8},
+    }
+    raw = "```json\n" + json.dumps(payload_obj, indent=2) + "\n```"
+    payload, diagnosis = _extract_teacher_json_object(raw)
+    assert diagnosis == ""
+    assert payload is not None
+    assert payload == payload_obj
+    # The embedded NOTE TEMPLATE fence and the JSON object literal inside the
+    # string value must both survive intact.
+    assert "## Supervised Role-Run Evidence Note" in payload["candidate_prompt_patch"]
+    assert '"a": <integer>' in payload["candidate_prompt_patch"]
+    assert payload["corrected_reference_output"] == {"a": 18, "b": 8}
+
+
+def test_teacher_extraction_prose_plus_fenced_json_with_nested_fences():
+    from local_harness.supervised_capability_loop import _extract_teacher_json_object
+    # Prose before and after a single explicit ```json fence that itself
+    # embeds a nested plain block; bounded trailing wrapper text is tolerated.
+    diagnosis_value = "\n```\n- item one\n- item two\n```\n"
+    payload_obj = {
+        "failure_classification": "prompt_contract_gap",
+        "teacher_diagnosis": diagnosis_value,
+        "retry_guidance": "Return JSON only.",
+    }
+    raw = (
+        "Here is my assessment of the failure.\n\n"
+        "```json\n"
+        + json.dumps(payload_obj, indent=2)
+        + "\n```\n\n"
+        "That should cover the observed failure mode."
+    )
+    payload, diagnosis = _extract_teacher_json_object(raw)
+    assert diagnosis == ""
+    assert payload is not None
+    assert payload == payload_obj
+    assert payload["failure_classification"] == "prompt_contract_gap"
+    assert "- item one" in payload["teacher_diagnosis"]
+    assert "- item two" in payload["teacher_diagnosis"]
+    assert payload["retry_guidance"] == "Return JSON only."
+
+
+def test_teacher_extraction_rejects_malformed_outer_json():
+    from local_harness.supervised_capability_loop import _extract_teacher_json_object
+    # A single explicit ```json fence whose body is NOT valid JSON (an
+    # unterminated string) must be rejected, not silently truncated.
+    raw = (
+        "```json\n"
+        "{\n"
+        "  \"failure_classification\": \"model_capability_insufficient\",\n"
+        "  \"teacher_diagnosis\": \"unterminated\n"
+        "}\n"
+        "```"
+    )
+    payload, diagnosis = _extract_teacher_json_object(raw)
+    assert payload is None
+    assert diagnosis != ""
+
+
+def test_teacher_extraction_rejects_multiple_competing_objects():
+    from local_harness.supervised_capability_loop import _extract_teacher_json_object
+    # Two competing top-level objects with no explicit fence: ambiguous, so
+    # the whole extraction is rejected rather than picking the first.
+    raw = 'First object {"failure_classification": "a"} then second object {"failure_classification": "b"}'
+    payload, diagnosis = _extract_teacher_json_object(raw)
+    assert payload is None
+    assert diagnosis != ""
+
+
+def test_teacher_extraction_valid_json_but_invalid_teacher_schema():
+    from local_harness.supervised_capability_loop import _extract_teacher_json_object, _parse_teacher
+    # Extraction succeeds (a valid JSON object) but the teacher payload is
+    # schema-invalid: its candidate_prompt_patch is a plain string rather than
+    # a valid patch object, so the strict schema validation rejects it.
+    # _parse_teacher keeps the parse "passed" (extraction recovered a dict) but
+    # must flag the patch candidate as invalid_candidate.
+    raw = json.dumps({
+        "failure_classification": "model_capability_insufficient",
+        "teacher_diagnosis": "Small model miscounts.",
+        "candidate_prompt_patch": "just a plain string, not a patch object",
+        "retry_guidance": "Escalate to a larger model.",
+    })
+    payload, diagnosis = _extract_teacher_json_object(raw)
+    assert diagnosis == ""
+    assert payload is not None
+    parsed = _parse_teacher(raw)
+    assert parsed["teacher_parse_status"] == "passed"
+    assert parsed["candidate_patch_status"] == "invalid_candidate"
+    # The invalid patch must NOT be carried through as a valid candidate.
+    assert "candidate_prompt_patch" not in parsed
+
+
+def test_teacher_extraction_ignores_hidden_reasoning_content():
+    from local_harness.supervised_capability_loop import _extract_teacher_json_object
+    from local_harness.icm_spec import WorkerResponse
+    # A response whose ONLY recoverable JSON lives in a hidden reasoning
+    # channel (raw_response.reasoning_content) and whose visible content is
+    # prose-only must not yield an object: the hidden channel is never scanned.
+    resp = WorkerResponse(
+        "ok",
+        "The model is miscounting the bullet items in the evidence block.",
+        "http://fixture/v1/chat/completions",
+        "small-1.7b",
+        "small-1.7b",
+        "stop",
+        {"completion_tokens": 5},
+        {"total_ms": 1},
+        {"reasoning_content": '{"failure_classification": "model_capability_insufficient", "corrected_reference_output": {"answer": 18}}'},
+    )
+    assert "corrected_reference_output" in resp.raw_response["reasoning_content"]
+    payload, diagnosis = _extract_teacher_json_object(resp.content)
+    assert payload is None
+    assert diagnosis != ""
+
+
+def test_teacher_extraction_preserved_spec_field_count_disagreement_shape():
+    from local_harness.supervised_capability_loop import _extract_teacher_json_object, _parse_teacher
+    # Reproduces the exact shape of the preserved failing teacher response from
+    # .work/dogfood/spec_field_count_disagreement_20260912/local-teacher-1.json
+    # (raw is stored as {"content": ...}; the visible content is raw["content"]).
+    # The old non-greedy fence regex truncated at the first nested ``` inside
+    # candidate_prompt_patch ("Unterminated string starting at"); JSON-aware
+    # recovery must now pass.
+    patch_value = (
+        "You are a bounded, read-only repository observer. Do not modify any file or state.\n"
+        "Do not fetch anything and do not use any tool. Answer using ONLY the two raw-evidence blocks inlined below. Do not add keys. Do not emit prose.\n\n"
+        "Task: Count the bullet-list items in each block below.\n\n"
+        "METHOD (follow exactly):\n"
+        "1. For Raw Evidence A, go line by line. For each line, check if it starts with the two characters '- '. If yes, increment a counter. Do not skip any line. The counter starts at 0.\n"
+        "2. For Raw Evidence B, do the same.\n"
+        "3. Report both final counters.\n\n"
+        "Raw evidence A \u2014 verbatim role-run evidence NOTE TEMPLATE (workflows/SUPERVISED_ROLE_RUN_EVIDENCE_NOTE_FORMAT.md):\n\n"
+        "```\n"
+        "## Supervised Role-Run Evidence Note\n\n"
+        "- Role used:\n"
+        "- Source prompt file:\n"
+        "- Active job packet:\n"
+        "- Human supervisor:\n"
+        "- Date:\n"
+        "- Purpose of role run:\n"
+        "- Authority source:\n"
+        "- Authority granted by active packet:\n"
+        "- Authorized file allowlist:\n"
+        "- Inputs reviewed:\n"
+        "- Output summary:\n"
+        "- Recommendations:\n"
+        "- Explicit non-authorizations:\n"
+        "- Actions performed under granted authority:\n"
+        "- Files changed:\n"
+        "- Stop conditions encountered:\n"
+        "- Follow-up packet candidates:\n"
+        "- Human decision:\n"
+        "```\n\n"
+        "Raw evidence B \u2014 verbatim 'Evidence To Record' list (workflows/SUPERVISED_MANAGEMENT_TEAM_USAGE_RULES.md):\n\n"
+        "- Active packet path.\n"
+        "- Role used.\n"
+        "- Prompt/input summary.\n"
+        "- Output summary.\n"
+        "- Files changed, if any.\n"
+        "- Verification run, if any.\n"
+        "- Human decision.\n"
+        "- Follow-up packet needed, if any.\n\n"
+        "Output EXACTLY one JSON object with these two keys and nothing else (no markdown, no code fences, no prose):\n"
+        "{\n"
+        "  \"evidence_note_template_field_count\": <integer>,\n"
+        "  \"usage_rules_evidence_to_record_count\": <integer>\n"
+        "}"
+    )
+    payload_obj = {
+        "failure_classification": "model_capability_insufficient",
+        "teacher_diagnosis": "The model (Qwen3-1.7B-Q4_K_M) consistently miscounts the bullet-list items in Raw Evidence A, reporting 11 instead of the correct 18. The count for Raw Evidence B (8) is correct in both attempts. The model likely truncates or loses track during enumeration of the longer list, a known limitation of small quantized models on sequential counting tasks. The prompt is unambiguous and the reference output is deterministic; the failure is purely a model capability gap, not a prompt ambiguity or transport issue.",
+        "candidate_prompt_patch": patch_value,
+        "retry_guidance": "The patch adds an explicit step-by-step counting method to reduce the chance of the small model losing track. However, given the model's consistent failure across two identical attempts (same prompt hash), there is low confidence this patch will succeed with Qwen3-1.7B-Q4_K_M. If the next attempt also fails, escalate to a larger model or accept the corrected reference output as the authoritative answer.",
+        "corrected_reference_output": {
+            "evidence_note_template_field_count": 18,
+            "usage_rules_evidence_to_record_count": 8,
+        },
+    }
+    content = "```json\n" + json.dumps(payload_obj, indent=2) + "\n```"
+    # raw is persisted as a dict whose "content" field is the visible string.
+    raw_record = {"raw": {"content": content}}
+
+    payload, diagnosis = _extract_teacher_json_object(raw_record["raw"]["content"])
+    assert diagnosis == ""
+    assert payload is not None
+    assert payload == payload_obj
+    # Both nested fenced blocks survive inside the string value.
+    assert "## Supervised Role-Run Evidence Note" in payload["candidate_prompt_patch"]
+    assert "- Human decision:" in payload["candidate_prompt_patch"]
+
+    parsed = _parse_teacher(raw_record["raw"]["content"])
+    assert parsed["teacher_parse_status"] == "passed"
+    assert parsed["failure_classification"] == "model_capability_insufficient"
+    assert parsed["corrected_reference_output"] == {
+        "evidence_note_template_field_count": 18,
+        "usage_rules_evidence_to_record_count": 8,
+    }

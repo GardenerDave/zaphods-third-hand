@@ -298,11 +298,22 @@ def _teacher_prompt(
     )
 
 
-_TEACHER_JSON_FENCE_RE = re.compile(r"```[ \t]*json[ \t]*\r?\n?(.*?)```", re.DOTALL | re.IGNORECASE)
+_TEACHER_JSON_FENCE_OPENER_RE = re.compile(r"```[ \t]*json[ \t]*\r?\n?", re.IGNORECASE)
+_TEACHER_JSON_FENCE_CLOSER_RE = re.compile(r"^[ \t]*```[ \t]*\r?$", re.MULTILINE)
+# Maximum number of characters of non-fence prose that may follow the closing
+# fence of the single explicit ``json`` fence.  Anything longer is treated as
+# wrapper text that competes with the object and is rejected as ambiguous.
+_FENCE_TRAILING_WRAPPER_MAX = 120
 
 
-def _teacher_json_fence_bodies(text: str) -> list[str]:
-    return [match.strip() for match in _TEACHER_JSON_FENCE_RE.findall(text)]
+def _teacher_json_fence_opener_count(text: str) -> int:
+    """Count explicit ``json`` fence openers (case-insensitive) in the text.
+
+    A nested ``` inside a JSON string value (for example inside
+    ``candidate_prompt_patch``) does NOT carry the ``json`` language tag, so it
+    is not counted here; only genuine ```json openers are.
+    """
+    return len(_TEACHER_JSON_FENCE_OPENER_RE.findall(text))
 
 
 def _teacher_embedded_json_objects(text: str) -> list[dict[str, Any]]:
@@ -327,15 +338,53 @@ def _teacher_embedded_json_objects(text: str) -> list[dict[str, Any]]:
     return objects
 
 
+def _teacher_explicit_fence_object(text: str) -> tuple[dict[str, Any] | None, str]:
+    """Recover the object inside a single explicit ```json fence, JSON-aware.
+
+    Locates the single explicit ``json`` opener, then uses
+    ``json.JSONDecoder().raw_decode()`` to find the actual object boundary.
+    ``raw_decode`` honors JSON string escaping, so triple backticks embedded in
+    a string value (for example nested evidence fences inside
+    ``candidate_prompt_patch``) do NOT terminate the extraction.  After the
+    object, only the expected outer closing fence, whitespace, and bounded
+    trailing wrapper text are tolerated.
+    """
+    openers = list(_TEACHER_JSON_FENCE_OPENER_RE.finditer(text))
+    if len(openers) != 1:
+        return None, "Teacher output did not contain exactly one explicit json fence."
+    start = openers[0].end()
+    brace = text.find("{", start)
+    if brace < 0:
+        return None, "Teacher json fence did not contain a JSON object."
+    try:
+        value, end = json.JSONDecoder().raw_decode(text, brace)
+    except json.JSONDecodeError as exc:
+        return None, f"Teacher json fence was not valid JSON: {exc.msg}"
+    if not isinstance(value, dict):
+        return None, "Teacher json fence was not a JSON object."
+    remainder = text[end:].strip()
+    if not remainder:
+        return value, ""
+    after_fence = remainder
+    closer = _TEACHER_JSON_FENCE_CLOSER_RE.match(remainder)
+    if closer:
+        after_fence = remainder[closer.end():].strip()
+    if len(after_fence) > _FENCE_TRAILING_WRAPPER_MAX:
+        return None, "Teacher json fence had excessive wrapper text after the closing fence."
+    return value, ""
+
+
 def _extract_teacher_json_object(raw: str) -> tuple[dict[str, Any] | None, str]:
     """Recover at most one top-level JSON object from visible teacher content.
 
     Preference order: (1) bare JSON object, (2) a single explicit ``json``
-    markdown fence, (3) otherwise one unambiguous top-level JSON object
+    markdown fence whose object is recovered with a JSON-aware ``raw_decode``
+    (embedded triple backticks inside string values do not terminate
+    extraction), (3) otherwise one unambiguous top-level JSON object
     recoverable from the visible content.  Only the visible ``raw`` string is
     scanned; no hidden reasoning channel is consulted.  A valid-JSON document
-    whose top level is not an object is rejected.  Ambiguous or absent objects
-    are rejected.
+    whose top level is not an object is rejected.  Malformed, ambiguous,
+    competing, or absent objects are rejected.
     """
     text = raw.strip()
     bare: Any = None
@@ -350,15 +399,8 @@ def _extract_teacher_json_object(raw: str) -> tuple[dict[str, Any] | None, str]:
         if isinstance(bare, dict):
             return bare, ""
         return None, "Teacher output was not a JSON object."
-    fenced = _teacher_json_fence_bodies(raw)
-    if len(fenced) == 1:
-        try:
-            value = json.loads(fenced[0])
-        except json.JSONDecodeError as exc:
-            return None, f"Teacher json fence was not valid JSON: {exc.msg}"
-        if isinstance(value, dict):
-            return value, ""
-        return None, "Teacher json fence was not a JSON object."
+    if _teacher_json_fence_opener_count(text) == 1:
+        return _teacher_explicit_fence_object(text)
     objects = _teacher_embedded_json_objects(raw)
     if len(objects) == 1:
         return objects[0], ""
